@@ -239,6 +239,7 @@ export type Database = {
           edit_at: string | null
           end_at: string | null
           id: string
+          is_coupon: boolean
           legacy_post_id: number
           published_at: string | null
           rating: number | null
@@ -261,6 +262,7 @@ export type Database = {
           edit_at?: string | null
           end_at?: string | null
           id?: string
+          is_coupon?: boolean
           legacy_post_id: number
           published_at?: string | null
           rating?: number | null
@@ -283,6 +285,7 @@ export type Database = {
           edit_at?: string | null
           end_at?: string | null
           id?: string
+          is_coupon?: boolean
           legacy_post_id?: number
           published_at?: string | null
           rating?: number | null
