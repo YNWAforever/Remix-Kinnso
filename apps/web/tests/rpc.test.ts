@@ -16,6 +16,13 @@ d('article RPCs', () => {
     expect(after.data!.views as number).toBe((before.data!.views as number) + 1)
   })
 
+  it('increment_article_view does NOT bump a draft / unpublished article', async () => {
+    const before = await svc.from('articles').select('views').eq('url', 'draft-article').single()
+    await svc.rpc('increment_article_view', { p_url: 'draft-article' })
+    const after = await svc.from('articles').select('views').eq('url', 'draft-article').single()
+    expect(after.data!.views as number).toBe(before.data!.views as number)
+  })
+
   it('get_you_may_like returns same-category published articles excluding self', async () => {
     const { data, error } = await svc.rpc('get_you_may_like', {
       p_article_id: '00000000-0000-0000-0000-000000000001', p_locale: 'en', p_limit: 5,

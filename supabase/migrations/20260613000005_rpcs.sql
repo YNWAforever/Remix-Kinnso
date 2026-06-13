@@ -1,6 +1,13 @@
+-- security definer so anon can bump the counter, but the WHERE clause mirrors
+-- the public-read RLS rules so views are only counted for visible articles
+-- (never for draft / expired / soft-deleted rows).
 create or replace function public.increment_article_view(p_url text)
 returns void language sql security definer set search_path = public as $$
-  update public.articles set views = views + 1 where url = p_url;
+  update public.articles set views = views + 1
+  where url = p_url
+    and published_at is not null and published_at <= now()
+    and (end_at is null or end_at >= now())
+    and deleted_at is null;
 $$;
 
 create or replace function public.get_you_may_like(p_article_id uuid, p_locale text, p_limit int default 5)

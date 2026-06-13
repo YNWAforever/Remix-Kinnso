@@ -31,7 +31,7 @@ create table public.article_tag_translations (
   tag_id uuid not null references public.article_tags(id) on delete cascade,
   locale text not null,
   name text not null,
-  unique (tag_id, locale)
+  primary key (tag_id, locale)
 );
 
 create table public.article_tag_map (
