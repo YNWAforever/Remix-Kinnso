@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+.pnp.*
+
+# turbo
+.turbo/
+
+# build output (apps have their own .gitignore for .next, etc.)
+dist/
+out/
+
+# env files (never commit secrets/keys; CI generates .env.test)
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# editor
+.vscode/
+.idea/
+
+# vercel
+.vercel
