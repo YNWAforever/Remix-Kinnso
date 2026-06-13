@@ -16,4 +16,15 @@ describe('cleanHtml', () => {
   it('strips javascript: hrefs', () => {
     expect(cleanHtml('<a href="javascript:alert(1)">x</a>')).not.toContain('javascript:')
   })
+  it('strips protocol-relative hrefs (open-redirect guard)', () => {
+    const out = cleanHtml('<a href="//evil.com">x</a>')
+    expect(out).not.toContain('//evil.com')
+    expect(out).toContain('>x</a>') // the anchor text survives, href removed
+  })
+  it('drops id attributes (DOM-clobbering guard)', () => {
+    expect(cleanHtml('<div id="__next">x</div>')).toBe('<div>x</div>')
+  })
+  it('drops name on anchors', () => {
+    expect(cleanHtml('<a name="body" href="https://x.com">x</a>')).not.toContain('name=')
+  })
 })

@@ -9,11 +9,11 @@ const OPTIONS: sanitizeHtml.IOptions = {
     'table', 'thead', 'tbody', 'tr', 'th', 'td',
   ],
   allowedAttributes: {
-    a: ['href', 'name', 'target', 'rel'],
+    a: ['href', 'target', 'rel'],
     img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
-    '*': ['id'],
   },
   allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+  allowProtocolRelative: false,
   transformTags: {
     a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer nofollow' }, true),
   },
