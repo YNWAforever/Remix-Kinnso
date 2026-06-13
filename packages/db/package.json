@@ -1,0 +1,10 @@
+{
+  "name": "@kinnso/db",
+  "version": "0.0.0",
+  "private": true,
+  "main": "types.ts",
+  "types": "types.ts",
+  "scripts": {
+    "gen": "supabase gen types typescript --linked > types.ts"
+  }
+}
