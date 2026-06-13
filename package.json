@@ -10,6 +10,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
+    "supabase": "^2.106.0",
     "turbo": "^2.1.0"
   }
 }
