@@ -40,7 +40,7 @@ export default async function ArticlesHubPage({ params }: { params: Promise<{ lo
         <section key={s.category} className="mb-10">
           <div className="flex items-baseline justify-between mb-4">
             <h2 className="text-2xl font-bold">{dict.categories[s.category]}</h2>
-            <Link href={`/${loc}/articles/${s.category}`} className="text-orange text-sm">→</Link>
+            <Link href={`/${loc}/articles/${s.category}`} className="text-orange text-sm" aria-label={dict.categories[s.category]}>→</Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {s.items.map((r) => (
