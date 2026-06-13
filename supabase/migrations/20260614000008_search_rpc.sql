@@ -38,9 +38,16 @@ language sql stable security invoker set search_path = public as $$
   select url, category, thumbnails, rating, published_at, edit_at, title, summary,
          count(*) over () as total_count
   from base
-  order by coalesce(edit_at, published_at) desc
+  -- url is a stable, unique tiebreaker so LIMIT/OFFSET pagination is deterministic
+  -- when two articles share a coalesce(edit_at, published_at) timestamp.
+  order by coalesce(edit_at, published_at) desc, url asc
   limit p_limit offset p_offset;
 $$;
 
 grant execute on function public.search_articles(text, text, text, text, text, int, int)
   to anon, authenticated;
+
+-- Supports the search ordering (avoids a heap sort as the corpus grows). coalesce
+-- over two stable timestamp columns is immutable, so an expression index is valid.
+create index if not exists articles_sort_idx
+  on public.articles (coalesce(edit_at, published_at) desc);
