@@ -24,7 +24,7 @@ async function getRedirects(): Promise<Map<string, string>> {
   return map
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
   const decision = resolveRequest(pathname, await getRedirects())
   if (decision.type === 'redirect') {
