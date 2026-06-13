@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import { LOCALES, toUrlCategory, type Locale } from '@/lib/i18n/config'
@@ -39,9 +40,9 @@ export interface ArticleDetail {
 
 /** Detail fetch: article (RLS-gated) for a given URL **category + url**, requested-locale translation,
  *  FAQs (visible, weight desc) and the first active author. Returns null when not visible or category mismatches. */
-export async function getArticleDetail(
+export const getArticleDetail = cache(async (
   urlCategory: string, url: string, locale: Locale,
-): Promise<ArticleDetail | null> {
+): Promise<ArticleDetail | null> => {
   const { data, error } = await db()
     .from('articles')
     .select('*, article_translations(*)')
@@ -94,10 +95,10 @@ export async function getArticleDetail(
       : null,
     faqs, author,
   }
-}
+})
 
 /** Locales that have a translation for a (visible) article — drives hreflang + sitemap. */
-export async function getPresentLocales(url: string): Promise<Locale[]> {
+export const getPresentLocales = cache(async (url: string): Promise<Locale[]> => {
   const { data, error } = await db()
     .from('articles')
     .select('article_translations(locale)')
@@ -107,7 +108,7 @@ export async function getPresentLocales(url: string): Promise<Locale[]> {
   if (!data) return []
   const set = new Set((data.article_translations ?? []).map((t) => t.locale))
   return LOCALES.filter((l) => set.has(l))
-}
+})
 
 export async function getYouMayLike(articleId: string, locale: Locale, limit = 5) {
   const { data, error } = await db().rpc('get_you_may_like', {

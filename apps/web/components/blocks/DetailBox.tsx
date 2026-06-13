@@ -1,5 +1,10 @@
 import React from 'react'
 
+/** Only allow http(s) links from CMS-authored structured fields (these bypass cleanHtml). */
+function safeHref(url?: string): string | undefined {
+  return url && /^https?:\/\//i.test(url) ? url : undefined
+}
+
 export function DetailBox({
   id, title, time, price, phone, address, website,
 }: {
@@ -10,13 +15,15 @@ export function DetailBox({
   if (time) rows.push(['🕑', time])
   if (price) rows.push(['💰', price])
   if (phone) rows.push(['📞', phone])
+  const addressHref = safeHref(address?.link)
   if (address?.label)
-    rows.push(['📍', address.link
-      ? <a href={address.link} target="_blank" rel="noopener noreferrer nofollow" className="text-info underline">{address.label}</a>
+    rows.push(['📍', addressHref
+      ? <a href={addressHref} target="_blank" rel="noopener noreferrer nofollow" className="text-info underline">{address.label}</a>
       : address.label])
+  const websiteHref = safeHref(website?.link)
   if (website?.label)
-    rows.push(['🔗', website.link
-      ? <a href={website.link} target="_blank" rel="noopener noreferrer nofollow" className="text-info underline">{website.label}</a>
+    rows.push(['🔗', websiteHref
+      ? <a href={websiteHref} target="_blank" rel="noopener noreferrer nofollow" className="text-info underline">{website.label}</a>
       : website.label])
   return (
     <section id={id} className="scroll-mt-24 mb-8 rounded-card border border-cream-2 p-5">
