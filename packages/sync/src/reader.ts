@@ -9,16 +9,16 @@ export class LegacyReader {
   }
   async close() { await this.pool.end() }
 
-  /** All non-deleted post ids, ascending (for backfill pagination). */
+  /** Published, non-deleted post ids, ascending (for backfill pagination). */
   async allPostIds(afterId = 0, limit = 200): Promise<number[]> {
     const [rows] = await this.pool.query<any[]>(
-      'select id from posts where id > :afterId and deleted_at is null order by id asc limit :limit',
+      'select id from posts where id > :afterId and deleted_at is null and published_at is not null order by id asc limit :limit',
       { afterId, limit },
     )
     return rows.map((r) => Number(r.id))
   }
 
-  /** Assemble one post bundle (includes soft-deleted post so the sync can propagate deletion). */
+  /** Assemble one post bundle (includes unpublished/soft-deleted posts so the sync can propagate removal). */
   async fetchPostBundle(id: number): Promise<LegacyPostBundle | null> {
     const [posts] = await this.pool.query<any[]>(
       'select id, slug, url, thumbnails, authors, regions, offers, rating, views, published_at, end_at, edit_at, source, deleted_at, updated_at from posts where id = :id',
@@ -36,9 +36,11 @@ export class LegacyReader {
       'select language, question, answer, weight from post_faqs where post_slug = :slug and deleted_at is null order by weight desc',
       { slug },
     )
+    // FIND_IN_SET is whitespace-sensitive; legacy stores `posts.authors` space-free, but
+    // strip any stray whitespace defensively so `author-a, author-b` still resolves both.
     const [authorRows] = await this.pool.query<any[]>(
       'select slug, language, name, image, job_title, description, show_in_author_page, labels from post_authors where deleted_at is null and find_in_set(slug, :authors)',
-      { authors: post.authors ?? '' },
+      { authors: (post.authors ?? '').replace(/\s+/g, '') },
     )
     const [catW] = await this.pool.query<any[]>(
       'select category_slug, weight from post_category_weights where post_slug = :slug and deleted_at is null',

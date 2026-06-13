@@ -17,21 +17,30 @@ function rewriteImages(value: unknown, cdn: string): unknown {
   return value
 }
 
-/** Parse legacy content JSON text → array of blocks with stable ids + CDN-rewritten images. Stored verbatim otherwise. */
-export function normalizeContent(raw: string | null | undefined, cdn: string): Block[] {
-  if (!raw) return []
+/**
+ * Parse legacy content JSON text → blocks with stable ids + CDN-rewritten images.
+ * Returns `null` ONLY on a genuine failure (missing text, invalid JSON, or non-array)
+ * so the caller can warn; returns `[]` for a valid-but-empty array (NOT a failure).
+ */
+export function tryParseBlocks(raw: string | null | undefined, cdn: string): Block[] | null {
+  if (!raw) return null
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
   } catch {
-    return [] // caller logs; other locales still render
+    return null
   }
-  if (!Array.isArray(parsed)) return []
+  if (!Array.isArray(parsed)) return null
   return parsed.map((b, i) => {
     const block = (b && typeof b === 'object' ? b : {}) as Record<string, unknown>
     const rewritten = rewriteImages(block, cdn) as Record<string, unknown>
     return { ...rewritten, type: String(block.type ?? 'unknown'), id: `block-${i}` } as Block
   })
+}
+
+/** Parse legacy content JSON text → blocks; `[]` for missing/invalid (other locales still render). */
+export function normalizeContent(raw: string | null | undefined, cdn: string): Block[] {
+  return tryParseBlocks(raw, cdn) ?? []
 }
 
 const stripHtml = (s: string) => s.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()

@@ -34,4 +34,17 @@ describe('transformPost', () => {
     const edited = { ...legacyPost, post: { ...legacyPost.post, edit_at: '2099-01-01 00:00:00' } }
     expect(sourceHash(edited)).not.toBe(h1)
   })
+
+  it('rewrites og_image from meta_tags through the CDN', () => {
+    const en = out.translations.find((t) => t.locale === 'en')!
+    expect(en.og_image).toBe('https://cdn.x/og.webp')
+  })
+
+  it('warns on malformed content JSON but NOT on a valid-but-empty array', () => {
+    const en = legacyPost.translations.find((t) => t.locale === 'en')!
+    const empty = transformPost({ ...legacyPost, translations: [{ ...en, content: '[]' }] }, cdn)
+    expect(empty.warnings.some((w) => w.kind === 'content_parse_failed')).toBe(false)
+    const bad = transformPost({ ...legacyPost, translations: [{ ...en, content: 'not json' }] }, cdn)
+    expect(bad.warnings.some((w) => w.kind === 'content_parse_failed')).toBe(true)
+  })
 })
