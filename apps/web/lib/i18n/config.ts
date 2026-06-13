@@ -6,7 +6,10 @@ export function isLocale(x: string): x is Locale {
   return (LOCALES as readonly string[]).includes(x)
 }
 
-/** Split `/zh-hk/rest` -> { locale:'zh-hk', rest:'/rest' }; no prefix -> { locale:null, rest:path }. */
+/**
+ * Split `/zh-hk/rest` -> { locale:'zh-hk', rest:'/rest' }; no prefix -> { locale:null, rest:path }.
+ * `pathname` must start with `/` as provided by Next.js `request.nextUrl.pathname`.
+ */
 export function parsePathname(pathname: string): { locale: Locale | null; rest: string } {
   const seg = pathname.split('/')[1] ?? ''
   if (isLocale(seg)) {
@@ -34,8 +37,8 @@ const DB_TO_URL: Record<DbCategory, UrlCategory> = {
 }
 /** null for unrouted segments (e.g. legacy `promotion`). */
 export function toDbCategory(seg: string): DbCategory | null {
-  return (URL_TO_DB as Record<string, DbCategory>)[seg] ?? null
+  return Object.hasOwn(URL_TO_DB, seg) ? URL_TO_DB[seg as UrlCategory] : null
 }
 export function toUrlCategory(cat: string): UrlCategory | null {
-  return (DB_TO_URL as Record<string, UrlCategory>)[cat] ?? null
+  return Object.hasOwn(DB_TO_URL, cat) ? DB_TO_URL[cat as DbCategory] : null
 }

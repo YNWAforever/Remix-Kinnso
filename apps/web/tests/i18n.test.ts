@@ -24,6 +24,20 @@ describe('i18n config', () => {
     expect(htmlLang('zh-cn')).toBe('zh-Hans-CN')
     expect(htmlLang('en')).toBe('en')
   })
+  it('htmlLang returns correct value for all 7 locales', () => {
+    expect(htmlLang('en')).toBe('en')
+    expect(htmlLang('zh-hk')).toBe('zh-Hant-HK')
+    expect(htmlLang('zh-tw')).toBe('zh-Hant-TW')
+    expect(htmlLang('zh-cn')).toBe('zh-Hans-CN')
+    expect(htmlLang('ja')).toBe('ja')
+    expect(htmlLang('ko')).toBe('ko')
+    expect(htmlLang('th')).toBe('th')
+  })
+  it('toDbCategory and toUrlCategory return null for prototype keys', () => {
+    expect(toDbCategory('constructor')).toBeNull()
+    expect(toDbCategory('toString')).toBeNull()
+    expect(toUrlCategory('hasOwnProperty')).toBeNull()
+  })
   it('maps plural URL category <-> singular db category', () => {
     expect(URL_CATEGORIES).toEqual(['destinations', 'dining', 'shopping'])
     expect(toDbCategory('destinations')).toBe('destination')
