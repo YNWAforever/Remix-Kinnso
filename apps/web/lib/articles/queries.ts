@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
-import { DEFAULT_LOCALE, LOCALES, toUrlCategory, type Locale } from '@/lib/i18n/config'
+import { LOCALES, toUrlCategory, type Locale } from '@/lib/i18n/config'
 
 // Plain anon client so this helper is testable in Node without Next's
 // request-scoped `cookies()`. RLS still hides unpublished/expired rows.
@@ -11,11 +11,12 @@ const db = () =>
   )
 
 export async function getArticleByUrl(url: string, locale: string) {
-  const { data } = await db()
+  const { data, error } = await db()
     .from('articles')
     .select('*, article_translations(*)')
     .eq('url', url)
     .maybeSingle()
+  if (error) throw error
   if (!data) return null
   const translation =
     (data.article_translations ?? []).find((t) => t.locale === locale) ?? null
@@ -41,34 +42,42 @@ export interface ArticleDetail {
 export async function getArticleDetail(
   urlCategory: string, url: string, locale: Locale,
 ): Promise<ArticleDetail | null> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from('articles')
     .select('*, article_translations(*)')
     .eq('url', url)
     .maybeSingle()
+  if (error) throw error
   if (!data) return null
   if (toUrlCategory(data.category) !== urlCategory) return null
 
   const translation =
     (data.article_translations ?? []).find((t) => t.locale === locale) ?? null
 
-  const { data: faqRows } = await db()
-    .from('article_faqs')
-    .select('question, answer, weight')
-    .eq('article_id', data.id).eq('locale', locale)
-    .order('weight', { ascending: false })
+  const firstSlug = (data.authors ?? [])[0]
+
+  const [faqResult, authorResult] = await Promise.all([
+    db()
+      .from('article_faqs')
+      .select('question, answer, weight')
+      .eq('article_id', data.id).eq('locale', locale)
+      .order('weight', { ascending: false }),
+    firstSlug
+      ? db()
+          .from('article_authors')
+          .select('name, title, bio, avatar')
+          .eq('slug', firstSlug).eq('locale', locale).eq('is_active', true)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ])
+
+  const { data: faqRows, error: faqError } = faqResult
+  if (faqError) throw faqError
   const faqs = faqRows ?? []
 
-  let author: ArticleDetail['author'] = null
-  const firstSlug = (data.authors ?? [])[0]
-  if (firstSlug) {
-    const { data: au } = await db()
-      .from('article_authors')
-      .select('name, title, bio, avatar')
-      .eq('slug', firstSlug).eq('locale', locale).eq('is_active', true)
-      .maybeSingle()
-    author = au ?? null
-  }
+  const { data: au, error: authorError } = authorResult
+  if (authorError) throw authorError
+  const author: ArticleDetail['author'] = au ?? null
 
   return {
     id: data.id, url: data.url, slug: data.slug, category: data.category,
@@ -89,20 +98,22 @@ export async function getArticleDetail(
 
 /** Locales that have a translation for a (visible) article — drives hreflang + sitemap. */
 export async function getPresentLocales(url: string): Promise<Locale[]> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from('articles')
     .select('article_translations(locale)')
     .eq('url', url)
     .maybeSingle()
+  if (error) throw error
   if (!data) return []
   const set = new Set((data.article_translations ?? []).map((t) => t.locale))
   return LOCALES.filter((l) => set.has(l))
 }
 
 export async function getYouMayLike(articleId: string, locale: Locale, limit = 5) {
-  const { data } = await db().rpc('get_you_may_like', {
+  const { data, error } = await db().rpc('get_you_may_like', {
     p_article_id: articleId, p_locale: locale, p_limit: limit,
   })
+  if (error) throw error
   return data ?? []
 }
 
@@ -118,10 +129,13 @@ export interface SearchResult {
   total: number; page: number; perPage: number
 }
 
+// Note: when the requested page is beyond the last page the RPC returns 0 rows,
+// so `total` reports 0 (the window count rides on the rows). This is fine for ISR
+// listing pagination which can't reach an out-of-range page.
 export async function searchArticles(p: SearchParams): Promise<SearchResult> {
   const page = Math.max(1, p.page ?? 1)
   const perPage = p.perPage ?? 12
-  const { data } = await db().rpc('search_articles', {
+  const { data, error } = await db().rpc('search_articles', {
     p_locale: p.locale,
     ...(p.category != null && { p_category: p.category }),
     ...(p.q != null && { p_q: p.q }),
@@ -129,9 +143,11 @@ export async function searchArticles(p: SearchParams): Promise<SearchResult> {
     ...(p.tag != null && { p_tag: p.tag }),
     p_limit: perPage, p_offset: (page - 1) * perPage,
   })
+  if (error) throw error
   const rows = data ?? []
   const total = rows.length ? Number(rows[0].total_count) : 0
   return {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- strip total_count from each item
     items: rows.map(({ total_count, ...r }) => r),
     total, page, perPage,
   }
@@ -139,9 +155,10 @@ export async function searchArticles(p: SearchParams): Promise<SearchResult> {
 
 /** All visible articles + their present locales — for sitemap.ts. */
 export async function getPublishedForSitemap() {
-  const { data } = await db()
+  const { data, error } = await db()
     .from('articles')
     .select('url, category, edit_at, updated_at, published_at, article_translations(locale)')
+  if (error) throw error
   return (data ?? []).map((a) => ({
     url: a.url, category: a.category,
     lastmod: a.edit_at ?? a.updated_at ?? a.published_at,
@@ -151,10 +168,11 @@ export async function getPublishedForSitemap() {
 
 /** Evergreen (end_at null) published articles, expanded across present locales — generateStaticParams. */
 export async function getStaticArticleParams(): Promise<Array<{ locale: Locale; category: string; url: string }>> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from('articles')
     .select('url, category, end_at, article_translations(locale)')
     .is('end_at', null)
+  if (error) throw error
   const out: Array<{ locale: Locale; category: string; url: string }> = []
   for (const a of data ?? []) {
     const category = toUrlCategory(a.category)
