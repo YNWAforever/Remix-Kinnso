@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { buildArticleMetadata, SITE_URL } from '@/lib/seo/metadata'
+import { buildArticleMetadata, buildListingMetadata, SITE_URL } from '@/lib/seo/metadata'
+import { LOCALES } from '@/lib/i18n/config'
 
 const base = {
   urlCategory: 'dining' as const, url: 'ramen-guide', locale: 'en' as const,
@@ -34,5 +35,22 @@ describe('buildArticleMetadata', () => {
   it('noindexes EN coupon articles only', () => {
     expect((buildArticleMetadata({ ...base, isCoupon: true, locale: 'en' }).robots as any).index).toBe(false)
     expect((buildArticleMetadata({ ...base, isCoupon: true, locale: 'zh-hk' }).robots as any).index).toBe(true)
+  })
+})
+
+describe('buildListingMetadata', () => {
+  it('category: canonical, all 7 locale hreflang keys + x-default, correct URLs', () => {
+    const m = buildListingMetadata({ urlCategory: 'dining', locale: 'en', presentLocales: LOCALES, title: 'Dining' })
+    expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles/dining`)
+    const langs = m.alternates!.languages as Record<string, string>
+    expect(Object.keys(langs).sort()).toEqual([...LOCALES, 'x-default'].sort())
+    expect(langs['x-default']).toBe(`${SITE_URL}/en/articles/dining`)
+    expect(langs['zh-hk']).toBe(`${SITE_URL}/zh-hk/articles/dining`)
+    expect((m.robots as any).index).toBe(true)
+  })
+
+  it('hub (urlCategory null): canonical points to /articles without category segment', () => {
+    const m = buildListingMetadata({ urlCategory: null, locale: 'en', presentLocales: LOCALES, title: 'Articles' })
+    expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles`)
   })
 })

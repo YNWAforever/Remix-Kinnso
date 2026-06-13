@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { searchArticles } from '@/lib/articles/queries'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { isLocale, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
+import { isLocale, toDbCategory, LOCALES, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
 import { buildListingMetadata } from '@/lib/seo/metadata'
 import { ArticleCard } from '@/components/ArticleCard'
 
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const dict = await getDictionary(locale as Locale)
   return buildListingMetadata({
     urlCategory: null, locale: locale as Locale,
-    presentLocales: ['en', 'zh-hk', 'zh-tw', 'ja', 'ko', 'th', 'zh-cn'],
+    presentLocales: LOCALES,
     title: dict.breadcrumb.articles,
   })
 }
@@ -29,7 +29,7 @@ export default async function ArticlesHubPage({ params }: { params: Promise<{ lo
   const sections = await Promise.all(
     URL_CATEGORIES.map(async (c) => ({
       category: c as UrlCategory,
-      items: (await searchArticles({ locale: loc, category: c === 'destinations' ? 'destination' : c, perPage: 6 })).items,
+      items: (await searchArticles({ locale: loc, category: toDbCategory(c)!, perPage: 6 })).items,
     })),
   )
 

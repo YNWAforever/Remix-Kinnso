@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import { DEFAULT_LOCALE, type Locale, type UrlCategory } from '@/lib/i18n/config'
 
+const OG_LOCALE: Record<Locale, string> = {
+  en: 'en_US', 'zh-hk': 'zh_HK', 'zh-tw': 'zh_TW', 'zh-cn': 'zh_CN', ja: 'ja_JP', ko: 'ko_KR', th: 'th_TH',
+}
+
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.kinnso.ai'
 
 export interface ArticleMetaInput {
@@ -31,7 +35,7 @@ export function buildArticleMetadata(i: ArticleMetaInput): Metadata {
       images: i.ogImage ? [i.ogImage] : [],
       publishedTime: i.publishedAt ?? undefined,
       modifiedTime: i.editAt ?? i.publishedAt ?? undefined,
-      locale: i.locale,
+      locale: OG_LOCALE[i.locale],
     },
     robots: { index, follow: true, 'max-image-preview': 'large' },
   }

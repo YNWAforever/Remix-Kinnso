@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { searchArticles } from '@/lib/articles/queries'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { isLocale, toDbCategory, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
+import { isLocale, toDbCategory, LOCALES, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
 import { buildListingMetadata } from '@/lib/seo/metadata'
 import { ArticleCard } from '@/components/ArticleCard'
 import { Pagination } from '@/components/Pagination'
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const dict = await getDictionary(locale as Locale)
   return buildListingMetadata({
     urlCategory: category as UrlCategory, locale: locale as Locale,
-    presentLocales: ['en', 'zh-hk', 'zh-tw', 'ja', 'ko', 'th', 'zh-cn'],
+    presentLocales: LOCALES,
     title: dict.categories[category as UrlCategory],
   })
 }
