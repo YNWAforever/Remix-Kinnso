@@ -8,8 +8,27 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+}
+
+/* KINNSO brand design tokens (Tailwind v4 @theme) */
+@theme {
+  --color-orange: #F26A1F;
+  --color-orange-dark: #C24E0E;
+  --color-amber: #F4A52A;
+  --color-cream: #FFF6EB;
+  --color-cream-2: #FFEFD9;
+  --color-ink: #1F1A14;
+  --color-muted: #7B7468;
+  --color-success: #2F8F5C;
+  --color-danger: #D24A3B;
+  --color-info: #2E6FB8;
+
+  --radius-card: 12px;
+  --radius-chip: 8px;
+  --radius-pill: 999px;
+
+  --font-sans: "DM Sans", "WQY Zen Hei", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +41,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
