@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { searchArticles, getPresentLocales } from '@/lib/articles/queries'
+import { searchArticles } from '@/lib/articles/queries'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale, toDbCategory, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
 import { buildListingMetadata } from '@/lib/seo/metadata'
