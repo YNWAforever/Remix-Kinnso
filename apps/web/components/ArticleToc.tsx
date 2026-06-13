@@ -3,6 +3,15 @@ import { useEffect, useState } from 'react'
 
 export function ArticleToc({ items, label }: { items: Array<{ id: string; title: string }>; label: string }) {
   const [active, setActive] = useState<string | null>(items[0]?.id ?? null)
+  // Reset active heading when the items list changes (e.g. navigating to a new article).
+  // Storing the previous items identity in state is the React-docs "adjusting state during
+  // rendering" pattern — the setState during render is only called when prevItems !== items,
+  // so it short-circuits immediately without triggering an extra effect.
+  const [prevItems, setPrevItems] = useState(items)
+  if (prevItems !== items) {
+    setPrevItems(items)
+    setActive(items[0]?.id ?? null)
+  }
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id) }),
