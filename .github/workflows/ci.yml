@@ -1,0 +1,40 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pinned packageManager (pnpm@x) from package.json
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+
+      # Local Supabase stack (Docker is available on GitHub-hosted runners).
+      # `supabase start` applies supabase/migrations and seeds supabase/seed.sql.
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: pnpm supabase start
+
+      - name: Export local Supabase env for tests
+        run: |
+          pnpm -s supabase status -o env \
+            --override-name api.url=SUPABASE_URL \
+            --override-name auth.anon_key=SUPABASE_ANON_KEY \
+            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            > apps/web/.env.test
+
+      - run: pnpm test

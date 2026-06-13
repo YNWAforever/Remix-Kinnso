@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "regions": ["hkg1"],
+  "buildCommand": "cd ../.. && pnpm --filter web build",
+  "installCommand": "cd ../.. && pnpm install"
+}
