@@ -6,8 +6,10 @@ packages:
 #   sharp         – Next.js image optimization (prebuilt binaries)
 #   unrs-resolver – fast module resolution used by eslint-config-next
 allowBuilds:
+  esbuild: true
   sharp: true
   unrs-resolver: true
 onlyBuiltDependencies:
+  - esbuild
   - sharp
   - unrs-resolver
