@@ -339,6 +339,28 @@ export type Database = {
         }[]
       }
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
+      search_articles: {
+        Args: {
+          p_category?: string
+          p_limit?: number
+          p_locale: string
+          p_offset?: number
+          p_q?: string
+          p_region?: string
+          p_tag?: string
+        }
+        Returns: {
+          category: string
+          edit_at: string
+          published_at: string
+          rating: number
+          summary: string
+          thumbnails: string[]
+          title: string
+          total_count: number
+          url: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
