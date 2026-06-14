@@ -18,6 +18,12 @@ export default async function SignInPage({
   const { error } = await searchParams
   const dict = await getDictionary(locale as Locale)
 
+  // Map the attacker-controllable ?error= param through a whitelist of known
+  // codes to a localized string. Anything unrecognized renders no banner —
+  // never reflect the raw query value into the alert (text-injection/phishing).
+  // The auth callback route emits ?error=callback on exchange failure.
+  const serverError = error === 'callback' ? dict.auth.errorGeneric : undefined
+
   // If already signed in, skip to the creator area.
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -36,7 +42,7 @@ export default async function SignInPage({
         }}
         errorInvalidCredentials={dict.auth.errorInvalidCredentials}
         errorGeneric={dict.auth.errorGeneric}
-        serverError={error}
+        serverError={serverError}
       />
 
       <p className="text-sm text-ink/70">

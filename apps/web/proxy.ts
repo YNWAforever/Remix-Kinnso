@@ -42,7 +42,12 @@ export async function proxy(req: NextRequest) {
     const url = req.nextUrl.clone()
     url.pathname = gate.location
     url.search = ''
-    return NextResponse.redirect(url, 307)
+    const res = NextResponse.redirect(url, 307)
+    // Copy the refreshed Supabase auth cookies from updateSession onto the
+    // redirect response. @supabase/ssr middleware requires these Set-Cookie
+    // headers to propagate or the rotated refresh token is lost (silent logout).
+    sessionResponse.cookies.getAll().forEach((c) => res.cookies.set(c))
+    return res
   }
 
   // 3. Existing redirect + locale-guard logic (unchanged).
@@ -51,7 +56,11 @@ export async function proxy(req: NextRequest) {
     const url = req.nextUrl.clone()
     url.pathname = decision.location
     url.search = decision.status === 301 ? '' : req.nextUrl.search
-    return NextResponse.redirect(url, decision.status)
+    const res = NextResponse.redirect(url, decision.status)
+    // Same as above: preserve refreshed Supabase auth cookies across the
+    // locale/SEO redirect so @supabase/ssr can rotate the session correctly.
+    sessionResponse.cookies.getAll().forEach((c) => res.cookies.set(c))
+    return res
   }
 
   // 4. Pass through, returning the session response so Set-Cookie headers

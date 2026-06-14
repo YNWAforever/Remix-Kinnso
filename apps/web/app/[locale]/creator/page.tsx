@@ -1,5 +1,4 @@
 import { redirect, notFound } from 'next/navigation'
-import Link from 'next/link'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
