@@ -38,6 +38,8 @@ export function buildArticleRow(
       thumbnails: csvToArray(p.thumbnails).map((t) => cdnUrl(t, cdn)),
       authors: csvToArray(p.authors),
       regions: csvToArray(p.regions),
+      // Legacy excluded EN coupon listings from the index; a post with offers is a coupon.
+      is_coupon: csvToArray(p.offers).length > 0,
       tag_slugs: tagSlugs,
       rating: p.rating ?? null,
       views: p.views ?? 0,

@@ -20,6 +20,12 @@ describe('transformPost', () => {
     expect(typeof out.article.source_hash).toBe('string')
   })
 
+  it('sets is_coupon when the legacy post has offers (drives EN-coupon noindex/search-exclude)', () => {
+    expect(transformPost({ ...legacyPost, post: { ...legacyPost.post, offers: 'COUPON10,SALE' } }, cdn).article.is_coupon).toBe(true)
+    expect(transformPost({ ...legacyPost, post: { ...legacyPost.post, offers: null } }, cdn).article.is_coupon).toBe(false)
+    expect(transformPost({ ...legacyPost, post: { ...legacyPost.post, offers: '' } }, cdn).article.is_coupon).toBe(false)
+  })
+
   it('fans out only present locales; fixes en meta_description leak', () => {
     expect(out.translations.map((t) => t.locale).sort()).toEqual(['en', 'zh-hk'])
     const en = out.translations.find((t) => t.locale === 'en')!
