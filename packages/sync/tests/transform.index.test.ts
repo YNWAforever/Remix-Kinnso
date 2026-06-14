@@ -15,7 +15,7 @@ describe('transformPost', () => {
     })
     expect(out.article.thumbnails).toEqual(['https://cdn.x/a.webp', 'https://cdn.x/b.webp'])
     expect(out.article.regions).toEqual(['jp', 'tokyo'])
-    expect(out.article.authors).toEqual(['jane-doe', 'ghost-author'])
+    expect(out.article.authors).toEqual(['best-ramen-author', 'ghost-author'])
     expect(out.article.tag_slugs).toEqual(['ramen'])
     expect(typeof out.article.source_hash).toBe('string')
   })

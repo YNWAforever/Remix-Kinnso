@@ -6,7 +6,7 @@ export const legacyPost: LegacyPostBundle = {
     slug: 'best-ramen-tokyo',
     url: 'best-ramen-tokyo',
     thumbnails: 'a.webp, b.webp',
-    authors: 'jane-doe,ghost-author',
+    authors: 'best-ramen-author,ghost-author',
     regions: 'jp, tokyo,',
     offers: '',
     rating: 4.5,
@@ -55,8 +55,8 @@ export const legacyPost: LegacyPostBundle = {
     { language: 'en', question: 'Hours?', answer: '11-22', weight: 0 },
   ],
   authors: [
-    { slug: 'jane-doe', language: 'en', name: 'Jane Doe', image: 'jane.webp', job_title: 'Editor', description: 'Bio', show_in_author_page: 1, labels: 'featured' },
-    { slug: 'jane-doe', language: 'zh-hk', name: '珍', image: 'jane.webp', job_title: '編輯', description: '簡介', show_in_author_page: 1, labels: '' },
+    { slug: 'best-ramen-author', language: 'en', name: 'Jane Doe', image: 'jane.webp', job_title: 'Editor', description: 'Bio', show_in_author_page: 1, labels: 'featured' },
+    { slug: 'best-ramen-author', language: 'zh-hk', name: '珍', image: 'jane.webp', job_title: '編輯', description: '簡介', show_in_author_page: 1, labels: '' },
   ],
   tags: [
     { slug: 'ramen', legacy_tag_id: 11, weight: 2, translations: [{ locale: 'en', name: 'Ramen' }, { locale: 'zh-hk', name: '拉麵' }] },
