@@ -302,6 +302,166 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_dna: {
+        Row: {
+          ai_draft: Json | null
+          created_at: string
+          creator_id: string
+          draft_ready_at: string | null
+          final: Json | null
+          id: string
+          model: string | null
+          scan_job_id: string | null
+          source: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_draft?: Json | null
+          created_at?: string
+          creator_id: string
+          draft_ready_at?: string | null
+          final?: Json | null
+          id?: string
+          model?: string | null
+          scan_job_id?: string | null
+          source?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_draft?: Json | null
+          created_at?: string
+          creator_id?: string
+          draft_ready_at?: string | null
+          final?: Json | null
+          id?: string
+          model?: string | null
+          scan_job_id?: string | null
+          source?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_dna_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_dna_scan_job_id_fkey"
+            columns: ["scan_job_id"]
+            isOneToOne: false
+            referencedRelation: "creator_scan_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_scan_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          creator_id: string
+          error: string | null
+          id: string
+          progress: Json
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          creator_id: string
+          error?: string | null
+          id?: string
+          progress?: Json
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          creator_id?: string
+          error?: string | null
+          id?: string
+          progress?: Json
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_scan_jobs_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_social_handles: {
+        Row: {
+          created_at: string
+          creator_id: string
+          handle: string
+          id: string
+          platform: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          handle: string
+          id?: string
+          platform: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          handle?: string
+          id?: string
+          platform?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_social_handles_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creators: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seo_redirects: {
         Row: {
           from_path: string
