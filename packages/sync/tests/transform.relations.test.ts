@@ -17,7 +17,7 @@ describe('transformTags', () => {
 describe('transformAuthors', () => {
   it('maps legacy author cols to article_authors rows (per slug+locale)', () => {
     const rows = transformAuthors(legacyPost.authors, 'https://cdn.x')
-    const en = rows.find((r) => r.slug === 'jane-doe' && r.locale === 'en')!
+    const en = rows.find((r) => r.slug === 'best-ramen-author' && r.locale === 'en')!
     expect(en).toMatchObject({ name: 'Jane Doe', title: 'Editor', bio: 'Bio', is_active: true })
     expect(en.avatar).toBe('https://cdn.x/jane.webp')
   })
