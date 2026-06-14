@@ -1,0 +1,73 @@
+name: Verify (cutover gate)
+
+# Post-deploy + on-demand. Targets the LIVE deploy, so it runs AFTER a deploy succeeds —
+# it cannot be a pre-merge gate on the URL that very deploy produces. The pre-merge gate
+# stays ci.yml (typecheck/lint/test, which includes @kinnso/parity's offline engine tests).
+#
+# To use as a PRE-MERGE gate instead: point E2E_BASE_URL / BASE_URL at a Vercel PREVIEW
+# deployment (or a local `next start`) and trigger via workflow_dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: Target base URL (defaults to the production deploy)
+        required: false
+        default: https://remix-kinnso-web.vercel.app
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: ${{ github.event.inputs.base_url || github.event.deployment_status.environment_url || vars.VERIFY_BASE_URL || 'https://remix-kinnso-web.vercel.app' }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Parity gate (fails on coverage gaps)
+        run: |
+          set -o pipefail
+          pnpm --filter @kinnso/parity parity -- --json | tee parity-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parity-report
+          path: parity-report.json
+
+  e2e:
+    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    env:
+      E2E_BASE_URL: ${{ github.event.inputs.base_url || github.event.deployment_status.environment_url || vars.VERIFY_BASE_URL || 'https://remix-kinnso-web.vercel.app' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm --filter @kinnso/e2e exec playwright install --with-deps chromium
+      - name: Playwright E2E (blocks on failure)
+        run: pnpm --filter @kinnso/e2e e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/e2e/playwright-report/
+      - name: Lighthouse CWV (warn-only, never fails this job)
+        if: always()
+        run: pnpm --filter @kinnso/e2e cwv
+        continue-on-error: true
