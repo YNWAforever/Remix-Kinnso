@@ -4,6 +4,13 @@ name: Verify (cutover gate)
 # it cannot be a pre-merge gate on the URL that very deploy produces. The pre-merge gate
 # stays ci.yml (typecheck/lint/test, which includes @kinnso/parity's offline engine tests).
 #
+# AUTO-TRIGGER SCOPE: a Vercel deployment_status fires for EVERY deploy — the web app AND
+# the sync API app, production AND every PR preview. Only the PRODUCTION WEB deploy is a
+# valid target for this gate (the sync URL serves the Hono API, not the rendered site, and
+# previews lack the gate's secrets). The job `if:` below therefore requires environment
+# 'Production' and an environment_url on the remix-kinnso-web project; everything else is
+# skipped (neutral, not failed). This keeps preview/sync deploys from posting red X's on PRs.
+#
 # To use as a PRE-MERGE gate instead: point E2E_BASE_URL / BASE_URL at a Vercel PREVIEW
 # deployment (or a local `next start`) and trigger via workflow_dispatch.
 
@@ -21,7 +28,11 @@ permissions:
 
 jobs:
   parity:
-    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment_status.environment == 'Production' &&
+       contains(github.event.deployment_status.environment_url, 'remix-kinnso-web'))
     runs-on: ubuntu-latest
     env:
       BASE_URL: ${{ github.event.inputs.base_url || github.event.deployment_status.environment_url || vars.VERIFY_BASE_URL || 'https://remix-kinnso-web.vercel.app' }}
@@ -46,7 +57,11 @@ jobs:
           path: parity-report.json
 
   e2e:
-    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment_status.environment == 'Production' &&
+       contains(github.event.deployment_status.environment_url, 'remix-kinnso-web'))
     runs-on: ubuntu-latest
     env:
       E2E_BASE_URL: ${{ github.event.inputs.base_url || github.event.deployment_status.environment_url || vars.VERIFY_BASE_URL || 'https://remix-kinnso-web.vercel.app' }}
