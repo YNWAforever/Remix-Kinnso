@@ -6,7 +6,8 @@ export const redirects: Check = async ({ legacy, newstack }) => {
   const out: CheckResult[] = []
   for (const s of samples) {
     const { status, location } = await newstack.redirect(s.from)
-    // Location is absolute (NextResponse.redirect); compare pathname only.
+    // Location may be relative (the proxy emits "/en/...") or absolute; resolve against a
+    // placeholder base so either form yields the pathname, then compare pathname only.
     const got = location ? new URL(location, 'http://placeholder.invalid').pathname : null
     const ok = status === 301 && got === s.to
     out.push({
