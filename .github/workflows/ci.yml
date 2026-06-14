@@ -30,13 +30,56 @@ jobs:
       - run: pnpm supabase start
 
       - name: Export local Supabase env for tests
-        # tee writes the same creds to both apps/web (anon-backed render tests)
-        # and packages/sync (service_role-backed sync integration test).
+        # tee writes the same creds to web (anon-backed render tests),
+        # packages/sync (service_role sync integration test), and
+        # apps/scan (service_role + anon scan integration test).
         run: |
           pnpm -s supabase status -o env \
             --override-name api.url=SUPABASE_URL \
             --override-name auth.anon_key=SUPABASE_ANON_KEY \
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
-            | tee apps/web/.env.test packages/sync/.env.test > /dev/null
+            | tee apps/web/.env.test packages/sync/.env.test apps/scan/.env.test > /dev/null
 
       - run: pnpm test
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @kinnso/e2e e2e:install
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: pnpm supabase start
+
+      - name: Export local Supabase env for apps/web and apps/scan
+        run: |
+          pnpm -s supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+            | tee apps/web/.env.local > /dev/null
+          echo "NEXT_PUBLIC_SCAN_URL=http://localhost:8788" >> apps/web/.env.local
+          pnpm -s supabase status -o env \
+            --override-name api.url=SUPABASE_URL \
+            --override-name auth.anon_key=SUPABASE_ANON_KEY \
+            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            | tee apps/scan/.env.local > /dev/null
+
+      - name: Start scan worker (fixture mode) and web app
+        run: |
+          SCAN_FIXTURE_MODE=1 pnpm --filter @kinnso/scan-app start &
+          pnpm --filter web dev &
+          npx --yes wait-on http://localhost:8788/health http://localhost:3000
+
+      - name: Run onboarding journey
+        env:
+          E2E_BASE_URL: http://localhost:3000
+        run: pnpm --filter @kinnso/e2e e2e creator-onboarding

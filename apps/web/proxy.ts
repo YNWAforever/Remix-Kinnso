@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resolveRequest } from '@/lib/redirects/resolve'
+import { updateSession } from '@/lib/supabase/middleware'
+import { gateDecision } from '@/lib/auth/gate'
 
 // Module-level cache of the locale-agnostic seo_redirects map (cold-isolate refresh).
 let cache: { map: Map<string, string>; at: number } | null = null
@@ -27,14 +29,43 @@ async function getRedirects(): Promise<Map<string, string>> {
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
+
+  // 1. Refresh the Supabase session cookie on every request.
+  //    updateSession also returns the current user so we avoid a second DB call.
+  const sessionResponse = await updateSession(req)
+  const user = sessionResponse.user
+
+  // 2. Auth gate — must run BEFORE the locale guard so that
+  //    /en/creator (already locale-prefixed) is caught here.
+  const gate = gateDecision(pathname, user !== null)
+  if (gate.type === 'redirect') {
+    const url = req.nextUrl.clone()
+    url.pathname = gate.location
+    url.search = ''
+    const res = NextResponse.redirect(url, 307)
+    // Copy the refreshed Supabase auth cookies from updateSession onto the
+    // redirect response. @supabase/ssr middleware requires these Set-Cookie
+    // headers to propagate or the rotated refresh token is lost (silent logout).
+    sessionResponse.cookies.getAll().forEach((c) => res.cookies.set(c))
+    return res
+  }
+
+  // 3. Existing redirect + locale-guard logic (unchanged).
   const decision = resolveRequest(pathname, await getRedirects())
   if (decision.type === 'redirect') {
     const url = req.nextUrl.clone()
     url.pathname = decision.location
     url.search = decision.status === 301 ? '' : req.nextUrl.search
-    return NextResponse.redirect(url, decision.status)
+    const res = NextResponse.redirect(url, decision.status)
+    // Same as above: preserve refreshed Supabase auth cookies across the
+    // locale/SEO redirect so @supabase/ssr can rotate the session correctly.
+    sessionResponse.cookies.getAll().forEach((c) => res.cookies.set(c))
+    return res
   }
-  return NextResponse.next()
+
+  // 4. Pass through, returning the session response so Set-Cookie headers
+  //    (refreshed session tokens) propagate to the browser.
+  return sessionResponse
 }
 
 export const config = {
