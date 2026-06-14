@@ -125,6 +125,12 @@ app.post('/scan', async (c) => {
     .single()
 
   if (insertErr || !job) {
+    // A unique-violation (23505) on the partial unique index means another active
+    // job already exists for this creator — a concurrent POST /scan that raced past
+    // the app-level active-job check. Map it to 429, matching that check's contract.
+    if (insertErr?.code === '23505') {
+      return c.json({ error: 'rate limited', reason: 'active_job_exists' }, 429)
+    }
     console.error('[scan] failed to insert job', insertErr?.message)
     return c.json({ error: 'internal error' }, 500)
   }
@@ -146,11 +152,14 @@ app.post('/scan/:jobId/retry', async (c) => {
 
   const jobId = c.req.param('jobId')
 
+  // Use maybeSingle() so a genuinely non-existent jobId yields { data: null,
+  // error: null } (rather than .single()'s PGRST116 error). This lets control
+  // reach canRetry(null, …) → 404 "job not found" instead of leaking a 500.
   const { data: job, error: jobErr } = await db
     .from('creator_scan_jobs')
     .select('id, creator_id, status, created_at')
     .eq('id', jobId)
-    .single()
+    .maybeSingle()
 
   if (jobErr) return c.json({ error: 'internal error' }, 500)
 
@@ -179,11 +188,23 @@ app.post('/scan/:jobId/retry', async (c) => {
     return c.json({ error: messages[status] }, status as never)
   }
 
-  // Reset to queued and re-run
-  await db
+  // Reset to queued and re-run. Check the reset error so a failed reset surfaces
+  // a 500 (symmetric with the POST /scan insert path) rather than silently
+  // returning 202 { retrying: true } to the client.
+  const { error: resetErr } = await db
     .from('creator_scan_jobs')
     .update({ status: 'queued', error: null as never, completed_at: null as never, updated_at: new Date().toISOString() })
     .eq('id', jobId)
+
+  if (resetErr) {
+    // A unique-violation (23505) means another active job already exists for this
+    // creator (the partial unique index) — surface it as a 429, not a 500.
+    if (resetErr.code === '23505') {
+      return c.json({ error: 'rate limited', reason: 'active_job_exists' }, 429)
+    }
+    console.error('[scan] retry reset failed', jobId, resetErr.message)
+    return c.json({ error: 'internal error' }, 500)
+  }
 
   runScan(makeDeps(), jobId).catch((err: unknown) => {
     console.error(`[scan] unhandled pipeline error on retry for job ${jobId}`, err)

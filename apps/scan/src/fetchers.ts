@@ -12,6 +12,20 @@ async function sleepMs(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/**
+ * Strips the query string from a URL so secrets carried as query params (e.g. the
+ * YouTube Data API `key=`) never reach an Error message or log line. Falls back to
+ * a static placeholder if the URL cannot be parsed.
+ */
+function redactUrl(url: string): string {
+  try {
+    const u = new URL(url)
+    return u.origin + u.pathname
+  } catch {
+    return '<unparseable-url>'
+  }
+}
+
 async function fetchWithRetry(
   url: string,
   init: RequestInit,
@@ -28,7 +42,9 @@ async function fetchWithRetry(
       continue
     }
     if (!RETRYABLE_STATUSES.has(res.status)) return res
-    lastError = new Error(`HTTP ${res.status} from ${url}`)
+    // Redact the query string — some URLs carry secrets as query params (e.g. the
+    // YouTube Data API key), and this Error message is surfaced to logs.
+    lastError = new Error(`HTTP ${res.status} from ${redactUrl(url)}`)
   }
   throw lastError
 }

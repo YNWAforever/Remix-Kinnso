@@ -184,8 +184,12 @@ export async function runScan(deps: ScanDeps, jobId: string): Promise<void> {
     try {
       llmText = await llm.complete(messages)
     } catch (secondErr) {
+      // Log the verbose provider response server-side only; the job.error column
+      // is client-readable (owner RLS), so store a generic user-safe message and
+      // never echo raw upstream provider bodies to the client.
+      console.error('[scan] LLM failed after retry', jobId, (secondErr as Error).message)
       await setJobStatus(db, jobId, 'failed', {
-        error: `LLM failed after retry: ${(secondErr as Error).message}`,
+        error: 'AI analysis temporarily unavailable, please retry.',
         completed_at: new Date().toISOString(),
       })
       return
@@ -197,8 +201,12 @@ export async function runScan(deps: ScanDeps, jobId: string): Promise<void> {
   try {
     parsed = parseDna(llmText)
   } catch (parseErr) {
+    // parseDna embeds a slice of raw LLM output in its message; keep that detail
+    // in server logs only, and store a generic user-safe message in job.error
+    // (client-readable via owner RLS).
+    console.error('[scan] DNA parse failed', jobId, (parseErr as Error).message)
     await setJobStatus(db, jobId, 'failed', {
-      error: `DNA parse failed: ${(parseErr as Error).message}`,
+      error: 'AI analysis could not be parsed, please retry.',
       completed_at: new Date().toISOString(),
     })
     return
