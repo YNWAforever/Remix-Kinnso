@@ -39,4 +39,23 @@ jobs:
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
             | tee apps/web/.env.test packages/sync/.env.test > /dev/null
 
+      - name: Wait for seed to be fully visible via the API
+        # `supabase start` can return before the TAIL of supabase/seed.sql is visible
+        # through PostgREST. article_authors is seeded near the end (after the larger
+        # article/translation/faq inserts), so the suite can race it: getArticleDetail's
+        # author read intermittently sees an empty article_authors and returns a null
+        # author (the queries.detail "Jane Doe" flake). Gate the suite on the seeded row
+        # actually being queryable through the same REST path the tests use.
+        run: |
+          set -a; . apps/web/.env.test; set +a
+          for i in $(seq 1 30); do
+            if curl -fs "$SUPABASE_URL/rest/v1/article_authors?select=slug&slug=eq.jane-doe" \
+                 -H "apikey: $SUPABASE_ANON_KEY" \
+                 -H "Authorization: Bearer $SUPABASE_ANON_KEY" | grep -q jane-doe; then
+              echo "seed visible after $i check(s)"; exit 0
+            fi
+            echo "waiting for seed visibility ($i)..."; sleep 2
+          done
+          echo "ERROR: article_authors seed never became visible via the API"; exit 1
+
       - run: pnpm test
