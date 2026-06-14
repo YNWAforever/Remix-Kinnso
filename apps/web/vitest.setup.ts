@@ -1,4 +1,5 @@
 import { config } from 'dotenv'
+import '@testing-library/jest-dom/vitest'
 
 // Load test env (created locally from the hosted project, or in CI from
 // `supabase status`). See README / CI for the required keys:
