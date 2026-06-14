@@ -1,0 +1,17 @@
+{
+  "name": "@kinnso/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "e2e": "playwright test",
+    "cwv": "lhci autorun"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.15.0",
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}
