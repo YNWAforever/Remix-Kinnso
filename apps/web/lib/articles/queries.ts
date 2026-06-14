@@ -11,6 +11,23 @@ const db = () =>
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY!,
   )
 
+/** Retry a read once on a transient failure (cold connection, momentary network/DB
+ *  blip) so an ISR/dynamic render degrades to a quick retry rather than crashing the
+ *  serverless function (FUNCTION_INVOCATION_FAILED). Reads are idempotent, so this is
+ *  safe; a persistent failure still throws and is caught by the route error boundary. */
+async function withRetry<T>(fn: () => Promise<T>, attempts = 2): Promise<T> {
+  let lastErr: unknown
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn()
+    } catch (e) {
+      lastErr = e
+      if (i < attempts - 1) await new Promise((r) => setTimeout(r, 150))
+    }
+  }
+  throw lastErr
+}
+
 export async function getArticleByUrl(url: string, locale: string) {
   const { data, error } = await db()
     .from('articles')
@@ -40,9 +57,9 @@ export interface ArticleDetail {
 
 /** Detail fetch: article (RLS-gated) for a given URL **category + url**, requested-locale translation,
  *  FAQs (visible, weight desc) and the first active author. Returns null when not visible or category mismatches. */
-export const getArticleDetail = cache(async (
+export const getArticleDetail = cache((
   urlCategory: string, url: string, locale: Locale,
-): Promise<ArticleDetail | null> => {
+): Promise<ArticleDetail | null> => withRetry(async () => {
   const { data, error } = await db()
     .from('articles')
     .select('*, article_translations(*)')
@@ -95,10 +112,10 @@ export const getArticleDetail = cache(async (
       : null,
     faqs, author,
   }
-})
+}))
 
 /** Locales that have a translation for a (visible) article — drives hreflang + sitemap. */
-export const getPresentLocales = cache(async (url: string): Promise<Locale[]> => {
+export const getPresentLocales = cache((url: string): Promise<Locale[]> => withRetry(async () => {
   const { data, error } = await db()
     .from('articles')
     .select('article_translations(locale)')
@@ -108,14 +125,16 @@ export const getPresentLocales = cache(async (url: string): Promise<Locale[]> =>
   if (!data) return []
   const set = new Set((data.article_translations ?? []).map((t) => t.locale))
   return LOCALES.filter((l) => set.has(l))
-})
+}))
 
 export async function getYouMayLike(articleId: string, locale: Locale, limit = 5) {
-  const { data, error } = await db().rpc('get_you_may_like', {
-    p_article_id: articleId, p_locale: locale, p_limit: limit,
+  return withRetry(async () => {
+    const { data, error } = await db().rpc('get_you_may_like', {
+      p_article_id: articleId, p_locale: locale, p_limit: limit,
+    })
+    if (error) throw error
+    return data ?? []
   })
-  if (error) throw error
-  return data ?? []
 }
 
 export interface SearchParams {
@@ -136,22 +155,24 @@ export interface SearchResult {
 export async function searchArticles(p: SearchParams): Promise<SearchResult> {
   const page = Math.max(1, p.page ?? 1)
   const perPage = p.perPage ?? 12
-  const { data, error } = await db().rpc('search_articles', {
-    p_locale: p.locale,
-    ...(p.category != null && { p_category: p.category }),
-    ...(p.q != null && { p_q: p.q }),
-    ...(p.region != null && { p_region: p.region }),
-    ...(p.tag != null && { p_tag: p.tag }),
-    p_limit: perPage, p_offset: (page - 1) * perPage,
+  return withRetry(async () => {
+    const { data, error } = await db().rpc('search_articles', {
+      p_locale: p.locale,
+      ...(p.category != null && { p_category: p.category }),
+      ...(p.q != null && { p_q: p.q }),
+      ...(p.region != null && { p_region: p.region }),
+      ...(p.tag != null && { p_tag: p.tag }),
+      p_limit: perPage, p_offset: (page - 1) * perPage,
+    })
+    if (error) throw error
+    const rows = data ?? []
+    const total = rows.length ? Number(rows[0].total_count) : 0
+    return {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- strip total_count from each item
+      items: rows.map(({ total_count, ...r }) => r),
+      total, page, perPage,
+    }
   })
-  if (error) throw error
-  const rows = data ?? []
-  const total = rows.length ? Number(rows[0].total_count) : 0
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- strip total_count from each item
-    items: rows.map(({ total_count, ...r }) => r),
-    total, page, perPage,
-  }
 }
 
 /** All visible articles + their present locales — for sitemap.ts. */

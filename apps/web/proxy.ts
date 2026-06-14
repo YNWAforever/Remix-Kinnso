@@ -14,6 +14,7 @@ async function getRedirects(): Promise<Map<string, string>> {
     try {
       const res = await fetch(`${base}/rest/v1/seo_redirects?select=from_path,to_path`, {
         headers: { apikey: key, authorization: `Bearer ${key}` },
+        signal: AbortSignal.timeout(2500), // bound edge latency; on timeout we fall back to locale-guard only
       })
       if (res.ok) for (const r of (await res.json()) as Array<{ from_path: string; to_path: string }>) {
         map.set(r.from_path, r.to_path)
