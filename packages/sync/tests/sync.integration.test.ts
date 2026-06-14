@@ -13,9 +13,13 @@ const svc = createClient(url ?? 'http://localhost:54321', key ?? 'placeholder-ke
 const LEGACY_ID = 900001
 
 run('sync integration', () => {
+  // Cleanup deletes by the fixture's OWN identifiers, which must stay DISJOINT from
+  // supabase/seed.sql (read by the web suite). turbo runs web#test and sync#test in
+  // parallel against the same local DB, so deleting a slug the seed also uses would yank
+  // it out from under a concurrent web read — that was the queries.detail "Jane Doe" flake.
   afterAll(async () => {
     await svc.from('articles').delete().eq('legacy_post_id', LEGACY_ID) // cascades children
-    await svc.from('article_authors').delete().eq('slug', 'jane-doe')
+    await svc.from('article_authors').delete().eq('slug', 'best-ramen-author')
     await svc.from('article_tags').delete().eq('slug', 'ramen')
   })
 
