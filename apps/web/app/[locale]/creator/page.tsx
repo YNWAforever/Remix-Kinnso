@@ -2,18 +2,20 @@ import { redirect, notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { resumeStep, type CreatorStatus, type JobSnapshot } from '@/lib/onboarding/resumeRoute'
+import { isThin, type JobProgress } from '@/lib/onboarding/progress'
+import type { Platform } from '@/lib/onboarding/validateHandle'
+import type { InitialHandle } from '@/components/onboarding/HandlesStep'
+import { WizardClient } from '@/components/onboarding/WizardClient'
+import type { Dna } from '@kinnso/scan'
 
 /**
- * /[locale]/creator
+ * /[locale]/creator — the onboarding wizard host.
  *
- * Gated by proxy.ts (unauthenticated users are redirected to sign-in
- * before this page ever renders). We call getUser() here as a defence-in-depth
- * check and to retrieve the user id for the creators row lookup.
- *
- * The `creators` row is created automatically by a SECURITY DEFINER trigger
- * on auth.users AFTER INSERT (Plan 1a). No client insert is needed here.
- *
- * Onboarding wizard, scan, and DNA forms are out of scope — deferred to Plan 4.
+ * Gated by proxy.ts (Plan 1b): unauthenticated users never reach this page.
+ * We read the live creator state server-side (RLS owner reads), compute the
+ * resume step, load the DNA draft/final when needed, and delegate rendering to
+ * the WizardClient. Standalone profile editing + public /c/[handle] are SP6.
  */
 export default async function CreatorPage({
   params,
@@ -22,53 +24,75 @@ export default async function CreatorPage({
 }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
-  const dict = await getDictionary(locale as Locale)
+  const messages = await getDictionary(locale as Locale)
 
   const supabase = await createSupabaseServerClient()
 
-  // Defence-in-depth: verify the session even though the proxy already gated this route.
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect(`/${locale}/sign-in`)
 
-  // Load the creators row. The trigger ensures it exists; RLS allows owner select.
+  // creators row (owner select). May be null briefly right after sign-up (trigger lag).
   const { data: creator } = await supabase
     .from('creators')
-    .select('id, display_name, status')
+    .select('id, status')
     .eq('id', user.id)
     .single()
 
+  // Saved handles (owner select).
+  const { data: handleRows } = await supabase
+    .from('creator_social_handles')
+    .select('platform, handle')
+    .eq('creator_id', user.id)
+  const handles: InitialHandle[] = (handleRows ?? []).map((h) => ({
+    platform: h.platform as Platform,
+    handle: h.handle,
+  }))
+
+  // Latest scan job (owner select; newest first).
+  const { data: jobRows } = await supabase
+    .from('creator_scan_jobs')
+    .select('id, status, progress')
+    .eq('creator_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+  const latestJobRaw = jobRows?.[0] ?? null
+  const latestJob: JobSnapshot | null = latestJobRaw
+    ? { id: latestJobRaw.id, status: latestJobRaw.status as JobSnapshot['status'] }
+    : null
+  const latestProgress = (latestJobRaw?.progress ?? null) as JobProgress | null
+
+  const creatorStatus = (creator?.status ?? null) as CreatorStatus | null
+  const initialStep = resumeStep(creatorStatus, latestJob, handles.length)
+
+  // DNA draft/final — only fetched when the step needs it.
+  let draft: Dna | null = null
+  let final: Dna | null = null
+  if (initialStep === 'review' || initialStep === 'done') {
+    const { data: dnaRow } = await supabase
+      .from('creator_dna')
+      .select('ai_draft, final')
+      .eq('creator_id', user.id)
+      .single()
+    draft = (dnaRow?.ai_draft ?? null) as Dna | null
+    final = (dnaRow?.final ?? null) as Dna | null
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
-      <h1 className="text-2xl font-bold text-ink">{dict.auth.creatorDashboard}</h1>
-
-      <div className="text-sm text-ink/70 text-center max-w-sm space-y-1">
-        <p>
-          <span className="font-medium">Email:</span> {user.email}
-        </p>
-        {creator ? (
-          <>
-            <p>
-              <span className="font-medium">Creator status:</span> {creator.status}
-            </p>
-            <p>
-              <span className="font-medium">Creator id:</span> {creator.id}
-            </p>
-          </>
-        ) : (
-          <p className="text-red-600">
-            creators row not found — check the Plan 1a trigger is deployed.
-          </p>
-        )}
-      </div>
-
-      <p className="text-sm text-ink/50 italic">{dict.auth.onboardingPlaceholder}</p>
-
-      <a
-        href={`/${locale}/auth/sign-out`}
-        className="text-sm underline text-ink/70 hover:text-ink"
-      >
-        {dict.auth.signOut}
-      </a>
+    <main className="flex min-h-screen flex-col items-center justify-start gap-6 p-6 pt-16">
+      <h1 className="text-2xl font-bold">{messages.onboarding.title}</h1>
+      <WizardClient
+        creatorId={user.id}
+        locale={locale as Locale}
+        initialStep={initialStep}
+        handles={handles}
+        latestJobId={latestJob?.id ?? null}
+        draft={draft}
+        final={final}
+        thin={isThin(latestProgress)}
+        messages={messages}
+      />
     </main>
   )
 }
