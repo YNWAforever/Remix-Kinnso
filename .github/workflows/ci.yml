@@ -30,13 +30,14 @@ jobs:
       - run: pnpm supabase start
 
       - name: Export local Supabase env for tests
-        # tee writes the same creds to both apps/web (anon-backed render tests)
-        # and packages/sync (service_role-backed sync integration test).
+        # tee writes the same creds to web (anon-backed render tests),
+        # packages/sync (service_role sync integration test), and
+        # apps/scan (service_role + anon scan integration test).
         run: |
           pnpm -s supabase status -o env \
             --override-name api.url=SUPABASE_URL \
             --override-name auth.anon_key=SUPABASE_ANON_KEY \
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
-            | tee apps/web/.env.test packages/sync/.env.test > /dev/null
+            | tee apps/web/.env.test packages/sync/.env.test apps/scan/.env.test > /dev/null
 
       - run: pnpm test
