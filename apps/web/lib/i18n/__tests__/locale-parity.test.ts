@@ -15,7 +15,7 @@ const GROUPS = ['studio', 'creatorProfile', 'merchants'] as const
 
 describe('i18n locale parity for new creator-profile groups', () => {
   const enPaths = Object.fromEntries(
-    GROUPS.map((g) => [g, keyPaths((en as Record<string, unknown>)[g])]),
+    GROUPS.map((g) => [g, keyPaths((en as unknown as Record<string, unknown>)[g])]),
   )
 
   it('en defines the three new groups', () => {
@@ -26,7 +26,7 @@ describe('i18n locale parity for new creator-profile groups', () => {
 
   for (const locale of LOCALES) {
     it(`${locale} has identical keys to en for each group`, async () => {
-      const dict = (await getDictionary(locale)) as Record<string, unknown>
+      const dict = (await getDictionary(locale)) as unknown as Record<string, unknown>
       for (const g of GROUPS) {
         expect(keyPaths(dict[g])).toEqual(enPaths[g])
       }
