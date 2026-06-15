@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { tierMeta, type Tier } from "@/lib/creator-mock";
+import type { Tier } from "@/lib/creator-mock";
 import type { Dna } from "@kinnso/scan";
 import TierBadge from "./TierBadge";
 import { CheckCircle2, MapPin, Sparkles } from "lucide-react";
