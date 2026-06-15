@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { LOCALES } from '../config'
-import { getDictionary } from '../dictionaries'
-import en from '../messages/en'
+import { LOCALES } from '@/lib/i18n/config'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import en from '@/lib/i18n/messages/en'
 
 /** Recursively collect dotted key paths, sorted. */
 function keyPaths(obj: unknown, prefix = ''): string[] {
