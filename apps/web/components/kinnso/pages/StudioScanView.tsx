@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Share2, ArrowRight, Lock } from "lucide-react";
 import BearMascot from "@/components/kinnso/BearMascot";
@@ -50,9 +50,11 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
   // metrics overlay (score/audience/contentMix/topTags/er) stays mock this slice.
   void dna;
 
-  const hasPriorScan = false;
   // Default to "done" so the report renders synchronously for tests and for
-  // hosts that pass an already-scanned creator (no auto-replay of the fake scan).
+  // hosts that pass an already-scanned creator. This is the one intentional
+  // behavior change vs. the redesign: no auto-replay of the fake scan on mount
+  // (the intro/scanning branch is reachable only via the Rescan/Start scan
+  // buttons), so there is no mount useEffect that would call setState in-effect.
   const [phase, setPhase] = useState<"intro" | "scanning" | "done">("done");
   const [doneSteps, setDoneSteps] = useState<number>(0);
   const [igInput, setIgInput] = useState(creator.handle);
@@ -73,8 +75,6 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
       }, s.delay);
     });
   };
-
-  useEffect(() => { if (phase === "intro" && !hasPriorScan) startScan(); /* eslint-disable-next-line */ }, []);
 
   const locs = creatorLocations.filter((l) => l.creatorHandle === creator.handle);
   const posts = creatorPosts.filter((p) => p.creatorHandle === creator.handle);
