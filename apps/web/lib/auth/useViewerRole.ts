@@ -27,13 +27,13 @@ export async function resolveViewerRole(
  * Pass `override` to force a role (e.g. a merchant-context host).
  */
 export function useViewerRole(override?: ViewerRole): ViewerRole {
-  const [role, setRole] = useState<ViewerRole>(override ?? 'anon')
+  const [role, setRole] = useState<ViewerRole>('anon')
 
   useEffect(() => {
-    if (override) {
-      setRole(override)
-      return
-    }
+    // When a host forces a role, skip session resolution entirely; the
+    // override is surfaced directly via the return value below (no
+    // synchronous setState in the effect).
+    if (override) return
     const supabase = createSupabaseBrowserClient()
     let active = true
     supabase.auth.getUser().then(({ data }) => {
@@ -48,5 +48,5 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
     }
   }, [override])
 
-  return role
+  return override ?? role
 }

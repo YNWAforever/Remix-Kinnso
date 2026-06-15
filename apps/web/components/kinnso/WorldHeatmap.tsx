@@ -56,10 +56,10 @@ export const WorldHeatmap: React.FC<Props> = ({ locations, height = 320, interac
             <Marker
               key={`${loc.creatorHandle}-${loc.city}`}
               coordinates={[loc.lon, loc.lat]}
-              onMouseEnter={(e) => setTip({ x: (e as any).clientX, y: (e as any).clientY, text: `${loc.city} · ${loc.postCount} posts` })}
+              onMouseEnter={(e) => setTip({ x: (e as React.MouseEvent).clientX, y: (e as React.MouseEvent).clientY, text: `${loc.city} · ${loc.postCount} posts` })}
               onMouseLeave={() => setTip(null)}
               onClick={() => interactive && onCityClick?.(loc)}
-              style={{ cursor: interactive ? "pointer" : "default" } as any}
+              style={{ cursor: interactive ? "pointer" : "default" } as unknown as React.ComponentProps<typeof Marker>["style"]}
             >
               <circle r={r} fill="hsl(var(--k-amber))" stroke="white" strokeWidth={1.2} />
             </Marker>
