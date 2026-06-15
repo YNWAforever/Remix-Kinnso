@@ -116,7 +116,7 @@ export interface EngagementHistoryPoint {
   creatorHandle: string
   month: string // "Jan", "Feb", …
   dnaScore: number
-  er: number // 0–0.12
+  er: number // engagement rate ~0.03–0.11 (data.ts clamps to this range)
   posts: number
 }
 
@@ -160,7 +160,10 @@ export interface MerchantProfile {
   city: string
   country: string
   category: string
-  primaryAudience: 'HK' | 'TW' | 'SG' | 'JP' | 'Other'
+  // Narrowed to the keys that ExtendedCreator.audience actually tracks (hk/tw/sg).
+  // 'JP' / 'Other' removed: neither maps to a real audience key, so they would
+  // silently fall through to the c.audience.other default in computeMatch.
+  primaryAudience: 'HK' | 'TW' | 'SG'
   budgetTier: Tier
   // NEW (Slice 1, mock UI-only — §8/§10 of the design spec):
   tier: 'free' | 'growth'

@@ -20,9 +20,9 @@ export function getCreator(handle: string): ExtendedCreator | undefined {
 export function computeBreakdown(c: ExtendedCreator): ScoreBreakdown {
   const MAX = 1_000_000
   const erNorm = Math.min(c.er / 0.12, 1)
-  const travelShare = 0.68
+  const travelShare = 0.68 // fixed mock placeholder — carried verbatim from the source matchScore mock; does not vary per creator
   const countryDiv = Math.min(1, c.countries / 10)
-  const recency = 0.71
+  const recency = 0.71 // fixed mock placeholder — carried verbatim from the source matchScore mock; does not vary per creator
   const reach = (30 * Math.log(Math.max(2, c.totalReach))) / Math.log(MAX)
   const er = 25 * erNorm
   const travel = 20 * travelShare
@@ -66,7 +66,7 @@ export function computeMatch(
 
   // 4. Audience fit (0–10)
   const targetCountryKey = m.primaryAudience.toLowerCase() as keyof typeof c.audience
-  const pct = c.audience[targetCountryKey] ?? c.audience.other
+  const pct = c.audience[targetCountryKey] ?? c.audience.other // defensive-only: unreachable for a type-legal primaryAudience ('HK'|'TW'|'SG')
   const audienceFit = pct >= 40 ? 10 : pct >= 25 ? 7 : 4
 
   const reasonList: MatchReason[] = []

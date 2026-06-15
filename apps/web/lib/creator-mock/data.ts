@@ -105,7 +105,7 @@ export const extendedCreators: ExtendedCreator[] = creators.map((c) => {
     followerTh: th,
     followerYt: yt,
     totalReach,
-    driven90dReach: Math.round(totalReach * 7.2),
+    driven90dReach: Math.round(totalReach * 7.2), // 7.2 is a mock multiplier only — not derived from real data
     drivenGmv: Math.round(c.score * 520),
     countries: 8 + (c.score % 7),
     cities: 22 + (c.score % 20),
@@ -151,7 +151,7 @@ export const creatorLocations: CreatorLocation[] = Object.entries(LOCATION_MAP).
     const meta = CITY_LIBRARY[r.city]!
     return {
       creatorHandle: handle,
-      city: r.city.replace(/([A-Z])/g, ' $1').trim(),
+      city: r.city.includes(' ') ? r.city : r.city.replace(/([A-Z])/g, ' $1').trim(),
       country: meta.country,
       countryName: meta.countryName,
       flag: meta.flag,
