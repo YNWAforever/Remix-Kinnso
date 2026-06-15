@@ -145,8 +145,8 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
         </Section>
 
         <SheetFooter className="mt-4 flex gap-2 sm:flex-row">
-          <button onClick={() => onChange(defaultFilters)} className="k-btn-ghost flex-1">Clear all</button>
-          <button onClick={() => onOpenChange(false)} className="k-btn-primary flex-1">Apply filters</button>
+          <button type="button" onClick={() => onChange(defaultFilters)} className="k-btn-ghost flex-1">Clear all</button>
+          <button type="button" onClick={() => onOpenChange(false)} className="k-btn-primary flex-1">Apply filters</button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
