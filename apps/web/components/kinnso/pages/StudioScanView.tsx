@@ -338,7 +338,9 @@ export function StudioScanView({ mode, identity, dna, metrics, isSample, t }: St
       </div>
 
       <CityDetailDrawer open={!!selectedCity} onOpenChange={(o) => !o && setSelectedCity(null)} location={selectedCity} posts={posts} places={places} />
-      <ShareDnaDialog open={shareOpen} onOpenChange={setShareOpen} creator={metrics} />
+      {/* Share is reachable only via the demo-only footer button; don't mount the
+          mock-data dialog in a real-creator view. (The city drawer stays — the map is in both modes.) */}
+      {isDemo && <ShareDnaDialog open={shareOpen} onOpenChange={setShareOpen} creator={metrics} />}
     </div>
   );
 }
