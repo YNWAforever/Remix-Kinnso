@@ -3,8 +3,10 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { StudioScanView } from '@/components/kinnso/pages/StudioScanView'
-import { getCreator, computeBreakdown, sampleDna } from '@/lib/creator-mock'
-import type { Dna } from '@kinnso/scan'
+import { StudioOnboardingPrompt } from '@/components/kinnso/StudioOnboardingPrompt'
+import { getCreator, sampleDna } from '@/lib/creator-mock'
+import { buildStudioIdentity, buildDemoIdentity, type HandleRow } from '@/lib/studio/identity'
+import { DnaSchema, type Dna, type Platform } from '@kinnso/scan'
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -13,9 +15,14 @@ export function generateStaticParams() {
 /**
  * /[locale]/studio/scan — Studio Scan + DNA report (ungated this slice).
  *
- * DNA core is the real `creator_dna.final` for a logged-in creator, else a
- * mock `Dna`. The rich metrics (score/tier/posts/places/map) are the mock
- * overlay keyed by handle until the data/scoring slices land.
+ * - ANON → mock demo (mock identity + sampleDna + mock metrics; fake-scan intro).
+ * - LOGGED-IN + valid `creator_dna.final` → REAL identity + REAL DNA core; the
+ *   numeric metric sections stay mock and are labelled "sample".
+ * - LOGGED-IN + no/invalid `final` → onboarding prompt (CTA → /[locale]/creator).
+ *
+ * The mock `ExtendedCreator` ('maywanders') is ALWAYS the `metrics` overlay —
+ * every numeric section + drawer filters fixtures by `metrics.handle`, so a real
+ * handle would empty them. Identity/metrics/dna are decoupled for that reason.
  */
 export default async function StudioScanPage({
   params,
@@ -25,33 +32,74 @@ export default async function StudioScanPage({
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
+  const t = messages.studio
 
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Real DNA core when the viewer is a logged-in creator with a published DNA.
-  let dna: Dna = sampleDna
-  if (user) {
-    const { data: dnaRow } = await supabase
-      .from('creator_dna')
-      .select('final')
-      .eq('creator_id', user.id)
-      .single()
-    if (dnaRow?.final) dna = dnaRow.final as Dna
+  const metrics = getCreator('maywanders')!
+
+  // ── ANON → unchanged mock demo ──────────────────────────────
+  if (!user) {
+    return (
+      <StudioScanView
+        mode="demo"
+        identity={buildDemoIdentity(metrics, new Date().toISOString())}
+        dna={sampleDna}
+        metrics={metrics}
+        isSample={false}
+        t={t}
+      />
+    )
   }
 
-  // Metrics overlay (mock). Demo creator until real metrics tables exist.
-  const creator = getCreator('maywanders')!
-  const breakdown = computeBreakdown(creator)
+  // ── LOGGED-IN → real identity + real DNA (RLS owner-scoped reads) ──
+  const { data: creatorRow } = await supabase
+    .from('creators')
+    .select('display_name')
+    .eq('id', user.id)
+    .single()
+
+  const { data: handleRows } = await supabase
+    .from('creator_social_handles')
+    .select('platform, handle, url')
+    .eq('creator_id', user.id)
+  const handles: HandleRow[] = (handleRows ?? []).map((h) => ({
+    platform: h.platform as Platform,
+    handle: h.handle,
+    url: h.url,
+  }))
+
+  const { data: dnaRow } = await supabase
+    .from('creator_dna')
+    .select('final, updated_at')
+    .eq('creator_id', user.id)
+    .single()
+
+  // `final` is untrusted jsonb — validate before rendering. Covers null,
+  // mid-onboarding (only ai_draft), and a missing creator_dna row.
+  const parsed = DnaSchema.safeParse(dnaRow?.final)
+  if (!parsed.success) {
+    return <StudioOnboardingPrompt t={t} locale={locale} />
+  }
+  const dna: Dna = parsed.data
+  const updatedAt = (dnaRow?.updated_at as string | null) ?? new Date().toISOString()
 
   return (
     <StudioScanView
-      creator={creator}
+      mode="real"
+      identity={buildStudioIdentity(
+        { display_name: creatorRow?.display_name ?? null },
+        handles,
+        dna,
+        updatedAt,
+      )}
       dna={dna}
-      breakdown={breakdown}
-      t={messages.studio}
+      metrics={metrics}
+      isSample
+      t={t}
     />
   )
 }

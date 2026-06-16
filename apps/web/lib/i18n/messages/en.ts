@@ -136,6 +136,23 @@ export interface Messages {
     deltaUnchanged: string
     deltaSinceLastScan: string
     scanHint: string
+    // Slice 2 — DNA core panel
+    dnaCoreHeading: string
+    dnaBio: string
+    dnaNiches: string
+    dnaPillars: string
+    dnaTone: string
+    dnaAudienceGeos: string
+    dnaLocales: string
+    dnaLanguages: string
+    dnaPlatforms: string
+    // Slice 2 — sample-metrics labelling
+    sampleBadge: string
+    sampleNote: string
+    // Slice 2 — empty state (no published DNA)
+    noDnaHeading: string
+    noDnaBody: string
+    noDnaCta: string
   }
   creatorProfile: {
     metaTitle: string
@@ -383,6 +400,20 @@ const messages: Messages = {
     deltaUnchanged: 'Unchanged',
     deltaSinceLastScan: '{delta} since last scan',
     scanHint: 'We scan your public posts to build your DNA.',
+    dnaCoreHeading: 'Your Creator DNA',
+    dnaBio: 'Bio',
+    dnaNiches: 'Niches',
+    dnaPillars: 'Content pillars',
+    dnaTone: 'Tone',
+    dnaAudienceGeos: 'Top regions',
+    dnaLocales: 'Top locales',
+    dnaLanguages: 'Languages',
+    dnaPlatforms: 'Platforms',
+    sampleBadge: 'Sample',
+    sampleNote: 'The numbers below are sample data — your real metrics arrive after your first full scan.',
+    noDnaHeading: 'Build your Creator DNA',
+    noDnaBody: 'Run a scan to generate your real creator DNA, then come back to see your Studio report.',
+    noDnaCta: 'Start your scan',
   },
   creatorProfile: {
     metaTitle: '{name} (@{handle}) — Travel Creator · DNA {score} | KINNSO',
