@@ -18,13 +18,15 @@ import TagCloud from "@/components/kinnso/TagCloud";
 import CityDetailDrawer from "@/components/kinnso/CityDetailDrawer";
 import ShareDnaDialog from "@/components/kinnso/ShareDnaDialog";
 import MissionCard from "@/components/kinnso/MissionCard";
+import DnaCorePanel from "@/components/kinnso/DnaCorePanel";
 import {
   creatorLocations, creatorPosts, creatorPlaceTags,
   engagementHistory, type CreatorLocation,
 } from "@/lib/creator-mock";
-import { missions, tierMeta, type Tier } from "@/lib/creator-mock";
+import { missions, tierMeta, computeBreakdown, type Tier } from "@/lib/creator-mock";
 import type { Dna } from "@kinnso/scan";
-import type { ExtendedCreator, ScoreBreakdown } from "@/lib/creator-mock";
+import type { ExtendedCreator } from "@/lib/creator-mock";
+import type { StudioIdentity } from "@/lib/studio/identity";
 import type { Messages } from "@/lib/i18n/messages/en";
 
 const SCAN_STEPS = [
@@ -39,25 +41,33 @@ const SCAN_STEPS = [
 
 const TIER_ORDER: Tier[] = ["seed", "rising", "pro", "elite"];
 
-export function StudioScanView({ creator, dna, breakdown, t }: {
-  creator: ExtendedCreator
-  dna: Dna
-  breakdown: ScoreBreakdown
-  t: Messages['studio']
-}) {
+const PLATFORM_EMOJI: Record<string, string> = {
+  instagram: "📷",
+  threads: "💬",
+  youtube: "▶️",
+};
+
+export type StudioMode = "demo" | "real";
+
+export interface StudioScanViewProps {
+  mode: StudioMode;
+  identity: StudioIdentity;
+  dna: Dna;
+  metrics: ExtendedCreator;
+  isSample: boolean;
+  t: Messages["studio"];
+}
+
+export function StudioScanView({ mode, identity, dna, metrics, isSample, t }: StudioScanViewProps) {
   const router = useRouter();
-  // dna is threaded so the host can pass real `creator_dna.final`; the rich
-  // metrics overlay (score/audience/contentMix/topTags/er) stays mock this slice.
-  void dna;
+  const isDemo = mode === "demo";
 
   // Default to "done" so the report renders synchronously for tests and for
-  // hosts that pass an already-scanned creator. This is the one intentional
-  // behavior change vs. the redesign: no auto-replay of the fake scan on mount
-  // (the intro/scanning branch is reachable only via the Rescan/Start scan
-  // buttons), so there is no mount useEffect that would call setState in-effect.
+  // hosts that pass an already-scanned creator. The fake intro/scanning branch
+  // is reachable only via the demo-only Start scan / Rescan buttons.
   const [phase, setPhase] = useState<"intro" | "scanning" | "done">("done");
   const [doneSteps, setDoneSteps] = useState<number>(0);
-  const [igInput, setIgInput] = useState(creator.handle);
+  const [igInput, setIgInput] = useState(metrics.handle);
   const [selectedCity, setSelectedCity] = useState<CreatorLocation | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -76,22 +86,27 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
     });
   };
 
-  const locs = creatorLocations.filter((l) => l.creatorHandle === creator.handle);
-  const posts = creatorPosts.filter((p) => p.creatorHandle === creator.handle);
-  const places = creatorPlaceTags.filter((p) => p.creatorHandle === creator.handle);
-  const history = engagementHistory.filter((h) => h.creatorHandle === creator.handle);
+  // Numeric sections + drawers filter the mock fixtures by the mock handle.
+  const locs = creatorLocations.filter((l) => l.creatorHandle === metrics.handle);
+  const posts = creatorPosts.filter((p) => p.creatorHandle === metrics.handle);
+  const places = creatorPlaceTags.filter((p) => p.creatorHandle === metrics.handle);
+  const history = engagementHistory.filter((h) => h.creatorHandle === metrics.handle);
   const topPosts = useMemo(
     () => [...posts].filter((p) => p.isTravel).sort((a, b) => (b.likes + b.saves * 3 + b.comments * 2) - (a.likes + a.saves * 3 + a.comments * 2)).slice(0, 6),
     [posts],
   );
-  const lastScanned = new Date().toISOString().slice(0, 10);
+  const breakdown = useMemo(() => computeBreakdown(metrics), [metrics]);
   const delta = 3;
 
   const matched = missions.slice(0, 3);
-  const tierIdx = TIER_ORDER.indexOf(creator.tier);
+  const tierIdx = TIER_ORDER.indexOf(metrics.tier);
 
-  // ───── INTRO + SCANNING SCREEN ─────────────────────────────
-  if (phase !== "done") {
+  const sampleChip = isSample ? (
+    <span className="k-pill ml-2 bg-kinnso-amber/50 text-kinnso-ink">{t.sampleBadge}</span>
+  ) : null;
+
+  // ───── INTRO + SCANNING SCREEN (demo only) ─────────────────
+  if (isDemo && phase !== "done") {
     return (
       <div className="k-container py-16">
         <div className="mx-auto max-w-2xl">
@@ -150,48 +165,68 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
     <div className="bg-kinnso-cream">
       <div className="k-container py-12">
         <div className="mx-auto max-w-[720px] space-y-10">
-          {/* 1 · Identity header */}
+          {/* 1 · Report-ready header */}
           <section className="text-center">
             <BearMascot variant="celebrating" size="md" />
             <h1 className="mt-3 text-2xl font-black text-kinnso-ink">{t.reportReadyHeading}</h1>
+            {isSample && <p className="mt-2 text-xs text-kinnso-muted">{t.sampleNote}</p>}
           </section>
 
+          {/* 2 · Identity card */}
           <section className="k-card p-5">
             <div className="flex items-start gap-4">
-              <img src={creator.avatar} alt={creator.name} className="h-20 w-20 rounded-full object-cover ring-2 ring-kinnso-cream2" />
+              {isDemo ? (
+                <img src={metrics.avatar} alt={identity.name} className="h-20 w-20 rounded-full object-cover ring-2 ring-kinnso-cream2" />
+              ) : (
+                <div className="grid h-20 w-20 place-items-center rounded-full bg-kinnso-orange/15 text-2xl font-black text-kinnso-orange ring-2 ring-kinnso-cream2">
+                  {identity.avatarInitials}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
-                <h2 className="text-xl font-bold text-kinnso-ink">{creator.name}</h2>
-                <p className="k-mono text-sm text-kinnso-muted">@{creator.handle}</p>
-                <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-                  <span className="rounded-md bg-kinnso-cream2 px-2 py-0.5 text-kinnso-ink">{creator.homeCity}</span>
-                  <span className="rounded-md bg-kinnso-cream2 px-2 py-0.5 text-kinnso-ink">{creator.category}</span>
-                </div>
+                <h2 className="text-xl font-bold text-kinnso-ink">{identity.name}</h2>
+                <p className="k-mono text-sm text-kinnso-muted">@{identity.handle}</p>
+                {isDemo && (
+                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                    <span className="rounded-md bg-kinnso-cream2 px-2 py-0.5 text-kinnso-ink">{metrics.homeCity}</span>
+                    <span className="rounded-md bg-kinnso-cream2 px-2 py-0.5 text-kinnso-ink">{metrics.category}</span>
+                  </div>
+                )}
                 <div className="mt-2 flex flex-wrap gap-3 text-xs text-kinnso-muted">
-                  <span>📷 {(creator.followerIg / 1000).toFixed(1)}k</span>
-                  <span>💬 {(creator.followerTh / 1000).toFixed(1)}k</span>
-                  {creator.followerYt > 0 && <span>▶️ {(creator.followerYt / 1000).toFixed(1)}k</span>}
+                  {identity.followers.map((f) => (
+                    <span key={f.platform}>
+                      {PLATFORM_EMOJI[f.platform] ?? ""} {typeof f.count === "number" ? `${(f.count / 1000).toFixed(1)}k` : "—"}
+                    </span>
+                  ))}
                 </div>
-                <div className="mt-2 text-[11px] text-kinnso-muted">{t.lastScanned} {lastScanned} · {t.postsAnalyzed}</div>
+                <div className="mt-2 text-[11px] text-kinnso-muted">
+                  {t.lastScanned} {identity.lastScanned}{isDemo ? ` · ${t.postsAnalyzed}` : ""}
+                </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <RescanStatusChip lastScanned={lastScanned} />
-                <button type="button" onClick={startScan} className="k-btn-ghost text-xs">{t.rescan}</button>
-              </div>
+              {isDemo && (
+                <div className="flex flex-col items-end gap-2">
+                  <RescanStatusChip lastScanned={identity.lastScanned} />
+                  <button type="button" onClick={startScan} className="k-btn-ghost text-xs">{t.rescan}</button>
+                </div>
+              )}
             </div>
           </section>
 
-          {/* 2 · Score ring + tier */}
+          {/* 3 · Your Creator DNA (real or sample-shaped Dna) */}
+          <DnaCorePanel dna={dna} t={t} />
+
+          {/* 4 · Score ring + tier */}
           <section className="k-card p-6 text-center">
-            <div className="flex justify-center"><ScoreRing score={creator.score} size="lg" showOutOf /></div>
+            <div className="flex items-center justify-center">{sampleChip}</div>
+            <div className="mt-1 flex justify-center"><ScoreRing score={metrics.score} size="lg" showOutOf /></div>
             <div className="mt-3"><ScoreDeltaChip delta={delta} /></div>
             <div className="mt-4 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
               <div className="rounded-md bg-kinnso-cream2 px-2 py-2"><div className="text-kinnso-muted">{t.avgLikes}</div><div className="k-mono font-bold text-kinnso-ink">3,400</div></div>
               <div className="rounded-md bg-kinnso-cream2 px-2 py-2"><div className="text-kinnso-muted">{t.avgSaves}</div><div className="k-mono font-bold text-kinnso-ink">980</div></div>
-              <div className="rounded-md bg-kinnso-cream2 px-2 py-2"><div className="text-kinnso-muted">{t.er}</div><div className="k-mono font-bold text-kinnso-ink">{(creator.er * 100).toFixed(1)}%</div></div>
+              <div className="rounded-md bg-kinnso-cream2 px-2 py-2"><div className="text-kinnso-muted">{t.er}</div><div className="k-mono font-bold text-kinnso-ink">{(metrics.er * 100).toFixed(1)}%</div></div>
               <div className="rounded-md bg-kinnso-cream2 px-2 py-2"><div className="text-kinnso-muted">{t.travel}</div><div className="k-mono font-bold text-kinnso-ink">69%</div></div>
             </div>
-            <div className="mt-5"><TierBadge tier={creator.tier} className="text-base" /></div>
-            <p className="mt-2 text-xs text-kinnso-muted">{tierMeta[creator.tier].payout} · {tierMeta[creator.tier].commission} {t.commission}</p>
+            <div className="mt-5"><TierBadge tier={metrics.tier} className="text-base" /></div>
+            <p className="mt-2 text-xs text-kinnso-muted">{tierMeta[metrics.tier].payout} · {tierMeta[metrics.tier].commission} {t.commission}</p>
             <div className="mt-4 flex items-center justify-center gap-2">
               {TIER_ORDER.map((tier, i) => (
                 <React.Fragment key={tier}>
@@ -202,42 +237,42 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
             </div>
           </section>
 
-          {/* 3 · Score breakdown */}
+          {/* 5 · Score breakdown */}
           <ScoreBreakdownPanel breakdown={breakdown} />
 
-          {/* 4 · Trend */}
+          {/* 6 · Trend */}
           <section className="k-card p-5">
-            <h3 className="text-base font-bold text-kinnso-ink">{t.engagementOverTime}</h3>
+            <h3 className="text-base font-bold text-kinnso-ink">{t.engagementOverTime}{sampleChip}</h3>
             <div className="mt-3"><EngagementTrendChart history={history} /></div>
           </section>
 
-          {/* 5 · Audience */}
+          {/* 7 · Audience */}
           <section className="k-card p-5">
-            <h3 className="text-base font-bold text-kinnso-ink">{t.yourAudience}</h3>
+            <h3 className="text-base font-bold text-kinnso-ink">{t.yourAudience}{sampleChip}</h3>
             <div className="mt-3 flex h-5 w-full overflow-hidden rounded-pill">
-              <div className="bg-kinnso-orange" style={{ width: `${creator.audience.hk}%` }} title={`HK ${creator.audience.hk}%`} />
-              <div className="bg-kinnso-amber"  style={{ width: `${creator.audience.tw}%` }} title={`TW ${creator.audience.tw}%`} />
-              <div className="bg-kinnso-blue"   style={{ width: `${creator.audience.sg}%` }} title={`SG ${creator.audience.sg}%`} />
-              <div className="bg-kinnso-cream2" style={{ width: `${creator.audience.other}%` }} />
+              <div className="bg-kinnso-orange" style={{ width: `${metrics.audience.hk}%` }} title={`HK ${metrics.audience.hk}%`} />
+              <div className="bg-kinnso-amber"  style={{ width: `${metrics.audience.tw}%` }} title={`TW ${metrics.audience.tw}%`} />
+              <div className="bg-kinnso-blue"   style={{ width: `${metrics.audience.sg}%` }} title={`SG ${metrics.audience.sg}%`} />
+              <div className="bg-kinnso-cream2" style={{ width: `${metrics.audience.other}%` }} />
             </div>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-kinnso-muted">
-              <span>🇭🇰 HK {creator.audience.hk}%</span>
-              <span>🇹🇼 TW {creator.audience.tw}%</span>
-              <span>🇸🇬 SG {creator.audience.sg}%</span>
-              <span>{t.audienceOther} {creator.audience.other}%</span>
+              <span>🇭🇰 HK {metrics.audience.hk}%</span>
+              <span>🇹🇼 TW {metrics.audience.tw}%</span>
+              <span>🇸🇬 SG {metrics.audience.sg}%</span>
+              <span>{t.audienceOther} {metrics.audience.other}%</span>
             </div>
           </section>
 
-          {/* 6 · Content mix */}
+          {/* 8 · Content mix */}
           <section className="k-card p-5">
-            <h3 className="text-base font-bold text-kinnso-ink">{t.whatYouCreate}</h3>
-            <div className="mt-3"><ContentMixDonut data={creator.contentMix} size={180} /></div>
+            <h3 className="text-base font-bold text-kinnso-ink">{t.whatYouCreate}{sampleChip}</h3>
+            <div className="mt-3"><ContentMixDonut data={metrics.contentMix} size={180} /></div>
           </section>
 
-          {/* 7 · Map + places */}
+          {/* 9 · Map + places */}
           <section className="k-card p-5">
-            <h3 className="text-base font-bold text-kinnso-ink">{t.placesCovered}</h3>
-            <p className="text-xs text-kinnso-muted">{t.placesCoveredSub.replace("{countries}", String(creator.countries)).replace("{cities}", String(creator.cities))}</p>
+            <h3 className="text-base font-bold text-kinnso-ink">{t.placesCovered}{sampleChip}</h3>
+            <p className="text-xs text-kinnso-muted">{t.placesCoveredSub.replace("{countries}", String(metrics.countries)).replace("{cities}", String(metrics.cities))}</p>
             <div className="mt-3"><WorldHeatmap locations={locs} onCityClick={setSelectedCity} /></div>
             <div className="mt-4 flex flex-wrap gap-2">
               {locs.map((l) => <CityChip key={l.city} city={l.city} posts={l.postCount} flag={l.flag} onClick={() => setSelectedCity(l)} />)}
@@ -246,20 +281,20 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
             <div className="mt-3 space-y-2">{places.slice(0, 5).map((p, i) => <PlaceTagRow key={i} place={p} />)}</div>
           </section>
 
-          {/* 8 · Top posts */}
+          {/* 10 · Top posts */}
           <section className="k-card p-5">
-            <h3 className="text-base font-bold text-kinnso-ink">{t.bestTravelPosts}</h3>
+            <h3 className="text-base font-bold text-kinnso-ink">{t.bestTravelPosts}{sampleChip}</h3>
             <p className="text-xs text-kinnso-muted">{t.rankedByEngagement}</p>
             <div className="mt-3"><PostThumbnailGrid posts={topPosts} cols={6} /></div>
           </section>
 
-          {/* 9 · Tag cloud */}
+          {/* 11 · Tag cloud */}
           <section className="k-card p-5">
-            <h3 className="text-base font-bold text-kinnso-ink">{t.knownFor}</h3>
-            <div className="mt-3"><TagCloud tags={creator.topTags} /></div>
+            <h3 className="text-base font-bold text-kinnso-ink">{t.knownFor}{sampleChip}</h3>
+            <div className="mt-3"><TagCloud tags={metrics.topTags} /></div>
           </section>
 
-          {/* 10 · Matched missions */}
+          {/* 12 · Matched missions */}
           <section>
             <div className="-mx-4 mb-4 rounded-md bg-kinnso-orange/90 px-4 py-2 text-sm font-bold text-white sm:-mx-0 sm:rounded-lg">
               {t.matchedForYou}
@@ -284,24 +319,26 @@ export function StudioScanView({ creator, dna, breakdown, t }: {
             </button>
           </section>
 
-          {/* Footer actions */}
-          <section className="space-y-3">
-            <button
-              type="button"
-              onClick={() => { router.push(`/c/${creator.handle}`); }}
-              className="k-btn-primary w-full"
-            >
-              {t.publishProfile}
-            </button>
-            <button type="button" onClick={() => setShareOpen(true)} className="k-btn-ghost w-full">
-              <Share2 className="mr-2 inline h-4 w-4" /> {t.shareDnaCard}
-            </button>
-          </section>
+          {/* Footer actions — demo only (real public profile + share land in a later slice) */}
+          {isDemo && (
+            <section className="space-y-3">
+              <button
+                type="button"
+                onClick={() => { router.push(`/c/${metrics.handle}`); }}
+                className="k-btn-primary w-full"
+              >
+                {t.publishProfile}
+              </button>
+              <button type="button" onClick={() => setShareOpen(true)} className="k-btn-ghost w-full">
+                <Share2 className="mr-2 inline h-4 w-4" /> {t.shareDnaCard}
+              </button>
+            </section>
+          )}
         </div>
       </div>
 
       <CityDetailDrawer open={!!selectedCity} onOpenChange={(o) => !o && setSelectedCity(null)} location={selectedCity} posts={posts} places={places} />
-      <ShareDnaDialog open={shareOpen} onOpenChange={setShareOpen} creator={creator} />
+      <ShareDnaDialog open={shareOpen} onOpenChange={setShareOpen} creator={metrics} />
     </div>
   );
 }
