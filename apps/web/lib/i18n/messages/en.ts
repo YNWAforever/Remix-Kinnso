@@ -243,6 +243,28 @@ export interface Messages {
     inviteDisabled: string
     resultsCapped: string
   }
+  nav: {
+    linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
+    linkGuides: string; linkArticles: string; linkFindCreators: string
+    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
+    signIn: string; language: string
+  }
+  footer: {
+    tagline: string; colCreators: string; colMerchants: string; colCompany: string
+    lApply: string; lStudio: string; lMissions: string; lEarnings: string
+    lPostMission: string; lPricing: string; lCaseStudies: string; lContact: string
+    lAbout: string; lAgent: string; lPress: string; lLegal: string; rights: string
+  }
+  home: {
+    heroPill: string; heroTitle: string; heroSubtitle: string; applyCta: string
+    howHeading: string; howSub: string
+    step1Title: string; step1Desc: string; step2Title: string; step2Desc: string
+    step3Title: string; step3Desc: string; step4Title: string; step4Desc: string
+    merchantWall: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string
+    travelersTitle: string; travelersDesc: string; travelersCta: string
+    merchantsTitle: string; merchantsDesc: string; merchantsCta: string
+  }
+  comingSoon: { heading: string; body: string; back: string }
 }
 
 const messages: Messages = {
@@ -489,6 +511,40 @@ const messages: Messages = {
     lockedFilter: 'Available on Growth',
     inviteDisabled: 'No invites left this month',
     resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
+  },
+  nav: {
+    linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
+    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators',
+    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
+    signIn: 'Sign in', language: 'Language',
+  },
+  footer: {
+    tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
+    colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
+    lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
+    lPostMission: 'Post a mission', lPricing: 'Pricing', lCaseStudies: 'Case studies', lContact: 'Contact',
+    lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
+    rights: '© 2026 KINNSO. All rights reserved.',
+  },
+  home: {
+    heroPill: 'CREATOR PROGRAM 2026',
+    heroTitle: 'Turn every trip into a paid Travel Guide.',
+    heroSubtitle: 'KINNSO scans your socials, proves your travel authority, and matches you with missions from real merchants.',
+    applyCta: 'Apply as Creator',
+    howHeading: 'How KINNSO works', howSub: 'From handle to first payout in days, not months.',
+    step1Title: 'Connect socials', step1Desc: 'Drop your IG / Threads / TikTok handles.',
+    step2Title: 'AI scans you', step2Desc: 'Travel posts classified, score computed, cities mapped.',
+    step3Title: 'Get qualified', step3Desc: 'Reach a Tier threshold and unlock the Studio.',
+    step4Title: 'Earn missions', step4Desc: 'Publish Guides, get paid via FPS or bank transfer.',
+    merchantWall: 'Trusted by partners',
+    featuredHeading: 'Featured creators this week', featuredSub: 'Real handles · scored by our AI Agent.', featuredSeeAll: 'See all',
+    travelersTitle: 'For Travelers', travelersDesc: 'Follow real creators, save Guides, book the exact same spots.', travelersCta: 'Explore Guides',
+    merchantsTitle: 'For Merchants', merchantsDesc: 'Post a mission. Pay only when a real creator publishes and drives clicks.', merchantsCta: 'Post a Mission',
+  },
+  comingSoon: {
+    heading: 'Coming soon',
+    body: 'This part of KINNSO is on the way. Check back shortly.',
+    back: 'Back to home',
   },
 }
 export default messages
