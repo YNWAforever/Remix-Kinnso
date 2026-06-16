@@ -77,6 +77,172 @@ export interface Messages {
     readBackHeading: string
     readBackIntro: string
   }
+  studio: {
+    introHeading: string
+    introSub: string
+    instagram: string
+    handlePlaceholder: string
+    startScan: string
+    scanningHeading: string
+    stepConnected: string
+    stepFetched: string
+    stepClassified: string
+    stepCities: string
+    stepPhotoScan: string
+    stepScoreReady: string
+    stepMissionsMatched: string
+    reportReadyHeading: string
+    lastScanned: string
+    postsAnalyzed: string
+    rescan: string
+    rescanIn: string
+    lastScannedAgo: string
+    avgLikes: string
+    avgSaves: string
+    er: string
+    travel: string
+    commission: string
+    scoreBreakdownToggle: string
+    scoreBreakdownReach: string
+    scoreBreakdownEr: string
+    scoreBreakdownTravel: string
+    scoreBreakdownDiversity: string
+    scoreBreakdownRecency: string
+    scoreBreakdownReachTip: string
+    scoreBreakdownErTip: string
+    scoreBreakdownTravelTip: string
+    scoreBreakdownDiversityTip: string
+    scoreBreakdownRecencyTip: string
+    scoreBreakdownPts: string
+    scoreBreakdownTotal: string
+    engagementOverTime: string
+    yourAudience: string
+    audienceOther: string
+    whatYouCreate: string
+    placesCovered: string
+    placesCoveredSub: string
+    topVenues: string
+    bestTravelPosts: string
+    rankedByEngagement: string
+    knownFor: string
+    matchedForYou: string
+    reachToUnlock: string
+    viewAllMissions: string
+    publishProfile: string
+    shareDnaCard: string
+    shareDialogTitle: string
+    shareCopyLink: string
+    shareCopied: string
+    deltaUnchanged: string
+    deltaSinceLastScan: string
+    scanHint: string
+  }
+  creatorProfile: {
+    metaTitle: string
+    metaDescription: string
+    notFoundTitle: string
+    follow: string
+    following: string
+    statGuides: string
+    statCountries: string
+    statCities: string
+    statReach90d: string
+    statDrivenGmv: string
+    engagementBandSummary: string
+    notConnected: string
+    followers: string
+    avgEng: string
+    travelPct: string
+    destinationsCovered: string
+    destinationsCoveredSub: string
+    topPlacesCovered: string
+    dnaScore6mo: string
+    contentMix: string
+    topTags: string
+    latestGuides: string
+    viewAllGuides: string
+    recentPosts: string
+    tabAll: string
+    tabInstagram: string
+    tabThreads: string
+    tabYoutube: string
+    cityPostsHeading: string
+    cityPlacesHeading: string
+    cityNoPosts: string
+    cityFirstVisited: string
+    cityLastVisited: string
+    cityPosts: string
+    cityAvgEng: string
+    cityTotalEngagement: string
+    brandWorkWith: string
+    brandTierLine: string
+    brandReachLine: string
+    brandSendBrief: string
+    brandSaveToList: string
+    brandSignInToContact: string
+  }
+  merchants: {
+    heading: string
+    sub: string
+    yourProfile: string
+    searchPlaceholder: string
+    filter: string
+    tabRecommended: string
+    tabSaved: string
+    tabWorking: string
+    emptyRecommended: string
+    emptySaved: string
+    emptyWorking: string
+    addPrivateNote: string
+    statusInProgress: string
+    statusDelivered: string
+    statusCompleted: string
+    matchLabel: string
+    reasonCovers: string
+    reasonCreator: string
+    reasonTier: string
+    reasonAudience: string
+    cardDna: string
+    cardEr: string
+    cardGuides: string
+    cardReach: string
+    cardCountries: string
+    viewProfile: string
+    sendBrief: string
+    save: string
+    saved: string
+    showDetails: string
+    hideDetails: string
+    detailTopLocations: string
+    detailContentSample: string
+    detailEngagementTrend: string
+    filterTitle: string
+    filterLocation: string
+    filterScore: string
+    filterMinEr: string
+    filterTier: string
+    filterCategory: string
+    filterAudience: string
+    filterPlatforms: string
+    filterMinFollowers: string
+    filterActivity: string
+    followersAny: string
+    activity7: string
+    activity30: string
+    activity90: string
+    activityAny: string
+    clearAll: string
+    applyFilters: string
+    close: string
+    searchesLeft: string
+    invitesLeft: string
+    upgradeToGrowth: string
+    upgradeBlurb: string
+    upgradeCta: string
+    lockedFilter: string
+    inviteDisabled: string
+    resultsCapped: string
+  }
 }
 
 const messages: Messages = {
@@ -157,6 +323,172 @@ const messages: Messages = {
     invalid: 'Please fix the highlighted fields before publishing.',
     readBackHeading: 'Your profile is live',
     readBackIntro: 'Here is your published creator DNA.',
+  },
+  studio: {
+    introHeading: 'Add your handles to begin',
+    introSub: 'Usually takes 60–90 seconds. Do not close this tab.',
+    instagram: 'Instagram',
+    handlePlaceholder: 'handle',
+    startScan: 'Start scan',
+    scanningHeading: 'Scanning your profiles…',
+    stepConnected: 'Connected to Instagram',
+    stepFetched: 'Fetched 412 posts',
+    stepClassified: 'Classified: 286 travel · 126 other',
+    stepCities: 'Extracted 41 cities across 12 countries',
+    stepPhotoScan: 'Photo scan complete · 22 landmarks identified',
+    stepScoreReady: 'Engagement Score: ready',
+    stepMissionsMatched: '6 missions matched',
+    reportReadyHeading: 'Your Creator DNA is ready 🎉',
+    lastScanned: 'Last scanned',
+    postsAnalyzed: '412 posts analyzed',
+    rescan: 'Rescan',
+    rescanIn: 'Rescan in {days}d',
+    lastScannedAgo: 'Last scanned {days}d ago',
+    avgLikes: 'Avg Likes',
+    avgSaves: 'Avg Saves',
+    er: 'ER',
+    travel: 'Travel',
+    commission: 'commission',
+    scoreBreakdownToggle: 'How is my score calculated?',
+    scoreBreakdownReach: 'Reach',
+    scoreBreakdownEr: 'Engagement rate',
+    scoreBreakdownTravel: 'Travel content focus',
+    scoreBreakdownDiversity: 'Country diversity',
+    scoreBreakdownRecency: 'Recent travel activity',
+    scoreBreakdownReachTip: 'Based on your total followers across platforms',
+    scoreBreakdownErTip: 'Saves weighted 3× — they signal strong intent',
+    scoreBreakdownTravelTip: 'Percentage of recent posts classified as travel',
+    scoreBreakdownDiversityTip: 'More countries = broader merchant reach (capped at 10)',
+    scoreBreakdownRecencyTip: 'Are you still actively posting travel content?',
+    scoreBreakdownPts: '{val} / {max} pts',
+    scoreBreakdownTotal: 'Total: {total} pts → score {score}',
+    engagementOverTime: 'Engagement over time',
+    yourAudience: 'Your audience',
+    audienceOther: 'Other',
+    whatYouCreate: 'What you create',
+    placesCovered: "Places you've covered",
+    placesCoveredSub: '{countries} countries · {cities} cities — extracted from your posts',
+    topVenues: 'Top venues',
+    bestTravelPosts: 'Your best travel posts',
+    rankedByEngagement: 'Ranked by engagement',
+    knownFor: "What you're known for",
+    matchedForYou: 'Matched for you · 6 NEW',
+    reachToUnlock: 'Reach {tier} to unlock',
+    viewAllMissions: 'View all 6 missions',
+    publishProfile: 'Publish my profile →',
+    shareDnaCard: 'Share DNA card',
+    shareDialogTitle: 'Share your DNA card',
+    shareCopyLink: 'Copy link',
+    shareCopied: 'Copied',
+    deltaUnchanged: 'Unchanged',
+    deltaSinceLastScan: '{delta} since last scan',
+    scanHint: 'We scan your public posts to build your DNA.',
+  },
+  creatorProfile: {
+    metaTitle: '{name} (@{handle}) — Travel Creator · DNA {score} | KINNSO',
+    metaDescription: '{category} travel creator based in {city}. {countries} countries · {guides} Guides. DNA Score {score}, {tier} tier.',
+    notFoundTitle: 'Creator not found · KINNSO',
+    follow: 'Follow',
+    following: 'Following',
+    statGuides: 'Guides',
+    statCountries: 'Countries',
+    statCities: 'Cities',
+    statReach90d: 'Reach 90d',
+    statDrivenGmv: 'Driven GMV',
+    engagementBandSummary: 'ER {er}% · Avg 3.4k likes · 980 saves',
+    notConnected: 'Not connected',
+    followers: 'followers',
+    avgEng: 'Avg eng.',
+    travelPct: '{pct}% travel',
+    destinationsCovered: 'Destinations covered',
+    destinationsCoveredSub: '{countries} countries · {cities} cities — extracted from public posts',
+    topPlacesCovered: 'Top places covered',
+    dnaScore6mo: 'DNA score · 6 months',
+    contentMix: 'Content mix',
+    topTags: 'Top tags',
+    latestGuides: 'Latest Guides',
+    viewAllGuides: 'View all guides →',
+    recentPosts: 'Recent posts',
+    tabAll: 'All',
+    tabInstagram: 'Instagram',
+    tabThreads: 'Threads',
+    tabYoutube: 'YouTube',
+    cityPostsHeading: 'Posts from this city',
+    cityPlacesHeading: 'Places in this city',
+    cityNoPosts: 'No posts yet.',
+    cityFirstVisited: 'First visited',
+    cityLastVisited: 'Last visited',
+    cityPosts: 'Posts',
+    cityAvgEng: 'Avg eng.',
+    cityTotalEngagement: '{count} total engagement',
+    brandWorkWith: 'Work with {name}',
+    brandTierLine: '{payout} · {commission} affiliate commission · {tier} tier',
+    brandReachLine: '{reach} reach · {countries} countries · DNA {score}',
+    brandSendBrief: 'Send a brief →',
+    brandSaveToList: 'Save to list',
+    brandSignInToContact: 'Sign in as merchant to contact',
+  },
+  merchants: {
+    heading: 'Find the right creator',
+    sub: 'Ranked by match score to your business profile. Updated daily.',
+    yourProfile: 'Your profile',
+    searchPlaceholder: 'Search by name, city, or tag…',
+    filter: 'Filter',
+    tabRecommended: 'Recommended',
+    tabSaved: 'Saved',
+    tabWorking: 'Working with',
+    emptyRecommended: 'No creators match your filters.',
+    emptySaved: "You haven't saved any creators yet.",
+    emptyWorking: 'No active collaborations.',
+    addPrivateNote: 'Add a private note…',
+    statusInProgress: 'in progress',
+    statusDelivered: 'delivered',
+    statusCompleted: 'completed',
+    matchLabel: 'match',
+    reasonCovers: 'Covers {city}',
+    reasonCreator: '{category} creator',
+    reasonTier: '{tier} tier',
+    reasonAudience: '{pct}% {country} audience',
+    cardDna: 'DNA',
+    cardEr: 'ER',
+    cardGuides: '{count} Guides',
+    cardReach: '{count}k Reach',
+    cardCountries: '{count} Countries',
+    viewProfile: 'View profile',
+    sendBrief: 'Send brief →',
+    save: 'Save',
+    saved: 'Saved',
+    showDetails: 'Show details',
+    hideDetails: 'Hide details',
+    detailTopLocations: 'Top locations',
+    detailContentSample: 'Content sample',
+    detailEngagementTrend: 'Engagement trend',
+    filterTitle: 'Filter creators',
+    filterLocation: 'Location',
+    filterScore: 'Engagement score',
+    filterMinEr: 'Minimum ER %',
+    filterTier: 'Tier',
+    filterCategory: 'Content category',
+    filterAudience: 'Primary audience',
+    filterPlatforms: 'Platforms',
+    filterMinFollowers: 'Minimum followers',
+    filterActivity: 'Activity',
+    followersAny: 'Any',
+    activity7: 'Posted in last 7 days',
+    activity30: 'Last 30 days',
+    activity90: 'Last 90 days',
+    activityAny: 'Any time',
+    clearAll: 'Clear all',
+    applyFilters: 'Apply filters',
+    close: 'Close',
+    searchesLeft: '{count} searches left',
+    invitesLeft: '{count} invites left',
+    upgradeToGrowth: 'Upgrade to Growth',
+    upgradeBlurb: 'Unlock advanced filters, unlimited search, and creator invites with Growth.',
+    upgradeCta: 'Upgrade',
+    lockedFilter: 'Available on Growth',
+    inviteDisabled: 'No invites left this month',
+    resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
   },
 }
 export default messages
