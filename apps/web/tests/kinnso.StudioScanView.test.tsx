@@ -69,7 +69,10 @@ describe('StudioScanView — real mode', () => {
     expect(screen.getByText('May Wong')).toBeTruthy()
     expect(screen.getByText('@maygram')).toBeTruthy()
     expect(screen.getByText(en.studio.dnaCoreHeading)).toBeTruthy()
-    expect(screen.getByText(sampleDna.niches[0])).toBeTruthy()
+    // Assert the DNA bio (unique prose, rendered only by DnaCorePanel). Do NOT
+    // assert a niche here: sampleDna.niches ('Coffee', 'City Walk') collide with
+    // the maywanders content-mix donut legend, which renders ungated in real mode.
+    expect(screen.getByText(sampleDna.bio)).toBeTruthy()
   })
 
   it('shows the sample note and hides the publish/share footer', () => {
