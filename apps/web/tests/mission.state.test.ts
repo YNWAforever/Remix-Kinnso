@@ -4,8 +4,31 @@ import {
   reviewParticipant,
   reviewSubmission,
 } from '@/lib/missions/state'
+import {
+  affiliateNetworks,
+  missionSources,
+  missionStatuses,
+  missionTypes,
+  missionVisibilities,
+  participantSources,
+  participantStatuses,
+  settlementStatuses,
+  submissionStatuses,
+} from '@/lib/missions/types'
 
 describe('mission state transitions', () => {
+  it('exports the requested mission domain sets', () => {
+    expect(missionTypes).toEqual(['coupon_affiliate', 'hybrid', 'paid'])
+    expect(missionSources).toEqual(['merchant', 'travelpayouts'])
+    expect(missionVisibilities).toEqual(['open', 'targeted'])
+    expect(missionStatuses).toEqual(['draft', 'published', 'paused', 'completed', 'cancelled'])
+    expect(participantStatuses).toEqual(['invited', 'applied', 'rejected', 'active', 'completed', 'cancelled'])
+    expect(participantSources).toEqual(['open_join', 'application', 'merchant_invite', 'affiliate_network_join'])
+    expect(submissionStatuses).toEqual(['pending', 'submitted', 'revision_requested', 'approved', 'rejected'])
+    expect(settlementStatuses).toEqual(['not_started', 'pending', 'partially_paid', 'paid', 'disputed'])
+    expect(affiliateNetworks).toEqual(['travelpayouts'])
+  })
+
   it('auto-joins merchant coupon missions', () => {
     expect(nextJoinStatus({ missionType: 'coupon_affiliate', missionSource: 'merchant' })).toEqual({
       source: 'open_join',
@@ -33,6 +56,10 @@ describe('mission state transitions', () => {
 
   it('merchant approval moves applicants to active', () => {
     expect(reviewParticipant('applied', 'approve')).toBe('active')
+  })
+
+  it('merchant approval moves invited creators to active', () => {
+    expect(reviewParticipant('invited', 'approve')).toBe('active')
   })
 
   it('merchant rejection moves applicants to rejected', () => {

@@ -1,8 +1,8 @@
 import type {
-  MissionJoinSource,
   MissionSource,
   MissionType,
   ParticipantReviewAction,
+  ParticipantSource,
   ParticipantStatus,
   SubmissionReviewAction,
   SubmissionStatus,
@@ -14,7 +14,7 @@ type JoinInput = {
 }
 
 type JoinResult = {
-  source: MissionJoinSource
+  source: ParticipantSource
   status: ParticipantStatus
 }
 
@@ -36,7 +36,7 @@ export const reviewParticipant = (
   currentStatus: ParticipantStatus,
   action: ParticipantReviewAction,
 ): ParticipantStatus => {
-  if (currentStatus !== 'applied') {
+  if (currentStatus !== 'applied' && currentStatus !== 'invited') {
     throw new Error(`Cannot review participant from ${currentStatus}`)
   }
 
