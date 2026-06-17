@@ -1,3 +1,25 @@
+create schema if not exists app_private;
+
+create or replace function app_private.is_mission_participant(target_mission_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.mission_participants participant
+    where participant.mission_id = target_mission_id
+      and participant.creator_id = (select auth.uid())
+  );
+$$;
+
+revoke all on schema app_private from public;
+revoke all on function app_private.is_mission_participant(uuid) from public;
+grant usage on schema app_private to authenticated;
+grant execute on function app_private.is_mission_participant(uuid) to authenticated;
+
 alter table public.merchant_profiles enable row level security;
 alter table public.kinnso_ops_members enable row level security;
 alter table public.affiliate_network_programs enable row level security;
@@ -80,7 +102,13 @@ create policy "missions_visible_select" on public.missions
   for select
   to authenticated
   using (
-    status = 'published'
+    (
+      status = 'published'
+      and (
+        visibility = 'open'
+        or app_private.is_mission_participant(missions.id)
+      )
+    )
     or exists (
       select 1
       from public.merchant_profiles merchant
@@ -175,17 +203,62 @@ create policy "mission_participants_visible_select" on public.mission_participan
     )
   );
 
-create policy "mission_participants_creator_insert" on public.mission_participants
+create policy "mission_participants_actor_insert" on public.mission_participants
   for insert
   to authenticated
-  with check (creator_id = (select auth.uid()));
+  with check (
+    (
+      creator_id = (select auth.uid())
+      and exists (
+        select 1
+        from public.missions mission
+        where mission.id = mission_participants.mission_id
+          and mission.status = 'published'
+          and mission.visibility = 'open'
+          and (
+            (
+              mission_participants.source = 'open_join'
+              and mission_participants.status = 'active'
+              and mission.mission_type = 'coupon_affiliate'
+            )
+            or (
+              mission_participants.source = 'affiliate_network_join'
+              and mission_participants.status = 'active'
+              and mission.mission_source = 'travelpayouts'
+            )
+            or (
+              mission_participants.source = 'application'
+              and mission_participants.status = 'applied'
+              and mission.mission_type in ('hybrid','paid')
+            )
+          )
+      )
+    )
+    or (
+      source = 'merchant_invite'
+      and status = 'invited'
+      and (
+        exists (
+          select 1
+          from public.missions mission
+          join public.merchant_profiles merchant on merchant.id = mission.merchant_profile_id
+          where mission.id = mission_participants.mission_id
+            and merchant.user_id = (select auth.uid())
+        )
+        or exists (
+          select 1
+          from public.kinnso_ops_members ops
+          where ops.user_id = (select auth.uid())
+            and ops.status = 'active'
+        )
+      )
+    )
+  );
 
 create policy "mission_participants_merchant_ops_update" on public.mission_participants
   for update
   to authenticated
   using (
-    creator_id = (select auth.uid())
-    or
     exists (
       select 1
       from public.missions mission
@@ -201,8 +274,6 @@ create policy "mission_participants_merchant_ops_update" on public.mission_parti
     )
   )
   with check (
-    creator_id = (select auth.uid())
-    or
     exists (
       select 1
       from public.missions mission
@@ -376,14 +447,41 @@ create policy "mission_social_snapshots_visible_select" on public.mission_social
   using (
     exists (
       select 1
-      from public.missions mission
-      where mission.id = mission_social_snapshots.mission_id
+      from public.mission_participants participant
+      where participant.id = mission_social_snapshots.mission_participant_id
+        and participant.creator_id = (select auth.uid())
     )
     or exists (
       select 1
       from public.mission_participants participant
-      where participant.id = mission_social_snapshots.mission_participant_id
+      join public.mission_milestone_submissions submission
+        on submission.mission_participant_id = participant.id
+      where submission.id = mission_social_snapshots.mission_milestone_submission_id
         and participant.creator_id = (select auth.uid())
+    )
+    or exists (
+      select 1
+      from public.missions mission
+      join public.merchant_profiles merchant on merchant.id = mission.merchant_profile_id
+      where mission.id = mission_social_snapshots.mission_id
+        and merchant.user_id = (select auth.uid())
+    )
+    or exists (
+      select 1
+      from public.mission_participants participant
+      join public.missions mission on mission.id = participant.mission_id
+      join public.merchant_profiles merchant on merchant.id = mission.merchant_profile_id
+      where participant.id = mission_social_snapshots.mission_participant_id
+        and merchant.user_id = (select auth.uid())
+    )
+    or exists (
+      select 1
+      from public.mission_milestone_submissions submission
+      join public.mission_participants participant on participant.id = submission.mission_participant_id
+      join public.missions mission on mission.id = participant.mission_id
+      join public.merchant_profiles merchant on merchant.id = mission.merchant_profile_id
+      where submission.id = mission_social_snapshots.mission_milestone_submission_id
+        and merchant.user_id = (select auth.uid())
     )
     or exists (
       select 1
