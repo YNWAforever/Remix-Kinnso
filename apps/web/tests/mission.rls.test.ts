@@ -250,6 +250,16 @@ d('mission schema RLS', () => {
     expect(visibleAfterInvite.error).toBeNull()
     expect(visibleAfterInvite.data!.id).toBe(targetedMissionId)
 
+    const rejected = await merchant
+      .from('mission_participants')
+      .update({ status: 'rejected' })
+      .eq('id', invite.data!.id)
+    expect(rejected.error).toBeNull()
+
+    const hiddenAfterRejected = await creator.from('missions').select('id').eq('id', targetedMissionId)
+    expect(hiddenAfterRejected.error).toBeNull()
+    expect(hiddenAfterRejected.data).toEqual([])
+
     const otherCreator = await authed(otherCreatorEmail)
     const hiddenFromOtherCreator = await otherCreator.from('missions').select('id').eq('id', targetedMissionId)
     expect(hiddenFromOtherCreator.error).toBeNull()
@@ -293,10 +303,15 @@ d('mission schema RLS', () => {
         original_url: 'https://example.com/travel',
         partner_url: 'https://tp.example/partner',
         sub_id: 'partner-good-link',
+        external_status: 'success',
       })
-      .select('id')
+      .select('id, external_status, partner_url, sub_id')
       .single()
     expect(trackedLink.error).toBeNull()
+    expect(trackedLink.data!.external_status).toBe('pending')
+    expect(trackedLink.data!.partner_url).toBe('https://example.com/travel')
+    expect(trackedLink.data!.sub_id).toMatch(/^pending:/)
+    expect(trackedLink.data!.sub_id).not.toBe('partner-good-link')
 
     const merchantParticipant = await creator
       .from('mission_participants')
@@ -324,6 +339,114 @@ d('mission schema RLS', () => {
       })
       .select('id')
     expect(blockedMerchantMissionLink.error === null ? blockedMerchantMissionLink.data : []).toEqual([])
+  })
+
+  it('creator milestone submissions cannot forge review state or cross missions', async () => {
+    const participant = await svc
+      .from('mission_participants')
+      .upsert(
+        {
+          mission_id: missionId,
+          creator_id: creatorId,
+          status: 'active',
+          source: 'open_join',
+        },
+        { onConflict: 'mission_id,creator_id' },
+      )
+      .select('id')
+      .single()
+    expect(participant.error).toBeNull()
+
+    const milestone = await svc
+      .from('mission_milestones')
+      .insert({ mission_id: missionId, title: 'Post proof', description: 'Upload post proof' })
+      .select('id')
+      .single()
+    expect(milestone.error).toBeNull()
+
+    const otherMissionMilestone = await svc
+      .from('mission_milestones')
+      .insert({ mission_id: travelpayoutsMissionId, title: 'Wrong mission', description: 'Different mission' })
+      .select('id')
+      .single()
+    expect(otherMissionMilestone.error).toBeNull()
+
+    const creator = await authed(creatorEmail)
+    const approvedInsert = await creator
+      .from('mission_milestone_submissions')
+      .insert({
+        mission_milestone_id: milestone.data!.id,
+        mission_participant_id: participant.data!.id,
+        status: 'approved',
+        merchant_feedback: 'self-reviewed',
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: merchantUserId,
+      })
+      .select('id')
+    expect(approvedInsert.error).not.toBeNull()
+
+    const mismatchedMission = await creator
+      .from('mission_milestone_submissions')
+      .insert({
+        mission_milestone_id: otherMissionMilestone.data!.id,
+        mission_participant_id: participant.data!.id,
+        status: 'submitted',
+        proof_urls: ['https://example.com/wrong-mission-proof'],
+      })
+      .select('id')
+    expect(mismatchedMission.error).not.toBeNull()
+
+    const validSubmission = await creator
+      .from('mission_milestone_submissions')
+      .insert({
+        mission_milestone_id: milestone.data!.id,
+        mission_participant_id: participant.data!.id,
+        status: 'submitted',
+        proof_urls: ['https://example.com/proof'],
+        notes: 'Proof submitted',
+        submitted_at: new Date().toISOString(),
+      })
+      .select('id, status, merchant_feedback, reviewed_at, reviewed_by')
+      .single()
+    expect(validSubmission.error).toBeNull()
+    expect(validSubmission.data!.status).toBe('submitted')
+    expect(validSubmission.data!.merchant_feedback).toBeNull()
+    expect(validSubmission.data!.reviewed_at).toBeNull()
+    expect(validSubmission.data!.reviewed_by).toBeNull()
+
+    const forgedReviewUpdate = await creator
+      .from('mission_milestone_submissions')
+      .update({ merchant_feedback: 'creator review' })
+      .eq('id', validSubmission.data!.id)
+      .select('id')
+    expect(forgedReviewUpdate.error === null ? forgedReviewUpdate.data : []).toEqual([])
+
+    const unchanged = await svc
+      .from('mission_milestone_submissions')
+      .select('merchant_feedback, reviewed_at, reviewed_by')
+      .eq('id', validSubmission.data!.id)
+      .single()
+    expect(unchanged.error).toBeNull()
+    expect(unchanged.data!.merchant_feedback).toBeNull()
+    expect(unchanged.data!.reviewed_at).toBeNull()
+    expect(unchanged.data!.reviewed_by).toBeNull()
+
+    const merchant = await authed(merchantEmail)
+    const merchantReview = await merchant
+      .from('mission_milestone_submissions')
+      .update({
+        status: 'approved',
+        merchant_feedback: 'Approved by merchant',
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: merchantUserId,
+      })
+      .eq('id', validSubmission.data!.id)
+      .select('status, merchant_feedback, reviewed_by')
+      .single()
+    expect(merchantReview.error).toBeNull()
+    expect(merchantReview.data!.status).toBe('approved')
+    expect(merchantReview.data!.merchant_feedback).toBe('Approved by merchant')
+    expect(merchantReview.data!.reviewed_by).toBe(merchantUserId)
   })
 
   it('social snapshots are visible to the creator, owning merchant, and ops only', async () => {

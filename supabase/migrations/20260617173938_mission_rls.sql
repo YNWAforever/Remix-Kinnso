@@ -12,6 +12,7 @@ as $$
     from public.mission_participants participant
     where participant.mission_id = target_mission_id
       and participant.creator_id = (select auth.uid())
+      and participant.status in ('invited','applied','active','completed')
   );
 $$;
 
