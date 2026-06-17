@@ -1,10 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import type {
+  AffiliateProgramStatus,
   MissionDraftInput,
   MissionSource,
   MissionType,
   ParticipantReviewAction,
+  ParticipantStatus,
   PartnerLinkRequest,
   SettlementPaymentStatus,
   SettlementStatus,
@@ -79,6 +81,16 @@ type UpdateSettlementInput = LocaleOption & {
   creatorCommissionAmount?: number | null
   kinnsoCommissionAmount?: number | null
   opsNote?: string | null
+}
+
+export type CreatePartnerLinkInput = LocaleOption & {
+  affiliateNetworkProgramId: string
+  missionId: string
+  missionParticipantId: string
+  creatorId: string
+  originalUrl: string
+  programStatus: AffiliateProgramStatus
+  participantStatus: ParticipantStatus
 }
 
 const merchantMissionsPath = '/merchants/missions'
@@ -485,15 +497,57 @@ export async function updateSettlementAction(
 }
 
 export async function createPartnerLinkAction(
-  input: PartnerLinkRequest,
-): Promise<ActionResult> {
+  input: CreatePartnerLinkInput,
+): Promise<ActionResult<{ link: { id: string; partner_url: string } }>> {
   'use server'
 
-  const validation = validatePartnerLinkRequest(input)
+  const request: PartnerLinkRequest = {
+    programStatus: input.programStatus,
+    participantStatus: input.participantStatus,
+    originalUrl: input.originalUrl,
+  }
+  const validation = validatePartnerLinkRequest(request)
   if (!validation.ok) return validation
 
-  return {
-    ok: false,
-    errors: { form: ['Travelpayouts adapter is added in Task 4'] },
+  const supabase = await getSupabase()
+  const { buildSubId, createTravelpayoutsPartnerLinks } = await import('@/lib/missions/travelpayouts')
+  const subId = buildSubId({
+    missionId: input.missionId,
+    participantId: input.missionParticipantId,
+    creatorId: input.creatorId,
+  })
+
+  let partnerUrl: string | null = null
+  try {
+    const [link] = await createTravelpayoutsPartnerLinks({
+      shorten: true,
+      links: [{ url: input.originalUrl, subId }],
+    })
+    if (link?.status === 'success' && link.partnerUrl) partnerUrl = link.partnerUrl
+  } catch {
+    return formError('Travelpayouts partner link could not be generated')
   }
+
+  if (!partnerUrl) return formError('Travelpayouts partner link could not be generated')
+
+  const { data, error } = await supabase
+    .from('affiliate_partner_links')
+    .insert({
+      affiliate_network_program_id: input.affiliateNetworkProgramId,
+      mission_id: input.missionId,
+      mission_participant_id: input.missionParticipantId,
+      creator_id: input.creatorId,
+      network: 'travelpayouts',
+      original_url: input.originalUrl,
+      partner_url: partnerUrl,
+      sub_id: subId,
+      external_status: 'success',
+    })
+    .select('id, partner_url')
+    .single()
+
+  if (error || !data) return formError('Partner link could not be saved')
+
+  await revalidate([localizedPath(input.locale, studioMissionsPath)])
+  return { ok: true, link: data }
 }
