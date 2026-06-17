@@ -1,5 +1,3 @@
-'use server'
-
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import type {
@@ -46,28 +44,32 @@ type BuildParticipantInsertInput = {
   applicationNote?: string | null
 }
 
-type CreateMissionOptions = {
+type LocaleOption = {
+  locale?: string
+}
+
+type CreateMissionOptions = LocaleOption & {
   publish?: boolean
 }
 
-type JoinMissionInput = {
+type JoinMissionInput = LocaleOption & {
   missionId: string
   applicationNote?: string | null
 }
 
-type ReviewParticipantInput = {
+type ReviewParticipantInput = LocaleOption & {
   participantId: string
   action: ParticipantReviewAction
   reviewNote?: string | null
 }
 
-type ReviewSubmissionInput = {
+type ReviewSubmissionInput = LocaleOption & {
   submissionId: string
   action: SubmissionReviewAction
   feedback?: string | null
 }
 
-type UpdateSettlementInput = {
+type UpdateSettlementInput = LocaleOption & {
   settlementId: string
   status: SettlementStatus
   creatorPayoutStatus: SettlementPaymentStatus
@@ -82,11 +84,21 @@ type UpdateSettlementInput = {
 const merchantMissionsPath = '/merchants/missions'
 const studioMissionsPath = '/studio/missions'
 const opsSettlementsPath = '/ops/settlements'
+const defaultLocale = 'en'
+const localePattern = /^[a-z]{2}(?:-[a-z]{2})?$/
 
 const formError = (message: string): ActionFailure => ({
   ok: false,
   errors: { form: [message] },
 })
+
+const normalizeLocale = (locale?: string) => {
+  const value = locale?.trim().toLowerCase()
+  return value && localePattern.test(value) ? value : defaultLocale
+}
+
+const localizedPath = (locale: string | undefined, path: string) =>
+  `/${normalizeLocale(locale)}${path}`
 
 async function getSupabase() {
   const { createSupabaseServerClient } = await import('@/lib/supabase/server')
@@ -196,6 +208,8 @@ export async function createMissionAction(
   input: MissionDraftInput,
   options: CreateMissionOptions = {},
 ): Promise<ActionResult<{ missionId: string }>> {
+  'use server'
+
   const validation = validateMissionDraft(input)
   if (!validation.ok) return validation
 
@@ -241,16 +255,24 @@ export async function createMissionAction(
     }))
 
     const { error: milestoneError } = await supabase.from('mission_milestones').insert(milestones)
-    if (milestoneError) return formError('Mission milestones could not be created')
+    if (milestoneError) {
+      await supabase.from('missions').delete().eq('id', mission.id)
+      return formError('Mission milestones could not be created')
+    }
   }
 
-  await revalidate([merchantMissionsPath, studioMissionsPath])
+  await revalidate([
+    localizedPath(options.locale, merchantMissionsPath),
+    localizedPath(options.locale, studioMissionsPath),
+  ])
   return { ok: true, missionId: mission.id }
 }
 
 export async function joinMissionAction(
   input: JoinMissionInput,
 ): Promise<ActionResult<{ participantId: string }>> {
+  'use server'
+
   const supabase = await getSupabase()
   const user = await getAuthenticatedUser(supabase)
   if (!user) return formError('Sign in is required')
@@ -280,13 +302,15 @@ export async function joinMissionAction(
 
   if (participantError || !participant) return formError('Mission could not be joined')
 
-  await revalidate([studioMissionsPath])
+  await revalidate([localizedPath(input.locale, studioMissionsPath)])
   return { ok: true, participantId: participant.id }
 }
 
 export async function reviewParticipantAction(
   input: ReviewParticipantInput,
 ): Promise<ActionResult<{ status: string }>> {
+  'use server'
+
   const supabase = await getSupabase()
   const user = await getAuthenticatedUser(supabase)
   if (!user) return formError('Sign in is required')
@@ -330,13 +354,15 @@ export async function reviewParticipantAction(
 
   if (updateError) return formError('Participant review could not be saved')
 
-  await revalidate([merchantMissionsPath])
+  await revalidate([localizedPath(input.locale, merchantMissionsPath)])
   return { ok: true, status: nextStatus }
 }
 
 export async function reviewSubmissionAction(
   input: ReviewSubmissionInput,
 ): Promise<ActionResult<{ status: string }>> {
+  'use server'
+
   const supabase = await getSupabase()
   const user = await getAuthenticatedUser(supabase)
   if (!user) return formError('Sign in is required')
@@ -389,13 +415,15 @@ export async function reviewSubmissionAction(
 
   if (updateError) return formError('Submission review could not be saved')
 
-  await revalidate([merchantMissionsPath])
+  await revalidate([localizedPath(input.locale, merchantMissionsPath)])
   return { ok: true, status: nextStatus }
 }
 
 export async function updateSettlementAction(
   input: UpdateSettlementInput,
 ): Promise<ActionResult<{ settlementId: string }>> {
+  'use server'
+
   const supabase = await getSupabase()
   const user = await getAuthenticatedUser(supabase)
   if (!user) return formError('Sign in is required')
@@ -423,20 +451,24 @@ export async function updateSettlementAction(
     updated_by_ops_member_id: opsMember.id,
   }
 
-  const { error } = await supabase
+  const { data: settlement, error } = await supabase
     .from('mission_settlements')
     .update(update)
     .eq('id', input.settlementId)
+    .select('id')
+    .maybeSingle()
 
-  if (error) return formError('Settlement update could not be saved')
+  if (error || !settlement) return formError('Settlement update could not be saved')
 
-  await revalidate([opsSettlementsPath])
-  return { ok: true, settlementId: input.settlementId }
+  await revalidate([localizedPath(input.locale, opsSettlementsPath)])
+  return { ok: true, settlementId: settlement.id }
 }
 
 export async function createPartnerLinkAction(
   input: PartnerLinkRequest,
 ): Promise<ActionResult> {
+  'use server'
+
   const validation = validatePartnerLinkRequest(input)
   if (!validation.ok) return validation
 

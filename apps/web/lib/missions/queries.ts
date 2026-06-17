@@ -49,11 +49,12 @@ export async function listCreatorMissions(
   supabase: SupabaseClient<Database>,
   creatorId: string,
 ) {
+  void creatorId
+
   return supabase
     .from('missions')
     .select(creatorMissionSelect)
     .eq('status', 'published')
-    .or(`visibility.eq.open,mission_participants.creator_id.eq.${creatorId}`)
     .order('published_at', { ascending: false })
 }
 
