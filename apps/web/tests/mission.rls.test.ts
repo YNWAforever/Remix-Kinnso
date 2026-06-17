@@ -673,4 +673,145 @@ d('mission schema RLS', () => {
       .eq('id', settlement.data!.id)
     expect(allowed.error).toBeNull()
   }, testTimeout)
+
+  it('merchant can delete an empty own mission for rollback', async () => {
+    let rollbackMissionId = ''
+
+    try {
+      const mission = await svc
+        .from('missions')
+        .insert({
+          merchant_profile_id: merchantProfileId,
+          title: 'Empty rollback mission',
+          summary: 'Mission created only to validate rollback deletes',
+          mission_source: 'merchant',
+          mission_type: 'coupon_affiliate',
+          visibility: 'open',
+          status: 'draft',
+          coupon_code: 'EMPTY',
+          coupon_url: 'https://example.com/empty-rollback',
+          affiliate_commission_rate: 10,
+          kinnso_commission_rate: 4,
+          creator_commission_rate: 6,
+        })
+        .select('id')
+        .single()
+      expect(mission.error).toBeNull()
+      rollbackMissionId = mission.data!.id
+
+      const merchant = await authed(merchantEmail)
+      const deleted = await merchant.from('missions').delete().eq('id', rollbackMissionId).select('id')
+      expect(deleted.error).toBeNull()
+      expect(deleted.data).toEqual([{ id: rollbackMissionId }])
+
+      const remaining = await svc.from('missions').select('id').eq('id', rollbackMissionId)
+      expect(remaining.error).toBeNull()
+      expect(remaining.data).toEqual([])
+    } finally {
+      if (rollbackMissionId) {
+        await runPsql(`delete from public.missions where id = ${sqlString(rollbackMissionId)};`)
+      }
+    }
+  }, testTimeout)
+
+  it('merchant cannot see affiliate events or delete own mission when affiliate events exist', async () => {
+    let blockedMissionId = ''
+    let eventId = ''
+
+    try {
+      const mission = await svc
+        .from('missions')
+        .insert({
+          merchant_profile_id: merchantProfileId,
+          title: 'Blocked rollback mission',
+          summary: 'Mission should not delete after affiliate events exist',
+          mission_source: 'merchant',
+          mission_type: 'coupon_affiliate',
+          visibility: 'open',
+          status: 'draft',
+          coupon_code: 'BLOCKED',
+          coupon_url: 'https://example.com/blocked-rollback',
+          affiliate_commission_rate: 10,
+          kinnso_commission_rate: 4,
+          creator_commission_rate: 6,
+        })
+        .select('id')
+        .single()
+      expect(mission.error).toBeNull()
+      blockedMissionId = mission.data!.id
+
+      const event = await svc
+        .from('affiliate_network_events')
+        .insert({
+          network: 'travelpayouts',
+          mission_id: blockedMissionId,
+          external_action_id: `rollback-block-${runId}`,
+          event_state: 'processing',
+          profit_amount: 12.34,
+          currency: 'HKD',
+        })
+        .select('id')
+        .single()
+      expect(event.error).toBeNull()
+      eventId = event.data!.id
+
+      const merchant = await authed(merchantEmail)
+      const merchantEventVisible = await merchant
+        .from('affiliate_network_events')
+        .select('id, profit_amount')
+        .eq('id', eventId)
+      expect(merchantEventVisible.error).toBeNull()
+      expect(merchantEventVisible.data).toEqual([])
+
+      const blockedDelete = await merchant.from('missions').delete().eq('id', blockedMissionId).select('id')
+      expect(blockedDelete.error).toBeNull()
+      expect(blockedDelete.data).toEqual([])
+
+      const remaining = await svc.from('missions').select('id').eq('id', blockedMissionId).single()
+      expect(remaining.error).toBeNull()
+      expect(remaining.data!.id).toBe(blockedMissionId)
+    } finally {
+      if (eventId) {
+        await runPsql(`delete from public.affiliate_network_events where id = ${sqlString(eventId)};`)
+      }
+      if (blockedMissionId) {
+        await runPsql(`delete from public.missions where id = ${sqlString(blockedMissionId)};`)
+      }
+    }
+  }, testTimeout)
+
+  it('ops can delete an empty Travelpayouts mission for rollback', async () => {
+    let opsRollbackMissionId = ''
+
+    try {
+      const mission = await svc
+        .from('missions')
+        .insert({
+          created_by_ops_member_id: opsMemberId,
+          affiliate_network_program_id: affiliateProgramId,
+          title: 'Ops rollback Travelpayouts mission',
+          summary: 'Ops can roll back empty Travelpayouts missions',
+          mission_source: 'travelpayouts',
+          mission_type: 'coupon_affiliate',
+          visibility: 'open',
+          status: 'draft',
+          affiliate_commission_rate: 10,
+          kinnso_commission_rate: 4,
+          creator_commission_rate: 6,
+        })
+        .select('id')
+        .single()
+      expect(mission.error).toBeNull()
+      opsRollbackMissionId = mission.data!.id
+
+      const opsClient = await authed(opsEmail)
+      const deleted = await opsClient.from('missions').delete().eq('id', opsRollbackMissionId).select('id')
+      expect(deleted.error).toBeNull()
+      expect(deleted.data).toEqual([{ id: opsRollbackMissionId }])
+    } finally {
+      if (opsRollbackMissionId) {
+        await runPsql(`delete from public.missions where id = ${sqlString(opsRollbackMissionId)};`)
+      }
+    }
+  }, testTimeout)
 })
