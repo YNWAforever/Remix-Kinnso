@@ -23,7 +23,6 @@ const snapshotCreatorEmail = `mission-snapshot-creator-${runId}@example.test`
 const partnerCreatorEmail = `mission-partner-creator-${runId}@example.test`
 const merchantEmail = `mission-merchant-${runId}@example.test`
 const opsEmail = `mission-ops-${runId}@example.test`
-const password = 'Test1234!'
 
 let creatorId = ''
 let otherCreatorId = ''
