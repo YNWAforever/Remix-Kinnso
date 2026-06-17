@@ -91,6 +91,8 @@ const formError = (message: string): ActionFailure => ({
   ok: false,
   errors: { form: [message] },
 })
+const incompleteMissionCreationError =
+  'Mission creation is incomplete. Please retry or contact ops before publishing again.'
 
 const normalizeLocale = (locale?: string) => {
   const value = locale?.trim().toLowerCase()
@@ -256,7 +258,15 @@ export async function createMissionAction(
 
     const { error: milestoneError } = await supabase.from('mission_milestones').insert(milestones)
     if (milestoneError) {
-      await supabase.from('missions').delete().eq('id', mission.id)
+      const { data: rolledBackMission, error: rollbackError } = await supabase
+        .from('missions')
+        .delete()
+        .eq('id', mission.id)
+        .select('id')
+        .maybeSingle()
+
+      if (rollbackError || !rolledBackMission) return formError(incompleteMissionCreationError)
+
       return formError('Mission milestones could not be created')
     }
   }
@@ -343,7 +353,7 @@ export async function reviewParticipantAction(
     return formError(error instanceof Error ? error.message : 'Participant could not be reviewed')
   }
 
-  const { error: updateError } = await supabase
+  const { data: updatedParticipant, error: updateError } = await supabase
     .from('mission_participants')
     .update({
       status: nextStatus,
@@ -351,11 +361,16 @@ export async function reviewParticipantAction(
       approved_at: nextStatus === 'active' ? new Date().toISOString() : null,
     })
     .eq('id', input.participantId)
+    .eq('status', participant.status)
+    .select('status')
+    .maybeSingle()
 
-  if (updateError) return formError('Participant review could not be saved')
+  if (updateError || !updatedParticipant) {
+    return formError('Participant review could not be saved')
+  }
 
   await revalidate([localizedPath(input.locale, merchantMissionsPath)])
-  return { ok: true, status: nextStatus }
+  return { ok: true, status: updatedParticipant.status }
 }
 
 export async function reviewSubmissionAction(
@@ -403,7 +418,7 @@ export async function reviewSubmissionAction(
     return formError(error instanceof Error ? error.message : 'Submission could not be reviewed')
   }
 
-  const { error: updateError } = await supabase
+  const { data: updatedSubmission, error: updateError } = await supabase
     .from('mission_milestone_submissions')
     .update({
       status: nextStatus,
@@ -412,11 +427,16 @@ export async function reviewSubmissionAction(
       reviewed_by: user.id,
     })
     .eq('id', input.submissionId)
+    .eq('status', submission.status)
+    .select('status')
+    .maybeSingle()
 
-  if (updateError) return formError('Submission review could not be saved')
+  if (updateError || !updatedSubmission) {
+    return formError('Submission review could not be saved')
+  }
 
   await revalidate([localizedPath(input.locale, merchantMissionsPath)])
-  return { ok: true, status: nextStatus }
+  return { ok: true, status: updatedSubmission.status }
 }
 
 export async function updateSettlementAction(

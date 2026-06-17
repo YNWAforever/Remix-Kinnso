@@ -5,6 +5,8 @@ import {
   buildMissionInsert,
   buildParticipantInsert,
   createMissionAction,
+  reviewParticipantAction,
+  reviewSubmissionAction,
   updateSettlementAction,
 } from '@/lib/missions/actions'
 
@@ -84,6 +86,8 @@ describe('mission actions module boundary', () => {
     const source = readFileSync(new URL('../lib/missions/actions.ts', import.meta.url), 'utf8')
 
     expect(source.trimStart().startsWith("'use server'")).toBe(false)
+    expect(source).not.toContain("from 'next/cache'")
+    expect(source).not.toContain('from "next/cache"')
     expect(buildMissionInsert({
       input: missionDraftFixture,
       merchantProfileId: 'merchant-profile-1',
@@ -157,7 +161,9 @@ describe('createMissionAction', () => {
   })
 
   it('rolls back the mission when milestone insertion fails', async () => {
-    const missionDeleteBuilder = createBuilder()
+    const missionDeleteBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+    })
     const supabase = createSupabaseMock({
       merchant_profiles: createBuilder({
         maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
@@ -185,6 +191,126 @@ describe('createMissionAction', () => {
     })
     expect(missionDeleteBuilder.delete).toHaveBeenCalledTimes(1)
     expect(missionDeleteBuilder.eq).toHaveBeenCalledWith('id', 'mission-1')
+  })
+
+  it('returns an incomplete creation error when rollback delete returns no row', async () => {
+    const missionDeleteBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+    })
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      missions: [
+        createBuilder({
+          single: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+        }),
+        missionDeleteBuilder,
+      ],
+      mission_milestones: createBuilder({
+        insert: vi.fn(async () => ({ error: new Error('milestone insert failed') })),
+      }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await createMissionAction(missionDraftFixture, {
+      publish: true,
+      locale: 'zh-hk',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: {
+        form: ['Mission creation is incomplete. Please retry or contact ops before publishing again.'],
+      },
+    })
+    expect(missionDeleteBuilder.delete).toHaveBeenCalledTimes(1)
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('reviewParticipantAction', () => {
+  it('returns an error when the participant update returns no row', async () => {
+    const participantUpdateBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+    })
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_participants: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: { id: 'participant-1', mission_id: 'mission-1', status: 'applied' },
+            error: null,
+          })),
+        }),
+        participantUpdateBuilder,
+      ],
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await reviewParticipantAction({
+      participantId: 'participant-1',
+      action: 'approve',
+      locale: 'zh-hk',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: { form: ['Participant review could not be saved'] },
+    })
+    expect(participantUpdateBuilder.eq).toHaveBeenCalledWith('status', 'applied')
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('reviewSubmissionAction', () => {
+  it('returns an error when the submission update returns no row', async () => {
+    const submissionUpdateBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+    })
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: {
+              id: 'submission-1',
+              status: 'submitted',
+              mission_participant_id: 'participant-1',
+            },
+            error: null,
+          })),
+        }),
+        submissionUpdateBuilder,
+      ],
+      mission_participants: createBuilder({
+        single: vi.fn(async () => ({ data: { mission_id: 'mission-1' }, error: null })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await reviewSubmissionAction({
+      submissionId: 'submission-1',
+      action: 'approve',
+      locale: 'zh-hk',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: { form: ['Submission review could not be saved'] },
+    })
+    expect(submissionUpdateBuilder.eq).toHaveBeenCalledWith('status', 'submitted')
+    expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 })
 
