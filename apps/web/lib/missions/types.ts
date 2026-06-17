@@ -44,10 +44,7 @@ export type SettlementPaymentStatus = 'pending' | 'paid'
 
 export type ValidationErrors = Record<string, string[]>
 
-export type ValidationResult = {
-  ok: boolean
-  errors: ValidationErrors
-}
+export type ValidationResult = { ok: true; errors: Record<string, never> } | { ok: false; errors: ValidationErrors }
 
 export type MissionMilestoneInput = {
   title: string

@@ -12,10 +12,13 @@ const addError = (errors: ValidationErrors, field: string, error: string) => {
   errors[field] = [...(errors[field] ?? []), error]
 }
 
+const isNonNegativeNumber = (value: unknown) =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0
+
 const validateNonNegative = (
   errors: ValidationErrors,
   field: string,
-  value: number | null,
+  value: unknown,
   required = false,
 ) => {
   if (value == null) {
@@ -23,13 +26,19 @@ const validateNonNegative = (
     return
   }
 
-  if (value < 0) addError(errors, field, 'non-negative')
+  if (!isNonNegativeNumber(value)) addError(errors, field, 'non-negative')
 }
 
-const resultFrom = (errors: ValidationErrors): ValidationResult => ({
-  ok: Object.keys(errors).length === 0,
-  errors,
-})
+const resultFrom = (errors: ValidationErrors): ValidationResult =>
+  Object.keys(errors).length === 0 ? { ok: true, errors: {} } : { ok: false, errors }
+
+const isAbsoluteHttpsUrl = (value: string) => {
+  try {
+    return new URL(value).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 export const validateMissionDraft = (input: MissionDraftInput): ValidationResult => {
   const errors: ValidationErrors = {}
@@ -66,7 +75,11 @@ export const validatePartnerLinkRequest = (input: PartnerLinkRequest): Validatio
 
   if (input.programStatus !== 'active') addError(errors, 'programStatus', 'active')
   if (input.participantStatus !== 'active') addError(errors, 'participantStatus', 'active')
-  if (isBlank(input.originalUrl)) addError(errors, 'originalUrl', 'required')
+  if (isBlank(input.originalUrl)) {
+    addError(errors, 'originalUrl', 'required')
+  } else if (!isAbsoluteHttpsUrl(input.originalUrl)) {
+    addError(errors, 'originalUrl', 'https')
+  }
 
   return resultFrom(errors)
 }

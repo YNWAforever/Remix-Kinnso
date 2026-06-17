@@ -66,6 +66,10 @@ describe('mission state transitions', () => {
     expect(reviewParticipant('applied', 'reject')).toBe('rejected')
   })
 
+  it('does not let active participants be reviewed again', () => {
+    expect(() => reviewParticipant('active', 'approve')).toThrow('Cannot review participant from active')
+  })
+
   it('submission review supports approval, revision, and rejection', () => {
     expect(reviewSubmission('submitted', 'approve')).toBe('approved')
     expect(reviewSubmission('submitted', 'request_revision')).toBe('revision_requested')

@@ -39,6 +39,26 @@ describe('mission validation', () => {
     expect(result.errors.couponUrl).toContain('required')
   })
 
+  it('rejects non-finite merchant commission values', () => {
+    const result = validateMissionDraft({
+      ...base,
+      affiliateCommissionRate: Number.NaN,
+      kinnsoCommissionRate: Infinity,
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.affiliateCommissionRate).toContain('non-negative')
+    expect(result.errors.kinnsoCommissionRate).toContain('non-negative')
+  })
+
+  it('rejects non-number runtime commission values', () => {
+    const result = validateMissionDraft({
+      ...base,
+      affiliateCommissionRate: '12' as unknown as number,
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.affiliateCommissionRate).toContain('non-negative')
+  })
+
   it('accepts Travelpayouts missions without merchant coupon fields', () => {
     const result = validateMissionDraft({
       ...base,
@@ -69,6 +89,36 @@ describe('mission validation', () => {
     expect(result.errors.milestones).toContain('at least one')
   })
 
+  it('rejects non-finite paid fee values', () => {
+    const result = validateMissionDraft({
+      ...base,
+      missionType: 'paid',
+      couponCode: null,
+      couponUrl: null,
+      affiliateCommissionRate: null,
+      kinnsoCommissionRate: null,
+      creatorCommissionRate: null,
+      paidFeeAmount: Infinity,
+      paidFeeCurrency: 'HKD',
+      milestones: [{ title: 'Publish deliverable', description: 'Post one creator deliverable.' }],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.paidFeeAmount).toContain('non-negative')
+  })
+
+  it('rejects Travelpayouts missions without an affiliate network program ID', () => {
+    const result = validateMissionDraft({
+      ...base,
+      missionSource: 'travelpayouts',
+      affiliateNetworkProgramId: '',
+      couponCode: null,
+      couponUrl: null,
+      milestones: [],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.affiliateNetworkProgramId).toContain('required')
+  })
+
   it('rejects partner link generation without an active participant', () => {
     const request: PartnerLinkRequest = {
       programStatus: 'active',
@@ -80,6 +130,18 @@ describe('mission validation', () => {
     expect(result.errors.participantStatus).toContain('active')
   })
 
+  it('rejects partner link generation without an absolute HTTPS URL', () => {
+    for (const originalUrl of ['abc', '/relative', 'http://example.com']) {
+      const result = validatePartnerLinkRequest({
+        programStatus: 'active',
+        participantStatus: 'active',
+        originalUrl,
+      })
+      expect(result.ok).toBe(false)
+      expect(result.errors.originalUrl).toContain('https')
+    }
+  })
+
   it('allows ops settlement updates with non-negative amounts', () => {
     const input: SettlementUpdateInput = {
       actorIsOps: true,
@@ -89,5 +151,29 @@ describe('mission validation', () => {
       affiliateCommissionAmount: 130.25,
     }
     expect(validateSettlementUpdate(input)).toEqual({ ok: true, errors: {} })
+  })
+
+  it('rejects negative settlement amounts', () => {
+    const result = validateSettlementUpdate({
+      actorIsOps: true,
+      status: 'partially_paid',
+      creatorPayoutStatus: 'pending',
+      kinnsoCommissionStatus: 'paid',
+      affiliateCommissionAmount: -1,
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.affiliateCommissionAmount).toContain('non-negative')
+  })
+
+  it('rejects non-ops settlement updates', () => {
+    const result = validateSettlementUpdate({
+      actorIsOps: false,
+      status: 'partially_paid',
+      creatorPayoutStatus: 'pending',
+      kinnsoCommissionStatus: 'paid',
+      affiliateCommissionAmount: 130.25,
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.actorIsOps).toContain('ops')
   })
 })
