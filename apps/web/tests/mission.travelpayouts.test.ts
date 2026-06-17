@@ -139,6 +139,8 @@ describe('Travelpayouts adapter', () => {
       priceAmount: 100,
       profitAmount: 8.5,
       currency: 'usd',
+      bookedAt: '2026-06-18 10:00:00',
+      updatedAt: '2026-06-18 11:00:00',
     })
   })
 
@@ -150,6 +152,7 @@ describe('Travelpayouts adapter', () => {
       sub_id: 'kinnso_m_m2_p_p2_c_c2',
       price_usd: '99.20',
       paid_profit_usd: '7.35',
+      date: '2026-06-19',
     })).toMatchObject({
       externalActionId: '100:456',
       externalProgramId: '100',
@@ -158,6 +161,7 @@ describe('Travelpayouts adapter', () => {
       priceAmount: 99.2,
       profitAmount: 7.35,
       currency: 'usd',
+      bookedAt: '2026-06-19',
     })
   })
 
