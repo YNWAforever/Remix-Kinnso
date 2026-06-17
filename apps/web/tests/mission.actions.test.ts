@@ -5,13 +5,21 @@ import {
   buildMissionInsert,
   buildParticipantInsert,
   createMissionAction,
+  createPartnerLinkAction,
   reviewParticipantAction,
   reviewSubmissionAction,
   updateSettlementAction,
 } from '@/lib/missions/actions'
 
-const { createSupabaseServerClientMock, revalidatePathMock } = vi.hoisted(() => ({
+const {
+  buildSubIdMock,
+  createSupabaseServerClientMock,
+  createTravelpayoutsPartnerLinksMock,
+  revalidatePathMock,
+} = vi.hoisted(() => ({
+  buildSubIdMock: vi.fn(),
   createSupabaseServerClientMock: vi.fn(),
+  createTravelpayoutsPartnerLinksMock: vi.fn(),
   revalidatePathMock: vi.fn(),
 }))
 
@@ -21,6 +29,11 @@ vi.mock('@/lib/supabase/server', () => ({
 
 vi.mock('next/cache', () => ({
   revalidatePath: revalidatePathMock,
+}))
+
+vi.mock('@/lib/missions/travelpayouts', () => ({
+  buildSubId: buildSubIdMock,
+  createTravelpayoutsPartnerLinks: createTravelpayoutsPartnerLinksMock,
 }))
 
 type MockBuilder = {
@@ -49,7 +62,13 @@ const createBuilder = (overrides: Partial<MockBuilder> = {}) => {
   return Object.assign(builder, overrides)
 }
 
-const createSupabaseMock = (tableBuilders: Record<string, MockBuilder | MockBuilder[]>) => {
+const createSupabaseMock = (
+  tableBuilders: Record<string, MockBuilder | MockBuilder[]>,
+  options: {
+    getUser?: ReturnType<typeof vi.fn>
+    rpc?: ReturnType<typeof vi.fn>
+  } = {},
+) => {
   const builders = new Map(
     Object.entries(tableBuilders).map(([table, builder]) => [
       table,
@@ -59,7 +78,7 @@ const createSupabaseMock = (tableBuilders: Record<string, MockBuilder | MockBuil
 
   return {
     auth: {
-      getUser: vi.fn(async () => ({ data: { user: { id: 'user-1' } }, error: null })),
+      getUser: options.getUser ?? vi.fn(async () => ({ data: { user: { id: 'user-1' } }, error: null })),
     },
     from: vi.fn((table: string) => {
       const builder = builders.get(table)
@@ -73,11 +92,14 @@ const createSupabaseMock = (tableBuilders: Record<string, MockBuilder | MockBuil
 
       return builder
     }),
+    rpc: options.rpc ?? vi.fn(async () => ({ data: null, error: null })),
   }
 }
 
 beforeEach(() => {
+  buildSubIdMock.mockReset()
   createSupabaseServerClientMock.mockReset()
+  createTravelpayoutsPartnerLinksMock.mockReset()
   revalidatePathMock.mockReset()
 })
 
@@ -340,5 +362,218 @@ describe('updateSettlementAction', () => {
       errors: { form: ['Settlement update could not be saved'] },
     })
     expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('createPartnerLinkAction', () => {
+  it('requires sign in before calling Travelpayouts', async () => {
+    const supabase = createSupabaseMock({}, {
+      getUser: vi.fn(async () => ({ data: { user: null }, error: null })),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await createPartnerLinkAction({
+      missionParticipantId: 'participant-1',
+      originalUrl: 'https://example.com/hotel',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: { form: ['Sign in is required'] },
+    })
+    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
+  })
+
+  it('returns an error for a missing or not-owned participant before calling Travelpayouts', async () => {
+    const participantBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+    })
+    const supabase = createSupabaseMock({
+      mission_participants: participantBuilder,
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await createPartnerLinkAction({
+      missionParticipantId: 'participant-1',
+      originalUrl: 'https://example.com/hotel',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: { form: ['Participant was not found'] },
+    })
+    expect(participantBuilder.eq).toHaveBeenCalledWith('creator_id', 'user-1')
+    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
+  })
+
+  it('validates inactive participant and program states before calling Travelpayouts', async () => {
+    const supabase = createSupabaseMock({
+      mission_participants: createBuilder({
+        maybeSingle: vi.fn(async () => ({
+          data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'applied' },
+          error: null,
+        })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({
+          data: {
+            id: 'mission-1',
+            affiliate_network_program_id: 'program-1',
+            mission_source: 'travelpayouts',
+            status: 'published',
+          },
+          error: null,
+        })),
+      }),
+      affiliate_network_programs: createBuilder({
+        maybeSingle: vi.fn(async () => ({
+          data: { id: 'program-1', network: 'travelpayouts', status: 'paused' },
+          error: null,
+        })),
+      }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await createPartnerLinkAction({
+      missionParticipantId: 'participant-1',
+      originalUrl: 'https://example.com/hotel',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: {
+        participantStatus: ['active'],
+        programStatus: ['active'],
+      },
+    })
+    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
+  })
+
+  it('returns an existing partner link without calling Travelpayouts', async () => {
+    const existingLinkBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({
+        data: { id: 'partner-link-1', partner_url: 'https://tp.st/existing' },
+        error: null,
+      })),
+    })
+    const supabase = createSupabaseMock({
+      mission_participants: createBuilder({
+        maybeSingle: vi.fn(async () => ({
+          data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
+          error: null,
+        })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({
+          data: {
+            id: 'mission-1',
+            affiliate_network_program_id: 'program-1',
+            mission_source: 'travelpayouts',
+            status: 'published',
+          },
+          error: null,
+        })),
+      }),
+      affiliate_network_programs: createBuilder({
+        maybeSingle: vi.fn(async () => ({
+          data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
+          error: null,
+        })),
+      }),
+      affiliate_partner_links: existingLinkBuilder,
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await createPartnerLinkAction({
+      missionParticipantId: 'participant-1',
+      originalUrl: 'https://example.com/hotel',
+    })
+
+    expect(result).toEqual({
+      ok: true,
+      link: { id: 'partner-link-1', partner_url: 'https://tp.st/existing' },
+    })
+    expect(existingLinkBuilder.eq).toHaveBeenCalledWith('creator_id', 'user-1')
+    expect(existingLinkBuilder.eq).toHaveBeenCalledWith('external_status', 'success')
+    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
+  })
+
+  it('validates membership before generating and storing a Travelpayouts partner link through the RPC', async () => {
+    buildSubIdMock.mockReturnValue('creator-sub')
+    createTravelpayoutsPartnerLinksMock.mockResolvedValue([
+      {
+        originalUrl: 'https://example.com/hotel',
+        partnerUrl: 'https://tp.st/abc',
+        status: 'success',
+      },
+    ])
+    const participantBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({
+        data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
+        error: null,
+      })),
+    })
+    const missionBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({
+        data: {
+          id: 'mission-1',
+          affiliate_network_program_id: 'program-1',
+          mission_source: 'travelpayouts',
+          status: 'published',
+        },
+        error: null,
+      })),
+    })
+    const programBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({
+        data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
+        error: null,
+      })),
+    })
+    const existingLinkBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+    })
+    const rpcMock = vi.fn(async () => ({
+      data: { id: 'partner-link-1', partner_url: 'https://tp.st/abc' },
+      error: null,
+    }))
+    const supabase = createSupabaseMock({
+      mission_participants: participantBuilder,
+      missions: missionBuilder,
+      affiliate_network_programs: programBuilder,
+      affiliate_partner_links: existingLinkBuilder,
+    }, { rpc: rpcMock })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await createPartnerLinkAction({
+      missionParticipantId: 'participant-1',
+      originalUrl: 'https://example.com/hotel',
+      locale: 'zh-hk',
+    })
+
+    expect(result).toEqual({
+      ok: true,
+      link: { id: 'partner-link-1', partner_url: 'https://tp.st/abc' },
+    })
+    expect(participantBuilder.maybeSingle.mock.invocationCallOrder[0])
+      .toBeLessThan(createTravelpayoutsPartnerLinksMock.mock.invocationCallOrder[0])
+    expect(missionBuilder.maybeSingle.mock.invocationCallOrder[0])
+      .toBeLessThan(createTravelpayoutsPartnerLinksMock.mock.invocationCallOrder[0])
+    expect(programBuilder.maybeSingle.mock.invocationCallOrder[0])
+      .toBeLessThan(createTravelpayoutsPartnerLinksMock.mock.invocationCallOrder[0])
+    expect(buildSubIdMock).toHaveBeenCalledWith({
+      missionId: 'mission-1',
+      participantId: 'participant-1',
+      creatorId: 'user-1',
+    })
+    expect(rpcMock).toHaveBeenCalledWith('create_travelpayouts_partner_link', {
+      p_affiliate_network_program_id: 'program-1',
+      p_mission_id: 'mission-1',
+      p_mission_participant_id: 'participant-1',
+      p_original_url: 'https://example.com/hotel',
+      p_partner_url: 'https://tp.st/abc',
+      p_sub_id: 'creator-sub',
+    })
+    expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/studio/missions')
   })
 })

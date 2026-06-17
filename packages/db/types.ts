@@ -1223,6 +1223,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_travelpayouts_partner_link: {
+        Args: {
+          p_affiliate_network_program_id: string
+          p_mission_id: string
+          p_mission_participant_id: string
+          p_original_url: string
+          p_partner_url: string
+          p_sub_id: string
+        }
+        Returns: {
+          id: string
+          partner_url: string
+        }[]
+      }
       get_you_may_like: {
         Args: { p_article_id: string; p_limit?: number; p_locale: string }
         Returns: {

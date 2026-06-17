@@ -84,13 +84,8 @@ type UpdateSettlementInput = LocaleOption & {
 }
 
 export type CreatePartnerLinkInput = LocaleOption & {
-  affiliateNetworkProgramId: string
-  missionId: string
   missionParticipantId: string
-  creatorId: string
   originalUrl: string
-  programStatus: AffiliateProgramStatus
-  participantStatus: ParticipantStatus
 }
 
 const merchantMissionsPath = '/merchants/missions'
@@ -501,20 +496,71 @@ export async function createPartnerLinkAction(
 ): Promise<ActionResult<{ link: { id: string; partner_url: string } }>> {
   'use server'
 
-  const request: PartnerLinkRequest = {
-    programStatus: input.programStatus,
-    participantStatus: input.participantStatus,
-    originalUrl: input.originalUrl,
+  const supabase = await getSupabase()
+  const user = await getAuthenticatedUser(supabase)
+  if (!user) return formError('Sign in is required')
+
+  const { data: participant, error: participantError } = await supabase
+    .from('mission_participants')
+    .select('id, mission_id, creator_id, status')
+    .eq('id', input.missionParticipantId)
+    .eq('creator_id', user.id)
+    .maybeSingle()
+
+  if (participantError || !participant) return formError('Participant was not found')
+
+  const { data: mission, error: missionError } = await supabase
+    .from('missions')
+    .select('id, affiliate_network_program_id, mission_source, status')
+    .eq('id', participant.mission_id)
+    .maybeSingle()
+
+  if (
+    missionError ||
+    !mission ||
+    mission.status !== 'published' ||
+    mission.mission_source !== 'travelpayouts' ||
+    !mission.affiliate_network_program_id
+  ) {
+    return formError('Mission is not available')
   }
-  const validation = validatePartnerLinkRequest(request)
+
+  const { data: program, error: programError } = await supabase
+    .from('affiliate_network_programs')
+    .select('id, network, status')
+    .eq('id', mission.affiliate_network_program_id)
+    .maybeSingle()
+
+  if (programError || !program || program.network !== 'travelpayouts') {
+    return formError('Affiliate program is not available')
+  }
+
+  const validation = validatePartnerLinkRequest({
+    programStatus: program.status as AffiliateProgramStatus,
+    participantStatus: participant.status as ParticipantStatus,
+    originalUrl: input.originalUrl,
+  })
   if (!validation.ok) return validation
 
-  const supabase = await getSupabase()
+  const { data: existingLink, error: existingLinkError } = await supabase
+    .from('affiliate_partner_links')
+    .select('id, partner_url')
+    .eq('network', 'travelpayouts')
+    .eq('mission_id', mission.id)
+    .eq('mission_participant_id', participant.id)
+    .eq('creator_id', user.id)
+    .eq('original_url', input.originalUrl)
+    .eq('external_status', 'success')
+    .maybeSingle()
+
+  if (existingLinkError) return formError('Partner link could not be loaded')
+  if (existingLink) return { ok: true, link: existingLink }
+
   const { buildSubId, createTravelpayoutsPartnerLinks } = await import('@/lib/missions/travelpayouts')
   const subId = buildSubId({
-    missionId: input.missionId,
-    participantId: input.missionParticipantId,
-    creatorId: input.creatorId,
+    missionId: mission.id,
+    participantId: participant.id,
+    creatorId: user.id,
   })
 
   let partnerUrl: string | null = null
@@ -531,23 +577,18 @@ export async function createPartnerLinkAction(
   if (!partnerUrl) return formError('Travelpayouts partner link could not be generated')
 
   const { data, error } = await supabase
-    .from('affiliate_partner_links')
-    .insert({
-      affiliate_network_program_id: input.affiliateNetworkProgramId,
-      mission_id: input.missionId,
-      mission_participant_id: input.missionParticipantId,
-      creator_id: input.creatorId,
-      network: 'travelpayouts',
-      original_url: input.originalUrl,
-      partner_url: partnerUrl,
-      sub_id: subId,
-      external_status: 'success',
+    .rpc('create_travelpayouts_partner_link', {
+      p_affiliate_network_program_id: mission.affiliate_network_program_id,
+      p_mission_id: mission.id,
+      p_mission_participant_id: participant.id,
+      p_original_url: input.originalUrl,
+      p_partner_url: partnerUrl,
+      p_sub_id: subId,
     })
-    .select('id, partner_url')
-    .single()
 
-  if (error || !data) return formError('Partner link could not be saved')
+  const link = Array.isArray(data) ? data[0] : data
+  if (error || !link) return formError('Partner link could not be saved')
 
   await revalidate([localizedPath(input.locale, studioMissionsPath)])
-  return { ok: true, link: data }
+  return { ok: true, link }
 }

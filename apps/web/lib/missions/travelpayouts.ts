@@ -84,6 +84,20 @@ const toNullableNumber = (value: unknown) => {
 
 const toCurrency = (value: unknown) => toNullableString(value)?.toLowerCase() ?? 'usd'
 
+const toEventState = (value: unknown) => {
+  switch (toNullableString(value)?.toLowerCase()) {
+    case 'paid':
+      return 'paid'
+    case 'processing':
+      return 'processing'
+    case 'cancelled':
+    case 'canceled':
+      return 'cancelled'
+    default:
+      return 'unknown'
+  }
+}
+
 export async function createTravelpayoutsPartnerLinks({
   links,
   shorten = true,
@@ -133,7 +147,7 @@ export function normalizeTravelpayoutsAction(raw: Record<string, unknown>): Trav
   return {
     externalActionId: toNullableString(raw.action_id),
     externalProgramId: toNullableString(raw.campaign_id),
-    eventState: toNullableString(raw.action_state ?? raw.state),
+    eventState: toEventState(raw.action_state ?? raw.state),
     subId: toNullableString(raw.sub_id),
     priceAmount: toNullableNumber(raw.price ?? raw.price_usd ?? raw.price_amount),
     profitAmount: toNullableNumber(raw.profit ?? raw.paid_profit_usd ?? raw.profit_amount),

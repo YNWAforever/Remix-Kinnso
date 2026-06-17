@@ -156,7 +156,7 @@ describe('Travelpayouts adapter', () => {
     })).toMatchObject({
       externalActionId: '100:456',
       externalProgramId: '100',
-      eventState: 'confirmed',
+      eventState: 'unknown',
       subId: 'kinnso_m_m2_p_p2_c_c2',
       priceAmount: 99.2,
       profitAmount: 7.35,
@@ -174,6 +174,15 @@ describe('Travelpayouts adapter', () => {
       currency: 'HKD',
     })).toMatchObject({
       currency: 'hkd',
+    })
+  })
+
+  it('normalizes canceled Travelpayouts states to cancelled', () => {
+    expect(normalizeTravelpayoutsAction({
+      action_id: '100:999',
+      state: 'canceled',
+    })).toMatchObject({
+      eventState: 'cancelled',
     })
   })
 })
