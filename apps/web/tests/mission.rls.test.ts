@@ -1,20 +1,28 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
+import { spawn } from 'node:child_process'
+import { createHmac, randomUUID } from 'node:crypto'
 
 const svcKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const dbContainer = process.env.SUPABASE_DB_CONTAINER
 const url = process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321'
 const anonKey = process.env.SUPABASE_ANON_KEY ?? 'missing'
-const d = svcKey && process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY ? describe : describe.skip
+const d = svcKey && dbContainer && process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY ? describe : describe.skip
+const hookTimeout = 60000
+const testTimeout = 15000
+const jwtSecret = process.env.SUPABASE_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long'
 
 const anon = createClient(url, anonKey)
 const svc = createClient(url, svcKey ?? 'missing')
+const runId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+const userIdsByEmail = new Map<string, string>()
 
-const creatorEmail = 'mission-creator@example.test'
-const otherCreatorEmail = 'mission-other-creator@example.test'
-const snapshotCreatorEmail = 'mission-snapshot-creator@example.test'
-const partnerCreatorEmail = 'mission-partner-creator@example.test'
-const merchantEmail = 'mission-merchant@example.test'
-const opsEmail = 'mission-ops@example.test'
+const creatorEmail = `mission-creator-${runId}@example.test`
+const otherCreatorEmail = `mission-other-creator-${runId}@example.test`
+const snapshotCreatorEmail = `mission-snapshot-creator-${runId}@example.test`
+const partnerCreatorEmail = `mission-partner-creator-${runId}@example.test`
+const merchantEmail = `mission-merchant-${runId}@example.test`
+const opsEmail = `mission-ops-${runId}@example.test`
 const password = 'Test1234!'
 
 let creatorId = ''
@@ -44,31 +52,130 @@ const missionTableNames = [
   'mission_settlements',
 ]
 
-async function recreateUser(email: string) {
-  const existing = await svc.auth.admin.listUsers()
-  const prev = (existing.data?.users ?? []).find((u) => u.email === email)
-  if (prev) await svc.auth.admin.deleteUser(prev.id)
-  const { data, error } = await svc.auth.admin.createUser({ email, password, email_confirm: true })
-  expect(error).toBeNull()
-  return data.user!.id
+function sqlString(value: string) {
+  return `'${value.replaceAll("'", "''")}'`
+}
+
+function base64Url(value: string | Buffer) {
+  return Buffer.from(value).toString('base64url')
+}
+
+function signTestJwt(userId: string, email: string) {
+  const now = Math.floor(Date.now() / 1000)
+  const header = base64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const payload = base64Url(
+    JSON.stringify({
+      aud: 'authenticated',
+      exp: now + 3600,
+      iat: now,
+      iss: `${url}/auth/v1`,
+      sub: userId,
+      email,
+      role: 'authenticated',
+      aal: 'aal1',
+      session_id: randomUUID(),
+    }),
+  )
+  const signature = createHmac('sha256', jwtSecret).update(`${header}.${payload}`).digest('base64url')
+  return `${header}.${payload}.${signature}`
+}
+
+async function runPsql(sql: string) {
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn('docker', ['exec', '-i', dbContainer!, 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1'])
+    let stderr = ''
+
+    child.stderr.on('data', (chunk) => {
+      stderr += String(chunk)
+    })
+    child.on('error', reject)
+    child.on('close', (code) => {
+      if (code === 0) resolve()
+      else reject(new Error(stderr || `psql exited with code ${code}`))
+    })
+
+    child.stdin.end(sql)
+  })
+}
+
+async function createTestUser(email: string) {
+  const userId = randomUUID()
+
+  await runPsql(`
+    insert into auth.users (
+      instance_id,
+      id,
+      aud,
+      role,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      confirmation_sent_at,
+      last_sign_in_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      is_super_admin,
+      created_at,
+      updated_at
+    )
+    values (
+      '00000000-0000-0000-0000-000000000000',
+      ${sqlString(userId)},
+      'authenticated',
+      'authenticated',
+      ${sqlString(email)},
+      '',
+      now(),
+      now(),
+      now(),
+      '{"provider":"email","providers":["email"]}'::jsonb,
+      '{}'::jsonb,
+      false,
+      now(),
+      now()
+    );
+
+    insert into auth.identities (
+      provider_id,
+      user_id,
+      identity_data,
+      provider,
+      last_sign_in_at,
+      created_at,
+      updated_at
+    )
+    values (
+      ${sqlString(userId)},
+      ${sqlString(userId)},
+      jsonb_build_object('sub', ${sqlString(userId)}, 'email', ${sqlString(email)}),
+      'email',
+      now(),
+      now(),
+      now()
+    );
+  `)
+
+  userIdsByEmail.set(email, userId)
+  return userId
 }
 
 async function authed(email: string) {
-  const { data, error } = await anon.auth.signInWithPassword({ email, password })
-  expect(error).toBeNull()
+  const userId = userIdsByEmail.get(email)
+  expect(userId).toBeTruthy()
+
   return createClient(url, anonKey, {
-    global: { headers: { Authorization: `Bearer ${data.session!.access_token}` } },
+    global: { headers: { Authorization: `Bearer ${signTestJwt(userId!, email)}` } },
   })
 }
 
 d('mission schema RLS', () => {
   beforeAll(async () => {
-    creatorId = await recreateUser(creatorEmail)
-    otherCreatorId = await recreateUser(otherCreatorEmail)
-    snapshotCreatorId = await recreateUser(snapshotCreatorEmail)
-    partnerCreatorId = await recreateUser(partnerCreatorEmail)
-    merchantUserId = await recreateUser(merchantEmail)
-    opsUserId = await recreateUser(opsEmail)
+    creatorId = await createTestUser(creatorEmail)
+    otherCreatorId = await createTestUser(otherCreatorEmail)
+    snapshotCreatorId = await createTestUser(snapshotCreatorEmail)
+    partnerCreatorId = await createTestUser(partnerCreatorEmail)
+    merchantUserId = await createTestUser(merchantEmail)
+    opsUserId = await createTestUser(opsEmail)
 
     const merchant = await svc
       .from('merchant_profiles')
@@ -164,13 +271,15 @@ d('mission schema RLS', () => {
       .single()
     expect(travelpayoutsMission.error).toBeNull()
     travelpayoutsMissionId = travelpayoutsMission.data!.id
-  })
+  }, hookTimeout)
 
   afterAll(async () => {
-    for (const id of [creatorId, otherCreatorId, snapshotCreatorId, partnerCreatorId, merchantUserId, opsUserId]) {
-      if (id) await svc.auth.admin.deleteUser(id)
-    }
-  })
+    const missionIds = [missionId, targetedMissionId, travelpayoutsMissionId].filter(Boolean)
+    if (missionIds.length > 0) await runPsql(`delete from public.missions where id in (${missionIds.map(sqlString).join(',')});`)
+
+    const ids = [creatorId, otherCreatorId, snapshotCreatorId, partnerCreatorId, merchantUserId, opsUserId].filter(Boolean)
+    if (ids.length > 0) await runPsql(`delete from auth.users where id in (${ids.map(sqlString).join(',')});`)
+  }, hookTimeout)
 
   it('anon cannot read mission tables', async () => {
     for (const tableName of missionTableNames) {
@@ -179,7 +288,7 @@ d('mission schema RLS', () => {
         true,
       )
     }
-  })
+  }, testTimeout)
 
   it('merchant can read and update own mission', async () => {
     const merchant = await authed(merchantEmail)
@@ -189,7 +298,7 @@ d('mission schema RLS', () => {
 
     const update = await merchant.from('missions').update({ title: 'RLS coupon mission updated' }).eq('id', missionId)
     expect(update.error).toBeNull()
-  })
+  }, testTimeout)
 
   it('creator can see published open missions and join once', async () => {
     const creator = await authed(creatorEmail)
@@ -224,7 +333,7 @@ d('mission schema RLS', () => {
     expect(unchanged.error).toBeNull()
     expect(unchanged.data!.status).toBe('active')
     expect(unchanged.data!.merchant_review_note).toBeNull()
-  })
+  }, testTimeout)
 
   it('targeted published missions are visible only to invited creators', async () => {
     const creator = await authed(creatorEmail)
@@ -264,7 +373,7 @@ d('mission schema RLS', () => {
     const hiddenFromOtherCreator = await otherCreator.from('missions').select('id').eq('id', targetedMissionId)
     expect(hiddenFromOtherCreator.error).toBeNull()
     expect(hiddenFromOtherCreator.data).toEqual([])
-  })
+  }, testTimeout)
 
   it('creator can read active affiliate network programs', async () => {
     const creator = await authed(creatorEmail)
@@ -276,7 +385,7 @@ d('mission schema RLS', () => {
 
     expect(error).toBeNull()
     expect(data!.program_name).toBe('Travelpayouts RLS Program')
-  })
+  }, testTimeout)
 
   it('creator can create tracked links only for the joined Travelpayouts mission program', async () => {
     const creator = await authed(partnerCreatorEmail)
@@ -339,7 +448,7 @@ d('mission schema RLS', () => {
       })
       .select('id')
     expect(blockedMerchantMissionLink.error === null ? blockedMerchantMissionLink.data : []).toEqual([])
-  })
+  }, testTimeout)
 
   it('creator milestone submissions cannot forge review state or cross missions', async () => {
     const participant = await svc
@@ -447,7 +556,28 @@ d('mission schema RLS', () => {
     expect(merchantReview.data!.status).toBe('approved')
     expect(merchantReview.data!.merchant_feedback).toBe('Approved by merchant')
     expect(merchantReview.data!.reviewed_by).toBe(merchantUserId)
-  })
+
+    const reopenedByCreator = await creator
+      .from('mission_milestone_submissions')
+      .update({
+        status: 'submitted',
+        notes: 'Changed after approval',
+        proof_urls: ['https://example.com/changed-proof'],
+      })
+      .eq('id', validSubmission.data!.id)
+      .select('id')
+    expect(reopenedByCreator.error === null ? reopenedByCreator.data : []).toEqual([])
+
+    const stillApproved = await svc
+      .from('mission_milestone_submissions')
+      .select('status, notes, proof_urls')
+      .eq('id', validSubmission.data!.id)
+      .single()
+    expect(stillApproved.error).toBeNull()
+    expect(stillApproved.data!.status).toBe('approved')
+    expect(stillApproved.data!.notes).toBe('Proof submitted')
+    expect(stillApproved.data!.proof_urls).toEqual(['https://example.com/proof'])
+  }, testTimeout)
 
   it('social snapshots are visible to the creator, owning merchant, and ops only', async () => {
     const participant = await svc
@@ -511,7 +641,7 @@ d('mission schema RLS', () => {
       .eq('id', snapshot.data!.id)
     expect(hiddenFromOtherCreator.error).toBeNull()
     expect(hiddenFromOtherCreator.data).toEqual([])
-  })
+  }, testTimeout)
 
   it('non-ops cannot update settlement while ops can', async () => {
     const settlement = await svc
@@ -543,5 +673,5 @@ d('mission schema RLS', () => {
       .update({ status: 'paid', updated_by_ops_member_id: opsMemberId })
       .eq('id', settlement.data!.id)
     expect(allowed.error).toBeNull()
-  })
+  }, testTimeout)
 })

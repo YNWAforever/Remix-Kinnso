@@ -231,6 +231,8 @@ begin
       if new.merchant_feedback is not null or new.reviewed_at is not null or new.reviewed_by is not null then
         raise exception 'Creators cannot set review fields';
       end if;
+    elsif old.status not in ('pending','submitted') then
+      raise exception 'Creators cannot update reviewed submissions';
     elsif new.merchant_feedback is distinct from old.merchant_feedback
       or new.reviewed_at is distinct from old.reviewed_at
       or new.reviewed_by is distinct from old.reviewed_by then
@@ -288,6 +290,7 @@ create index mission_participants_creator_idx on public.mission_participants(cre
 create index mission_milestones_mission_idx on public.mission_milestones(mission_id, sort_order);
 create index mission_submissions_milestone_idx on public.mission_milestone_submissions(mission_milestone_id);
 create index mission_submissions_participant_idx on public.mission_milestone_submissions(mission_participant_id);
+create index mission_submissions_reviewed_by_idx on public.mission_milestone_submissions(reviewed_by);
 create index mission_social_snapshots_mission_idx on public.mission_social_snapshots(mission_id);
 create index mission_social_snapshots_participant_idx on public.mission_social_snapshots(mission_participant_id);
 create index mission_social_snapshots_submission_idx on public.mission_social_snapshots(mission_milestone_submission_id);
