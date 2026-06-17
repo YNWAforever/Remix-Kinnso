@@ -45,6 +45,36 @@ describe('Travelpayouts adapter', () => {
         headers: expect.objectContaining({ 'X-Access-Token': 'test-token' }),
       }),
     )
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
+      trs: 197987,
+      marker: 339296,
+      shorten: true,
+      links: [{ url: 'https://example.com/hotel', sub_id: 'creator-sub' }],
+    })
+  })
+
+  it('maps non-success partner link codes to failed', async () => {
+    vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'test-token')
+    vi.stubEnv('TRAVELPAYOUTS_PROJECT_ID', '197987')
+    vi.stubEnv('TRAVELPAYOUTS_MARKER', '339296')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      result: {
+        links: [{
+          url: 'https://example.com/hotel',
+          code: 'invalid_url',
+          message: 'Unsupported link',
+        }],
+      },
+    }))))
+
+    await expect(createTravelpayoutsPartnerLinks({
+      links: [{ url: 'https://example.com/hotel', subId: 'creator-sub' }],
+    })).resolves.toEqual([{
+      originalUrl: 'https://example.com/hotel',
+      partnerUrl: '',
+      status: 'failed',
+      message: 'Unsupported link',
+    }])
   })
 
   it('throws for missing server-side configuration without exposing configured secrets', async () => {
@@ -109,6 +139,37 @@ describe('Travelpayouts adapter', () => {
       priceAmount: 100,
       profitAmount: 8.5,
       currency: 'usd',
+    })
+  })
+
+  it('normalizes Travelpayouts fallback finance/statistics fields', () => {
+    expect(normalizeTravelpayoutsAction({
+      action_id: '100:456',
+      campaign_id: '100',
+      state: 'confirmed',
+      sub_id: 'kinnso_m_m2_p_p2_c_c2',
+      price_usd: '99.20',
+      paid_profit_usd: '7.35',
+    })).toMatchObject({
+      externalActionId: '100:456',
+      externalProgramId: '100',
+      eventState: 'confirmed',
+      subId: 'kinnso_m_m2_p_p2_c_c2',
+      priceAmount: 99.2,
+      profitAmount: 7.35,
+      currency: 'usd',
+    })
+  })
+
+  it('lowercases provided Travelpayouts currency values', () => {
+    expect(normalizeTravelpayoutsAction({
+      action_id: '100:789',
+      action_state: 'paid',
+      price: '100.00',
+      profit: '8.50',
+      currency: 'HKD',
+    })).toMatchObject({
+      currency: 'hkd',
     })
   })
 })

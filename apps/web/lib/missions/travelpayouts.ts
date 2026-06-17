@@ -12,7 +12,7 @@ export type TravelpayoutsLinkInput = {
 export type TravelpayoutsLinkResult = {
   originalUrl: string
   partnerUrl: string
-  status: string
+  status: 'success' | 'failed'
   message?: string
 }
 
@@ -82,6 +82,8 @@ const toNullableNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+const toCurrency = (value: unknown) => toNullableString(value)?.toLowerCase() ?? 'usd'
+
 export async function createTravelpayoutsPartnerLinks({
   links,
   shorten = true,
@@ -120,7 +122,7 @@ export async function createTravelpayoutsPartnerLinks({
     const result: TravelpayoutsLinkResult = {
       originalUrl: link.url ?? links[index]?.url ?? '',
       partnerUrl: link.partner_url ?? '',
-      status: link.code === 'success' ? 'success' : link.code ?? 'failed',
+      status: link.code === 'success' ? 'success' : 'failed',
     }
     if (message) result.message = message
     return result
@@ -131,11 +133,11 @@ export function normalizeTravelpayoutsAction(raw: Record<string, unknown>): Trav
   return {
     externalActionId: toNullableString(raw.action_id),
     externalProgramId: toNullableString(raw.campaign_id),
-    eventState: toNullableString(raw.action_state),
+    eventState: toNullableString(raw.action_state ?? raw.state),
     subId: toNullableString(raw.sub_id),
-    priceAmount: toNullableNumber(raw.price ?? raw.price_amount),
-    profitAmount: toNullableNumber(raw.profit ?? raw.profit_amount),
-    currency: toNullableString(raw.currency),
+    priceAmount: toNullableNumber(raw.price ?? raw.price_usd ?? raw.price_amount),
+    profitAmount: toNullableNumber(raw.profit ?? raw.paid_profit_usd ?? raw.profit_amount),
+    currency: toCurrency(raw.currency),
     bookedAt: toNullableString(raw.booked_at ?? raw.created_at ?? raw.date),
     updatedAt: toNullableString(raw.updated_at),
     raw,
