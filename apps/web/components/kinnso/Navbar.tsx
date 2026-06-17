@@ -3,56 +3,65 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { useViewerRole } from "@/lib/auth/useViewerRole";
+import LocaleSwitcher from "@/components/kinnso/LocaleSwitcher";
+import type { ViewerRole } from "@/lib/auth/viewer-role";
+import type { Locale } from "@/lib/i18n/config";
+import type { Messages } from "@/lib/i18n/messages/en";
 
-const baseAnchors = [
-  { to: "/creators",  label: "Creators" },
-  { to: "/merchants", label: "Merchants" },
-  { to: "/agent",     label: "AI Agent" },
-  { to: "/feed",      label: "Travelers" },
-  { to: "/explore",   label: "Guides" },
-  { to: "/articles",  label: "Articles" },
-];
-const merchantAnchor = { to: "/merchants/creators", label: "Find Creators" };
-
-export const Navbar: React.FC = () => {
-  const role = useViewerRole();
+export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["nav"] }> = ({ locale, role, t }) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const anchors = role === "merchant" ? [...baseAnchors, merchantAnchor] : baseAnchors;
+  const p = (path: string) => `/${locale}${path}`;
+
+  const baseAnchors = [
+    { to: "/creators",  label: t.linkCreators },
+    { to: "/merchants", label: t.linkMerchants },
+    { to: "/agent",     label: t.linkAgent },
+    { to: "/feed",      label: t.linkTravelers },
+    { to: "/explore",   label: t.linkGuides },
+    { to: "/articles",  label: t.linkArticles },
+  ];
+  const anchors = role === "merchant"
+    ? [...baseAnchors, { to: "/merchants/creators", label: t.linkFindCreators }]
+    : baseAnchors;
 
   const cta = (() => {
-    if (role === "creator") return { label: "Open Studio →", to: "/studio", className: "k-btn-primary" };
-    if (role === "creator-pending") return { label: "Application pending", to: "/creators/apply", className: "k-pill bg-kinnso-amber/30 text-kinnso-ink px-4 py-2" };
-    if (role === "merchant") return { label: "Post a Mission →", to: "/merchants/post", className: "k-btn-primary" };
-    return { label: "Apply as Creator", to: "/creators/apply", className: "k-btn-primary" };
+    if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k-btn-primary" };
+    if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "k-pill bg-kinnso-amber/30 text-kinnso-ink px-4 py-2" };
+    if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/post", className: "k-btn-primary" };
+    return { label: t.ctaApply, to: "/sign-up", className: "k-btn-primary" };
   })();
 
   return (
     <header className="sticky top-0 z-40 border-b border-kinnso-cream2 bg-kinnso-cream/90 backdrop-blur">
       <div className="k-container flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={p("")} aria-label="KINNSO" className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-md bg-kinnso-orange text-white font-black">K</span>
           <span className="text-xl font-black tracking-tight text-kinnso-ink">KINNSO</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           {anchors.map((a) => {
-            const isActive = pathname === a.to || pathname.endsWith(a.to)
+            const href = p(a.to);
+            const isActive = pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={a.to}
-                href={a.to}
+                href={href}
                 className={`rounded-pill px-3 py-2 text-sm font-semibold transition ${isActive ? "bg-kinnso-cream2 text-kinnso-ink" : "text-kinnso-ink/80 hover:bg-kinnso-cream2"}`}
               >
                 {a.label}
               </Link>
-            )
+            );
           })}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Link href={cta.to} className={cta.className}>{cta.label}</Link>
+          <LocaleSwitcher locale={locale} t={t} />
+          {role === "anon" && (
+            <Link href={p("/sign-in")} className="rounded-pill px-3 py-2 text-sm font-bold text-kinnso-ink hover:bg-kinnso-cream2">{t.signIn}</Link>
+          )}
+          <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
         </div>
 
         <button className="md:hidden" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu">
@@ -62,14 +71,20 @@ export const Navbar: React.FC = () => {
 
       {open && (
         <div className="border-t border-kinnso-cream2 bg-kinnso-cream md:hidden">
-          <div className="k-container flex flex-col py-3">
+          <div className="k-container flex flex-col gap-1 py-3">
             {anchors.map((a) => (
-              <Link key={a.to} href={a.to} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-semibold text-kinnso-ink hover:bg-kinnso-cream2">
+              <Link key={a.to} href={p(a.to)} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-semibold text-kinnso-ink hover:bg-kinnso-cream2">
                 {a.label}
               </Link>
             ))}
-            <div className="mt-2 flex items-center justify-between">
-              <Link href={cta.to} onClick={() => setOpen(false)} className={cta.className}>{cta.label}</Link>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <LocaleSwitcher locale={locale} t={t} />
+              <div className="flex items-center gap-2">
+                {role === "anon" && (
+                  <Link href={p("/sign-in")} onClick={() => setOpen(false)} className="rounded-pill px-3 py-2 text-sm font-bold text-kinnso-ink hover:bg-kinnso-cream2">{t.signIn}</Link>
+                )}
+                <Link href={p(cta.to)} onClick={() => setOpen(false)} className={cta.className}>{cta.label}</Link>
+              </div>
             </div>
           </div>
         </div>

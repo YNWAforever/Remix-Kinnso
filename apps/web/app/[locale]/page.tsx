@@ -1,11 +1,16 @@
-import { notFound, redirect } from 'next/navigation'
-import { isLocale } from '@/lib/i18n/config'
+import { notFound } from 'next/navigation'
+import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { HomeView } from '@/components/kinnso/pages/HomeView'
 
-// The locale root has no content of its own — the articles experience lives at
-// /{locale}/articles. Redirect there so the bare domain (/) -> /{locale} (proxy
-// locale guard) -> /{locale}/articles resolves to a real page instead of a 404.
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }))
+}
+
+/** /[locale] — the KINNSO creator front door (replaces the old redirect to /articles). */
 export default async function LocaleHome({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
-  redirect(`/${locale}/articles`)
+  const messages = await getDictionary(locale as Locale)
+  return <HomeView locale={locale as Locale} t={messages.home} />
 }

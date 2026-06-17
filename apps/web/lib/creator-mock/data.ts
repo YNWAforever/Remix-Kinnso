@@ -286,6 +286,11 @@ export const merchantProfile: MerchantProfile = {
   inviteLimit: 5,
 }
 
+// Merchant logo wall for the homepage "Trusted by partners" strip (mock).
+export const merchantLogos: string[] = [
+  'Cathay', 'Klook', 'agoda', 'Trip.com', 'KKday', 'EVA Air', 'Shangri-La', 'Muji',
+]
+
 // ─── DNA sample — REAL @kinnso/scan `Dna` (unified source of truth).
 // Replaces the redesign's flat `sampleDna`; its numeric/audience data lives
 // in the metrics overlay (extendedCreators) instead.
