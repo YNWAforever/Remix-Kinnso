@@ -12,6 +12,7 @@ const svc = createClient(url, svcKey ?? 'missing')
 const creatorEmail = 'mission-creator@example.test'
 const otherCreatorEmail = 'mission-other-creator@example.test'
 const snapshotCreatorEmail = 'mission-snapshot-creator@example.test'
+const partnerCreatorEmail = 'mission-partner-creator@example.test'
 const merchantEmail = 'mission-merchant@example.test'
 const opsEmail = 'mission-ops@example.test'
 const password = 'Test1234!'
@@ -19,12 +20,14 @@ const password = 'Test1234!'
 let creatorId = ''
 let otherCreatorId = ''
 let snapshotCreatorId = ''
+let partnerCreatorId = ''
 let merchantUserId = ''
 let opsUserId = ''
 let merchantProfileId = ''
 let opsMemberId = ''
 let missionId = ''
 let targetedMissionId = ''
+let travelpayoutsMissionId = ''
 let affiliateProgramId = ''
 
 const missionTableNames = [
@@ -63,6 +66,7 @@ d('mission schema RLS', () => {
     creatorId = await recreateUser(creatorEmail)
     otherCreatorId = await recreateUser(otherCreatorEmail)
     snapshotCreatorId = await recreateUser(snapshotCreatorEmail)
+    partnerCreatorId = await recreateUser(partnerCreatorEmail)
     merchantUserId = await recreateUser(merchantEmail)
     opsUserId = await recreateUser(opsEmail)
 
@@ -139,10 +143,31 @@ d('mission schema RLS', () => {
       .single()
     expect(targetedMission.error).toBeNull()
     targetedMissionId = targetedMission.data!.id
+
+    const travelpayoutsMission = await svc
+      .from('missions')
+      .insert({
+        created_by_ops_member_id: opsMemberId,
+        affiliate_network_program_id: affiliateProgramId,
+        title: 'Travelpayouts affiliate mission',
+        summary: 'Creators can auto-join and create tracked links',
+        mission_source: 'travelpayouts',
+        mission_type: 'coupon_affiliate',
+        visibility: 'open',
+        status: 'published',
+        affiliate_commission_rate: 10,
+        kinnso_commission_rate: 4,
+        creator_commission_rate: 6,
+        published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(travelpayoutsMission.error).toBeNull()
+    travelpayoutsMissionId = travelpayoutsMission.data!.id
   })
 
   afterAll(async () => {
-    for (const id of [creatorId, otherCreatorId, snapshotCreatorId, merchantUserId, opsUserId]) {
+    for (const id of [creatorId, otherCreatorId, snapshotCreatorId, partnerCreatorId, merchantUserId, opsUserId]) {
       if (id) await svc.auth.admin.deleteUser(id)
     }
   })
@@ -241,6 +266,64 @@ d('mission schema RLS', () => {
 
     expect(error).toBeNull()
     expect(data!.program_name).toBe('Travelpayouts RLS Program')
+  })
+
+  it('creator can create tracked links only for the joined Travelpayouts mission program', async () => {
+    const creator = await authed(partnerCreatorEmail)
+    const travelpayoutsParticipant = await creator
+      .from('mission_participants')
+      .insert({
+        mission_id: travelpayoutsMissionId,
+        creator_id: partnerCreatorId,
+        status: 'active',
+        source: 'affiliate_network_join',
+      })
+      .select('id')
+      .single()
+    expect(travelpayoutsParticipant.error).toBeNull()
+
+    const trackedLink = await creator
+      .from('affiliate_partner_links')
+      .insert({
+        affiliate_network_program_id: affiliateProgramId,
+        mission_id: travelpayoutsMissionId,
+        mission_participant_id: travelpayoutsParticipant.data!.id,
+        creator_id: partnerCreatorId,
+        network: 'travelpayouts',
+        original_url: 'https://example.com/travel',
+        partner_url: 'https://tp.example/partner',
+        sub_id: 'partner-good-link',
+      })
+      .select('id')
+      .single()
+    expect(trackedLink.error).toBeNull()
+
+    const merchantParticipant = await creator
+      .from('mission_participants')
+      .insert({
+        mission_id: missionId,
+        creator_id: partnerCreatorId,
+        status: 'active',
+        source: 'open_join',
+      })
+      .select('id')
+      .single()
+    expect(merchantParticipant.error).toBeNull()
+
+    const blockedMerchantMissionLink = await creator
+      .from('affiliate_partner_links')
+      .insert({
+        affiliate_network_program_id: affiliateProgramId,
+        mission_id: missionId,
+        mission_participant_id: merchantParticipant.data!.id,
+        creator_id: partnerCreatorId,
+        network: 'travelpayouts',
+        original_url: 'https://example.com/not-travelpayouts',
+        partner_url: 'https://tp.example/bad',
+        sub_id: 'partner-bad-link',
+      })
+      .select('id')
+    expect(blockedMerchantMissionLink.error === null ? blockedMerchantMissionLink.data : []).toEqual([])
   })
 
   it('social snapshots are visible to the creator, owning merchant, and ops only', async () => {

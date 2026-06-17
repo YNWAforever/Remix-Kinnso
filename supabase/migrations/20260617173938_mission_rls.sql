@@ -516,13 +516,21 @@ create policy "affiliate_partner_links_creator_insert" on public.affiliate_partn
   to authenticated
   with check (
     creator_id = (select auth.uid())
+    and network = 'travelpayouts'
     and exists (
       select 1
       from public.mission_participants participant
+      join public.missions mission on mission.id = participant.mission_id
+      join public.affiliate_network_programs program
+        on program.id = affiliate_partner_links.affiliate_network_program_id
       where participant.id = affiliate_partner_links.mission_participant_id
         and participant.mission_id = affiliate_partner_links.mission_id
         and participant.creator_id = affiliate_partner_links.creator_id
         and participant.status = 'active'
+        and mission.id = affiliate_partner_links.mission_id
+        and mission.mission_source = 'travelpayouts'
+        and mission.affiliate_network_program_id = affiliate_partner_links.affiliate_network_program_id
+        and program.status = 'active'
     )
   );
 
