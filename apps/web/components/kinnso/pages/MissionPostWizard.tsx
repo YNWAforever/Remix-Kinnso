@@ -6,7 +6,6 @@ import type {
   MissionDraftInput,
   MissionType,
   MissionVisibility,
-  ValidationResult,
 } from '@/lib/missions/types'
 import { validateMissionDraft } from '@/lib/missions/validation'
 
@@ -24,12 +23,6 @@ const numberOrNull = (value: string) => (value.trim() === '' ? null : Number(val
 const textOrNull = (value: string) => {
   const next = value.trim()
   return next === '' ? null : next
-}
-
-const hasBlockingErrors = (validation: ValidationResult, publish: boolean) => {
-  if (validation.ok) return false
-  if (publish) return true
-  return Boolean(validation.errors.title || validation.errors.summary)
 }
 
 export function MissionPostWizard({ locale, t, onSubmit }: Props) {
@@ -73,7 +66,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const submit = async (publish: boolean) => {
     const input = buildInput()
     const validation = validateMissionDraft(input)
-    if (hasBlockingErrors(validation, publish)) {
+    if (!validation.ok) {
       setError(t.validationError)
       return
     }
