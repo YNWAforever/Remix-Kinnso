@@ -26,6 +26,7 @@ export default async function MerchantsCreatorsPage({
   return (
     <MerchantsCreatorsView
       merchant={merchantProfile}
+      locale={locale as Locale}
       t={{ ...messages.merchants, creatorProfile: messages.creatorProfile }}
     />
   )

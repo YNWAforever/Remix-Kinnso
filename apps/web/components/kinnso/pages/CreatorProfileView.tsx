@@ -7,6 +7,7 @@ import { creatorLocations, creatorPosts, creatorPlaceTags, engagementHistory, ty
 import { guides } from "@/lib/creator-mock";
 import type { ExtendedCreator } from "@/lib/creator-mock";
 import type { ViewerRole } from "@/lib/auth/viewer-role";
+import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 
 import ScoreRing from "@/components/kinnso/ScoreRing";
@@ -26,11 +27,12 @@ import EngagementTrendChart from "@/components/kinnso/EngagementTrendChart";
 interface Props {
   creator: ExtendedCreator;
   role: ViewerRole;
+  locale: Locale;
   embedded?: boolean;
   t: Messages['creatorProfile'];
 }
 
-const CreatorProfileView: React.FC<Props> = ({ creator, role, embedded, t }) => {
+const CreatorProfileView: React.FC<Props> = ({ creator, role, locale, embedded, t }) => {
   const [following, setFollowing] = useState(false);
   const toggleFollow = () => setFollowing((v) => !v);
 
@@ -46,6 +48,27 @@ const CreatorProfileView: React.FC<Props> = ({ creator, role, embedded, t }) => 
 
   const filteredPosts = postTab === "all" ? posts : posts.filter((p) => p.platform === postTab);
   const wrap = embedded ? "" : "k-container py-8 md:py-12";
+  const p = (path: string) => `/${locale}${path}`;
+  const socialLinks = [
+    {
+      label: `Instagram profile for ${creator.handle}`,
+      href: `https://www.instagram.com/${creator.handle}/`,
+      icon: Instagram,
+      show: true,
+    },
+    {
+      label: `Threads profile for ${creator.handle}`,
+      href: `https://www.threads.net/@${creator.handle}`,
+      icon: MessageCircle,
+      show: true,
+    },
+    {
+      label: `YouTube profile for ${creator.handle}`,
+      href: `https://www.youtube.com/@${creator.handle}`,
+      icon: Youtube,
+      show: creator.followerYt > 0,
+    },
+  ];
 
   return (
     <article className={wrap}>
@@ -71,9 +94,11 @@ const CreatorProfileView: React.FC<Props> = ({ creator, role, embedded, t }) => 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                 <span className="inline-flex items-center rounded-md bg-kinnso-cream2 px-2 py-0.5 text-kinnso-ink"><MapPin className="mr-1 h-3 w-3" /> {creator.homeCity}</span>
                 <span className="rounded-md bg-kinnso-cream2 px-2 py-0.5 text-kinnso-ink">{creator.category}</span>
-                <a href="#" className="text-kinnso-muted hover:text-kinnso-orange"><Instagram className="h-4 w-4" /></a>
-                <a href="#" className="text-kinnso-muted hover:text-kinnso-orange"><MessageCircle className="h-4 w-4" /></a>
-                {creator.followerYt > 0 && <a href="#" className="text-kinnso-muted hover:text-kinnso-orange"><Youtube className="h-4 w-4" /></a>}
+                {socialLinks.filter((link) => link.show).map(({ label, href, icon: Icon }) => (
+                  <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="text-kinnso-muted hover:text-kinnso-orange">
+                    <Icon className="h-4 w-4" />
+                  </a>
+                ))}
               </div>
             </div>
             <button type="button" onClick={toggleFollow} className={following ? "k-btn-ghost" : "k-btn-primary"}>
@@ -159,13 +184,13 @@ const CreatorProfileView: React.FC<Props> = ({ creator, role, embedded, t }) => 
             {myGuides.slice(0, 6).map((g) => <GuideCard key={g.slug} g={g} />)}
           </div>
           {myGuides.length > 6 && (
-            <Link href="/feed" className="k-btn-ghost mt-4 inline-block text-sm">{t.viewAllGuides}</Link>
+            <Link href={p("/feed")} className="k-btn-ghost mt-4 inline-block text-sm">{t.viewAllGuides}</Link>
           )}
         </section>
       )}
 
       {/* Brand contact */}
-      <section className="mt-8"><BrandContactCard creator={creator} role={role} t={t} /></section>
+      <section className="mt-8"><BrandContactCard creator={creator} role={role} locale={locale} t={t} /></section>
 
       {/* Recent posts */}
       <section className="mt-8">

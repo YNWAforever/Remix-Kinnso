@@ -7,6 +7,7 @@ import CreatorMatchCard from "@/components/kinnso/CreatorMatchCard";
 import CreatorFilterDrawer, { defaultFilters, type CreatorFilters } from "@/components/kinnso/CreatorFilterDrawer";
 import { CreatorProfileView } from "@/components/kinnso/pages/CreatorProfileView";
 import { extendedCreators, creatorLocations, merchantWorkingWith, getCreator, computeMatch, type ExtendedCreator } from "@/lib/creator-mock";
+import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 import type { MerchantProfile } from "@/lib/creator-mock";
 
@@ -44,10 +45,11 @@ const FREE_CAP = 3;
 
 interface Props {
   merchant: MerchantProfile;
+  locale: Locale;
   t: Messages['merchants'] & { creatorProfile: Messages['creatorProfile'] };
 }
 
-const MerchantsCreatorsView: React.FC<Props> = ({ merchant, t }) => {
+const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState<CreatorFilters>(defaultFilters);
   const [query, setQuery] = useState("");
@@ -211,7 +213,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, t }) => {
             <div className="px-4 pb-24 pt-6">
               {(() => {
                 const c = getCreator(quickViewHandle);
-                return c ? <CreatorProfileView creator={c} role="merchant" embedded t={t.creatorProfile} /> : null;
+                return c ? <CreatorProfileView creator={c} role="merchant" locale={locale} embedded t={t.creatorProfile} /> : null;
               })()}
             </div>
           )}

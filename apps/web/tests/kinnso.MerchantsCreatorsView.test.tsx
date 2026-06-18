@@ -13,19 +13,19 @@ const baseMerchant = { ...merchantProfile, tier: 'growth' as const, searchesLeft
 
 describe('MerchantsCreatorsView', () => {
   it('renders the header and a recommended list', () => {
-    render(<MerchantsCreatorsView merchant={baseMerchant} t={{ ...en.merchants, creatorProfile: en.creatorProfile }} />)
+    render(<MerchantsCreatorsView merchant={baseMerchant} locale="en" t={{ ...en.merchants, creatorProfile: en.creatorProfile }} />)
     expect(screen.getByRole('heading', { level: 1, name: en.merchants.heading })).toBeTruthy()
     expect(screen.getByRole('tab', { name: new RegExp(en.merchants.tabRecommended) })).toBeTruthy()
   })
 
   it('shows quota chips from the merchant profile', () => {
-    render(<MerchantsCreatorsView merchant={baseMerchant} t={{ ...en.merchants, creatorProfile: en.creatorProfile }} />)
+    render(<MerchantsCreatorsView merchant={baseMerchant} locale="en" t={{ ...en.merchants, creatorProfile: en.creatorProfile }} />)
     expect(screen.getByText(new RegExp(en.merchants.searchesLeft))).toBeTruthy()
     expect(screen.getByText(new RegExp(en.merchants.invitesLeft))).toBeTruthy()
   })
 
   it('growth tier: filter button is enabled and opens the drawer', () => {
-    render(<MerchantsCreatorsView merchant={baseMerchant} t={{ ...en.merchants, creatorProfile: en.creatorProfile }} />)
+    render(<MerchantsCreatorsView merchant={baseMerchant} locale="en" t={{ ...en.merchants, creatorProfile: en.creatorProfile }} />)
     const filterBtn = screen.getByRole('button', { name: new RegExp(en.merchants.filter) })
     expect((filterBtn as HTMLButtonElement).disabled).toBe(false)
     fireEvent.click(filterBtn)
@@ -37,6 +37,7 @@ describe('MerchantsCreatorsView', () => {
     render(
       <MerchantsCreatorsView
         merchant={{ ...baseMerchant, tier: 'free' }}
+        locale="en"
         t={{ ...en.merchants, creatorProfile: en.creatorProfile }}
       />,
     )
@@ -51,6 +52,7 @@ describe('MerchantsCreatorsView', () => {
     render(
       <MerchantsCreatorsView
         merchant={{ ...baseMerchant, invitesLeft: 0 }}
+        locale="en"
         t={{ ...en.merchants, creatorProfile: en.creatorProfile }}
       />,
     )

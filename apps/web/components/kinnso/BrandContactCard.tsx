@@ -3,17 +3,22 @@ import Link from "next/link";
 import type { ExtendedCreator } from "@/lib/creator-mock";
 import { tierMeta } from "@/lib/creator-mock";
 import type { ViewerRole } from "@/lib/auth/viewer-role";
+import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 
 interface Props {
   creator: ExtendedCreator;
   role: ViewerRole;
+  locale: Locale;
   t: Messages["creatorProfile"];
 }
 
-export function BrandContactCard({ creator, role, t }: Props) {
+export function BrandContactCard({ creator, role, locale, t }: Props) {
   const meta = tierMeta[creator.tier];
   const firstName = creator.name.split(" ")[0];
+  const p = (path: string) => `/${locale}${path}`;
+  const creatorBriefHref = `${p("/merchants/post")}?creator=${encodeURIComponent(creator.handle)}`;
+
   return (
     <div className="overflow-hidden rounded-lg bg-kinnso-amber/40 p-6 md:flex md:items-center md:justify-between md:gap-8">
       <div>
@@ -28,13 +33,13 @@ export function BrandContactCard({ creator, role, t }: Props) {
       <div className="mt-4 flex flex-wrap gap-2 md:mt-0">
         {role === "merchant" ? (
           <>
-            <Link href={`/merchants/post?creator=${creator.handle}`} className="k-btn-primary">{t.brandSendBrief}</Link>
+            <Link href={creatorBriefHref} className="k-btn-primary">{t.brandSendBrief}</Link>
             <button type="button" className="k-btn-ghost">{t.brandSaveToList}</button>
           </>
         ) : role === "anon" ? (
           <span className="rounded-pill bg-white/70 px-4 py-2 text-sm font-semibold text-kinnso-ink">{t.brandSignInToContact}</span>
         ) : (
-          <Link href="/merchants/post" className="k-btn-primary">{t.brandSendBrief}</Link>
+          <Link href={p("/merchants/post")} className="k-btn-primary">{t.brandSendBrief}</Link>
         )}
       </div>
     </div>
