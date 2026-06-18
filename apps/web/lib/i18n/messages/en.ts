@@ -13,6 +13,9 @@ export interface Messages {
     password: string
     emailSent: string
     emailSentDesc: string
+    emailSentNext: string
+    emailSentSignIn: string
+    emailSentUseAnother: string
     alreadyHaveAccount: string
     noAccount: string
     errorInvalidCredentials: string
@@ -340,6 +343,9 @@ const messages: Messages = {
     password: 'Password',
     emailSent: 'Check your email',
     emailSentDesc: 'We sent you a confirmation link. Click it to activate your account.',
+    emailSentNext: 'After confirming, Kinnso will take you to creator setup to connect Instagram, YouTube, or Threads.',
+    emailSentSignIn: 'Sign in after confirming',
+    emailSentUseAnother: 'Use another email',
     alreadyHaveAccount: 'Already have an account?',
     noAccount: 'Don\'t have an account?',
     errorInvalidCredentials: 'Invalid email or password.',
