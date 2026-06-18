@@ -19,6 +19,7 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
     if (override) return
     const supabase = createSupabaseBrowserClient()
     let active = true
+    let latestResolution = 0
 
     const resolveSignedInRole = async (userId: string): Promise<ViewerRole> => {
       const [{ data: ops }, { data: merchant }] = await Promise.all([
@@ -37,23 +38,25 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
       return ops ? 'ops' : merchant ? 'merchant' : 'creator'
     }
 
+    const initialResolution = ++latestResolution
     supabase.auth.getUser().then(async ({ data }) => {
-      if (!active) return
+      if (!active || initialResolution !== latestResolution) return
       if (!data.user) {
         setRole('anon')
         return
       }
       const nextRole = await resolveSignedInRole(data.user.id)
-      if (!active) return
+      if (!active || initialResolution !== latestResolution) return
       setRole(nextRole)
     })
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const resolution = ++latestResolution
       if (!session?.user) {
         if (active) setRole('anon')
         return
       }
       const nextRole = await resolveSignedInRole(session.user.id)
-      if (active) setRole(nextRole)
+      if (active && resolution === latestResolution) setRole(nextRole)
     })
     return () => {
       active = false
