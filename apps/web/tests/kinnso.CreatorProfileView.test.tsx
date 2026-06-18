@@ -6,10 +6,11 @@ afterEach(cleanup)
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
 import { CreatorProfileView } from '@/components/kinnso/pages/CreatorProfileView'
-import { getCreator } from '@/lib/creator-mock'
+import { getCreator, guides } from '@/lib/creator-mock'
 import en from '@/lib/i18n/messages/en'
 
 const creator = getCreator('maywanders')!
+const firstGuide = guides.find((guide) => guide.creatorHandle === creator.handle)!
 
 describe('CreatorProfileView', () => {
   it('renders hero, stat grid and key section headings', () => {
@@ -49,6 +50,13 @@ describe('CreatorProfileView', () => {
     )
     expect(screen.getByRole('link', { name: en.creatorProfile.brandSendBrief }).getAttribute('href')).toBe(
       `/en/merchants/post?creator=${creator.handle}`,
+    )
+  })
+
+  it('keeps guide card links locale scoped', () => {
+    render(<CreatorProfileView creator={creator} role="anon" locale="en" t={en.creatorProfile} />)
+    expect(screen.getByRole('link', { name: new RegExp(firstGuide.title) }).getAttribute('href')).toBe(
+      `/en/g/${firstGuide.slug}`,
     )
   })
 

@@ -181,7 +181,7 @@ const CreatorProfileView: React.FC<Props> = ({ creator, role, locale, embedded, 
         <section className="mt-8">
           <h2 className="text-xl font-bold text-kinnso-ink">{t.latestGuides}</h2>
           <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {myGuides.slice(0, 6).map((g) => <GuideCard key={g.slug} g={g} />)}
+            {myGuides.slice(0, 6).map((g) => <GuideCard key={g.slug} g={g} locale={locale} />)}
           </div>
           {myGuides.length > 6 && (
             <Link href={p("/feed")} className="k-btn-ghost mt-4 inline-block text-sm">{t.viewAllGuides}</Link>
