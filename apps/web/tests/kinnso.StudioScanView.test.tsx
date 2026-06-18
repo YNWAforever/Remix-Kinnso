@@ -69,6 +69,7 @@ describe('StudioScanView — demo mode', () => {
     renderDemo()
     fireEvent.click(screen.getByRole('button', { name: en.studio.shareDnaCard }))
     expect(screen.getByText(en.studio.shareDialogTitle)).toBeTruthy()
+    expect(screen.getByText(`http://localhost:3000/en/c/${metrics.handle}`)).toBeTruthy()
   })
 
   it('keeps mission and profile navigation under the active locale', () => {
