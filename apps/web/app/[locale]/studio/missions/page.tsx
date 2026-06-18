@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { CreatorMissionsView, type CreatorMissionCard } from '@/components/kinnso/pages/CreatorMissionsView'
+import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createPartnerLinkAction, joinMissionAction } from '@/lib/missions/actions'
@@ -18,6 +19,9 @@ type CreatorMissionRow = {
   mission_source: string | null
   mission_type: string | null
   status: string | null
+  affiliate_commission_rate: number | null
+  creator_commission_rate: number | null
+  kinnso_commission_rate: number | null
   paid_fee_amount: number | null
   paid_fee_currency: string | null
   affiliate_network_programs?: {
@@ -44,16 +48,33 @@ const programCompensation = (program: CreatorMissionRow['affiliate_network_progr
   return row?.default_commission_description?.trim() || 'Affiliate commission'
 }
 
+const merchantAffiliateCompensation = (row: CreatorMissionRow) => {
+  if (typeof row.creator_commission_rate === 'number' && typeof row.affiliate_commission_rate === 'number') {
+    return `Affiliate commission ${row.creator_commission_rate}% creator / ${row.affiliate_commission_rate}% total`
+  }
+  return 'Affiliate commission'
+}
+
 const programUrl = (program: CreatorMissionRow['affiliate_network_programs']) => {
   const row = Array.isArray(program) ? program[0] : program
   return row?.program_url?.trim() || null
 }
 
+const paidCompensation = (row: CreatorMissionRow) =>
+  typeof row.paid_fee_amount === 'number'
+    ? `${row.paid_fee_currency ?? 'HKD'} ${row.paid_fee_amount}`
+    : null
+
 const formatCompensation = (row: CreatorMissionRow) => {
-  if (typeof row.paid_fee_amount === 'number') {
-    return `${row.paid_fee_currency ?? 'HKD'} ${row.paid_fee_amount}`
+  const paid = paidCompensation(row)
+  const affiliate = row.mission_source === 'travelpayouts'
+    ? programCompensation(row.affiliate_network_programs)
+    : merchantAffiliateCompensation(row)
+
+  if (row.mission_type === 'hybrid' && paid) {
+    return `${paid} + ${affiliate}`
   }
-  return programCompensation(row.affiliate_network_programs)
+  return paid ?? affiliate
 }
 
 function mapCreatorMission(row: CreatorMissionRow, creatorId: string): CreatorMissionCard {
@@ -87,6 +108,9 @@ export default async function StudioMissionsPage({ params }: { params: Params })
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect(`/${loc}/sign-in`)
+
+  const role = await resolveViewerRole(supabase)
+  if (role !== 'creator') notFound()
 
   const { data } = await listCreatorMissions(supabase, user.id)
   const missions = ((data ?? []) as unknown as CreatorMissionRow[]).map((row) =>

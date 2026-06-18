@@ -1,10 +1,22 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
+const { refreshMock } = vi.hoisted(() => ({
+  refreshMock: vi.fn(),
+}))
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: refreshMock }),
+}))
+
 import { MissionDetailView } from '@/components/kinnso/pages/MissionDetailView'
 import en from '@/lib/i18n/messages/en'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  refreshMock.mockReset()
+})
 
 describe('MissionDetailView', () => {
   const mission = {
@@ -31,5 +43,20 @@ describe('MissionDetailView', () => {
     fireEvent.click(screen.getByRole('button', { name: en.missions.approve }))
 
     expect((await screen.findByRole('alert')).textContent).toContain('Merchant access is required')
+  })
+
+  it('disables review buttons while pending and refreshes after success', async () => {
+    let resolveReview!: (result: { ok: true }) => void
+    const onReviewParticipant = vi.fn(() => new Promise<{ ok: true }>((resolve) => {
+      resolveReview = resolve
+    }))
+    render(<MissionDetailView t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
+
+    const button = screen.getByRole('button', { name: en.missions.approve })
+    fireEvent.click(button)
+
+    expect(button).toHaveProperty('disabled', true)
+    resolveReview({ ok: true })
+    await waitFor(() => expect(refreshMock).toHaveBeenCalledTimes(1))
   })
 })

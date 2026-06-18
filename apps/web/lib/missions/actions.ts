@@ -588,6 +588,9 @@ export async function createPartnerLinkAction(
   if (existingLinkError) return formError('Partner link could not be loaded')
   if (existingLink) return { ok: true, link: existingLink }
 
+  const serviceSupabase = await getSupabaseServiceRoleClient()
+  if (!serviceSupabase) return formError('Partner link persistence is not configured')
+
   const { buildSubId, createTravelpayoutsPartnerLinks } = await import('@/lib/missions/travelpayouts')
   const subId = buildSubId({
     missionId: mission.id,
@@ -607,9 +610,6 @@ export async function createPartnerLinkAction(
   }
 
   if (!partnerUrl) return formError('Travelpayouts partner link could not be generated')
-
-  const serviceSupabase = await getSupabaseServiceRoleClient()
-  if (!serviceSupabase) return formError('Partner link persistence is not configured')
 
   const partnerLinkInsert: PartnerLinkInsert = {
     affiliate_network_program_id: mission.affiliate_network_program_id,

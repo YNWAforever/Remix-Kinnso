@@ -14,7 +14,8 @@ export const merchantMissionSelect = `
 
 export const creatorMissionSelect = `
   id,title,summary,mission_source,mission_type,visibility,status,published_at,
-  coupon_code,coupon_url,paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
+  coupon_code,coupon_url,affiliate_commission_rate,creator_commission_rate,kinnso_commission_rate,
+  paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
   affiliate_network_programs(id,program_name,program_url,default_commission_description,status),
   mission_milestones(id,title,description,due_at,sort_order),
   mission_participants(id,status,source,creator_id),

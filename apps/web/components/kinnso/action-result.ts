@@ -9,3 +9,5 @@ export const actionErrorMessage = (result: KinnsoActionResult) => {
   const [message] = Object.values(result.errors ?? {}).flat()
   return message ?? 'Action could not be completed'
 }
+
+export const actionSucceeded = (result: KinnsoActionResult) => Boolean(result?.ok)

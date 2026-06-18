@@ -682,7 +682,7 @@ describe('createPartnerLinkAction', () => {
     expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/studio/missions')
   })
 
-  it('returns a safe error when service-role persistence is not configured', async () => {
+  it('checks service-role persistence before calling Travelpayouts', async () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '')
     buildSubIdMock.mockReturnValue('creator-sub')
@@ -733,7 +733,7 @@ describe('createPartnerLinkAction', () => {
       ok: false,
       errors: { form: ['Partner link persistence is not configured'] },
     })
-    expect(createTravelpayoutsPartnerLinksMock).toHaveBeenCalledTimes(1)
+    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
     expect(createServiceClientMock).not.toHaveBeenCalled()
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })

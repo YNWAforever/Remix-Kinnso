@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { actionErrorMessage, type KinnsoActionResult } from '@/components/kinnso/action-result'
+import { useRouter } from 'next/navigation'
+import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -20,12 +21,20 @@ type OpsSettlementViewProps = {
 }
 
 export function OpsSettlementView({ t, settlements, onUpdate }: OpsSettlementViewProps) {
+  const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
   const runUpdate = async (settlementId: string) => {
     setActionError(null)
-    const result = await onUpdate(settlementId, 'paid')
-    setActionError(actionErrorMessage(result))
+    setIsPending(true)
+    try {
+      const result = await onUpdate(settlementId, 'paid')
+      setActionError(actionErrorMessage(result))
+      if (actionSucceeded(result)) router.refresh()
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -54,7 +63,7 @@ export function OpsSettlementView({ t, settlements, onUpdate }: OpsSettlementVie
               {settlement.status === 'paid' ? t.statusPaid : t.statusPending}
             </p>
             {settlement.status !== 'paid' && (
-              <button type="button" className="k-btn-primary text-sm" onClick={() => void runUpdate(settlement.id)}>
+              <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runUpdate(settlement.id)}>
                 {t.markPaid}
               </button>
             )}

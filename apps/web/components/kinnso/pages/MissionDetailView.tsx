@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { actionErrorMessage, type KinnsoActionResult } from '@/components/kinnso/action-result'
+import { useRouter } from 'next/navigation'
+import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { SocialSignalBadge } from '@/components/kinnso/SocialSignalBadge'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -30,12 +31,20 @@ export function MissionDetailView({
   onReviewParticipant,
   onReviewSubmission,
 }: MissionDetailViewProps) {
+  const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
   const runAction = async (action: () => KinnsoActionResult | Promise<KinnsoActionResult>) => {
     setActionError(null)
-    const result = await action()
-    setActionError(actionErrorMessage(result))
+    setIsPending(true)
+    try {
+      const result = await action()
+      setActionError(actionErrorMessage(result))
+      if (actionSucceeded(result)) router.refresh()
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -58,10 +67,10 @@ export function MissionDetailView({
               </div>
               {participant.status === 'applied' && (
                 <div className="flex gap-2">
-                  <button type="button" className="k-btn-primary text-sm" onClick={() => void runAction(() => onReviewParticipant(participant.id, 'approve'))}>
+                  <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runAction(() => onReviewParticipant(participant.id, 'approve'))}>
                     {t.approve}
                   </button>
-                  <button type="button" className="k-btn-ghost text-sm" onClick={() => void runAction(() => onReviewParticipant(participant.id, 'reject'))}>
+                  <button type="button" className="k-btn-ghost text-sm" disabled={isPending} onClick={() => void runAction(() => onReviewParticipant(participant.id, 'reject'))}>
                     {t.reject}
                   </button>
                 </div>
@@ -85,13 +94,13 @@ export function MissionDetailView({
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" className="k-btn-primary text-sm" onClick={() => void runAction(() => onReviewSubmission(submission.id, 'approve'))}>
+                  <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runAction(() => onReviewSubmission(submission.id, 'approve'))}>
                     {t.approve}
                   </button>
-                  <button type="button" className="k-btn-ghost text-sm" onClick={() => void runAction(() => onReviewSubmission(submission.id, 'request_revision'))}>
+                  <button type="button" className="k-btn-ghost text-sm" disabled={isPending} onClick={() => void runAction(() => onReviewSubmission(submission.id, 'request_revision'))}>
                     {t.requestRevision}
                   </button>
-                  <button type="button" className="k-btn-ghost text-sm" onClick={() => void runAction(() => onReviewSubmission(submission.id, 'reject'))}>
+                  <button type="button" className="k-btn-ghost text-sm" disabled={isPending} onClick={() => void runAction(() => onReviewSubmission(submission.id, 'reject'))}>
                     {t.reject}
                   </button>
                 </div>

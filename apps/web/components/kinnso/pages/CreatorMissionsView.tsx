@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { actionErrorMessage, type KinnsoActionResult } from '@/components/kinnso/action-result'
+import { useRouter } from 'next/navigation'
+import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -32,7 +33,9 @@ export function CreatorMissionsView({
   onJoin,
   onCreateLink,
 }: CreatorMissionsViewProps) {
+  const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
   const getJoinLabel = (missionType: CreatorMissionCard['missionType']) => (
     missionType === 'coupon_affiliate' ? t.joinMission : t.applyMission
@@ -40,8 +43,14 @@ export function CreatorMissionsView({
 
   const runAction = async (action: () => KinnsoActionResult | Promise<KinnsoActionResult>) => {
     setActionError(null)
-    const result = await action()
-    setActionError(actionErrorMessage(result))
+    setIsPending(true)
+    try {
+      const result = await action()
+      setActionError(actionErrorMessage(result))
+      if (actionSucceeded(result)) router.refresh()
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
@@ -76,7 +85,7 @@ export function CreatorMissionsView({
               )}
               <div className="mt-4 flex flex-wrap gap-2">
                 {!mission.participant && (
-                  <button type="button" className="k-btn-primary text-sm" onClick={() => void runAction(() => onJoin(mission.id))}>
+                  <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runAction(() => onJoin(mission.id))}>
                     {getJoinLabel(mission.missionType)}
                   </button>
                 )}
@@ -84,6 +93,7 @@ export function CreatorMissionsView({
                   <button
                     type="button"
                     className="k-btn-ghost text-sm"
+                    disabled={isPending}
                     onClick={() => void runAction(() => onCreateLink(activeParticipantId, programUrl))}
                   >
                     {t.generatePartnerLink}

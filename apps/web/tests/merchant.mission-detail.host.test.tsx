@@ -17,7 +17,10 @@ const { getMerchantProfileMock, listMerchantMissionsMock, notFoundMock } = vi.ho
         mission_milestone_submissions: [{
           id: 'submission-1',
           status: 'submitted',
-          mission_social_snapshots: [{ confidence_status: 'verified_signal' }],
+          mission_social_snapshots: [
+            { confidence_status: 'unavailable' },
+            { confidence_status: 'verified_signal' },
+          ],
         }],
       }],
     }],
@@ -28,6 +31,7 @@ const { getMerchantProfileMock, listMerchantMissionsMock, notFoundMock } = vi.ho
 vi.mock('next/navigation', () => ({
   notFound: notFoundMock,
   redirect: vi.fn((path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) }),
+  useRouter: () => ({ refresh: vi.fn() }),
 }))
 
 vi.mock('@/lib/missions/queries', () => ({

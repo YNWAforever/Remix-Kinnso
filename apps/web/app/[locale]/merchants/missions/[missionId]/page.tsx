@@ -33,8 +33,9 @@ function creatorName(creatorId: string | null) {
 function socialSignalStatus(
   snapshots: Array<{ confidence_status: string | null }> | null | undefined,
 ): MissionDetail['submissions'][number]['snapshotStatus'] {
-  const status = snapshots?.[0]?.confidence_status
-  if (status === 'verified_signal' || status === 'needs_review') return status
+  const statuses = snapshots?.map((snapshot) => snapshot.confidence_status) ?? []
+  if (statuses.includes('verified_signal')) return 'verified_signal'
+  if (statuses.includes('needs_review')) return 'needs_review'
   return 'unavailable'
 }
 
