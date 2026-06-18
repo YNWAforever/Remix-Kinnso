@@ -13,4 +13,10 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: en.footer.lStudio }).getAttribute('href')).toBe('/ja/studio')
     expect(screen.getByRole('link', { name: en.footer.lAbout }).getAttribute('href')).toBe('/ja/about')
   })
+
+  it('does not render placeholder social links', () => {
+    render(<Footer locale="en" t={en.footer} />)
+    expect(screen.queryByRole('link', { name: 'Instagram' })).toBeNull()
+    expect(screen.getByText('Instagram')).toBeTruthy()
+  })
 })

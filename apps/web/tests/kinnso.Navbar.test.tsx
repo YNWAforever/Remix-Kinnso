@@ -3,7 +3,11 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/en' }))
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/en',
+  useSearchParams: () => new URLSearchParams(),
+}))
 
 import { Navbar } from '@/components/kinnso/Navbar'
 import en from '@/lib/i18n/messages/en'
@@ -33,5 +37,10 @@ describe('Navbar', () => {
   it('renders the locale switcher', () => {
     render(<Navbar locale="en" role="anon" t={en.nav} />)
     expect(screen.getByLabelText(en.nav.language)).toBeTruthy()
+  })
+
+  it('uses localized text for the mobile menu toggle label', () => {
+    render(<Navbar locale="en" role="anon" t={en.nav} />)
+    expect(screen.getByRole('button', { name: en.nav.menuToggle })).toBeTruthy()
   })
 })

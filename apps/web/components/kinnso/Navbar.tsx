@@ -64,7 +64,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
           <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
         </div>
 
-        <button className="md:hidden" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu">
+        <button className="md:hidden" onClick={() => setOpen((v) => !v)} aria-label={t.menuToggle}>
           {open ? <X /> : <Menu />}
         </button>
       </div>

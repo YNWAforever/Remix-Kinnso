@@ -19,7 +19,8 @@ export function LocaleSwitcher({ locale, t }: { locale: Locale; t: Messages['nav
     // segs[0] === '' (leading slash); segs[1] is the current locale (or a non-locale path)
     if (isLocale(segs[1] ?? '')) segs[1] = next
     else segs.splice(1, 0, next)
-    router.push(segs.join('/') || `/${next}`)
+    const nextPath = segs.join('/') || `/${next}`
+    router.push(`${nextPath}${window.location.search}`)
   }
 
   return (

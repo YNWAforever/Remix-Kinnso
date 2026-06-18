@@ -5,7 +5,11 @@ import { render, screen, cleanup } from '@testing-library/react'
 afterEach(cleanup)
 
 const { pathname } = vi.hoisted(() => ({ pathname: { value: '/en' } }))
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => pathname.value }))
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => pathname.value,
+  useSearchParams: () => new URLSearchParams(),
+}))
 // Force a deterministic role so chrome presence is the only variable.
 vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
 

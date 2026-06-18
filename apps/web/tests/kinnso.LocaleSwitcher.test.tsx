@@ -21,8 +21,9 @@ describe('LocaleSwitcher', () => {
   })
 
   it('swaps the first path segment, preserving the rest', () => {
+    window.history.replaceState(null, '', '/en/studio/scan?q=ramen&page=2')
     render(<LocaleSwitcher locale="en" t={en.nav} />)
     fireEvent.change(screen.getByLabelText(en.nav.language), { target: { value: 'ja' } })
-    expect(push).toHaveBeenCalledWith('/ja/studio/scan')
+    expect(push).toHaveBeenCalledWith('/ja/studio/scan?q=ramen&page=2')
   })
 })

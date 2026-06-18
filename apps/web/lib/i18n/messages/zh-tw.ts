@@ -304,7 +304,7 @@ const messages: Messages = {
     linkCreators: '創作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
     linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '尋找創作者',
     ctaApply: '申請成為創作者', ctaOpenStudio: '開啟工作室', ctaPending: '申請審核中', ctaPostMission: '發布任務',
-    signIn: '登入', language: '語言',
+    signIn: '登入', language: '語言', menuToggle: '選單',
   },
   footer: {
     tagline: 'AI 旅遊內容工作室 · 為創作者付費 · 香港 · 台北 · 東京',
