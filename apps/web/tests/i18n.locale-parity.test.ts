@@ -11,7 +11,7 @@ function keyPaths(obj: unknown, prefix = ''): string[] {
     .sort()
 }
 
-const GROUPS = ['studio', 'creatorProfile', 'merchants', 'nav', 'footer', 'home', 'comingSoon'] as const
+const GROUPS = ['studio', 'creatorProfile', 'merchants', 'missions', 'nav', 'footer', 'home', 'comingSoon'] as const
 
 describe('i18n locale parity for new creator-profile groups', () => {
   const enPaths = Object.fromEntries(

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type {
   MissionDraftInput,
@@ -12,8 +12,16 @@ import { validateMissionDraft } from '@/lib/missions/validation'
 interface Props {
   locale: string
   t: Messages['missions']
-  onSubmit: (input: MissionDraftInput, opts: { publish: boolean }) => unknown | Promise<unknown>
+  onSubmit: (input: MissionDraftInput, opts: { publish: boolean }) => SubmitResult | Promise<SubmitResult>
 }
+
+type SubmitResult =
+  | void
+  | { ok: true }
+  | {
+      ok: false
+      errors?: Record<string, string[]>
+    }
 
 const fieldShell = 'grid gap-1 text-sm font-semibold text-kinnso-ink'
 const inputShell =
@@ -24,6 +32,14 @@ const textOrNull = (value: string) => {
   const next = value.trim()
   return next === '' ? null : next
 }
+
+const isFailureResult = (result: SubmitResult): result is Extract<SubmitResult, { ok: false }> =>
+  typeof result === 'object' && result !== null && 'ok' in result && result.ok === false
+
+const firstActionError = (errors: Record<string, string[]> | undefined) =>
+  Object.values(errors ?? {})
+    .flat()
+    .find((message) => message.trim().length > 0)
 
 export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [missionType, setMissionType] = useState<MissionType>('coupon_affiliate')
@@ -40,6 +56,8 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [milestoneTitle, setMilestoneTitle] = useState('')
   const [milestoneDescription, setMilestoneDescription] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const submittingRef = useRef(false)
 
   const includesCoupon = missionType === 'coupon_affiliate' || missionType === 'hybrid'
   const includesPaid = missionType === 'paid' || missionType === 'hybrid'
@@ -64,6 +82,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   })
 
   const submit = async (publish: boolean) => {
+    if (submittingRef.current) return
     const input = buildInput()
     const validation = validateMissionDraft(input)
     if (!validation.ok) {
@@ -72,7 +91,19 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
     }
 
     setError('')
-    await onSubmit(input, { publish })
+    submittingRef.current = true
+    setSubmitting(true)
+    try {
+      const result = await onSubmit(input, { publish })
+      if (isFailureResult(result)) {
+        setError(firstActionError(result.errors) ?? t.validationError)
+      }
+    } catch {
+      setError(t.validationError)
+    } finally {
+      submittingRef.current = false
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -217,8 +248,8 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
         {error && <p className="text-sm font-semibold text-kinnso-red" role="alert">{error}</p>}
 
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="k-btn-ghost" onClick={() => void submit(false)}>{t.saveDraft}</button>
-          <button type="button" className="k-btn-primary" onClick={() => void submit(true)}>{t.publish}</button>
+          <button type="button" className="k-btn-ghost disabled:opacity-50" disabled={submitting} onClick={() => void submit(false)}>{t.saveDraft}</button>
+          <button type="button" className="k-btn-primary disabled:opacity-50" disabled={submitting} onClick={() => void submit(true)}>{t.publish}</button>
         </div>
       </form>
     </div>
