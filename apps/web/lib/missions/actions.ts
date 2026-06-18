@@ -23,6 +23,7 @@ import {
 type MissionInsert = Database['public']['Tables']['missions']['Insert']
 type MissionMilestoneInsert = Database['public']['Tables']['mission_milestones']['Insert']
 type ParticipantInsert = Database['public']['Tables']['mission_participants']['Insert']
+type PartnerLinkInsert = Database['public']['Tables']['affiliate_partner_links']['Insert']
 type SettlementUpdate = Database['public']['Tables']['mission_settlements']['Update']
 type Supabase = SupabaseClient<Database>
 
@@ -112,6 +113,21 @@ const localizedPath = (locale: string | undefined, path: string) =>
 async function getSupabase() {
   const { createSupabaseServerClient } = await import('@/lib/supabase/server')
   return createSupabaseServerClient()
+}
+
+async function getSupabaseServiceRoleClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!url || !serviceRoleKey) return null
+
+  const { createClient } = await import('@supabase/supabase-js')
+  return createClient<Database>(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
 }
 
 async function revalidate(paths: string[]) {
@@ -576,19 +592,29 @@ export async function createPartnerLinkAction(
 
   if (!partnerUrl) return formError('Travelpayouts partner link could not be generated')
 
-  const { data, error } = await supabase
-    .rpc('create_travelpayouts_partner_link', {
-      p_affiliate_network_program_id: mission.affiliate_network_program_id,
-      p_mission_id: mission.id,
-      p_mission_participant_id: participant.id,
-      p_original_url: input.originalUrl,
-      p_partner_url: partnerUrl,
-      p_sub_id: subId,
-    })
+  const serviceSupabase = await getSupabaseServiceRoleClient()
+  if (!serviceSupabase) return formError('Partner link persistence is not configured')
 
-  const link = Array.isArray(data) ? data[0] : data
-  if (error || !link) return formError('Partner link could not be saved')
+  const partnerLinkInsert: PartnerLinkInsert = {
+    affiliate_network_program_id: mission.affiliate_network_program_id,
+    mission_id: mission.id,
+    mission_participant_id: participant.id,
+    creator_id: user.id,
+    network: 'travelpayouts',
+    original_url: input.originalUrl,
+    partner_url: partnerUrl,
+    sub_id: subId,
+    external_status: 'success',
+  }
+
+  const { data, error } = await serviceSupabase
+    .from('affiliate_partner_links')
+    .insert(partnerLinkInsert)
+    .select('id, partner_url')
+    .single()
+
+  if (error || !data) return formError('Partner link could not be saved')
 
   await revalidate([localizedPath(input.locale, studioMissionsPath)])
-  return { ok: true, link }
+  return { ok: true, link: data }
 }
