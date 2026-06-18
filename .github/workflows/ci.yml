@@ -75,6 +75,11 @@ jobs:
 
       - name: Start scan worker (fixture mode) and web app
         run: |
+          # tsx src/server.ts reads process.env directly (no dotenv), unlike
+          # `next dev` which auto-loads .env.local — so export the worker's env here.
+          set -a
+          . ./apps/scan/.env.local
+          set +a
           SCAN_FIXTURE_MODE=1 pnpm --filter @kinnso/scan-app start &
           pnpm --filter web dev &
           npx --yes wait-on http://localhost:8788/health http://localhost:3000
