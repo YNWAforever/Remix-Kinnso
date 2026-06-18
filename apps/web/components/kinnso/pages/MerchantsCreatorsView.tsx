@@ -148,6 +148,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
                 key={c.handle}
                 creator={c}
                 saved={saves.includes(c.handle)}
+                locale={locale}
                 onToggleSave={() => toggleSave(c.handle)}
                 onQuickView={() => setQuickViewHandle(c.handle)}
               />
@@ -164,6 +165,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
                 <CreatorMatchCard
                   creator={c}
                   saved
+                  locale={locale}
                   onToggleSave={() => toggleSave(c.handle)}
                   onQuickView={() => setQuickViewHandle(c.handle)}
                 />
