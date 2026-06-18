@@ -57,6 +57,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [milestoneDescription, setMilestoneDescription] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const submittingRef = useRef(false)
 
   const includesCoupon = missionType === 'coupon_affiliate' || missionType === 'hybrid'
@@ -82,6 +83,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   })
 
   const submit = async (publish: boolean) => {
+    if (submitted) return
     if (submittingRef.current) return
     const input = buildInput()
     const validation = validateMissionDraft(input)
@@ -97,7 +99,9 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
       const result = await onSubmit(input, { publish })
       if (isFailureResult(result)) {
         setError(firstActionError(result.errors) ?? t.validationError)
+        return
       }
+      setSubmitted(true)
     } catch {
       setError(t.validationError)
     } finally {
@@ -248,8 +252,8 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
         {error && <p className="text-sm font-semibold text-kinnso-red" role="alert">{error}</p>}
 
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="k-btn-ghost disabled:opacity-50" disabled={submitting} onClick={() => void submit(false)}>{t.saveDraft}</button>
-          <button type="button" className="k-btn-primary disabled:opacity-50" disabled={submitting} onClick={() => void submit(true)}>{t.publish}</button>
+          <button type="button" className="k-btn-ghost disabled:opacity-50" disabled={submitting || submitted} onClick={() => void submit(false)}>{t.saveDraft}</button>
+          <button type="button" className="k-btn-primary disabled:opacity-50" disabled={submitting || submitted} onClick={() => void submit(true)}>{t.publish}</button>
         </div>
       </form>
     </div>

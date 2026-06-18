@@ -58,8 +58,8 @@ describe('MissionPostWizard', () => {
     let resolveSubmit: () => void = () => {}
     const onSubmit = vi.fn(
       () =>
-        new Promise<{ ok: true }>((resolve) => {
-          resolveSubmit = () => resolve({ ok: true })
+        new Promise<{ ok: false; errors: { form: string[] } }>((resolve) => {
+          resolveSubmit = () => resolve({ ok: false, errors: { form: ['Retry after fixing the issue'] } })
         }),
     )
     render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
@@ -77,5 +77,21 @@ describe('MissionPostWizard', () => {
 
     resolveSubmit()
     await waitFor(() => expect(saveDraft).not.toBeDisabled())
+  })
+
+  it('keeps submit actions disabled after a successful create', async () => {
+    const onSubmit = vi.fn(async () => ({ ok: true }))
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Test mission' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Mission summary' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponCode), { target: { value: 'TEST10' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponUrl), { target: { value: 'https://example.com/test' } })
+
+    const saveDraft = screen.getByRole('button', { name: en.missions.saveDraft })
+    fireEvent.click(saveDraft)
+
+    await waitFor(() => expect(saveDraft).toBeDisabled())
+    fireEvent.click(saveDraft)
+    expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 })
