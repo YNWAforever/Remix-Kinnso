@@ -7,7 +7,6 @@ export type { ViewerRole } from './viewer-role'
 /**
  * Thin viewer-role hook (replaces the redesign's MockAuthContext).
  * Reads the real Supabase session client-side; defaults to 'anon'.
- * This slice has no merchant/status resolution: a signed-in user is 'creator'.
  * Pass `override` to force a role (e.g. a merchant-context host).
  */
 export function useViewerRole(override?: ViewerRole): ViewerRole {
@@ -20,8 +19,27 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
     if (override) return
     const supabase = createSupabaseBrowserClient()
     let active = true
-    supabase.auth.getUser().then(({ data }) => {
-      if (active) setRole(data.user ? 'creator' : 'anon')
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!active) return
+      if (!data.user) {
+        setRole('anon')
+        return
+      }
+      const [{ data: ops }, { data: merchant }] = await Promise.all([
+        supabase
+          .from('kinnso_ops_members')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .eq('status', 'active')
+          .maybeSingle(),
+        supabase
+          .from('merchant_profiles')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .maybeSingle(),
+      ])
+      if (!active) return
+      setRole(ops ? 'ops' : merchant ? 'merchant' : 'creator')
     })
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setRole(session?.user ? 'creator' : 'anon')
