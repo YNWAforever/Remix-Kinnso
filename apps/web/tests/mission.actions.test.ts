@@ -43,6 +43,8 @@ vi.mock('@/lib/missions/travelpayouts', () => ({
   createTravelpayoutsPartnerLinks: createTravelpayoutsPartnerLinksMock,
 }))
 
+vi.mock('server-only', () => ({}))
+
 type MockBuilder = {
   delete: ReturnType<typeof vi.fn>
   eq: ReturnType<typeof vi.fn>
@@ -736,5 +738,17 @@ describe('createPartnerLinkAction', () => {
     expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
     expect(createServiceClientMock).not.toHaveBeenCalled()
     expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('social enrichment boundary', () => {
+  it('returns unavailable instead of throwing when enrichment is not configured', async () => {
+    const { fetchSocialSnapshot } = await import('@/lib/missions/social-enrichment')
+
+    await expect(
+      fetchSocialSnapshot({ platform: 'instagram', proofUrl: 'https://instagram.com/p/demo' }),
+    ).resolves.toMatchObject({
+      confidenceStatus: 'unavailable',
+    })
   })
 })
