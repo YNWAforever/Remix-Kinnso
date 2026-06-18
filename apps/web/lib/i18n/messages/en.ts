@@ -261,6 +261,17 @@ export interface Messages {
     resultsCapped: string
   }
   missions: {
+    missionQueue: string
+    joinMission: string
+    applyMission: string
+    generatePartnerLink: string
+    approve: string
+    reject: string
+    requestRevision: string
+    submitMilestone: string
+    participants: string
+    pendingApplications: string
+    settlement: string
     postHeading: string
     postSub: string
     typeCoupon: string
@@ -282,6 +293,13 @@ export interface Messages {
     openMission: string
     targetedMission: string
     validationError: string
+  }
+  ops: {
+    settlementHeading: string
+    settlementSub: string
+    markPaid: string
+    statusPending: string
+    statusPaid: string
   }
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
@@ -567,6 +585,17 @@ const messages: Messages = {
     resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
   },
   missions: {
+    missionQueue: 'Mission queue',
+    joinMission: 'Join mission',
+    applyMission: 'Apply mission',
+    generatePartnerLink: 'Generate partner link',
+    approve: 'Approve',
+    reject: 'Reject',
+    requestRevision: 'Request revision',
+    submitMilestone: 'Submit milestone',
+    participants: 'Participants',
+    pendingApplications: 'Pending applications',
+    settlement: 'Settlement',
     postHeading: 'Post a mission',
     postSub: 'Create coupon, hybrid, or paid creator work in one flow.',
     typeCoupon: 'Coupon affiliate',
@@ -588,6 +617,13 @@ const messages: Messages = {
     openMission: 'Open mission',
     targetedMission: 'Targeted invite',
     validationError: 'Check the highlighted fields and try again.',
+  },
+  ops: {
+    settlementHeading: 'Settlement queue',
+    settlementSub: 'Track creator payouts and KINNSO commissions.',
+    markPaid: 'Mark paid',
+    statusPending: 'Pending',
+    statusPaid: 'Paid',
   },
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',

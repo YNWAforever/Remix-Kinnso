@@ -1,0 +1,41 @@
+import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
+import type { Messages } from '@/lib/i18n/messages/en'
+
+export type MerchantMissionRow = {
+  id: string
+  title: string
+  status: string
+  participantCount: number
+  pendingCount: number
+  settlementStatus: string | null
+}
+
+type MerchantMissionsViewProps = {
+  t: Messages['missions']
+  missions: MerchantMissionRow[]
+}
+
+export function MerchantMissionsView({ t, missions }: MerchantMissionsViewProps) {
+  return (
+    <main className="k-container py-10">
+      <h1 className="text-3xl font-black text-kinnso-ink">{t.missionQueue}</h1>
+      <div className="mt-6 overflow-hidden rounded-2xl border border-kinnso-cream2 bg-white shadow-kinnso">
+        <div className="grid grid-cols-1 gap-3 border-b border-kinnso-cream2 px-4 py-3 text-xs font-bold uppercase text-kinnso-muted sm:grid-cols-[1fr_120px]">
+          <span>{t.title}</span>
+          <span>Status</span>
+        </div>
+        {missions.map((mission) => (
+          <article key={mission.id} className="grid grid-cols-1 gap-3 border-b border-kinnso-cream2 px-4 py-4 last:border-b-0 sm:grid-cols-[1fr_120px] sm:items-center">
+            <div>
+              <h2 className="font-bold text-kinnso-ink">{mission.title}</h2>
+              <p className="mt-1 text-sm text-kinnso-muted">
+                {t.participants}: {mission.participantCount} / {t.pendingApplications}: {mission.pendingCount} / {t.settlement}: {mission.settlementStatus ?? '-'}
+              </p>
+            </div>
+            <MissionStatusBadge status={mission.status} />
+          </article>
+        ))}
+      </div>
+    </main>
+  )
+}
