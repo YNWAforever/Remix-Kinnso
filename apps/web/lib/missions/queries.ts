@@ -4,7 +4,10 @@ import type { Database } from '@kinnso/db'
 export const merchantMissionSelect = `
   id,title,summary,mission_source,mission_type,visibility,status,published_at,
   coupon_code,coupon_url,paid_fee_amount,paid_fee_currency,
-  mission_participants(id,status,source,creator_id,application_note,merchant_review_note,approved_at),
+  mission_participants(
+    id,status,source,creator_id,application_note,merchant_review_note,approved_at,
+    mission_milestone_submissions(id,status,mission_social_snapshots(confidence_status))
+  ),
   mission_milestones(id,title,description,due_at,sort_order),
   mission_settlements(id,status,creator_payout_status,kinnso_commission_status,affiliate_commission_status)
 `

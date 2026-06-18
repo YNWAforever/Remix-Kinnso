@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { actionErrorMessage, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -14,14 +16,27 @@ export type OpsSettlementRow = {
 type OpsSettlementViewProps = {
   t: Messages['ops']
   settlements: OpsSettlementRow[]
-  onUpdate: (settlementId: string, status: 'paid') => void | Promise<void>
+  onUpdate: (settlementId: string, status: 'paid') => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
 export function OpsSettlementView({ t, settlements, onUpdate }: OpsSettlementViewProps) {
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  const runUpdate = async (settlementId: string) => {
+    setActionError(null)
+    const result = await onUpdate(settlementId, 'paid')
+    setActionError(actionErrorMessage(result))
+  }
+
   return (
     <main className="k-container py-10">
       <h1 className="text-3xl font-black text-kinnso-ink">{t.settlementHeading}</h1>
       <p className="mt-2 text-sm text-kinnso-muted">{t.settlementSub}</p>
+      {actionError && (
+        <p role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
+          {actionError}
+        </p>
+      )}
 
       <div className="mt-6 divide-y divide-kinnso-cream2 overflow-hidden rounded-2xl border border-kinnso-cream2 bg-white shadow-kinnso">
         {settlements.map((settlement) => (
@@ -39,7 +54,7 @@ export function OpsSettlementView({ t, settlements, onUpdate }: OpsSettlementVie
               {settlement.status === 'paid' ? t.statusPaid : t.statusPending}
             </p>
             {settlement.status !== 'paid' && (
-              <button type="button" className="k-btn-primary text-sm" onClick={() => void onUpdate(settlement.id, 'paid')}>
+              <button type="button" className="k-btn-primary text-sm" onClick={() => void runUpdate(settlement.id)}>
                 {t.markPaid}
               </button>
             )}

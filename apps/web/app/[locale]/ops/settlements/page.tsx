@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { OpsSettlementView, type OpsSettlementRow } from '@/components/kinnso/pages/OpsSettlementView'
+import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { updateSettlementAction } from '@/lib/missions/actions'
@@ -43,21 +44,19 @@ export default async function OpsSettlementsPage({ params }: { params: Params })
   } = await supabase.auth.getUser()
   if (!user) redirect(`/${loc}/sign-in`)
 
+  const role = await resolveViewerRole(supabase)
+  if (role !== 'ops') notFound()
+
   const { data } = await listOpsSettlements(supabase)
   const settlements = ((data ?? []) as unknown as OpsSettlementData[]).map(mapOpsSettlement)
 
   async function markPaid(settlementId: string, status: 'paid') {
     'use server'
-    await updateSettlementAction({
+    return updateSettlementAction({
       settlementId,
       status,
       creatorPayoutStatus: 'paid',
       kinnsoCommissionStatus: 'paid',
-      affiliateCommissionAmount: null,
-      affiliateCommissionStatus: null,
-      creatorCommissionAmount: null,
-      kinnsoCommissionAmount: null,
-      opsNote: null,
       locale: loc,
     })
   }

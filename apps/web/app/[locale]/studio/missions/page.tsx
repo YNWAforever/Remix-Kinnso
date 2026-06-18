@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { CreatorMissionsView, type CreatorMissionCard } from '@/components/kinnso/pages/CreatorMissionsView'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { joinMissionAction } from '@/lib/missions/actions'
+import { createPartnerLinkAction, joinMissionAction } from '@/lib/missions/actions'
 import { listCreatorMissions } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -20,7 +20,13 @@ type CreatorMissionRow = {
   status: string | null
   paid_fee_amount: number | null
   paid_fee_currency: string | null
-  affiliate_network_programs?: { default_commission_description?: string | null } | Array<{ default_commission_description?: string | null }> | null
+  affiliate_network_programs?: {
+    default_commission_description?: string | null
+    program_url?: string | null
+  } | Array<{
+    default_commission_description?: string | null
+    program_url?: string | null
+  }> | null
   mission_participants?: Array<{ id: string; status: string | null; creator_id: string | null }> | null
   affiliate_partner_links?: Array<{ id: string; partner_url: string | null }> | null
 }
@@ -36,6 +42,11 @@ const missionType = (type: string | null): CreatorMissionCard['missionType'] => 
 const programCompensation = (program: CreatorMissionRow['affiliate_network_programs']) => {
   const row = Array.isArray(program) ? program[0] : program
   return row?.default_commission_description?.trim() || 'Affiliate commission'
+}
+
+const programUrl = (program: CreatorMissionRow['affiliate_network_programs']) => {
+  const row = Array.isArray(program) ? program[0] : program
+  return row?.program_url?.trim() || null
 }
 
 const formatCompensation = (row: CreatorMissionRow) => {
@@ -60,6 +71,7 @@ function mapCreatorMission(row: CreatorMissionRow, creatorId: string): CreatorMi
       id: link.id,
       partnerUrl: link.partner_url ?? '',
     })),
+    programUrl: programUrl(row.affiliate_network_programs),
     compensation: formatCompensation(row),
   }
 }
@@ -83,12 +95,12 @@ export default async function StudioMissionsPage({ params }: { params: Params })
 
   async function join(missionId: string) {
     'use server'
-    await joinMissionAction({ missionId, locale: loc })
+    return joinMissionAction({ missionId, locale: loc })
   }
 
-  async function createLink(missionId: string) {
+  async function createLink(missionParticipantId: string, originalUrl: string) {
     'use server'
-    void missionId
+    return createPartnerLinkAction({ missionParticipantId, originalUrl, locale: loc })
   }
 
   return <CreatorMissionsView t={messages.missions} missions={missions} onJoin={join} onCreateLink={createLink} />

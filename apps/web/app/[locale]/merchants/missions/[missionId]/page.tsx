@@ -14,23 +14,49 @@ type Params = Promise<{ locale: string; missionId: string }>
 type MerchantMissionDetailData = {
   id: string
   title: string | null
-  mission_participants?: Array<{ id: string; status: string | null; creator_id: string | null }> | null
+  mission_participants?: Array<{
+    id: string
+    status: string | null
+    creator_id: string | null
+    mission_milestone_submissions?: Array<{
+      id: string
+      status: string | null
+      mission_social_snapshots?: Array<{ confidence_status: string | null }> | null
+    }> | null
+  }> | null
 }
 
 function creatorName(creatorId: string | null) {
   return creatorId ? `Creator ${creatorId.slice(0, 8)}` : 'Creator'
 }
 
+function socialSignalStatus(
+  snapshots: Array<{ confidence_status: string | null }> | null | undefined,
+): MissionDetail['submissions'][number]['snapshotStatus'] {
+  const status = snapshots?.[0]?.confidence_status
+  if (status === 'verified_signal' || status === 'needs_review') return status
+  return 'unavailable'
+}
+
 function mapMissionDetail(row: MerchantMissionDetailData): MissionDetail {
+  const participants = row.mission_participants ?? []
+
   return {
     id: row.id,
     title: row.title ?? '',
-    participants: (row.mission_participants ?? []).map((participant) => ({
+    participants: participants.map((participant) => ({
       id: participant.id,
       creatorName: creatorName(participant.creator_id),
       status: participant.status ?? 'applied',
     })),
-    submissions: [],
+    submissions: participants.flatMap((participant) =>
+      (participant.mission_milestone_submissions ?? []).map((submission) => ({
+        id: submission.id,
+        creatorName: creatorName(participant.creator_id),
+        status: submission.status ?? 'pending',
+        snapshotStatus: socialSignalStatus(submission.mission_social_snapshots),
+      })),
+    ),
   }
 }
 
@@ -55,12 +81,12 @@ export default async function MerchantMissionDetailPage({ params }: { params: Pa
 
   async function reviewParticipant(participantId: string, action: 'approve' | 'reject') {
     'use server'
-    await reviewParticipantAction({ participantId, action, locale: loc })
+    return reviewParticipantAction({ participantId, action, locale: loc })
   }
 
   async function reviewSubmission(submissionId: string, action: 'approve' | 'request_revision' | 'reject') {
     'use server'
-    await reviewSubmissionAction({ submissionId, action, locale: loc })
+    return reviewSubmissionAction({ submissionId, action, locale: loc })
   }
 
   return (

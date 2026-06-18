@@ -77,7 +77,7 @@ type UpdateSettlementInput = LocaleOption & {
   status: SettlementStatus
   creatorPayoutStatus: SettlementPaymentStatus
   kinnsoCommissionStatus: SettlementPaymentStatus
-  affiliateCommissionAmount: number | null
+  affiliateCommissionAmount?: number | null
   affiliateCommissionStatus?: SettlementPaymentStatus | null
   creatorCommissionAmount?: number | null
   kinnsoCommissionAmount?: number | null
@@ -310,6 +310,12 @@ export async function joinMissionAction(
   const user = await getAuthenticatedUser(supabase)
   if (!user) return formError('Sign in is required')
 
+  const opsMember = await getActiveOpsMember(supabase, user.id)
+  if (opsMember) return formError('Creator access is required')
+
+  const merchantProfile = await getMerchantProfileForUser(supabase, user.id)
+  if (merchantProfile) return formError('Creator access is required')
+
   const { data: mission, error: missionError } = await supabase
     .from('missions')
     .select('id, mission_type, mission_source')
@@ -486,12 +492,22 @@ export async function updateSettlementAction(
     status: input.status,
     creator_payout_status: input.creatorPayoutStatus,
     kinnso_commission_status: input.kinnsoCommissionStatus,
-    affiliate_commission_amount: input.affiliateCommissionAmount,
-    affiliate_commission_status: input.affiliateCommissionStatus,
-    creator_commission_amount: input.creatorCommissionAmount,
-    kinnso_commission_amount: input.kinnsoCommissionAmount,
-    ops_note: input.opsNote,
     updated_by_ops_member_id: opsMember.id,
+  }
+  if (input.affiliateCommissionAmount !== undefined) {
+    update.affiliate_commission_amount = input.affiliateCommissionAmount
+  }
+  if (input.affiliateCommissionStatus !== undefined) {
+    update.affiliate_commission_status = input.affiliateCommissionStatus
+  }
+  if (input.creatorCommissionAmount !== undefined) {
+    update.creator_commission_amount = input.creatorCommissionAmount
+  }
+  if (input.kinnsoCommissionAmount !== undefined) {
+    update.kinnso_commission_amount = input.kinnsoCommissionAmount
+  }
+  if (input.opsNote !== undefined) {
+    update.ops_note = input.opsNote
   }
 
   const { data: settlement, error } = await supabase
