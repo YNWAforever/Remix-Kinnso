@@ -26,7 +26,7 @@ jobs:
       # `supabase start` applies supabase/migrations and seeds supabase/seed.sql.
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.106.0
       - run: pnpm supabase start
 
       - name: Export local Supabase env for tests
@@ -57,7 +57,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.106.0
       - run: pnpm supabase start
 
       - name: Export local Supabase env for apps/web and apps/scan
