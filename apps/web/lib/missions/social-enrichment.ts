@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - server-only is a Next.js runtime marker; this workspace does not install its types.
 import 'server-only'
 

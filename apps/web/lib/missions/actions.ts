@@ -7,7 +7,6 @@ import type {
   MissionType,
   ParticipantReviewAction,
   ParticipantStatus,
-  PartnerLinkRequest,
   SettlementPaymentStatus,
   SettlementStatus,
   SubmissionReviewAction,
