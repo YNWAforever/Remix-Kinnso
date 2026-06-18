@@ -45,6 +45,7 @@ export default async function StudioScanPage({
   if (!user) {
     return (
       <StudioScanView
+        locale={locale as Locale}
         mode="demo"
         identity={buildDemoIdentity(metrics, new Date().toISOString())}
         dna={sampleDna}
@@ -89,6 +90,7 @@ export default async function StudioScanPage({
 
   return (
     <StudioScanView
+      locale={locale as Locale}
       mode="real"
       identity={buildStudioIdentity(
         { display_name: creatorRow?.display_name ?? null },

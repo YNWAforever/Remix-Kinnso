@@ -3,7 +3,10 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+
+const pushMock = vi.hoisted(() => vi.fn())
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: pushMock }) }))
 
 import { StudioScanView } from '@/components/kinnso/pages/StudioScanView'
 import { getCreator, sampleDna } from '@/lib/creator-mock'
@@ -15,6 +18,7 @@ const metrics = getCreator('maywanders')!
 function renderDemo() {
   return render(
     <StudioScanView
+      locale="en"
       mode="demo"
       identity={buildDemoIdentity(metrics, '2026-06-16T00:00:00Z')}
       dna={sampleDna}
@@ -29,6 +33,7 @@ const handles: HandleRow[] = [{ platform: 'instagram', handle: 'maygram', url: n
 function renderReal() {
   return render(
     <StudioScanView
+      locale="en"
       mode="real"
       identity={buildStudioIdentity({ display_name: 'May Wong' }, handles, sampleDna, '2026-06-01T00:00:00Z')}
       dna={sampleDna}
@@ -40,6 +45,10 @@ function renderReal() {
 }
 
 describe('StudioScanView — demo mode', () => {
+  afterEach(() => {
+    pushMock.mockReset()
+  })
+
   it('renders the report headings and the DNA core panel', () => {
     renderDemo()
     expect(screen.getByText(en.studio.reportReadyHeading)).toBeTruthy()
@@ -60,6 +69,19 @@ describe('StudioScanView — demo mode', () => {
     renderDemo()
     fireEvent.click(screen.getByRole('button', { name: en.studio.shareDnaCard }))
     expect(screen.getByText(en.studio.shareDialogTitle)).toBeTruthy()
+  })
+
+  it('keeps mission and profile navigation under the active locale', () => {
+    const { container } = renderDemo()
+
+    const missionLinks = Array.from(container.querySelectorAll<HTMLAnchorElement>('a[href="/en/studio/missions"]'))
+    expect(missionLinks).toHaveLength(3)
+
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(en.studio.viewAllMissions) }))
+    expect(pushMock).toHaveBeenCalledWith('/en/studio/missions')
+
+    fireEvent.click(screen.getByRole('button', { name: en.studio.publishProfile }))
+    expect(pushMock).toHaveBeenCalledWith(`/en/c/${metrics.handle}`)
   })
 })
 

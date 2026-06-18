@@ -3,8 +3,8 @@ import { Calendar, MapPin } from "lucide-react";
 import TierBadge from "./TierBadge";
 import type { Mission } from "@/lib/creator-mock";
 
-const MissionCard = ({ m }: { m: Mission }) => (
-  <Link href={`/studio/missions/${m.id}`} className="block">
+const MissionCard = ({ m, href }: { m: Mission; href: string }) => (
+  <Link href={href} className="block">
     <article className="k-card group relative h-full overflow-hidden p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
       <div className="flex items-start justify-between gap-3">
         <div>
