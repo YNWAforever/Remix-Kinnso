@@ -260,6 +260,29 @@ export interface Messages {
     inviteDisabled: string
     resultsCapped: string
   }
+  missions: {
+    postHeading: string
+    postSub: string
+    typeCoupon: string
+    typeHybrid: string
+    typePaid: string
+    title: string
+    summary: string
+    couponCode: string
+    couponUrl: string
+    affiliateCommissionRate: string
+    kinnsoCommissionRate: string
+    creatorCommissionRate: string
+    paidFeeAmount: string
+    paidFeeCurrency: string
+    milestoneTitle: string
+    milestoneDescription: string
+    saveDraft: string
+    publish: string
+    openMission: string
+    targetedMission: string
+    validationError: string
+  }
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string
@@ -542,6 +565,29 @@ const messages: Messages = {
     lockedFilter: 'Available on Growth',
     inviteDisabled: 'No invites left this month',
     resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
+  },
+  missions: {
+    postHeading: 'Post a mission',
+    postSub: 'Create coupon, hybrid, or paid creator work in one flow.',
+    typeCoupon: 'Coupon affiliate',
+    typeHybrid: 'Affiliate + paid mission',
+    typePaid: 'Paid mission only',
+    title: 'Mission title',
+    summary: 'Mission summary',
+    couponCode: 'Coupon code',
+    couponUrl: 'Coupon URL',
+    affiliateCommissionRate: 'Affiliate commission rate',
+    kinnsoCommissionRate: 'KINNSO commission rate',
+    creatorCommissionRate: 'Creator commission rate',
+    paidFeeAmount: 'Paid mission fee',
+    paidFeeCurrency: 'Currency',
+    milestoneTitle: 'Milestone title',
+    milestoneDescription: 'Milestone description',
+    saveDraft: 'Save draft',
+    publish: 'Publish',
+    openMission: 'Open mission',
+    targetedMission: 'Targeted invite',
+    validationError: 'Check the highlighted fields and try again.',
   },
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
