@@ -7,13 +7,250 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.5"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
+      affiliate_network_events: {
+        Row: {
+          affiliate_network_program_id: string | null
+          booked_at: string | null
+          created_at: string
+          creator_id: string | null
+          currency: string | null
+          event_state: string
+          external_action_id: string
+          external_updated_at: string | null
+          id: string
+          mission_id: string | null
+          mission_participant_id: string | null
+          network: string
+          price_amount: number | null
+          profit_amount: number | null
+          raw_response_checksum: string | null
+          sub_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          affiliate_network_program_id?: string | null
+          booked_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          currency?: string | null
+          event_state?: string
+          external_action_id: string
+          external_updated_at?: string | null
+          id?: string
+          mission_id?: string | null
+          mission_participant_id?: string | null
+          network: string
+          price_amount?: number | null
+          profit_amount?: number | null
+          raw_response_checksum?: string | null
+          sub_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affiliate_network_program_id?: string | null
+          booked_at?: string | null
+          created_at?: string
+          creator_id?: string | null
+          currency?: string | null
+          event_state?: string
+          external_action_id?: string
+          external_updated_at?: string | null
+          id?: string
+          mission_id?: string | null
+          mission_participant_id?: string | null
+          network?: string
+          price_amount?: number | null
+          profit_amount?: number | null
+          raw_response_checksum?: string | null
+          sub_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_network_events_affiliate_network_program_id_fkey"
+            columns: ["affiliate_network_program_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_network_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_network_events_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_network_events_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_network_events_mission_participant_id_fkey"
+            columns: ["mission_participant_id"]
+            isOneToOne: false
+            referencedRelation: "mission_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_network_programs: {
+        Row: {
+          category: string | null
+          created_at: string
+          default_commission_description: string | null
+          default_currency: string | null
+          description: string | null
+          external_program_id: string
+          id: string
+          join_policy: string
+          metadata: Json
+          network: string
+          program_name: string
+          program_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          default_commission_description?: string | null
+          default_currency?: string | null
+          description?: string | null
+          external_program_id: string
+          id?: string
+          join_policy?: string
+          metadata?: Json
+          network: string
+          program_name: string
+          program_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          default_commission_description?: string | null
+          default_currency?: string | null
+          description?: string | null
+          external_program_id?: string
+          id?: string
+          join_policy?: string
+          metadata?: Json
+          network?: string
+          program_name?: string
+          program_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      affiliate_partner_links: {
+        Row: {
+          affiliate_network_program_id: string
+          created_at: string
+          creator_id: string
+          external_status: string
+          generated_at: string
+          id: string
+          mission_id: string
+          mission_participant_id: string
+          network: string
+          original_url: string
+          partner_url: string
+          sub_id: string
+          updated_at: string
+        }
+        Insert: {
+          affiliate_network_program_id: string
+          created_at?: string
+          creator_id: string
+          external_status?: string
+          generated_at?: string
+          id?: string
+          mission_id: string
+          mission_participant_id: string
+          network: string
+          original_url: string
+          partner_url: string
+          sub_id: string
+          updated_at?: string
+        }
+        Update: {
+          affiliate_network_program_id?: string
+          created_at?: string
+          creator_id?: string
+          external_status?: string
+          generated_at?: string
+          id?: string
+          mission_id?: string
+          mission_participant_id?: string
+          network?: string
+          original_url?: string
+          partner_url?: string
+          sub_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_partner_links_affiliate_network_program_id_fkey"
+            columns: ["affiliate_network_program_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_network_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_partner_links_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_partner_links_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_partner_links_mission_participant_id_fkey"
+            columns: ["mission_participant_id"]
+            isOneToOne: false
+            referencedRelation: "mission_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       article_authors: {
         Row: {
           avatar: string | null
@@ -462,6 +699,504 @@ export type Database = {
         }
         Relationships: []
       }
+      kinnso_ops_members: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      merchant_profiles: {
+        Row: {
+          company_name: string
+          contact_email: string
+          contact_name: string | null
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      mission_milestone_submissions: {
+        Row: {
+          created_at: string
+          id: string
+          merchant_feedback: string | null
+          mission_milestone_id: string
+          mission_participant_id: string
+          notes: string | null
+          proof_urls: string[]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          merchant_feedback?: string | null
+          mission_milestone_id: string
+          mission_participant_id: string
+          notes?: string | null
+          proof_urls?: string[]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          merchant_feedback?: string | null
+          mission_milestone_id?: string
+          mission_participant_id?: string
+          notes?: string | null
+          proof_urls?: string[]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_milestone_submissions_mission_milestone_id_fkey"
+            columns: ["mission_milestone_id"]
+            isOneToOne: false
+            referencedRelation: "mission_milestones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_milestone_submissions_mission_participant_id_fkey"
+            columns: ["mission_participant_id"]
+            isOneToOne: false
+            referencedRelation: "mission_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_milestones: {
+        Row: {
+          created_at: string
+          description: string
+          due_at: string | null
+          id: string
+          mission_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          due_at?: string | null
+          id?: string
+          mission_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          due_at?: string | null
+          id?: string
+          mission_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_milestones_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_participants: {
+        Row: {
+          application_note: string | null
+          approved_at: string | null
+          created_at: string
+          creator_id: string
+          id: string
+          merchant_review_note: string | null
+          mission_id: string
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          application_note?: string | null
+          approved_at?: string | null
+          created_at?: string
+          creator_id: string
+          id?: string
+          merchant_review_note?: string | null
+          mission_id: string
+          source: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          application_note?: string | null
+          approved_at?: string | null
+          created_at?: string
+          creator_id?: string
+          id?: string
+          merchant_review_note?: string | null
+          mission_id?: string
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_participants_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_participants_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_settlements: {
+        Row: {
+          affiliate_commission_amount: number | null
+          affiliate_commission_status: string | null
+          affiliate_network_event_id: string | null
+          amount_currency: string | null
+          created_at: string
+          creator_commission_amount: number | null
+          creator_payout_status: string | null
+          id: string
+          kinnso_commission_amount: number | null
+          kinnso_commission_status: string | null
+          merchant_invoice_status: string | null
+          merchant_payment_status: string | null
+          mission_id: string
+          mission_participant_id: string | null
+          ops_note: string | null
+          paid_fee_amount: number | null
+          status: string
+          updated_at: string
+          updated_by_ops_member_id: string | null
+        }
+        Insert: {
+          affiliate_commission_amount?: number | null
+          affiliate_commission_status?: string | null
+          affiliate_network_event_id?: string | null
+          amount_currency?: string | null
+          created_at?: string
+          creator_commission_amount?: number | null
+          creator_payout_status?: string | null
+          id?: string
+          kinnso_commission_amount?: number | null
+          kinnso_commission_status?: string | null
+          merchant_invoice_status?: string | null
+          merchant_payment_status?: string | null
+          mission_id: string
+          mission_participant_id?: string | null
+          ops_note?: string | null
+          paid_fee_amount?: number | null
+          status?: string
+          updated_at?: string
+          updated_by_ops_member_id?: string | null
+        }
+        Update: {
+          affiliate_commission_amount?: number | null
+          affiliate_commission_status?: string | null
+          affiliate_network_event_id?: string | null
+          amount_currency?: string | null
+          created_at?: string
+          creator_commission_amount?: number | null
+          creator_payout_status?: string | null
+          id?: string
+          kinnso_commission_amount?: number | null
+          kinnso_commission_status?: string | null
+          merchant_invoice_status?: string | null
+          merchant_payment_status?: string | null
+          mission_id?: string
+          mission_participant_id?: string | null
+          ops_note?: string | null
+          paid_fee_amount?: number | null
+          status?: string
+          updated_at?: string
+          updated_by_ops_member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_settlements_affiliate_network_event_id_fkey"
+            columns: ["affiliate_network_event_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_network_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_settlements_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_settlements_mission_participant_id_fkey"
+            columns: ["mission_participant_id"]
+            isOneToOne: false
+            referencedRelation: "mission_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_settlements_updated_by_ops_member_id_fkey"
+            columns: ["updated_by_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_social_snapshots: {
+        Row: {
+          confidence_status: string
+          created_at: string
+          engagement_count: number | null
+          fetched_at: string | null
+          follower_count: number | null
+          handle: string | null
+          id: string
+          mission_id: string | null
+          mission_milestone_submission_id: string | null
+          mission_participant_id: string | null
+          platform: string
+          post_media_url: string | null
+          profile_media_url: string | null
+          profile_url: string | null
+          proof_url: string | null
+          raw_response_checksum: string | null
+          updated_at: string
+        }
+        Insert: {
+          confidence_status?: string
+          created_at?: string
+          engagement_count?: number | null
+          fetched_at?: string | null
+          follower_count?: number | null
+          handle?: string | null
+          id?: string
+          mission_id?: string | null
+          mission_milestone_submission_id?: string | null
+          mission_participant_id?: string | null
+          platform: string
+          post_media_url?: string | null
+          profile_media_url?: string | null
+          profile_url?: string | null
+          proof_url?: string | null
+          raw_response_checksum?: string | null
+          updated_at?: string
+        }
+        Update: {
+          confidence_status?: string
+          created_at?: string
+          engagement_count?: number | null
+          fetched_at?: string | null
+          follower_count?: number | null
+          handle?: string | null
+          id?: string
+          mission_id?: string | null
+          mission_milestone_submission_id?: string | null
+          mission_participant_id?: string | null
+          platform?: string
+          post_media_url?: string | null
+          profile_media_url?: string | null
+          profile_url?: string | null
+          proof_url?: string | null
+          raw_response_checksum?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_social_snapshots_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_social_snapshots_mission_milestone_submission_id_fkey"
+            columns: ["mission_milestone_submission_id"]
+            isOneToOne: false
+            referencedRelation: "mission_milestone_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_social_snapshots_mission_participant_id_fkey"
+            columns: ["mission_participant_id"]
+            isOneToOne: false
+            referencedRelation: "mission_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      missions: {
+        Row: {
+          affiliate_commission_rate: number | null
+          affiliate_network_program_id: string | null
+          application_instructions: string | null
+          coupon_code: string | null
+          coupon_description: string | null
+          coupon_url: string | null
+          created_at: string
+          created_by_ops_member_id: string | null
+          creator_commission_rate: number | null
+          ends_at: string | null
+          id: string
+          kinnso_commission_rate: number | null
+          merchant_profile_id: string | null
+          mission_source: string
+          mission_type: string
+          paid_fee_amount: number | null
+          paid_fee_currency: string | null
+          published_at: string | null
+          starts_at: string | null
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          affiliate_commission_rate?: number | null
+          affiliate_network_program_id?: string | null
+          application_instructions?: string | null
+          coupon_code?: string | null
+          coupon_description?: string | null
+          coupon_url?: string | null
+          created_at?: string
+          created_by_ops_member_id?: string | null
+          creator_commission_rate?: number | null
+          ends_at?: string | null
+          id?: string
+          kinnso_commission_rate?: number | null
+          merchant_profile_id?: string | null
+          mission_source?: string
+          mission_type: string
+          paid_fee_amount?: number | null
+          paid_fee_currency?: string | null
+          published_at?: string | null
+          starts_at?: string | null
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          affiliate_commission_rate?: number | null
+          affiliate_network_program_id?: string | null
+          application_instructions?: string | null
+          coupon_code?: string | null
+          coupon_description?: string | null
+          coupon_url?: string | null
+          created_at?: string
+          created_by_ops_member_id?: string | null
+          creator_commission_rate?: number | null
+          ends_at?: string | null
+          id?: string
+          kinnso_commission_rate?: number | null
+          merchant_profile_id?: string | null
+          mission_source?: string
+          mission_type?: string
+          paid_fee_amount?: number | null
+          paid_fee_currency?: string | null
+          published_at?: string | null
+          starts_at?: string | null
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_affiliate_network_program_id_fkey"
+            columns: ["affiliate_network_program_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_network_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_created_by_ops_member_id_fkey"
+            columns: ["created_by_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seo_redirects: {
         Row: {
           from_path: string
@@ -649,6 +1384,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

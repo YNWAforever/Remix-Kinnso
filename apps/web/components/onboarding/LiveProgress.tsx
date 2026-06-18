@@ -99,15 +99,31 @@ export function LiveProgress({
         )
         .subscribe()
 
+      // Polling backstop: Realtime postgres_changes on the RLS-protected jobs table
+      // can be missed (socket-auth / connection timing), which would otherwise strand
+      // the wizard forever. Re-select until the job reaches a terminal state.
+      let timer: ReturnType<typeof setInterval> | undefined
+      const select = (): PromiseLike<void> =>
+        supabase
+          .from('creator_scan_jobs')
+          .select('id, status, progress, error')
+          .eq('id', id)
+          .single()
+          .then(({ data }) => {
+            const row = data as JobRow | null
+            applyJob(row)
+            if (row && (row.status === 'ready' || row.status === 'failed') && timer) {
+              clearInterval(timer)
+              timer = undefined
+            }
+          })
+
       // Initial select AFTER subscribe so a terminal-before-subscribe job reconciles in.
-      void supabase
-        .from('creator_scan_jobs')
-        .select('id, status, progress, error')
-        .eq('id', id)
-        .single()
-        .then(({ data }) => applyJob(data as JobRow | null))
+      void select()
+      timer = setInterval(() => void select(), 2000)
 
       return () => {
+        if (timer) clearInterval(timer)
         supabase.removeChannel(channel)
       }
     },

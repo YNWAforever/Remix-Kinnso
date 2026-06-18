@@ -34,10 +34,9 @@ const Footer = ({ locale, t }: { locale: Locale; t: Messages["footer"] }) => {
         <div className="k-container flex flex-col items-center justify-between gap-2 py-4 text-xs text-kinnso-muted sm:flex-row">
           <span>{t.rights}</span>
           <span className="flex items-center gap-3">
-            <a href="#" className="hover:text-kinnso-orange">Instagram</a>
-            <a href="#" className="hover:text-kinnso-orange">Threads</a>
-            <a href="#" className="hover:text-kinnso-orange">LINE</a>
-            <a href="#" className="hover:text-kinnso-orange">WhatsApp</a>
+            {["Instagram", "Threads", "LINE", "WhatsApp"].map((label) => (
+              <span key={label}>{label}</span>
+            ))}
           </span>
         </div>
       </div>

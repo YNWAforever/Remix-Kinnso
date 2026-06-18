@@ -10,11 +10,12 @@ interface Props {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   creator: ExtendedCreator;
+  profilePath: string;
 }
 
-export const ShareDnaDialog: React.FC<Props> = ({ open, onOpenChange, creator }) => {
+export const ShareDnaDialog: React.FC<Props> = ({ open, onOpenChange, creator, profilePath }) => {
   const [copied, setCopied] = useState(false);
-  const link = `${typeof window !== "undefined" ? window.location.origin : ""}/c/${creator.handle}`;
+  const link = `${typeof window !== "undefined" ? window.location.origin : ""}${profilePath}`;
   const copy = async () => {
     try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch {}
   };

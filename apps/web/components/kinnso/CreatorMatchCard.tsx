@@ -5,6 +5,7 @@ import { Bookmark, ExternalLink, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ExtendedCreator } from "@/lib/creator-mock";
 import { creatorPosts, creatorLocations, engagementHistory, computeMatch } from "@/lib/creator-mock";
+import type { Locale } from "@/lib/i18n/config";
 import ScoreRing from "./ScoreRing";
 import TierBadge from "./TierBadge";
 import EngagementTrendChart from "./EngagementTrendChart";
@@ -14,16 +15,18 @@ import WorldHeatmap from "./WorldHeatmap";
 interface Props {
   creator: ExtendedCreator;
   saved: boolean;
+  locale: Locale;
   onToggleSave: () => void;
   onQuickView: () => void;
 }
 
-export const CreatorMatchCard: React.FC<Props> = ({ creator, saved, onToggleSave, onQuickView }) => {
+export const CreatorMatchCard: React.FC<Props> = ({ creator, saved, locale, onToggleSave, onQuickView }) => {
   const [expanded, setExpanded] = useState(false);
   const match = computeMatch(creator);
   const locs = creatorLocations.filter((l) => l.creatorHandle === creator.handle).slice(0, 5);
   const topPosts = creatorPosts.filter((p) => p.creatorHandle === creator.handle && p.isTravel).slice(0, 3);
   const history = engagementHistory.filter((h) => h.creatorHandle === creator.handle);
+  const briefHref = `/${locale}/merchants/post?creator=${encodeURIComponent(creator.handle)}`;
 
   return (
     <article className="k-card overflow-hidden">
@@ -67,7 +70,7 @@ export const CreatorMatchCard: React.FC<Props> = ({ creator, saved, onToggleSave
         {/* Right */}
         <div className="flex flex-col gap-2">
           <button onClick={onQuickView} className="k-btn-ghost text-xs"><ExternalLink className="mr-1 inline h-3 w-3" /> View profile</button>
-          <Link href={`/merchants/post?creator=${creator.handle}`} className="k-btn-primary text-xs">Send brief →</Link>
+          <Link href={briefHref} className="k-btn-primary text-xs">Send brief →</Link>
           <button onClick={onToggleSave} className={cn("k-btn-ghost text-xs", saved && "bg-kinnso-amber/40 text-kinnso-ink")}>
             <Bookmark className={cn("mr-1 inline h-3 w-3", saved && "fill-current")} /> {saved ? "Saved" : "Save"}
           </button>

@@ -13,6 +13,9 @@ export interface Messages {
     password: string
     emailSent: string
     emailSentDesc: string
+    emailSentNext: string
+    emailSentSignIn: string
+    emailSentUseAnother: string
     alreadyHaveAccount: string
     noAccount: string
     errorInvalidCredentials: string
@@ -260,11 +263,52 @@ export interface Messages {
     inviteDisabled: string
     resultsCapped: string
   }
+  missions: {
+    missionQueue: string
+    joinMission: string
+    applyMission: string
+    generatePartnerLink: string
+    approve: string
+    reject: string
+    requestRevision: string
+    submitMilestone: string
+    participants: string
+    pendingApplications: string
+    settlement: string
+    postHeading: string
+    postSub: string
+    typeCoupon: string
+    typeHybrid: string
+    typePaid: string
+    title: string
+    summary: string
+    couponCode: string
+    couponUrl: string
+    affiliateCommissionRate: string
+    kinnsoCommissionRate: string
+    creatorCommissionRate: string
+    paidFeeAmount: string
+    paidFeeCurrency: string
+    milestoneTitle: string
+    milestoneDescription: string
+    saveDraft: string
+    publish: string
+    openMission: string
+    targetedMission: string
+    validationError: string
+  }
+  ops: {
+    settlementHeading: string
+    settlementSub: string
+    markPaid: string
+    statusPending: string
+    statusPaid: string
+  }
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
-    signIn: string; language: string
+    signIn: string; language: string; menuToggle: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
@@ -299,6 +343,9 @@ const messages: Messages = {
     password: 'Password',
     emailSent: 'Check your email',
     emailSentDesc: 'We sent you a confirmation link. Click it to activate your account.',
+    emailSentNext: 'After confirming, Kinnso will take you to creator setup to connect Instagram, YouTube, or Threads.',
+    emailSentSignIn: 'Sign in after confirming',
+    emailSentUseAnother: 'Use another email',
     alreadyHaveAccount: 'Already have an account?',
     noAccount: 'Don\'t have an account?',
     errorInvalidCredentials: 'Invalid email or password.',
@@ -543,11 +590,52 @@ const messages: Messages = {
     inviteDisabled: 'No invites left this month',
     resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
   },
+  missions: {
+    missionQueue: 'Mission queue',
+    joinMission: 'Join mission',
+    applyMission: 'Apply mission',
+    generatePartnerLink: 'Generate partner link',
+    approve: 'Approve',
+    reject: 'Reject',
+    requestRevision: 'Request revision',
+    submitMilestone: 'Submit milestone',
+    participants: 'Participants',
+    pendingApplications: 'Pending applications',
+    settlement: 'Settlement',
+    postHeading: 'Post a mission',
+    postSub: 'Create coupon, hybrid, or paid creator work in one flow.',
+    typeCoupon: 'Coupon affiliate',
+    typeHybrid: 'Affiliate + paid mission',
+    typePaid: 'Paid mission only',
+    title: 'Mission title',
+    summary: 'Mission summary',
+    couponCode: 'Coupon code',
+    couponUrl: 'Coupon URL',
+    affiliateCommissionRate: 'Affiliate commission rate',
+    kinnsoCommissionRate: 'KINNSO commission rate',
+    creatorCommissionRate: 'Creator commission rate',
+    paidFeeAmount: 'Paid mission fee',
+    paidFeeCurrency: 'Currency',
+    milestoneTitle: 'Milestone title',
+    milestoneDescription: 'Milestone description',
+    saveDraft: 'Save draft',
+    publish: 'Publish',
+    openMission: 'Open mission',
+    targetedMission: 'Targeted invite',
+    validationError: 'Check the highlighted fields and try again.',
+  },
+  ops: {
+    settlementHeading: 'Settlement queue',
+    settlementSub: 'Track creator payouts and KINNSO commissions.',
+    markPaid: 'Mark paid',
+    statusPending: 'Pending',
+    statusPaid: 'Paid',
+  },
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
     linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
-    signIn: 'Sign in', language: 'Language',
+    signIn: 'Sign in', language: 'Language', menuToggle: 'Menu',
   },
   footer: {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',

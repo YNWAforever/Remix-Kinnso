@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { Bookmark, MapPin } from "lucide-react";
 import type { Guide } from "@/lib/creator-mock";
+import type { Locale } from "@/lib/i18n/config";
 
-const GuideCard = ({ g }: { g: Guide }) => (
-  <Link href={`/g/${g.slug}`} className="group block">
+const GuideCard = ({ g, locale }: { g: Guide; locale: Locale }) => (
+  <Link href={`/${locale}/g/${g.slug}`} className="group block">
     <article className="k-card overflow-hidden">
       <div className="relative aspect-[4/3] overflow-hidden bg-kinnso-cream2">
         <img src={g.cover} alt={g.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />

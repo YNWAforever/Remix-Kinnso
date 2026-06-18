@@ -28,6 +28,7 @@ import type { Dna } from "@kinnso/scan";
 import type { ExtendedCreator } from "@/lib/creator-mock";
 import type { StudioIdentity } from "@/lib/studio/identity";
 import type { Messages } from "@/lib/i18n/messages/en";
+import type { Locale } from "@/lib/i18n/config";
 
 const SCAN_STEPS = [
   { label: "Connected to Instagram", delay: 0 },
@@ -50,6 +51,7 @@ const PLATFORM_EMOJI: Record<string, string> = {
 export type StudioMode = "demo" | "real";
 
 export interface StudioScanViewProps {
+  locale: Locale;
   mode: StudioMode;
   identity: StudioIdentity;
   dna: Dna;
@@ -58,9 +60,11 @@ export interface StudioScanViewProps {
   t: Messages["studio"];
 }
 
-export function StudioScanView({ mode, identity, dna, metrics, isSample, t }: StudioScanViewProps) {
+export function StudioScanView({ locale, mode, identity, dna, metrics, isSample, t }: StudioScanViewProps) {
   const router = useRouter();
   const isDemo = mode === "demo";
+  const studioMissionsHref = `/${locale}/studio/missions`;
+  const publicProfileHref = `/${locale}/c/${metrics.handle}`;
 
   // Default to "done" so the report renders synchronously for tests and for
   // hosts that pass an already-scanned creator. The fake intro/scanning branch
@@ -309,12 +313,12 @@ export function StudioScanView({ mode, identity, dna, metrics, isSample, t }: St
                         <Lock className="h-3 w-3" /> {t.reachToUnlock.replace("{tier}", m.tier)}
                       </div>
                     )}
-                    <MissionCard m={m} />
+                    <MissionCard m={m} href={studioMissionsHref} />
                   </div>
                 );
               })}
             </div>
-            <button type="button" onClick={() => router.push("/studio/missions")} className="k-btn-ghost mt-4 text-sm">
+            <button type="button" onClick={() => router.push(studioMissionsHref)} className="k-btn-ghost mt-4 text-sm">
               {t.viewAllMissions} <ArrowRight className="ml-1 inline h-3 w-3" />
             </button>
           </section>
@@ -324,7 +328,7 @@ export function StudioScanView({ mode, identity, dna, metrics, isSample, t }: St
             <section className="space-y-3">
               <button
                 type="button"
-                onClick={() => { router.push(`/c/${metrics.handle}`); }}
+                onClick={() => { router.push(publicProfileHref); }}
                 className="k-btn-primary w-full"
               >
                 {t.publishProfile}
@@ -340,7 +344,14 @@ export function StudioScanView({ mode, identity, dna, metrics, isSample, t }: St
       <CityDetailDrawer open={!!selectedCity} onOpenChange={(o) => !o && setSelectedCity(null)} location={selectedCity} posts={posts} places={places} />
       {/* Share is reachable only via the demo-only footer button; don't mount the
           mock-data dialog in a real-creator view. (The city drawer stays — the map is in both modes.) */}
-      {isDemo && <ShareDnaDialog open={shareOpen} onOpenChange={setShareOpen} creator={metrics} />}
+      {isDemo && (
+        <ShareDnaDialog
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          creator={metrics}
+          profilePath={publicProfileHref}
+        />
+      )}
     </div>
   );
 }

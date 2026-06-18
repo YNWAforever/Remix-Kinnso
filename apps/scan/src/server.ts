@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import { loadConfig } from './config'
@@ -56,6 +57,19 @@ async function getVerifiedUser(
 // ---------------------------------------------------------------------------
 
 const app = new Hono()
+
+// CORS: the web app calls this worker cross-origin from the browser
+// (NEXT_PUBLIC_SCAN_URL) with an Authorization header, which triggers a
+// preflight OPTIONS. Requests are bearer-authenticated (not cookie-based), so a
+// permissive default origin is safe; tighten via WEB_ORIGIN in production.
+app.use(
+  '*',
+  cors({
+    origin: process.env.WEB_ORIGIN ?? '*',
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Authorization', 'Content-Type'],
+  }),
+)
 
 // GET /health
 app.get('/health', (c) => c.json({ ok: true }))

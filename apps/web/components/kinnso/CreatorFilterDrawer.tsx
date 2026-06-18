@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 
@@ -61,6 +61,9 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
       <SheetContent side="right" className="w-full max-w-md overflow-y-auto bg-kinnso-cream">
         <SheetHeader className="text-left">
           <SheetTitle className="text-kinnso-ink">Filter creators</SheetTitle>
+          <SheetDescription className="sr-only">
+            Refine creators by location, score, tier, category, audience, platform, and activity.
+          </SheetDescription>
         </SheetHeader>
 
         <Section title="Location">

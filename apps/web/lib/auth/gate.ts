@@ -8,7 +8,7 @@ export type GateDecision =
  * Pure function — given a pathname and whether a session exists,
  * decide whether to allow the request or redirect to sign-in.
  *
- * Matches paths of the form /{locale}/creator or /{locale}/creator/*.
+ * Matches locale-prefixed paths that require a signed-in viewer.
  * Paths without a recognised locale prefix are always allowed (the
  * locale guard in proxy.ts will add the prefix first).
  *
@@ -27,8 +27,20 @@ export function gateDecision(pathname: string, hasSession: boolean): GateDecisio
 
   const rest = parts.slice(2).join('/')  // 'creator' | 'creator/settings' | 'articles' | ...
 
-  // Gate if the path is /creator or /creator/anything
-  if (rest === 'creator' || rest.startsWith('creator/')) {
+  const gatedPrefixes = [
+    'creator',
+    'creator/',
+    'merchants/post',
+    'merchants/missions',
+    'merchants/missions/',
+    'studio/missions',
+    'ops/settlements',
+  ]
+  const needsAuth = gatedPrefixes.some((prefix) =>
+    rest === prefix || rest.startsWith(prefix.endsWith('/') ? prefix : `${prefix}/`),
+  )
+
+  if (needsAuth) {
     if (hasSession) return { type: 'allow' }
     return { type: 'redirect', location: `/${maybeLocale}/sign-in` }
   }

@@ -26,7 +26,7 @@ jobs:
       # `supabase start` applies supabase/migrations and seeds supabase/seed.sql.
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.106.0
       - run: pnpm supabase start
 
       - name: Export local Supabase env for tests
@@ -57,7 +57,7 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.106.0
       - run: pnpm supabase start
 
       - name: Export local Supabase env for apps/web and apps/scan
@@ -75,6 +75,11 @@ jobs:
 
       - name: Start scan worker (fixture mode) and web app
         run: |
+          # tsx src/server.ts reads process.env directly (no dotenv), unlike
+          # `next dev` which auto-loads .env.local — so export the worker's env here.
+          set -a
+          . ./apps/scan/.env.local
+          set +a
           SCAN_FIXTURE_MODE=1 pnpm --filter @kinnso/scan-app start &
           pnpm --filter web dev &
           npx --yes wait-on http://localhost:8788/health http://localhost:3000

@@ -1,12 +1,13 @@
 'use client'
 import React, { useMemo, useState } from "react";
 import { Filter, Search, X, Lock } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreatorMatchCard from "@/components/kinnso/CreatorMatchCard";
 import CreatorFilterDrawer, { defaultFilters, type CreatorFilters } from "@/components/kinnso/CreatorFilterDrawer";
 import { CreatorProfileView } from "@/components/kinnso/pages/CreatorProfileView";
 import { extendedCreators, creatorLocations, merchantWorkingWith, getCreator, computeMatch, type ExtendedCreator } from "@/lib/creator-mock";
+import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 import type { MerchantProfile } from "@/lib/creator-mock";
 
@@ -44,10 +45,11 @@ const FREE_CAP = 3;
 
 interface Props {
   merchant: MerchantProfile;
+  locale: Locale;
   t: Messages['merchants'] & { creatorProfile: Messages['creatorProfile'] };
 }
 
-const MerchantsCreatorsView: React.FC<Props> = ({ merchant, t }) => {
+const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState<CreatorFilters>(defaultFilters);
   const [query, setQuery] = useState("");
@@ -146,6 +148,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, t }) => {
                 key={c.handle}
                 creator={c}
                 saved={saves.includes(c.handle)}
+                locale={locale}
                 onToggleSave={() => toggleSave(c.handle)}
                 onQuickView={() => setQuickViewHandle(c.handle)}
               />
@@ -162,6 +165,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, t }) => {
                 <CreatorMatchCard
                   creator={c}
                   saved
+                  locale={locale}
                   onToggleSave={() => toggleSave(c.handle)}
                   onQuickView={() => setQuickViewHandle(c.handle)}
                 />
@@ -207,11 +211,15 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, t }) => {
       {/* Quick view drawer */}
       <Sheet open={!!quickViewHandle} onOpenChange={(o) => !o && setQuickViewHandle(null)}>
         <SheetContent side="right" className="w-full max-w-2xl overflow-y-auto bg-kinnso-cream p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{t.viewProfile}</SheetTitle>
+            <SheetDescription>{t.sendBrief} {t.save}</SheetDescription>
+          </SheetHeader>
           {quickViewHandle && (
             <div className="px-4 pb-24 pt-6">
               {(() => {
                 const c = getCreator(quickViewHandle);
-                return c ? <CreatorProfileView creator={c} role="merchant" embedded t={t.creatorProfile} /> : null;
+                return c ? <CreatorProfileView creator={c} role="merchant" locale={locale} embedded t={t.creatorProfile} /> : null;
               })()}
             </div>
           )}

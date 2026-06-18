@@ -32,6 +32,34 @@ describe('gateDecision', () => {
     })
   })
 
+  it('redirects unauthenticated users from merchant mission creation', () => {
+    expect(gateDecision('/en/merchants/post', false)).toEqual({
+      type: 'redirect',
+      location: '/en/sign-in',
+    })
+  })
+
+  it('redirects unauthenticated users from merchant mission list', () => {
+    expect(gateDecision('/zh-hk/merchants/missions', false)).toEqual({
+      type: 'redirect',
+      location: '/zh-hk/sign-in',
+    })
+  })
+
+  it('redirects unauthenticated users from creator missions', () => {
+    expect(gateDecision('/ja/studio/missions', false)).toEqual({
+      type: 'redirect',
+      location: '/ja/sign-in',
+    })
+  })
+
+  it('redirects unauthenticated users from ops settlement queue', () => {
+    expect(gateDecision('/en/ops/settlements', false)).toEqual({
+      type: 'redirect',
+      location: '/en/sign-in',
+    })
+  })
+
   // ---- non-creator paths — always allow regardless of auth ----
   it('allows any user on a public path', () => {
     expect(gateDecision('/en/articles', false)).toEqual({ type: 'allow' })

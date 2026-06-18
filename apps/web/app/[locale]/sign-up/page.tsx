@@ -34,9 +34,23 @@ export default async function SignUpPage({
       <h1 className="text-2xl font-bold text-ink">{dict.auth.signUp}</h1>
 
       {sent === '1' ? (
-        <div className="text-center max-w-sm">
-          <p className="font-medium text-ink">{dict.auth.emailSent}</p>
-          <p className="text-sm text-ink/70 mt-1">{dict.auth.emailSentDesc}</p>
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
+          <div>
+            <p className="font-medium text-ink">{dict.auth.emailSent}</p>
+            <p className="mt-1 text-sm text-ink/70">{dict.auth.emailSentDesc}</p>
+            <p className="mt-3 text-sm text-ink/70">{dict.auth.emailSentNext}</p>
+          </div>
+          <div className="flex w-full flex-col gap-2">
+            <Link
+              href={`/${locale}/sign-in`}
+              className="rounded bg-ink px-4 py-2 text-sm font-medium text-cream transition-colors hover:bg-ink/90"
+            >
+              {dict.auth.emailSentSignIn}
+            </Link>
+            <Link href={`/${locale}/sign-up`} className="text-sm text-ink/70 underline">
+              {dict.auth.emailSentUseAnother}
+            </Link>
+          </div>
         </div>
       ) : (
         <>

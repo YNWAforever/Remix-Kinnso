@@ -3,7 +3,12 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/en/articles', notFound: vi.fn() }))
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/en/articles',
+  useSearchParams: () => new URLSearchParams(),
+  notFound: vi.fn(),
+}))
 vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
 // app/layout.tsx calls next/font/google factories at module eval; they are not
 // callable under vitest (no Next SWC font transform). Stub them to {variable}.

@@ -48,6 +48,6 @@ export default async function CreatorPublicPage({
   const role = await resolveViewerRole(supabase)
 
   return (
-    <CreatorProfileView creator={creator} role={role} t={messages.creatorProfile} />
+    <CreatorProfileView creator={creator} role={role} locale={locale as Locale} t={messages.creatorProfile} />
   )
 }
