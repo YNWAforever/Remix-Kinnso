@@ -1,7 +1,7 @@
 'use client'
 import React, { useMemo, useState } from "react";
 import { Filter, Search, X, Lock } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreatorMatchCard from "@/components/kinnso/CreatorMatchCard";
 import CreatorFilterDrawer, { defaultFilters, type CreatorFilters } from "@/components/kinnso/CreatorFilterDrawer";
@@ -211,6 +211,10 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
       {/* Quick view drawer */}
       <Sheet open={!!quickViewHandle} onOpenChange={(o) => !o && setQuickViewHandle(null)}>
         <SheetContent side="right" className="w-full max-w-2xl overflow-y-auto bg-kinnso-cream p-0">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{t.viewProfile}</SheetTitle>
+            <SheetDescription>{t.sendBrief} {t.save}</SheetDescription>
+          </SheetHeader>
           {quickViewHandle && (
             <div className="px-4 pb-24 pt-6">
               {(() => {
