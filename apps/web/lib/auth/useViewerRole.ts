@@ -19,30 +19,41 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
     if (override) return
     const supabase = createSupabaseBrowserClient()
     let active = true
+
+    const resolveSignedInRole = async (userId: string): Promise<ViewerRole> => {
+      const [{ data: ops }, { data: merchant }] = await Promise.all([
+        supabase
+          .from('kinnso_ops_members')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .maybeSingle(),
+        supabase
+          .from('merchant_profiles')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle(),
+      ])
+      return ops ? 'ops' : merchant ? 'merchant' : 'creator'
+    }
+
     supabase.auth.getUser().then(async ({ data }) => {
       if (!active) return
       if (!data.user) {
         setRole('anon')
         return
       }
-      const [{ data: ops }, { data: merchant }] = await Promise.all([
-        supabase
-          .from('kinnso_ops_members')
-          .select('id')
-          .eq('user_id', data.user.id)
-          .eq('status', 'active')
-          .maybeSingle(),
-        supabase
-          .from('merchant_profiles')
-          .select('id')
-          .eq('user_id', data.user.id)
-          .maybeSingle(),
-      ])
+      const nextRole = await resolveSignedInRole(data.user.id)
       if (!active) return
-      setRole(ops ? 'ops' : merchant ? 'merchant' : 'creator')
+      setRole(nextRole)
     })
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setRole(session?.user ? 'creator' : 'anon')
+    const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user) {
+        if (active) setRole('anon')
+        return
+      }
+      const nextRole = await resolveSignedInRole(session.user.id)
+      if (active) setRole(nextRole)
     })
     return () => {
       active = false

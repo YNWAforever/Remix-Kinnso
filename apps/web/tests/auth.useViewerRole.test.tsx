@@ -1,14 +1,18 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { renderHook, waitFor, cleanup } from '@testing-library/react'
+import { act, renderHook, waitFor, cleanup } from '@testing-library/react'
 
 let sessionUser: { id: string } | null = null
 let opsMember: { id: string } | null = null
 let merchantProfile: { id: string } | null = null
 const getUser = vi.fn(async () => ({ data: { user: sessionUser }, error: null }))
-const onAuthStateChange = vi.fn((_cb: unknown) => ({
-  data: { subscription: { unsubscribe: vi.fn() } },
-}))
+let authStateCallback: ((_event: string, session: { user: { id: string } } | null) => void | Promise<void>) | null = null
+const onAuthStateChange = vi.fn((cb: typeof authStateCallback) => {
+  authStateCallback = cb
+  return {
+    data: { subscription: { unsubscribe: vi.fn() } },
+  }
+})
 const from = vi.fn((table: string) => {
   const builder = {
     select: vi.fn(() => builder),
@@ -31,6 +35,7 @@ afterEach(() => {
   sessionUser = null
   opsMember = null
   merchantProfile = null
+  authStateCallback = null
   vi.clearAllMocks()
 })
 
@@ -69,6 +74,19 @@ describe('useViewerRole', () => {
     merchantProfile = { id: 'merchant-1' }
     const { result } = renderHook(() => useViewerRole())
     await waitFor(() => expect(result.current).toBe('ops'))
+  })
+
+  it('resolves auth state changes with merchant and ops lookups', async () => {
+    sessionUser = null
+    merchantProfile = { id: 'merchant-1' }
+    const { result } = renderHook(() => useViewerRole())
+
+    expect(result.current).toBe('anon')
+    await act(async () => {
+      await authStateCallback?.('SIGNED_IN', { user: { id: 'u1' } })
+    })
+
+    await waitFor(() => expect(result.current).toBe('merchant'))
   })
 
   it('honors an explicit override', () => {
