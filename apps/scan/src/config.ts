@@ -1,3 +1,5 @@
+import { DEFAULT_LLM_URL } from './llm'
+
 export interface ScanConfig {
   port: number
   supabaseUrl: string
@@ -5,8 +7,9 @@ export interface ScanConfig {
   serviceRoleKey: string
   rapidApiKey: string
   youtubeApiKey: string
-  openRouterApiKey: string
-  openRouterModel: string
+  llmApiKey: string
+  llmModel: string
+  llmBaseUrl: string
   fixtureMode: boolean
 }
 
@@ -23,8 +26,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ScanConfig {
     serviceRoleKey: req('SUPABASE_SERVICE_ROLE_KEY'),
     rapidApiKey: env.RAPIDAPI_KEY ?? '',
     youtubeApiKey: env.YOUTUBE_API_KEY ?? '',
-    openRouterApiKey: env.OPENROUTER_API_KEY ?? '',
-    openRouterModel: env.OPENROUTER_MODEL ?? 'anthropic/claude-3.5-sonnet',
+    // Provider-agnostic LLM config. LLM_* are the canonical names; the legacy
+    // OPENROUTER_* names are still honoured as a fallback so existing
+    // deployments keep working. Point LLM_BASE_URL at any OpenAI-compatible
+    // chat-completions endpoint (OpenRouter, OpenCode Zen, …) to switch.
+    llmApiKey: env.LLM_API_KEY ?? env.OPENROUTER_API_KEY ?? '',
+    llmModel: env.LLM_MODEL ?? env.OPENROUTER_MODEL ?? 'anthropic/claude-3.5-sonnet',
+    llmBaseUrl: env.LLM_BASE_URL ?? DEFAULT_LLM_URL,
     fixtureMode: env.SCAN_FIXTURE_MODE === '1',
   }
 }

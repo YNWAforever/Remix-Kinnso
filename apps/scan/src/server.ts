@@ -7,7 +7,7 @@ import { loadConfig } from './config'
 import { rateLimitDecision, canRetry, type JobRecord } from './policy'
 import { runScan, type ScanDeps } from './pipeline'
 import { CompositeFetcher, FakeFetcher } from './fetchers'
-import { OpenRouterClient, FakeLlm } from './llm'
+import { ChatCompletionsClient, FakeLlm } from './llm'
 
 // ---------------------------------------------------------------------------
 // Bootstrap
@@ -27,7 +27,9 @@ const authClient = createClient(cfg.supabaseUrl, cfg.anonKey, {
 
 // Platform fetcher + LLM — real or fake depending on SCAN_FIXTURE_MODE
 const fetcher = cfg.fixtureMode ? new FakeFetcher() : new CompositeFetcher(cfg.rapidApiKey, cfg.youtubeApiKey)
-const llm = cfg.fixtureMode ? new FakeLlm() : new OpenRouterClient(cfg.openRouterApiKey, cfg.openRouterModel)
+const llm = cfg.fixtureMode
+  ? new FakeLlm()
+  : new ChatCompletionsClient(cfg.llmApiKey, cfg.llmModel, cfg.llmBaseUrl)
 
 if (cfg.fixtureMode) {
   console.info('[scan] ⚠️  FIXTURE MODE enabled — using fake fetchers and LLM')
@@ -35,7 +37,7 @@ if (cfg.fixtureMode) {
 
 // Shared deps bag passed to runScan
 function makeDeps(): ScanDeps {
-  return { db, fetcher, llm, model: cfg.openRouterModel }
+  return { db, fetcher, llm, model: cfg.llmModel }
 }
 
 // ---------------------------------------------------------------------------

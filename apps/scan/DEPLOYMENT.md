@@ -27,9 +27,24 @@ This directory ships everything Railway needs:
    | `SUPABASE_SERVICE_ROLE_KEY` | *(service role key)* | **SECRET** — bypasses RLS for job/DNA writes; never expose client-side |
    | `RAPIDAPI_KEY` | *(RapidAPI key)* | **SECRET** — Instagram/Threads fetch |
    | `YOUTUBE_API_KEY` | *(YouTube Data API v3 key)* | **SECRET** |
-   | `OPENROUTER_API_KEY` | *(OpenRouter key)* | **SECRET** — DNA synthesis LLM |
-   | `OPENROUTER_MODEL` | `anthropic/claude-3.5-sonnet` | optional; this is the built-in default |
+   | `LLM_API_KEY` | *(LLM gateway key)* | **SECRET** — DNA synthesis LLM |
+   | `LLM_BASE_URL` | *(OpenAI-compatible `/chat/completions` URL)* | which provider to call (see below) |
+   | `LLM_MODEL` | *(model id)* | a model the chosen gateway serves |
    | `WEB_ORIGIN` | `https://remix-kinnso-web.vercel.app` | locks CORS to the web app (defaults to `*` if unset) |
+
+   **LLM provider is pluggable.** The worker uses a generic OpenAI-compatible chat-completions
+   client, so any gateway exposing that shape works — just set `LLM_BASE_URL` (+ `LLM_API_KEY`
+   / `LLM_MODEL`). Two examples:
+
+   | Provider | `LLM_BASE_URL` | `LLM_MODEL` (example) |
+   |---|---|---|
+   | OpenCode Zen | `https://opencode.ai/zen/v1/chat/completions` | *(a model id from your OpenCode account)* |
+   | OpenRouter | `https://openrouter.ai/api/v1/chat/completions` | `anthropic/claude-3.5-sonnet` |
+
+   If `LLM_BASE_URL` is unset it defaults to the OpenRouter URL; if `LLM_API_KEY` / `LLM_MODEL`
+   are unset the legacy `OPENROUTER_API_KEY` / `OPENROUTER_MODEL` names are honoured as a
+   fallback. **Note:** `LLM_API_KEY` must be **non-empty** — the client is constructed at boot
+   and throws (failing the healthcheck) on an empty key.
 
    Leave `SCAN_FIXTURE_MODE` **unset** in production (setting it to `1` swaps in fake
    fetch/LLM adapters — that's for CI/E2E only).
