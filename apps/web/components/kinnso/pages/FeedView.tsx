@@ -3,7 +3,7 @@ import { feedItems } from '@/lib/creator-mock'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
-export function FeedView({ locale: _locale, t }: { locale: Locale; t: Messages['feed'] }) {
+export function FeedView({ t }: { locale: Locale; t: Messages['feed'] }) {
   return (
     <main>
       <section className="k-container py-12">
