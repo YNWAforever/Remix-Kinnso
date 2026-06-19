@@ -1,26 +1,28 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { OpenRouterClient, FakeLlm } from '../src/llm'
+import { ChatCompletionsClient, FakeLlm } from '../src/llm'
 import type { LlmMessage } from '@kinnso/scan'
 
 const MESSAGES: LlmMessage[] = [{ role: 'user', content: 'Generate DNA.' }]
 
-describe('OpenRouterClient', () => {
+function okResponse(content: string): Response {
+  return new Response(JSON.stringify({ choices: [{ message: { content } }] }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
+
+describe('ChatCompletionsClient', () => {
   beforeEach(() => { vi.stubGlobal('fetch', vi.fn()) })
   afterEach(() => { vi.unstubAllGlobals() })
 
   it('throws on construction when apiKey is empty', () => {
-    expect(() => new OpenRouterClient('', 'some-model')).toThrow('OPENROUTER_API_KEY is required')
+    expect(() => new ChatCompletionsClient('', 'some-model')).toThrow('LLM API key is required')
   })
 
-  it('sends Authorization header with Bearer token', async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({ choices: [{ message: { content: 'hello' } }] }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      )
-    )
+  it('defaults to the OpenRouter endpoint when no baseUrl is given', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(okResponse('hello'))
     vi.stubGlobal('fetch', fetchMock)
-    const client = new OpenRouterClient('or-key', 'anthropic/claude-3.5-sonnet')
+    const client = new ChatCompletionsClient('or-key', 'anthropic/claude-3.5-sonnet')
     await client.complete(MESSAGES)
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(url).toBe('https://openrouter.ai/api/v1/chat/completions')
@@ -28,15 +30,25 @@ describe('OpenRouterClient', () => {
     expect(headers.Authorization).toBe('Bearer or-key')
   })
 
-  it('sends the model and messages in request body', async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({ choices: [{ message: { content: 'ok' } }] }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      )
-    )
+  it('posts to the injected baseUrl (provider-agnostic)', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(okResponse('hello'))
     vi.stubGlobal('fetch', fetchMock)
-    const client = new OpenRouterClient('or-key', 'openai/gpt-4o')
+    const client = new ChatCompletionsClient(
+      'oc-key',
+      'some-model',
+      'https://opencode.ai/zen/v1/chat/completions'
+    )
+    await client.complete(MESSAGES)
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe('https://opencode.ai/zen/v1/chat/completions')
+    const headers = init.headers as Record<string, string>
+    expect(headers.Authorization).toBe('Bearer oc-key')
+  })
+
+  it('sends the model and messages in request body', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(okResponse('ok'))
+    vi.stubGlobal('fetch', fetchMock)
+    const client = new ChatCompletionsClient('or-key', 'openai/gpt-4o')
     await client.complete(MESSAGES)
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     const body = JSON.parse(init.body as string)
@@ -45,23 +57,15 @@ describe('OpenRouterClient', () => {
   })
 
   it('returns the text content from choices[0].message.content', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({ choices: [{ message: { content: 'the dna text' } }] }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        )
-      )
-    )
-    const result = await new OpenRouterClient('key', 'model').complete(MESSAGES)
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(okResponse('the dna text')))
+    const result = await new ChatCompletionsClient('key', 'model').complete(MESSAGES)
     expect(result).toBe('the dna text')
   })
 
   it('throws on non-200 response', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(new Response('bad', { status: 401 })))
-    await expect(new OpenRouterClient('key', 'model').complete(MESSAGES)).rejects.toThrow(
-      'OpenRouter returned HTTP 401'
+    await expect(new ChatCompletionsClient('key', 'model').complete(MESSAGES)).rejects.toThrow(
+      'LLM endpoint returned HTTP 401'
     )
   })
 
@@ -75,7 +79,7 @@ describe('OpenRouterClient', () => {
         })
       )
     )
-    await expect(new OpenRouterClient('key', 'model').complete(MESSAGES)).rejects.toThrow(
+    await expect(new ChatCompletionsClient('key', 'model').complete(MESSAGES)).rejects.toThrow(
       'no text content'
     )
   })

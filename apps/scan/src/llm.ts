@@ -1,17 +1,32 @@
 import type { LlmClient, LlmMessage } from '@kinnso/scan'
 
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+/**
+ * Default endpoint when LLM_BASE_URL is unset. OpenRouter's OpenAI-compatible
+ * chat-completions URL — kept as the fallback for backward compatibility.
+ */
+export const DEFAULT_LLM_URL = 'https://openrouter.ai/api/v1/chat/completions'
 
-export class OpenRouterClient implements LlmClient {
+/**
+ * Generic OpenAI-compatible chat-completions client.
+ *
+ * Works with any provider that exposes the OpenAI `/chat/completions` shape
+ * (Bearer auth, `{ model, messages }` request, `choices[0].message.content`
+ * response) — OpenRouter, OpenCode Zen, OpenAI, etc. The endpoint is injected
+ * via `baseUrl` so the worker stays provider-agnostic; swap providers by
+ * setting `LLM_BASE_URL` (+ `LLM_API_KEY` / `LLM_MODEL`) in the environment,
+ * no code change required.
+ */
+export class ChatCompletionsClient implements LlmClient {
   constructor(
     private readonly apiKey: string,
-    private readonly model: string
+    private readonly model: string,
+    private readonly baseUrl: string = DEFAULT_LLM_URL
   ) {
-    if (!apiKey) throw new Error('OpenRouterClient: OPENROUTER_API_KEY is required')
+    if (!apiKey) throw new Error('ChatCompletionsClient: LLM API key is required')
   }
 
   async complete(messages: LlmMessage[]): Promise<string> {
-    const res = await fetch(OPENROUTER_URL, {
+    const res = await fetch(this.baseUrl, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
@@ -21,8 +36,10 @@ export class OpenRouterClient implements LlmClient {
     })
 
     if (!res.ok) {
+      // The body is the provider's error payload (status/message) — never the
+      // API key, which travels only in the Authorization header.
       const text = await res.text().catch(() => '')
-      throw new Error(`OpenRouter returned HTTP ${res.status}: ${text}`)
+      throw new Error(`LLM endpoint returned HTTP ${res.status}: ${text}`)
     }
 
     const data = (await res.json()) as {
@@ -30,7 +47,7 @@ export class OpenRouterClient implements LlmClient {
     }
     const content = data.choices?.[0]?.message?.content
     if (typeof content !== 'string' || !content) {
-      throw new Error('OpenRouter response contained no text content')
+      throw new Error('LLM response contained no text content')
     }
     return content
   }
