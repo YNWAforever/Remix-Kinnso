@@ -30,7 +30,7 @@ export function SignUpForm({
     setPending(true)
     try {
       const supabase = createSupabaseBrowserClient()
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -46,6 +46,14 @@ export function SignUpForm({
         } else {
           setError(errorGeneric)
         }
+        return
+      }
+      // With email-enumeration protection enabled, signing up an already-registered
+      // (confirmed) email returns a 200 with no error and an obfuscated user whose
+      // `identities` array is empty — and Supabase sends no confirmation email. Treat
+      // that as "already registered" instead of falsely claiming an email was sent.
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        setError(errorEmailTaken)
         return
       }
       // On success, redirect to the same page with ?sent=1 to show the confirmation message.
