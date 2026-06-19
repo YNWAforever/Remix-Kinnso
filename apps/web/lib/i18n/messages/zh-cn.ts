@@ -387,5 +387,28 @@ const messages: Messages = {
     samplesHeading: '现有公开任务', samplesSub: '来自商家的现有简报样本。',
     ctaTitle: '准备好启动了吗？', ctaDesc: '立即发布你的第一个任务。', ctaButton: '发布任务',
   },
+  studioOffers: {
+    heading: '联盟优惠',
+    subtitle: '加入旅游联盟计划并生成可追踪的合作链接。',
+    empty: '暂时没有可用的联盟优惠。',
+    join: '加入优惠',
+    generateLink: '生成合作链接',
+    copy: '复制',
+    copied: '已复制',
+    category: '类别',
+    commission: '佣金',
+    viewProgram: '查看计划',
+  },
+  studioEarnings: {
+    heading: '收益',
+    subtitle: '追踪任务与联盟佣金的收益。',
+    paid: '已支付',
+    pending: '待支付',
+    empty: '尚无收益，已完成的任务及已结算的佣金会在此显示。',
+    colMission: '任务',
+    colType: '类型',
+    colAmount: '金额',
+    colStatus: '状态',
+  },
 }
 export default messages

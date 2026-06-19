@@ -387,5 +387,28 @@ const messages: Messages = {
     samplesHeading: '現在公開中のミッション', samplesSub: '加盟店からのライブブリーフのサンプル。',
     ctaTitle: '始める準備はできましたか？', ctaDesc: '今日最初のミッションを投稿しましょう。', ctaButton: 'ミッションを投稿',
   },
+  studioOffers: {
+    heading: 'アフィリエイト案件',
+    subtitle: '旅行アフィリエイトプログラムに参加し、トラッキング付きパートナーリンクを生成します。',
+    empty: '現在利用できるアフィリエイト案件はありません。',
+    join: '案件に参加',
+    generateLink: 'パートナーリンクを生成',
+    copy: 'コピー',
+    copied: 'コピー済み',
+    category: 'カテゴリー',
+    commission: '報酬',
+    viewProgram: 'プログラムを見る',
+  },
+  studioEarnings: {
+    heading: '収益',
+    subtitle: 'ミッションとアフィリエイト報酬の収益を確認します。',
+    paid: '支払済み',
+    pending: '保留中',
+    empty: 'まだ収益はありません。完了したミッションと確定した報酬がここに表示されます。',
+    colMission: 'ミッション',
+    colType: 'タイプ',
+    colAmount: '金額',
+    colStatus: 'ステータス',
+  },
 }
 export default messages

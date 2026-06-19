@@ -387,5 +387,28 @@ const messages: Messages = {
     samplesHeading: '現有公開任務', samplesSub: '來自商家的現有簡報樣本。',
     ctaTitle: '準備好啟動了嗎？', ctaDesc: '立即發佈你的第一個任務。', ctaButton: '發佈任務',
   },
+  studioOffers: {
+    heading: '聯盟優惠',
+    subtitle: '加入旅遊聯盟計劃並產生可追蹤的合作連結。',
+    empty: '暫時沒有可用的聯盟優惠。',
+    join: '加入優惠',
+    generateLink: '產生合作連結',
+    copy: '複製',
+    copied: '已複製',
+    category: '類別',
+    commission: '佣金',
+    viewProgram: '查看計劃',
+  },
+  studioEarnings: {
+    heading: '收益',
+    subtitle: '追蹤任務與聯盟佣金的收益。',
+    paid: '已支付',
+    pending: '待支付',
+    empty: '尚未有收益，已完成的任務及已結算的佣金會在此顯示。',
+    colMission: '任務',
+    colType: '類型',
+    colAmount: '金額',
+    colStatus: '狀態',
+  },
 }
 export default messages
