@@ -326,6 +326,44 @@ export interface Messages {
     merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
   comingSoon: { heading: string; body: string; back: string }
+  studioHome: {
+    pill: string; heading: string; subtitle: string
+    liveBadge: string; soonBadge: string; open: string
+    scanTitle: string; scanDesc: string
+    missionsTitle: string; missionsDesc: string
+    earningsTitle: string; earningsDesc: string
+    offersTitle: string; offersDesc: string
+    inboxTitle: string; inboxDesc: string
+    guidesTitle: string; guidesDesc: string
+  }
+  explore: {
+    pill: string; heading: string; subtitle: string
+    savesLabel: string; emptyNote: string
+  }
+  feed: {
+    pill: string; heading: string; subtitle: string
+    savesLabel: string
+  }
+  creatorsLanding: {
+    heroPill: string; heroTitle: string; heroSubtitle: string; applyCta: string
+    howHeading: string; howSub: string
+    step1Title: string; step1Desc: string
+    step2Title: string; step2Desc: string
+    step3Title: string; step3Desc: string
+    step4Title: string; step4Desc: string
+    featuredHeading: string; featuredSub: string
+    ctaTitle: string; ctaDesc: string; ctaButton: string
+  }
+  merchantsLanding: {
+    heroPill: string; heroTitle: string; heroSubtitle: string
+    postCta: string; browseCta: string
+    howHeading: string; howSub: string
+    step1Title: string; step1Desc: string
+    step2Title: string; step2Desc: string
+    step3Title: string; step3Desc: string
+    samplesHeading: string; samplesSub: string
+    ctaTitle: string; ctaDesc: string; ctaButton: string
+  }
 }
 
 const messages: Messages = {
@@ -664,6 +702,56 @@ const messages: Messages = {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
     back: 'Back to home',
+  },
+  studioHome: {
+    pill: 'Creator Studio',
+    heading: 'Your Studio',
+    subtitle: 'Everything you need to grow — scan your DNA, take missions, and track earnings.',
+    liveBadge: 'Live', soonBadge: 'Soon', open: 'Open',
+    scanTitle: 'AI Scan', scanDesc: 'Your creator DNA, score and tier.',
+    missionsTitle: 'Missions', missionsDesc: 'Briefs you can join and submit.',
+    earningsTitle: 'Earnings', earningsDesc: 'Payouts, commission and history.',
+    offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
+    inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
+    guidesTitle: 'New Guide', guidesDesc: 'Publish a travel guide.',
+  },
+  explore: {
+    pill: 'Explore',
+    heading: 'Travel Guides from real creators',
+    subtitle: 'Discover hand-picked spots, saved by travelers like you.',
+    savesLabel: 'saves',
+    emptyNote: 'More guides are added every week.',
+  },
+  feed: {
+    pill: 'Feed',
+    heading: 'What travelers are saving now',
+    subtitle: 'A live look at the guides and spots trending across KINNSO.',
+    savesLabel: 'saves',
+  },
+  creatorsLanding: {
+    heroPill: 'Creator Program',
+    heroTitle: 'Get paid to share the trips you already take.',
+    heroSubtitle: 'KINNSO proves your travel authority and matches you with paid missions from real merchants.',
+    applyCta: 'Apply as Creator',
+    howHeading: 'How the program works', howSub: 'From handle to first payout in days.',
+    step1Title: 'Connect socials', step1Desc: 'Add your IG / Threads / TikTok handles.',
+    step2Title: 'AI scans you', step2Desc: 'We classify your travel posts and score you.',
+    step3Title: 'Get qualified', step3Desc: 'Reach a Tier and unlock the Studio.',
+    step4Title: 'Earn missions', step4Desc: 'Publish Guides and get paid.',
+    featuredHeading: 'Creators already earning', featuredSub: 'Real handles, scored by our AI Agent.',
+    ctaTitle: 'Ready to apply?', ctaDesc: 'It takes two minutes and a couple of handles.', ctaButton: 'Start your application',
+  },
+  merchantsLanding: {
+    heroPill: 'For Merchants',
+    heroTitle: 'Reach travelers through creators they trust.',
+    heroSubtitle: 'Post a mission and pay only when a real creator publishes and drives clicks.',
+    postCta: 'Post a Mission', browseCta: 'Browse creators',
+    howHeading: 'How it works', howSub: 'Launch a campaign in three steps.',
+    step1Title: 'Post a brief', step1Desc: 'Describe the mission, cities and payout.',
+    step2Title: 'Creators apply', step2Desc: 'Qualified creators join and submit work.',
+    step3Title: 'Pay on results', step3Desc: 'Approve submissions and pay on publish.',
+    samplesHeading: 'Open missions right now', samplesSub: 'A sample of live briefs from merchants.',
+    ctaTitle: 'Ready to launch?', ctaDesc: 'Post your first mission today.', ctaButton: 'Post a Mission',
   },
 }
 export default messages
