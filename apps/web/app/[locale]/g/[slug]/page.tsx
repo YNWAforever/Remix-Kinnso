@@ -51,7 +51,7 @@ export default async function GuidePage({
           className="relative min-h-[360px] bg-cover bg-center"
           role="img"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.68)), url("${guide.cover}")`,
+            backgroundImage: `linear-gradient(180deg, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.68)), url("${encodeURI(guide.cover)}")`,
           }}
         >
           <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
