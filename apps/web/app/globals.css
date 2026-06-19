@@ -89,8 +89,21 @@
   .k-btn-ghost     { @apply inline-flex items-center justify-center rounded-pill px-5 py-2.5 text-sm font-bold text-kinnso-ink transition hover:bg-kinnso-cream2; }
   .k-section-title { @apply text-2xl md:text-3xl font-black tracking-tight text-kinnso-ink; }
   .k-mono          { font-family: var(--font-mono); }
-  .k-input         { @apply w-full rounded-pill bg-white border border-kinnso-cream2 px-5 py-2.5 text-sm outline-none focus:border-kinnso-orange transition; }
+  .k-input         { @apply w-full rounded-pill bg-white border border-kinnso-cream2 px-5 py-2.5 text-sm outline-none focus:border-kinnso-orange transition min-h-[44px]; }
   textarea.k-input { @apply rounded-card; }
+
+  .k-input:focus-visible,
+  .k-btn-primary:focus-visible,
+  .k-btn-ghost:focus-visible {
+    outline: 2px solid var(--color-kinnso-orange);
+    outline-offset: 2px;
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--color-kinnso-orange);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
