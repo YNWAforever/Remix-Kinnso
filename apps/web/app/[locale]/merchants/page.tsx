@@ -1,7 +1,15 @@
-import { renderComingSoonPage, type RouteHostProps } from '../_routeHost'
+import { notFound } from 'next/navigation'
+import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { MerchantsLandingView } from '@/components/kinnso/pages/MerchantsLandingView'
 
-export { generateStaticParams } from '../_routeHost'
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }))
+}
 
-export default function MerchantsPage({ params }: RouteHostProps) {
-  return renderComingSoonPage(params, (messages) => messages.nav.linkMerchants)
+export default async function MerchantsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  if (!isLocale(locale)) notFound()
+  const messages = await getDictionary(locale as Locale)
+  return <MerchantsLandingView locale={locale as Locale} t={messages.merchantsLanding} />
 }
