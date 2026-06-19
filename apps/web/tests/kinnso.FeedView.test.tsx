@@ -1,17 +1,33 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
-import en from '@/lib/i18n/messages/en'
-import { feedItems } from '@/lib/creator-mock'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
 import { FeedView } from '@/components/kinnso/pages/FeedView'
+import type { Guide } from '@/lib/creator-mock'
+import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
 
+const guide = (over: Partial<Guide> = {}): Guide => ({
+  slug: 'tokyo-eats',
+  title: 'Tokyo Eats',
+  cover: 'https://img.example/cover.jpg',
+  city: 'Tokyo',
+  saves: 1234,
+  creatorHandle: 'mei',
+  ...over,
+})
+
 describe('FeedView', () => {
-  it('renders the feed heading and an item per mock feed entry', () => {
-    render(<FeedView locale="en" t={en.feed} />)
-    expect(screen.getByRole('heading', { name: en.feed.heading })).toBeTruthy()
-    expect(screen.getByText(feedItems[0].caption)).toBeTruthy()
-    expect(screen.getAllByText(feedItems[0].creatorHandle).length).toBeGreaterThan(0)
+  it('renders real guides as feed cards linking to the guide detail', () => {
+    render(<FeedView locale="en" t={en.feed} items={[guide()]} />)
+    expect(screen.getByText('Tokyo Eats')).toBeTruthy()
+    expect(screen.getByText('@mei')).toBeTruthy()
+    expect(screen.getByText(/1,234 saves/)).toBeTruthy()
+    expect(screen.getByRole('link').getAttribute('href')).toBe('/en/g/tokyo-eats')
+  })
+
+  it('shows the empty state when there are no items', () => {
+    render(<FeedView locale="en" t={en.feed} items={[]} />)
+    expect(screen.getByText(en.feed.empty)).toBeTruthy()
   })
 })
