@@ -395,6 +395,7 @@ const messages: Messages = {
     heading: '여행자들이 지금 저장하는 것',
     subtitle: 'KINNSO에서 트렌딩 중인 가이드와 장소를 실시간으로 확인하세요.',
     savesLabel: '회 저장',
+    empty: '아직 가이드가 없습니다. 새로운 여행 가이드를 기다려 주세요.',
   },
   creatorsLanding: {
     heroPill: '크리에이터 프로그램',
