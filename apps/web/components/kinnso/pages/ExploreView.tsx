@@ -1,9 +1,17 @@
 import GuideCard from '@/components/kinnso/GuideCard'
-import { guides } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/creator-mock'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
-export function ExploreView({ locale, t }: { locale: Locale; t: Messages['explore'] }) {
+export function ExploreView({
+  locale,
+  t,
+  guides,
+}: {
+  locale: Locale
+  t: Messages['explore']
+  guides: Guide[]
+}) {
   return (
     <main>
       <section className="k-container py-12">
