@@ -13,7 +13,7 @@ function keyPaths(obj: unknown, prefix = ''): string[] {
 
 const GROUPS = [
   'studio', 'creatorProfile', 'merchants', 'missions', 'ops', 'nav', 'footer', 'home', 'comingSoon',
-  'studioHome', 'explore', 'feed', 'creatorsLanding', 'merchantsLanding',
+  'studioHome', 'explore', 'feed', 'creatorsLanding', 'merchantsLanding', 'studioGuides',
 ] as const
 
 describe('i18n locale parity for new creator-profile groups', () => {
