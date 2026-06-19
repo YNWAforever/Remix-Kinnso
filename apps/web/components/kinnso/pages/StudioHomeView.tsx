@@ -11,7 +11,7 @@ export function StudioHomeView({ locale, t }: { locale: Locale; t: Messages['stu
     { href: '/studio/earnings', title: t.earningsTitle, desc: t.earningsDesc, live: false, icon: <Wallet className="h-5 w-5" /> },
     { href: '/studio/offers', title: t.offersTitle, desc: t.offersDesc, live: false, icon: <Tag className="h-5 w-5" /> },
     { href: '/studio/inbox', title: t.inboxTitle, desc: t.inboxDesc, live: false, icon: <Inbox className="h-5 w-5" /> },
-    { href: '/studio/guides/new', title: t.guidesTitle, desc: t.guidesDesc, live: false, icon: <PenSquare className="h-5 w-5" /> },
+    { href: '/studio/guides', title: t.guidesTitle, desc: t.guidesDesc, live: true, icon: <PenSquare className="h-5 w-5" /> },
   ]
   return (
     <main>
