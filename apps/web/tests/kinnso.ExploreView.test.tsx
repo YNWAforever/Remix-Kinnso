@@ -10,7 +10,7 @@ afterEach(cleanup)
 describe('ExploreView', () => {
   it('renders the explore heading and a card per guide', () => {
     render(<ExploreView locale="en" t={en.explore} guides={guides} />)
-    expect(screen.getByRole('heading', { name: en.explore.heading })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: en.explore.heading })).toBeTruthy()
     expect(screen.getByText(guides[0].title)).toBeTruthy()
     expect(
       screen.getAllByRole('link').some((a) => a.getAttribute('href') === `/en/g/${guides[0].slug}`),

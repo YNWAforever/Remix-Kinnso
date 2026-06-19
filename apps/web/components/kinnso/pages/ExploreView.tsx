@@ -18,6 +18,7 @@ export function ExploreView({
         <span className="k-pill bg-kinnso-cream2 text-kinnso-ink">{t.pill}</span>
         <h1 className="mt-4 text-4xl font-black tracking-tight text-kinnso-ink md:text-5xl">{t.heading}</h1>
         <p className="mt-3 max-w-2xl text-lg text-kinnso-muted">{t.subtitle}</p>
+        <h2 className="sr-only">{t.heading}</h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {guides.map((g) => (
             <GuideCard key={g.slug} g={g} locale={locale} />

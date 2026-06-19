@@ -28,5 +28,5 @@ export default async function StudioNewGuidePage({
     return result
   }
 
-  return <GuideForm t={messages.studioGuides} mode="new" onSubmit={submitGuide} />
+  return <GuideForm t={messages.studioGuides} mode="new" backHref={`/${locale}/studio/guides`} onSubmit={submitGuide} />
 }

@@ -44,7 +44,7 @@ export function MyGuidesView({
                   <p className="text-sm text-kinnso-muted">{g.city}</p>
                 </div>
                 <span
-                  className={`k-pill ${g.status === 'published' ? 'bg-kinnso-orange/10 text-kinnso-orange' : 'bg-kinnso-cream2 text-kinnso-muted'}`}
+                  className={`k-pill ${g.status === 'published' ? 'bg-kinnso-orange/20 text-kinnso-ink' : 'bg-kinnso-cream2 text-kinnso-ink'}`}
                 >
                   {g.status === 'published' ? t.statusPublished : t.statusDraft}
                 </span>

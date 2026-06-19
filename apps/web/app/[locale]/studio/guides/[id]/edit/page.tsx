@@ -43,5 +43,5 @@ export default async function StudioEditGuidePage({
     return result
   }
 
-  return <GuideForm t={messages.studioGuides} mode="edit" initial={initial} onSubmit={submitGuide} />
+  return <GuideForm t={messages.studioGuides} mode="edit" initial={initial} backHref={`/${locale}/studio/guides`} onSubmit={submitGuide} />
 }

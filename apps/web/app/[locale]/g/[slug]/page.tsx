@@ -62,7 +62,7 @@ export default async function GuidePage({
                 <MapPin className="h-4 w-4" />
                 {guide.city}
               </span>
-              <span className="inline-flex items-center gap-1">
+              <span className="inline-flex items-center gap-1 tabular-nums">
                 <Bookmark className="h-4 w-4" />
                 {guide.saves.toLocaleString()}
               </span>
