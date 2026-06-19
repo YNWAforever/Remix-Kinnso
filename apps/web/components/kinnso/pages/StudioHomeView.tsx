@@ -8,8 +8,8 @@ export function StudioHomeView({ locale, t }: { locale: Locale; t: Messages['stu
   const tools = [
     { href: '/studio/scan', title: t.scanTitle, desc: t.scanDesc, live: true, icon: <Sparkles className="h-5 w-5" /> },
     { href: '/studio/missions', title: t.missionsTitle, desc: t.missionsDesc, live: true, icon: <Target className="h-5 w-5" /> },
-    { href: '/studio/earnings', title: t.earningsTitle, desc: t.earningsDesc, live: false, icon: <Wallet className="h-5 w-5" /> },
-    { href: '/studio/offers', title: t.offersTitle, desc: t.offersDesc, live: false, icon: <Tag className="h-5 w-5" /> },
+    { href: '/studio/earnings', title: t.earningsTitle, desc: t.earningsDesc, live: true, icon: <Wallet className="h-5 w-5" /> },
+    { href: '/studio/offers', title: t.offersTitle, desc: t.offersDesc, live: true, icon: <Tag className="h-5 w-5" /> },
     { href: '/studio/inbox', title: t.inboxTitle, desc: t.inboxDesc, live: false, icon: <Inbox className="h-5 w-5" /> },
     { href: '/studio/guides/new', title: t.guidesTitle, desc: t.guidesDesc, live: false, icon: <PenSquare className="h-5 w-5" /> },
   ]
