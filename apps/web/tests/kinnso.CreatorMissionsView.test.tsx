@@ -34,7 +34,7 @@ const missions = [{
 describe('CreatorMissionsView', () => {
   it('renders auto-join mission cards and calls join', () => {
     const onJoin = vi.fn()
-    render(<CreatorMissionsView t={en.missions} missions={missions} onJoin={onJoin} onCreateLink={vi.fn()} />)
+    render(<CreatorMissionsView t={en.missions} missions={missions} onJoin={onJoin} />)
     expect(screen.getByText('Travelpayouts hotel program')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: en.missions.joinMission }))
     expect(onJoin).toHaveBeenCalledWith('m1')
@@ -45,7 +45,7 @@ describe('CreatorMissionsView', () => {
       ok: false,
       errors: { form: ['Creator access is required'] },
     }))
-    render(<CreatorMissionsView t={en.missions} missions={missions} onJoin={onJoin} onCreateLink={vi.fn()} />)
+    render(<CreatorMissionsView t={en.missions} missions={missions} onJoin={onJoin} />)
 
     fireEvent.click(screen.getByRole('button', { name: en.missions.joinMission }))
 
@@ -57,7 +57,7 @@ describe('CreatorMissionsView', () => {
     const onJoin = vi.fn(() => new Promise<{ ok: true }>((resolve) => {
       resolveJoin = resolve
     }))
-    render(<CreatorMissionsView t={en.missions} missions={missions} onJoin={onJoin} onCreateLink={vi.fn()} />)
+    render(<CreatorMissionsView t={en.missions} missions={missions} onJoin={onJoin} />)
 
     const button = screen.getByRole('button', { name: en.missions.joinMission })
     fireEvent.click(button)
@@ -74,30 +74,10 @@ describe('CreatorMissionsView', () => {
         t={en.missions}
         missions={[{ ...missions[0], id: 'm2', title: 'Paid reel mission', missionType: 'paid' }]}
         onJoin={onJoin}
-        onCreateLink={vi.fn()}
       />,
     )
 
     fireEvent.click(screen.getByRole('button', { name: en.missions.applyMission }))
     expect(onJoin).toHaveBeenCalledWith('m2')
-  })
-
-  it('generates partner links from the active participant and program URL', () => {
-    const onCreateLink = vi.fn()
-    render(
-      <CreatorMissionsView
-        t={en.missions}
-        missions={[{
-          ...missions[0],
-          participant: { id: 'participant-1', status: 'active' },
-          programUrl: 'https://example.com/hotel',
-        }]}
-        onJoin={vi.fn()}
-        onCreateLink={onCreateLink}
-      />,
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: en.missions.generatePartnerLink }))
-    expect(onCreateLink).toHaveBeenCalledWith('participant-1', 'https://example.com/hotel')
   })
 })

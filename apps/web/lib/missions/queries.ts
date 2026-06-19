@@ -22,6 +22,13 @@ export const creatorMissionSelect = `
   affiliate_partner_links(id,partner_url,original_url,sub_id)
 `
 
+export const affiliateOfferSelect = `
+  id,title,summary,mission_source,mission_type,status,published_at,
+  affiliate_network_programs(id,program_name,program_url,category,default_commission_description,status),
+  mission_participants(id,status,source,creator_id),
+  affiliate_partner_links(id,partner_url,original_url,sub_id)
+`
+
 export const opsSettlementSelect = `
   id,status,merchant_invoice_status,merchant_payment_status,creator_payout_status,
   kinnso_commission_status,affiliate_commission_status,amount_currency,
@@ -29,6 +36,12 @@ export const opsSettlementSelect = `
   missions(id,title,mission_source,mission_type),
   mission_participants(id,creator_id,status),
   affiliate_network_events(id,network,external_action_id,sub_id,event_state,profit_amount,currency)
+`
+
+export const creatorSettlementSelect = `
+  id,status,creator_payout_status,amount_currency,
+  creator_commission_amount,paid_fee_amount,
+  missions(title,mission_type,mission_source)
 `
 
 export async function getMerchantProfile(
@@ -49,17 +62,35 @@ export async function listMerchantMissions(
     .order('created_at', { ascending: false })
 }
 
-export async function listCreatorMissions(
+export async function listAffiliateOffers(
   supabase: SupabaseClient<Database>,
-  creatorId: string,
 ) {
-  void creatorId
+  return supabase
+    .from('missions')
+    .select(affiliateOfferSelect)
+    .eq('status', 'published')
+    .eq('mission_source', 'travelpayouts')
+    .order('published_at', { ascending: false })
+}
 
+export async function listCreatorMerchantMissions(
+  supabase: SupabaseClient<Database>,
+) {
   return supabase
     .from('missions')
     .select(creatorMissionSelect)
     .eq('status', 'published')
+    .neq('mission_source', 'travelpayouts')
     .order('published_at', { ascending: false })
+}
+
+export async function listCreatorSettlements(
+  supabase: SupabaseClient<Database>,
+) {
+  return supabase
+    .from('mission_settlements')
+    .select(creatorSettlementSelect)
+    .order('updated_at', { ascending: false })
 }
 
 export async function listOpsSettlements(supabase: SupabaseClient<Database>) {

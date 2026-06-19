@@ -3,8 +3,8 @@ import { CreatorMissionsView, type CreatorMissionCard } from '@/components/kinns
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { createPartnerLinkAction, joinMissionAction } from '@/lib/missions/actions'
-import { listCreatorMissions } from '@/lib/missions/queries'
+import { joinMissionAction } from '@/lib/missions/actions'
+import { listCreatorMerchantMissions } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export function generateStaticParams() {
@@ -112,7 +112,7 @@ export default async function StudioMissionsPage({ params }: { params: Params })
   const role = await resolveViewerRole(supabase)
   if (role !== 'creator') notFound()
 
-  const { data } = await listCreatorMissions(supabase, user.id)
+  const { data } = await listCreatorMerchantMissions(supabase)
   const missions = ((data ?? []) as unknown as CreatorMissionRow[]).map((row) =>
     mapCreatorMission(row, user.id),
   )
@@ -122,10 +122,5 @@ export default async function StudioMissionsPage({ params }: { params: Params })
     return joinMissionAction({ missionId, locale: loc })
   }
 
-  async function createLink(missionParticipantId: string, originalUrl: string) {
-    'use server'
-    return createPartnerLinkAction({ missionParticipantId, originalUrl, locale: loc })
-  }
-
-  return <CreatorMissionsView t={messages.missions} missions={missions} onJoin={join} onCreateLink={createLink} />
+  return <CreatorMissionsView t={messages.missions} missions={missions} onJoin={join} />
 }

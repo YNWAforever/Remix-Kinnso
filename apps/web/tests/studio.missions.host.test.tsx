@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { listCreatorMissionsMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
-  listCreatorMissionsMock: vi.fn(async () => ({
+const { listCreatorMerchantMissionsMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
+  listCreatorMerchantMissionsMock: vi.fn(async () => ({
     data: [{
       id: 'mission-1',
       title: 'Hybrid stay mission',
@@ -37,7 +37,7 @@ vi.mock('@/lib/auth/viewer-role', () => ({
 }))
 
 vi.mock('@/lib/missions/queries', () => ({
-  listCreatorMissions: listCreatorMissionsMock,
+  listCreatorMerchantMissions: listCreatorMerchantMissionsMock,
 }))
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -51,7 +51,7 @@ vi.mock('@/lib/supabase/server', () => ({
 import StudioMissionsPage from '@/app/[locale]/studio/missions/page'
 
 beforeEach(() => {
-  listCreatorMissionsMock.mockClear()
+  listCreatorMerchantMissionsMock.mockClear()
   resolveViewerRoleMock.mockReset()
   resolveViewerRoleMock.mockResolvedValue('creator')
 })
@@ -64,7 +64,7 @@ describe('/[locale]/studio/missions host', () => {
       StudioMissionsPage({ params: Promise.resolve({ locale: 'en' }) }),
     ).rejects.toThrow('NEXT_NOT_FOUND')
 
-    expect(listCreatorMissionsMock).not.toHaveBeenCalled()
+    expect(listCreatorMerchantMissionsMock).not.toHaveBeenCalled()
   })
 
   it('shows hybrid missions with both paid and affiliate compensation', async () => {

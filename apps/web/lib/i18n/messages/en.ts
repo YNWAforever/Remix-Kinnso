@@ -379,6 +379,29 @@ export interface Messages {
     samplesHeading: string; samplesSub: string
     ctaTitle: string; ctaDesc: string; ctaButton: string
   }
+  studioOffers: {
+    heading: string
+    subtitle: string
+    empty: string
+    join: string
+    generateLink: string
+    copy: string
+    copied: string
+    category: string
+    commission: string
+    viewProgram: string
+  }
+  studioEarnings: {
+    heading: string
+    subtitle: string
+    paid: string
+    pending: string
+    empty: string
+    colMission: string
+    colType: string
+    colAmount: string
+    colStatus: string
+  }
 }
 
 const messages: Messages = {
@@ -801,6 +824,29 @@ const messages: Messages = {
     step3Title: 'Pay on results', step3Desc: 'Approve submissions and pay on publish.',
     samplesHeading: 'Open missions right now', samplesSub: 'A sample of live briefs from merchants.',
     ctaTitle: 'Ready to launch?', ctaDesc: 'Post your first mission today.', ctaButton: 'Post a Mission',
+  },
+  studioOffers: {
+    heading: 'Affiliate offers',
+    subtitle: 'Join travel affiliate programs and generate tracked partner links.',
+    empty: 'No affiliate offers are available right now.',
+    join: 'Join offer',
+    generateLink: 'Generate partner link',
+    copy: 'Copy',
+    copied: 'Copied',
+    category: 'Category',
+    commission: 'Commission',
+    viewProgram: 'View program',
+  },
+  studioEarnings: {
+    heading: 'Earnings',
+    subtitle: 'Track payouts from missions and affiliate commissions.',
+    paid: 'Paid',
+    pending: 'Pending',
+    empty: 'No earnings yet. Completed missions and settled commissions will appear here.',
+    colMission: 'Mission',
+    colType: 'Type',
+    colAmount: 'Amount',
+    colStatus: 'Status',
   },
 }
 export default messages

@@ -421,5 +421,28 @@ const messages: Messages = {
     samplesHeading: '지금 공개된 미션', samplesSub: '판매자의 현재 브리프 샘플.',
     ctaTitle: '시작할 준비가 되셨나요?', ctaDesc: '오늘 첫 미션을 게시하세요.', ctaButton: '미션 게시',
   },
+  studioOffers: {
+    heading: '제휴 오퍼',
+    subtitle: '여행 제휴 프로그램에 참여하고 추적 가능한 파트너 링크를 생성하세요.',
+    empty: '현재 이용 가능한 제휴 오퍼가 없습니다.',
+    join: '오퍼 참여',
+    generateLink: '파트너 링크 생성',
+    copy: '복사',
+    copied: '복사됨',
+    category: '카테고리',
+    commission: '커미션',
+    viewProgram: '프로그램 보기',
+  },
+  studioEarnings: {
+    heading: '수익',
+    subtitle: '미션과 제휴 커미션 수익을 추적하세요.',
+    paid: '지급 완료',
+    pending: '대기 중',
+    empty: '아직 수익이 없습니다. 완료된 미션과 정산된 커미션이 여기에 표시됩니다.',
+    colMission: '미션',
+    colType: '유형',
+    colAmount: '금액',
+    colStatus: '상태',
+  },
 }
 export default messages
