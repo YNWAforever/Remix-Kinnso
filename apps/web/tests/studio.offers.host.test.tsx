@@ -59,5 +59,6 @@ describe('/[locale]/studio/offers host', () => {
     render(ui)
     expect(screen.getByText('Hotels affiliate')).toBeTruthy()
     expect(screen.getByText('Commission: Up to 7%')).toBeTruthy()
+    expect(screen.getByText(/Category:\s*Hotels/)).toBeTruthy()
   })
 })

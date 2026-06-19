@@ -22,6 +22,13 @@ export const creatorMissionSelect = `
   affiliate_partner_links(id,partner_url,original_url,sub_id)
 `
 
+export const affiliateOfferSelect = `
+  id,title,summary,mission_source,mission_type,status,published_at,
+  affiliate_network_programs(id,program_name,program_url,category,default_commission_description,status),
+  mission_participants(id,status,source,creator_id),
+  affiliate_partner_links(id,partner_url,original_url,sub_id)
+`
+
 export const opsSettlementSelect = `
   id,status,merchant_invoice_status,merchant_payment_status,creator_payout_status,
   kinnso_commission_status,affiliate_commission_status,amount_currency,
@@ -60,7 +67,7 @@ export async function listAffiliateOffers(
 ) {
   return supabase
     .from('missions')
-    .select(creatorMissionSelect)
+    .select(affiliateOfferSelect)
     .eq('status', 'published')
     .eq('mission_source', 'travelpayouts')
     .order('published_at', { ascending: false })

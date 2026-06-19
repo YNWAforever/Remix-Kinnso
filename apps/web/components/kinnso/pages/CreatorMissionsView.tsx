@@ -24,14 +24,12 @@ type CreatorMissionsViewProps = {
   t: Messages['missions']
   missions: CreatorMissionCard[]
   onJoin: (missionId: string) => KinnsoActionResult | Promise<KinnsoActionResult>
-  onCreateLink: (missionParticipantId: string, originalUrl: string) => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
 export function CreatorMissionsView({
   t,
   missions,
   onJoin,
-  onCreateLink,
 }: CreatorMissionsViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
@@ -63,9 +61,6 @@ export function CreatorMissionsView({
       )}
       <div className="mt-6 grid gap-4">
         {missions.map((mission) => {
-          const activeParticipantId = mission.participant?.status === 'active' ? mission.participant.id : null
-          const programUrl = mission.programUrl
-
           return (
             <article key={mission.id} className="k-card p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -87,16 +82,6 @@ export function CreatorMissionsView({
                 {!mission.participant && (
                   <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runAction(() => onJoin(mission.id))}>
                     {getJoinLabel(mission.missionType)}
-                  </button>
-                )}
-                {mission.missionSource === 'travelpayouts' && activeParticipantId && programUrl && (
-                  <button
-                    type="button"
-                    className="k-btn-ghost text-sm"
-                    disabled={isPending}
-                    onClick={() => void runAction(() => onCreateLink(activeParticipantId, programUrl))}
-                  >
-                    {t.generatePartnerLink}
                   </button>
                 )}
               </div>

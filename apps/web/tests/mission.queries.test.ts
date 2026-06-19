@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   merchantMissionSelect,
   creatorMissionSelect,
+  affiliateOfferSelect,
   opsSettlementSelect,
   creatorSettlementSelect,
   listAffiliateOffers,
@@ -18,6 +19,10 @@ describe('mission query projections', () => {
   it('keeps creator mission projection stable', () => {
     expect(creatorMissionSelect).toContain('affiliate_partner_links')
     expect(creatorMissionSelect).toContain('mission_milestones')
+  })
+
+  it('includes program category in the affiliate offer projection', () => {
+    expect(affiliateOfferSelect).toContain('category')
   })
 
   it('keeps ops settlement projection stable', () => {
