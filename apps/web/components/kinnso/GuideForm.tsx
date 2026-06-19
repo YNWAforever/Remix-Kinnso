@@ -184,7 +184,7 @@ export function GuideForm({ t, mode, initial, backHref, onSubmit }: Props) {
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="k-btn-ghost disabled:opacity-50"
+              className="k-btn-ghost min-h-[44px] cursor-pointer disabled:opacity-50"
               disabled={pending !== null}
               onClick={() => void submit(false)}
             >
@@ -192,7 +192,7 @@ export function GuideForm({ t, mode, initial, backHref, onSubmit }: Props) {
             </button>
             <button
               type="button"
-              className="k-btn-primary disabled:opacity-50"
+              className="k-btn-primary min-h-[44px] cursor-pointer disabled:opacity-50"
               disabled={pending !== null}
               onClick={() => void submit(true)}
             >
