@@ -701,12 +701,12 @@ export type Database = {
       }
       guides: {
         Row: {
+          city: string
           cover_url: string
           created_at: string
           creator_handle: string
           creator_id: string
           creator_name: string
-          city: string
           id: string
           published_at: string | null
           saves_count: number
@@ -717,12 +717,12 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          city: string
           cover_url: string
           created_at?: string
           creator_handle: string
           creator_id: string
           creator_name: string
-          city: string
           id?: string
           published_at?: string | null
           saves_count?: number
@@ -733,12 +733,12 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          city?: string
           cover_url?: string
           created_at?: string
           creator_handle?: string
           creator_id?: string
           creator_name?: string
-          city?: string
           id?: string
           published_at?: string | null
           saves_count?: number
