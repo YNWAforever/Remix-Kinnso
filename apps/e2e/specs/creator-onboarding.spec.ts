@@ -32,9 +32,10 @@ test('creator signs up, adds handles, scans, reviews DNA, publishes, reads back'
   await page.getByPlaceholder(/handle or profile url/i).first().fill('travel.hk')
   await page.getByRole('button', { name: /run scan/i }).click()
 
-  // 3. Live progress -> fixture mode drives queued->ready quickly; wait for review.
+  // 3. Live progress -> fixture mode drives queued->ready quickly, but cold CI
+  // can spend >30s across next-dev route work, Supabase auth, and scan polling.
   await expect(page.getByRole('heading', { name: /review your creator dna/i })).toBeVisible({
-    timeout: 30_000,
+    timeout: 60_000,
   })
 
   // 4. Edit the bio and publish.
