@@ -17,7 +17,7 @@ const GuideCard = ({ g, locale }: { g: Guide; locale: Locale }) => (
           <span className="inline-flex items-center"><MapPin className="mr-0.5 h-3 w-3" /> {g.city}</span>
         </div>
         <div className="mt-3 flex items-center justify-end text-xs text-kinnso-muted">
-          <span className="inline-flex items-center"><Bookmark className="mr-1 h-3 w-3" /> {g.saves.toLocaleString()}</span>
+          <span className="inline-flex items-center tabular-nums"><Bookmark className="mr-1 h-3 w-3" /> {g.saves.toLocaleString()}</span>
         </div>
       </div>
     </article>

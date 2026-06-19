@@ -699,6 +699,65 @@ export type Database = {
         }
         Relationships: []
       }
+      guides: {
+        Row: {
+          city: string
+          cover_url: string
+          created_at: string
+          creator_handle: string
+          creator_id: string
+          creator_name: string
+          id: string
+          published_at: string | null
+          saves_count: number
+          slug: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          cover_url: string
+          created_at?: string
+          creator_handle: string
+          creator_id: string
+          creator_name: string
+          id?: string
+          published_at?: string | null
+          saves_count?: number
+          slug: string
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          cover_url?: string
+          created_at?: string
+          creator_handle?: string
+          creator_id?: string
+          creator_name?: string
+          id?: string
+          published_at?: string | null
+          saves_count?: number
+          slug?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guides_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kinnso_ops_members: {
         Row: {
           created_at: string

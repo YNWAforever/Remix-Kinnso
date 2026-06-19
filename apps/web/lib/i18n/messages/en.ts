@@ -336,6 +336,21 @@ export interface Messages {
     inboxTitle: string; inboxDesc: string
     guidesTitle: string; guidesDesc: string
   }
+  studioGuides: {
+    listPill: string; listHeading: string; listSubtitle: string
+    newButton: string; emptyTitle: string; emptyBody: string
+    statusDraft: string; statusPublished: string
+    edit: string; delete: string; deleteConfirm: string
+    formNewHeading: string; formEditHeading: string
+    titleLabel: string; titlePlaceholder: string
+    cityLabel: string; cityPlaceholder: string
+    coverLabel: string; coverPlaceholder: string; coverPreviewAlt: string
+    summaryLabel: string; summaryPlaceholder: string
+    saveDraft: string; publish: string; saving: string
+    backToGuides: string
+    errorTitleRequired: string; errorSummaryRequired: string; errorCityRequired: string
+    errorCoverRequired: string; errorCoverInvalid: string; errorGeneric: string
+  }
   explore: {
     pill: string; heading: string; subtitle: string
     savesLabel: string; emptyNote: string
@@ -737,6 +752,40 @@ const messages: Messages = {
     offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
     guidesTitle: 'New Guide', guidesDesc: 'Publish a travel guide.',
+  },
+  studioGuides: {
+    listPill: 'Studio',
+    listHeading: 'My guides',
+    listSubtitle: 'Draft, publish, and manage the travel guides you share on KINNSO.',
+    newButton: 'New guide',
+    emptyTitle: 'No guides yet',
+    emptyBody: 'Publish your first guide and it will appear in Explore.',
+    statusDraft: 'Draft',
+    statusPublished: 'Published',
+    edit: 'Edit',
+    delete: 'Delete',
+    deleteConfirm: 'Delete this guide? This cannot be undone.',
+    formNewHeading: 'New guide',
+    formEditHeading: 'Edit guide',
+    titleLabel: 'Title',
+    titlePlaceholder: 'e.g. Shibuya Coffee Crawl: 7 Quiet Roasters',
+    cityLabel: 'City',
+    cityPlaceholder: 'e.g. Tokyo',
+    coverLabel: 'Cover image URL',
+    coverPlaceholder: 'https://…',
+    coverPreviewAlt: 'Cover preview',
+    summaryLabel: 'Summary',
+    summaryPlaceholder: 'A short description of what this guide covers.',
+    saveDraft: 'Save draft',
+    publish: 'Publish',
+    saving: 'Saving…',
+    backToGuides: 'Back to my guides',
+    errorTitleRequired: 'Add a title.',
+    errorSummaryRequired: 'Add a summary.',
+    errorCityRequired: 'Add a city.',
+    errorCoverRequired: 'Add a cover image URL.',
+    errorCoverInvalid: 'Enter a valid image URL (http or https).',
+    errorGeneric: 'Something went wrong. Please try again.',
   },
   explore: {
     pill: 'Explore',
