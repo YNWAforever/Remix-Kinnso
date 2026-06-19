@@ -13,6 +13,7 @@ import type {
   MerchantProfile,
   MerchantWorkingWith,
   Guide,
+  FeedItem,
 } from './types'
 
 // ─── tierMeta (kinnso.ts, verbatim) ───────────────────────────
@@ -322,4 +323,14 @@ export const guides: Guide[] = [
   { slug: 'seoul-frame-by-frame', title: 'Seoul, Frame by Frame: A Photo Walk in Seongsu', cover: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?q=80&w=1600&auto=format&fit=crop', city: 'Seoul', saves: 1410, creatorHandle: 'kenjishoots' },
   { slug: 'hk-island-slow-day', title: 'Hong Kong Island, Slow Day: Tram, Tea, Sunset', cover: 'https://images.unsplash.com/photo-1536599018102-9f803c140fc1?q=80&w=1600&auto=format&fit=crop', city: 'Hong Kong', saves: 670, creatorHandle: 'saraonfoot' },
   { slug: 'singapore-family-3day', title: 'Singapore with Kids: 3 Days, Zero Meltdowns', cover: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=1600&auto=format&fit=crop', city: 'Singapore', saves: 510, creatorHandle: 'voyagewithem' },
+]
+
+// ─── Feed items (travelers feed, Slice 3b) ────────────────────
+export const feedItems: FeedItem[] = [
+  { id: 'f1', creatorHandle: '@maywanders', creatorName: 'May', avatar: 'https://i.pravatar.cc/100?img=47', image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1200&auto=format&fit=crop', caption: 'Sunset ramen crawl in Sham Shui Po', city: 'Hong Kong', saves: 1280, postedAgo: '2h' },
+  { id: 'f2', creatorHandle: '@nomadleo', creatorName: 'Leo', avatar: 'https://i.pravatar.cc/100?img=12', image: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80&w=1200&auto=format&fit=crop', caption: 'Hidden coffee lanes in Daikanyama', city: 'Tokyo', saves: 980, postedAgo: '5h' },
+  { id: 'f3', creatorHandle: '@aubreyeats', creatorName: 'Aubrey', avatar: 'https://i.pravatar.cc/100?img=32', image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?q=80&w=1200&auto=format&fit=crop', caption: 'Best night-market bites in Taipei', city: 'Taipei', saves: 1543, postedAgo: '8h' },
+  { id: 'f4', creatorHandle: '@seoulsearch', creatorName: 'Jin', avatar: 'https://i.pravatar.cc/100?img=5', image: 'https://images.unsplash.com/photo-1517154421773-0529f29ea451?q=80&w=1200&auto=format&fit=crop', caption: 'Hanok stays worth the splurge', city: 'Seoul', saves: 760, postedAgo: '12h' },
+  { id: 'f5', creatorHandle: '@bangkokbites', creatorName: 'Nok', avatar: 'https://i.pravatar.cc/100?img=20', image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?q=80&w=1200&auto=format&fit=crop', caption: 'Boat-noodle route along the canals', city: 'Bangkok', saves: 1120, postedAgo: '1d' },
+  { id: 'f6', creatorHandle: '@maywanders', creatorName: 'May', avatar: 'https://i.pravatar.cc/100?img=47', image: 'https://images.unsplash.com/photo-1535139262971-c51845709a48?q=80&w=1200&auto=format&fit=crop', caption: 'A perfect rainy-day cafe in Sheung Wan', city: 'Hong Kong', saves: 845, postedAgo: '1d' },
 ]

@@ -213,3 +213,15 @@ export interface Guide {
   saves: number
   creatorHandle: string
 }
+
+export interface FeedItem {
+  id: string
+  creatorHandle: string
+  creatorName: string
+  avatar: string
+  image: string
+  caption: string
+  city: string
+  saves: number
+  postedAgo: string
+}
