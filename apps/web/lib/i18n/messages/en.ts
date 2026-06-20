@@ -308,7 +308,7 @@ export interface Messages {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
-    signIn: string; language: string; menuToggle: string
+    signIn: string; language: string; menuToggle: string; skipToContent: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
@@ -711,7 +711,7 @@ const messages: Messages = {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
     linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
-    signIn: 'Sign in', language: 'Language', menuToggle: 'Menu',
+    signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },
   footer: {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',

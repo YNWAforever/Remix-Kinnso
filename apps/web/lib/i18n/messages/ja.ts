@@ -307,7 +307,7 @@ const messages: Messages = {
     linkCreators: 'クリエイター', linkMerchants: '加盟店', linkAgent: 'AIエージェント', linkTravelers: '旅行者',
     linkGuides: 'ガイド', linkArticles: '記事', linkFindCreators: 'クリエイターを探す',
     ctaApply: 'クリエイター応募', ctaOpenStudio: 'スタジオを開く', ctaPending: '申請審査中', ctaPostMission: 'ミッションを投稿',
-    signIn: 'ログイン', language: '言語', menuToggle: 'メニュー',
+    signIn: 'ログイン', language: '言語', menuToggle: 'メニュー', skipToContent: '本文へスキップ',
   },
   footer: {
     tagline: 'AIトラベルコンテンツスタジオ · クリエイターに報酬 · 香港 · 台北 · 東京',

@@ -307,7 +307,7 @@ const messages: Messages = {
     linkCreators: 'ครีเอเตอร์', linkMerchants: 'ร้านค้า', linkAgent: 'ผู้ช่วย AI', linkTravelers: 'นักเดินทาง',
     linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์',
     ctaApply: 'สมัครเป็นครีเอเตอร์', ctaOpenStudio: 'เปิดสตูดิโอ', ctaPending: 'กำลังตรวจสอบใบสมัคร', ctaPostMission: 'โพสต์ภารกิจ',
-    signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู',
+    signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู', skipToContent: 'ข้ามไปยังเนื้อหา',
   },
   footer: {
     tagline: 'สตูดิโอคอนเทนต์ท่องเที่ยว AI · จ่ายให้ครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',

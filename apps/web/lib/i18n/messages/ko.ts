@@ -307,7 +307,7 @@ const messages: Messages = {
     linkCreators: '크리에이터', linkMerchants: '가맹점', linkAgent: 'AI 에이전트', linkTravelers: '여행자',
     linkGuides: '가이드', linkArticles: '아티클', linkFindCreators: '크리에이터 찾기',
     ctaApply: '크리에이터 지원', ctaOpenStudio: '스튜디오 열기', ctaPending: '신청 검토 중', ctaPostMission: '미션 등록',
-    signIn: '로그인', language: '언어', menuToggle: '메뉴',
+    signIn: '로그인', language: '언어', menuToggle: '메뉴', skipToContent: '본문으로 건너뛰기',
   },
   footer: {
     tagline: 'AI 트래블 콘텐츠 스튜디오 · 크리에이터에게 지급 · 홍콩 · 타이베이 · 도쿄',

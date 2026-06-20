@@ -33,6 +33,15 @@ describe('SiteChrome', () => {
     expect(screen.getByText(en.footer.tagline)).toBeTruthy()                        // footer
   })
 
+  it('renders a skip link and stable main target on normal paths', () => {
+    renderAt('/en/articles')
+    const skip = screen.getByRole('link', { name: en.nav.skipToContent })
+    const main = document.querySelector('#main-content')
+    expect(skip.getAttribute('href')).toBe('#main-content')
+    expect(main).toBeTruthy()
+    expect(main?.classList.contains('scroll-mt-16')).toBe(true)
+  })
+
   it.each(['/en/sign-in', '/en/sign-up', '/en/creator'])('hides chrome on %s', (path) => {
     renderAt(path)
     expect(screen.getByText('PAGE_BODY')).toBeTruthy()

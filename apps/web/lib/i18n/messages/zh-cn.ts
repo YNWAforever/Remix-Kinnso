@@ -307,7 +307,7 @@ const messages: Messages = {
     linkCreators: '创作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
     linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '寻找创作者',
     ctaApply: '申请成为创作者', ctaOpenStudio: '打开工作室', ctaPending: '申请审核中', ctaPostMission: '发布任务',
-    signIn: '登录', language: '语言', menuToggle: '菜单',
+    signIn: '登录', language: '语言', menuToggle: '菜单', skipToContent: '跳到内容',
   },
   footer: {
     tagline: 'AI 旅游内容工作室 · 为创作者付费 · 香港 · 台北 · 东京',
