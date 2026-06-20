@@ -70,7 +70,9 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
           onClick={() => setOpen((v) => !v)}
           aria-label={t.menuToggle}
           aria-expanded={open}
-          aria-controls="kinnso-mobile-menu"
+          // Only reference the menu region while it is actually in the DOM
+          // (it mounts on open); pointing aria-controls at an absent element is an ARIA error.
+          aria-controls={open ? "kinnso-mobile-menu" : undefined}
         >
           {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
         </button>

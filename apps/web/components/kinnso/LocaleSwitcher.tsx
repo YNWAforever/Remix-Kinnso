@@ -30,7 +30,7 @@ export function LocaleSwitcher({ locale, t }: { locale: Locale; t: Messages['nav
         aria-label={t.language}
         value={locale}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-pill border border-kinnso-edge bg-white px-2.5 py-1.5 text-xs font-semibold text-kinnso-ink outline-none transition focus-visible:border-kinnso-orange focus-visible:ring-2 focus-visible:ring-kinnso-orange/30"
+        className="rounded-pill border border-kinnso-edge bg-white px-2.5 py-1.5 text-xs font-semibold text-kinnso-ink outline-none transition focus-visible:border-kinnso-orange focus-visible:ring-2 focus-visible:ring-kinnso-orange focus-visible:ring-offset-1"
       >
         {LOCALES.map((l) => (
           <option key={l} value={l}>{LABELS[l]}</option>

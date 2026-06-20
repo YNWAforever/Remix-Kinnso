@@ -44,6 +44,9 @@ describe('SiteChrome', () => {
     renderAt('/en/articles')
     const skip = screen.getByRole('link', { name: 'Skip to content' })
     expect(skip.getAttribute('href')).toBe('#main-content')
-    expect(document.querySelector('#main-content')).toBeTruthy()
+    const main = document.querySelector('#main-content')
+    expect(main).toBeTruthy()
+    // The skip target must be programmatically focusable so focus actually lands there.
+    expect(main?.getAttribute('tabindex')).toBe('-1')
   })
 })

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 
 afterEach(cleanup)
 vi.mock('next/navigation', () => ({
@@ -44,10 +44,16 @@ describe('Navbar', () => {
     expect(screen.getByRole('button', { name: en.nav.menuToggle })).toBeTruthy()
   })
 
-  it('connects the mobile menu button to the collapsible menu region', () => {
+  it('connects the mobile menu button to the collapsible menu region only while it is open', () => {
     render(<Navbar locale="en" role="anon" t={en.nav} />)
     const button = screen.getByRole('button', { name: en.nav.menuToggle })
+    // Collapsed: not expanded, and no controlled region referenced (it isn't rendered yet).
     expect(button.getAttribute('aria-expanded')).toBe('false')
+    expect(button.getAttribute('aria-controls')).toBeNull()
+    // Expanded: the menu mounts and the button references its real id.
+    fireEvent.click(button)
+    expect(button.getAttribute('aria-expanded')).toBe('true')
     expect(button.getAttribute('aria-controls')).toBe('kinnso-mobile-menu')
+    expect(document.getElementById('kinnso-mobile-menu')).toBeTruthy()
   })
 })
