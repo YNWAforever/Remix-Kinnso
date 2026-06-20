@@ -43,4 +43,11 @@ describe('Navbar', () => {
     render(<Navbar locale="en" role="anon" t={en.nav} />)
     expect(screen.getByRole('button', { name: en.nav.menuToggle })).toBeTruthy()
   })
+
+  it('connects the mobile menu button to the collapsible menu region', () => {
+    render(<Navbar locale="en" role="anon" t={en.nav} />)
+    const button = screen.getByRole('button', { name: en.nav.menuToggle })
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+    expect(button.getAttribute('aria-controls')).toBe('kinnso-mobile-menu')
+  })
 })

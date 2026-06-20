@@ -39,4 +39,11 @@ describe('SiteChrome', () => {
     expect(screen.queryByRole('link', { name: en.nav.ctaApply })).toBeNull()
     expect(screen.queryByText(en.footer.tagline)).toBeNull()
   })
+
+  it('renders a skip link and stable main target on normal paths', () => {
+    renderAt('/en/articles')
+    const skip = screen.getByRole('link', { name: 'Skip to content' })
+    expect(skip.getAttribute('href')).toBe('#main-content')
+    expect(document.querySelector('#main-content')).toBeTruthy()
+  })
 })

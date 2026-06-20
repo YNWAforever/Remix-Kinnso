@@ -13,6 +13,7 @@ vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
 // app/layout.tsx calls next/font/google factories at module eval; they are not
 // callable under vitest (no Next SWC font transform). Stub them to {variable}.
 vi.mock('next/font/google', () => ({
+  Bricolage_Grotesque: () => ({ variable: 'font-bricolage' }),
   DM_Sans: () => ({ variable: 'font-dm-sans' }),
   JetBrains_Mono: () => ({ variable: 'font-jetbrains-mono' }),
 }))

@@ -14,33 +14,36 @@
 @theme {
   --color-orange: #F26A1F;
   --color-orange-dark: #C24E0E;
-  --color-amber: #F4A52A;
-  --color-cream: #FFF6EB;
-  --color-cream-2: #FFEFD9;
-  --color-ink: #1F1A14;
-  --color-muted: #7B7468;
+  --color-amber: #F4BD50;
+  --color-cream: #F8F1E6;
+  --color-cream-2: #EFE3D2;
+  --color-ink: #211B16;
+  --color-muted: #6D6257;
   --color-success: #2F8F5C;
   --color-danger: #D24A3B;
   --color-info: #2E6FB8;
 
-  --radius-card: 12px;
+  --radius-card: 8px;
+  --radius-ticket: 18px;
   --radius-chip: 8px;
   --radius-pill: 999px;
 
+  --font-display: var(--font-bricolage), var(--font-dm-sans), "WQY Zen Hei", sans-serif;
   --font-sans: var(--font-dm-sans), "WQY Zen Hei", sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
 
   /* kinnso-* utility aliases (ported components use the `kinnso-` namespace) */
   --color-kinnso-orange: #F26A1F;
   --color-kinnso-orangeDark: #C24E0E;
-  --color-kinnso-amber: #F4A52A;
-  --color-kinnso-cream: #FFF6EB;
-  --color-kinnso-cream2: #FFEFD9;
-  --color-kinnso-ink: #1F1A14;
-  --color-kinnso-muted: #7B7468;
+  --color-kinnso-amber: #F4BD50;
+  --color-kinnso-cream: #F8F1E6;
+  --color-kinnso-cream2: #EFE3D2;
+  --color-kinnso-ink: #211B16;
+  --color-kinnso-muted: #6D6257;
   --color-kinnso-green: #2F8F5C;
   --color-kinnso-red: #D24A3B;
   --color-kinnso-blue: #2E6FB8;
+  --color-kinnso-edge: #DED5C7;
 
   /* keyframe registrations (Tailwind v4 reads --animate-* from @theme) */
   --animate-marquee: marquee 40s linear infinite;
@@ -80,6 +83,15 @@
   to   { opacity: 1; transform: none; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
 @layer components {
   .k-container     { @apply mx-auto px-4 sm:px-6 max-w-[1320px]; }
   .k-card          { @apply bg-white rounded-card shadow-kinnso; }
@@ -104,6 +116,23 @@
     outline-offset: 2px;
     border-radius: 4px;
   }
+
+  .k-display      { font-family: var(--font-display); letter-spacing: -0.02em; }
+  .k-page-band    { @apply bg-kinnso-cream text-kinnso-ink; }
+  .k-ticket       { @apply rounded-ticket border border-kinnso-edge bg-white shadow-kinnso; }
+  .k-ticket-soft  { @apply rounded-ticket border border-kinnso-edge bg-kinnso-cream shadow-kinnso; }
+  .k-route-stamp  { @apply inline-flex w-fit items-center rounded-pill border border-kinnso-ink bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-kinnso-ink; }
+  .k-ticket-divider {
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--color-kinnso-edge) 0 8px, transparent 8px 14px);
+  }
+  .k-receipt-row  { @apply flex items-center justify-between gap-4 border-t border-dashed border-kinnso-edge py-3; }
+  .k-route-markers { @apply grid gap-2 text-xs font-bold uppercase tracking-wider text-kinnso-muted; }
+  .k-route-markers__rail { @apply flex items-center justify-between gap-3; }
+  .k-route-markers__dot { @apply h-2.5 w-2.5 rounded-full bg-kinnso-orange; }
+  .k-route-markers__dot:nth-child(2) { background: var(--color-kinnso-green); }
+  .k-route-markers__dot:nth-child(3) { background: var(--color-kinnso-amber); }
+  .k-route-markers__labels { @apply flex items-center justify-between gap-3; }
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
