@@ -16,14 +16,16 @@ const CityChip = ({ city, posts, flag, onClick, active, className }: Props) => (
     type="button"
     onClick={onClick}
     className={cn(
-      "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition",
-      active ? "bg-kinnso-orange text-white" : "bg-kinnso-cream2 text-kinnso-ink hover:bg-kinnso-amber/30",
+      "inline-flex items-center gap-1.5 rounded-pill border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] transition",
+      active
+        ? "border-kinnso-orange bg-kinnso-orange text-white"
+        : "border-kinnso-ink bg-white text-kinnso-ink hover:bg-kinnso-cream2",
       className
     )}
   >
     {flag && <span aria-hidden>{flag}</span>}
-    <span className="font-semibold">{city}</span>
-    {posts !== undefined && <span className="text-xs opacity-70">({posts})</span>}
+    <span>{city}</span>
+    {posts !== undefined && <span className="opacity-70">({posts})</span>}
   </button>
 );
 

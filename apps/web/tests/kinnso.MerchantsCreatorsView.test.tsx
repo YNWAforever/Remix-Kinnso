@@ -56,6 +56,11 @@ describe('MerchantsCreatorsView', () => {
     }
   })
 
+  it('renders with Market Passport ticket chrome', () => {
+    renderView()
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
+  })
+
   it('free tier: locks filters and shows the upgrade prompt', () => {
     renderView({ ...baseMerchant, tier: 'free' })
     const filterBtn = screen.getByRole('button', { name: new RegExp(en.merchants.filter) })

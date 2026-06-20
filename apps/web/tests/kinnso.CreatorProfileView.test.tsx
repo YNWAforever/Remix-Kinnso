@@ -66,4 +66,16 @@ describe('CreatorProfileView', () => {
     )
     expect(container.querySelector('article')?.className).not.toContain('k-container')
   })
+
+  it('renders creator hero inside a ticket card', () => {
+    const { container } = render(
+      <CreatorProfileView creator={creator} role="anon" locale="en" t={en.creatorProfile} />,
+    )
+    expect(container.querySelector('.k-ticket')).toBeTruthy()
+  })
+
+  it('shows a score label in the engagement band', () => {
+    render(<CreatorProfileView creator={creator} role="anon" locale="en" t={en.creatorProfile} />)
+    expect(screen.getAllByText(/score/i).length).toBeGreaterThan(0)
+  })
 })

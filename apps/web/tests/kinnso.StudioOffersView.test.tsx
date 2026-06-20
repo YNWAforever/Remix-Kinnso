@@ -34,6 +34,7 @@ describe('StudioOffersView', () => {
     expect(screen.getByText('Hotels affiliate')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: en.studioOffers.join }))
     expect(onJoin).toHaveBeenCalledWith('m1')
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 
   it('generates a partner link from an active participant and program URL', () => {

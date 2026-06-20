@@ -119,6 +119,7 @@
 
   .k-display      { font-family: var(--font-display); letter-spacing: -0.02em; }
   .k-page-band    { @apply bg-kinnso-cream text-kinnso-ink; }
+  .k-auth-card    { @apply mx-auto w-full max-w-sm; }
   .k-ticket       { @apply rounded-ticket border border-kinnso-edge bg-white shadow-kinnso; }
   .k-ticket-soft  { @apply rounded-ticket border border-kinnso-edge bg-kinnso-cream shadow-kinnso; }
   .k-route-stamp  { @apply inline-flex w-fit items-center rounded-pill border border-kinnso-ink bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-kinnso-ink; }

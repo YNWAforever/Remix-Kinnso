@@ -66,7 +66,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
   if (a.faqs.length) ld.push(faqJsonLd(a.faqs))
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
+    <main className="k-container py-8">
       <JsonLd data={ld} />
       <ViewPing url={url} />
 
@@ -79,7 +79,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
       </nav>
 
       <header className="mb-6">
-        <h1 className="text-3xl md:text-4xl font-bold text-ink">{a.translation.title}</h1>
+        <h1 className="k-display text-3xl md:text-4xl font-black text-kinnso-ink">{a.translation.title}</h1>
         {a.author && <p className="text-muted mt-2">{dict.article.by} {a.author.name}</p>}
       </header>
 

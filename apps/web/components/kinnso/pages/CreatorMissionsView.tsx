@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
+import { TicketCard } from '@/components/kinnso/MarketPassport'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export type CreatorMissionCard = {
@@ -62,7 +63,7 @@ export function CreatorMissionsView({
       <div className="mt-6 grid gap-4">
         {missions.map((mission) => {
           return (
-            <article key={mission.id} className="k-card p-5">
+            <TicketCard key={mission.id} as="article" className="p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0 space-y-2">
                   <h2 className="text-lg font-bold text-kinnso-ink">{mission.title}</h2>
@@ -85,7 +86,7 @@ export function CreatorMissionsView({
                   </button>
                 )}
               </div>
-            </article>
+            </TicketCard>
           )
         })}
       </div>

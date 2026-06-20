@@ -44,9 +44,9 @@ export default async function CategoryPage(
   })
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{dict.categories[category as UrlCategory]}</h1>
-      <p className="text-muted mb-6">{total} {dict.listing.resultsCount}</p>
+    <main className="k-container py-8">
+      <h1 className="k-display text-3xl font-black text-kinnso-ink mb-6">{dict.categories[category as UrlCategory]}</h1>
+      <p className="text-kinnso-muted mb-6">{total} {dict.listing.resultsCount}</p>
 
       {items.length === 0 ? (
         <p className="text-muted">{dict.listing.noResults}</p>

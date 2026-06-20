@@ -15,6 +15,7 @@ describe('GuideForm', () => {
     expect(screen.getByLabelText(en.studioGuides.summaryLabel, { exact: false })).toBeTruthy()
     expect(screen.getByRole('button', { name: en.studioGuides.saveDraft })).toBeTruthy()
     expect(screen.getByRole('button', { name: en.studioGuides.publish })).toBeTruthy()
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 
   it('shows a validation error and does not call onSubmit when title is blank', () => {

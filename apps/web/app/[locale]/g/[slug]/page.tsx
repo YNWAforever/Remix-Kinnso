@@ -6,6 +6,7 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getCreator, guides } from '@/lib/creator-mock'
 import { getGuideBySlug } from '@/lib/guides/queries'
+import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
 
 export function generateStaticParams() {
   // Seed (mock) guides stay statically prerendered; real guides resolve on
@@ -47,27 +48,39 @@ export default async function GuidePage({
     <article className="k-container py-8 md:py-12">
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
         <div
+          role="img"
           aria-label={guide.title}
           className="relative min-h-[360px] bg-cover bg-center"
-          role="img"
           style={{
-            backgroundImage: `linear-gradient(180deg, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.68)), url("${encodeURI(guide.cover)}")`,
+            backgroundImage: `url("${encodeURI(guide.cover)}")`,
           }}
         >
-          <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
-            <span className="k-pill bg-white/15 text-white backdrop-blur">{messages.creatorProfile.latestGuides}</span>
-            <h1 className="mt-4 max-w-3xl text-3xl font-black leading-tight md:text-5xl">{guide.title}</h1>
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-white/90">
+          {/* Gradient overlay for legibility */}
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/70" />
+
+          {/* RouteStamp – city/category signal, positioned top-left */}
+          <div className="absolute left-6 top-6 flex flex-wrap gap-2 sm:left-8">
+            <RouteStamp>{guide.city}</RouteStamp>
+          </div>
+
+          {/* TicketCard overlay – title, author, city, saves */}
+          <TicketCard className="absolute inset-x-4 bottom-4 p-5 sm:inset-x-6 sm:bottom-6 sm:p-7 md:inset-x-8 md:bottom-8">
+            <h1 className="max-w-3xl text-2xl font-black leading-tight text-kinnso-ink md:text-4xl">{guide.title}</h1>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-kinnso-muted">
               <span className="inline-flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4" aria-hidden="true" />
                 {guide.city}
               </span>
               <span className="inline-flex items-center gap-1 tabular-nums">
-                <Bookmark className="h-4 w-4" />
+                <Bookmark className="h-4 w-4" aria-hidden="true" />
                 {guide.saves.toLocaleString()}
               </span>
             </div>
-          </div>
+            <div className="mt-3">
+              <div className="text-sm font-black text-kinnso-ink">{authorName}</div>
+              <div className="k-mono mt-0.5 text-sm text-kinnso-muted">@{guide.creatorHandle}</div>
+            </div>
+          </TicketCard>
         </div>
       </section>
 

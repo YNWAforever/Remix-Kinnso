@@ -29,7 +29,7 @@ export const CreatorMatchCard: React.FC<Props> = ({ creator, saved, locale, onTo
   const briefHref = `/${locale}/merchants/post?creator=${encodeURIComponent(creator.handle)}`;
 
   return (
-    <article className="k-card overflow-hidden">
+    <article className="k-ticket overflow-hidden">
       <div className="grid gap-4 p-5 md:grid-cols-[200px_1fr_180px] md:gap-6">
         {/* Left */}
         <div className="flex items-start gap-3 md:flex-col md:items-start">

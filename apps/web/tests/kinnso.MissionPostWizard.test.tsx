@@ -7,6 +7,11 @@ import en from '@/lib/i18n/messages/en'
 afterEach(cleanup)
 
 describe('MissionPostWizard', () => {
+  it('renders with Market Passport ticket chrome', () => {
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={vi.fn()} />)
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
+  })
+
   it('shows coupon fields for coupon affiliate missions', () => {
     render(<MissionPostWizard locale="en" t={en.missions} onSubmit={vi.fn()} />)
     fireEvent.click(screen.getByRole('radio', { name: en.missions.typeCoupon }))

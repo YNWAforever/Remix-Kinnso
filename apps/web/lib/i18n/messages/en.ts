@@ -20,6 +20,8 @@ export interface Messages {
     noAccount: string
     errorInvalidCredentials: string
     errorEmailTaken: string
+    errorInvalidEmail: string
+    errorRateLimited: string
     errorGeneric: string
     creatorDashboard: string
     onboardingPlaceholder: string
@@ -308,7 +310,7 @@ export interface Messages {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
-    signIn: string; language: string; menuToggle: string
+    signIn: string; language: string; menuToggle: string; skipToContent: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
@@ -426,6 +428,8 @@ const messages: Messages = {
     noAccount: 'Don\'t have an account?',
     errorInvalidCredentials: 'Invalid email or password.',
     errorEmailTaken: 'An account with this email already exists.',
+    errorInvalidEmail: 'Enter a valid email address.',
+    errorRateLimited: 'Too many sign-up attempts. Please wait a minute and try again.',
     errorGeneric: 'Something went wrong. Please try again.',
     creatorDashboard: 'Creator Dashboard',
     onboardingPlaceholder: 'Onboarding wizard coming in Plan 4.',
@@ -711,7 +715,7 @@ const messages: Messages = {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
     linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
-    signIn: 'Sign in', language: 'Language', menuToggle: 'Menu',
+    signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },
   footer: {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
@@ -722,19 +726,30 @@ const messages: Messages = {
     rights: '© 2026 KINNSO. All rights reserved.',
   },
   home: {
-    heroPill: 'CREATOR PROGRAM 2026',
-    heroTitle: 'Turn every trip into a paid Travel Guide.',
-    heroSubtitle: 'KINNSO scans your socials, proves your travel authority, and matches you with missions from real merchants.',
+    heroPill: 'Creator route / HK -> JP -> TW',
+    heroTitle: 'Trips that pay their way.',
+    heroSubtitle: 'KINNSO scans your social route, proves your city authority, and matches you with missions that turn guides into income.',
     applyCta: 'Apply as Creator',
-    howHeading: 'How KINNSO works', howSub: 'From handle to first payout in days, not months.',
-    step1Title: 'Connect socials', step1Desc: 'Drop your IG / Threads / TikTok handles.',
-    step2Title: 'AI scans you', step2Desc: 'Travel posts classified, score computed, cities mapped.',
-    step3Title: 'Get qualified', step3Desc: 'Reach a Tier threshold and unlock the Studio.',
-    step4Title: 'Earn missions', step4Desc: 'Publish Guides, get paid via FPS or bank transfer.',
-    merchantWall: 'Trusted by partners',
-    featuredHeading: 'Featured creators this week', featuredSub: 'Real handles · scored by our AI Agent.', featuredSeeAll: 'See all',
-    travelersTitle: 'For Travelers', travelersDesc: 'Follow real creators, save Guides, book the exact same spots.', travelersCta: 'Explore Guides',
-    merchantsTitle: 'For Merchants', merchantsDesc: 'Post a mission. Pay only when a real creator publishes and drives clicks.', merchantsCta: 'Post a Mission',
+    howHeading: 'Your route to paid travel work',
+    howSub: 'A real sequence: scan, qualify, match, publish, earn.',
+    step1Title: 'Scan a handle',
+    step1Desc: 'Connect IG, Threads, TikTok, or YouTube signals.',
+    step2Title: 'Prove your cities',
+    step2Desc: 'KINNSO maps travel posts, places, and audience fit.',
+    step3Title: 'Match with missions',
+    step3Desc: 'Merchants send briefs based on your route and score.',
+    step4Title: 'Publish and earn',
+    step4Desc: 'Turn guides, partner links, and briefs into payouts.',
+    merchantWall: 'Partner stamps',
+    featuredHeading: 'Creator passes this week',
+    featuredSub: 'Real handles, city proof, and score signals.',
+    featuredSeeAll: 'See all',
+    travelersTitle: 'For Travelers',
+    travelersDesc: 'Follow real creators, save guide tickets, and book the exact same spots.',
+    travelersCta: 'Explore Guides',
+    merchantsTitle: 'For Merchants',
+    merchantsDesc: 'Issue a mission ticket and match with creators who already own the route.',
+    merchantsCta: 'Post a Mission',
   },
   comingSoon: {
     heading: 'Coming soon',

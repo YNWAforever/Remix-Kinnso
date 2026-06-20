@@ -117,7 +117,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
         <p className="mt-1 text-sm text-kinnso-muted">{t.postSub}</p>
       </div>
 
-      <form className="mt-8 grid max-w-3xl gap-6" onSubmit={(event) => event.preventDefault()}>
+      <form className="k-ticket mt-8 grid max-w-3xl gap-6 p-6" onSubmit={(event) => event.preventDefault()}>
         <fieldset className="grid gap-3">
           <legend className="sr-only">{t.postHeading}</legend>
           <div className="flex flex-wrap gap-2">

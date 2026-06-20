@@ -30,6 +30,11 @@ describe('CreatorMatchCard', () => {
     expect(screen.getAllByText(String(match.score)).length).toBeGreaterThan(0)
   })
 
+  it('renders with Market Passport ticket chrome', () => {
+    render(<CreatorMatchCard creator={creator} saved={false} locale="en" onToggleSave={vi.fn()} onQuickView={vi.fn()} />)
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
+  })
+
   it('expands the detail panel when "Show details" is clicked', () => {
     render(<CreatorMatchCard creator={creator} saved={false} locale="en" onToggleSave={vi.fn()} onQuickView={vi.fn()} />)
     // Collapsed: the "Top locations" detail heading is absent.

@@ -55,6 +55,23 @@ describe('StudioScanView — demo mode', () => {
     expect(screen.getByText(en.studio.engagementOverTime)).toBeTruthy()
     expect(screen.getByText(en.studio.dnaCoreHeading)).toBeTruthy()
     expect(screen.getByText(en.studio.matchedForYou)).toBeTruthy()
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
+  })
+
+  it('intro screen has a labelled instagram input', () => {
+    render(
+      <StudioScanView
+        locale="en"
+        mode="demo"
+        initialPhase="intro"
+        identity={buildDemoIdentity(metrics, '2026-06-16T00:00:00Z')}
+        dna={sampleDna}
+        metrics={metrics}
+        isSample={false}
+        t={en.studio}
+      />,
+    )
+    expect(screen.getByLabelText(en.studio.instagram)).toBeTruthy()
   })
 
   it('shows the mock identity and the publish/share footer; no sample note', () => {

@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { GuideInput } from '@/lib/guides/types'
 import { validateGuideInput } from '@/lib/guides/validation'
+import { TicketCard } from '@/components/kinnso/MarketPassport'
 
 type SubmitResult = void | { ok: true } | { ok: false; errors?: Record<string, string[]> }
 
@@ -95,7 +96,7 @@ export function GuideForm({ t, mode, initial, backHref, onSubmit }: Props) {
           {mode === 'new' ? t.formNewHeading : t.formEditHeading}
         </h1>
 
-        <div className="mt-8 grid gap-5">
+        <TicketCard className="mt-8 grid gap-5 p-6">
           <label htmlFor="guide-title" className="grid gap-1.5">
             <span className="text-sm font-bold text-kinnso-ink">{t.titleLabel}{requiredMark}</span>
             <input
@@ -199,7 +200,7 @@ export function GuideForm({ t, mode, initial, backHref, onSubmit }: Props) {
               {pending === 'publish' ? t.saving : t.publish}
             </button>
           </div>
-        </div>
+        </TicketCard>
       </section>
     </main>
   )

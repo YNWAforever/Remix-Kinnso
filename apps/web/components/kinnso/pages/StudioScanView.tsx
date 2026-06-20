@@ -1,5 +1,6 @@
 'use client'
 import React, { useMemo, useState } from "react";
+import { TicketCard } from "@/components/kinnso/MarketPassport";
 import { useRouter } from "next/navigation";
 import { Loader2, Share2, ArrowRight, Lock } from "lucide-react";
 import BearMascot from "@/components/kinnso/BearMascot";
@@ -53,6 +54,8 @@ export type StudioMode = "demo" | "real";
 export interface StudioScanViewProps {
   locale: Locale;
   mode: StudioMode;
+  /** Override the initial scan phase — used in tests to reach the intro screen. Defaults to "done". */
+  initialPhase?: "intro" | "scanning" | "done";
   identity: StudioIdentity;
   dna: Dna;
   metrics: ExtendedCreator;
@@ -60,7 +63,7 @@ export interface StudioScanViewProps {
   t: Messages["studio"];
 }
 
-export function StudioScanView({ locale, mode, identity, dna, metrics, isSample, t }: StudioScanViewProps) {
+export function StudioScanView({ locale, mode, initialPhase = "done", identity, dna, metrics, isSample, t }: StudioScanViewProps) {
   const router = useRouter();
   const isDemo = mode === "demo";
   const studioMissionsHref = `/${locale}/studio/missions`;
@@ -69,7 +72,8 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
   // Default to "done" so the report renders synchronously for tests and for
   // hosts that pass an already-scanned creator. The fake intro/scanning branch
   // is reachable only via the demo-only Start scan / Rescan buttons.
-  const [phase, setPhase] = useState<"intro" | "scanning" | "done">("done");
+  // Pass initialPhase="intro" in tests to reach the intro input screen.
+  const [phase, setPhase] = useState<"intro" | "scanning" | "done">(initialPhase);
   const [doneSteps, setDoneSteps] = useState<number>(0);
   const [igInput, setIgInput] = useState(metrics.handle);
   const [selectedCity, setSelectedCity] = useState<CreatorLocation | null>(null);
@@ -124,19 +128,27 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
 
           {phase === "intro" && (
             <div className="mt-8 space-y-3">
-              <label className="block">
-                <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-kinnso-muted">{t.instagram}</span>
+              <div>
+                <label htmlFor="studio-ig-handle" className="mb-1 block text-xs font-bold uppercase tracking-wider text-kinnso-muted">{t.instagram}</label>
                 <div className="flex items-center rounded-pill bg-white ring-1 ring-kinnso-cream2 focus-within:ring-kinnso-orange">
-                  <span className="k-mono pl-4 pr-1 text-kinnso-muted">@</span>
-                  <input value={igInput} onChange={(e) => setIgInput(e.target.value)} className="k-mono flex-1 bg-transparent py-2.5 pr-4 text-sm outline-none" placeholder={t.handlePlaceholder} />
+                  <span aria-hidden="true" className="k-mono pl-4 pr-1 text-kinnso-muted">@</span>
+                  <input
+                    id="studio-ig-handle"
+                    name="instagramHandle"
+                    autoComplete="username"
+                    value={igInput}
+                    onChange={(e) => setIgInput(e.target.value)}
+                    className="k-mono flex-1 bg-transparent py-2.5 pr-4 text-sm outline-none"
+                    placeholder={t.handlePlaceholder}
+                  />
                 </div>
-              </label>
+              </div>
               <button type="button" onClick={startScan} className="k-btn-primary w-full">{t.startScan}</button>
             </div>
           )}
 
           {phase === "scanning" && (
-            <>
+            <div role="status" aria-live="polite">
               <div className="mt-8 h-1.5 overflow-hidden rounded-pill bg-kinnso-cream2">
                 <div className="h-full bg-kinnso-orange transition-all duration-500" style={{ width: `${(doneSteps / SCAN_STEPS.length) * 100}%` }} />
               </div>
@@ -147,9 +159,9 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
                   return (
                     <li key={i} className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        {done ? <span className="grid h-5 w-5 place-items-center rounded-full bg-kinnso-green text-white">✓</span>
-                              : active ? <Loader2 className="h-5 w-5 animate-spin text-kinnso-orange" />
-                              : <span className="h-5 w-5 rounded-full bg-kinnso-cream2" />}
+                        {done ? <span aria-hidden="true" className="grid h-5 w-5 place-items-center rounded-full bg-kinnso-green text-white">✓</span>
+                              : active ? <Loader2 aria-hidden="true" className="h-5 w-5 animate-spin text-kinnso-orange" />
+                              : <span aria-hidden="true" className="h-5 w-5 rounded-full bg-kinnso-cream2" />}
                         <span className={done ? "text-kinnso-ink" : "text-kinnso-muted"}>{s.label}</span>
                       </div>
                       {done && <span className="k-mono text-xs text-kinnso-muted">{(s.delay / 1000).toFixed(0)}s</span>}
@@ -157,7 +169,7 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
                   );
                 })}
               </ul>
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -177,7 +189,7 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
           </section>
 
           {/* 2 · Identity card */}
-          <section className="k-card p-5">
+          <TicketCard as="section" className="p-5">
             <div className="flex items-start gap-4">
               {isDemo ? (
                 <img src={metrics.avatar} alt={identity.name} className="h-20 w-20 rounded-full object-cover ring-2 ring-kinnso-cream2" />
@@ -213,13 +225,13 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
                 </div>
               )}
             </div>
-          </section>
+          </TicketCard>
 
           {/* 3 · Your Creator DNA (real or sample-shaped Dna) */}
           <DnaCorePanel dna={dna} t={t} />
 
           {/* 4 · Score ring + tier */}
-          <section className="k-card p-6 text-center">
+          <TicketCard as="section" className="p-6 text-center">
             <div className="flex items-center justify-center">{sampleChip}</div>
             <div className="mt-1 flex justify-center"><ScoreRing score={metrics.score} size="lg" showOutOf /></div>
             <div className="mt-3"><ScoreDeltaChip delta={delta} /></div>
@@ -235,11 +247,11 @@ export function StudioScanView({ locale, mode, identity, dna, metrics, isSample,
               {TIER_ORDER.map((tier, i) => (
                 <React.Fragment key={tier}>
                   <span className={`rounded-pill px-2.5 py-1 text-[11px] font-semibold ${i === tierIdx ? "bg-kinnso-orange text-white" : "bg-kinnso-cream2 text-kinnso-muted"}`}>{tier.charAt(0).toUpperCase() + tier.slice(1)}</span>
-                  {i < TIER_ORDER.length - 1 && <span className="text-kinnso-muted">▸</span>}
+                  {i < TIER_ORDER.length - 1 && <span aria-hidden="true" className="text-kinnso-muted">▸</span>}
                 </React.Fragment>
               ))}
             </div>
-          </section>
+          </TicketCard>
 
           {/* 5 · Score breakdown */}
           <ScoreBreakdownPanel breakdown={breakdown} />

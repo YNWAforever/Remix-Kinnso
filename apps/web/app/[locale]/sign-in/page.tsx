@@ -30,27 +30,31 @@ export default async function SignInPage({
   if (user) redirect(`/${locale}/creator`)
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
-      <h1 className="text-2xl font-bold text-ink">{dict.auth.signIn}</h1>
+    <main className="k-page-band flex min-h-screen flex-col items-center justify-center p-6">
+      <div className="k-auth-card k-ticket w-full max-w-sm p-8">
+        <h1 className="k-display text-2xl font-bold text-kinnso-ink">{dict.auth.signIn}</h1>
 
-      <SignInForm
-        locale={locale as Locale}
-        labels={{
-          email: dict.auth.email,
-          password: dict.auth.password,
-          submit: dict.auth.signIn,
-        }}
-        errorInvalidCredentials={dict.auth.errorInvalidCredentials}
-        errorGeneric={dict.auth.errorGeneric}
-        serverError={serverError}
-      />
+        <div className="mt-6">
+          <SignInForm
+            locale={locale as Locale}
+            labels={{
+              email: dict.auth.email,
+              password: dict.auth.password,
+              submit: dict.auth.signIn,
+            }}
+            errorInvalidCredentials={dict.auth.errorInvalidCredentials}
+            errorGeneric={dict.auth.errorGeneric}
+            serverError={serverError}
+          />
+        </div>
 
-      <p className="text-sm text-ink/70">
-        {dict.auth.noAccount}{' '}
-        <Link href={`/${locale}/sign-up`} className="underline text-ink">
-          {dict.auth.signUp}
-        </Link>
-      </p>
+        <p className="mt-4 text-sm text-kinnso-muted">
+          {dict.auth.noAccount}{' '}
+          <Link href={`/${locale}/sign-up`} className="underline text-kinnso-ink">
+            {dict.auth.signUp}
+          </Link>
+        </p>
+      </div>
     </main>
   )
 }

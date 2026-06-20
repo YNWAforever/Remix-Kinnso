@@ -24,5 +24,6 @@ describe('StudioEarningsView', () => {
     expect(screen.getByText('USD')).toBeTruthy()
     expect(screen.getByText('Hotel program')).toBeTruthy()
     expect(screen.getAllByText(en.studioEarnings.paid).length).toBeGreaterThan(0)
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 })

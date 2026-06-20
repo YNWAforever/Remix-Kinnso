@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, FileText, Send, Users } from 'lucide-react'
 import MissionCard from '@/components/kinnso/MissionCard'
+import { RouteStamp, TicketCard, TicketDivider } from '@/components/kinnso/MarketPassport'
 import { missions } from '@/lib/creator-mock'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -8,24 +9,23 @@ import type { Messages } from '@/lib/i18n/messages/en'
 export function MerchantsLandingView({ locale, t }: { locale: Locale; t: Messages['merchantsLanding'] }) {
   const p = (path: string) => `/${locale}${path}`
   const steps = [
-    { n: 1, title: t.step1Title, desc: t.step1Desc, icon: <FileText className="h-5 w-5" /> },
-    { n: 2, title: t.step2Title, desc: t.step2Desc, icon: <Users className="h-5 w-5" /> },
-    { n: 3, title: t.step3Title, desc: t.step3Desc, icon: <Send className="h-5 w-5" /> },
+    { n: 1, title: t.step1Title, desc: t.step1Desc, icon: <FileText aria-hidden="true" className="h-5 w-5" /> },
+    { n: 2, title: t.step2Title, desc: t.step2Desc, icon: <Users aria-hidden="true" className="h-5 w-5" /> },
+    { n: 3, title: t.step3Title, desc: t.step3Desc, icon: <Send aria-hidden="true" className="h-5 w-5" /> },
   ]
   return (
     <main>
-      {/* HERO */}
-      <section className="relative isolate overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-kinnso-ink via-kinnso-ink to-kinnso-orangeDark" />
-        <div className="k-container py-20 text-white md:py-24">
-          <span className="k-pill bg-white/15 text-white backdrop-blur">{t.heroPill}</span>
-          <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[1.05] tracking-tight md:text-6xl">{t.heroTitle}</h1>
-          <p className="mt-5 max-w-xl text-lg text-white/90">{t.heroSubtitle}</p>
+      {/* HERO — paper/ink mission-ticket composition */}
+      <section className="k-page-band py-20 md:py-28">
+        <div className="k-container">
+          <RouteStamp>{t.heroPill}</RouteStamp>
+          <h1 className="k-display mt-4 max-w-3xl">{t.heroTitle}</h1>
+          <p className="mt-5 max-w-xl text-lg text-kinnso-muted">{t.heroSubtitle}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={p('/merchants/post')} className="k-btn-primary inline-flex bg-white text-kinnso-ink hover:bg-white/90">
-              {t.postCta} <ArrowRight className="ml-2 h-4 w-4" />
+            <Link href={p('/merchants/post')} className="k-btn-primary inline-flex">
+              {t.postCta} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" />
             </Link>
-            <Link href={p('/merchants/creators')} className="k-btn-primary inline-flex bg-white/10 text-white hover:bg-white/20">
+            <Link href={p('/merchants/creators')} className="k-btn-ghost inline-flex">
               {t.browseCta}
             </Link>
           </div>
@@ -36,18 +36,21 @@ export function MerchantsLandingView({ locale, t }: { locale: Locale; t: Message
       <section className="k-container py-16">
         <h2 className="k-section-title text-center">{t.howHeading}</h2>
         <p className="mt-2 text-center text-kinnso-muted">{t.howSub}</p>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <ol className="mt-10 grid gap-4 md:grid-cols-3" aria-label={t.howHeading}>
           {steps.map((s) => (
-            <div key={s.n} className="k-card p-5">
-              <div className="flex items-center justify-between">
-                <span className="k-mono text-3xl font-black text-kinnso-orange">0{s.n}</span>
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orange">{s.icon}</span>
-              </div>
-              <h3 className="mt-3 text-lg font-bold text-kinnso-ink">{s.title}</h3>
-              <p className="mt-1 text-sm text-kinnso-muted">{s.desc}</p>
-            </div>
+            <li key={s.n}>
+              <TicketCard className="h-full p-5">
+                <div className="flex items-center justify-between">
+                  <span className="k-mono text-3xl font-black text-kinnso-orange">0{s.n}</span>
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orange">{s.icon}</span>
+                </div>
+                <TicketDivider className="my-3" />
+                <h3 className="text-lg font-bold text-kinnso-ink">{s.title}</h3>
+                <p className="mt-1 text-sm text-kinnso-muted">{s.desc}</p>
+              </TicketCard>
+            </li>
           ))}
-        </div>
+        </ol>
       </section>
 
       {/* SAMPLE MISSIONS */}
@@ -63,11 +66,11 @@ export function MerchantsLandingView({ locale, t }: { locale: Locale; t: Message
 
       {/* CTA */}
       <section className="k-container pb-20">
-        <div className="k-card bg-kinnso-cream2 p-8 text-center">
+        <TicketCard className="p-8 text-center">
           <h2 className="text-2xl font-black text-kinnso-ink">{t.ctaTitle}</h2>
           <p className="mt-2 text-kinnso-muted">{t.ctaDesc}</p>
-          <Link href={p('/merchants/post')} className="k-btn-primary mt-5 inline-flex">{t.ctaButton} <ArrowRight className="ml-2 h-4 w-4" /></Link>
-        </div>
+          <Link href={p('/merchants/post')} className="k-btn-primary mt-5 inline-flex">{t.ctaButton} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" /></Link>
+        </TicketCard>
       </section>
     </main>
   )

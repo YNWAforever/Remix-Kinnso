@@ -91,7 +91,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
             <h1 className="text-3xl font-black text-kinnso-ink md:text-4xl">{t.heading}</h1>
             <p className="mt-1 text-sm text-kinnso-muted">{t.sub}</p>
           </div>
-          <div className="rounded-lg bg-kinnso-cream2 px-4 py-2 text-xs">
+          <div className="k-ticket px-4 py-2 text-xs">
             <div className="text-kinnso-muted">{t.yourProfile}</div>
             <div className="font-semibold text-kinnso-ink">{merchant.name} · {merchant.city} · {merchant.category}</div>
             <div className="mt-2 flex gap-2 text-xs">

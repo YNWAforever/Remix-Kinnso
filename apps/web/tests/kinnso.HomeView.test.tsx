@@ -12,7 +12,9 @@ import en from '@/lib/i18n/messages/en'
 describe('HomeView', () => {
   it('renders hero, how-it-works, a featured creator, and locale-correct CTAs', () => {
     render(<HomeView locale="en" t={en.home} />)
-    expect(screen.getByRole('heading', { level: 1, name: en.home.heroTitle })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Trips that pay their way.' })).toBeTruthy()
+    expect(screen.getByText('Creator route / HK -> JP -> TW')).toBeTruthy()
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
     expect(screen.getByText(en.home.howHeading)).toBeTruthy()
     expect(screen.getByText(en.home.step1Title)).toBeTruthy()
     // Featured carousel: a known mock creator + locale-prefixed link
