@@ -64,13 +64,22 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
           <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
         </div>
 
-        <button className="md:hidden" onClick={() => setOpen((v) => !v)} aria-label={t.menuToggle}>
-          {open ? <X /> : <Menu />}
+        <button
+          type="button"
+          className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange md:hidden"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={t.menuToggle}
+          aria-expanded={open}
+          // Only reference the menu region while it is actually in the DOM
+          // (it mounts on open); pointing aria-controls at an absent element is an ARIA error.
+          aria-controls={open ? "kinnso-mobile-menu" : undefined}
+        >
+          {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
         </button>
       </div>
 
       {open && (
-        <div className="border-t border-kinnso-cream2 bg-kinnso-cream md:hidden">
+        <div id="kinnso-mobile-menu" className="border-t border-kinnso-cream2 bg-kinnso-cream md:hidden">
           <div className="k-container flex flex-col gap-1 py-3">
             {anchors.map((a) => (
               <Link key={a.to} href={p(a.to)} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-semibold text-kinnso-ink hover:bg-kinnso-cream2">
