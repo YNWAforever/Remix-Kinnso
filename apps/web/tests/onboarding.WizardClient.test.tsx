@@ -7,6 +7,13 @@ import type { Dna } from '@kinnso/scan'
 
 // next/navigation router stub
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
+// Supabase browser client stub — backs the review step's client-side draft pull.
+const { maybeSingleMock } = vi.hoisted(() => ({ maybeSingleMock: vi.fn() }))
+vi.mock('@/lib/supabase/client', () => ({
+  createSupabaseBrowserClient: () => ({
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: maybeSingleMock }) }) }),
+  }),
+}))
 // Stub the leaf step components so this test only asserts ORCHESTRATION (which step renders).
 vi.mock('@/components/onboarding/HandlesStep', () => ({
   HandlesStep: () => <div data-testid="step-handles" />,
@@ -58,6 +65,14 @@ describe('WizardClient initial step', () => {
   it("renders review for initialStep='review'", () => {
     render(<WizardClient {...base()} initialStep="review" draft={dna} />)
     expect(screen.getByTestId('step-review')).toBeTruthy()
+  })
+  it("recovers in review when the server draft is missing by fetching it client-side", async () => {
+    // Reproduces the onboarding e2e failure: scan reached 'ready' but the refreshed
+    // server snapshot carried no ai_draft, so the review step never appeared.
+    maybeSingleMock.mockResolvedValue({ data: { ai_draft: dna }, error: null })
+    render(<WizardClient {...base()} initialStep="review" draft={null} />)
+    expect(await screen.findByTestId('step-review')).toBeTruthy()
+    expect(maybeSingleMock).toHaveBeenCalled()
   })
   it("renders readback for initialStep='done'", () => {
     render(<WizardClient {...base()} initialStep="done" final={dna} />)
