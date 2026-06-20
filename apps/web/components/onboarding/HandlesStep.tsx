@@ -158,6 +158,15 @@ export function HandlesStep({
                   placeholder={t.placeholder}
                   value={row.raw}
                   onChange={(e) => updateRow(row.key, { raw: e.target.value })}
+                  onKeyDown={(e) => {
+                    // Pressing Enter in a handle field is the natural way to submit;
+                    // without this it does nothing (no enclosing <form>), which reads
+                    // as "no response after typing". Only fire when a run is allowed.
+                    if (e.key === 'Enter' && canRun) {
+                      e.preventDefault()
+                      void run()
+                    }
+                  }}
                 />
                 <button
                   type="button"

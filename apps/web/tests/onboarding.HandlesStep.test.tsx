@@ -73,6 +73,36 @@ describe('HandlesStep', () => {
     )
   })
 
+  it('runs on Enter in the handle field (no dead "type then nothing" state)', async () => {
+    const onRun = vi.fn()
+    renderStep(onRun)
+    const input = screen.getAllByPlaceholderText(dict.placeholder)[0]
+    fireEvent.change(input, { target: { value: 'travel.with.pang' } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+    await waitFor(() => expect(onRun).toHaveBeenCalledTimes(1))
+    expect(upsert).toHaveBeenCalledWith(
+      [
+        {
+          creator_id: 'creator-1',
+          platform: 'instagram',
+          handle: 'travel.with.pang',
+          url: 'https://www.instagram.com/travel.with.pang/',
+        },
+      ],
+      { onConflict: 'creator_id,platform' },
+    )
+  })
+
+  it('does NOT run on Enter when the handle is invalid', () => {
+    const onRun = vi.fn()
+    renderStep(onRun)
+    const input = screen.getAllByPlaceholderText(dict.placeholder)[0]
+    fireEvent.change(input, { target: { value: 'bad handle!' } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+    expect(onRun).not.toHaveBeenCalled()
+    expect(upsert).not.toHaveBeenCalled()
+  })
+
   it('flags a duplicate platform and keeps Run disabled', () => {
     renderStep()
     fireEvent.change(screen.getAllByPlaceholderText(dict.placeholder)[0], {
