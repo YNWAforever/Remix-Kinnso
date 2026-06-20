@@ -58,6 +58,7 @@ export interface Messages {
       rateLimited: string
       reauth: string
       error: string
+      unconfigured: string
       continue: string
     }
     signOut: string
@@ -466,6 +467,7 @@ const messages: Messages = {
       rateLimited: "You've scanned too recently. Please try again later.",
       reauth: 'Your session expired. Please sign in again.',
       error: 'Something went wrong starting the scan. Please try again.',
+      unconfigured: 'Scanning is temporarily unavailable. Please try again later.',
       continue: 'Continue',
     },
     signOut: 'Sign out',

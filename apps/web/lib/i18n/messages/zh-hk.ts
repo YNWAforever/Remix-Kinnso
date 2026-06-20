@@ -60,6 +60,7 @@ const messages: Messages = {
       rateLimited: '你最近已掃描過，請稍後再試。',
       reauth: '登入逾時，請重新登入。',
       error: '開始掃描時發生錯誤，請再試一次。',
+      unconfigured: '掃描暫時無法使用，請稍後再試。',
       continue: '繼續',
     },
     signOut: '登出',

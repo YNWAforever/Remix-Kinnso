@@ -17,7 +17,7 @@ const PHASE_KEY: Record<JobStatus, keyof ProgressDict> = {
 }
 const STATE_KEY = { pending: 'statePending', ok: 'stateOk', failed: 'stateFailed' } as const
 
-type Notice = 'none' | 'rateLimited' | 'reauth' | 'error'
+type Notice = 'none' | 'rateLimited' | 'reauth' | 'error' | 'unconfigured'
 
 async function bearer(): Promise<string | null> {
   const supabase = createSupabaseBrowserClient()
@@ -61,12 +61,27 @@ export function LiveProgress({
 
   // POST a fresh scan to the worker; returns the jobId or sets a notice.
   const startScan = useCallback(async (path: string): Promise<string | null> => {
+    // The scan worker runs as a separate service (Railway); the web app reaches
+    // it via NEXT_PUBLIC_SCAN_URL, inlined at build time. If it's missing or not
+    // an absolute URL, an empty value would make fetch() POST to the web app's own
+    // origin (e.g. `/scan`) — a silent 404/redirect that strands the wizard. Fail
+    // loudly instead of pretending to start a scan.
+    const base = process.env.NEXT_PUBLIC_SCAN_URL?.trim()
+    if (!base || !/^https?:\/\//i.test(base)) {
+      console.error(
+        '[scan] NEXT_PUBLIC_SCAN_URL is not configured (got %o) — cannot start scan. ' +
+          'Point it at the deployed scan worker and redeploy the web app.',
+        process.env.NEXT_PUBLIC_SCAN_URL,
+      )
+      setNotice('unconfigured')
+      return null
+    }
     const token = await bearer()
     if (!token) {
       setNotice('reauth')
       return null
     }
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SCAN_URL}${path}`, {
+    const res = await fetch(`${base}${path}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -182,6 +197,7 @@ export function LiveProgress({
       {notice === 'rateLimited' ? <p className="text-sm text-amber-600">{t.rateLimited}</p> : null}
       {notice === 'reauth' ? <p className="text-sm text-red-600">{t.reauth}</p> : null}
       {notice === 'error' ? <p className="text-sm text-red-600">{t.error}</p> : null}
+      {notice === 'unconfigured' ? <p className="text-sm text-red-600">{t.unconfigured}</p> : null}
 
       {status === 'failed' ? (
         <button

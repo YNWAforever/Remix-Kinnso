@@ -107,6 +107,28 @@ describe('LiveProgress (subscribe-after-terminal reconcile)', () => {
   })
 })
 
+describe('LiveProgress (unconfigured scan URL)', () => {
+  it('does not POST and shows the unconfigured notice when NEXT_PUBLIC_SCAN_URL is empty', async () => {
+    process.env.NEXT_PUBLIC_SCAN_URL = ''
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    render(<LiveProgress creatorId="c1" jobId={null} platforms={['instagram']} t={t} onReady={vi.fn()} />)
+    await waitFor(() => expect(screen.getByText(t.unconfigured)).toBeTruthy())
+    // Critically: it never POSTs to the web app's own origin.
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    expect(errSpy).toHaveBeenCalled()
+    errSpy.mockRestore()
+  })
+
+  it('does not POST when NEXT_PUBLIC_SCAN_URL is a non-absolute (relative) value', async () => {
+    process.env.NEXT_PUBLIC_SCAN_URL = '/scan-proxy'
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    render(<LiveProgress creatorId="c1" jobId={null} platforms={['instagram']} t={t} onReady={vi.fn()} />)
+    await waitFor(() => expect(screen.getByText(t.unconfigured)).toBeTruthy())
+    expect(globalThis.fetch).not.toHaveBeenCalled()
+    errSpy.mockRestore()
+  })
+})
+
 describe('LiveProgress (429 + retry)', () => {
   it('shows the rate-limit message on 429', async () => {
     ;(globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({

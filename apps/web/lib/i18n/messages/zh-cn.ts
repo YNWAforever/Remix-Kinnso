@@ -60,6 +60,7 @@ const messages: Messages = {
       rateLimited: '你最近已扫描过，请稍后再试。',
       reauth: '登录已过期，请重新登录。',
       error: '开始扫描时出错，请重试。',
+      unconfigured: '扫描暂时不可用，请稍后再试。',
       continue: '继续',
     },
     signOut: '退出登录',

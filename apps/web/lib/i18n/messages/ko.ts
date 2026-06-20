@@ -60,6 +60,7 @@ const messages: Messages = {
       rateLimited: '최근에 스캔했습니다. 나중에 다시 시도하세요.',
       reauth: '세션이 만료되었습니다. 다시 로그인하세요.',
       error: '스캔을 시작하는 중 오류가 발생했습니다. 다시 시도하세요.',
+      unconfigured: '스캔을 현재 사용할 수 없습니다. 잠시 후 다시 시도하세요.',
       continue: '계속',
     },
     signOut: '로그아웃',
