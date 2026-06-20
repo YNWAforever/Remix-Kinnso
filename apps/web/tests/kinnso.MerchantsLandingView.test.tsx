@@ -15,5 +15,6 @@ describe('MerchantsLandingView', () => {
     const links = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
     expect(links).toContain('/en/merchants/post')
     expect(links).toContain('/en/merchants/creators')
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 })

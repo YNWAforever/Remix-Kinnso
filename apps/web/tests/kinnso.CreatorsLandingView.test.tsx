@@ -13,5 +13,6 @@ describe('CreatorsLandingView', () => {
     expect(screen.getByText(en.creatorsLanding.step1Title)).toBeTruthy()
     expect(screen.getByText(en.creatorsLanding.step4Title)).toBeTruthy()
     expect(screen.getAllByRole('link').some((a) => a.getAttribute('href') === '/en/sign-up')).toBe(true)
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 })

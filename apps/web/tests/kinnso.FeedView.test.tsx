@@ -24,6 +24,7 @@ describe('FeedView', () => {
     expect(screen.getByText('@mei')).toBeTruthy()
     expect(screen.getByText(/1,234 saves/)).toBeTruthy()
     expect(screen.getByRole('link').getAttribute('href')).toBe('/en/g/tokyo-eats')
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 
   it('shows the empty state when there are no items', () => {

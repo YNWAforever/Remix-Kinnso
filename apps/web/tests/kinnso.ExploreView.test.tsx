@@ -15,5 +15,6 @@ describe('ExploreView', () => {
     expect(
       screen.getAllByRole('link').some((a) => a.getAttribute('href') === `/en/g/${guides[0].slug}`),
     ).toBe(true)
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 })
