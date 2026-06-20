@@ -40,6 +40,8 @@ describe('SiteChrome', () => {
     expect(skip.getAttribute('href')).toBe('#main-content')
     expect(main).toBeTruthy()
     expect(main?.classList.contains('scroll-mt-16')).toBe(true)
+    // The skip target must be programmatically focusable so focus actually lands there.
+    expect(main?.getAttribute('tabindex')).toBe('-1')
   })
 
   it.each(['/en/sign-in', '/en/sign-up', '/en/creator'])('hides chrome on %s', (path) => {
