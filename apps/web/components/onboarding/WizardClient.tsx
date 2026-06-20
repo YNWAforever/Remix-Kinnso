@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import type { Dna } from '@kinnso/scan'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
@@ -35,8 +36,46 @@ export function WizardClient(props: WizardClientProps) {
   const { creatorId, locale, handles, latestJobId, draft, final, thin, messages } = props
   const router = useRouter()
   const [step, setStep] = useState<Step>(props.initialStep)
+  // Client-fetched fallback for the AI draft. The server snapshot is the primary
+  // source, but `router.refresh()` can lag or serve a cached snapshot under the
+  // App Router — so `effectiveDraft` lets the review step recover on its own.
+  const [clientDraft, setClientDraft] = useState<Dna | null>(null)
+  const effectiveDraft = draft ?? clientDraft
 
   const onb = messages.onboarding
+
+  // Resilience: once we're on the review step but no draft has arrived, pull it
+  // directly from creator_dna (owner RLS) until it appears. Without this, a
+  // missed/stale refresh after a successful scan strands the creator on the
+  // "analysis ready" line forever — the failure the e2e onboarding journey hit.
+  useEffect(() => {
+    if (step !== 'review' || effectiveDraft) return
+    let cancelled = false
+    const supabase = createSupabaseBrowserClient()
+    const pull = async (): Promise<boolean> => {
+      const { data } = await supabase
+        .from('creator_dna')
+        .select('ai_draft')
+        .eq('creator_id', creatorId)
+        .maybeSingle()
+      const d = (data?.ai_draft ?? null) as Dna | null
+      if (d && !cancelled) {
+        setClientDraft(d)
+        return true
+      }
+      return false
+    }
+    void pull()
+    const timer = setInterval(() => {
+      void pull().then((got) => {
+        if (got) clearInterval(timer)
+      })
+    }, 1500)
+    return () => {
+      cancelled = true
+      clearInterval(timer)
+    }
+  }, [step, effectiveDraft, creatorId])
 
   // 'wait' — creators row not visible yet (trigger lag); a manual refresh recovers.
   if (step === 'wait') {
@@ -82,8 +121,9 @@ export function WizardClient(props: WizardClientProps) {
   }
 
   if (step === 'review') {
-    if (!draft) {
-      // Draft not yet on the server snapshot — refresh and stay on progress.
+    if (!effectiveDraft) {
+      // Draft not on the server snapshot yet — the effect above is pulling it
+      // from creator_dna; show the "analysis ready" line until it arrives.
       return (
         <section className="text-center text-sm text-ink/70">
           {onb.progressStep.phaseReady}
@@ -93,7 +133,7 @@ export function WizardClient(props: WizardClientProps) {
     return (
       <DnaReviewForm
         creatorId={creatorId}
-        draft={draft}
+        draft={effectiveDraft}
         thin={thin}
         t={messages.dna}
         onPublished={() => {
@@ -107,7 +147,7 @@ export function WizardClient(props: WizardClientProps) {
   // step === 'done'
   return (
     <ReadBack
-      dna={final ?? draft ?? emptyDna()}
+      dna={final ?? effectiveDraft ?? emptyDna()}
       t={messages.dna}
       signOutHref={`/${locale}/auth/sign-out`}
       signOutLabel={onb.signOut}
