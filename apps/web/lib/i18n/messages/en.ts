@@ -357,7 +357,7 @@ export interface Messages {
   }
   feed: {
     pill: string; heading: string; subtitle: string
-    savesLabel: string
+    savesLabel: string; empty: string
   }
   creatorsLanding: {
     heroPill: string; heroTitle: string; heroSubtitle: string; applyCta: string
@@ -799,6 +799,7 @@ const messages: Messages = {
     heading: 'What travelers are saving now',
     subtitle: 'A live look at the guides and spots trending across KINNSO.',
     savesLabel: 'saves',
+    empty: 'No guides yet. Check back soon for new travel guides.',
   },
   creatorsLanding: {
     heroPill: 'Creator Program',

@@ -395,6 +395,7 @@ const messages: Messages = {
     heading: '旅行者正在收藏的內容',
     subtitle: '即時瀏覽 KINNSO 上最熱門的攻略和景點。',
     savesLabel: '次收藏',
+    empty: '暫時沒有指南，請稍後再來查看新的旅遊指南。',
   },
   creatorsLanding: {
     heroPill: '創作者計劃',

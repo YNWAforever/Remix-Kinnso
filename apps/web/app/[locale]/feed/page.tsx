@@ -2,6 +2,9 @@ import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { FeedView } from '@/components/kinnso/pages/FeedView'
+import { getPublishedGuides } from '@/lib/guides/queries'
+
+export const revalidate = 300
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -11,5 +14,6 @@ export default async function FeedPage({ params }: { params: Promise<{ locale: s
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
-  return <FeedView locale={locale as Locale} t={messages.feed} />
+  const guides = await getPublishedGuides()
+  return <FeedView locale={locale as Locale} t={messages.feed} items={guides} />
 }
