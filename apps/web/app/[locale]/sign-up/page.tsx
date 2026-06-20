@@ -30,11 +30,12 @@ export default async function SignUpPage({
   if (user) redirect(`/${locale}/creator`)
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
-      <h1 className="text-2xl font-bold text-ink">{dict.auth.signUp}</h1>
+    <main className="k-page-band flex min-h-screen flex-col items-center justify-center gap-6 p-6">
+      <div className="k-auth-card k-ticket w-full max-w-sm p-8">
+      <h1 className="k-display text-2xl font-bold text-kinnso-ink">{dict.auth.signUp}</h1>
 
       {sent === '1' ? (
-        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
+        <div className="mt-6 flex w-full flex-col items-center gap-4 text-center">
           <div>
             <p className="font-medium text-ink">{dict.auth.emailSent}</p>
             <p className="mt-1 text-sm text-ink/70">{dict.auth.emailSentDesc}</p>
@@ -75,6 +76,7 @@ export default async function SignUpPage({
           </p>
         </>
       )}
+      </div>
     </main>
   )
 }

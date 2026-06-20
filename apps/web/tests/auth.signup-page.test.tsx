@@ -43,5 +43,6 @@ describe('/[locale]/sign-up host', () => {
     ).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Sign in after confirming' }).getAttribute('href')).toBe('/en/sign-in')
     expect(screen.getByRole('link', { name: 'Use another email' }).getAttribute('href')).toBe('/en/sign-up')
+    expect(document.querySelector('.k-auth-card')).toBeTruthy()
   })
 })
