@@ -4,6 +4,12 @@ import type { ReactNode } from "react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { TicketDivider } from "@/components/kinnso/MarketPassport";
+
+const PILL_FOCUS =
+  "outline-none transition focus-visible:ring-2 focus-visible:ring-kinnso-orange focus-visible:ring-offset-1";
+const FIELD_FOCUS =
+  "outline-none transition focus-visible:border-kinnso-orange focus-visible:ring-2 focus-visible:ring-kinnso-orange focus-visible:ring-offset-1";
 
 export interface CreatorFilters {
   cities: string[];
@@ -47,7 +53,8 @@ function toggle<T>(arr: T[], v: T): T[] {
 }
 
 const Section = ({ title, children }: { title: string; children: ReactNode }) => (
-  <section className="border-b border-kinnso-cream2 py-4">
+  <section className="py-4">
+    <TicketDivider className="mb-4" />
     <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-kinnso-muted">{title}</h4>
     {children}
   </section>
@@ -70,7 +77,7 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
           <div className="flex flex-wrap gap-2">
             {CITIES.map((c) => (
               <button key={c} type="button" onClick={() => set({ cities: toggle(v.cities, c) })}
-                className={`rounded-pill px-3 py-1 text-xs font-semibold ${v.cities.includes(c) ? "bg-kinnso-orange text-white" : "bg-kinnso-cream2 text-kinnso-ink"}`}>
+                className={`rounded-pill px-3 py-1 text-xs font-semibold ${PILL_FOCUS} ${v.cities.includes(c) ? "bg-kinnso-orange text-white" : "bg-kinnso-cream2 text-kinnso-ink"}`}>
                 {c}
               </button>
             ))}
@@ -81,7 +88,7 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
           <Slider value={v.scoreRange} min={50} max={100} step={1} onValueChange={(val) => set({ scoreRange: [val[0], val[1]] as [number, number] })} />
           <div className="mt-2 flex justify-between text-xs text-kinnso-muted"><span>{v.scoreRange[0]}</span><span>{v.scoreRange[1]}</span></div>
           <label className="mt-3 block text-xs text-kinnso-muted">Minimum ER %
-            <input type="number" value={v.minEr} onChange={(e) => set({ minEr: +e.target.value })} className="mt-1 w-20 rounded-md bg-white px-2 py-1 ring-1 ring-kinnso-cream2" />
+            <input type="number" value={v.minEr} onChange={(e) => set({ minEr: +e.target.value })} className={`mt-1 w-20 rounded-md bg-white px-2 py-1 ring-1 ring-kinnso-cream2 ${FIELD_FOCUS}`} />
           </label>
         </Section>
 
@@ -111,7 +118,7 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
           <div className="flex flex-wrap gap-2">
             {AUDIENCE.map((a) => (
               <button key={a} type="button" onClick={() => set({ primaryAudience: toggle(v.primaryAudience, a) })}
-                className={`rounded-pill px-3 py-1 text-xs font-semibold ${v.primaryAudience.includes(a) ? "bg-kinnso-orange text-white" : "bg-kinnso-cream2 text-kinnso-ink"}`}>
+                className={`rounded-pill px-3 py-1 text-xs font-semibold ${PILL_FOCUS} ${v.primaryAudience.includes(a) ? "bg-kinnso-orange text-white" : "bg-kinnso-cream2 text-kinnso-ink"}`}>
                 {a}
               </button>
             ))}
@@ -128,7 +135,7 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
             ))}
           </div>
           <label className="mt-3 block text-xs text-kinnso-muted">Minimum followers
-            <select value={v.minFollowers} onChange={(e) => set({ minFollowers: +e.target.value })} className="ml-2 rounded-md bg-white px-2 py-1 ring-1 ring-kinnso-cream2">
+            <select value={v.minFollowers} onChange={(e) => set({ minFollowers: +e.target.value })} className={`ml-2 rounded-md bg-white px-2 py-1 ring-1 ring-kinnso-cream2 ${FIELD_FOCUS}`}>
               <option value={0}>Any</option>
               <option value={1000}>1k+</option>
               <option value={5000}>5k+</option>
@@ -139,7 +146,7 @@ export const CreatorFilterDrawer = ({ open, onOpenChange, value, onChange }: Pro
         </Section>
 
         <Section title="Activity">
-          <select value={v.activityDays} onChange={(e) => set({ activityDays: +e.target.value })} className="rounded-md bg-white px-2 py-1 ring-1 ring-kinnso-cream2">
+          <select value={v.activityDays} onChange={(e) => set({ activityDays: +e.target.value })} className={`rounded-md bg-white px-2 py-1 ring-1 ring-kinnso-cream2 ${FIELD_FOCUS}`}>
             <option value={7}>Posted in last 7 days</option>
             <option value={30}>Last 30 days</option>
             <option value={90}>Last 90 days</option>
