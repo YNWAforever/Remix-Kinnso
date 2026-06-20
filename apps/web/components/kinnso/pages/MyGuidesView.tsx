@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { GuideListItem } from '@/lib/guides/types'
+import { TicketCard } from '@/components/kinnso/MarketPassport'
 
 export function MyGuidesView({
   locale,
@@ -36,7 +37,7 @@ export function MyGuidesView({
         ) : (
           <ul className="mt-10 grid gap-4">
             {guides.map((g) => (
-              <li key={g.id} className="k-card flex items-center gap-4 p-4">
+              <TicketCard key={g.id} as="li" className="flex items-center gap-4 p-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={g.cover} alt={g.title} className="h-16 w-24 rounded-md object-cover" />
                 <div className="min-w-0 flex-1">
@@ -51,7 +52,7 @@ export function MyGuidesView({
                 <Link href={p(`/studio/guides/${g.id}/edit`)} className="k-btn-ghost text-sm">
                   {t.edit}
                 </Link>
-              </li>
+              </TicketCard>
             ))}
           </ul>
         )}

@@ -20,6 +20,7 @@ describe('MyGuidesView', () => {
     expect(
       screen.getAllByRole('link').some((a) => a.getAttribute('href') === '/en/studio/guides/2/edit'),
     ).toBe(true)
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 
   it('shows the empty state when there are no guides', () => {

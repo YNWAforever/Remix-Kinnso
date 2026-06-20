@@ -38,6 +38,7 @@ describe('CreatorMissionsView', () => {
     expect(screen.getByText('Travelpayouts hotel program')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: en.missions.joinMission }))
     expect(onJoin).toHaveBeenCalledWith('m1')
+    expect(document.querySelector('.k-ticket')).toBeTruthy()
   })
 
   it('shows join action errors returned by the server', async () => {

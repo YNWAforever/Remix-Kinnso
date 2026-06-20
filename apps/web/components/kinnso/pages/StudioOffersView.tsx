@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
+import { ReceiptRow, TicketCard } from '@/components/kinnso/MarketPassport'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export type AffiliateOfferCard = {
@@ -64,7 +65,7 @@ export function StudioOffersView({ t, offers, onJoin, onCreateLink }: StudioOffe
           {offers.map((offer) => {
             const activeParticipantId = offer.participant?.status === 'active' ? offer.participant.id : null
             return (
-              <article key={offer.id} className="k-card p-5">
+              <TicketCard key={offer.id} as="article" className="p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 space-y-2">
                     <h2 className="text-lg font-bold text-kinnso-ink">{offer.title}</h2>
@@ -77,17 +78,21 @@ export function StudioOffersView({ t, offers, onJoin, onCreateLink }: StudioOffe
                   {offer.participant && <MissionStatusBadge status={offer.participant.status} />}
                 </div>
                 {offer.partnerLinks.length > 0 && (
-                  <ul className="mt-4 space-y-2 text-sm text-kinnso-muted">
+                  <ul className="mt-4 space-y-2">
                     {offer.partnerLinks.map((link) => (
-                      <li key={link.id} className="flex items-center gap-2">
-                        <span className="min-w-0 truncate">{link.partnerUrl}</span>
-                        <button
-                          type="button"
-                          className="k-btn-ghost shrink-0 text-xs"
-                          onClick={() => void copyLink(link.id, link.partnerUrl)}
-                        >
-                          {copiedId === link.id ? t.copied : t.copy}
-                        </button>
+                      <li key={link.id}>
+                        <ReceiptRow
+                          label={link.partnerUrl}
+                          value={
+                            <button
+                              type="button"
+                              className="k-btn-ghost text-xs"
+                              onClick={() => void copyLink(link.id, link.partnerUrl)}
+                            >
+                              {copiedId === link.id ? t.copied : t.copy}
+                            </button>
+                          }
+                        />
                       </li>
                     ))}
                   </ul>
@@ -114,7 +119,7 @@ export function StudioOffersView({ t, offers, onJoin, onCreateLink }: StudioOffe
                     </a>
                   )}
                 </div>
-              </article>
+              </TicketCard>
             )
           })}
         </div>
