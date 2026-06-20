@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import ScanWidget from '@/components/kinnso/ScanWidget'
 
 afterEach(cleanup)
@@ -14,7 +14,11 @@ describe('ScanWidget', () => {
     expect(input.getAttribute('autoComplete')).toBe('username')
     fireEvent.change(input, { target: { value: 'maywanders' } })
     fireEvent.click(screen.getByRole('button', { name: /scan/i }))
-    vi.advanceTimersByTime(1700)
+    // The scan result is rendered by a setTimeout-driven state update; flush it
+    // inside act() so React commits the live region before we assert on it.
+    act(() => {
+      vi.advanceTimersByTime(1700)
+    })
     expect(screen.getByRole('status')).toBeTruthy()
     vi.useRealTimers()
   })
