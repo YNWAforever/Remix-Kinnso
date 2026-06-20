@@ -22,6 +22,8 @@ const messages: Messages = {
     noAccount: 'アカウントをお持ちでないですか？',
     errorInvalidCredentials: 'メールアドレスまたはパスワードが間違っています。',
     errorEmailTaken: 'このメールアドレスはすでに使用されています。',
+    errorInvalidEmail: '有効なメールアドレスを入力してください。',
+    errorRateLimited: '登録リクエストが多すぎます。少し待ってからもう一度お試しください。',
     errorGeneric: 'エラーが発生しました。もう一度お試しください。',
     creatorDashboard: 'クリエイタートップ',
     onboardingPlaceholder: 'オンボーディングウィザードはプラン4で公開予定です。',

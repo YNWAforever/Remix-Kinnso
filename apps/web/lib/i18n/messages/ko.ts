@@ -22,6 +22,8 @@ const messages: Messages = {
     noAccount: '계정이 없으신가요?',
     errorInvalidCredentials: '이메일 또는 비밀번호가 올바르지 않습니다.',
     errorEmailTaken: '이미 사용 중인 이메일입니다.',
+    errorInvalidEmail: '유효한 이메일 주소를 입력하세요.',
+    errorRateLimited: '회원가입 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.',
     errorGeneric: '오류가 발생했습니다. 다시 시도해 주세요.',
     creatorDashboard: '크리에이터 대시보드',
     onboardingPlaceholder: '온보딩 마법사는 플랜 4에서 제공될 예정입니다.',

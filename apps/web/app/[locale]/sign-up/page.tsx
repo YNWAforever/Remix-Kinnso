@@ -62,6 +62,8 @@ export default async function SignUpPage({
               submit: dict.auth.signUp,
             }}
             errorEmailTaken={dict.auth.errorEmailTaken}
+            errorInvalidEmail={dict.auth.errorInvalidEmail}
+            errorRateLimited={dict.auth.errorRateLimited}
             errorGeneric={dict.auth.errorGeneric}
             serverError={serverError}
           />

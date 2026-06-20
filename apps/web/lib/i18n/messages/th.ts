@@ -22,6 +22,8 @@ const messages: Messages = {
     noAccount: 'ยังไม่มีบัญชีใช่ไหม?',
     errorInvalidCredentials: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
     errorEmailTaken: 'มีบัญชีที่ใช้อีเมลนี้อยู่แล้ว',
+    errorInvalidEmail: 'กรุณากรอกอีเมลที่ถูกต้อง',
+    errorRateLimited: 'มีการสมัครหลายครั้งเกินไป กรุณารอสักครู่แล้วลองอีกครั้ง',
     errorGeneric: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
     creatorDashboard: 'แดชบอร์ดผู้สร้าง',
     onboardingPlaceholder: 'วิซาร์ดการเตรียมความพร้อมจะมาในแผน 4',

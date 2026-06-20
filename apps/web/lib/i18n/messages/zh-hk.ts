@@ -22,6 +22,8 @@ const messages: Messages = {
     noAccount: '還沒有帳戶？',
     errorInvalidCredentials: '電郵或密碼錯誤。',
     errorEmailTaken: '此電郵已有帳戶。',
+    errorInvalidEmail: '請輸入有效的電郵地址。',
+    errorRateLimited: '註冊嘗試次數過多，請稍後再試。',
     errorGeneric: '出現錯誤，請再試一次。',
     creatorDashboard: '創作者主頁',
     onboardingPlaceholder: '入門嚮導將於方案 4 推出。',

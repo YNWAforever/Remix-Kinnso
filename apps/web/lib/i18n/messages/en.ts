@@ -20,6 +20,8 @@ export interface Messages {
     noAccount: string
     errorInvalidCredentials: string
     errorEmailTaken: string
+    errorInvalidEmail: string
+    errorRateLimited: string
     errorGeneric: string
     creatorDashboard: string
     onboardingPlaceholder: string
@@ -426,6 +428,8 @@ const messages: Messages = {
     noAccount: 'Don\'t have an account?',
     errorInvalidCredentials: 'Invalid email or password.',
     errorEmailTaken: 'An account with this email already exists.',
+    errorInvalidEmail: 'Enter a valid email address.',
+    errorRateLimited: 'Too many sign-up attempts. Please wait a minute and try again.',
     errorGeneric: 'Something went wrong. Please try again.',
     creatorDashboard: 'Creator Dashboard',
     onboardingPlaceholder: 'Onboarding wizard coming in Plan 4.',

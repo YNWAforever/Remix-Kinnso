@@ -25,6 +25,8 @@ const renderForm = () =>
       locale="en"
       labels={labels}
       errorEmailTaken="That email is already registered."
+      errorInvalidEmail="Enter a valid email address."
+      errorRateLimited="Too many sign-up attempts. Please wait a minute and try again."
       errorGeneric="Something went wrong."
     />,
   )
@@ -65,6 +67,30 @@ describe('SignUpForm', () => {
     renderForm()
     fillAndSubmit()
     expect((await screen.findByRole('alert')).textContent).toBe('That email is already registered.')
+    expect(pushMock).not.toHaveBeenCalled()
+  })
+
+  it('shows the invalid-email message when Supabase rejects the email address', async () => {
+    signUpMock.mockResolvedValue({
+      data: { user: null, session: null },
+      error: { code: 400, error_code: 'email_address_invalid', message: 'Email address is invalid' },
+    })
+    renderForm()
+    fillAndSubmit()
+    expect((await screen.findByRole('alert')).textContent).toBe('Enter a valid email address.')
+    expect(pushMock).not.toHaveBeenCalled()
+  })
+
+  it('shows the rate-limit message when Supabase throttles signup emails', async () => {
+    signUpMock.mockResolvedValue({
+      data: { user: null, session: null },
+      error: { code: 'over_email_send_rate_limit', message: 'email rate limit exceeded' },
+    })
+    renderForm()
+    fillAndSubmit()
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'Too many sign-up attempts. Please wait a minute and try again.',
+    )
     expect(pushMock).not.toHaveBeenCalled()
   })
 })

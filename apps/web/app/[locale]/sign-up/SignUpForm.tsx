@@ -10,14 +10,24 @@ interface SignUpFormProps {
   locale: Locale
   labels: AuthFormLabels
   errorEmailTaken: string
+  errorInvalidEmail: string
+  errorRateLimited: string
   errorGeneric: string
   serverError?: string
+}
+
+function getAuthErrorCode(error: { code?: unknown; error_code?: unknown }) {
+  if (typeof error.code === 'string') return error.code
+  if (typeof error.error_code === 'string') return error.error_code
+  return undefined
 }
 
 export function SignUpForm({
   locale,
   labels,
   errorEmailTaken,
+  errorInvalidEmail,
+  errorRateLimited,
   errorGeneric,
   serverError,
 }: SignUpFormProps) {
@@ -41,7 +51,12 @@ export function SignUpForm({
       })
       if (signUpError) {
         // Supabase returns "User already registered" for duplicate emails.
-        if (signUpError.message.toLowerCase().includes('already registered')) {
+        const errorCode = getAuthErrorCode(signUpError)
+        if (errorCode === 'email_address_invalid') {
+          setError(errorInvalidEmail)
+        } else if (errorCode === 'over_email_send_rate_limit') {
+          setError(errorRateLimited)
+        } else if (signUpError.message.toLowerCase().includes('already registered')) {
           setError(errorEmailTaken)
         } else {
           setError(errorGeneric)
