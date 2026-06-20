@@ -21,6 +21,7 @@ const FALLBACK_METRICS: DnaMetrics = {
 };
 
 const platforms = ["Instagram", "Threads", "TikTok", "YouTube"];
+const inputId = "home-social-handle";
 
 export const ScanWidget: React.FC<{ dna?: Dna; metrics?: DnaMetrics }> = ({ dna = FALLBACK_DNA, metrics = FALLBACK_METRICS }) => {
   const [handle, setHandle] = useState("");
@@ -35,11 +36,15 @@ export const ScanWidget: React.FC<{ dna?: Dna; metrics?: DnaMetrics }> = ({ dna 
   return (
     <div className="w-full">
       <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="flex flex-1 items-center rounded-pill bg-white shadow-kinnso ring-1 ring-kinnso-cream2 focus-within:ring-kinnso-orange">
-          <span className="k-mono pl-5 pr-1 text-kinnso-muted">@</span>
+        <label htmlFor={inputId} className="sr-only">Social handle</label>
+        <div className="flex flex-1 items-center rounded-pill bg-white shadow-kinnso ring-1 ring-kinnso-edge focus-within:ring-2 focus-within:ring-kinnso-orange/40">
+          <span aria-hidden="true" className="k-mono pl-5 pr-1 text-kinnso-muted">@</span>
           <input
+            id={inputId}
+            name="socialHandle"
+            autoComplete="username"
             className="k-mono flex-1 bg-transparent py-3 pr-4 text-sm text-kinnso-ink outline-none placeholder:text-kinnso-muted/60"
-            placeholder="yourhandle"
+            placeholder="maywanders..."
             value={handle}
             onChange={(e) => setHandle(e.target.value.replace(/^@/, ""))}
             onKeyDown={(e) => e.key === "Enter" && runScan()}
@@ -47,21 +52,21 @@ export const ScanWidget: React.FC<{ dna?: Dna; metrics?: DnaMetrics }> = ({ dna 
         </div>
         <button onClick={runScan} className="k-btn-primary justify-center sm:px-7" disabled={status === "scanning"}>
           {status === "scanning" ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Scanning…</>
+            <><Loader2 aria-hidden="true" className="mr-2 h-4 w-4 animate-spin" /> Scanning…</>
           ) : (
-            <>Scan <ArrowRight className="ml-2 h-4 w-4" /></>
+            <>Scan <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" /></>
           )}
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-white/80">
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-kinnso-muted">
         {platforms.map((p) => (
-          <span key={p} className="rounded-pill bg-white/15 px-3 py-1 backdrop-blur-sm">{p}</span>
+          <span key={p} className="rounded-pill border border-kinnso-edge bg-white px-3 py-1 shadow-kinnso">{p}</span>
         ))}
       </div>
 
       {status === "done" && (
-        <div className="mt-6">
+        <div className="mt-6" role="status" aria-live="polite">
           <DnaCard dna={dna} metrics={metrics} compact />
         </div>
       )}
