@@ -29,7 +29,7 @@ const PostThumbnailGrid = ({ posts, cols = 3, className, showOverlay = true }: P
             rel="noreferrer"
             className="group relative block aspect-square overflow-hidden rounded-lg bg-kinnso-cream2"
           >
-            <img src={p.thumbnail} alt={p.caption} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+            <img src={p.thumbnail} alt={p.caption} width={300} height={300} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
             <span className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-white/90 text-kinnso-ink">
               <Icon className="h-3 w-3" />
             </span>

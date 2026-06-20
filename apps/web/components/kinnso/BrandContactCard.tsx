@@ -5,6 +5,7 @@ import { tierMeta } from "@/lib/creator-mock";
 import type { ViewerRole } from "@/lib/auth/viewer-role";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
+import { TicketCard } from "@/components/kinnso/MarketPassport";
 
 interface Props {
   creator: ExtendedCreator;
@@ -20,7 +21,7 @@ export function BrandContactCard({ creator, role, locale, t }: Props) {
   const creatorBriefHref = `${p("/merchants/post")}?creator=${encodeURIComponent(creator.handle)}`;
 
   return (
-    <div className="overflow-hidden rounded-lg bg-kinnso-amber/40 p-6 md:flex md:items-center md:justify-between md:gap-8">
+    <TicketCard className="bg-kinnso-amber/40 p-6 md:flex md:items-center md:justify-between md:gap-8">
       <div>
         <h3 className="text-xl font-black text-kinnso-ink">{t.brandWorkWith.replace("{name}", firstName)}</h3>
         <p className="mt-1 text-sm text-kinnso-ink/80">
@@ -42,7 +43,7 @@ export function BrandContactCard({ creator, role, locale, t }: Props) {
           <Link href={p("/merchants/post")} className="k-btn-primary">{t.brandSendBrief}</Link>
         )}
       </div>
-    </div>
+    </TicketCard>
   );
 }
 export default BrandContactCard;

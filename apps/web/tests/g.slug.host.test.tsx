@@ -22,5 +22,6 @@ describe('/[locale]/g/[slug] host', () => {
     expect(screen.getByRole('link', { name: `@${guide.creatorHandle}` }).getAttribute('href')).toBe(
       `/en/c/${guide.creatorHandle}`,
     )
+    expect(document.querySelector('.k-route-stamp')).toBeTruthy()
   })
 })

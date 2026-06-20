@@ -23,6 +23,7 @@ import BrandContactCard from "@/components/kinnso/BrandContactCard";
 import PostThumbnailGrid from "@/components/kinnso/PostThumbnailGrid";
 import CityDetailDrawer from "@/components/kinnso/CityDetailDrawer";
 import EngagementTrendChart from "@/components/kinnso/EngagementTrendChart";
+import { TicketCard, RouteMarkers } from "@/components/kinnso/MarketPassport";
 
 interface Props {
   creator: ExtendedCreator;
@@ -75,17 +76,36 @@ const CreatorProfileView: React.FC<Props> = ({ creator, role, locale, embedded, 
       {/* HERO */}
       <header className="overflow-hidden rounded-xl">
         <div className="relative h-48 w-full sm:h-72 md:h-80">
-          <img src={creator.banner} alt="" className="h-full w-full object-cover" />
+          <img
+            src={creator.banner}
+            alt=""
+            width={1200}
+            height={400}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-black/30" />
           <span className="absolute right-4 top-4"><TierBadge tier={creator.tier} className="bg-kinnso-orange !text-white" /></span>
           <div className="absolute -bottom-12 left-6 flex items-end gap-3 sm:left-8">
-            <img src={creator.avatar} alt={creator.name} className="h-24 w-24 rounded-full object-cover ring-4 ring-kinnso-cream" />
+            <img
+              src={creator.avatar}
+              alt={creator.name}
+              width={96}
+              height={96}
+              className="h-24 w-24 rounded-full object-cover ring-4 ring-kinnso-cream"
+            />
             <div className="mb-2 hidden rounded-xl bg-white p-1.5 shadow-kinnso sm:block">
               <ScoreRing score={creator.score} size="sm" />
             </div>
           </div>
         </div>
-        <div className="bg-white p-6 pt-16 sm:p-8 sm:pt-16">
+
+        <TicketCard className="rounded-t-none p-6 pt-16 sm:p-8 sm:pt-16">
+          {locs.length > 0 && (
+            <div className="mb-4">
+              <RouteMarkers points={locs.slice(0, 3).map((l) => l.city)} />
+            </div>
+          )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h1 className="text-3xl font-black text-kinnso-ink md:text-4xl">{creator.name}</h1>
@@ -120,13 +140,16 @@ const CreatorProfileView: React.FC<Props> = ({ creator, role, locale, embedded, 
               </div>
             ))}
           </div>
-        </div>
+        </TicketCard>
       </header>
 
       {/* Engagement band */}
       <section className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-kinnso-cream2 px-5 py-4">
         <div className="flex items-center gap-3">
-          <span className="k-mono text-3xl font-black text-kinnso-orange">{creator.score}<span className="text-base text-kinnso-muted">/100</span></span>
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-kinnso-muted">score</span>
+            <div className="k-mono text-3xl font-black text-kinnso-orange">{creator.score}<span className="text-base text-kinnso-muted">/100</span></div>
+          </div>
           <TierBadge tier={creator.tier} />
         </div>
         <span className="text-xs text-kinnso-muted">{t.engagementBandSummary.replace("{er}", (creator.er * 100).toFixed(1))}</span>
