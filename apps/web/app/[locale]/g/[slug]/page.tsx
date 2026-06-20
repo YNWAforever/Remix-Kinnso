@@ -48,6 +48,8 @@ export default async function GuidePage({
     <article className="k-container py-8 md:py-12">
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
         <div
+          role="img"
+          aria-label={guide.title}
           className="relative min-h-[360px] bg-cover bg-center"
           style={{
             backgroundImage: `url("${encodeURI(guide.cover)}")`,
