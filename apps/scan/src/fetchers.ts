@@ -69,16 +69,30 @@ export class RapidApiFetcher implements PlatformFetcher {
     const host =
       platform === 'instagram' ? RAPIDAPI_IG_HOST : RAPIDAPI_THREADS_HOST
 
-    // Endpoint: GET /user/info?username=<handle>  (both scraper APIs share this shape)
-    const url = `https://${host}/user/info?username=${encodeURIComponent(handle)}`
-    const res = await fetchWithRetry(url, {
-      method: 'GET',
-      headers: {
-        'x-rapidapi-key': this.apiKey,
-        'x-rapidapi-host': host,
-        Accept: 'application/json',
-      },
-    })
+    // The instagram-scraper-stable-api product serves profile data via a POST
+    // form endpoint (`/ig_get_fb_profile_v3.php`, body `username_or_url=<handle>`)
+    // that returns a FLAT object: { username, biography, follower_count, ... }.
+    // The earlier `/user/info?username=` REST route does not exist on this API
+    // and 4xx'd for every handle. Threads keeps its own endpoint shape.
+    const res =
+      platform === 'instagram'
+        ? await fetchWithRetry(`https://${host}/ig_get_fb_profile_v3.php`, {
+            method: 'POST',
+            headers: {
+              'x-rapidapi-key': this.apiKey,
+              'x-rapidapi-host': host,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ username_or_url: handle }).toString(),
+          })
+        : await fetchWithRetry(`https://${host}/user/info?username=${encodeURIComponent(handle)}`, {
+            method: 'GET',
+            headers: {
+              'x-rapidapi-key': this.apiKey,
+              'x-rapidapi-host': host,
+              Accept: 'application/json',
+            },
+          })
 
     if (!res.ok) {
       throw new Error(`RapidAPI ${platform} returned HTTP ${res.status} for handle "${handle}"`)

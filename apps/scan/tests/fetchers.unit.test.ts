@@ -37,7 +37,9 @@ describe('RapidApiFetcher', () => {
     expect(fetchMock).toHaveBeenCalledOnce()
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(url).toContain('instagram-scraper-stable-api.p.rapidapi.com')
-    expect(url).toContain('some_handle')
+    // instagram uses the POST form endpoint; the handle travels in the body.
+    expect(init.method).toBe('POST')
+    expect(String(init.body)).toContain('some_handle')
     const headers = init.headers as Record<string, string>
     expect(headers['x-rapidapi-key']).toBe('test-api-key')
     expect(headers['x-rapidapi-host']).toBe('instagram-scraper-stable-api.p.rapidapi.com')
