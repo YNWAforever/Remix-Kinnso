@@ -71,7 +71,16 @@ export function SignUpForm({
         setError(errorEmailTaken)
         return
       }
-      // On success, redirect to the same page with ?sent=1 to show the confirmation message.
+      // When email confirmation is disabled (auto-confirm), signUp returns a live
+      // session — the creator is already signed in, so send them straight into the
+      // onboarding wizard instead of a "check your email" dead-end they can't clear.
+      // router.refresh() forces the server to pick up the freshly-set auth cookie.
+      if (data.session) {
+        router.push(`/${locale}/creator`)
+        router.refresh()
+        return
+      }
+      // Otherwise email confirmation is required: show the "check your email" screen.
       router.push(`/${locale}/sign-up?sent=1`)
     } catch {
       setError(errorGeneric)

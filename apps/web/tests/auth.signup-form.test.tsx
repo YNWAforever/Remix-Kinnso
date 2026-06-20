@@ -2,13 +2,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 
-const { pushMock, signUpMock } = vi.hoisted(() => ({
+const { pushMock, refreshMock, signUpMock } = vi.hoisted(() => ({
   pushMock: vi.fn(),
+  refreshMock: vi.fn(),
   signUpMock: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
+  useRouter: () => ({ push: pushMock, refresh: refreshMock }),
 }))
 
 vi.mock('@/lib/supabase/client', () => ({
@@ -40,15 +41,30 @@ function fillAndSubmit() {
 afterEach(cleanup)
 beforeEach(() => {
   pushMock.mockReset()
+  refreshMock.mockReset()
   signUpMock.mockReset()
 })
 
 describe('SignUpForm', () => {
-  it('redirects to the sent state for a genuinely new signup', async () => {
-    signUpMock.mockResolvedValue({ data: { user: { identities: [{ id: 'i1' }] } }, error: null })
+  it('redirects to the sent state for a genuinely new signup (email confirmation required, no session)', async () => {
+    signUpMock.mockResolvedValue({ data: { user: { identities: [{ id: 'i1' }] }, session: null }, error: null })
     renderForm()
     fillAndSubmit()
     await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/sign-up?sent=1'))
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('sends an auto-confirmed signup straight into the creator wizard when a session is returned', async () => {
+    // With email confirmation disabled, signUp returns a live session — the user is
+    // already signed in, so we must not strand them on the "check your email" screen.
+    signUpMock.mockResolvedValue({
+      data: { user: { identities: [{ id: 'i1' }] }, session: { access_token: 'tok' } },
+      error: null,
+    })
+    renderForm()
+    fillAndSubmit()
+    await waitFor(() => expect(pushMock).toHaveBeenCalledWith('/en/creator'))
+    expect(refreshMock).toHaveBeenCalled()
     expect(screen.queryByRole('alert')).toBeNull()
   })
 
