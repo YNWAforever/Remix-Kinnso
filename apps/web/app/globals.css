@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  /* KINNSO ships a single light, cream/orange brand theme. Pin the UA color-scheme
+     to light so native controls, scrollbars, and form fields don't auto-darken when
+     the OS appearance switches to Dark (e.g. macOS "Auto" at sunset). */
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -138,13 +142,6 @@
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
 body {
   background: var(--background);
