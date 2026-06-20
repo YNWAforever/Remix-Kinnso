@@ -4,6 +4,7 @@ node_modules/
 
 # turbo
 .turbo/
+.worktrees/
 
 # build output (apps have their own .gitignore for .next, etc.)
 dist/
