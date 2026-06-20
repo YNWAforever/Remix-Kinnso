@@ -1,3 +1,4 @@
+import React from 'react'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { ReceiptRow, TicketCard, TicketDivider } from '@/components/kinnso/MarketPassport'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -43,15 +44,15 @@ export function StudioEarningsView({ t, totals, items }: StudioEarningsViewProps
               </thead>
               <tbody>
                 {items.map((item, i) => (
-                  <>
-                    {i > 0 && <tr key={`div-${item.id}`} aria-hidden="true"><td colSpan={4} className="p-0"><TicketDivider /></td></tr>}
-                    <tr key={item.id}>
+                  <React.Fragment key={item.id}>
+                    {i > 0 && <tr aria-hidden="true"><td colSpan={4} className="p-0"><TicketDivider /></td></tr>}
+                    <tr>
                       <td className="py-2 pr-4 pl-5 font-medium text-kinnso-ink">{item.missionTitle}</td>
                       <td className="py-2 pr-4 capitalize text-kinnso-muted">{item.missionType.replaceAll('_', ' ')}</td>
                       <td className="py-2 pr-4 tabular-nums text-kinnso-ink">{item.currency} {item.amount.toLocaleString()}</td>
                       <td className="py-2 pr-5"><MissionStatusBadge status={item.payoutStatus === 'paid' ? t.paid : t.pending} /></td>
                     </tr>
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
