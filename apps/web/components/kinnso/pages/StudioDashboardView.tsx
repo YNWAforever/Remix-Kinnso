@@ -1,0 +1,116 @@
+import Link from 'next/link'
+import type { Dna, Platform } from '@kinnso/scan'
+import type { Locale } from '@/lib/i18n/config'
+import type { Messages } from '@/lib/i18n/messages/en'
+import type { Readiness } from '@/lib/studio/readiness'
+import type { EarningsCurrencyTotal } from '@/lib/missions/earnings'
+import { TicketCard } from '@/components/kinnso/MarketPassport'
+import { DnaSnapshotCard } from '@/components/kinnso/DnaSnapshotCard'
+import { StudioReadinessChecklist } from '@/components/kinnso/StudioReadinessChecklist'
+import { StudioQuickLinks } from '@/components/kinnso/StudioQuickLinks'
+import { AddHandleDialog } from '@/components/kinnso/AddHandleDialog'
+import { StudioRescanButton } from '@/components/kinnso/StudioRescanButton'
+
+export interface OpportunityPreview {
+  id: string
+  title: string
+  kind: 'mission' | 'offer'
+}
+
+export interface StudioDashboardViewProps {
+  locale: Locale
+  t: Messages['studioDashboard']
+  studioHomeT: Messages['studioHome']
+  progressT: Messages['onboarding']['progressStep']
+  creatorId: string
+  name: string
+  dna: Dna
+  lastScanned: string // ISO
+  readiness: Readiness
+  opportunities: OpportunityPreview[]
+  earnings: EarningsCurrencyTotal[]
+  platforms: Platform[]
+  missingPlatforms: Platform[]
+  activeJobId: string | null
+}
+
+export function StudioDashboardView(props: StudioDashboardViewProps) {
+  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, opportunities, earnings, platforms, missingPlatforms, activeJobId } = props
+  const p = (path: string) => `/${locale}${path}`
+
+  return (
+    <main>
+      <section className="k-container space-y-6 py-10">
+        {/* 1. Greeting */}
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-black tracking-tight text-kinnso-ink md:text-4xl">
+            {t.greeting.replace('{name}', name)}
+          </h1>
+          <span className="k-pill bg-green-100 text-green-700">{t.statusActive}</span>
+        </div>
+
+        {/* 2. DNA snapshot */}
+        <DnaSnapshotCard locale={locale} t={t} dna={dna} lastScanned={lastScanned} />
+
+        {/* 3. Readiness checklist (hero) with interactive slots */}
+        <StudioReadinessChecklist
+          locale={locale}
+          t={t}
+          readiness={readiness}
+          slots={{
+            'connect-platforms': <AddHandleDialog creatorId={creatorId} missing={missingPlatforms} t={t} />,
+            'dna-fresh': <StudioRescanButton creatorId={creatorId} platforms={platforms} activeJobId={activeJobId} progressT={progressT} t={t} />,
+          }}
+        />
+
+        {/* 4. Opportunities */}
+        <TicketCard className="p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-kinnso-ink">{t.opportunitiesTitle}</h2>
+            <Link href={p('/studio/missions')} className="text-sm font-bold text-kinnso-orange">{t.opportunitiesBrowse} →</Link>
+          </div>
+          {opportunities.length === 0 ? (
+            <p className="mt-2 text-sm text-kinnso-muted">{t.opportunitiesEmpty}</p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {opportunities.map((o) => (
+                <li key={o.id}>
+                  <Link href={p(o.kind === 'offer' ? '/studio/offers' : '/studio/missions')} className="text-sm font-semibold text-kinnso-ink hover:text-kinnso-orange">
+                    {o.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </TicketCard>
+
+        {/* 5. Earnings */}
+        <TicketCard className="p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-kinnso-ink">{t.earningsTitle}</h2>
+            <Link href={p('/studio/earnings')} className="text-sm font-bold text-kinnso-orange">{t.earningsView} →</Link>
+          </div>
+          {earnings.length === 0 ? (
+            <p className="mt-2 text-sm text-kinnso-muted"><span>$0</span> · <span>{t.earningsEmpty}</span></p>
+          ) : (
+            <ul className="mt-3 space-y-1 text-sm text-kinnso-ink">
+              {earnings.map((e) => (
+                <li key={e.currency}>
+                  <span className="font-semibold">{e.currency}</span> {e.paid.toLocaleString()} paid · {e.pending.toLocaleString()} pending
+                </li>
+              ))}
+            </ul>
+          )}
+        </TicketCard>
+
+        {/* 6. Quick links */}
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-kinnso-muted">{t.quickLinksTitle}</p>
+          <StudioQuickLinks locale={locale} t={studioHomeT} />
+        </div>
+      </section>
+    </main>
+  )
+}
+
+export default StudioDashboardView
