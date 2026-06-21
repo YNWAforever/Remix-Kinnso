@@ -78,6 +78,31 @@ describe('RapidApiFetcher', () => {
     // nested shape (data.user.edge_followed_by.count).
     expect(result).toMatchObject({ data: { user: { edge_followed_by: { count: 100 } } } })
   }, 10_000)
+
+  it('paginates instagram posts and merges captions across pages', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(makeOkResponse({ biography: 'b', follower_count: 5 })) // profile
+      .mockResolvedValueOnce(
+        makeOkResponse({ posts: [{ node: { caption: { text: 'cap1' } } }], pagination_token: 'tok2' }),
+      )
+      .mockResolvedValueOnce(
+        makeOkResponse({ posts: [{ node: { caption: { text: 'cap2' } } }], pagination_token: '' }),
+      )
+    vi.stubGlobal('fetch', fetchMock)
+    const result = (await new RapidApiFetcher('key').fetch('instagram', 'u')) as {
+      data: { user: { edge_media_to_timeline_edge: { edges: Array<{ node: { edge_media_to_caption: { edges: Array<{ node: { text: string } }> } } }> } } }
+    }
+    // 1 profile call + 2 post pages
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    // page 2 must carry the cursor returned by page 1
+    expect(String((fetchMock.mock.calls[2][1] as RequestInit).body)).toContain('tok2')
+    // both pages' captions land in the timeline edges
+    const texts = result.data.user.edge_media_to_timeline_edge.edges.map(
+      (e) => e.node.edge_media_to_caption.edges[0].node.text,
+    )
+    expect(texts).toEqual(['cap1', 'cap2'])
+  })
 })
 
 // ---------------------------------------------------------------------------

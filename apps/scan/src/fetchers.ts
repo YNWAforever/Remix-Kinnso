@@ -56,6 +56,12 @@ async function fetchWithRetry(
 const RAPIDAPI_IG_HOST = 'instagram-scraper-stable-api.p.rapidapi.com'
 const RAPIDAPI_THREADS_HOST = 'threads-scraper-api2.p.rapidapi.com'
 
+// How many pages (12 posts each) of recent Instagram posts to pull for caption
+// signal. The feed includes reels/videos with captions, so this also covers reel
+// content; the dedicated reels endpoint returns engagement metrics but no captions.
+// Tunable — higher = richer DNA but a bigger/slower LLM prompt and more API calls.
+const IG_POST_PAGES = 2
+
 /**
  * Fetches public profile data for Instagram or Threads via RapidAPI.
  * Returns the raw JSON body; shape is passed to @kinnso/scan `normalize()` as-is.
@@ -106,29 +112,40 @@ export class RapidApiFetcher implements PlatformFetcher {
     // ("thin") result. The reshape below reads these off `raw.posts`.
     if (platform === 'instagram') {
       try {
-        const postsRes = await fetchWithRetry(`https://${host}/get_ig_user_posts.php`, {
-          method: 'POST',
-          headers: {
-            'x-rapidapi-key': this.apiKey,
-            'x-rapidapi-host': host,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            username_or_url: handle,
-            amount: '12',
-            pagination_token: '',
-          }).toString(),
-        })
-        if (postsRes.ok) {
+        const captions: string[] = []
+        const seen = new Set<string>()
+        let token = ''
+        for (let page = 0; page < IG_POST_PAGES; page++) {
+          const postsRes = await fetchWithRetry(`https://${host}/get_ig_user_posts.php`, {
+            method: 'POST',
+            headers: {
+              'x-rapidapi-key': this.apiKey,
+              'x-rapidapi-host': host,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              username_or_url: handle,
+              amount: '12',
+              pagination_token: token,
+            }).toString(),
+          })
+          if (!postsRes.ok) break
           const pj = (await postsRes.json()) as {
             posts?: Array<{ node?: { caption?: { text?: string } } }>
+            pagination_token?: string
           }
-          const captions = (pj.posts ?? [])
-            .map((p) => p?.node?.caption?.text)
-            .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
-            .map((text) => ({ caption: text }))
-          if (captions.length > 0) raw.posts = captions
+          for (const p of pj.posts ?? []) {
+            const t = p?.node?.caption?.text
+            if (typeof t === 'string' && t.trim().length > 0 && !seen.has(t)) {
+              seen.add(t)
+              captions.push(t)
+            }
+          }
+          // Follow the cursor to the next page; stop when the API stops returning one.
+          token = pj.pagination_token ?? ''
+          if (!token) break
         }
+        if (captions.length > 0) raw.posts = captions.map((caption) => ({ caption }))
       } catch (err) {
         console.warn(`[scan] instagram posts fetch failed for "${handle}"`, (err as Error).message)
       }
