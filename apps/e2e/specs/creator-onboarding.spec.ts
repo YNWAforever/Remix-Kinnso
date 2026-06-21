@@ -24,8 +24,10 @@ test('creator signs up, adds handles, scans, reviews DNA, publishes, reads back'
   await page.getByLabel(/password/i).fill(PASSWORD)
   await page.getByRole('button', { name: /sign up|create account/i }).click()
 
-  // Land on the gated wizard (handles step).
+  // Land on the gated wizard. Brand-new creators first see a welcome/orientation
+  // screen — click through it to reach the handles step.
   await page.waitForURL(/\/en\/creator/, { timeout: 30_000 })
+  await page.getByRole('button', { name: /get started/i }).click()
   await expect(page.getByRole('heading', { name: /add your social handles/i })).toBeVisible()
 
   // 2. Add one Instagram handle and run the scan.
