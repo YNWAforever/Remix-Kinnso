@@ -354,6 +354,44 @@ export interface Messages {
     inboxTitle: string; inboxDesc: string
     guidesTitle: string; guidesDesc: string
   }
+  studioDashboard: {
+    greeting: string
+    statusActive: string
+    dnaSnapshotTitle: string
+    dnaLastScanned: string
+    dnaNiches: string
+    dnaPillars: string
+    viewFullReport: string
+    checklistTitle: string
+    checklistProgress: string
+    itemDnaReadyTitle: string
+    itemDnaReadyCta: string
+    itemWriteGuideTitle: string
+    itemWriteGuideCta: string
+    itemConnectTitle: string
+    itemConnectGap: string
+    itemConnectCta: string
+    itemConnectAllDone: string
+    itemFreshTitle: string
+    itemFreshScanned: string
+    itemFreshScannedToday: string
+    rescanCta: string
+    opportunitiesTitle: string
+    opportunitiesEmpty: string
+    opportunitiesBrowse: string
+    earningsTitle: string
+    earningsEmpty: string
+    earningsView: string
+    quickLinksTitle: string
+    addHandleTitle: string
+    addHandlePlaceholder: string
+    addHandleSave: string
+    addHandleCancel: string
+    addHandleErrorEmpty: string
+    addHandleErrorFormat: string
+    addHandleErrorLength: string
+    addHandleSaved: string
+  }
   studioGuides: {
     listPill: string; listHeading: string; listSubtitle: string
     newButton: string; emptyTitle: string; emptyBody: string
@@ -799,6 +837,44 @@ const messages: Messages = {
     offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
     guidesTitle: 'New Guide', guidesDesc: 'Publish a travel guide.',
+  },
+  studioDashboard: {
+    greeting: 'Welcome back, {name}',
+    statusActive: 'Active creator',
+    dnaSnapshotTitle: 'Your Creator DNA',
+    dnaLastScanned: 'last scanned {date}',
+    dnaNiches: 'Niches',
+    dnaPillars: 'Content pillars',
+    viewFullReport: 'View full DNA report →',
+    checklistTitle: 'Get discovered',
+    checklistProgress: '{done} / {total}',
+    itemDnaReadyTitle: 'Your Creator DNA is ready',
+    itemDnaReadyCta: 'View report',
+    itemWriteGuideTitle: 'Write your first guide',
+    itemWriteGuideCta: 'Write a guide',
+    itemConnectTitle: 'Connect your platforms',
+    itemConnectGap: '{done}/{total} · add {missing}',
+    itemConnectCta: 'Add',
+    itemConnectAllDone: 'All platforms connected',
+    itemFreshTitle: 'Keep your DNA fresh',
+    itemFreshScanned: 'scanned {days}d ago',
+    itemFreshScannedToday: 'scanned today',
+    rescanCta: 'Rescan',
+    opportunitiesTitle: 'Opportunities',
+    opportunitiesEmpty: "No brand missions matched yet — we’ll notify you. Finish your checklist to get discovered.",
+    opportunitiesBrowse: 'Browse all',
+    earningsTitle: 'Earnings',
+    earningsEmpty: 'Start earning by joining a mission.',
+    earningsView: 'View earnings',
+    quickLinksTitle: 'Quick links',
+    addHandleTitle: 'Add a platform',
+    addHandlePlaceholder: 'handle or profile link',
+    addHandleSave: 'Add',
+    addHandleCancel: 'Cancel',
+    addHandleErrorEmpty: 'Enter a handle.',
+    addHandleErrorFormat: 'That handle has invalid characters.',
+    addHandleErrorLength: 'That handle is too long (max 30).',
+    addHandleSaved: 'Added — rescan to include it in your DNA.',
   },
   studioGuides: {
     listPill: 'Studio',
