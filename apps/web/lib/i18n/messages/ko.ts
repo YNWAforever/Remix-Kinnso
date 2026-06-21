@@ -30,6 +30,15 @@ const messages: Messages = {
   },
   onboarding: {
     title: '크리에이터 프로필 설정',
+    welcomeStep: {
+      heading: '크리에이터 DNA를 만들어 볼까요',
+      intro: '공개된 게시물을 읽어 니치, 오디언스, 도달 범위를 담은 프로필을 만듭니다. 브랜드가 당신을 더 쉽게 찾을 수 있어요.',
+      pointPublic: '공개 게시물만 — 비공개는 보지 않아요',
+      pointTime: '약 1분 소요',
+      pointEdit: '공개 전에 검토하고 편집할 수 있어요',
+      cta: '시작하기',
+      platforms: 'Instagram, YouTube, Threads 지원',
+    },
     handlesStep: {
       heading: '소셜 계정 추가',
       intro: '아래에서 1~3개의 계정을 추가하세요. 스캔하여 크리에이터 DNA를 작성합니다.',

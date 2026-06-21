@@ -18,6 +18,9 @@ vi.mock('@/lib/supabase/client', () => ({
 vi.mock('@/components/onboarding/HandlesStep', () => ({
   HandlesStep: () => <div data-testid="step-handles" />,
 }))
+vi.mock('@/components/onboarding/WelcomeStep', () => ({
+  WelcomeStep: () => <div data-testid="step-welcome" />,
+}))
 vi.mock('@/components/onboarding/LiveProgress', () => ({
   LiveProgress: () => <div data-testid="step-progress" />,
 }))
@@ -50,8 +53,18 @@ function base() {
 }
 
 describe('WizardClient initial step', () => {
-  it("renders handles for initialStep='handles'", () => {
+  it("renders welcome for a brand-new creator (no handles yet)", () => {
     render(<WizardClient {...base()} initialStep="handles" />)
+    expect(screen.getByTestId('step-welcome')).toBeTruthy()
+  })
+  it("renders handles for initialStep='handles' once handles exist", () => {
+    render(
+      <WizardClient
+        {...base()}
+        initialStep="handles"
+        handles={[{ platform: 'instagram', handle: 'x' }]}
+      />,
+    )
     expect(screen.getByTestId('step-handles')).toBeTruthy()
   })
   it("renders progress for initialStep='progress'", () => {

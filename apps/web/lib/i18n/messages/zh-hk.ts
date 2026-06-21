@@ -30,6 +30,15 @@ const messages: Messages = {
   },
   onboarding: {
     title: '設定你的創作者檔案',
+    welcomeStep: {
+      heading: '一齊嚟打造你嘅創作者 DNA',
+      intro: '我哋會讀取你嘅公開帖文，生成一份涵蓋你嘅範疇、受眾同觸及嘅檔案，等品牌更容易搵到你並合作。',
+      pointPublic: '只讀取公開帖文 — 唔涉及私人內容',
+      pointTime: '大約一分鐘',
+      pointEdit: '發佈前你可以查看同編輯',
+      cta: '開始',
+      platforms: '支援 Instagram、YouTube 同 Threads',
+    },
     handlesStep: {
       heading: '加入你的社交帳號',
       intro: '加入以下 1–3 個帳號，我們會掃描以草擬你的創作者 DNA。',

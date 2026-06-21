@@ -10,6 +10,7 @@ import type { Step } from '@/lib/onboarding/resumeRoute'
 import type { Platform } from '@/lib/onboarding/validateHandle'
 import type { InitialHandle } from '@/components/onboarding/HandlesStep'
 import { HandlesStep } from './HandlesStep'
+import { WelcomeStep } from './WelcomeStep'
 import { LiveProgress } from './LiveProgress'
 import { DnaReviewForm } from './DnaReviewForm'
 import { ReadBack } from './ReadBack'
@@ -43,6 +44,17 @@ export function WizardClient(props: WizardClientProps) {
   const effectiveDraft = draft ?? clientDraft
 
   const onb = messages.onboarding
+
+  // One-time welcome for brand-new creators; the dismissed flag is persisted
+  // client-side so it doesn't reappear on refresh.
+  const [welcomed, setWelcomed] = useState(false)
+  useEffect(() => {
+    try {
+      if (window.localStorage?.getItem('kinnso_welcome_seen') === '1') setWelcomed(true)
+    } catch {
+      // localStorage unavailable (private mode / test env) — just show the welcome.
+    }
+  }, [])
 
   // Resilience: once we're on the review step but no draft has arrived, pull it
   // directly from creator_dna (owner RLS) until it appears. Without this, a
@@ -94,6 +106,22 @@ export function WizardClient(props: WizardClientProps) {
   }
 
   if (step === 'handles') {
+    // Brand-new creators (no saved handles yet) get a one-time welcome first.
+    if (handles.length === 0 && !welcomed) {
+      return (
+        <WelcomeStep
+          t={onb.welcomeStep}
+          onStart={() => {
+            try {
+              window.localStorage.setItem('kinnso_welcome_seen', '1')
+            } catch {
+              // ignore storage failures (private mode, etc.)
+            }
+            setWelcomed(true)
+          }}
+        />
+      )
+    }
     return (
       <HandlesStep
         creatorId={creatorId}

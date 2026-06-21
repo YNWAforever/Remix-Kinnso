@@ -30,6 +30,15 @@ const messages: Messages = {
   },
   onboarding: {
     title: 'クリエイタープロフィールを設定',
+    welcomeStep: {
+      heading: 'あなたのクリエイターDNAを作りましょう',
+      intro: '公開済みの投稿を読み取り、あなたのニッチ・オーディエンス・リーチをまとめたプロフィールを作成します。ブランドがあなたを見つけやすくなります。',
+      pointPublic: '公開投稿のみ — 非公開のものは読み取りません',
+      pointTime: '所要時間は約1分',
+      pointEdit: '公開前に内容を確認・編集できます',
+      cta: 'はじめる',
+      platforms: 'Instagram、YouTube、Threads に対応',
+    },
     handlesStep: {
       heading: 'SNSアカウントを追加',
       intro: '以下から1〜3件のアカウントを追加してください。スキャンしてクリエイターDNAを作成します。',

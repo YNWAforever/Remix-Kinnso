@@ -30,6 +30,15 @@ const messages: Messages = {
   },
   onboarding: {
     title: '设置你的创作者资料',
+    welcomeStep: {
+      heading: '一起来打造你的创作者 DNA',
+      intro: '我们会读取你的公开帖子，生成一份涵盖你的领域、受众和触达的档案，让品牌更容易找到并与你合作。',
+      pointPublic: '仅读取公开帖子 — 不涉及私密内容',
+      pointTime: '大约一分钟',
+      pointEdit: '发布前你可以查看和编辑',
+      cta: '开始',
+      platforms: '支持 Instagram、YouTube 和 Threads',
+    },
     handlesStep: {
       heading: '添加你的社交账号',
       intro: '添加下列 1–3 个账号，我们会扫描以草拟你的创作者 DNA。',

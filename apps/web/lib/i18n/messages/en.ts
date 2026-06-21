@@ -28,6 +28,15 @@ export interface Messages {
   }
   onboarding: {
     title: string
+    welcomeStep: {
+      heading: string
+      intro: string
+      pointPublic: string
+      pointTime: string
+      pointEdit: string
+      cta: string
+      platforms: string
+    }
     handlesStep: {
       heading: string
       intro: string
@@ -443,6 +452,15 @@ const messages: Messages = {
   },
   onboarding: {
     title: 'Set up your creator profile',
+    welcomeStep: {
+      heading: "Let's build your creator DNA",
+      intro: 'We read your public posts to draft a profile of your niches, audience and reach — so brands can find and work with you.',
+      pointPublic: 'Only your public posts — nothing private',
+      pointTime: 'Takes about a minute',
+      pointEdit: 'You review & edit before anything goes live',
+      cta: 'Get started',
+      platforms: 'Works with Instagram, YouTube and Threads',
+    },
     handlesStep: {
       heading: 'Add your social handles',
       intro: 'Add 1–3 of the accounts below. We scan them to draft your creator DNA.',
