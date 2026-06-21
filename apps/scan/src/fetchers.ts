@@ -99,6 +99,41 @@ export class RapidApiFetcher implements PlatformFetcher {
     }
     const raw = (await res.json()) as Record<string, unknown>
 
+    // Instagram: the profile endpoint carries no captions, so enrich it with
+    // recent post captions from `/get_ig_user_posts.php` (POST form; captions live
+    // at `posts[].node.caption.text`) so the DNA reflects real content, not just
+    // the bio. Best-effort — a posts-fetch failure still yields a profile-only
+    // ("thin") result. The reshape below reads these off `raw.posts`.
+    if (platform === 'instagram') {
+      try {
+        const postsRes = await fetchWithRetry(`https://${host}/get_ig_user_posts.php`, {
+          method: 'POST',
+          headers: {
+            'x-rapidapi-key': this.apiKey,
+            'x-rapidapi-host': host,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            username_or_url: handle,
+            amount: '12',
+            pagination_token: '',
+          }).toString(),
+        })
+        if (postsRes.ok) {
+          const pj = (await postsRes.json()) as {
+            posts?: Array<{ node?: { caption?: { text?: string } } }>
+          }
+          const captions = (pj.posts ?? [])
+            .map((p) => p?.node?.caption?.text)
+            .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+            .map((text) => ({ caption: text }))
+          if (captions.length > 0) raw.posts = captions
+        }
+      } catch (err) {
+        console.warn(`[scan] instagram posts fetch failed for "${handle}"`, (err as Error).message)
+      }
+    }
+
     // Reshape the provider response into the nested shape the @kinnso/scan
     // normalizers read:
     //   - Instagram: { data: { user: { edge_followed_by, biography,

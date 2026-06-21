@@ -184,12 +184,15 @@ export async function runScan(deps: ScanDeps, jobId: string): Promise<void> {
     try {
       llmText = await llm.complete(messages)
     } catch (secondErr) {
-      // Log the verbose provider response server-side only; the job.error column
-      // is client-readable (owner RLS), so store a generic user-safe message and
-      // never echo raw upstream provider bodies to the client.
+      // Surface a capped, single-line reason into job.error (client-readable via
+      // owner RLS) so a failure is diagnosable in one shot — e.g. "fetch failed"
+      // or "LLM endpoint returned HTTP 404: …". The API key lives only in the
+      // Authorization header, never in these provider error bodies, so this is
+      // safe; the full untruncated error still goes to the server logs.
+      const reason = (secondErr as Error).message.replace(/\s+/g, ' ').slice(0, 200)
       console.error('[scan] LLM failed after retry', jobId, (secondErr as Error).message)
       await setJobStatus(db, jobId, 'failed', {
-        error: 'AI analysis temporarily unavailable, please retry.',
+        error: `AI analysis failed: ${reason}`,
         completed_at: new Date().toISOString(),
       })
       return

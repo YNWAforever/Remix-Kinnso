@@ -30,12 +30,14 @@ describe('RapidApiFetcher', () => {
   })
 
   it('sends correct x-rapidapi-key and x-rapidapi-host headers for instagram', async () => {
-    const fetchMock = vi.fn().mockResolvedValueOnce(makeOkResponse({ data: {} }))
+    // instagram makes two calls (profile, then posts for captions); both ok here.
+    const fetchMock = vi.fn().mockResolvedValue(makeOkResponse({ data: {} }))
     vi.stubGlobal('fetch', fetchMock)
     const f = new RapidApiFetcher('test-api-key')
     await f.fetch('instagram', 'some_handle')
-    expect(fetchMock).toHaveBeenCalledOnce()
+    // calls[0] is the profile endpoint.
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toContain('ig_get_fb_profile_v3.php')
     expect(url).toContain('instagram-scraper-stable-api.p.rapidapi.com')
     // instagram uses the POST form endpoint; the handle travels in the body.
     expect(init.method).toBe('POST')
@@ -67,10 +69,11 @@ describe('RapidApiFetcher', () => {
       .fn()
       .mockResolvedValueOnce(makeErrorResponse(429))
       .mockResolvedValueOnce(makeOkResponse({ data: { followers_count: 100 } }))
+      .mockResolvedValueOnce(makeOkResponse({ posts: [] })) // posts-captions call
     vi.stubGlobal('fetch', fetchMock)
-    // Override sleep so the test does not wait 500 ms
+    // profile retries once (429 -> ok) = 2 calls, then the posts call = 3 total
     const result = await new RapidApiFetcher('key').fetch('instagram', 'user')
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledTimes(3)
     // The fetcher reshapes the provider response into the normalizer-expected
     // nested shape (data.user.edge_followed_by.count).
     expect(result).toMatchObject({ data: { user: { edge_followed_by: { count: 100 } } } })
