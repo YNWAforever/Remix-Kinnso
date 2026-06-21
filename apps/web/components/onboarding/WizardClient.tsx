@@ -49,8 +49,14 @@ export function WizardClient(props: WizardClientProps) {
   // client-side so it doesn't reappear on refresh.
   const [welcomed, setWelcomed] = useState(false)
   useEffect(() => {
+    // One-time client read of the persisted dismiss flag. setState-on-mount is
+    // intentional (it can't run during SSR), and starting from `false` on both
+    // server and client avoids a hydration mismatch.
     try {
-      if (window.localStorage?.getItem('kinnso_welcome_seen') === '1') setWelcomed(true)
+      if (window.localStorage?.getItem('kinnso_welcome_seen') === '1') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setWelcomed(true)
+      }
     } catch {
       // localStorage unavailable (private mode / test env) — just show the welcome.
     }
