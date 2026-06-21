@@ -59,6 +59,12 @@ export interface Messages {
       reauth: string
       error: string
       unconfigured: string
+      stepFetchingDesc: string
+      stepAnalyzingDesc: string
+      stepReadyTitle: string
+      stepReadyDesc: string
+      timeHint: string
+      elapsed: string
       continue: string
     }
     signOut: string
@@ -468,6 +474,12 @@ const messages: Messages = {
       reauth: 'Your session expired. Please sign in again.',
       error: 'Something went wrong starting the scan. Please try again.',
       unconfigured: 'Scanning is temporarily unavailable. Please try again later.',
+      stepFetchingDesc: 'Reading your last ~24 posts',
+      stepAnalyzingDesc: 'Finding your niches, tone & audience',
+      stepReadyTitle: 'Your DNA is ready',
+      stepReadyDesc: 'Building your creator profile',
+      timeHint: 'Usually under a minute',
+      elapsed: 'elapsed',
       continue: 'Continue',
     },
     signOut: 'Sign out',

@@ -19,6 +19,66 @@ const STATE_KEY = { pending: 'statePending', ok: 'stateOk', failed: 'stateFailed
 
 type Notice = 'none' | 'rateLimited' | 'reauth' | 'error' | 'unconfigured'
 
+type StepState = 'done' | 'active' | 'failed' | 'upcoming'
+
+// The three visible steps of the scan journey. The worker's 4 statuses
+// (queued/fetching/analyzing/ready) collapse onto these.
+const STEPS: ReadonlyArray<{ key: string; titleKey: keyof ProgressDict; descKey: keyof ProgressDict }> = [
+  { key: 'fetch', titleKey: 'phaseFetching', descKey: 'stepFetchingDesc' },
+  { key: 'analyze', titleKey: 'phaseAnalyzing', descKey: 'stepAnalyzingDesc' },
+  { key: 'ready', titleKey: 'stepReadyTitle', descKey: 'stepReadyDesc' },
+]
+
+// On failure the failing step is inferred from the error text (the worker drops
+// the prior phase when it flips to 'failed'): a fetch-phase failure vs a later one.
+function stepStatesFor(status: JobStatus, error: string | null): [StepState, StepState, StepState] {
+  if (status === 'ready') return ['done', 'done', 'done']
+  if (status === 'failed') {
+    const fetchFailed = /platform fetches failed|no data to analyze/i.test(error ?? '')
+    return fetchFailed ? ['failed', 'upcoming', 'upcoming'] : ['done', 'failed', 'upcoming']
+  }
+  if (status === 'analyzing') return ['done', 'active', 'upcoming']
+  return ['active', 'upcoming', 'upcoming'] // queued | fetching
+}
+
+// Phase-capped progress: the bar grows with elapsed time so it never looks frozen
+// during the ~40s analyze phase, but it can't pass the active phase's ceiling — so
+// it stays honest (won't show 90% while still fetching).
+const PHASE_CEIL: Record<JobStatus, number> = {
+  queued: 12,
+  fetching: 55,
+  analyzing: 93,
+  ready: 100,
+  failed: 93,
+}
+
+function StepBullet({ state }: { state: StepState }) {
+  if (state === 'done') {
+    return (
+      <span className="flex size-6 flex-none items-center justify-center rounded-full bg-green-100 text-green-700">
+        <svg viewBox="0 0 20 20" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+          <path d="M5 10.5l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+    )
+  }
+  if (state === 'active') {
+    return (
+      <span className="size-6 flex-none animate-spin rounded-full border-2 border-ink/20 border-t-ink" aria-hidden="true" />
+    )
+  }
+  if (state === 'failed') {
+    return (
+      <span className="flex size-6 flex-none items-center justify-center rounded-full bg-red-100 text-red-700">
+        <svg viewBox="0 0 20 20" className="size-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+          <path d="M6 6l8 8M14 6l-8 8" strokeLinecap="round" />
+        </svg>
+      </span>
+    )
+  }
+  return <span className="size-6 flex-none rounded-full border-2 border-ink/15" aria-hidden="true" />
+}
+
 async function bearer(): Promise<string | null> {
   const supabase = createSupabaseBrowserClient()
   const {
@@ -42,6 +102,7 @@ export function LiveProgress({
 }) {
   const [job, setJob] = useState<JobRow | null>(null)
   const [notice, setNotice] = useState<Notice>('none')
+  const [elapsed, setElapsed] = useState(0)
   const jobIdRef = useRef<string | null>(jobId)
   const readyFiredRef = useRef(false)
 
@@ -164,6 +225,15 @@ export function LiveProgress({
     // creatorId is included so a different creator remounts the subscription.
   }, [creatorId, startScan, subscribeAndSelect])
 
+  // Tick the elapsed-seconds counter once per second; stop once the job reaches a
+  // terminal state or a notice blocks the scan.
+  useEffect(() => {
+    const stopped = job?.status === 'ready' || job?.status === 'failed' || notice !== 'none'
+    if (stopped) return
+    const id = setInterval(() => setElapsed((e) => e + 1), 1000)
+    return () => clearInterval(id)
+  }, [job?.status, notice])
+
   async function retry() {
     const id = jobIdRef.current
     if (!id) return
@@ -178,21 +248,69 @@ export function LiveProgress({
   }
 
   const status: JobStatus = job?.status ?? 'queued'
+  const blockingNotice = notice !== 'none'
   const rows = toRenderRows(job?.progress ?? null, platforms)
+  const steps: [StepState, StepState, StepState] =
+    blockingNotice && !job ? ['failed', 'upcoming', 'upcoming'] : stepStatesFor(status, job?.error ?? null)
+  const barPct = status === 'ready' ? 100 : Math.min(PHASE_CEIL[status], Math.round(elapsed * 1.7))
+  const mmss = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`
 
   return (
-    <section className="w-full max-w-md space-y-4">
+    <section className="w-full max-w-md space-y-5">
       <h2 className="text-xl font-semibold">{t.heading}</h2>
-      <p className="text-sm font-medium">{t[PHASE_KEY[status]]}</p>
+      {/* Screen-reader live region announcing the current phase. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {`${t.heading}: ${t[PHASE_KEY[status]]}`}
+      </p>
 
-      <ul className="space-y-1">
-        {rows.map((r) => (
-          <li key={r.platform} className="flex justify-between text-sm">
-            <span className="capitalize">{r.platform}</span>
-            <span>{t[STATE_KEY[r.state]]}</span>
-          </li>
-        ))}
-      </ul>
+      <div
+        className="h-1.5 w-full overflow-hidden rounded-full bg-ink/10"
+        role="progressbar"
+        aria-valuenow={barPct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="h-full rounded-full bg-ink transition-[width] duration-700 ease-linear"
+          style={{ width: `${barPct}%` }}
+        />
+      </div>
+
+      <ol className="space-y-3.5">
+        {STEPS.map((s, i) => {
+          const st = steps[i]
+          return (
+            <li key={s.key} className="flex items-start gap-3">
+              <StepBullet state={st} />
+              <div className={st === 'upcoming' ? 'opacity-50' : undefined}>
+                <p className="text-sm font-medium">{t[s.titleKey]}</p>
+                <p className={`text-xs ${st === 'active' ? 'text-ink/60' : 'text-ink/45'}`}>{t[s.descKey]}</p>
+                {i === 0 && platforms.length > 1 ? (
+                  <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+                    {rows.map((r) => (
+                      <li key={r.platform} className="text-[11px] text-ink/50">
+                        <span className="capitalize">{r.platform}</span> · {t[STATE_KEY[r.state]]}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </li>
+          )
+        })}
+      </ol>
+
+      {!blockingNotice && status !== 'failed' ? (
+        <p className="flex items-center gap-1.5 border-t border-ink/10 pt-3 text-xs text-ink/50">
+          <svg viewBox="0 0 20 20" className="size-3.5 flex-none" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+            <circle cx="10" cy="10" r="7.5" />
+            <path d="M10 6v4l2.5 2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span>
+            {t.timeHint} · {mmss} {t.elapsed}
+          </span>
+        </p>
+      ) : null}
 
       {notice === 'rateLimited' ? <p className="text-sm text-amber-600">{t.rateLimited}</p> : null}
       {notice === 'reauth' ? <p className="text-sm text-red-600">{t.reauth}</p> : null}
