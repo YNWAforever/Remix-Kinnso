@@ -580,17 +580,25 @@ export async function createPartnerLinkAction(
   })
 
   let partnerUrl: string | null = null
+  let failureReason = 'no partner link returned'
   try {
     const [link] = await createTravelpayoutsPartnerLinks({
       shorten: true,
       links: [{ url: input.originalUrl, subId }],
     })
     if (link?.status === 'success' && link.partnerUrl) partnerUrl = link.partnerUrl
-  } catch {
-    return formError('Travelpayouts partner link could not be generated')
+    else if (link?.message) failureReason = link.message
+  } catch (err) {
+    failureReason = err instanceof Error ? err.message : String(err)
   }
 
-  if (!partnerUrl) return formError('Travelpayouts partner link could not be generated')
+  if (!partnerUrl) {
+    // Surface the real Travelpayouts reason (HTTP status / API message) rather than
+    // swallowing it. The access token is never present in these reasons, so it is safe
+    // to log and return.
+    console.error('[createPartnerLinkAction] Travelpayouts link generation failed:', failureReason)
+    return formError(`Travelpayouts partner link could not be generated: ${failureReason}`)
+  }
 
   // Persist via the SECURITY DEFINER RPC (granted to `authenticated`). It re-validates
   // ownership + active mission/program state and inserts as definer, so no service-role
