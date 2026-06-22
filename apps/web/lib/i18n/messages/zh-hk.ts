@@ -314,6 +314,11 @@ const messages: Messages = {
     openMission: 'Open mission',
     targetedMission: 'Targeted invite',
     validationError: 'Check the highlighted fields and try again.',
+    myMissions: '我的任務',
+    availableMissions: '可參與的任務',
+    milestoneProgress: '里程碑已提交',
+    myMissionsEmpty: '你尚未參加任何任務。',
+    availableEmpty: '暫時沒有可參與的任務，請稍後再查看。',
   },
   ops: {
     settlementHeading: 'Settlement queue',

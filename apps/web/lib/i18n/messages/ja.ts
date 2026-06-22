@@ -314,6 +314,11 @@ const messages: Messages = {
     openMission: 'Open mission',
     targetedMission: 'Targeted invite',
     validationError: 'Check the highlighted fields and try again.',
+    myMissions: 'マイミッション',
+    availableMissions: '募集中のミッション',
+    milestoneProgress: 'マイルストーン提出済み',
+    myMissionsEmpty: 'まだミッションに参加していません。',
+    availableEmpty: '現在募集中のミッションはありません。またご確認ください。',
   },
   ops: {
     settlementHeading: 'Settlement queue',

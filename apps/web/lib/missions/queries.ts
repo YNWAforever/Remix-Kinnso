@@ -18,7 +18,7 @@ export const creatorMissionSelect = `
   paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
   affiliate_network_programs(id,program_name,program_url,default_commission_description,status),
   mission_milestones(id,title,description,due_at,sort_order),
-  mission_participants(id,status,source,creator_id),
+  mission_participants(id,status,source,creator_id,mission_milestone_submissions(id,status,mission_milestone_id)),
   affiliate_partner_links(id,partner_url,original_url,sub_id)
 `
 
