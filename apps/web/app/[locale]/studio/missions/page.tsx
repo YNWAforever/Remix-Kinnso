@@ -3,6 +3,7 @@ import { CreatorMissionsView, type CreatorMissionCard } from '@/components/kinns
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { creatorMissionProgress } from '@/lib/missions/list'
 import { joinMissionAction } from '@/lib/missions/actions'
 import { listCreatorMerchantMissions } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -31,7 +32,13 @@ type CreatorMissionRow = {
     default_commission_description?: string | null
     program_url?: string | null
   }> | null
-  mission_participants?: Array<{ id: string; status: string | null; creator_id: string | null }> | null
+  mission_milestones?: Array<{ id: string }> | null
+  mission_participants?: Array<{
+    id: string
+    status: string | null
+    creator_id: string | null
+    mission_milestone_submissions?: Array<{ status: string | null; mission_milestone_id: string }> | null
+  }> | null
   affiliate_partner_links?: Array<{ id: string; partner_url: string | null }> | null
 }
 
@@ -79,6 +86,10 @@ const formatCompensation = (row: CreatorMissionRow) => {
 
 function mapCreatorMission(row: CreatorMissionRow, creatorId: string): CreatorMissionCard {
   const participant = row.mission_participants?.find((item) => item.creator_id === creatorId) ?? null
+  const { milestoneCount, submittedCount } = creatorMissionProgress(
+    row.mission_milestones,
+    participant?.mission_milestone_submissions,
+  )
 
   return {
     id: row.id,
@@ -94,6 +105,8 @@ function mapCreatorMission(row: CreatorMissionRow, creatorId: string): CreatorMi
     })),
     programUrl: programUrl(row.affiliate_network_programs),
     compensation: formatCompensation(row),
+    milestoneCount,
+    submittedCount,
   }
 }
 
