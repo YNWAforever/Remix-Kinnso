@@ -33,21 +33,21 @@ type CreatorMissionsViewProps = {
 export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
-  const [isPending, setIsPending] = useState(false)
+  const [pendingId, setPendingId] = useState<string | null>(null)
   const { mine, available } = segmentMissions(missions)
 
   const getJoinLabel = (missionType: CreatorMissionCard['missionType']) =>
     missionType === 'coupon_affiliate' ? t.joinMission : t.applyMission
 
-  const runAction = async (action: () => KinnsoActionResult | Promise<KinnsoActionResult>) => {
+  const runAction = async (missionId: string, action: () => KinnsoActionResult | Promise<KinnsoActionResult>) => {
     setActionError(null)
-    setIsPending(true)
+    setPendingId(missionId)
     try {
       const result = await action()
       setActionError(actionErrorMessage(result))
       if (actionSucceeded(result)) router.refresh()
     } finally {
-      setIsPending(false)
+      setPendingId(null)
     }
   }
 
@@ -115,8 +115,8 @@ export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsView
                   <button
                     type="button"
                     className="k-btn-primary text-sm"
-                    disabled={isPending}
-                    onClick={() => void runAction(() => onJoin(mission.id))}
+                    disabled={pendingId === mission.id}
+                    onClick={() => void runAction(mission.id, () => onJoin(mission.id))}
                   >
                     {getJoinLabel(mission.missionType)}
                   </button>

@@ -72,6 +72,25 @@ describe('CreatorMissionsView', () => {
     await waitFor(() => expect(refreshMock).toHaveBeenCalledTimes(1))
   })
 
+  it('only disables the mission whose action is in flight', () => {
+    const onJoin = vi.fn(() => new Promise<{ ok: true }>(() => {}))
+    render(
+      <CreatorMissionsView
+        t={en.missions}
+        missions={[
+          { ...baseAvailable, id: 'm1', missionType: 'coupon_affiliate' },
+          { ...baseAvailable, id: 'm2', title: 'Paid reel', missionType: 'paid' },
+        ]}
+        onJoin={onJoin}
+      />,
+    )
+    const joinButton = screen.getByRole('button', { name: en.missions.joinMission })
+    const applyButton = screen.getByRole('button', { name: en.missions.applyMission })
+    fireEvent.click(joinButton)
+    expect(joinButton).toHaveProperty('disabled', true)
+    expect(applyButton).toHaveProperty('disabled', false)
+  })
+
   it('uses apply copy for paid missions', () => {
     const onJoin = vi.fn()
     render(
