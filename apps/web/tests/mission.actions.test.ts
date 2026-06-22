@@ -584,9 +584,7 @@ describe('createPartnerLinkAction', () => {
     expect(createServiceClientMock).not.toHaveBeenCalled()
   })
 
-  it('validates membership before generating and storing a Travelpayouts partner link through the service client', async () => {
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
-    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'test-service-role-key')
+  it('validates membership before generating and storing a Travelpayouts partner link via the security-definer RPC', async () => {
     buildSubIdMock.mockReturnValue('creator-sub')
     createTravelpayoutsPartnerLinksMock.mockResolvedValue([
       {
@@ -621,23 +619,20 @@ describe('createPartnerLinkAction', () => {
     const existingLinkBuilder = createBuilder({
       maybeSingle: vi.fn(async () => ({ data: null, error: null })),
     })
-    const supabase = createSupabaseMock({
-      mission_participants: participantBuilder,
-      missions: missionBuilder,
-      affiliate_network_programs: programBuilder,
-      affiliate_partner_links: existingLinkBuilder,
-    })
+    const rpcMock = vi.fn(async () => ({
+      data: [{ id: 'partner-link-1', partner_url: 'https://tp.st/abc' }],
+      error: null,
+    }))
+    const supabase = createSupabaseMock(
+      {
+        mission_participants: participantBuilder,
+        missions: missionBuilder,
+        affiliate_network_programs: programBuilder,
+        affiliate_partner_links: existingLinkBuilder,
+      },
+      { rpc: rpcMock },
+    )
     createSupabaseServerClientMock.mockResolvedValue(supabase)
-    const serviceInsertBuilder = createBuilder({
-      single: vi.fn(async () => ({
-        data: { id: 'partner-link-1', partner_url: 'https://tp.st/abc' },
-        error: null,
-      })),
-    })
-    const serviceSupabase = createSupabaseMock({
-      affiliate_partner_links: serviceInsertBuilder,
-    })
-    createServiceClientMock.mockReturnValue(serviceSupabase)
 
     const result = await createPartnerLinkAction({
       missionParticipantId: 'participant-1',
@@ -660,33 +655,21 @@ describe('createPartnerLinkAction', () => {
       participantId: 'participant-1',
       creatorId: 'user-1',
     })
-    expect(createServiceClientMock).toHaveBeenCalledWith(
-      'https://example.supabase.co',
-      'test-service-role-key',
-      expect.objectContaining({
-        auth: expect.objectContaining({
-          autoRefreshToken: false,
-          persistSession: false,
-        }),
-      }),
-    )
-    expect(serviceInsertBuilder.insert).toHaveBeenCalledWith({
-      affiliate_network_program_id: 'program-1',
-      mission_id: 'mission-1',
-      mission_participant_id: 'participant-1',
-      creator_id: 'user-1',
-      network: 'travelpayouts',
-      original_url: 'https://example.com/hotel',
-      partner_url: 'https://tp.st/abc',
-      sub_id: 'creator-sub',
-      external_status: 'success',
+    // Persists through the SECURITY DEFINER RPC on the creator's own client — no
+    // service-role key client is constructed.
+    expect(rpcMock).toHaveBeenCalledWith('create_travelpayouts_partner_link', {
+      p_affiliate_network_program_id: 'program-1',
+      p_mission_id: 'mission-1',
+      p_mission_participant_id: 'participant-1',
+      p_original_url: 'https://example.com/hotel',
+      p_partner_url: 'https://tp.st/abc',
+      p_sub_id: 'creator-sub',
     })
+    expect(createServiceClientMock).not.toHaveBeenCalled()
     expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/studio/missions')
   })
 
-  it('checks service-role persistence before calling Travelpayouts', async () => {
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
-    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '')
+  it('returns a save error when the partner-link RPC rejects', async () => {
     buildSubIdMock.mockReturnValue('creator-sub')
     createTravelpayoutsPartnerLinksMock.mockResolvedValue([
       {
@@ -695,34 +678,38 @@ describe('createPartnerLinkAction', () => {
         status: 'success',
       },
     ])
-    const supabase = createSupabaseMock({
-      mission_participants: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
-          error: null,
-        })),
-      }),
-      missions: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: {
-            id: 'mission-1',
-            affiliate_network_program_id: 'program-1',
-            mission_source: 'travelpayouts',
-            status: 'published',
-          },
-          error: null,
-        })),
-      }),
-      affiliate_network_programs: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
-          error: null,
-        })),
-      }),
-      affiliate_partner_links: createBuilder({
-        maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-      }),
-    })
+    const rpcMock = vi.fn(async () => ({ data: null, error: { message: 'Partner link is not allowed' } }))
+    const supabase = createSupabaseMock(
+      {
+        mission_participants: createBuilder({
+          maybeSingle: vi.fn(async () => ({
+            data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
+            error: null,
+          })),
+        }),
+        missions: createBuilder({
+          maybeSingle: vi.fn(async () => ({
+            data: {
+              id: 'mission-1',
+              affiliate_network_program_id: 'program-1',
+              mission_source: 'travelpayouts',
+              status: 'published',
+            },
+            error: null,
+          })),
+        }),
+        affiliate_network_programs: createBuilder({
+          maybeSingle: vi.fn(async () => ({
+            data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
+            error: null,
+          })),
+        }),
+        affiliate_partner_links: createBuilder({
+          maybeSingle: vi.fn(async () => ({ data: null, error: null })),
+        }),
+      },
+      { rpc: rpcMock },
+    )
     createSupabaseServerClientMock.mockResolvedValue(supabase)
 
     const result = await createPartnerLinkAction({
@@ -733,10 +720,16 @@ describe('createPartnerLinkAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      errors: { form: ['Partner link persistence is not configured'] },
+      errors: { form: ['Partner link could not be saved'] },
     })
-    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
-    expect(createServiceClientMock).not.toHaveBeenCalled()
+    expect(rpcMock).toHaveBeenCalledWith(
+      'create_travelpayouts_partner_link',
+      expect.objectContaining({
+        p_mission_participant_id: 'participant-1',
+        p_partner_url: 'https://tp.st/abc',
+        p_sub_id: 'creator-sub',
+      }),
+    )
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 })
