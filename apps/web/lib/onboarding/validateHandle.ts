@@ -7,8 +7,17 @@
  *  - youtube:   letters/digits/`.`/`_`/`-`, 1–30 chars (the `@handle`, not a channel id)
  *  - threads:   letters/digits/`_`, 1–30 chars (no dots)
  */
-export const PLATFORMS = ['instagram', 'youtube', 'threads'] as const
-export type Platform = (typeof PLATFORMS)[number]
+import type { Platform } from '@kinnso/scan'
+
+// `Platform` is defined canonically by the zod `PlatformEnum` in `@kinnso/scan`
+// (the DNA schema's source of truth). Re-export it here so handle validation and
+// the DNA schema can never silently drift to two different unions.
+export type { Platform }
+
+// Supported platforms in display order. `satisfies` ties the runtime values to the
+// canonical union, so a mismatch with `@kinnso/scan` is a compile error, not a
+// silent structural-typing coincidence.
+export const PLATFORMS = ['instagram', 'youtube', 'threads'] as const satisfies readonly Platform[]
 
 export function isPlatform(x: string): x is Platform {
   return (PLATFORMS as readonly string[]).includes(x)
