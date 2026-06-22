@@ -314,6 +314,11 @@ const messages: Messages = {
     openMission: 'Open mission',
     targetedMission: 'Targeted invite',
     validationError: 'Check the highlighted fields and try again.',
+    myMissions: '내 미션',
+    availableMissions: '참여 가능한 미션',
+    milestoneProgress: '마일스톤 제출',
+    myMissionsEmpty: '아직 참여한 미션이 없습니다.',
+    availableEmpty: '지금은 참여 가능한 미션이 없습니다. 나중에 다시 확인해 주세요.',
   },
   ops: {
     settlementHeading: 'Settlement queue',

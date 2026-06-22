@@ -314,6 +314,11 @@ const messages: Messages = {
     openMission: 'Open mission',
     targetedMission: 'Targeted invite',
     validationError: 'Check the highlighted fields and try again.',
+    myMissions: 'ภารกิจของฉัน',
+    availableMissions: 'ภารกิจที่เปิดรับ',
+    milestoneProgress: 'ไมล์สโตนที่ส่งแล้ว',
+    myMissionsEmpty: 'คุณยังไม่ได้เข้าร่วมภารกิจใด ๆ',
+    availableEmpty: 'ขณะนี้ยังไม่มีภารกิจที่เปิดรับ โปรดกลับมาตรวจสอบใหม่',
   },
   ops: {
     settlementHeading: 'Settlement queue',

@@ -315,6 +315,11 @@ export interface Messages {
     openMission: string
     targetedMission: string
     validationError: string
+    myMissions: string
+    availableMissions: string
+    milestoneProgress: string
+    myMissionsEmpty: string
+    availableEmpty: string
   }
   ops: {
     settlementHeading: string
@@ -775,6 +780,11 @@ const messages: Messages = {
     openMission: 'Open mission',
     targetedMission: 'Targeted invite',
     validationError: 'Check the highlighted fields and try again.',
+    myMissions: 'My missions',
+    availableMissions: 'Available missions',
+    milestoneProgress: 'milestones submitted',
+    myMissionsEmpty: "You haven't joined any missions yet.",
+    availableEmpty: 'No missions available right now. Check back soon.',
   },
   ops: {
     settlementHeading: 'Settlement queue',
