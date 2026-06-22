@@ -17,13 +17,31 @@ const dna: Dna = {
   languages: ['zh-HK', 'en'],
 }
 
+function renderReadBack() {
+  return render(
+    <ReadBack
+      dna={dna}
+      t={en.dna}
+      dashboardHref="/en/studio"
+      signOutHref="/en/auth/sign-out"
+      signOutLabel={en.onboarding.signOut}
+    />,
+  )
+}
+
 describe('ReadBack', () => {
   it('renders the published DNA and the sign-out link', () => {
-    render(<ReadBack dna={dna} t={en.dna} signOutHref="/en/auth/sign-out" signOutLabel={en.onboarding.signOut} />)
+    renderReadBack()
     expect(screen.getByText(en.dna.readBackHeading)).toBeTruthy()
     expect(screen.getByText('Travel creator in HK')).toBeTruthy()
     expect(screen.getByText('travel, food')).toBeTruthy()
     const link = screen.getByRole('link', { name: en.onboarding.signOut }) as HTMLAnchorElement
     expect(link.getAttribute('href')).toBe('/en/auth/sign-out')
+  })
+
+  it('renders a primary CTA to the Creator Studio dashboard', () => {
+    renderReadBack()
+    const cta = screen.getByRole('link', { name: en.dna.enterStudio }) as HTMLAnchorElement
+    expect(cta.getAttribute('href')).toBe('/en/studio')
   })
 })

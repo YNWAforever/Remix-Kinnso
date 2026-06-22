@@ -99,6 +99,7 @@ const messages: Messages = {
     invalid: 'กรุณาแก้ไขช่องที่ไฮไลต์ก่อนเผยแพร่',
     readBackHeading: 'โปรไฟล์ของคุณเผยแพร่แล้ว',
     readBackIntro: 'นี่คือ DNA ครีเอเตอร์ที่คุณเผยแพร่',
+    enterStudio: 'ไปที่ Creator Studio',
   },
   studio: {
     introHeading: 'เพิ่มแฮนเดิลของคุณเพื่อเริ่มต้น',

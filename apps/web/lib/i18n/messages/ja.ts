@@ -99,6 +99,7 @@ const messages: Messages = {
     invalid: '公開する前に強調された項目を修正してください。',
     readBackHeading: 'プロフィールが公開されました',
     readBackIntro: '公開されたクリエイターDNAはこちらです。',
+    enterStudio: 'クリエイタースタジオへ',
   },
   studio: {
     introHeading: 'アカウントを追加して開始',

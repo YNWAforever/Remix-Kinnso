@@ -97,6 +97,7 @@ export interface Messages {
     invalid: string
     readBackHeading: string
     readBackIntro: string
+    enterStudio: string
   }
   studio: {
     introHeading: string
@@ -559,6 +560,7 @@ const messages: Messages = {
     invalid: 'Please fix the highlighted fields before publishing.',
     readBackHeading: 'Your profile is live',
     readBackIntro: 'Here is your published creator DNA.',
+    enterStudio: 'Go to Creator Studio',
   },
   studio: {
     introHeading: 'Add your handles to begin',

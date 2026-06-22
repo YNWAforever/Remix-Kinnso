@@ -99,6 +99,7 @@ const messages: Messages = {
     invalid: '请先修正高亮的字段再发布。',
     readBackHeading: '你的资料已上线',
     readBackIntro: '以下是你已发布的创作者 DNA。',
+    enterStudio: '前往创作者工作室',
   },
   studio: {
     introHeading: '添加你的账号以开始',

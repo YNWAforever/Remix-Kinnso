@@ -99,6 +99,7 @@ const messages: Messages = {
     invalid: '請先修正標示的欄位再發佈。',
     readBackHeading: '你的檔案已上線',
     readBackIntro: '以下是你已發佈的創作者 DNA。',
+    enterStudio: '前往創作者工作室',
   },
   studio: {
     introHeading: '加入你的帳號以開始',

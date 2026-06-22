@@ -17,11 +17,13 @@ function Row({ label, value }: { label: string; value: string }) {
 export function ReadBack({
   dna,
   t,
+  dashboardHref,
   signOutHref,
   signOutLabel,
 }: {
   dna: Dna
   t: DnaDict
+  dashboardHref: string
   signOutHref: string
   signOutLabel: string
 }) {
@@ -44,9 +46,17 @@ export function ReadBack({
         />
       </div>
 
-      <a href={signOutHref} className="text-sm underline text-ink/70 hover:text-ink">
-        {signOutLabel}
-      </a>
+      <div className="flex flex-wrap items-center gap-4 pt-1">
+        <a
+          href={dashboardHref}
+          className="inline-flex items-center justify-center rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
+        >
+          {t.enterStudio}
+        </a>
+        <a href={signOutHref} className="text-sm underline text-ink/70 hover:text-ink">
+          {signOutLabel}
+        </a>
+      </div>
     </section>
   )
 }

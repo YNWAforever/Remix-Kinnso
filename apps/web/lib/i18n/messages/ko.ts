@@ -99,6 +99,7 @@ const messages: Messages = {
     invalid: '게시하기 전에 강조된 항목을 수정하세요.',
     readBackHeading: '프로필이 공개되었습니다',
     readBackIntro: '게시된 크리에이터 DNA입니다.',
+    enterStudio: '크리에이터 스튜디오로 이동',
   },
   studio: {
     introHeading: '계정을 추가하여 시작하기',

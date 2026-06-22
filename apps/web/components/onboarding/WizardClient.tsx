@@ -183,6 +183,7 @@ export function WizardClient(props: WizardClientProps) {
     <ReadBack
       dna={final ?? effectiveDraft ?? emptyDna()}
       t={messages.dna}
+      dashboardHref={`/${locale}/studio`}
       signOutHref={`/${locale}/auth/sign-out`}
       signOutLabel={onb.signOut}
     />
