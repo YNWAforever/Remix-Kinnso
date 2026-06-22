@@ -19,6 +19,18 @@ describe('Travelpayouts adapter', () => {
     expect(buildSubId({ missionId: 'm1', participantId: 'p1', creatorId: 'c1' })).toBe('kinnso_m_m1_p_p1_c_c1')
   })
 
+  it('strips UUID hyphens so the sub_id is Travelpayouts-legal ([0-9A-Za-z_] only)', () => {
+    const missionId = '389edc00-ed11-468e-a289-52215930c8c0'
+    const participantId = 'dd24c548-aae0-4567-b08a-8f8185b186d1'
+    const creatorId = 'a0000000-0000-4000-a000-00000000ad01'
+    const subId = buildSubId({ missionId, participantId, creatorId })
+    // The load-bearing property: no hyphens, only Travelpayouts-legal characters.
+    expect(subId).not.toContain('-')
+    expect(subId).toMatch(/^[0-9A-Za-z_]+$/)
+    expect(subId).toContain(creatorId.replace(/-/g, '')) // creator still recoverable for attribution
+    expect(subId.length).toBeLessThanOrEqual(4096)
+  })
+
   it('creates partner links with server-side token and marker', async () => {
     vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'test-token')
     vi.stubEnv('TRAVELPAYOUTS_PROJECT_ID', '197987')

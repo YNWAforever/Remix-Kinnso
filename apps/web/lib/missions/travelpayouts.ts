@@ -53,8 +53,15 @@ type TravelpayoutsPartnerLinkResponse = {
   }
 }
 
-export const buildSubId = ({ missionId, participantId, creatorId }: BuildSubIdInput) =>
-  `kinnso_m_${missionId}_p_${participantId}_c_${creatorId}`
+export const buildSubId = ({ missionId, participantId, creatorId }: BuildSubIdInput) => {
+  // Travelpayouts SubIDs accept only [0-9A-Za-z_] (max 4096 chars). UUID hyphens are
+  // rejected — which both fails link creation AND would break per-creator attribution —
+  // so strip them. The value stays unique and deterministic; reconciliation matches it
+  // verbatim (affiliate_partner_links.sub_id ↔ affiliate_network_events.sub_id), so the
+  // format is opaque and needs no parser change.
+  const stripHyphens = (id: string) => id.replace(/-/g, '')
+  return `kinnso_m_${stripHyphens(missionId)}_p_${stripHyphens(participantId)}_c_${stripHyphens(creatorId)}`
+}
 
 const requireEnv = (name: string) => {
   const value = process.env[name]?.trim()
