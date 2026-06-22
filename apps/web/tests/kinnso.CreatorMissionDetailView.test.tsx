@@ -6,6 +6,7 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
 
 import { CreatorMissionDetailView } from '@/components/kinnso/pages/CreatorMissionDetailView'
 import type { CreatorMissionDetail } from '@/lib/missions/detail'
+import type { KinnsoActionResult } from '@/components/kinnso/action-result'
 import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
@@ -17,7 +18,7 @@ const base: CreatorMissionDetail = {
   milestones: [{ id: 'a', title: 'Main reel', description: 'A reel', dueAt: '2026-07-02T00:00:00Z', state: 'none', signal: null }],
 }
 
-const render1 = (mission: CreatorMissionDetail, props: Partial<{ onJoin: () => unknown; onApply: (n: string) => unknown }> = {}) =>
+const render1 = (mission: CreatorMissionDetail, props: Partial<{ onJoin: () => KinnsoActionResult; onApply: (n: string) => KinnsoActionResult }> = {}) =>
   render(
     <CreatorMissionDetailView
       locale="en"
