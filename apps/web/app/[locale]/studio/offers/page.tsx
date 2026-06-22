@@ -5,6 +5,7 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createPartnerLinkAction, joinMissionAction } from '@/lib/missions/actions'
 import { listAffiliateOffers } from '@/lib/missions/queries'
+import { isTravelpayoutsConfigured } from '@/lib/missions/travelpayouts'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export function generateStaticParams() {
@@ -67,5 +68,13 @@ export default async function StudioOffersPage({ params }: { params: Params }) {
     return createPartnerLinkAction({ missionParticipantId, originalUrl, locale: loc })
   }
 
-  return <StudioOffersView t={messages.studioOffers} offers={offers} onJoin={join} onCreateLink={createLink} />
+  return (
+    <StudioOffersView
+      t={messages.studioOffers}
+      offers={offers}
+      linkSetupPending={!isTravelpayoutsConfigured()}
+      onJoin={join}
+      onCreateLink={createLink}
+    />
+  )
 }

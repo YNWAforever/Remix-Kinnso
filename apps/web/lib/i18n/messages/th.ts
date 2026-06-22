@@ -501,6 +501,7 @@ const messages: Messages = {
     category: 'หมวดหมู่',
     commission: 'ค่าคอมมิชชัน',
     viewProgram: 'ดูโปรแกรม',
+    setupNotConfigured: 'กำลังตั้งค่าการสร้างลิงก์พาร์ทเนอร์ โปรดกลับมาตรวจสอบอีกครั้ง',
   },
   studioEarnings: {
     heading: 'รายได้',
