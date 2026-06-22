@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
@@ -184,5 +184,39 @@ describe('Travelpayouts adapter', () => {
     })).toMatchObject({
       eventState: 'cancelled',
     })
+  })
+})
+
+import { isTravelpayoutsConfigured } from '@/lib/missions/travelpayouts'
+
+describe('isTravelpayoutsConfigured', () => {
+  const KEYS = ['TRAVELPAYOUTS_API_TOKEN', 'TRAVELPAYOUTS_PROJECT_ID', 'TRAVELPAYOUTS_MARKER'] as const
+  const saved: Record<string, string | undefined> = {}
+  // Snapshot the real env before EACH test and restore after, so cases don't leak.
+  beforeEach(() => {
+    for (const k of KEYS) saved[k] = process.env[k]
+  })
+  afterEach(() => {
+    for (const k of KEYS) {
+      if (saved[k] === undefined) delete process.env[k]
+      else process.env[k] = saved[k]
+    }
+  })
+  const set = (key: (typeof KEYS)[number], value?: string) => {
+    if (value === undefined) delete process.env[key]
+    else process.env[key] = value
+  }
+
+  it('is true only when token + numeric project + numeric marker are all present', () => {
+    set('TRAVELPAYOUTS_API_TOKEN', 'tok'); set('TRAVELPAYOUTS_PROJECT_ID', '123'); set('TRAVELPAYOUTS_MARKER', '456')
+    expect(isTravelpayoutsConfigured()).toBe(true)
+  })
+  it('is false when the token is missing', () => {
+    set('TRAVELPAYOUTS_API_TOKEN', undefined); set('TRAVELPAYOUTS_PROJECT_ID', '123'); set('TRAVELPAYOUTS_MARKER', '456')
+    expect(isTravelpayoutsConfigured()).toBe(false)
+  })
+  it('is false when project/marker are not numeric', () => {
+    set('TRAVELPAYOUTS_API_TOKEN', 'tok'); set('TRAVELPAYOUTS_PROJECT_ID', 'abc'); set('TRAVELPAYOUTS_MARKER', '456')
+    expect(isTravelpayoutsConfigured()).toBe(false)
   })
 })
