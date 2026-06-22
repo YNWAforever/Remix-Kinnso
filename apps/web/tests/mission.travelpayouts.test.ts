@@ -219,4 +219,8 @@ describe('isTravelpayoutsConfigured', () => {
     set('TRAVELPAYOUTS_API_TOKEN', 'tok'); set('TRAVELPAYOUTS_PROJECT_ID', 'abc'); set('TRAVELPAYOUTS_MARKER', '456')
     expect(isTravelpayoutsConfigured()).toBe(false)
   })
+  it('is false when project/marker are present but blank (Number("")===0 guard)', () => {
+    set('TRAVELPAYOUTS_API_TOKEN', 'tok'); set('TRAVELPAYOUTS_PROJECT_ID', ''); set('TRAVELPAYOUTS_MARKER', '   ')
+    expect(isTravelpayoutsConfigured()).toBe(false)
+  })
 })

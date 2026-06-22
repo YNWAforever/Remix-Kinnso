@@ -76,10 +76,17 @@ const requireNumericEnv = (name: string) => {
  * broken link button.
  */
 export const isTravelpayoutsConfigured = (): boolean => {
-  const token = process.env.TRAVELPAYOUTS_API_TOKEN?.trim()
-  const project = Number(process.env.TRAVELPAYOUTS_PROJECT_ID)
-  const marker = Number(process.env.TRAVELPAYOUTS_MARKER)
-  return Boolean(token) && Number.isFinite(project) && Number.isFinite(marker)
+  // Match requireEnv/requireNumericEnv semantics: trimmed, non-empty, and numeric.
+  // (Number('') === 0 is finite, so guard against blank-but-present vars too.)
+  const isNumericEnv = (value: string | undefined): boolean => {
+    const trimmed = value?.trim()
+    return Boolean(trimmed) && Number.isFinite(Number(trimmed))
+  }
+  return (
+    Boolean(process.env.TRAVELPAYOUTS_API_TOKEN?.trim()) &&
+    isNumericEnv(process.env.TRAVELPAYOUTS_PROJECT_ID) &&
+    isNumericEnv(process.env.TRAVELPAYOUTS_MARKER)
+  )
 }
 
 const toNullableString = (value: unknown) => {
