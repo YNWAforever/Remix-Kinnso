@@ -6,6 +6,7 @@ import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
+import { segmentMissions } from '@/lib/missions/list'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export type CreatorMissionCard = {
@@ -19,6 +20,8 @@ export type CreatorMissionCard = {
   partnerLinks: Array<{ id: string; partnerUrl: string }>
   programUrl: string | null
   compensation: string
+  milestoneCount: number
+  submittedCount: number
 }
 
 type CreatorMissionsViewProps = {
@@ -27,18 +30,14 @@ type CreatorMissionsViewProps = {
   onJoin: (missionId: string) => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
-export function CreatorMissionsView({
-  t,
-  missions,
-  onJoin,
-}: CreatorMissionsViewProps) {
+export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
+  const { mine, available } = segmentMissions(missions)
 
-  const getJoinLabel = (missionType: CreatorMissionCard['missionType']) => (
+  const getJoinLabel = (missionType: CreatorMissionCard['missionType']) =>
     missionType === 'coupon_affiliate' ? t.joinMission : t.applyMission
-  )
 
   const runAction = async (action: () => KinnsoActionResult | Promise<KinnsoActionResult>) => {
     setActionError(null)
@@ -60,36 +59,73 @@ export function CreatorMissionsView({
           {actionError}
         </p>
       )}
-      <div className="mt-6 grid gap-4">
-        {missions.map((mission) => {
-          return (
-            <TicketCard key={mission.id} as="article" className="p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 space-y-2">
-                  <h2 className="text-lg font-bold text-kinnso-ink">{mission.title}</h2>
-                  <p className="text-sm text-kinnso-muted">{mission.summary}</p>
-                  <MissionCompensationSummary text={mission.compensation} />
+
+      <section className="mt-8" aria-label={t.myMissions}>
+        <h2 className="text-lg font-bold text-kinnso-ink">{t.myMissions}</h2>
+        {mine.length === 0 ? (
+          <p className="mt-3 text-sm text-kinnso-muted">{t.myMissionsEmpty}</p>
+        ) : (
+          <div className="mt-4 grid gap-4">
+            {mine.map((mission) => (
+              <TicketCard key={mission.id} as="article" className="p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 space-y-2">
+                    <h3 className="text-lg font-bold text-kinnso-ink">{mission.title}</h3>
+                    <p className="text-sm text-kinnso-muted">{mission.summary}</p>
+                    <MissionCompensationSummary text={mission.compensation} />
+                  </div>
+                  <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
                 </div>
-                <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
-              </div>
-              {mission.partnerLinks.length > 0 && (
-                <ul className="mt-4 space-y-1 text-sm text-kinnso-muted">
-                  {mission.partnerLinks.map((link) => (
-                    <li key={link.id} className="truncate">{link.partnerUrl}</li>
-                  ))}
-                </ul>
-              )}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {!mission.participant && (
-                  <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runAction(() => onJoin(mission.id))}>
+                {mission.milestoneCount > 0 && (
+                  <div className="mt-4 flex items-center gap-3">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-kinnso-cream2">
+                      <div
+                        className="h-full rounded-full bg-kinnso-ink"
+                        style={{ width: `${Math.round((mission.submittedCount / mission.milestoneCount) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="whitespace-nowrap text-xs text-kinnso-muted">
+                      {mission.submittedCount} / {mission.milestoneCount} {t.milestoneProgress}
+                    </span>
+                  </div>
+                )}
+              </TicketCard>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-10" aria-label={t.availableMissions}>
+        <h2 className="text-lg font-bold text-kinnso-ink">{t.availableMissions}</h2>
+        {available.length === 0 ? (
+          <p className="mt-3 text-sm text-kinnso-muted">{t.availableEmpty}</p>
+        ) : (
+          <div className="mt-4 grid gap-4">
+            {available.map((mission) => (
+              <TicketCard key={mission.id} as="article" className="p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 space-y-2">
+                    <h3 className="text-lg font-bold text-kinnso-ink">{mission.title}</h3>
+                    <p className="text-sm text-kinnso-muted">{mission.summary}</p>
+                    <MissionCompensationSummary text={mission.compensation} />
+                  </div>
+                  <MissionStatusBadge status={mission.status} />
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="k-btn-primary text-sm"
+                    disabled={isPending}
+                    onClick={() => void runAction(() => onJoin(mission.id))}
+                  >
                     {getJoinLabel(mission.missionType)}
                   </button>
-                )}
-              </div>
-            </TicketCard>
-          )
-        })}
-      </div>
+                </div>
+              </TicketCard>
+            ))}
+          </div>
+        )}
+      </section>
     </main>
   )
 }
