@@ -146,7 +146,11 @@ export async function createTravelpayoutsPartnerLinks({
   })
 
   if (!response.ok) {
-    throw new Error(`Travelpayouts partner link request failed: ${response.status}`)
+    // Include the response body — it carries the real reason (e.g. "Unauthorized",
+    // "invalid marker"). The access token is sent in the request header, never echoed
+    // back here, so this is safe to surface.
+    const body = await response.text().catch(() => '')
+    throw new Error(`Travelpayouts partner link request failed: ${response.status} ${body}`.trim())
   }
 
   const json = await response.json() as TravelpayoutsPartnerLinkResponse
