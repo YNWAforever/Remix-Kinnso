@@ -4,7 +4,7 @@ import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
 
-/** Secondary launcher grid for the Studio dashboard (moved from StudioHomeView). */
+/** Secondary launcher grid for the Studio dashboard. */
 export function StudioQuickLinks({ locale, t }: { locale: Locale; t: Messages['studioHome'] }) {
   const p = (path: string) => `/${locale}${path}`
   const tools = [
