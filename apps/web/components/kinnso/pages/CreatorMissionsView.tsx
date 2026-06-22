@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
@@ -25,12 +26,13 @@ export type CreatorMissionCard = {
 }
 
 type CreatorMissionsViewProps = {
+  locale: string
   t: Messages['missions']
   missions: CreatorMissionCard[]
   onJoin: (missionId: string) => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
-export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsViewProps) {
+export function CreatorMissionsView({ locale, t, missions, onJoin }: CreatorMissionsViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [pendingId, setPendingId] = useState<string | null>(null)
@@ -38,6 +40,8 @@ export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsView
 
   const getJoinLabel = (missionType: CreatorMissionCard['missionType']) =>
     missionType === 'coupon_affiliate' ? t.joinMission : t.applyMission
+
+  const detailHref = (missionId: string) => `/${locale}/studio/missions/${missionId}`
 
   const runAction = async (missionId: string, action: () => KinnsoActionResult | Promise<KinnsoActionResult>) => {
     setActionError(null)
@@ -89,6 +93,11 @@ export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsView
                     </span>
                   </div>
                 )}
+                <div className="mt-4 flex justify-end">
+                  <Link href={detailHref(mission.id)} className="k-btn-ghost text-sm">
+                    {t.viewDetails}
+                  </Link>
+                </div>
               </TicketCard>
             ))}
           </div>
@@ -111,7 +120,10 @@ export function CreatorMissionsView({ t, missions, onJoin }: CreatorMissionsView
                   </div>
                   <MissionStatusBadge status={mission.status} />
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+                  <Link href={detailHref(mission.id)} className="k-btn-ghost text-sm">
+                    {t.viewDetails}
+                  </Link>
                   <button
                     type="button"
                     className="k-btn-primary text-sm"

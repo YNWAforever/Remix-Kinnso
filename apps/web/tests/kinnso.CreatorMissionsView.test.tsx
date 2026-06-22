@@ -47,7 +47,7 @@ const baseMine: CreatorMissionCard = {
 describe('CreatorMissionsView', () => {
   it('renders an available mission and calls join', () => {
     const onJoin = vi.fn()
-    render(<CreatorMissionsView t={en.missions} missions={[baseAvailable]} onJoin={onJoin} />)
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[baseAvailable]} onJoin={onJoin} />)
     expect(screen.getByText('Boutique hotels program')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: en.missions.joinMission }))
     expect(onJoin).toHaveBeenCalledWith('m1')
@@ -56,7 +56,7 @@ describe('CreatorMissionsView', () => {
 
   it('shows join action errors returned by the server', async () => {
     const onJoin = vi.fn(async () => ({ ok: false, errors: { form: ['Creator access is required'] } }))
-    render(<CreatorMissionsView t={en.missions} missions={[baseAvailable]} onJoin={onJoin} />)
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[baseAvailable]} onJoin={onJoin} />)
     fireEvent.click(screen.getByRole('button', { name: en.missions.joinMission }))
     expect((await screen.findByRole('alert')).textContent).toContain('Creator access is required')
   })
@@ -64,7 +64,7 @@ describe('CreatorMissionsView', () => {
   it('disables actions while pending and refreshes after success', async () => {
     let resolveJoin!: (result: { ok: true }) => void
     const onJoin = vi.fn(() => new Promise<{ ok: true }>((resolve) => { resolveJoin = resolve }))
-    render(<CreatorMissionsView t={en.missions} missions={[baseAvailable]} onJoin={onJoin} />)
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[baseAvailable]} onJoin={onJoin} />)
     const button = screen.getByRole('button', { name: en.missions.joinMission })
     fireEvent.click(button)
     expect(button).toHaveProperty('disabled', true)
@@ -76,6 +76,7 @@ describe('CreatorMissionsView', () => {
     const onJoin = vi.fn(() => new Promise<{ ok: true }>(() => {}))
     render(
       <CreatorMissionsView
+        locale="en"
         t={en.missions}
         missions={[
           { ...baseAvailable, id: 'm1', missionType: 'coupon_affiliate' },
@@ -95,6 +96,7 @@ describe('CreatorMissionsView', () => {
     const onJoin = vi.fn()
     render(
       <CreatorMissionsView
+        locale="en"
         t={en.missions}
         missions={[{ ...baseAvailable, id: 'm2', missionType: 'paid' }]}
         onJoin={onJoin}
@@ -105,15 +107,23 @@ describe('CreatorMissionsView', () => {
   })
 
   it('renders joined missions under My missions with progress and no join button', () => {
-    render(<CreatorMissionsView t={en.missions} missions={[baseMine]} onJoin={vi.fn()} />)
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[baseMine]} onJoin={vi.fn()} />)
     expect(screen.getByText('Summer in Shibuya')).toBeTruthy()
     expect(screen.getByText(`1 / 3 ${en.missions.milestoneProgress}`)).toBeTruthy()
     expect(screen.queryByRole('button', { name: en.missions.applyMission })).toBeNull()
   })
 
   it('shows an empty state for each band', () => {
-    render(<CreatorMissionsView t={en.missions} missions={[]} onJoin={vi.fn()} />)
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[]} onJoin={vi.fn()} />)
     expect(screen.getByText(en.missions.myMissionsEmpty)).toBeTruthy()
     expect(screen.getByText(en.missions.availableEmpty)).toBeTruthy()
+  })
+
+  it('links each card to its detail page', () => {
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[baseMine, baseAvailable]} onJoin={vi.fn()} />)
+    const links = screen.getAllByRole('link', { name: en.missions.viewDetails })
+    expect(links.map((a) => a.getAttribute('href'))).toEqual(
+      expect.arrayContaining(['/en/studio/missions/m9', '/en/studio/missions/m1']),
+    )
   })
 })
