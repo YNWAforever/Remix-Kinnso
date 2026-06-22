@@ -24,9 +24,10 @@ type StudioOffersViewProps = {
   offers: AffiliateOfferCard[]
   onJoin: (missionId: string) => KinnsoActionResult | Promise<KinnsoActionResult>
   onCreateLink: (missionParticipantId: string, originalUrl: string) => KinnsoActionResult | Promise<KinnsoActionResult>
+  linkSetupPending?: boolean
 }
 
-export function StudioOffersView({ t, offers, onJoin, onCreateLink }: StudioOffersViewProps) {
+export function StudioOffersView({ t, offers, onJoin, onCreateLink, linkSetupPending = false }: StudioOffersViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
@@ -104,14 +105,18 @@ export function StudioOffersView({ t, offers, onJoin, onCreateLink }: StudioOffe
                     </button>
                   )}
                   {activeParticipantId && offer.programUrl && (
-                    <button
-                      type="button"
-                      className="k-btn-ghost text-sm"
-                      disabled={isPending}
-                      onClick={() => void runAction(() => onCreateLink(activeParticipantId, offer.programUrl as string))}
-                    >
-                      {t.generateLink}
-                    </button>
+                    linkSetupPending ? (
+                      <p className="text-xs text-kinnso-muted">{t.setupNotConfigured}</p>
+                    ) : (
+                      <button
+                        type="button"
+                        className="k-btn-ghost text-sm"
+                        disabled={isPending}
+                        onClick={() => void runAction(() => onCreateLink(activeParticipantId, offer.programUrl as string))}
+                      >
+                        {t.generateLink}
+                      </button>
+                    )
                   )}
                   {offer.programUrl && (
                     <a className="k-btn-ghost text-sm" href={offer.programUrl} target="_blank" rel="noreferrer">

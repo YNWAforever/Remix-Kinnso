@@ -501,6 +501,7 @@ const messages: Messages = {
     category: '类别',
     commission: '佣金',
     viewProgram: '查看计划',
+    setupNotConfigured: '合作伙伴链接生成正在设置中，请稍后再来查看。',
   },
   studioEarnings: {
     heading: '收益',

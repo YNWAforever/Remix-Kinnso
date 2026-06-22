@@ -51,6 +51,20 @@ describe('StudioOffersView', () => {
     expect(onCreateLink).toHaveBeenCalledWith('p1', 'https://example.com/hotels')
   })
 
+  it('shows the setup-pending note instead of generate when links are not configured', () => {
+    render(
+      <StudioOffersView
+        t={en.studioOffers}
+        offers={[offer({ participant: { id: 'p1', status: 'active' } })]}
+        linkSetupPending
+        onJoin={vi.fn()}
+        onCreateLink={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(en.studioOffers.setupNotConfigured)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: en.studioOffers.generateLink })).toBeNull()
+  })
+
   it('renders generated links with a copy affordance', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.assign(navigator, { clipboard: { writeText } })

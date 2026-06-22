@@ -69,6 +69,26 @@ const requireNumericEnv = (name: string) => {
   return parsed
 }
 
+/**
+ * True when all three Travelpayouts env vars are present and project/marker are
+ * numeric — i.e. createTravelpayoutsPartnerLinks() will not throw on missing
+ * config. Used by the offers UI to show a "setup pending" note instead of a
+ * broken link button.
+ */
+export const isTravelpayoutsConfigured = (): boolean => {
+  // Match requireEnv/requireNumericEnv semantics: trimmed, non-empty, and numeric.
+  // (Number('') === 0 is finite, so guard against blank-but-present vars too.)
+  const isNumericEnv = (value: string | undefined): boolean => {
+    const trimmed = value?.trim()
+    return Boolean(trimmed) && Number.isFinite(Number(trimmed))
+  }
+  return (
+    Boolean(process.env.TRAVELPAYOUTS_API_TOKEN?.trim()) &&
+    isNumericEnv(process.env.TRAVELPAYOUTS_PROJECT_ID) &&
+    isNumericEnv(process.env.TRAVELPAYOUTS_MARKER)
+  )
+}
+
 const toNullableString = (value: unknown) => {
   if (value == null) return null
   if (typeof value === 'string') return value

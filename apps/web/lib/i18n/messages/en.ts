@@ -447,6 +447,7 @@ export interface Messages {
     category: string
     commission: string
     viewProgram: string
+    setupNotConfigured: string
   }
   studioEarnings: {
     heading: string
@@ -962,6 +963,7 @@ const messages: Messages = {
     category: 'Category',
     commission: 'Commission',
     viewProgram: 'View program',
+    setupNotConfigured: 'Partner-link generation is being set up — check back soon.',
   },
   studioEarnings: {
     heading: 'Earnings',
