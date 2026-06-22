@@ -320,6 +320,26 @@ export interface Messages {
     milestoneProgress: string
     myMissionsEmpty: string
     availableEmpty: string
+    viewDetails: string
+  }
+  missionDetail: {
+    back: string
+    briefHeading: string
+    milestonesHeading: string
+    notStarted: string
+    dueLabel: string
+    join: string
+    apply: string
+    applyNoteLabel: string
+    applyNotePlaceholder: string
+    awaitingTitle: string
+    awaitingBody: string
+    rejectedTitle: string
+    rejectedBody: string
+    couponHeading: string
+    couponCodeLabel: string
+    partnerLinksHeading: string
+    openLink: string
   }
   ops: {
     settlementHeading: string
@@ -787,6 +807,26 @@ const messages: Messages = {
     milestoneProgress: 'milestones submitted',
     myMissionsEmpty: "You haven't joined any missions yet.",
     availableEmpty: 'No missions available right now. Check back soon.',
+    viewDetails: 'View details',
+  },
+  missionDetail: {
+    back: 'Missions',
+    briefHeading: 'Brief',
+    milestonesHeading: 'Milestones',
+    notStarted: 'Not started',
+    dueLabel: 'Due',
+    join: 'Join mission',
+    apply: 'Apply',
+    applyNoteLabel: 'Application note (optional)',
+    applyNotePlaceholder: 'Tell the merchant why you are a fit',
+    awaitingTitle: 'Awaiting approval',
+    awaitingBody: 'The merchant is reviewing your application.',
+    rejectedTitle: 'Not selected',
+    rejectedBody: 'This application was not accepted.',
+    couponHeading: 'Your coupon',
+    couponCodeLabel: 'Code',
+    partnerLinksHeading: 'Your links',
+    openLink: 'Open',
   },
   ops: {
     settlementHeading: 'Settlement queue',
