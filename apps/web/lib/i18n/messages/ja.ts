@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'AIトラベルコンテンツスタジオ · クリエイターに報酬 · 香港 · 台北 · 東京',
     colCreators: 'クリエイター', colMerchants: '加盟店', colCompany: '会社',
     lApply: '応募', lStudio: 'スタジオ', lMissions: 'ミッション', lEarnings: '収益',
-    lPostMission: 'ミッションを投稿', lPricing: '料金', lCaseStudies: '事例', lContact: 'お問い合わせ',
+    lPostMission: 'ミッションを投稿', lPricing: '仕組み', lCaseStudies: '事例', lContact: 'お問い合わせ',
     lAbout: '会社概要', lAgent: 'AIエージェント', lPress: 'プレス', lLegal: '規約',
     rights: '© 2026 KINNSO. 無断転載を禁じます。',
   },

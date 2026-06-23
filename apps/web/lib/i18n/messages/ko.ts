@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'AI 트래블 콘텐츠 스튜디오 · 크리에이터에게 지급 · 홍콩 · 타이베이 · 도쿄',
     colCreators: '크리에이터', colMerchants: '가맹점', colCompany: '회사',
     lApply: '지원', lStudio: '스튜디오', lMissions: '미션', lEarnings: '수익',
-    lPostMission: '미션 등록', lPricing: '요금', lCaseStudies: '사례', lContact: '문의',
+    lPostMission: '미션 등록', lPricing: '이용 방법', lCaseStudies: '사례', lContact: '문의',
     lAbout: '소개', lAgent: 'AI 에이전트', lPress: '보도자료', lLegal: '약관',
     rights: '© 2026 KINNSO. 모든 권리 보유.',
   },

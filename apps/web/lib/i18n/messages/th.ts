@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'สตูดิโอคอนเทนต์ท่องเที่ยว AI · จ่ายให้ครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',
     colCreators: 'ครีเอเตอร์', colMerchants: 'ร้านค้า', colCompany: 'บริษัท',
     lApply: 'สมัคร', lStudio: 'สตูดิโอ', lMissions: 'ภารกิจ', lEarnings: 'รายได้',
-    lPostMission: 'โพสต์ภารกิจ', lPricing: 'ราคา', lCaseStudies: 'กรณีศึกษา', lContact: 'ติดต่อ',
+    lPostMission: 'โพสต์ภารกิจ', lPricing: 'วิธีการทำงาน', lCaseStudies: 'กรณีศึกษา', lContact: 'ติดต่อ',
     lAbout: 'เกี่ยวกับ', lAgent: 'ผู้ช่วย AI', lPress: 'ข่าวสาร', lLegal: 'ข้อกำหนด',
     rights: '© 2026 KINNSO สงวนลิขสิทธิ์',
   },

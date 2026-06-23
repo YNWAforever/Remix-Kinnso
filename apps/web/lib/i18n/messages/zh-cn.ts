@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'AI 旅游内容工作室 · 为创作者付费 · 香港 · 台北 · 东京',
     colCreators: '创作者', colMerchants: '商家', colCompany: '公司',
     lApply: '申请', lStudio: '工作室', lMissions: '任务', lEarnings: '收益',
-    lPostMission: '发布任务', lPricing: '定价', lCaseStudies: '案例', lContact: '联系我们',
+    lPostMission: '发布任务', lPricing: '运作方式', lCaseStudies: '案例', lContact: '联系我们',
     lAbout: '关于', lAgent: 'AI 助手', lPress: '媒体', lLegal: '条款',
     rights: '© 2026 KINNSO. 版权所有。',
   },

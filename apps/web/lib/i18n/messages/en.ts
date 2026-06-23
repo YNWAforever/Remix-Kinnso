@@ -873,7 +873,7 @@ const messages: Messages = {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
-    lPostMission: 'Post a mission', lPricing: 'Pricing', lCaseStudies: 'Case studies', lContact: 'Contact',
+    lPostMission: 'Post a mission', lPricing: 'How it works', lCaseStudies: 'Case studies', lContact: 'Contact',
     lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
   },
