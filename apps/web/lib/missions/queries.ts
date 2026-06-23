@@ -92,7 +92,8 @@ export const creatorMissionDetailSelect = `
   mission_milestones(id,title,description,due_at,sort_order),
   mission_participants(id,status,source,creator_id,application_note,
     mission_milestone_submissions(id,mission_milestone_id,status,proof_urls,notes,merchant_feedback,submitted_at,
-      mission_social_snapshots(confidence_status))),
+      mission_social_snapshots(confidence_status),
+      mission_verification_jobs(id,status,confidence_status,created_at))),
   affiliate_partner_links(id,partner_url,original_url,sub_id)
 `
 

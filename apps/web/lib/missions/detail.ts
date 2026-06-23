@@ -1,7 +1,16 @@
+import { canSubmitMilestone } from '@/lib/missions/submission-state'
+
 export type MissionType = 'coupon_affiliate' | 'hybrid' | 'paid'
 export type ParticipationCta = 'join' | 'apply' | 'awaiting' | 'rejected' | 'active'
 export type MilestoneState = 'none' | 'submitted' | 'approved' | 'revision_requested' | 'rejected'
 export type SocialSignalStatus = 'verified_signal' | 'needs_review' | 'unavailable'
+export type VerificationStatus = 'queued' | 'fetching' | 'ready' | 'failed'
+
+export type VerificationView = {
+  jobId: string
+  status: VerificationStatus
+  confidence: SocialSignalStatus | null
+}
 
 type ProgramRef = { program_url?: string | null; default_commission_description?: string | null }
 
@@ -14,6 +23,7 @@ type SubmissionRow = {
   merchant_feedback: string | null
   submitted_at: string | null
   mission_social_snapshots?: Array<{ confidence_status: string | null }> | null
+  mission_verification_jobs?: Array<{ id: string; status: string | null; confidence_status: string | null; created_at: string | null }> | null
 }
 
 export type MissionDetailRow = {
@@ -50,6 +60,12 @@ export type MilestoneRow = {
   dueAt: string | null
   state: MilestoneState
   signal: SocialSignalStatus | null
+  submissionId: string | null
+  proofUrl: string | null
+  notes: string | null
+  merchantFeedback: string | null
+  canSubmit: boolean
+  verification: VerificationView | null
 }
 
 export type CreatorMissionDetail = {
@@ -63,6 +79,7 @@ export type CreatorMissionDetail = {
   couponCode: string | null
   couponUrl: string | null
   partnerLinks: Array<{ id: string; partnerUrl: string }>
+  participantId: string | null
   participantStatus: string | null
   cta: ParticipationCta
   milestones: MilestoneRow[]
@@ -88,6 +105,9 @@ const SUBMITTED_STATES: Record<string, MilestoneState> = {
   rejected: 'rejected',
 }
 
+const SIGNAL_STATUSES = new Set<SocialSignalStatus>(['verified_signal', 'needs_review', 'unavailable'])
+const VERIFICATION_STATUSES = new Set<VerificationStatus>(['queued', 'fetching', 'ready', 'failed'])
+
 const signalFrom = (
   snapshots: Array<{ confidence_status: string | null }> | null | undefined,
 ): SocialSignalStatus | null => {
@@ -98,9 +118,22 @@ const signalFrom = (
   return null
 }
 
+function latestVerification(jobs: SubmissionRow['mission_verification_jobs']): VerificationView | null {
+  if (!jobs || jobs.length === 0) return null
+  const sorted = jobs.slice().sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? ''))
+  const job = sorted[0]
+  const status = (job.status ?? '') as VerificationStatus
+  if (!VERIFICATION_STATUSES.has(status)) return null
+  const confidence = SIGNAL_STATUSES.has((job.confidence_status ?? '') as SocialSignalStatus)
+    ? (job.confidence_status as SocialSignalStatus)
+    : null
+  return { jobId: job.id, status, confidence }
+}
+
 export function buildMilestoneRows(
   milestones: MissionDetailRow['mission_milestones'],
   submissions: SubmissionRow[] | null | undefined,
+  participantStatus: string | null = null,
 ): MilestoneRow[] {
   const latest = new Map<string, SubmissionRow>()
   for (const sub of submissions ?? []) {
@@ -123,6 +156,12 @@ export function buildMilestoneRows(
         dueAt: milestone.due_at ?? null,
         state,
         signal: state !== 'none' && rawSignal === null && sub ? 'unavailable' : rawSignal,
+        submissionId: sub?.id ?? null,
+        proofUrl: sub?.proof_urls?.[0] ?? null,
+        notes: sub?.notes ?? null,
+        merchantFeedback: sub?.merchant_feedback ?? null,
+        canSubmit: canSubmitMilestone(participantStatus, state),
+        verification: latestVerification(sub?.mission_verification_jobs),
       }
     })
 }
@@ -162,8 +201,13 @@ export function toCreatorMissionDetail(row: MissionDetailRow, creatorId: string)
     couponCode: row.coupon_code,
     couponUrl: row.coupon_url,
     partnerLinks: (row.affiliate_partner_links ?? []).map((link) => ({ id: link.id, partnerUrl: link.partner_url ?? '' })),
+    participantId: participant?.id ?? null,
     participantStatus: participant?.status ?? null,
     cta: resolveParticipationCta(participant?.status ?? null, missionType),
-    milestones: buildMilestoneRows(row.mission_milestones, participant?.mission_milestone_submissions ?? null),
+    milestones: buildMilestoneRows(
+      row.mission_milestones,
+      participant?.mission_milestone_submissions ?? null,
+      participant?.status ?? null,
+    ),
   }
 }
