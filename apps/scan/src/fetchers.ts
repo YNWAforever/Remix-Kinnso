@@ -6,6 +6,7 @@ import type { PlatformFetcher, Platform } from '@kinnso/scan'
 
 export type SinglePostResult = {
   authorHandle: string | null
+  authorId?: string | null
   engagementCount: number | null
   postUrl: string | null
 }

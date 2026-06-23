@@ -21,4 +21,27 @@ describe('resolveConfidence', () => {
   it('unavailable when the post could not be fetched', () => {
     expect(resolveConfidence(null, 'traveler')).toBe('unavailable')
   })
+  it('verified_signal via channel-id match even when handles differ', () => {
+    expect(
+      resolveConfidence(
+        { authorHandle: 'whatever', authorId: 'UCabc', engagementCount: null, postUrl: null },
+        'some-handle',
+        'UCabc',
+      ),
+    ).toBe('verified_signal')
+  })
+  it('falls back to handle match when channel ids differ', () => {
+    expect(
+      resolveConfidence(
+        { authorHandle: '@Traveler', authorId: 'UCother', engagementCount: null, postUrl: null },
+        'traveler',
+        'UCmine',
+      ),
+    ).toBe('needs_review')
+  })
+  it('verified_signal via handle when no expectedId is given (IG/Threads unchanged)', () => {
+    expect(
+      resolveConfidence({ authorHandle: '@Traveler', authorId: 'UCother', engagementCount: null, postUrl: null }, 'traveler'),
+    ).toBe('verified_signal')
+  })
 })
