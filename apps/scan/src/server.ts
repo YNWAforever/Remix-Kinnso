@@ -8,6 +8,7 @@ import { rateLimitDecision, canRetry, type JobRecord } from './policy'
 import { runScan, type ScanDeps } from './pipeline'
 import { CompositeFetcher, FakeFetcher } from './fetchers'
 import { ChatCompletionsClient, FakeLlm } from './llm'
+import { handleVerifySubmission, handleVerifyRetry } from './verify-server'
 
 // ---------------------------------------------------------------------------
 // Bootstrap
@@ -227,6 +228,35 @@ app.post('/scan/:jobId/retry', async (c) => {
   })
 
   return c.json({ jobId, retrying: true }, 202)
+})
+
+// POST /verify-submission — insert a verification job and run pipeline in background
+app.post('/verify-submission', async (c) => {
+  const user = await getVerifiedUser(c.req.header('Authorization'))
+  if (!user) return c.json({ error: 'unauthorized' }, 401)
+
+  const body = (await c.req.json().catch(() => ({}))) as { submissionId?: string }
+  const submissionId = body.submissionId
+  if (!submissionId) return c.json({ error: 'submissionId is required' }, 400)
+
+  const result = await handleVerifySubmission(
+    { db, fetcher, userId: user.id },
+    { submissionId },
+  )
+  return c.json(result.body, result.status as never)
+})
+
+// POST /verify-submission/:jobId/retry — retry a failed verification job
+app.post('/verify-submission/:jobId/retry', async (c) => {
+  const user = await getVerifiedUser(c.req.header('Authorization'))
+  if (!user) return c.json({ error: 'unauthorized' }, 401)
+
+  const jobId = c.req.param('jobId')
+  const result = await handleVerifyRetry(
+    { db, fetcher, userId: user.id },
+    { jobId },
+  )
+  return c.json(result.body, result.status as never)
 })
 
 // Fail closed
