@@ -14,10 +14,10 @@ export function resolveConfidence(
   if (!post) return 'unavailable'
   // ID-first: canonical channel-id match (YouTube). Channel ids are opaque,
   // case-sensitive tokens — compare trimmed, exact case.
-  if (post.authorId && expectedId) {
-    return post.authorId.trim() === expectedId.trim() ? 'verified_signal' : 'needs_review'
+  if (post.authorId && expectedId && post.authorId.trim() === expectedId.trim()) {
+    return 'verified_signal'
   }
-  // Handle fallback (IG/Threads always; YouTube when ids unavailable).
+  // Handle fallback (IG/Threads always; YouTube when ids unavailable/mismatched).
   const author = normalizeHandle(post.authorHandle)
   const expected = normalizeHandle(creatorHandle)
   if (author && expected && author === expected) return 'verified_signal'
