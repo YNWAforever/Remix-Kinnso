@@ -88,6 +88,17 @@ export async function verifySubmission(deps: VerifyDeps, jobId: string): Promise
         : null
     const confidence = resolveConfidence(post, handleRow?.handle ?? null, expectedId)
 
+    // Resubmission reuses the same submission row, so a prior verification may have
+    // left a snapshot. Clear any existing snapshot(s) for this submission before
+    // inserting the current one — otherwise signalFrom() (which returns the most
+    // favorable status across all snapshots) would let a stale verified_signal mask
+    // a weaker re-verification of a different proof URL. Service-role only.
+    const { error: snapDelErr } = await db
+      .from('mission_social_snapshots')
+      .delete()
+      .eq('mission_milestone_submission_id', job.mission_milestone_submission_id)
+    if (snapDelErr) throw new Error(`snapshot cleanup failed: ${snapDelErr.message}`)
+
     const { error: snapErr } = await db.from('mission_social_snapshots').insert({
       mission_id: participant.mission_id,
       mission_participant_id: submission.mission_participant_id,

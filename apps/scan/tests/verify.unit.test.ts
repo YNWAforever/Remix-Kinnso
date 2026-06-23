@@ -23,6 +23,7 @@ function makeDb(jobOverrides: Record<string, unknown> = {}, handle = 'traveler',
   }
   const updates: Array<{ table: string; data: Record<string, unknown> }> = []
   const inserts: Array<{ table: string; data: Record<string, unknown> }> = []
+  const deletes: Array<{ table: string }> = []
 
   const rows: Record<string, unknown> = {
     mission_verification_jobs: job,
@@ -35,6 +36,7 @@ function makeDb(jobOverrides: Record<string, unknown> = {}, handle = 'traveler',
   const db = {
     _updates: updates,
     _inserts: inserts,
+    _deletes: deletes,
     from: (table: string) => ({
       select: () => ({
         eq: () => ({
@@ -47,6 +49,7 @@ function makeDb(jobOverrides: Record<string, unknown> = {}, handle = 'traveler',
         eq: async () => { updates.push({ table, data }); Object.assign(job as Record<string, unknown>, data); return { data: null, error: null } },
       }),
       insert: async (data: Record<string, unknown>) => { inserts.push({ table, data }); return { data: null, error: null } },
+      delete: () => ({ eq: async () => { deletes.push({ table }); return { data: null, error: null } } }),
     }),
   }
   return db as never
@@ -57,6 +60,7 @@ const deps = (db: unknown, fetcher = new FakeFetcher()): VerifyDeps => ({ db: db
 type TrackingDb = {
   _updates: Array<{ data: Record<string, unknown> }>
   _inserts: Array<{ table: string; data: Record<string, unknown> }>
+  _deletes: Array<{ table: string }>
 }
 
 describe('verifySubmission', () => {
@@ -70,6 +74,15 @@ describe('verifySubmission', () => {
     expect(snapshot.data.confidence_status).toBe('verified_signal')
     expect(snapshot.data.mission_milestone_submission_id).toBe(SUB_ID)
     expect(snapshot.data.mission_id).toBe(MISSION_ID)
+  })
+
+  it('clears prior snapshots for the submission before inserting (no stale signal on resubmit)', async () => {
+    const db = makeDb({}, 'fake_ig_user')
+    await verifySubmission(deps(db), JOB_ID)
+    // A re-verification must delete the submission's existing snapshot(s) so a stale
+    // favorable confidence cannot mask a weaker re-verification of a new proof URL.
+    const del = (db as never as TrackingDb)._deletes.find((d) => d.table === 'mission_social_snapshots')
+    expect(del).toBeDefined()
   })
 
   it('writes needs_review when the handle does not match', async () => {
