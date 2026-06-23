@@ -37,7 +37,7 @@ describe('resolveConfidence', () => {
         'traveler',
         'UCmine',
       ),
-    ).toBe('needs_review')
+    ).toBe('verified_signal')
   })
   it('verified_signal via handle when no expectedId is given (IG/Threads unchanged)', () => {
     expect(

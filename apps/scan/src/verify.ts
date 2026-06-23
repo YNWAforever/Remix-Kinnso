@@ -58,7 +58,7 @@ export async function verifySubmission(deps: VerifyDeps, jobId: string): Promise
       throw new Error('submission or participant not found')
     }
 
-    const platform = (job.platform ?? '') as 'instagram' | 'threads'
+    const platform = (job.platform ?? '') as 'instagram' | 'threads' | 'youtube'
     const { data: handleRow } = await db
       .from('creator_social_handles')
       .select('handle')
@@ -80,7 +80,13 @@ export async function verifySubmission(deps: VerifyDeps, jobId: string): Promise
     }
 
     const post = await fetcher.fetchPost(parsed.platform, parsed.id)
-    const confidence = resolveConfidence(post, handleRow?.handle ?? null)
+    // YouTube uses a hybrid match: resolve the creator's handle to a canonical
+    // channel id so resolveConfidence can match on id first, handle second.
+    const expectedId =
+      parsed.platform === 'youtube' && handleRow?.handle
+        ? await fetcher.resolveChannelId(handleRow.handle)
+        : null
+    const confidence = resolveConfidence(post, handleRow?.handle ?? null, expectedId)
 
     const { error: snapErr } = await db.from('mission_social_snapshots').insert({
       mission_id: participant.mission_id,

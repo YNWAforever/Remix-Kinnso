@@ -148,4 +148,20 @@ describe('verifySubmission', () => {
     const statuses = (db as never as TrackingDb)._updates.map((u) => u.data.status).filter(Boolean)
     expect(statuses[statuses.length - 1]).toBe('failed')
   })
+
+  it('writes a verified_signal youtube snapshot via channel-id match', async () => {
+    const db = makeDb({ platform: 'youtube', proof_url: 'https://www.youtube.com/watch?v=abc' }, 'any-handle')
+    await verifySubmission(deps(db), JOB_ID) // FakeFetcher youtube post.authorId === resolveChannelId default
+    const snapshot = (db as never as TrackingDb)._inserts.find((i) => i.table === 'mission_social_snapshots')!
+    expect(snapshot.data.platform).toBe('youtube')
+    expect(snapshot.data.confidence_status).toBe('verified_signal')
+  })
+
+  it('falls back to handle match for youtube when channel ids differ', async () => {
+    const db = makeDb({ platform: 'youtube', proof_url: 'https://www.youtube.com/watch?v=abc' }, 'matchme')
+    const fetcher = new FakeFetcher({}, [], { youtube: { authorHandle: 'matchme', authorId: 'UCother', engagementCount: 1, postUrl: null } }, 'UCmine')
+    await verifySubmission(deps(db, fetcher), JOB_ID)
+    const snapshot = (db as never as TrackingDb)._inserts.find((i) => i.table === 'mission_social_snapshots')!
+    expect(snapshot.data.confidence_status).toBe('verified_signal')
+  })
 })
