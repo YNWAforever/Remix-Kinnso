@@ -363,7 +363,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: '創作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
-    linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '尋找創作者',
+    linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '尋找創作者', linkMissions: '任務',
     ctaApply: '申請成為創作者', ctaOpenStudio: '開啟工作室', ctaPending: '申請審核中', ctaPostMission: '發佈任務',
     signIn: '登入', language: '語言', menuToggle: '選單', skipToContent: '跳到內容',
   },

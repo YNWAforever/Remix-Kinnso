@@ -364,7 +364,7 @@ export interface Messages {
   }
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
-    linkGuides: string; linkArticles: string; linkFindCreators: string
+    linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
   }
@@ -865,7 +865,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
-    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators',
+    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },

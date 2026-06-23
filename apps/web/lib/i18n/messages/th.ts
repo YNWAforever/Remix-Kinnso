@@ -363,7 +363,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: 'ครีเอเตอร์', linkMerchants: 'ร้านค้า', linkAgent: 'ผู้ช่วย AI', linkTravelers: 'นักเดินทาง',
-    linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์',
+    linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์', linkMissions: 'ภารกิจ',
     ctaApply: 'สมัครเป็นครีเอเตอร์', ctaOpenStudio: 'เปิดสตูดิโอ', ctaPending: 'กำลังตรวจสอบใบสมัคร', ctaPostMission: 'โพสต์ภารกิจ',
     signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู', skipToContent: 'ข้ามไปยังเนื้อหา',
   },

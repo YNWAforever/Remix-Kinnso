@@ -25,13 +25,22 @@ describe('Navbar', () => {
     expect(screen.getByRole('link', { name: en.nav.ctaApply }).getAttribute('href')).toBe('/en/sign-up')
   })
 
-  it('creator shows Open Studio → /en/studio; merchant shows Find Creators + Post a Mission', () => {
+  it('creator shows Open Studio → /en/studio; merchant shows Missions queue + Post a Mission', () => {
     render(<Navbar locale="en" role="creator" t={en.nav} />)
     expect(screen.getByRole('link', { name: en.nav.ctaOpenStudio }).getAttribute('href')).toBe('/en/studio')
     cleanup()
     render(<Navbar locale="en" role="merchant" t={en.nav} />)
-    expect(screen.getByRole('link', { name: en.nav.linkFindCreators }).getAttribute('href')).toBe('/en/merchants/creators')
+    expect(screen.getByRole('link', { name: en.nav.linkMissions }).getAttribute('href')).toBe('/en/merchants/missions')
     expect(screen.getByRole('link', { name: en.nav.ctaPostMission }).getAttribute('href')).toBe('/en/merchants/post')
+    // mock "Find Creators" landing is no longer in nav
+    expect(screen.queryByRole('link', { name: en.nav.linkFindCreators })).toBeNull()
+  })
+
+  it('does not render a Travelers/feed anchor (consolidated into /explore)', () => {
+    render(<Navbar locale="en" role="anon" t={en.nav} />)
+    const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
+    expect(hrefs).not.toContain('/en/feed')
+    expect(hrefs).toContain('/en/explore')
   })
 
   it('renders the locale switcher', () => {
