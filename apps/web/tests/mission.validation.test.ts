@@ -3,6 +3,7 @@ import {
   validateMissionDraft,
   validatePartnerLinkRequest,
   validateSettlementUpdate,
+  validateSubmission,
 } from '@/lib/missions/validation'
 import type {
   MissionDraftInput,
@@ -175,5 +176,32 @@ describe('mission validation', () => {
     })
     expect(result.ok).toBe(false)
     expect(result.errors.actorIsOps).toContain('ops')
+  })
+})
+
+describe('validateSubmission', () => {
+  it('accepts a valid Instagram proof URL with notes', () => {
+    expect(validateSubmission({ proofUrl: 'https://www.instagram.com/p/Cabc123/', notes: 'live now' }))
+      .toEqual({ ok: true, errors: {} })
+  })
+  it('requires a proof URL', () => {
+    const r = validateSubmission({ proofUrl: '  ' })
+    expect(r.ok).toBe(false)
+    expect(r.errors.proofUrl).toContain('required')
+  })
+  it('rejects a non-http URL', () => {
+    const r = validateSubmission({ proofUrl: 'ftp://example.com/x' })
+    expect(r.ok).toBe(false)
+    expect(r.errors.proofUrl).toContain('url')
+  })
+  it('rejects an unsupported platform URL', () => {
+    const r = validateSubmission({ proofUrl: 'https://youtu.be/dQw4w9WgXcQ' })
+    expect(r.ok).toBe(false)
+    expect(r.errors.proofUrl).toContain('unsupported')
+  })
+  it('rejects notes longer than 1000 chars', () => {
+    const r = validateSubmission({ proofUrl: 'https://instagram.com/p/x', notes: 'a'.repeat(1001) })
+    expect(r.ok).toBe(false)
+    expect(r.errors.notes).toContain('too_long')
   })
 })
