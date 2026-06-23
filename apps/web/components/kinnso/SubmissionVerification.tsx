@@ -34,9 +34,10 @@ export function SubmissionVerification({ jobId, t }: Props) {
         .select('id, status, confidence_status, error')
         .eq('id', id)
         .single()
-        .then(({ data }: { data: JobRow | null }) => {
-          setJob(data)
-          if (data && (data.status === 'ready' || data.status === 'failed') && !stopped) {
+        .then(({ data }) => {
+          const data_ = data as JobRow | null
+          setJob(data_)
+          if (data_ && (data_.status === 'ready' || data_.status === 'failed') && !stopped) {
             stopped = true
             if (timer) {
               clearInterval(timer)
