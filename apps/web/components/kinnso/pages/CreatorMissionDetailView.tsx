@@ -7,9 +7,13 @@ import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { SocialSignalBadge } from '@/components/kinnso/SocialSignalBadge'
+import { SubmissionVerification } from '@/components/kinnso/SubmissionVerification'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
-import type { CreatorMissionDetail } from '@/lib/missions/detail'
+import { startVerification } from '@/lib/missions/verify-client'
+import type { CreatorMissionDetail, MilestoneRow } from '@/lib/missions/detail'
 import type { Messages } from '@/lib/i18n/messages/en'
+
+type SubmitResult = { ok: true; submissionId: string } | { ok: false; errors?: Record<string, string[]> }
 
 type CreatorMissionDetailViewProps = {
   locale: string
@@ -17,9 +21,72 @@ type CreatorMissionDetailViewProps = {
   mission: CreatorMissionDetail
   onJoin: () => KinnsoActionResult | Promise<KinnsoActionResult>
   onApply: (note: string) => KinnsoActionResult | Promise<KinnsoActionResult>
+  onSubmitMilestone: (input: { milestoneId: string; proofUrl: string; notes: string }) => Promise<SubmitResult>
 }
 
-export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply }: CreatorMissionDetailViewProps) {
+function MilestoneSubmit({
+  milestone, t, onSubmitMilestone,
+}: {
+  milestone: MilestoneRow
+  t: Messages['missionDetail']
+  onSubmitMilestone: CreatorMissionDetailViewProps['onSubmitMilestone']
+}) {
+  const [proofUrl, setProofUrl] = useState(milestone.proofUrl ?? '')
+  const [notes, setNotes] = useState(milestone.notes ?? '')
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [jobId, setJobId] = useState<string | null>(milestone.verification?.jobId ?? null)
+
+  async function submit() {
+    setPending(true)
+    setError(null)
+    try {
+      const result = await onSubmitMilestone({ milestoneId: milestone.id, proofUrl, notes })
+      if (!result.ok) {
+        setError(Object.values(result.errors ?? {}).flat()[0] ?? t.submitError)
+        return
+      }
+      const started = await startVerification(result.submissionId)
+      if ('jobId' in started) setJobId(started.jobId)
+      else setError(t.submitError)
+    } finally {
+      setPending(false)
+    }
+  }
+
+  const isResubmit = milestone.state === 'revision_requested'
+
+  return (
+    <div className="mt-3 space-y-2">
+      {milestone.merchantFeedback && (
+        <p className="rounded-md bg-kinnso-cream2 px-3 py-2 text-xs text-kinnso-ink">
+          <span className="font-semibold">{t.merchantFeedbackLabel}:</span> {milestone.merchantFeedback}
+        </p>
+      )}
+      {milestone.canSubmit && (
+        <>
+          <label className="block text-xs font-semibold text-kinnso-ink" htmlFor={`proof-${milestone.id}`}>{t.proofUrlLabel}</label>
+          <input
+            id={`proof-${milestone.id}`} className="k-input w-full" value={proofUrl}
+            placeholder={t.proofUrlPlaceholder} onChange={(e) => setProofUrl(e.target.value)}
+          />
+          <label className="block text-xs font-semibold text-kinnso-ink" htmlFor={`notes-${milestone.id}`}>{t.submissionNotesLabel}</label>
+          <textarea
+            id={`notes-${milestone.id}`} className="k-input w-full" rows={2} value={notes}
+            placeholder={t.submissionNotesPlaceholder} onChange={(e) => setNotes(e.target.value)}
+          />
+          {error && <p role="alert" className="text-xs font-semibold text-red-700">{error}</p>}
+          <button type="button" className="k-btn-primary text-sm" disabled={pending} onClick={() => void submit()}>
+            {isResubmit ? t.resubmitMilestone : t.submitMilestone}
+          </button>
+        </>
+      )}
+      {jobId && <SubmissionVerification jobId={jobId} t={t} />}
+    </div>
+  )
+}
+
+export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, onSubmitMilestone }: CreatorMissionDetailViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
@@ -157,6 +224,7 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply }
                       )}
                     </div>
                   </div>
+                  <MilestoneSubmit milestone={milestone} t={t} onSubmitMilestone={onSubmitMilestone} />
                 </TicketCard>
               ))}
             </div>
