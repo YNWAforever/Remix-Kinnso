@@ -2,8 +2,7 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const { channelMock, fromMock, retryMock } = vi.hoisted(() => ({
-  channelMock: vi.fn(),
+const { fromMock, retryMock } = vi.hoisted(() => ({
   fromMock: vi.fn(),
   retryMock: vi.fn(),
 }))
