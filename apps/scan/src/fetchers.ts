@@ -1,6 +1,21 @@
 import type { PlatformFetcher, Platform } from '@kinnso/scan'
 
 // ---------------------------------------------------------------------------
+// Single-post fetch types (for mission verification)
+// ---------------------------------------------------------------------------
+
+export type SinglePostResult = {
+  authorHandle: string | null
+  engagementCount: number | null
+  postUrl: string | null
+}
+
+export interface PostFetcher {
+  // Returns null on any fetch/parse failure — callers treat null as 'unavailable'.
+  fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null>
+}
+
+// ---------------------------------------------------------------------------
 // Retry helpers
 // ---------------------------------------------------------------------------
 
@@ -204,6 +219,56 @@ export class RapidApiFetcher implements PlatformFetcher {
       })),
     }
   }
+
+  async fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null> {
+    try {
+      if (platform === 'instagram') {
+        const res = await fetchWithRetry(`https://${RAPIDAPI_IG_HOST}/get_media_data.php`, {
+          method: 'POST',
+          headers: {
+            'x-rapidapi-key': this.apiKey,
+            'x-rapidapi-host': RAPIDAPI_IG_HOST,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ shortcode: id }).toString(),
+        })
+        if (!res.ok) return null
+        const raw = (await res.json()) as Record<string, any>
+        const node = (raw.data ?? raw.media ?? raw) as Record<string, any>
+        const author =
+          node?.owner?.username ?? node?.user?.username ?? node?.author?.username ?? null
+        const likes = Number(node?.edge_media_preview_like?.count ?? node?.like_count ?? node?.likes ?? NaN)
+        return {
+          authorHandle: typeof author === 'string' ? author : null,
+          engagementCount: Number.isFinite(likes) ? likes : null,
+          postUrl: `https://www.instagram.com/p/${id}/`,
+        }
+      }
+
+      // Threads: best-effort post info on the existing Threads host.
+      const res = await fetchWithRetry(`https://${RAPIDAPI_THREADS_HOST}/post/info?post_id=${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': this.apiKey,
+          'x-rapidapi-host': RAPIDAPI_THREADS_HOST,
+          Accept: 'application/json',
+        },
+      })
+      if (!res.ok) return null
+      const raw = (await res.json()) as Record<string, any>
+      const node = (raw.data ?? raw.post ?? raw) as Record<string, any>
+      const author = node?.user?.username ?? node?.author?.username ?? node?.owner?.username ?? null
+      const likes = Number(node?.like_count ?? node?.likes ?? NaN)
+      return {
+        authorHandle: typeof author === 'string' ? author : null,
+        engagementCount: Number.isFinite(likes) ? likes : null,
+        postUrl: null,
+      }
+    } catch (err) {
+      console.warn(`[scan] fetchPost failed: ${platform}/${id}`, (err as Error).message)
+      return null
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -309,6 +374,10 @@ export class CompositeFetcher implements PlatformFetcher {
     }
     throw new Error(`CompositeFetcher: unsupported platform "${platform}"`)
   }
+
+  fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null> {
+    return this.rapidApi.fetchPost(platform, id)
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -361,15 +430,22 @@ export const FAKE_PAYLOADS: Record<Platform, unknown> = {
   },
 }
 
+const FAKE_POSTS: Record<'instagram' | 'threads', (id: string) => SinglePostResult> = {
+  instagram: (id) => ({ authorHandle: 'fake_ig_user', engagementCount: 1234, postUrl: `https://www.instagram.com/p/${id}/` }),
+  threads: (id) => ({ authorHandle: 'fake_threads_user', engagementCount: 56, postUrl: `https://www.threads.net/post/${id}` }),
+}
+
 /**
  * Fake fetcher for tests and fixture mode.
  * Never makes network calls; returns deterministic canned payloads.
  * Optionally override per platform via `overrides` map.
+ * Third arg `postOverrides` overrides per-platform single-post fetch results.
  */
-export class FakeFetcher implements PlatformFetcher {
+export class FakeFetcher implements PlatformFetcher, PostFetcher {
   constructor(
     private readonly overrides: Partial<Record<Platform, unknown>> = {},
-    private readonly failPlatforms: Platform[] = []
+    private readonly failPlatforms: Platform[] = [],
+    private readonly postOverrides: Partial<Record<'instagram' | 'threads', SinglePostResult>> = {},
   ) {}
 
   async fetch(platform: Platform, _handle: string): Promise<unknown> {
@@ -377,5 +453,11 @@ export class FakeFetcher implements PlatformFetcher {
       throw new Error(`FakeFetcher: simulated failure for platform "${platform}"`)
     }
     return this.overrides[platform] ?? FAKE_PAYLOADS[platform]
+  }
+
+  async fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null> {
+    if (this.failPlatforms.includes(platform)) return null
+    if (this.postOverrides[platform]) return this.postOverrides[platform]!
+    return FAKE_POSTS[platform](id)
   }
 }
