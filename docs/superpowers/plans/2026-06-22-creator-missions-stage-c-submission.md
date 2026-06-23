@@ -38,7 +38,7 @@ The existing fetchers only take `(platform, handle)`. There is **no** single-pos
 
 ## File map
 
-**Migrations** (`apps/web/supabase/migrations/`)
+**Migrations** (`supabase/migrations/`)
 - Create `20260619000002_mission_verification_jobs.sql` — new table + RLS + grants + single-active index.
 - Create `20260619000003_allow_submission_resubmit.sql` — replace the integrity trigger function to allow `revision_requested → submitted` by the owning creator.
 
@@ -77,7 +77,7 @@ The existing fetchers only take `(platform, handle)`. There is **no** single-pos
 Mirrors `creator_scan_jobs` (`supabase/migrations/20260614000009_creator_tables.sql:25-43`, RLS `…11:30-32`, grants `…12:14-16`, single-active `…15:11-13`). `creators.id = auth.uid()` directly, so the owner predicate is `creator_id = auth.uid()`.
 
 **Files:**
-- Create: `apps/web/supabase/migrations/20260619000002_mission_verification_jobs.sql`
+- Create: `supabase/migrations/20260619000002_mission_verification_jobs.sql`
 
 - [ ] **Step 1: Write the migration**
 
@@ -135,7 +135,7 @@ Expected: 0 errors; `mission_verification_jobs` resolves in both `@kinnso/db` co
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/web/supabase/migrations/20260619000002_mission_verification_jobs.sql packages/db
+git add supabase/migrations/20260619000002_mission_verification_jobs.sql packages/db
 git commit -m "feat(missions): add mission_verification_jobs table + regenerate db types"
 ```
 
@@ -146,7 +146,7 @@ git commit -m "feat(missions): add mission_verification_jobs table + regenerate 
 The current `enforce_mission_submission_integrity` (`supabase/migrations/20260617173932_mission_tables.sql:195-249`) blocks creator UPDATEs when `old.status not in ('pending','submitted')` — which makes `revision_requested` a dead-end. This migration replaces the function, adding `'revision_requested'` to the allowed prior statuses. Everything else (review-field tampering blocks, the `not in ('pending','submitted')` *new*-status block, the active-participant requirement) is unchanged.
 
 **Files:**
-- Create: `apps/web/supabase/migrations/20260619000003_allow_submission_resubmit.sql`
+- Create: `supabase/migrations/20260619000003_allow_submission_resubmit.sql`
 
 - [ ] **Step 1: Write the migration** (full function body, only the one `elsif` predicate differs)
 
@@ -217,7 +217,7 @@ Apply via the Supabase MCP (`scryfkefedzuetfdtrvl`, name `allow_submission_resub
 - [ ] **Step 3: Commit**
 
 ```bash
-git add apps/web/supabase/migrations/20260619000003_allow_submission_resubmit.sql
+git add supabase/migrations/20260619000003_allow_submission_resubmit.sql
 git commit -m "feat(missions): allow creator resubmit from revision_requested"
 ```
 
