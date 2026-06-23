@@ -44,10 +44,10 @@ export default async function MerchantMissionsPage({ params }: { params: Params 
   if (!user) redirect(`/${loc}/sign-in`)
 
   const { data: merchantProfile } = await getMerchantProfile(supabase, user.id)
-  if (!merchantProfile) return <MerchantMissionsView t={messages.missions} missions={[]} />
+  if (!merchantProfile) return <MerchantMissionsView locale={loc} t={messages.missions} missions={[]} />
 
   const { data } = await listMerchantMissions(supabase, merchantProfile.id)
   const missions = ((data ?? []) as unknown as MerchantMissionData[]).map(mapMerchantMission)
 
-  return <MerchantMissionsView t={messages.missions} missions={missions} />
+  return <MerchantMissionsView locale={loc} t={messages.missions} missions={missions} />
 }
