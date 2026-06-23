@@ -313,7 +313,11 @@ export class YouTubeFetcher implements PlatformFetcher {
       if (!channelId) return null
       const likes = Number(item?.statistics?.likeCount ?? NaN)
       const views = Number(item?.statistics?.viewCount ?? NaN)
-      const engagementCount = Number.isFinite(likes) ? likes : Number.isFinite(views) ? views : null
+      const rawEngagement = Number.isFinite(likes) ? likes : Number.isFinite(views) ? views : null
+      // mission_social_snapshots.engagement_count is int4; viral view counts can
+      // exceed 2.1B and would overflow → the insert throws → verification 'failed'.
+      // Clamp to int4 max so a huge video still verifies.
+      const engagementCount = rawEngagement == null ? null : Math.min(rawEngagement, 2147483647)
 
       // Best-effort customUrl (@handle) for the handle-fallback match.
       let authorHandle: string | null = null

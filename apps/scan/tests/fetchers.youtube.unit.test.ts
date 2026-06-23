@@ -42,6 +42,16 @@ describe('YouTubeFetcher.fetchVideoAuthor', () => {
     const post = await new YouTubeFetcher('key').fetchVideoAuthor('vid')
     expect(post).toEqual({ authorHandle: null, authorId: 'UCabc', engagementCount: null, postUrl: 'https://www.youtube.com/watch?v=vid' })
   })
+
+  it('clamps engagement to int4 max when viewCount exceeds it (no likeCount)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string) =>
+      url.includes('/videos')
+        ? jsonResponse({ items: [{ snippet: { channelId: 'UCabc' }, statistics: { viewCount: '5000000000' } }] })
+        : jsonResponse({ items: [{ snippet: { customUrl: '@x' } }] }),
+    ))
+    const post = await new YouTubeFetcher('key').fetchVideoAuthor('vid')
+    expect(post?.engagementCount).toBe(2147483647)
+  })
 })
 
 describe('YouTubeFetcher.resolveChannelId', () => {
