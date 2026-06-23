@@ -9,6 +9,7 @@ import {
   joinMissionAction,
   reviewParticipantAction,
   reviewSubmissionAction,
+  submitMilestoneAction,
   updateSettlementAction,
 } from '@/lib/missions/actions'
 
@@ -750,5 +751,77 @@ describe('social enrichment boundary', () => {
     ).resolves.toMatchObject({
       confidenceStatus: 'unavailable',
     })
+  })
+})
+
+describe('submitMilestoneAction', () => {
+  it('rejects an invalid proof URL before any DB call', async () => {
+    const supabase = createSupabaseMock({})
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+    const result = await submitMilestoneAction({
+      missionId: 'm1', milestoneId: 'ms1', participantId: 'p1', proofUrl: 'not-a-url', locale: 'en',
+    })
+    expect(result).toEqual({ ok: false, errors: { proofUrl: ['url'] } })
+  })
+
+  it('inserts a submitted submission for the owning active participant', async () => {
+    const submissionInsert = createBuilder({ single: vi.fn(async () => ({ data: { id: 'sub-1' }, error: null })) })
+    const supabase = createSupabaseMock({
+      mission_participants: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'p1', creator_id: 'user-1', status: 'active', mission_id: 'm1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }), // existing lookup → none
+        submissionInsert, // insert
+      ],
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await submitMilestoneAction({
+      missionId: 'm1', milestoneId: 'ms1', participantId: 'p1',
+      proofUrl: 'https://www.instagram.com/p/Cabc/', notes: 'live', locale: 'en',
+    })
+
+    expect(result).toEqual({ ok: true, submissionId: 'sub-1' })
+    expect(submissionInsert.insert).toHaveBeenCalledWith({
+      mission_milestone_id: 'ms1',
+      mission_participant_id: 'p1',
+      proof_urls: ['https://www.instagram.com/p/Cabc/'],
+      notes: 'live',
+      status: 'submitted',
+      submitted_at: expect.any(String),
+    })
+  })
+
+  it('rejects when the participant belongs to another creator', async () => {
+    const supabase = createSupabaseMock({
+      mission_participants: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'p1', creator_id: 'someone-else', status: 'active', mission_id: 'm1' }, error: null })),
+      }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+    const result = await submitMilestoneAction({
+      missionId: 'm1', milestoneId: 'ms1', participantId: 'p1', proofUrl: 'https://instagram.com/p/x', locale: 'en',
+    })
+    expect(result).toEqual({ ok: false, errors: { form: ['Creator access is required'] } })
+  })
+
+  it('updates an existing revision_requested submission instead of inserting', async () => {
+    const submissionUpdate = createBuilder({ single: vi.fn(async () => ({ data: { id: 'sub-1' }, error: null })) })
+    const supabase = createSupabaseMock({
+      mission_participants: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'p1', creator_id: 'user-1', status: 'active', mission_id: 'm1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({ maybeSingle: vi.fn(async () => ({ data: { id: 'sub-1', status: 'revision_requested' }, error: null })) }),
+        submissionUpdate,
+      ],
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+    const result = await submitMilestoneAction({
+      missionId: 'm1', milestoneId: 'ms1', participantId: 'p1', proofUrl: 'https://instagram.com/p/x', locale: 'en',
+    })
+    expect(result).toEqual({ ok: true, submissionId: 'sub-1' })
+    expect(submissionUpdate.update).toHaveBeenCalled()
   })
 })

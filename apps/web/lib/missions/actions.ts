@@ -17,6 +17,7 @@ import {
   validateMissionDraft,
   validatePartnerLinkRequest,
   validateSettlementUpdate,
+  validateSubmission,
 } from '@/lib/missions/validation'
 
 type MissionInsert = Database['public']['Tables']['missions']['Insert']
@@ -520,6 +521,81 @@ export async function updateSettlementAction(
 
   await revalidate([localizedPath(input.locale, opsSettlementsPath)])
   return { ok: true, settlementId: settlement.id }
+}
+
+export type SubmitMilestoneInput = {
+  missionId: string
+  milestoneId: string
+  participantId: string
+  proofUrl: string
+  notes?: string | null
+  locale?: string
+}
+
+const RESUBMITTABLE = new Set(['pending', 'submitted', 'revision_requested'])
+
+export async function submitMilestoneAction(
+  input: SubmitMilestoneInput,
+): Promise<ActionResult<{ submissionId: string }>> {
+  'use server'
+
+  const validation = validateSubmission({ proofUrl: input.proofUrl, notes: input.notes })
+  if (!validation.ok) return { ok: false, errors: validation.errors }
+
+  const supabase = await getSupabase()
+  const user = await getAuthenticatedUser(supabase)
+  if (!user) return formError('Sign in is required')
+
+  const { data: participant, error: participantError } = await supabase
+    .from('mission_participants')
+    .select('id, creator_id, status, mission_id')
+    .eq('id', input.participantId)
+    .maybeSingle()
+
+  if (participantError || !participant) return formError('Mission participation was not found')
+  if (participant.creator_id !== user.id) return formError('Creator access is required')
+  if (participant.status !== 'active') return formError('Mission is not active')
+
+  const proofUrls = [input.proofUrl.trim()]
+  const notes = input.notes ?? null
+  const submittedAt = new Date().toISOString()
+
+  const { data: existing } = await supabase
+    .from('mission_milestone_submissions')
+    .select('id, status')
+    .eq('mission_milestone_id', input.milestoneId)
+    .eq('mission_participant_id', input.participantId)
+    .maybeSingle()
+
+  if (existing) {
+    if (!RESUBMITTABLE.has(existing.status ?? '')) return formError('This milestone has already been reviewed')
+    const { data: updated, error: updateError } = await supabase
+      .from('mission_milestone_submissions')
+      .update({ status: 'submitted', proof_urls: proofUrls, notes, submitted_at: submittedAt })
+      .eq('id', existing.id)
+      .select('id')
+      .single()
+    if (updateError || !updated) return formError('Submission could not be saved')
+    await revalidate([localizedPath(input.locale, studioMissionsPath)])
+    return { ok: true, submissionId: updated.id }
+  }
+
+  const { data: inserted, error: insertError } = await supabase
+    .from('mission_milestone_submissions')
+    .insert({
+      mission_milestone_id: input.milestoneId,
+      mission_participant_id: input.participantId,
+      proof_urls: proofUrls,
+      notes,
+      status: 'submitted',
+      submitted_at: submittedAt,
+    })
+    .select('id')
+    .single()
+
+  if (insertError || !inserted) return formError('Submission could not be saved')
+  await revalidate([localizedPath(input.locale, studioMissionsPath)])
+  return { ok: true, submissionId: inserted.id }
 }
 
 export async function createPartnerLinkAction(
