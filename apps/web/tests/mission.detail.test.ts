@@ -7,6 +7,27 @@ import {
   type MissionDetailRow,
 } from '@/lib/missions/detail'
 
+const activeRow = (overrides: Partial<MissionDetailRow> = {}): MissionDetailRow => ({
+  id: 'm1', title: 'T', summary: 'S',
+  mission_source: 'merchant', mission_type: 'paid', status: 'published',
+  coupon_code: null, coupon_url: null,
+  paid_fee_amount: 5000, paid_fee_currency: 'HKD',
+  affiliate_commission_rate: null, creator_commission_rate: null, kinnso_commission_rate: null,
+  affiliate_network_programs: null,
+  mission_milestones: [{ id: 'ms1', title: 'Post a reel', description: 'd', due_at: null, sort_order: 0 }],
+  mission_participants: [{
+    id: 'p1', status: 'active', source: 'application', creator_id: 'creator-1', application_note: null,
+    mission_milestone_submissions: [{
+      id: 'sub1', mission_milestone_id: 'ms1', status: 'submitted',
+      proof_urls: ['https://www.instagram.com/p/Cabc/'], notes: 'note', merchant_feedback: null, submitted_at: '2026-06-20T00:00:00Z',
+      mission_social_snapshots: [{ confidence_status: 'verified_signal' }],
+      mission_verification_jobs: [{ id: 'job1', status: 'ready', confidence_status: 'verified_signal', created_at: '2026-06-20T00:01:00Z' }],
+    }],
+  }],
+  affiliate_partner_links: [],
+  ...overrides,
+})
+
 describe('resolveParticipationCta', () => {
   it('maps no participant to join for coupon and apply for paid/hybrid', () => {
     expect(resolveParticipationCta(null, 'coupon_affiliate')).toBe('join')
@@ -82,5 +103,32 @@ describe('toCreatorMissionDetail', () => {
     )
     expect(detail).toMatchObject({ cta: 'active', participantStatus: 'active' })
     expect(detail.milestones[0]).toMatchObject({ state: 'submitted', signal: 'unavailable' })
+  })
+})
+
+describe('toCreatorMissionDetail — submission + verification', () => {
+  it('exposes participantId for the active participant', () => {
+    expect(toCreatorMissionDetail(activeRow(), 'creator-1').participantId).toBe('p1')
+  })
+  it('maps the milestone submission, proof URL and merchant feedback', () => {
+    const ms = toCreatorMissionDetail(activeRow(), 'creator-1').milestones[0]
+    expect(ms.submissionId).toBe('sub1')
+    expect(ms.proofUrl).toBe('https://www.instagram.com/p/Cabc/')
+    expect(ms.state).toBe('submitted')
+  })
+  it('maps the latest verification job', () => {
+    const ms = toCreatorMissionDetail(activeRow(), 'creator-1').milestones[0]
+    expect(ms.verification).toEqual({ jobId: 'job1', status: 'ready', confidence: 'verified_signal' })
+  })
+  it('allows submit for an active participant with no submission', () => {
+    const row = activeRow({
+      mission_participants: [{ id: 'p1', status: 'active', source: 'application', creator_id: 'creator-1', application_note: null, mission_milestone_submissions: [] }],
+    })
+    expect(toCreatorMissionDetail(row, 'creator-1').milestones[0].canSubmit).toBe(true)
+  })
+  it('blocks submit once approved', () => {
+    const row = activeRow()
+    row.mission_participants![0].mission_milestone_submissions![0].status = 'approved'
+    expect(toCreatorMissionDetail(row, 'creator-1').milestones[0].canSubmit).toBe(false)
   })
 })
