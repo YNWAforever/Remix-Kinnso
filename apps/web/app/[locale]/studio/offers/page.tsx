@@ -22,7 +22,7 @@ type OfferRow = {
   summary: string | null
   affiliate_network_programs?: ProgramRel | ProgramRel[] | null
   mission_participants?: Array<{ id: string; status: string | null; creator_id: string | null }> | null
-  affiliate_partner_links?: Array<{ id: string; partner_url: string | null }> | null
+  affiliate_partner_links?: Array<{ id: string; partner_url: string | null; sub_id: string | null }> | null
 }
 
 const program = (rel: OfferRow['affiliate_network_programs']) => (Array.isArray(rel) ? rel[0] ?? null : rel ?? null)
@@ -38,7 +38,11 @@ function mapOffer(row: OfferRow, creatorId: string): AffiliateOfferCard {
     compensation: prog?.default_commission_description?.trim() || 'Affiliate commission',
     programUrl: prog?.program_url?.trim() || null,
     participant: participant ? { id: participant.id, status: participant.status ?? 'active' } : null,
-    partnerLinks: (row.affiliate_partner_links ?? []).map((link) => ({ id: link.id, partnerUrl: link.partner_url ?? '' })),
+    partnerLinks: (row.affiliate_partner_links ?? []).map((link) => ({
+      id: link.id,
+      partnerUrl: link.partner_url ?? '',
+      subId: link.sub_id ?? '',
+    })),
   }
 }
 

@@ -507,6 +507,7 @@ const messages: Messages = {
     commission: '커미션',
     viewProgram: '프로그램 보기',
     setupNotConfigured: '파트너 링크 생성을 준비 중입니다. 잠시 후 다시 확인해 주세요.',
+    trackingId: '트래킹 ID',
   },
   studioEarnings: {
     heading: '수익',
