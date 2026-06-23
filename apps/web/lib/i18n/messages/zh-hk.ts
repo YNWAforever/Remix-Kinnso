@@ -507,6 +507,7 @@ const messages: Messages = {
     commission: '佣金',
     viewProgram: '查看計劃',
     setupNotConfigured: '夥伴連結生成功能設定中，請稍後再查看。',
+    trackingId: '追蹤 ID',
   },
   studioEarnings: {
     heading: '收益',

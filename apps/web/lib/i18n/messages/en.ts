@@ -453,6 +453,7 @@ export interface Messages {
     commission: string
     viewProgram: string
     setupNotConfigured: string
+    trackingId: string
   }
   studioEarnings: {
     heading: string
@@ -974,6 +975,7 @@ const messages: Messages = {
     commission: 'Commission',
     viewProgram: 'View program',
     setupNotConfigured: 'Partner-link generation is being set up — check back soon.',
+    trackingId: 'Tracking ID',
   },
   studioEarnings: {
     heading: 'Earnings',

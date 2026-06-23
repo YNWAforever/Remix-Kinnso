@@ -71,7 +71,7 @@ describe('StudioOffersView', () => {
     render(
       <StudioOffersView
         t={en.studioOffers}
-        offers={[offer({ participant: { id: 'p1', status: 'active' }, partnerLinks: [{ id: 'l1', partnerUrl: 'https://tp.link/abc' }] })]}
+        offers={[offer({ participant: { id: 'p1', status: 'active' }, partnerLinks: [{ id: 'l1', partnerUrl: 'https://tp.link/abc', subId: 'kinnso_m_aaaa_p_bbbb_c_creator9' }] })]}
         onJoin={vi.fn()}
         onCreateLink={vi.fn()}
       />,
@@ -79,5 +79,19 @@ describe('StudioOffersView', () => {
     expect(screen.getByText('https://tp.link/abc')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: en.studioOffers.copy }))
     await waitFor(() => expect(writeText).toHaveBeenCalledWith('https://tp.link/abc'))
+  })
+
+  it('shows the per-creator tracking id (sub_id) on a generated link', () => {
+    render(
+      <StudioOffersView
+        t={en.studioOffers}
+        offers={[offer({ participant: { id: 'p1', status: 'active' }, partnerLinks: [{ id: 'l1', partnerUrl: 'https://tp.link/abc', subId: 'kinnso_m_aaaa_p_bbbb_c_creator9' }] })]}
+        onJoin={vi.fn()}
+        onCreateLink={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(en.studioOffers.trackingId, { exact: false })).toBeTruthy()
+    const tag = screen.getByText(/creator9/) as HTMLElement
+    expect(tag.getAttribute('title')).toBe('kinnso_m_aaaa_p_bbbb_c_creator9')
   })
 })

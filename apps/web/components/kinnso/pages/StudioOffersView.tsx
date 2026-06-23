@@ -16,7 +16,12 @@ export type AffiliateOfferCard = {
   compensation: string
   programUrl: string | null
   participant: { id: string; status: string } | null
-  partnerLinks: Array<{ id: string; partnerUrl: string }>
+  partnerLinks: Array<{ id: string; partnerUrl: string; subId: string }>
+}
+
+/** Show enough of the per-creator sub_id to be recognizable without dumping ~110 chars. */
+function shortenSubId(subId: string): string {
+  return subId.length > 22 ? `${subId.slice(0, 12)}…${subId.slice(-8)}` : subId
 }
 
 type StudioOffersViewProps = {
@@ -94,6 +99,14 @@ export function StudioOffersView({ t, offers, onJoin, onCreateLink, linkSetupPen
                             </button>
                           }
                         />
+                        {link.subId && (
+                          <p className="mt-1 text-xs text-kinnso-muted">
+                            {t.trackingId}:{' '}
+                            <code className="font-mono" title={link.subId}>
+                              {shortenSubId(link.subId)}
+                            </code>
+                          </p>
+                        )}
                       </li>
                     ))}
                   </ul>
