@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: 'แสดงเฉพาะผลลัพธ์อันดับต้น อัปเกรดเป็น Growth เพื่อดูการจับคู่ทั้งหมด',
   },
   missions: {
-    missionQueue: 'คิวภารกิจ',
+    missionQueue: 'คิวภารกิจ', backToQueue: 'กลับไปที่คิว',
     joinMission: 'เข้าร่วมภารกิจ',
     applyMission: 'สมัครภารกิจ',
     generatePartnerLink: 'สร้างลิงก์พันธมิตร',

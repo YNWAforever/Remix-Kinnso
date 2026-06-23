@@ -28,7 +28,7 @@ describe('MissionDetailView', () => {
 
   it('lets merchant approve an applicant', () => {
     const onReviewParticipant = vi.fn()
-    render(<MissionDetailView t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
+    render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: en.missions.approve }))
     expect(onReviewParticipant).toHaveBeenCalledWith('p1', 'approve')
   })
@@ -38,7 +38,7 @@ describe('MissionDetailView', () => {
       ok: false,
       errors: { form: ['Merchant access is required'] },
     }))
-    render(<MissionDetailView t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
+    render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
 
     fireEvent.click(screen.getByRole('button', { name: en.missions.approve }))
 
@@ -50,7 +50,7 @@ describe('MissionDetailView', () => {
     const onReviewParticipant = vi.fn(() => new Promise<{ ok: true }>((resolve) => {
       resolveReview = resolve
     }))
-    render(<MissionDetailView t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
+    render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={onReviewParticipant} onReviewSubmission={vi.fn()} />)
 
     const button = screen.getByRole('button', { name: en.missions.approve })
     fireEvent.click(button)
@@ -58,5 +58,10 @@ describe('MissionDetailView', () => {
     expect(button).toHaveProperty('disabled', true)
     resolveReview({ ok: true })
     await waitFor(() => expect(refreshMock).toHaveBeenCalledTimes(1))
+  })
+
+  it('links back to the mission queue', () => {
+    render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={vi.fn()} onReviewSubmission={vi.fn()} />)
+    expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/missions')
   })
 })

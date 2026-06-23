@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: '상위 결과만 표시 중. Growth로 업그레이드하여 모든 매칭 보기.',
   },
   missions: {
-    missionQueue: '미션 대기열',
+    missionQueue: '미션 대기열', backToQueue: '대기열로 돌아가기',
     joinMission: '미션 참여',
     applyMission: '미션 지원',
     generatePartnerLink: '파트너 링크 생성',

@@ -284,6 +284,7 @@ export interface Messages {
   }
   missions: {
     missionQueue: string
+    backToQueue: string
     joinMission: string
     applyMission: string
     generatePartnerLink: string
@@ -784,7 +785,7 @@ const messages: Messages = {
     resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
   },
   missions: {
-    missionQueue: 'Mission queue',
+    missionQueue: 'Mission queue', backToQueue: 'Back to queue',
     joinMission: 'Join mission',
     applyMission: 'Apply mission',
     generatePartnerLink: 'Generate partner link',

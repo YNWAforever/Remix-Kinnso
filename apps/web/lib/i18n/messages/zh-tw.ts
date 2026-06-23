@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: '僅顯示頂尖結果。升級至 Growth 查看所有配對。',
   },
   missions: {
-    missionQueue: '任務佇列',
+    missionQueue: '任務佇列', backToQueue: '返回任務列表',
     joinMission: '加入任務',
     applyMission: '申請任務',
     generatePartnerLink: '產生合作連結',

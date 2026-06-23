@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: '上位の結果のみ表示。Growthにアップグレードで全マッチを表示。',
   },
   missions: {
-    missionQueue: 'ミッションキュー',
+    missionQueue: 'ミッションキュー', backToQueue: 'キューに戻る',
     joinMission: 'ミッションに参加',
     applyMission: 'ミッションに応募',
     generatePartnerLink: 'パートナーリンクを生成',

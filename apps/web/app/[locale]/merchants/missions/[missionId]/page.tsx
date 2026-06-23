@@ -92,6 +92,7 @@ export default async function MerchantMissionDetailPage({ params }: { params: Pa
 
   return (
     <MissionDetailView
+      locale={loc}
       t={messages.missions}
       mission={mapMissionDetail(row)}
       onReviewParticipant={reviewParticipant}
