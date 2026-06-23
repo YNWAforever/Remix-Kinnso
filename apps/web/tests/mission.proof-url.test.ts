@@ -14,8 +14,17 @@ describe('parseProofUrl', () => {
   it('accepts threads.com host', () => {
     expect(parseProofUrl('https://threads.com/@x/post/abc')).toEqual({ platform: 'threads', id: 'abc' })
   })
-  it('returns null for an unsupported (YouTube) URL', () => {
-    expect(parseProofUrl('https://youtu.be/dQw4w9WgXcQ')).toBeNull()
+  it('parses a YouTube watch URL', () => {
+    expect(parseProofUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toEqual({ platform: 'youtube', id: 'dQw4w9WgXcQ' })
+  })
+  it('parses a youtu.be short link', () => {
+    expect(parseProofUrl('https://youtu.be/dQw4w9WgXcQ')).toEqual({ platform: 'youtube', id: 'dQw4w9WgXcQ' })
+  })
+  it('parses a YouTube Shorts URL', () => {
+    expect(parseProofUrl('https://www.youtube.com/shorts/abc123')).toEqual({ platform: 'youtube', id: 'abc123' })
+  })
+  it('returns null for an unsupported (TikTok) URL', () => {
+    expect(parseProofUrl('https://www.tiktok.com/@u/video/123')).toBeNull()
   })
   it('returns null for a non-URL string', () => {
     expect(parseProofUrl('not a url')).toBeNull()
