@@ -13,6 +13,7 @@ type Props = { jobId: string; t: Messages['missionDetail'] }
 export function SubmissionVerification({ jobId, t }: Props) {
   const [job, setJob] = useState<JobRow | null>(null)
   const currentId = useRef(jobId)
+  const cleanupRef = useRef<(() => void) | null>(null)
 
   const subscribeAndSelect = useCallback((id: string) => {
     const supabase = createSupabaseBrowserClient()
@@ -58,15 +59,17 @@ export function SubmissionVerification({ jobId, t }: Props) {
 
   useEffect(() => {
     currentId.current = jobId
-    return subscribeAndSelect(jobId)
+    cleanupRef.current = subscribeAndSelect(jobId)
+    return () => cleanupRef.current?.()
   }, [jobId, subscribeAndSelect])
 
   async function retry() {
     const newId = await retryVerification(currentId.current)
     if (newId) {
+      cleanupRef.current?.()
       currentId.current = newId
       setJob(null)
-      subscribeAndSelect(newId)
+      cleanupRef.current = subscribeAndSelect(newId)
     }
   }
 
