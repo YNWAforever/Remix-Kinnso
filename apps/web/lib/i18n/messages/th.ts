@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: 'รายได้', earningsDesc: 'การชำระเงิน ค่าคอมมิชชัน และประวัติ',
     offersTitle: 'ข้อเสนอ', offersDesc: 'ข้อเสนอพันธมิตรที่คุณโปรโมตได้',
     inboxTitle: 'กล่องข้อความ', inboxDesc: 'ข้อความจากผู้ประกอบการ',
-    guidesTitle: 'คู่มือใหม่', guidesDesc: 'เผยแพร่คู่มือการท่องเที่ยว',
+    guidesTitle: 'ไกด์', guidesDesc: 'ร่างและเผยแพร่ไกด์ของคุณ',
   },
   studioDashboard: {
     greeting: 'ยินดีต้อนรับกลับมา {name}',

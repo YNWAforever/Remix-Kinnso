@@ -918,7 +918,7 @@ const messages: Messages = {
     earningsTitle: 'Earnings', earningsDesc: 'Payouts, commission and history.',
     offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
-    guidesTitle: 'New Guide', guidesDesc: 'Publish a travel guide.',
+    guidesTitle: 'Guides', guidesDesc: 'Draft and publish your guides.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',

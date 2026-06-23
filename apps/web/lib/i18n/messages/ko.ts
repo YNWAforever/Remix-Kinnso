@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: '수익', earningsDesc: '지급금, 수수료 및 내역.',
     offersTitle: '오퍼', offersDesc: '홍보할 수 있는 제휴 오퍼.',
     inboxTitle: '받은 편지함', inboxDesc: '판매자로부터의 메시지.',
-    guidesTitle: '새 가이드', guidesDesc: '여행 가이드를 게시하세요.',
+    guidesTitle: '가이드', guidesDesc: '가이드를 작성하고 게시하세요.',
   },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',

@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: '収益', earningsDesc: '支払い、手数料、履歴。',
     offersTitle: 'オファー', offersDesc: 'プロモーションできるアフィリエイトオファー。',
     inboxTitle: '受信箱', inboxDesc: '加盟店からのメッセージ。',
-    guidesTitle: '新しいガイド', guidesDesc: '旅行ガイドを公開する。',
+    guidesTitle: 'ガイド', guidesDesc: 'ガイドを作成して公開。',
   },
   studioDashboard: {
     greeting: 'おかえりなさい、{name}さん',

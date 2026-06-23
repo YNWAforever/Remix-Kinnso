@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: '收益', earningsDesc: '付款、佣金及歷史記錄。',
     offersTitle: '優惠', offersDesc: '可推廣的聯盟優惠。',
     inboxTitle: '收件匣', inboxDesc: '來自商家的訊息。',
-    guidesTitle: '新攻略', guidesDesc: '發佈一篇旅遊攻略。',
+    guidesTitle: '攻略', guidesDesc: '撰寫並發佈你的攻略。',
   },
   studioDashboard: {
     greeting: '歡迎回來，{name}',

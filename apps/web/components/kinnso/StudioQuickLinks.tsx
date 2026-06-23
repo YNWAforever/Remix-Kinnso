@@ -17,21 +17,36 @@ export function StudioQuickLinks({ locale, t }: { locale: Locale; t: Messages['s
   ]
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {tools.map((tool) => (
-        <TicketCard key={tool.href} as={Link} href={p(tool.href)} className="group p-5 transition hover:border-kinnso-orange">
-          <div className="flex items-center justify-between">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orange">{tool.icon}</span>
-            <RouteStamp className={tool.live ? 'bg-kinnso-orange/10 text-kinnso-orange' : 'bg-kinnso-cream2 text-kinnso-muted'}>
-              {tool.live ? t.liveBadge : t.soonBadge}
-            </RouteStamp>
-          </div>
-          <h3 className="mt-3 text-lg font-bold text-kinnso-ink">{tool.title}</h3>
-          <p className="mt-1 text-sm text-kinnso-muted">{tool.desc}</p>
-          <span className="mt-3 inline-flex items-center text-sm font-bold text-kinnso-orange">
-            {t.open} <ArrowRight aria-hidden="true" className="ml-1 h-4 w-4 transition group-hover:translate-x-0.5" />
-          </span>
-        </TicketCard>
-      ))}
+      {tools.map((tool) => {
+        const header = (
+          <>
+            <div className="flex items-center justify-between">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orange">{tool.icon}</span>
+              <RouteStamp className={tool.live ? 'bg-kinnso-orange/10 text-kinnso-orange' : 'bg-kinnso-cream2 text-kinnso-muted'}>
+                {tool.live ? t.liveBadge : t.soonBadge}
+              </RouteStamp>
+            </div>
+            <h3 className="mt-3 text-lg font-bold text-kinnso-ink">{tool.title}</h3>
+            <p className="mt-1 text-sm text-kinnso-muted">{tool.desc}</p>
+          </>
+        )
+        if (!tool.live) {
+          // Backlog tool: visible but not clickable — no dead link to a Coming-Soon stub.
+          return (
+            <TicketCard key={tool.href} className="p-5 opacity-70">
+              {header}
+            </TicketCard>
+          )
+        }
+        return (
+          <TicketCard key={tool.href} as={Link} href={p(tool.href)} className="group p-5 transition hover:border-kinnso-orange">
+            {header}
+            <span className="mt-3 inline-flex items-center text-sm font-bold text-kinnso-orange">
+              {t.open} <ArrowRight aria-hidden="true" className="ml-1 h-4 w-4 transition group-hover:translate-x-0.5" />
+            </span>
+          </TicketCard>
+        )
+      })}
     </div>
   )
 }
