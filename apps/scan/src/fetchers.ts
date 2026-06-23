@@ -13,7 +13,10 @@ export type SinglePostResult = {
 
 export interface PostFetcher {
   // Returns null on any fetch/parse failure — callers treat null as 'unavailable'.
-  fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null>
+  fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null>
+  // Resolve a creator's registered handle to a canonical channel id. YouTube-only;
+  // non-YouTube fetchers return null. Used for the ID-first match.
+  resolveChannelId(handle: string): Promise<string | null>
 }
 
 // ---------------------------------------------------------------------------
@@ -221,7 +224,8 @@ export class RapidApiFetcher implements PlatformFetcher {
     }
   }
 
-  async fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null> {
+  async fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null> {
+    if (platform === 'youtube') return null // routed to YouTubeFetcher by CompositeFetcher
     try {
       if (platform === 'instagram') {
         const res = await fetchWithRetry(`https://${RAPIDAPI_IG_HOST}/get_media_data.php`, {
@@ -269,6 +273,11 @@ export class RapidApiFetcher implements PlatformFetcher {
       console.warn(`[scan] fetchPost failed: ${platform}/${id}`, (err as Error).message)
       return null
     }
+  }
+
+  // RapidAPI handles IG/Threads only; channel-id resolution is YouTube-specific.
+  async resolveChannelId(): Promise<string | null> {
+    return null
   }
 }
 
@@ -435,8 +444,13 @@ export class CompositeFetcher implements PlatformFetcher {
     throw new Error(`CompositeFetcher: unsupported platform "${platform}"`)
   }
 
-  fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null> {
+  fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null> {
+    if (platform === 'youtube') return this.youtube.fetchVideoAuthor(id)
     return this.rapidApi.fetchPost(platform, id)
+  }
+
+  resolveChannelId(handle: string): Promise<string | null> {
+    return this.youtube.resolveChannelId(handle)
   }
 }
 
@@ -490,9 +504,10 @@ export const FAKE_PAYLOADS: Record<Platform, unknown> = {
   },
 }
 
-const FAKE_POSTS: Record<'instagram' | 'threads', (id: string) => SinglePostResult> = {
+const FAKE_POSTS: Record<'instagram' | 'threads' | 'youtube', (id: string) => SinglePostResult> = {
   instagram: (id) => ({ authorHandle: 'fake_ig_user', engagementCount: 1234, postUrl: `https://www.instagram.com/p/${id}/` }),
   threads: (id) => ({ authorHandle: 'fake_threads_user', engagementCount: 56, postUrl: `https://www.threads.net/post/${id}` }),
+  youtube: (id) => ({ authorHandle: 'fakeytchannel', authorId: 'UCfakechannelid', engagementCount: 999, postUrl: `https://www.youtube.com/watch?v=${id}` }),
 }
 
 /**
@@ -505,7 +520,8 @@ export class FakeFetcher implements PlatformFetcher, PostFetcher {
   constructor(
     private readonly overrides: Partial<Record<Platform, unknown>> = {},
     private readonly failPlatforms: Platform[] = [],
-    private readonly postOverrides: Partial<Record<'instagram' | 'threads', SinglePostResult>> = {},
+    private readonly postOverrides: Partial<Record<'instagram' | 'threads' | 'youtube', SinglePostResult>> = {},
+    private readonly channelId: string | null = 'UCfakechannelid',
   ) {}
 
   async fetch(platform: Platform, _handle: string): Promise<unknown> {
@@ -515,9 +531,13 @@ export class FakeFetcher implements PlatformFetcher, PostFetcher {
     return this.overrides[platform] ?? FAKE_PAYLOADS[platform]
   }
 
-  async fetchPost(platform: 'instagram' | 'threads', id: string): Promise<SinglePostResult | null> {
+  async fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null> {
     if (this.failPlatforms.includes(platform)) return null
     if (this.postOverrides[platform]) return this.postOverrides[platform]!
     return FAKE_POSTS[platform](id)
+  }
+
+  async resolveChannelId(_handle: string): Promise<string | null> {
+    return this.channelId
   }
 }
