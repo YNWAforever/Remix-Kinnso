@@ -30,7 +30,7 @@ describe('resolveConfidence', () => {
       ),
     ).toBe('verified_signal')
   })
-  it('falls back to handle match when channel ids differ', () => {
+  it('falls back to handle match (verified) when channel ids differ but handles match', () => {
     expect(
       resolveConfidence(
         { authorHandle: '@Traveler', authorId: 'UCother', engagementCount: null, postUrl: null },
@@ -38,6 +38,15 @@ describe('resolveConfidence', () => {
         'UCmine',
       ),
     ).toBe('verified_signal')
+  })
+  it('needs_review when channel ids AND handles both differ', () => {
+    expect(
+      resolveConfidence(
+        { authorHandle: 'someone_else', authorId: 'UCother', engagementCount: null, postUrl: null },
+        'traveler',
+        'UCmine',
+      ),
+    ).toBe('needs_review')
   })
   it('verified_signal via handle when no expectedId is given (IG/Threads unchanged)', () => {
     expect(
