@@ -195,9 +195,12 @@ describe('validateSubmission', () => {
     expect(r.errors.proofUrl).toContain('url')
   })
   it('rejects an unsupported platform URL', () => {
-    const r = validateSubmission({ proofUrl: 'https://youtu.be/dQw4w9WgXcQ' })
+    const r = validateSubmission({ proofUrl: 'https://www.tiktok.com/@u/video/123' })
     expect(r.ok).toBe(false)
     expect(r.errors.proofUrl).toContain('unsupported')
+  })
+  it('accepts a YouTube proof URL', () => {
+    expect(validateSubmission({ proofUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }).ok).toBe(true)
   })
   it('rejects notes longer than 1000 chars', () => {
     const r = validateSubmission({ proofUrl: 'https://instagram.com/p/x', notes: 'a'.repeat(1001) })
