@@ -65,4 +65,19 @@ describe('StudioDashboardView', () => {
     expect(screen.getByText(/HKD/)).toBeTruthy()
     expect(screen.queryByText(en.studioDashboard.opportunitiesEmpty)).toBeNull()
   })
+
+  it('deep-links a mission opportunity to its detail page and an offer to /studio/offers', () => {
+    render(
+      <StudioDashboardView
+        {...baseProps}
+        opportunities={[
+          { id: 'm1', title: 'Stay at Hotel X', kind: 'mission' },
+          { id: 'o9', title: 'Klook affiliate', kind: 'offer' },
+        ]}
+        earnings={[]}
+      />,
+    )
+    expect(screen.getByRole('link', { name: 'Stay at Hotel X' }).getAttribute('href')).toBe('/en/studio/missions/m1')
+    expect(screen.getByRole('link', { name: 'Klook affiliate' }).getAttribute('href')).toBe('/en/studio/offers')
+  })
 })
