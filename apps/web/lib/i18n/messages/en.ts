@@ -340,6 +340,20 @@ export interface Messages {
     couponCodeLabel: string
     partnerLinksHeading: string
     openLink: string
+    proofUrlLabel: string
+    proofUrlPlaceholder: string
+    submissionNotesLabel: string
+    submissionNotesPlaceholder: string
+    submitMilestone: string
+    resubmitMilestone: string
+    submitError: string
+    merchantFeedbackLabel: string
+    verifying: string
+    verifiedSignal: string
+    needsReview: string
+    couldntVerify: string
+    verificationFailed: string
+    retry: string
   }
   ops: {
     settlementHeading: string
@@ -827,6 +841,20 @@ const messages: Messages = {
     couponCodeLabel: 'Code',
     partnerLinksHeading: 'Your links',
     openLink: 'Open',
+    proofUrlLabel: 'Post URL',
+    proofUrlPlaceholder: 'https://www.instagram.com/p/...',
+    submissionNotesLabel: 'Notes (optional)',
+    submissionNotesPlaceholder: 'Add context for the merchant',
+    submitMilestone: 'Submit for review',
+    resubmitMilestone: 'Resubmit',
+    submitError: 'Submission could not be sent',
+    merchantFeedbackLabel: 'Merchant feedback',
+    verifying: 'Verifying…',
+    verifiedSignal: 'Verified signal',
+    needsReview: 'Needs review',
+    couldntVerify: "Couldn’t verify",
+    verificationFailed: 'Verification failed',
+    retry: 'Retry',
   },
   ops: {
     settlementHeading: 'Settlement queue',
