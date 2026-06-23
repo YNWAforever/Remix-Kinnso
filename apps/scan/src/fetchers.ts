@@ -287,6 +287,65 @@ export class YouTubeFetcher implements PlatformFetcher {
     if (!apiKey) throw new Error('YouTubeFetcher: YOUTUBE_API_KEY is required')
   }
 
+  // Single-video author lookup for mission proof verification. Best-effort:
+  // any failure resolves to null (treated as confidence 'unavailable').
+  async fetchVideoAuthor(id: string): Promise<SinglePostResult | null> {
+    try {
+      const vurl =
+        `${YOUTUBE_BASE}/videos?part=snippet,statistics` +
+        `&id=${encodeURIComponent(id)}&key=${encodeURIComponent(this.apiKey)}`
+      const vres = await fetchWithRetry(vurl, { method: 'GET', headers: { Accept: 'application/json' } })
+      if (!vres.ok) return null
+      const vbody = (await vres.json()) as {
+        items?: Array<{ snippet?: { channelId?: string }; statistics?: { likeCount?: string; viewCount?: string } }>
+      }
+      const item = vbody.items?.[0]
+      const channelId = item?.snippet?.channelId ?? null
+      if (!channelId) return null
+      const likes = Number(item?.statistics?.likeCount ?? NaN)
+      const views = Number(item?.statistics?.viewCount ?? NaN)
+      const engagementCount = Number.isFinite(likes) ? likes : Number.isFinite(views) ? views : null
+
+      // Best-effort customUrl (@handle) for the handle-fallback match.
+      let authorHandle: string | null = null
+      try {
+        const curl =
+          `${YOUTUBE_BASE}/channels?part=snippet` +
+          `&id=${encodeURIComponent(channelId)}&key=${encodeURIComponent(this.apiKey)}`
+        const cres = await fetchWithRetry(curl, { method: 'GET', headers: { Accept: 'application/json' } })
+        if (cres.ok) {
+          const cbody = (await cres.json()) as { items?: Array<{ snippet?: { customUrl?: string } }> }
+          authorHandle = cbody.items?.[0]?.snippet?.customUrl ?? null
+        }
+      } catch (err) {
+        console.warn(`[scan] youtube customUrl fetch failed for "${channelId}"`, (err as Error).message)
+      }
+
+      return { authorHandle, authorId: channelId, engagementCount, postUrl: `https://www.youtube.com/watch?v=${id}` }
+    } catch (err) {
+      console.warn(`[scan] youtube fetchVideoAuthor failed for "${id}"`, (err as Error).message)
+      return null
+    }
+  }
+
+  // Resolve a creator's registered @handle to its canonical channel id (UC…).
+  // Best-effort: returns null on any failure.
+  async resolveChannelId(handle: string): Promise<string | null> {
+    try {
+      const forHandle = handle.startsWith('@') ? handle : `@${handle}`
+      const url =
+        `${YOUTUBE_BASE}/channels?part=id` +
+        `&forHandle=${encodeURIComponent(forHandle)}&key=${encodeURIComponent(this.apiKey)}`
+      const res = await fetchWithRetry(url, { method: 'GET', headers: { Accept: 'application/json' } })
+      if (!res.ok) return null
+      const body = (await res.json()) as { items?: Array<{ id?: string }> }
+      return body.items?.[0]?.id ?? null
+    } catch (err) {
+      console.warn(`[scan] youtube resolveChannelId failed for "${handle}"`, (err as Error).message)
+      return null
+    }
+  }
+
   async fetch(platform: 'youtube', handle: string): Promise<unknown> {
     // Normalise: strip leading "@" if present
     const forHandle = handle.startsWith('@') ? handle : `@${handle}`
