@@ -1153,6 +1153,66 @@ export type Database = {
           },
         ]
       }
+      mission_verification_jobs: {
+        Row: {
+          completed_at: string | null
+          confidence_status: string | null
+          created_at: string
+          creator_id: string
+          error: string | null
+          id: string
+          mission_milestone_submission_id: string
+          platform: string | null
+          proof_url: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          confidence_status?: string | null
+          created_at?: string
+          creator_id: string
+          error?: string | null
+          id?: string
+          mission_milestone_submission_id: string
+          platform?: string | null
+          proof_url?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          confidence_status?: string | null
+          created_at?: string
+          creator_id?: string
+          error?: string | null
+          id?: string
+          mission_milestone_submission_id?: string
+          platform?: string | null
+          proof_url?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_verification_jobs_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_verification_jobs_mission_milestone_submission_id_fkey"
+            columns: ["mission_milestone_submission_id"]
+            isOneToOne: false
+            referencedRelation: "mission_milestone_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           affiliate_commission_rate: number | null
