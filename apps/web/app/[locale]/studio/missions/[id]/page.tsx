@@ -3,7 +3,7 @@ import { CreatorMissionDetailView } from '@/components/kinnso/pages/CreatorMissi
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { joinMissionAction } from '@/lib/missions/actions'
+import { joinMissionAction, submitMilestoneAction } from '@/lib/missions/actions'
 import { toCreatorMissionDetail, type MissionDetailRow } from '@/lib/missions/detail'
 import { getCreatorMissionDetail } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -44,7 +44,19 @@ export default async function StudioMissionDetailPage({ params }: { params: Para
     return joinMissionAction({ missionId: id, applicationNote: note, locale: loc })
   }
 
+  async function submitMilestone(input: { milestoneId: string; proofUrl: string; notes: string }) {
+    'use server'
+    return submitMilestoneAction({
+      missionId: id,
+      milestoneId: input.milestoneId,
+      participantId: mission.participantId ?? '',
+      proofUrl: input.proofUrl,
+      notes: input.notes,
+      locale: loc,
+    })
+  }
+
   return (
-    <CreatorMissionDetailView locale={loc} t={messages.missionDetail} mission={mission} onJoin={join} onApply={apply} />
+    <CreatorMissionDetailView locale={loc} t={messages.missionDetail} mission={mission} onJoin={join} onApply={apply} onSubmitMilestone={submitMilestone} />
   )
 }
