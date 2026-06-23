@@ -135,5 +135,5 @@ export default async function StudioMissionsPage({ params }: { params: Params })
     return joinMissionAction({ missionId, locale: loc })
   }
 
-  return <CreatorMissionsView t={messages.missions} missions={missions} onJoin={join} />
+  return <CreatorMissionsView locale={loc} t={messages.missions} missions={missions} onJoin={join} />
 }

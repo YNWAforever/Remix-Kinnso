@@ -1,6 +1,25 @@
 import type { PlatformFetcher, Platform } from '@kinnso/scan'
 
 // ---------------------------------------------------------------------------
+// Single-post fetch types (for mission verification)
+// ---------------------------------------------------------------------------
+
+export type SinglePostResult = {
+  authorHandle: string | null
+  authorId?: string | null
+  engagementCount: number | null
+  postUrl: string | null
+}
+
+export interface PostFetcher {
+  // Returns null on any fetch/parse failure — callers treat null as 'unavailable'.
+  fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null>
+  // Resolve a creator's registered handle to a canonical channel id. YouTube-only;
+  // non-YouTube fetchers return null. Used for the ID-first match.
+  resolveChannelId(handle: string): Promise<string | null>
+}
+
+// ---------------------------------------------------------------------------
 // Retry helpers
 // ---------------------------------------------------------------------------
 
@@ -204,6 +223,62 @@ export class RapidApiFetcher implements PlatformFetcher {
       })),
     }
   }
+
+  async fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null> {
+    if (platform === 'youtube') return null // routed to YouTubeFetcher by CompositeFetcher
+    try {
+      if (platform === 'instagram') {
+        const res = await fetchWithRetry(`https://${RAPIDAPI_IG_HOST}/get_media_data.php`, {
+          method: 'POST',
+          headers: {
+            'x-rapidapi-key': this.apiKey,
+            'x-rapidapi-host': RAPIDAPI_IG_HOST,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ shortcode: id }).toString(),
+        })
+        if (!res.ok) return null
+        const raw = (await res.json()) as Record<string, any>
+        const node = (raw.data ?? raw.media ?? raw) as Record<string, any>
+        const author =
+          node?.owner?.username ?? node?.user?.username ?? node?.author?.username ?? null
+        const likes = Number(node?.edge_media_preview_like?.count ?? node?.like_count ?? node?.likes ?? NaN)
+        return {
+          authorHandle: typeof author === 'string' ? author : null,
+          engagementCount: Number.isFinite(likes) ? likes : null,
+          postUrl: `https://www.instagram.com/p/${id}/`,
+        }
+      }
+
+      // Threads: best-effort post info on the existing Threads host.
+      const res = await fetchWithRetry(`https://${RAPIDAPI_THREADS_HOST}/post/info?post_id=${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': this.apiKey,
+          'x-rapidapi-host': RAPIDAPI_THREADS_HOST,
+          Accept: 'application/json',
+        },
+      })
+      if (!res.ok) return null
+      const raw = (await res.json()) as Record<string, any>
+      const node = (raw.data ?? raw.post ?? raw) as Record<string, any>
+      const author = node?.user?.username ?? node?.author?.username ?? node?.owner?.username ?? null
+      const likes = Number(node?.like_count ?? node?.likes ?? NaN)
+      return {
+        authorHandle: typeof author === 'string' ? author : null,
+        engagementCount: Number.isFinite(likes) ? likes : null,
+        postUrl: null,
+      }
+    } catch (err) {
+      console.warn(`[scan] fetchPost failed: ${platform}/${id}`, (err as Error).message)
+      return null
+    }
+  }
+
+  // RapidAPI handles IG/Threads only; channel-id resolution is YouTube-specific.
+  async resolveChannelId(): Promise<string | null> {
+    return null
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -219,6 +294,65 @@ const YOUTUBE_BASE = 'https://www.googleapis.com/youtube/v3'
 export class YouTubeFetcher implements PlatformFetcher {
   constructor(private readonly apiKey: string) {
     if (!apiKey) throw new Error('YouTubeFetcher: YOUTUBE_API_KEY is required')
+  }
+
+  // Single-video author lookup for mission proof verification. Best-effort:
+  // any failure resolves to null (treated as confidence 'unavailable').
+  async fetchVideoAuthor(id: string): Promise<SinglePostResult | null> {
+    try {
+      const vurl =
+        `${YOUTUBE_BASE}/videos?part=snippet,statistics` +
+        `&id=${encodeURIComponent(id)}&key=${encodeURIComponent(this.apiKey)}`
+      const vres = await fetchWithRetry(vurl, { method: 'GET', headers: { Accept: 'application/json' } })
+      if (!vres.ok) return null
+      const vbody = (await vres.json()) as {
+        items?: Array<{ snippet?: { channelId?: string }; statistics?: { likeCount?: string; viewCount?: string } }>
+      }
+      const item = vbody.items?.[0]
+      const channelId = item?.snippet?.channelId ?? null
+      if (!channelId) return null
+      const likes = Number(item?.statistics?.likeCount ?? NaN)
+      const views = Number(item?.statistics?.viewCount ?? NaN)
+      const engagementCount = Number.isFinite(likes) ? likes : Number.isFinite(views) ? views : null
+
+      // Best-effort customUrl (@handle) for the handle-fallback match.
+      let authorHandle: string | null = null
+      try {
+        const curl =
+          `${YOUTUBE_BASE}/channels?part=snippet` +
+          `&id=${encodeURIComponent(channelId)}&key=${encodeURIComponent(this.apiKey)}`
+        const cres = await fetchWithRetry(curl, { method: 'GET', headers: { Accept: 'application/json' } })
+        if (cres.ok) {
+          const cbody = (await cres.json()) as { items?: Array<{ snippet?: { customUrl?: string } }> }
+          authorHandle = cbody.items?.[0]?.snippet?.customUrl ?? null
+        }
+      } catch (err) {
+        console.warn(`[scan] youtube customUrl fetch failed for "${channelId}"`, (err as Error).message)
+      }
+
+      return { authorHandle, authorId: channelId, engagementCount, postUrl: `https://www.youtube.com/watch?v=${id}` }
+    } catch (err) {
+      console.warn(`[scan] youtube fetchVideoAuthor failed for "${id}"`, (err as Error).message)
+      return null
+    }
+  }
+
+  // Resolve a creator's registered @handle to its canonical channel id (UC…).
+  // Best-effort: returns null on any failure.
+  async resolveChannelId(handle: string): Promise<string | null> {
+    try {
+      const forHandle = handle.startsWith('@') ? handle : `@${handle}`
+      const url =
+        `${YOUTUBE_BASE}/channels?part=id` +
+        `&forHandle=${encodeURIComponent(forHandle)}&key=${encodeURIComponent(this.apiKey)}`
+      const res = await fetchWithRetry(url, { method: 'GET', headers: { Accept: 'application/json' } })
+      if (!res.ok) return null
+      const body = (await res.json()) as { items?: Array<{ id?: string }> }
+      return body.items?.[0]?.id ?? null
+    } catch (err) {
+      console.warn(`[scan] youtube resolveChannelId failed for "${handle}"`, (err as Error).message)
+      return null
+    }
   }
 
   async fetch(platform: 'youtube', handle: string): Promise<unknown> {
@@ -309,6 +443,15 @@ export class CompositeFetcher implements PlatformFetcher {
     }
     throw new Error(`CompositeFetcher: unsupported platform "${platform}"`)
   }
+
+  fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null> {
+    if (platform === 'youtube') return this.youtube.fetchVideoAuthor(id)
+    return this.rapidApi.fetchPost(platform, id)
+  }
+
+  resolveChannelId(handle: string): Promise<string | null> {
+    return this.youtube.resolveChannelId(handle)
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -361,15 +504,24 @@ export const FAKE_PAYLOADS: Record<Platform, unknown> = {
   },
 }
 
+const FAKE_POSTS: Record<'instagram' | 'threads' | 'youtube', (id: string) => SinglePostResult> = {
+  instagram: (id) => ({ authorHandle: 'fake_ig_user', engagementCount: 1234, postUrl: `https://www.instagram.com/p/${id}/` }),
+  threads: (id) => ({ authorHandle: 'fake_threads_user', engagementCount: 56, postUrl: `https://www.threads.net/post/${id}` }),
+  youtube: (id) => ({ authorHandle: 'fakeytchannel', authorId: 'UCfakechannelid', engagementCount: 999, postUrl: `https://www.youtube.com/watch?v=${id}` }),
+}
+
 /**
  * Fake fetcher for tests and fixture mode.
  * Never makes network calls; returns deterministic canned payloads.
  * Optionally override per platform via `overrides` map.
+ * Third arg `postOverrides` overrides per-platform single-post fetch results.
  */
-export class FakeFetcher implements PlatformFetcher {
+export class FakeFetcher implements PlatformFetcher, PostFetcher {
   constructor(
     private readonly overrides: Partial<Record<Platform, unknown>> = {},
-    private readonly failPlatforms: Platform[] = []
+    private readonly failPlatforms: Platform[] = [],
+    private readonly postOverrides: Partial<Record<'instagram' | 'threads' | 'youtube', SinglePostResult>> = {},
+    private readonly channelId: string | null = 'UCfakechannelid',
   ) {}
 
   async fetch(platform: Platform, _handle: string): Promise<unknown> {
@@ -377,5 +529,15 @@ export class FakeFetcher implements PlatformFetcher {
       throw new Error(`FakeFetcher: simulated failure for platform "${platform}"`)
     }
     return this.overrides[platform] ?? FAKE_PAYLOADS[platform]
+  }
+
+  async fetchPost(platform: 'instagram' | 'threads' | 'youtube', id: string): Promise<SinglePostResult | null> {
+    if (this.failPlatforms.includes(platform)) return null
+    if (this.postOverrides[platform]) return this.postOverrides[platform]!
+    return FAKE_POSTS[platform](id)
+  }
+
+  async resolveChannelId(_handle: string): Promise<string | null> {
+    return this.channelId
   }
 }

@@ -84,6 +84,31 @@ export async function listCreatorMerchantMissions(
     .order('published_at', { ascending: false })
 }
 
+export const creatorMissionDetailSelect = `
+  id,title,summary,mission_source,mission_type,visibility,status,published_at,
+  coupon_code,coupon_url,affiliate_commission_rate,creator_commission_rate,kinnso_commission_rate,
+  paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
+  affiliate_network_programs(id,program_name,program_url,default_commission_description,status),
+  mission_milestones(id,title,description,due_at,sort_order),
+  mission_participants(id,status,source,creator_id,application_note,
+    mission_milestone_submissions(id,mission_milestone_id,status,proof_urls,notes,merchant_feedback,submitted_at,
+      mission_social_snapshots(confidence_status),
+      mission_verification_jobs(id,status,confidence_status,created_at))),
+  affiliate_partner_links(id,partner_url,original_url,sub_id)
+`
+
+export async function getCreatorMissionDetail(
+  supabase: SupabaseClient<Database>,
+  missionId: string,
+) {
+  return supabase
+    .from('missions')
+    .select(creatorMissionDetailSelect)
+    .eq('id', missionId)
+    .eq('status', 'published')
+    .maybeSingle()
+}
+
 export async function listCreatorSettlements(
   supabase: SupabaseClient<Database>,
 ) {

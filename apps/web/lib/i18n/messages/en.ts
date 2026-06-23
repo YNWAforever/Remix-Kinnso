@@ -320,6 +320,40 @@ export interface Messages {
     milestoneProgress: string
     myMissionsEmpty: string
     availableEmpty: string
+    viewDetails: string
+  }
+  missionDetail: {
+    back: string
+    briefHeading: string
+    milestonesHeading: string
+    notStarted: string
+    dueLabel: string
+    join: string
+    apply: string
+    applyNoteLabel: string
+    applyNotePlaceholder: string
+    awaitingTitle: string
+    awaitingBody: string
+    rejectedTitle: string
+    rejectedBody: string
+    couponHeading: string
+    couponCodeLabel: string
+    partnerLinksHeading: string
+    openLink: string
+    proofUrlLabel: string
+    proofUrlPlaceholder: string
+    submissionNotesLabel: string
+    submissionNotesPlaceholder: string
+    submitMilestone: string
+    resubmitMilestone: string
+    submitError: string
+    merchantFeedbackLabel: string
+    verifying: string
+    verifiedSignal: string
+    needsReview: string
+    couldntVerify: string
+    verificationFailed: string
+    retry: string
   }
   ops: {
     settlementHeading: string
@@ -787,6 +821,40 @@ const messages: Messages = {
     milestoneProgress: 'milestones submitted',
     myMissionsEmpty: "You haven't joined any missions yet.",
     availableEmpty: 'No missions available right now. Check back soon.',
+    viewDetails: 'View details',
+  },
+  missionDetail: {
+    back: 'Missions',
+    briefHeading: 'Brief',
+    milestonesHeading: 'Milestones',
+    notStarted: 'Not started',
+    dueLabel: 'Due',
+    join: 'Join mission',
+    apply: 'Apply',
+    applyNoteLabel: 'Application note (optional)',
+    applyNotePlaceholder: 'Tell the merchant why you are a fit',
+    awaitingTitle: 'Awaiting approval',
+    awaitingBody: 'The merchant is reviewing your application.',
+    rejectedTitle: 'Not selected',
+    rejectedBody: 'This application was not accepted.',
+    couponHeading: 'Your coupon',
+    couponCodeLabel: 'Code',
+    partnerLinksHeading: 'Your links',
+    openLink: 'Open',
+    proofUrlLabel: 'Post URL',
+    proofUrlPlaceholder: 'https://www.instagram.com/p/...',
+    submissionNotesLabel: 'Notes (optional)',
+    submissionNotesPlaceholder: 'Add context for the merchant',
+    submitMilestone: 'Submit for review',
+    resubmitMilestone: 'Resubmit',
+    submitError: 'Submission could not be sent',
+    merchantFeedbackLabel: 'Merchant feedback',
+    verifying: 'Verifying…',
+    verifiedSignal: 'Verified signal',
+    needsReview: 'Needs review',
+    couldntVerify: "Couldn’t verify",
+    verificationFailed: 'Verification failed',
+    retry: 'Retry',
   },
   ops: {
     settlementHeading: 'Settlement queue',

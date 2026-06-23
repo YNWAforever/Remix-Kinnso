@@ -5,6 +5,7 @@ import type {
   ValidationErrors,
   ValidationResult,
 } from '@/lib/missions/types'
+import { parseProofUrl } from '@/lib/missions/proof-url'
 
 const isBlank = (value: string | null | undefined) => value == null || value.trim() === ''
 
@@ -79,6 +80,25 @@ export const validatePartnerLinkRequest = (input: PartnerLinkRequest): Validatio
     addError(errors, 'originalUrl', 'required')
   } else if (!isAbsoluteHttpsUrl(input.originalUrl)) {
     addError(errors, 'originalUrl', 'https')
+  }
+
+  return resultFrom(errors)
+}
+
+export const validateSubmission = (input: { proofUrl: string; notes?: string | null }): ValidationResult => {
+  const errors: ValidationErrors = {}
+  const url = (input.proofUrl ?? '').trim()
+
+  if (isBlank(url)) {
+    addError(errors, 'proofUrl', 'required')
+  } else if (!/^https?:\/\//i.test(url)) {
+    addError(errors, 'proofUrl', 'url')
+  } else if (!parseProofUrl(url)) {
+    addError(errors, 'proofUrl', 'unsupported')
+  }
+
+  if ((input.notes ?? '').length > 1000) {
+    addError(errors, 'notes', 'too_long')
   }
 
   return resultFrom(errors)
