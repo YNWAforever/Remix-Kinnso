@@ -357,6 +357,7 @@ export interface Messages {
     retry: string
   }
   ops: {
+    backHome: string
     settlementHeading: string
     settlementSub: string
     markPaid: string
@@ -858,7 +859,7 @@ const messages: Messages = {
     retry: 'Retry',
   },
   ops: {
-    settlementHeading: 'Settlement queue',
+    settlementHeading: 'Settlement queue', backHome: 'Back to home',
     settlementSub: 'Track creator payouts and KINNSO commissions.',
     markPaid: 'Mark paid',
     statusPending: 'Pending',

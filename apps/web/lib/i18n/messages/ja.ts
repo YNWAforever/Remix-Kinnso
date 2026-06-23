@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: '再試行',
   },
   ops: {
-    settlementHeading: '精算キュー',
+    settlementHeading: '精算キュー', backHome: 'ホームに戻る',
     settlementSub: 'クリエイターへの支払いとKINNSOの手数料を管理します。',
     markPaid: '支払済みにする',
     statusPending: '保留中',

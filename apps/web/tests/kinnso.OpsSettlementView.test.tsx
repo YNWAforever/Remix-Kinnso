@@ -29,7 +29,7 @@ describe('OpsSettlementView', () => {
 
   it('lets ops update settlement rows', () => {
     const onUpdate = vi.fn()
-    render(<OpsSettlementView t={en.ops} settlements={[settlement]} onUpdate={onUpdate} />)
+    render(<OpsSettlementView locale="en" t={en.ops} settlements={[settlement]} onUpdate={onUpdate} />)
     fireEvent.click(screen.getByRole('button', { name: en.ops.markPaid }))
     expect(onUpdate).toHaveBeenCalledWith('s1', 'paid')
   })
@@ -39,7 +39,7 @@ describe('OpsSettlementView', () => {
       ok: false,
       errors: { form: ['Active ops member access is required'] },
     }))
-    render(<OpsSettlementView t={en.ops} settlements={[settlement]} onUpdate={onUpdate} />)
+    render(<OpsSettlementView locale="en" t={en.ops} settlements={[settlement]} onUpdate={onUpdate} />)
 
     fireEvent.click(screen.getByRole('button', { name: en.ops.markPaid }))
 
@@ -51,7 +51,7 @@ describe('OpsSettlementView', () => {
     const onUpdate = vi.fn(() => new Promise<{ ok: true }>((resolve) => {
       resolveUpdate = resolve
     }))
-    render(<OpsSettlementView t={en.ops} settlements={[settlement]} onUpdate={onUpdate} />)
+    render(<OpsSettlementView locale="en" t={en.ops} settlements={[settlement]} onUpdate={onUpdate} />)
 
     const button = screen.getByRole('button', { name: en.ops.markPaid })
     fireEvent.click(button)
@@ -59,5 +59,10 @@ describe('OpsSettlementView', () => {
     expect(button).toHaveProperty('disabled', true)
     resolveUpdate({ ok: true })
     await waitFor(() => expect(refreshMock).toHaveBeenCalledTimes(1))
+  })
+
+  it('links back to home off the ops island', () => {
+    render(<OpsSettlementView locale="en" t={en.ops} settlements={[settlement]} onUpdate={vi.fn()} />)
+    expect(screen.getByRole('link', { name: en.ops.backHome }).getAttribute('href')).toBe('/en')
   })
 })

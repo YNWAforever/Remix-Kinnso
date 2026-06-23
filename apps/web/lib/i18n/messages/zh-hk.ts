@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: '重試',
   },
   ops: {
-    settlementHeading: '結算佇列',
+    settlementHeading: '結算佇列', backHome: '返回首頁',
     settlementSub: '追蹤創作者收益及 KINNSO 佣金。',
     markPaid: '標記為已支付',
     statusPending: '待支付',

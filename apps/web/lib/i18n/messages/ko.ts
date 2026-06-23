@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: '다시 시도',
   },
   ops: {
-    settlementHeading: '정산 대기열',
+    settlementHeading: '정산 대기열', backHome: '홈으로',
     settlementSub: '크리에이터 지급금과 KINNSO 커미션을 추적하세요.',
     markPaid: '지급 완료 처리',
     statusPending: '대기 중',

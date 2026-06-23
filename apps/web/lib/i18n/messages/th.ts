@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: 'ลองอีกครั้ง',
   },
   ops: {
-    settlementHeading: 'คิวการชำระเงิน',
+    settlementHeading: 'คิวการชำระเงิน', backHome: 'กลับสู่หน้าหลัก',
     settlementSub: 'ติดตามการจ่ายเงินครีเอเตอร์และค่าคอมมิชชัน KINNSO',
     markPaid: 'ทำเครื่องหมายว่าจ่ายแล้ว',
     statusPending: 'รอดำเนินการ',
