@@ -2,27 +2,32 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import en from '@/lib/i18n/messages/en'
-import { creators } from '@/lib/creator-mock'
 import { CreatorsLandingView } from '@/components/kinnso/pages/CreatorsLandingView'
+import type { CreatorSummary } from '@/lib/creators/queries'
 
 afterEach(cleanup)
 
-describe('CreatorsLandingView', () => {
-  it('renders the hero title, the four steps and an apply CTA to sign-up', () => {
-    render(<CreatorsLandingView locale="en" t={en.creatorsLanding} />)
-    expect(screen.getByRole('heading', { name: en.creatorsLanding.heroTitle })).toBeTruthy()
-    expect(screen.getByText(en.creatorsLanding.step1Title)).toBeTruthy()
-    expect(screen.getByText(en.creatorsLanding.step4Title)).toBeTruthy()
-    expect(screen.getAllByRole('link').some((a) => a.getAttribute('href') === '/en/sign-up')).toBe(true)
-    expect(document.querySelector('.k-ticket')).toBeTruthy()
+const creators: CreatorSummary[] = [
+  { handle: 'maya', name: 'Maya Wanders', bio: 'Slow travel.', niches: ['Coffee'], guideCount: 3 },
+]
+
+describe('CreatorsLandingView (directory-first)', () => {
+  it('renders a card per real creator linking to the profile', () => {
+    render(<CreatorsLandingView locale="en" t={en.creatorsLanding} creators={creators} />)
+    expect(screen.getByText('Maya Wanders')).toBeInTheDocument()
+    const link = screen.getByRole('link', { name: new RegExp(en.creatorsLanding.viewProfile, 'i') })
+    expect(link.getAttribute('href')).toBe('/en/c/maya')
+    expect(screen.getByText('3 Guides')).toBeInTheDocument()
   })
 
-  it('does not render any fabricated creator (honest marketing)', () => {
-    render(<CreatorsLandingView locale="en" t={en.creatorsLanding} />)
-    for (const c of creators.slice(0, 6)) {
-      expect(screen.queryByText(`@${c.handle}`)).toBeNull()
-    }
-    // no link into a (mock) creator profile page
-    expect(screen.queryAllByRole('link').some((a) => a.getAttribute('href')?.includes('/c/'))).toBe(false)
+  it('shows the honest empty state when there are no creators', () => {
+    render(<CreatorsLandingView locale="en" t={en.creatorsLanding} creators={[]} />)
+    expect(screen.getByText(en.creatorsLanding.directoryEmpty)).toBeInTheDocument()
+  })
+
+  it('keeps an apply CTA to sign-up', () => {
+    render(<CreatorsLandingView locale="en" t={en.creatorsLanding} creators={creators} />)
+    const applyLinks = screen.getAllByRole('link').filter((a) => a.getAttribute('href') === '/en/sign-up')
+    expect(applyLinks.length).toBeGreaterThan(0)
   })
 })
