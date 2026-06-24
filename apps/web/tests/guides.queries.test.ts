@@ -1,5 +1,25 @@
-import { describe, it, expect } from 'vitest'
-import { mapRowToGuide, mergeWithSeed } from '@/lib/guides/queries'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+// Mutable mock state, read fresh on each query call.
+const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown }))
+
+vi.mock('@/lib/supabase/public', () => ({
+  createSupabasePublicClient: () => ({
+    from: () => {
+      const builder = {
+        select: () => builder,
+        eq: () => builder,
+        // getPublishedGuides awaits the .order() result
+        order: () => Promise.resolve({ data: state.list }),
+        // getGuideBySlug awaits .maybeSingle()
+        maybeSingle: async () => ({ data: state.single }),
+      }
+      return builder
+    },
+  }),
+}))
+
+import { mapRowToGuide, getPublishedGuides, getGuideBySlug } from '@/lib/guides/queries'
 import { guides as mockGuides } from '@/lib/creator-mock'
 
 const row = {
@@ -10,6 +30,11 @@ const row = {
   saves_count: 42,
   creator_handle: 'teafan',
 }
+
+beforeEach(() => {
+  state.list = []
+  state.single = null
+})
 
 describe('mapRowToGuide', () => {
   it('maps a db row to the public Guide shape', () => {
@@ -24,17 +49,31 @@ describe('mapRowToGuide', () => {
   })
 })
 
-describe('mergeWithSeed', () => {
-  it('puts db guides first, then mock seed, deduped by slug', () => {
-    const db = [mapRowToGuide(row)]
-    const merged = mergeWithSeed(db, mockGuides)
-    expect(merged[0].slug).toBe('kyoto-tea')
-    expect(merged.length).toBe(db.length + mockGuides.length)
+describe('getPublishedGuides', () => {
+  it('returns only DB guides (no mock seed appended)', async () => {
+    state.list = [row]
+    const result = await getPublishedGuides()
+    expect(result).toHaveLength(1)
+    expect(result[0].slug).toBe('kyoto-tea')
+    expect(result.some((g) => g.slug === mockGuides[0].slug)).toBe(false)
   })
-  it('drops a seed guide whose slug a db guide already uses', () => {
-    const clash = mapRowToGuide({ ...row, slug: mockGuides[0].slug })
-    const merged = mergeWithSeed([clash], mockGuides)
-    expect(merged.filter((g) => g.slug === mockGuides[0].slug)).toHaveLength(1)
-    expect(merged[0].title).toBe('Kyoto Tea Houses')
+
+  it('returns an empty array when the DB has no published guides', async () => {
+    state.list = []
+    expect(await getPublishedGuides()).toEqual([])
+  })
+})
+
+describe('getGuideBySlug', () => {
+  it('returns the db guide (source: db) when a row exists', async () => {
+    state.single = { ...row, creator_name: 'Tea Fan', summary: 'Lovely tea houses.' }
+    const guide = await getGuideBySlug('kyoto-tea')
+    expect(guide?.slug).toBe('kyoto-tea')
+    expect(guide?.source).toBe('db')
+  })
+
+  it('returns null for a slug not in the database (no mock fallback)', async () => {
+    state.single = null
+    expect(await getGuideBySlug(mockGuides[0].slug)).toBeNull()
   })
 })
