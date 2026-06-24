@@ -391,6 +391,16 @@ export interface Messages {
     merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
   comingSoon: { heading: string; body: string; back: string }
+  agent: {
+    heroPill: string; heroTitle: string; heroSubtitle: string
+    heroCta: string; heroSecondaryCta: string
+    valuesHeading: string
+    value1Title: string; value1Desc: string
+    value2Title: string; value2Desc: string
+    value3Title: string; value3Desc: string
+    tiersHeading: string; tiersSub: string; comingNote: string
+    ctaTitle: string; ctaDesc: string; ctaButton: string
+  }
   studioHome: {
     pill: string; heading: string; subtitle: string
     liveBadge: string; soonBadge: string; open: string
@@ -920,6 +930,26 @@ const messages: Messages = {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
     back: 'Back to home',
+  },
+  agent: {
+    heroPill: 'Creator Copilot',
+    heroTitle: 'Your AI copilot for growing as a creator',
+    heroSubtitle: 'KINNSO Copilot is a growing library of saved AI agents that help you grow your audience, find your next idea, and produce content that earns.',
+    heroCta: 'Join as a creator',
+    heroSecondaryCta: 'See how it works',
+    valuesHeading: 'What your copilot will do',
+    value1Title: 'Grow your audience',
+    value1Desc: 'Data-backed prompts on what to post, when, and where — tuned to your Creator DNA.',
+    value2Title: 'Never run out of ideas',
+    value2Desc: 'Surface fresh content angles and trending places that fit your niche and audience.',
+    value3Title: 'Produce better content',
+    value3Desc: 'Turn a rough idea into captions, shot lists, and guide drafts you can publish in minutes.',
+    tiersHeading: 'A better copilot as you climb',
+    tiersSub: 'Publish guides and complete missions to level up. Higher tiers unlock more agents, higher limits, better commissions, and exclusive missions.',
+    comingNote: 'The copilot ships inside Studio in a later release. Join now to be first in line.',
+    ctaTitle: 'Get your copilot',
+    ctaDesc: 'Sign up as a creator, scan your DNA, and be first to use the copilot when it lands.',
+    ctaButton: 'Join KINNSO',
   },
   studioHome: {
     pill: 'Creator Studio',
