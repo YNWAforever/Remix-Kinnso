@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: '상위 결과만 표시 중. Growth로 업그레이드하여 모든 매칭 보기.',
   },
   missions: {
-    missionQueue: '미션 대기열',
+    missionQueue: '미션 대기열', backToQueue: '대기열로 돌아가기',
     joinMission: '미션 참여',
     applyMission: '미션 지원',
     generatePartnerLink: '파트너 링크 생성',
@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: '다시 시도',
   },
   ops: {
-    settlementHeading: '정산 대기열',
+    settlementHeading: '정산 대기열', backHome: '홈으로',
     settlementSub: '크리에이터 지급금과 KINNSO 커미션을 추적하세요.',
     markPaid: '지급 완료 처리',
     statusPending: '대기 중',
@@ -363,7 +363,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: '크리에이터', linkMerchants: '가맹점', linkAgent: 'AI 에이전트', linkTravelers: '여행자',
-    linkGuides: '가이드', linkArticles: '아티클', linkFindCreators: '크리에이터 찾기',
+    linkGuides: '가이드', linkArticles: '아티클', linkFindCreators: '크리에이터 찾기', linkMissions: '미션',
     ctaApply: '크리에이터 지원', ctaOpenStudio: '스튜디오 열기', ctaPending: '신청 검토 중', ctaPostMission: '미션 등록',
     signIn: '로그인', language: '언어', menuToggle: '메뉴', skipToContent: '본문으로 건너뛰기',
   },
@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'AI 트래블 콘텐츠 스튜디오 · 크리에이터에게 지급 · 홍콩 · 타이베이 · 도쿄',
     colCreators: '크리에이터', colMerchants: '가맹점', colCompany: '회사',
     lApply: '지원', lStudio: '스튜디오', lMissions: '미션', lEarnings: '수익',
-    lPostMission: '미션 등록', lPricing: '요금', lCaseStudies: '사례', lContact: '문의',
+    lPostMission: '미션 등록', lPricing: '이용 방법', lCaseStudies: '사례', lContact: '문의',
     lAbout: '소개', lAgent: 'AI 에이전트', lPress: '보도자료', lLegal: '약관',
     rights: '© 2026 KINNSO. 모든 권리 보유.',
   },
@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: '수익', earningsDesc: '지급금, 수수료 및 내역.',
     offersTitle: '오퍼', offersDesc: '홍보할 수 있는 제휴 오퍼.',
     inboxTitle: '받은 편지함', inboxDesc: '판매자로부터의 메시지.',
-    guidesTitle: '새 가이드', guidesDesc: '여행 가이드를 게시하세요.',
+    guidesTitle: '가이드', guidesDesc: '가이드를 작성하고 게시하세요.',
   },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',

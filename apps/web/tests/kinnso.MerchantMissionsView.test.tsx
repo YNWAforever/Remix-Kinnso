@@ -7,8 +7,8 @@ import en from '@/lib/i18n/messages/en'
 afterEach(cleanup)
 
 describe('MerchantMissionsView', () => {
-  it('shows mission status and participant counts', () => {
-    render(<MerchantMissionsView t={en.missions} missions={[{
+  it('shows mission status and counts, and links each row to its detail page', () => {
+    render(<MerchantMissionsView locale="en" t={en.missions} missions={[{
       id: 'm1',
       title: 'Paid reel campaign',
       status: 'published',
@@ -19,5 +19,6 @@ describe('MerchantMissionsView', () => {
     expect(screen.getByText('Paid reel campaign')).toBeTruthy()
     expect(screen.getByText(/2/)).toBeTruthy()
     expect(screen.getByText(/pending/i)).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Paid reel campaign/ }).getAttribute('href')).toBe('/en/merchants/missions/m1')
   })
 })

@@ -1,30 +1,38 @@
 // @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-afterEach(cleanup)
-
-const { getPublishedGuidesMock } = vi.hoisted(() => ({ getPublishedGuidesMock: vi.fn() }))
+const { redirectMock, notFoundMock } = vi.hoisted(() => ({
+  redirectMock: vi.fn((url: string) => {
+    throw new Error(`NEXT_REDIRECT:${url}`)
+  }),
+  notFoundMock: vi.fn(() => {
+    throw new Error('NEXT_NOT_FOUND')
+  }),
+}))
 
 vi.mock('next/navigation', () => ({
-  notFound: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
+  redirect: redirectMock,
+  notFound: notFoundMock,
 }))
-vi.mock('@/lib/guides/queries', () => ({ getPublishedGuides: getPublishedGuidesMock }))
 
 import FeedPage from '@/app/[locale]/feed/page'
 
-beforeEach(() => {
-  getPublishedGuidesMock.mockReset()
-  getPublishedGuidesMock.mockResolvedValue([
-    { slug: 'kyoto-temples', title: 'Kyoto Temples', cover: 'https://img.example/k.jpg', city: 'Kyoto', saves: 88, creatorHandle: 'rin' },
-  ])
+afterEach(() => {
+  redirectMock.mockClear()
+  notFoundMock.mockClear()
 })
 
 describe('/[locale]/feed host', () => {
-  it('renders real published guides as feed cards', async () => {
-    const ui = await FeedPage({ params: Promise.resolve({ locale: 'en' }) })
-    render(ui)
-    expect(screen.getByText('Kyoto Temples')).toBeTruthy()
-    expect(screen.getByRole('link').getAttribute('href')).toBe('/en/g/kyoto-temples')
+  it('redirects to the canonical /explore route, locale-prefixed', async () => {
+    await expect(
+      FeedPage({ params: Promise.resolve({ locale: 'en' }) }),
+    ).rejects.toThrow('NEXT_REDIRECT:/en/explore')
+    expect(redirectMock).toHaveBeenCalledWith('/en/explore')
+  })
+
+  it('404s an unknown locale', async () => {
+    await expect(
+      FeedPage({ params: Promise.resolve({ locale: 'zz' }) }),
+    ).rejects.toThrow('NEXT_NOT_FOUND')
   })
 })

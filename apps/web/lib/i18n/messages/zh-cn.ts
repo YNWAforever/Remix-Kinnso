@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: '仅显示顶尖结果。升级至 Growth 查看所有匹配。',
   },
   missions: {
-    missionQueue: '任务队列',
+    missionQueue: '任务队列', backToQueue: '返回任务列表',
     joinMission: '加入任务',
     applyMission: '申请任务',
     generatePartnerLink: '生成合作链接',
@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: '重试',
   },
   ops: {
-    settlementHeading: '结算队列',
+    settlementHeading: '结算队列', backHome: '返回首页',
     settlementSub: '追踪创作者付款及 KINNSO 佣金。',
     markPaid: '标记为已支付',
     statusPending: '待支付',
@@ -363,7 +363,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: '创作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
-    linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '寻找创作者',
+    linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '寻找创作者', linkMissions: '任务',
     ctaApply: '申请成为创作者', ctaOpenStudio: '打开工作室', ctaPending: '申请审核中', ctaPostMission: '发布任务',
     signIn: '登录', language: '语言', menuToggle: '菜单', skipToContent: '跳到内容',
   },
@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'AI 旅游内容工作室 · 为创作者付费 · 香港 · 台北 · 东京',
     colCreators: '创作者', colMerchants: '商家', colCompany: '公司',
     lApply: '申请', lStudio: '工作室', lMissions: '任务', lEarnings: '收益',
-    lPostMission: '发布任务', lPricing: '定价', lCaseStudies: '案例', lContact: '联系我们',
+    lPostMission: '发布任务', lPricing: '运作方式', lCaseStudies: '案例', lContact: '联系我们',
     lAbout: '关于', lAgent: 'AI 助手', lPress: '媒体', lLegal: '条款',
     rights: '© 2026 KINNSO. 版权所有。',
   },
@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: '收益', earningsDesc: '付款、佣金及历史记录。',
     offersTitle: '优惠', offersDesc: '可推广的联盟优惠。',
     inboxTitle: '收件箱', inboxDesc: '来自商家的消息。',
-    guidesTitle: '新攻略', guidesDesc: '发布一篇旅游攻略。',
+    guidesTitle: '攻略', guidesDesc: '撰写并发布你的攻略。',
   },
   studioDashboard: {
     greeting: '欢迎回来，{name}',

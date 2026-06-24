@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: '上位の結果のみ表示。Growthにアップグレードで全マッチを表示。',
   },
   missions: {
-    missionQueue: 'ミッションキュー',
+    missionQueue: 'ミッションキュー', backToQueue: 'キューに戻る',
     joinMission: 'ミッションに参加',
     applyMission: 'ミッションに応募',
     generatePartnerLink: 'パートナーリンクを生成',
@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: '再試行',
   },
   ops: {
-    settlementHeading: '精算キュー',
+    settlementHeading: '精算キュー', backHome: 'ホームに戻る',
     settlementSub: 'クリエイターへの支払いとKINNSOの手数料を管理します。',
     markPaid: '支払済みにする',
     statusPending: '保留中',
@@ -363,7 +363,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: 'クリエイター', linkMerchants: '加盟店', linkAgent: 'AIエージェント', linkTravelers: '旅行者',
-    linkGuides: 'ガイド', linkArticles: '記事', linkFindCreators: 'クリエイターを探す',
+    linkGuides: 'ガイド', linkArticles: '記事', linkFindCreators: 'クリエイターを探す', linkMissions: 'ミッション',
     ctaApply: 'クリエイター応募', ctaOpenStudio: 'スタジオを開く', ctaPending: '申請審査中', ctaPostMission: 'ミッションを投稿',
     signIn: 'ログイン', language: '言語', menuToggle: 'メニュー', skipToContent: '本文へスキップ',
   },
@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'AIトラベルコンテンツスタジオ · クリエイターに報酬 · 香港 · 台北 · 東京',
     colCreators: 'クリエイター', colMerchants: '加盟店', colCompany: '会社',
     lApply: '応募', lStudio: 'スタジオ', lMissions: 'ミッション', lEarnings: '収益',
-    lPostMission: 'ミッションを投稿', lPricing: '料金', lCaseStudies: '事例', lContact: 'お問い合わせ',
+    lPostMission: 'ミッションを投稿', lPricing: '仕組み', lCaseStudies: '事例', lContact: 'お問い合わせ',
     lAbout: '会社概要', lAgent: 'AIエージェント', lPress: 'プレス', lLegal: '規約',
     rights: '© 2026 KINNSO. 無断転載を禁じます。',
   },
@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: '収益', earningsDesc: '支払い、手数料、履歴。',
     offersTitle: 'オファー', offersDesc: 'プロモーションできるアフィリエイトオファー。',
     inboxTitle: '受信箱', inboxDesc: '加盟店からのメッセージ。',
-    guidesTitle: '新しいガイド', guidesDesc: '旅行ガイドを公開する。',
+    guidesTitle: 'ガイド', guidesDesc: 'ガイドを作成して公開。',
   },
   studioDashboard: {
     greeting: 'おかえりなさい、{name}さん',

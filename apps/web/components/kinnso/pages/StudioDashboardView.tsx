@@ -75,7 +75,7 @@ export function StudioDashboardView(props: StudioDashboardViewProps) {
             <ul className="mt-3 space-y-2">
               {opportunities.map((o) => (
                 <li key={o.id}>
-                  <Link href={p(o.kind === 'offer' ? '/studio/offers' : '/studio/missions')} className="text-sm font-semibold text-kinnso-ink hover:text-kinnso-orange">
+                  <Link href={p(o.kind === 'offer' ? '/studio/offers' : `/studio/missions/${o.id}`)} className="text-sm font-semibold text-kinnso-ink hover:text-kinnso-orange">
                     {o.title}
                   </Link>
                 </li>

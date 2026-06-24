@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
+import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export type MerchantMissionRow = {
@@ -11,11 +13,12 @@ export type MerchantMissionRow = {
 }
 
 type MerchantMissionsViewProps = {
+  locale: Locale
   t: Messages['missions']
   missions: MerchantMissionRow[]
 }
 
-export function MerchantMissionsView({ t, missions }: MerchantMissionsViewProps) {
+export function MerchantMissionsView({ locale, t, missions }: MerchantMissionsViewProps) {
   return (
     <main className="k-container py-10">
       <h1 className="text-3xl font-black text-kinnso-ink">{t.missionQueue}</h1>
@@ -25,7 +28,11 @@ export function MerchantMissionsView({ t, missions }: MerchantMissionsViewProps)
           <span>Status</span>
         </div>
         {missions.map((mission) => (
-          <article key={mission.id} className="grid grid-cols-1 gap-3 border-b border-kinnso-cream2 px-4 py-4 last:border-b-0 sm:grid-cols-[1fr_120px] sm:items-center">
+          <Link
+            key={mission.id}
+            href={`/${locale}/merchants/missions/${mission.id}`}
+            className="grid grid-cols-1 gap-3 border-b border-kinnso-cream2 px-4 py-4 transition last:border-b-0 hover:bg-kinnso-cream2 sm:grid-cols-[1fr_120px] sm:items-center"
+          >
             <div>
               <h2 className="font-bold text-kinnso-ink">{mission.title}</h2>
               <p className="mt-1 text-sm text-kinnso-muted">
@@ -33,7 +40,7 @@ export function MerchantMissionsView({ t, missions }: MerchantMissionsViewProps)
               </p>
             </div>
             <MissionStatusBadge status={mission.status} />
-          </article>
+          </Link>
         ))}
       </div>
     </main>

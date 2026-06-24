@@ -282,7 +282,7 @@ const messages: Messages = {
     resultsCapped: 'แสดงเฉพาะผลลัพธ์อันดับต้น อัปเกรดเป็น Growth เพื่อดูการจับคู่ทั้งหมด',
   },
   missions: {
-    missionQueue: 'คิวภารกิจ',
+    missionQueue: 'คิวภารกิจ', backToQueue: 'กลับไปที่คิว',
     joinMission: 'เข้าร่วมภารกิจ',
     applyMission: 'สมัครภารกิจ',
     generatePartnerLink: 'สร้างลิงก์พันธมิตร',
@@ -355,7 +355,7 @@ const messages: Messages = {
     retry: 'ลองอีกครั้ง',
   },
   ops: {
-    settlementHeading: 'คิวการชำระเงิน',
+    settlementHeading: 'คิวการชำระเงิน', backHome: 'กลับสู่หน้าหลัก',
     settlementSub: 'ติดตามการจ่ายเงินครีเอเตอร์และค่าคอมมิชชัน KINNSO',
     markPaid: 'ทำเครื่องหมายว่าจ่ายแล้ว',
     statusPending: 'รอดำเนินการ',
@@ -363,7 +363,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: 'ครีเอเตอร์', linkMerchants: 'ร้านค้า', linkAgent: 'ผู้ช่วย AI', linkTravelers: 'นักเดินทาง',
-    linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์',
+    linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์', linkMissions: 'ภารกิจ',
     ctaApply: 'สมัครเป็นครีเอเตอร์', ctaOpenStudio: 'เปิดสตูดิโอ', ctaPending: 'กำลังตรวจสอบใบสมัคร', ctaPostMission: 'โพสต์ภารกิจ',
     signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู', skipToContent: 'ข้ามไปยังเนื้อหา',
   },
@@ -371,7 +371,7 @@ const messages: Messages = {
     tagline: 'สตูดิโอคอนเทนต์ท่องเที่ยว AI · จ่ายให้ครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',
     colCreators: 'ครีเอเตอร์', colMerchants: 'ร้านค้า', colCompany: 'บริษัท',
     lApply: 'สมัคร', lStudio: 'สตูดิโอ', lMissions: 'ภารกิจ', lEarnings: 'รายได้',
-    lPostMission: 'โพสต์ภารกิจ', lPricing: 'ราคา', lCaseStudies: 'กรณีศึกษา', lContact: 'ติดต่อ',
+    lPostMission: 'โพสต์ภารกิจ', lPricing: 'วิธีการทำงาน', lCaseStudies: 'กรณีศึกษา', lContact: 'ติดต่อ',
     lAbout: 'เกี่ยวกับ', lAgent: 'ผู้ช่วย AI', lPress: 'ข่าวสาร', lLegal: 'ข้อกำหนด',
     rights: '© 2026 KINNSO สงวนลิขสิทธิ์',
   },
@@ -416,7 +416,7 @@ const messages: Messages = {
     earningsTitle: 'รายได้', earningsDesc: 'การชำระเงิน ค่าคอมมิชชัน และประวัติ',
     offersTitle: 'ข้อเสนอ', offersDesc: 'ข้อเสนอพันธมิตรที่คุณโปรโมตได้',
     inboxTitle: 'กล่องข้อความ', inboxDesc: 'ข้อความจากผู้ประกอบการ',
-    guidesTitle: 'คู่มือใหม่', guidesDesc: 'เผยแพร่คู่มือการท่องเที่ยว',
+    guidesTitle: 'ไกด์', guidesDesc: 'ร่างและเผยแพร่ไกด์ของคุณ',
   },
   studioDashboard: {
     greeting: 'ยินดีต้อนรับกลับมา {name}',

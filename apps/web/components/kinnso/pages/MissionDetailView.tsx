@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import type { Locale } from '@/lib/i18n/config'
 import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { SocialSignalBadge } from '@/components/kinnso/SocialSignalBadge'
@@ -19,6 +21,7 @@ export type MissionDetail = {
 }
 
 type MissionDetailViewProps = {
+  locale: Locale
   t: Messages['missions']
   mission: MissionDetail
   onReviewParticipant: (participantId: string, action: ReviewParticipantAction) => KinnsoActionResult | Promise<KinnsoActionResult>
@@ -26,6 +29,7 @@ type MissionDetailViewProps = {
 }
 
 export function MissionDetailView({
+  locale,
   t,
   mission,
   onReviewParticipant,
@@ -49,7 +53,10 @@ export function MissionDetailView({
 
   return (
     <main className="k-container py-10">
-      <h1 className="text-3xl font-black text-kinnso-ink">{mission.title}</h1>
+      <Link href={`/${locale}/merchants/missions`} className="text-sm font-semibold text-kinnso-orange hover:underline">
+        <span aria-hidden="true">←</span> {t.backToQueue}
+      </Link>
+      <h1 className="mt-3 text-3xl font-black text-kinnso-ink">{mission.title}</h1>
       {actionError && (
         <p role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
           {actionError}

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import type { Locale } from '@/lib/i18n/config'
 import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/components/kinnso/action-result'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -15,12 +17,13 @@ export type OpsSettlementRow = {
 }
 
 type OpsSettlementViewProps = {
+  locale: Locale
   t: Messages['ops']
   settlements: OpsSettlementRow[]
   onUpdate: (settlementId: string, status: 'paid') => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
-export function OpsSettlementView({ t, settlements, onUpdate }: OpsSettlementViewProps) {
+export function OpsSettlementView({ locale, t, settlements, onUpdate }: OpsSettlementViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
@@ -39,7 +42,10 @@ export function OpsSettlementView({ t, settlements, onUpdate }: OpsSettlementVie
 
   return (
     <main className="k-container py-10">
-      <h1 className="text-3xl font-black text-kinnso-ink">{t.settlementHeading}</h1>
+      <Link href={`/${locale}`} className="text-sm font-semibold text-kinnso-orange hover:underline">
+        <span aria-hidden="true">←</span> {t.backHome}
+      </Link>
+      <h1 className="mt-3 text-3xl font-black text-kinnso-ink">{t.settlementHeading}</h1>
       <p className="mt-2 text-sm text-kinnso-muted">{t.settlementSub}</p>
       {actionError && (
         <p role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">

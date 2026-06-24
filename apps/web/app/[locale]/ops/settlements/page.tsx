@@ -61,5 +61,5 @@ export default async function OpsSettlementsPage({ params }: { params: Params })
     })
   }
 
-  return <OpsSettlementView t={messages.ops} settlements={settlements} onUpdate={markPaid} />
+  return <OpsSettlementView locale={loc} t={messages.ops} settlements={settlements} onUpdate={markPaid} />
 }

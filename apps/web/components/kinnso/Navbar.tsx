@@ -17,12 +17,12 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
     { to: "/creators",  label: t.linkCreators },
     { to: "/merchants", label: t.linkMerchants },
     { to: "/agent",     label: t.linkAgent },
-    { to: "/feed",      label: t.linkTravelers },
     { to: "/explore",   label: t.linkGuides },
     { to: "/articles",  label: t.linkArticles },
   ];
+  // Merchants get a direct link to their real mission queue (was the mock "Find Creators" landing).
   const anchors = role === "merchant"
-    ? [...baseAnchors, { to: "/merchants/creators", label: t.linkFindCreators }]
+    ? [...baseAnchors, { to: "/merchants/missions", label: t.linkMissions }]
     : baseAnchors;
 
   const cta = (() => {

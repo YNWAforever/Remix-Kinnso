@@ -6,8 +6,8 @@ const Footer = ({ locale, t }: { locale: Locale; t: Messages["footer"] }) => {
   const p = (path: string) => `/${locale}${path}`;
   const cols = [
     { title: t.colCreators, links: [[t.lApply, "/sign-up"], [t.lStudio, "/studio"], [t.lMissions, "/studio/missions"], [t.lEarnings, "/studio/earnings"]] as const },
-    { title: t.colMerchants, links: [[t.lPostMission, "/merchants/post"], [t.lPricing, "/merchants"], [t.lCaseStudies, "/about"], [t.lContact, "/about"]] as const },
-    { title: t.colCompany, links: [[t.lAbout, "/about"], [t.lAgent, "/agent"], [t.lPress, "/about"], [t.lLegal, "/legal/creator-terms"]] as const },
+    { title: t.colMerchants, links: [[t.lPostMission, "/merchants/post"], [t.lPricing, "/merchants"]] as const },
+    { title: t.colCompany, links: [[t.lAbout, "/about"], [t.lAgent, "/agent"], [t.lLegal, "/legal/creator-terms"]] as const },
   ];
   return (
     <footer className="border-t border-kinnso-cream2 bg-white">
@@ -31,13 +31,8 @@ const Footer = ({ locale, t }: { locale: Locale; t: Messages["footer"] }) => {
         ))}
       </div>
       <div className="border-t border-kinnso-cream2">
-        <div className="k-container flex flex-col items-center justify-between gap-2 py-4 text-xs text-kinnso-muted sm:flex-row">
+        <div className="k-container flex items-center justify-center py-4 text-xs text-kinnso-muted sm:justify-start">
           <span>{t.rights}</span>
-          <span className="flex items-center gap-3">
-            {["Instagram", "Threads", "LINE", "WhatsApp"].map((label) => (
-              <span key={label}>{label}</span>
-            ))}
-          </span>
         </div>
       </div>
     </footer>

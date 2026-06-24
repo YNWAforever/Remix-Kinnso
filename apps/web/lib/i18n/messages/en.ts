@@ -284,6 +284,7 @@ export interface Messages {
   }
   missions: {
     missionQueue: string
+    backToQueue: string
     joinMission: string
     applyMission: string
     generatePartnerLink: string
@@ -356,6 +357,7 @@ export interface Messages {
     retry: string
   }
   ops: {
+    backHome: string
     settlementHeading: string
     settlementSub: string
     markPaid: string
@@ -364,7 +366,7 @@ export interface Messages {
   }
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
-    linkGuides: string; linkArticles: string; linkFindCreators: string
+    linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
   }
@@ -784,7 +786,7 @@ const messages: Messages = {
     resultsCapped: 'Showing top results. Upgrade to Growth to see all matches.',
   },
   missions: {
-    missionQueue: 'Mission queue',
+    missionQueue: 'Mission queue', backToQueue: 'Back to queue',
     joinMission: 'Join mission',
     applyMission: 'Apply mission',
     generatePartnerLink: 'Generate partner link',
@@ -857,7 +859,7 @@ const messages: Messages = {
     retry: 'Retry',
   },
   ops: {
-    settlementHeading: 'Settlement queue',
+    settlementHeading: 'Settlement queue', backHome: 'Back to home',
     settlementSub: 'Track creator payouts and KINNSO commissions.',
     markPaid: 'Mark paid',
     statusPending: 'Pending',
@@ -865,7 +867,7 @@ const messages: Messages = {
   },
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
-    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators',
+    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },
@@ -873,7 +875,7 @@ const messages: Messages = {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
-    lPostMission: 'Post a mission', lPricing: 'Pricing', lCaseStudies: 'Case studies', lContact: 'Contact',
+    lPostMission: 'Post a mission', lPricing: 'How it works', lCaseStudies: 'Case studies', lContact: 'Contact',
     lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
   },
@@ -918,7 +920,7 @@ const messages: Messages = {
     earningsTitle: 'Earnings', earningsDesc: 'Payouts, commission and history.',
     offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
-    guidesTitle: 'New Guide', guidesDesc: 'Publish a travel guide.',
+    guidesTitle: 'Guides', guidesDesc: 'Draft and publish your guides.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
