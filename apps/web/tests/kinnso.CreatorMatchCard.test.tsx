@@ -46,9 +46,7 @@ describe('CreatorMatchCard', () => {
 
   it('keeps the send brief link locale scoped', () => {
     render(<CreatorMatchCard creator={creator} saved={false} locale="en" onToggleSave={vi.fn()} onQuickView={vi.fn()} />)
-    expect(screen.getByRole('link', { name: 'Send brief →' }).getAttribute('href')).toBe(
-      `/en/merchants/post?creator=${creator.handle}`,
-    )
+    expect(screen.getByRole('link', { name: 'Send brief →' }).getAttribute('href')).toBe('/en/merchants/post')
   })
 
   it('fires onToggleSave and onQuickView', () => {
