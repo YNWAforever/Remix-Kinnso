@@ -24,10 +24,11 @@ export default async function SignInPage({
   // The auth callback route emits ?error=callback on exchange failure.
   const serverError = error === 'callback' ? dict.auth.errorGeneric : undefined
 
-  // If already signed in, skip to the creator area.
+  // If already signed in, route through the role-aware hub (/studio sends
+  // merchant/ops/creator to the right place).
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (user) redirect(`/${locale}/creator`)
+  if (user) redirect(`/${locale}/studio`)
 
   return (
     <main className="k-page-band flex min-h-screen flex-col items-center justify-center p-6">

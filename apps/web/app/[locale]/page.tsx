@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { getPublishedGuides } from '@/lib/guides/queries'
 import { HomeView } from '@/components/kinnso/pages/HomeView'
 
 export function generateStaticParams() {
@@ -12,5 +13,6 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
-  return <HomeView locale={locale as Locale} t={messages.home} />
+  const guides = await getPublishedGuides()
+  return <HomeView locale={locale as Locale} t={messages.home} guides={guides} />
 }

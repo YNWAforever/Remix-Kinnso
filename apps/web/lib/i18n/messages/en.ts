@@ -18,6 +18,10 @@ export interface Messages {
     emailSentUseAnother: string
     alreadyHaveAccount: string
     noAccount: string
+    signUpCreatorTitle: string
+    signUpCreatorSubtitle: string
+    termsPrefix: string
+    termsLink: string
     errorInvalidCredentials: string
     errorEmailTaken: string
     errorInvalidEmail: string
@@ -171,6 +175,7 @@ export interface Messages {
     // Slice 2 — sample-metrics labelling
     sampleBadge: string
     sampleNote: string
+    demoBanner: string
     // Slice 2 — empty state (no published DNA)
     noDnaHeading: string
     noDnaBody: string
@@ -381,11 +386,21 @@ export interface Messages {
     howHeading: string; howSub: string
     step1Title: string; step1Desc: string; step2Title: string; step2Desc: string
     step3Title: string; step3Desc: string; step4Title: string; step4Desc: string
-    merchantWall: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string
+    merchantWall: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
     travelersTitle: string; travelersDesc: string; travelersCta: string
     merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
   comingSoon: { heading: string; body: string; back: string }
+  agent: {
+    heroPill: string; heroTitle: string; heroSubtitle: string
+    heroCta: string; heroSecondaryCta: string
+    valuesHeading: string
+    value1Title: string; value1Desc: string
+    value2Title: string; value2Desc: string
+    value3Title: string; value3Desc: string
+    tiersHeading: string; tiersSub: string; comingNote: string
+    ctaTitle: string; ctaDesc: string; ctaButton: string
+  }
   studioHome: {
     pill: string; heading: string; subtitle: string
     liveBadge: string; soonBadge: string; open: string
@@ -524,6 +539,10 @@ const messages: Messages = {
     emailSentUseAnother: 'Use another email',
     alreadyHaveAccount: 'Already have an account?',
     noAccount: 'Don\'t have an account?',
+    signUpCreatorTitle: 'Apply as a creator',
+    signUpCreatorSubtitle: 'Create your account, scan your Creator DNA, and start earning with KINNSO.',
+    termsPrefix: 'By creating an account you agree to our',
+    termsLink: 'Creator Terms',
     errorInvalidCredentials: 'Invalid email or password.',
     errorEmailTaken: 'An account with this email already exists.',
     errorInvalidEmail: 'Enter a valid email address.',
@@ -675,6 +694,7 @@ const messages: Messages = {
     dnaPlatforms: 'Platforms',
     sampleBadge: 'Sample',
     sampleNote: 'The numbers below are sample data — your real metrics arrive after your first full scan.',
+    demoBanner: 'Sample report — sign up and scan to see your own Creator DNA.',
     noDnaHeading: 'Build your Creator DNA',
     noDnaBody: 'Run a scan to generate your real creator DNA, then come back to see your Studio report.',
     noDnaCta: 'Start your scan',
@@ -895,9 +915,10 @@ const messages: Messages = {
     step4Title: 'Publish and earn',
     step4Desc: 'Turn guides, partner links, and briefs into payouts.',
     merchantWall: 'Partner stamps',
-    featuredHeading: 'Creator passes this week',
-    featuredSub: 'Real handles, city proof, and score signals.',
+    featuredHeading: 'Featured guides',
+    featuredSub: 'Real city guides published by KINNSO creators.',
     featuredSeeAll: 'See all',
+    featuredEmpty: 'No published guides yet — be the first to publish one.',
     travelersTitle: 'For Travelers',
     travelersDesc: 'Follow real creators, save guide tickets, and book the exact same spots.',
     travelersCta: 'Explore Guides',
@@ -909,6 +930,26 @@ const messages: Messages = {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
     back: 'Back to home',
+  },
+  agent: {
+    heroPill: 'Creator Copilot',
+    heroTitle: 'Your AI copilot for growing as a creator',
+    heroSubtitle: 'KINNSO Copilot is a growing library of saved AI agents that help you grow your audience, find your next idea, and produce content that earns.',
+    heroCta: 'Join as a creator',
+    heroSecondaryCta: 'See how it works',
+    valuesHeading: 'What your copilot will do',
+    value1Title: 'Grow your audience',
+    value1Desc: 'Data-backed prompts on what to post, when, and where — tuned to your Creator DNA.',
+    value2Title: 'Never run out of ideas',
+    value2Desc: 'Surface fresh content angles and trending places that fit your niche and audience.',
+    value3Title: 'Produce better content',
+    value3Desc: 'Turn a rough idea into captions, shot lists, and guide drafts you can publish in minutes.',
+    tiersHeading: 'A better copilot as you climb',
+    tiersSub: 'Publish guides and complete missions to level up. Higher tiers unlock more agents, higher limits, better commissions, and exclusive missions.',
+    comingNote: 'The copilot ships inside Studio in a later release. Join now to be first in line.',
+    ctaTitle: 'Get your copilot',
+    ctaDesc: 'Sign up as a creator, scan your DNA, and be first to use the copilot when it lands.',
+    ctaButton: 'Join KINNSO',
   },
   studioHome: {
     pill: 'Creator Studio',

@@ -39,17 +39,17 @@ beforeEach(() => {
 })
 
 describe('/[locale]/studio/scan host', () => {
-  it('anon → mock demo report (no sample note, footer present)', async () => {
+  it('anon → sample demo report, clearly labelled with the demo banner', async () => {
     state.user = null
     const ui = await StudioScanPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
     expect(screen.getByText(en.studio.reportReadyHeading)).toBeTruthy()
     expect(screen.getByText(en.studio.dnaCoreHeading)).toBeTruthy()
-    expect(screen.queryByText(en.studio.sampleNote)).toBeNull()
+    expect(screen.getByText(en.studio.demoBanner)).toBeTruthy()
     expect(screen.getByRole('button', { name: en.studio.publishProfile })).toBeTruthy()
   })
 
-  it('logged-in + valid final DNA → real identity + DNA core + sample note', async () => {
+  it('logged-in + valid final DNA → real DNA core only (no sample framing, no fabricated metrics)', async () => {
     state.user = { id: 'u1' }
     state.rows = {
       creators: { display_name: 'May Wong' },
@@ -60,10 +60,12 @@ describe('/[locale]/studio/scan host', () => {
     render(ui)
     expect(screen.getByText('May Wong')).toBeTruthy()
     expect(screen.getByText('@maygram')).toBeTruthy()
-    // sampleDna.bio is unique prose rendered only by DnaCorePanel; a niche would
-    // collide with the maywanders content-mix donut legend (renders in real mode).
+    // sampleDna.bio is unique prose rendered only by DnaCorePanel — the real DNA.
     expect(screen.getByText(sampleDna.bio)).toBeTruthy()
-    expect(screen.getByText(en.studio.sampleNote)).toBeTruthy()
+    // Real mode is honest: no "sample" framing, no demo banner, no maywanders metrics.
+    expect(screen.queryByText(en.studio.sampleNote)).toBeNull()
+    expect(screen.queryByText(en.studio.demoBanner)).toBeNull()
+    expect(screen.queryByText(en.studio.whatYouCreate)).toBeNull()
   })
 
   it('logged-in + no/invalid final DNA → onboarding prompt', async () => {

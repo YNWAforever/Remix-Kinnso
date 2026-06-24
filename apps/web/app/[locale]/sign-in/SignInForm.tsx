@@ -36,8 +36,10 @@ export function SignInForm({
         setError(errorInvalidCredentials)
         return
       }
-      // On success, hard-navigate to force the server to pick up the new cookie.
-      router.push(`/${locale}/creator`)
+      // On success, hard-navigate through the role-aware hub (/studio routes
+      // merchant/ops/creator to the right place). refresh() forces the server to
+      // pick up the new auth cookie.
+      router.push(`/${locale}/studio`)
       router.refresh()
     } catch {
       setError(errorGeneric)

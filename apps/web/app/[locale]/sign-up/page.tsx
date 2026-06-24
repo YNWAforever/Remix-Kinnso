@@ -24,15 +24,17 @@ export default async function SignUpPage({
   // The auth callback route emits ?error=callback on exchange failure.
   const serverError = error === 'callback' ? dict.auth.errorGeneric : undefined
 
-  // If already signed in, skip to the creator area.
+  // If already signed in, route through the role-aware hub (/studio sends
+  // merchant/ops/creator to the right place).
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (user) redirect(`/${locale}/creator`)
+  if (user) redirect(`/${locale}/studio`)
 
   return (
     <main className="k-page-band flex min-h-screen flex-col items-center justify-center gap-6 p-6">
       <div className="k-auth-card k-ticket w-full max-w-sm p-8">
-      <h1 className="k-display text-2xl font-bold text-kinnso-ink">{dict.auth.signUp}</h1>
+      <h1 className="k-display text-2xl font-bold text-kinnso-ink">{dict.auth.signUpCreatorTitle}</h1>
+      {sent !== '1' && <p className="mt-2 text-sm text-ink/70">{dict.auth.signUpCreatorSubtitle}</p>}
 
       {sent === '1' ? (
         <div className="mt-6 flex w-full flex-col items-center gap-4 text-center">
@@ -73,6 +75,12 @@ export default async function SignUpPage({
             <Link href={`/${locale}/sign-in`} className="underline text-ink">
               {dict.auth.signIn}
             </Link>
+          </p>
+          <p className="mt-3 text-xs text-ink/60">
+            {dict.auth.termsPrefix}{' '}
+            <Link href={`/${locale}/legal/creator-terms`} className="underline text-ink">
+              {dict.auth.termsLink}
+            </Link>.
           </p>
         </>
       )}

@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(),
   notFound: vi.fn(),
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -21,7 +22,9 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
+import { redirect } from 'next/navigation'
 import SignUpPage from '@/app/[locale]/sign-up/page'
+import en from '@/lib/i18n/messages/en'
 
 beforeEach(() => {
   state.user = null
@@ -44,5 +47,26 @@ describe('/[locale]/sign-up host', () => {
     expect(screen.getByRole('link', { name: 'Sign in after confirming' }).getAttribute('href')).toBe('/en/sign-in')
     expect(screen.getByRole('link', { name: 'Use another email' }).getAttribute('href')).toBe('/en/sign-up')
     expect(document.querySelector('.k-auth-card')).toBeTruthy()
+  })
+
+  it('uses creator framing and a real terms link', async () => {
+    state.user = null
+    const ui = await SignUpPage({
+      params: Promise.resolve({ locale: 'en' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(ui)
+    expect(screen.getByRole('heading', { level: 1, name: en.auth.signUpCreatorTitle })).toBeTruthy()
+    expect(screen.getByText(en.auth.signUpCreatorSubtitle)).toBeTruthy()
+    expect(screen.getByRole('link', { name: en.auth.termsLink }).getAttribute('href')).toBe('/en/legal/creator-terms')
+  })
+
+  it('redirects an already-signed-in user to the role-aware hub /studio', async () => {
+    state.user = { id: 'u1' }
+    await SignUpPage({
+      params: Promise.resolve({ locale: 'en' }),
+      searchParams: Promise.resolve({}),
+    })
+    expect(redirect).toHaveBeenCalledWith('/en/studio')
   })
 })

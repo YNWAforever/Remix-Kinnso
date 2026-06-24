@@ -15,14 +15,16 @@ export function generateStaticParams() {
 /**
  * /[locale]/studio/scan — Studio Scan + DNA report (ungated this slice).
  *
- * - ANON → mock demo (mock identity + sampleDna + mock metrics; fake-scan intro).
- * - LOGGED-IN + valid `creator_dna.final` → REAL identity + REAL DNA core; the
- *   numeric metric sections stay mock and are labelled "sample".
+ * - ANON → sample demo (mock identity + sampleDna + mock metrics; fake-scan intro),
+ *   shown behind an explicit `demoBanner` so it is never mistaken for live data.
+ * - LOGGED-IN + valid `creator_dna.final` → REAL identity + REAL qualitative DNA
+ *   ONLY (isSample=false). The fabricated numeric metric sections are demo-only and
+ *   do NOT render here — we have no real metrics pipeline yet.
  * - LOGGED-IN + no/invalid `final` → onboarding prompt (CTA → /[locale]/creator).
  *
- * The mock `ExtendedCreator` ('maywanders') is ALWAYS the `metrics` overlay —
- * every numeric section + drawer filters fixtures by `metrics.handle`, so a real
- * handle would empty them. Identity/metrics/dna are decoupled for that reason.
+ * The mock `ExtendedCreator` ('maywanders') is still passed as `metrics` to satisfy
+ * the demo render path; in real mode the view ignores it (all metric sections are
+ * gated to demo mode).
  */
 export default async function StudioScanPage({
   params,
@@ -100,7 +102,7 @@ export default async function StudioScanPage({
       )}
       dna={dna}
       metrics={metrics}
-      isSample
+      isSample={false}
       t={t}
     />
   )
