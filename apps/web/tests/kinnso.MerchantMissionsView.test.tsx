@@ -21,4 +21,10 @@ describe('MerchantMissionsView', () => {
     expect(screen.getByText(/pending/i)).toBeTruthy()
     expect(screen.getByRole('link', { name: /Paid reel campaign/ }).getAttribute('href')).toBe('/en/merchants/missions/m1')
   })
+
+  it('shows a post-a-mission CTA when there are no missions', () => {
+    render(<MerchantMissionsView locale="en" t={en.missions} missions={[]} />)
+    expect(screen.getByText(en.missions.missionsEmptyTitle)).toBeTruthy()
+    expect(screen.getByRole('link', { name: en.missions.postMissionCta }).getAttribute('href')).toBe('/en/merchants/post')
+  })
 })

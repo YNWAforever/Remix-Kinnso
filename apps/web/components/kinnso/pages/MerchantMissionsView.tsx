@@ -27,21 +27,31 @@ export function MerchantMissionsView({ locale, t, missions }: MerchantMissionsVi
           <span>{t.title}</span>
           <span>Status</span>
         </div>
-        {missions.map((mission) => (
-          <Link
-            key={mission.id}
-            href={`/${locale}/merchants/missions/${mission.id}`}
-            className="grid grid-cols-1 gap-3 border-b border-kinnso-cream2 px-4 py-4 transition last:border-b-0 hover:bg-kinnso-cream2 sm:grid-cols-[1fr_120px] sm:items-center"
-          >
-            <div>
-              <h2 className="font-bold text-kinnso-ink">{mission.title}</h2>
-              <p className="mt-1 text-sm text-kinnso-muted">
-                {t.participants}: {mission.participantCount} / {t.pendingApplications}: {mission.pendingCount} / {t.settlement}: {mission.settlementStatus ?? '-'}
-              </p>
-            </div>
-            <MissionStatusBadge status={mission.status} />
-          </Link>
-        ))}
+        {missions.length === 0 ? (
+          <div className="px-4 py-12 text-center">
+            <h2 className="text-lg font-black text-kinnso-ink">{t.missionsEmptyTitle}</h2>
+            <p className="mt-1 text-sm text-kinnso-muted">{t.missionsEmptyBody}</p>
+            <Link href={`/${locale}/merchants/post`} className="k-btn-primary mt-5 inline-flex">
+              {t.postMissionCta}
+            </Link>
+          </div>
+        ) : (
+          missions.map((mission) => (
+            <Link
+              key={mission.id}
+              href={`/${locale}/merchants/missions/${mission.id}`}
+              className="grid grid-cols-1 gap-3 border-b border-kinnso-cream2 px-4 py-4 transition last:border-b-0 hover:bg-kinnso-cream2 sm:grid-cols-[1fr_120px] sm:items-center"
+            >
+              <div>
+                <h2 className="font-bold text-kinnso-ink">{mission.title}</h2>
+                <p className="mt-1 text-sm text-kinnso-muted">
+                  {t.participants}: {mission.participantCount} / {t.pendingApplications}: {mission.pendingCount} / {t.settlement}: {mission.settlementStatus ?? '-'}
+                </p>
+              </div>
+              <MissionStatusBadge status={mission.status} />
+            </Link>
+          ))
+        )}
       </div>
     </main>
   )
