@@ -84,7 +84,7 @@ describe('MissionPostWizard', () => {
     await waitFor(() => expect(saveDraft).not.toBeDisabled())
   })
 
-  it('keeps submit actions disabled after a successful create', async () => {
+  it('shows a success panel after a successful create', async () => {
     const onSubmit = vi.fn(async () => ({ ok: true }))
     render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
     fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Test mission' } })
@@ -92,11 +92,24 @@ describe('MissionPostWizard', () => {
     fireEvent.change(screen.getByLabelText(en.missions.couponCode), { target: { value: 'TEST10' } })
     fireEvent.change(screen.getByLabelText(en.missions.couponUrl), { target: { value: 'https://example.com/test' } })
 
-    const saveDraft = screen.getByRole('button', { name: en.missions.saveDraft })
-    fireEvent.click(saveDraft)
+    fireEvent.click(screen.getByRole('button', { name: en.missions.saveDraft }))
 
-    await waitFor(() => expect(saveDraft).toBeDisabled())
-    fireEvent.click(saveDraft)
+    expect(await screen.findByText(en.missions.postSuccessTitle)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: en.missions.saveDraft })).toBeNull()
     expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
+  it('links the success panel to the new mission and the queue', async () => {
+    const onSubmit = vi.fn(async () => ({ ok: true, missionId: 'm1' }))
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Test mission' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Mission summary' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponCode), { target: { value: 'TEST10' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponUrl), { target: { value: 'https://example.com/test' } })
+
+    fireEvent.click(screen.getByRole('button', { name: en.missions.publish }))
+
+    expect((await screen.findByRole('link', { name: en.missions.viewMission })).getAttribute('href')).toBe('/en/merchants/missions/m1')
+    expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/missions')
   })
 })

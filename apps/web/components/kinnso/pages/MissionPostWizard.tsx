@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Link from 'next/link'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type {
   MissionDraftInput,
@@ -17,7 +18,7 @@ interface Props {
 
 type SubmitResult =
   | void
-  | { ok: true }
+  | { ok: true; missionId?: string }
   | {
       ok: false
       errors?: Record<string, string[]>
@@ -58,6 +59,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [missionId, setMissionId] = useState<string | null>(null)
   const submittingRef = useRef(false)
 
   const includesCoupon = missionType === 'coupon_affiliate' || missionType === 'hybrid'
@@ -101,6 +103,9 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
         setError(firstActionError(result.errors) ?? t.validationError)
         return
       }
+      if (result && typeof result === 'object' && 'missionId' in result && result.missionId) {
+        setMissionId(result.missionId)
+      }
       setSubmitted(true)
     } catch {
       setError(t.validationError)
@@ -108,6 +113,27 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
       submittingRef.current = false
       setSubmitting(false)
     }
+  }
+
+  if (submitted) {
+    return (
+      <div className="k-container py-10" lang={locale}>
+        <div className="rounded-2xl border border-kinnso-cream2 bg-white p-8 shadow-kinnso">
+          <h1 className="text-2xl font-black text-kinnso-ink">{t.postSuccessTitle}</h1>
+          <p className="mt-2 text-kinnso-muted">{t.postSuccessBody}</p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {missionId && (
+              <Link href={`/${locale}/merchants/missions/${missionId}`} className="k-btn-primary">
+                {t.viewMission}
+              </Link>
+            )}
+            <Link href={`/${locale}/merchants/missions`} className="k-btn-ghost">
+              {t.backToQueue}
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
