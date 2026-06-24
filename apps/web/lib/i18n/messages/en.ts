@@ -171,6 +171,7 @@ export interface Messages {
     // Slice 2 — sample-metrics labelling
     sampleBadge: string
     sampleNote: string
+    demoBanner: string
     // Slice 2 — empty state (no published DNA)
     noDnaHeading: string
     noDnaBody: string
@@ -675,6 +676,7 @@ const messages: Messages = {
     dnaPlatforms: 'Platforms',
     sampleBadge: 'Sample',
     sampleNote: 'The numbers below are sample data — your real metrics arrive after your first full scan.',
+    demoBanner: 'Sample report — sign up and scan to see your own Creator DNA.',
     noDnaHeading: 'Build your Creator DNA',
     noDnaBody: 'Run a scan to generate your real creator DNA, then come back to see your Studio report.',
     noDnaCta: 'Start your scan',

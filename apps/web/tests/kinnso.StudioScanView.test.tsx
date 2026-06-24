@@ -38,7 +38,7 @@ function renderReal() {
       identity={buildStudioIdentity({ display_name: 'May Wong' }, handles, sampleDna, '2026-06-01T00:00:00Z')}
       dna={sampleDna}
       metrics={metrics}
-      isSample
+      isSample={false}
       t={en.studio}
     />,
   )
@@ -109,16 +109,27 @@ describe('StudioScanView — real mode', () => {
     expect(screen.getByText('May Wong')).toBeTruthy()
     expect(screen.getByText('@maygram')).toBeTruthy()
     expect(screen.getByText(en.studio.dnaCoreHeading)).toBeTruthy()
-    // Assert the DNA bio (unique prose, rendered only by DnaCorePanel). Do NOT
-    // assert a niche here: sampleDna.niches ('Coffee', 'City Walk') collide with
-    // the maywanders content-mix donut legend, which renders ungated in real mode.
+    // The DNA bio is unique prose rendered only by DnaCorePanel — it is the real,
+    // qualitative DNA, which is all real mode shows.
     expect(screen.getByText(sampleDna.bio)).toBeTruthy()
   })
 
-  it('shows the sample note and hides the publish/share footer', () => {
+  it('shows real DNA only — no fabricated metric sections, no sample framing', () => {
     renderReal()
-    expect(screen.getByText(en.studio.sampleNote)).toBeTruthy()
-    expect(screen.getAllByText(en.studio.sampleBadge).length).toBeGreaterThan(0)
+    // The maywanders numeric overlay is gone in real mode.
+    expect(screen.queryByText(en.studio.engagementOverTime)).toBeNull()
+    expect(screen.queryByText(en.studio.yourAudience)).toBeNull()
+    expect(screen.queryByText(en.studio.whatYouCreate)).toBeNull()
+    expect(screen.queryByText(en.studio.bestTravelPosts)).toBeNull()
+    expect(screen.queryByText('3,400')).toBeNull() // fabricated avg likes
+    // Real DNA is genuine, not a sample.
+    expect(screen.queryByText(en.studio.sampleNote)).toBeNull()
+    expect(screen.queryByText(en.studio.sampleBadge)).toBeNull()
+  })
+
+  it('offers an honest link to real missions and hides the publish/share footer', () => {
+    renderReal()
+    expect(screen.getByRole('link', { name: new RegExp(en.studio.viewAllMissions) }).getAttribute('href')).toBe('/en/studio/missions')
     expect(screen.queryByRole('button', { name: en.studio.publishProfile })).toBeNull()
     expect(screen.queryByRole('button', { name: en.studio.shareDnaCard })).toBeNull()
   })

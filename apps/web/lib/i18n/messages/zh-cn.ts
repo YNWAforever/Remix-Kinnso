@@ -171,6 +171,7 @@ const messages: Messages = {
     dnaPlatforms: '平台',
     sampleBadge: '示例',
     sampleNote: '以下数字为示例数据，完成首次完整扫描后将显示你的真实数据。',
+    demoBanner: '这是示例报告——注册并扫描即可查看你自己的创作者 DNA。',
     noDnaHeading: '创建你的创作者 DNA',
     noDnaBody: '运行扫描以生成你的真实创作者 DNA，然后回来查看你的 Studio 报告。',
     noDnaCta: '开始扫描',

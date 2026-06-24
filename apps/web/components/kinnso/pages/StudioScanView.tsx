@@ -1,6 +1,7 @@
 'use client'
 import React, { useMemo, useState } from "react";
 import { TicketCard } from "@/components/kinnso/MarketPassport";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Share2, ArrowRight, Lock } from "lucide-react";
 import BearMascot from "@/components/kinnso/BearMascot";
@@ -188,6 +189,13 @@ export function StudioScanView({ locale, mode, initialPhase = "done", identity, 
             {isSample && <p className="mt-2 text-xs text-kinnso-muted">{t.sampleNote}</p>}
           </section>
 
+          {/* Demo banner — the anonymous demo is an explicit sample, never live data. */}
+          {isDemo && (
+            <div className="rounded-md bg-kinnso-amber/40 px-4 py-2 text-center text-sm font-semibold text-kinnso-ink">
+              {t.demoBanner}
+            </div>
+          )}
+
           {/* 2 · Identity card */}
           <TicketCard as="section" className="p-5">
             <div className="flex items-start gap-4">
@@ -230,6 +238,19 @@ export function StudioScanView({ locale, mode, initialPhase = "done", identity, 
           {/* 3 · Your Creator DNA (real or sample-shaped Dna) */}
           <DnaCorePanel dna={dna} t={t} />
 
+          {/* Real mode stops here: identity + real qualitative DNA only. Every
+              numeric section below is fabricated sample data (the maywanders
+              overlay) and renders in the anonymous demo ONLY. */}
+          {!isDemo && (
+            <div>
+              <Link href={studioMissionsHref} className="k-btn-primary inline-flex">
+                {t.viewAllMissions} <ArrowRight aria-hidden="true" className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+          )}
+
+          {isDemo && (
+          <>
           {/* 4 · Score ring + tier */}
           <TicketCard as="section" className="p-6 text-center">
             <div className="flex items-center justify-center">{sampleChip}</div>
@@ -334,6 +355,8 @@ export function StudioScanView({ locale, mode, initialPhase = "done", identity, 
               {t.viewAllMissions} <ArrowRight className="ml-1 inline h-3 w-3" />
             </button>
           </section>
+          </>
+          )}
 
           {/* Footer actions — demo only (real public profile + share land in a later slice) */}
           {isDemo && (
@@ -353,9 +376,11 @@ export function StudioScanView({ locale, mode, initialPhase = "done", identity, 
         </div>
       </div>
 
-      <CityDetailDrawer open={!!selectedCity} onOpenChange={(o) => !o && setSelectedCity(null)} location={selectedCity} posts={posts} places={places} />
-      {/* Share is reachable only via the demo-only footer button; don't mount the
-          mock-data dialog in a real-creator view. (The city drawer stays — the map is in both modes.) */}
+      {/* Share + city drawer are demo-only — they render mock fixture data and
+          must not appear in a real-creator view. */}
+      {isDemo && (
+        <CityDetailDrawer open={!!selectedCity} onOpenChange={(o) => !o && setSelectedCity(null)} location={selectedCity} posts={posts} places={places} />
+      )}
       {isDemo && (
         <ShareDnaDialog
           open={shareOpen}
