@@ -80,6 +80,11 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
 
       <header className="mb-6">
         <h1 className="k-display text-3xl md:text-4xl font-black text-kinnso-ink">{a.translation.title}</h1>
+        {a.translation.locale !== loc && (
+          <p className="mt-2 rounded-lg bg-kinnso-cream2 px-3 py-2 text-sm text-kinnso-ink">
+            {dict.article.fallbackNotice}
+          </p>
+        )}
         {a.author && <p className="text-muted mt-2">{dict.article.by} {a.author.name}</p>}
       </header>
 

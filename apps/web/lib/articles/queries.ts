@@ -15,6 +15,16 @@ const db = () =>
  *  blip) so an ISR/dynamic render degrades to a quick retry rather than crashing the
  *  serverless function (FUNCTION_INVOCATION_FAILED). Reads are idempotent, so this is
  *  safe; a persistent failure still throws and is caught by the route error boundary. */
+/** Pick the best translation for a requested locale: exact match → `en` → first available. */
+function pickTranslation<T extends { locale: string }>(translations: T[], locale: string): T | null {
+  if (translations.length === 0) return null
+  return (
+    translations.find((t) => t.locale === locale) ??
+    translations.find((t) => t.locale === 'en') ??
+    translations[0]
+  )
+}
+
 async function withRetry<T>(fn: () => Promise<T>, attempts = 2): Promise<T> {
   let lastErr: unknown
   for (let i = 0; i < attempts; i++) {
@@ -36,8 +46,7 @@ export async function getArticleByUrl(url: string, locale: string) {
     .maybeSingle()
   if (error) throw error
   if (!data) return null
-  const translation =
-    (data.article_translations ?? []).find((t) => t.locale === locale) ?? null
+  const translation = pickTranslation(data.article_translations ?? [], locale)
   return { ...data, translation }
 }
 
@@ -69,8 +78,7 @@ export const getArticleDetail = cache((
   if (!data) return null
   if (toUrlCategory(data.category) !== urlCategory) return null
 
-  const translation =
-    (data.article_translations ?? []).find((t) => t.locale === locale) ?? null
+  const translation = pickTranslation(data.article_translations ?? [], locale)
 
   const firstSlug = (data.authors ?? [])[0]
 
