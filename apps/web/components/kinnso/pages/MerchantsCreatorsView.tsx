@@ -7,9 +7,23 @@ import CreatorMatchCard from "@/components/kinnso/CreatorMatchCard";
 import CreatorFilterDrawer, { defaultFilters, type CreatorFilters } from "@/components/kinnso/CreatorFilterDrawer";
 import { CreatorProfileView } from "@/components/kinnso/pages/CreatorProfileView";
 import { extendedCreators, creatorLocations, merchantWorkingWith, getCreator, computeMatch, type ExtendedCreator } from "@/lib/creator-mock";
+import type { PublicCreator } from "@/lib/creators/queries";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 import type { MerchantProfile } from "@/lib/creator-mock";
+
+// Adapter for the mock merchant creator-search quick-view (a cut-from-nav
+// backlog surface): map a mock ExtendedCreator onto the real PublicCreator
+// shape so the rebuilt profile renders. Real public profiles use /c/[handle].
+function toPublicCreator(c: ExtendedCreator): PublicCreator {
+  return {
+    handle: c.handle,
+    name: c.name,
+    bio: c.bio,
+    profile: { niches: [c.category], content_pillars: [], tone: [], audience_geos: [], audience_locales: [], languages: [], platforms: [] },
+    guides: [],
+  }
+}
 
 function filterCreators(list: ExtendedCreator[], f: CreatorFilters, query: string): ExtendedCreator[] {
   const q = query.trim().toLowerCase();
@@ -219,7 +233,7 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
             <div className="px-4 pb-24 pt-6">
               {(() => {
                 const c = getCreator(quickViewHandle);
-                return c ? <CreatorProfileView creator={c} role="merchant" locale={locale} embedded t={t.creatorProfile} /> : null;
+                return c ? <CreatorProfileView creator={toPublicCreator(c)} locale={locale} embedded t={t.creatorProfile} /> : null;
               })()}
             </div>
           )}

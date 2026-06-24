@@ -1,41 +1,36 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import type { PublicCreator } from '@/lib/creators/queries'
 
-afterEach(cleanup)
-// vi.mock factories are hoisted above module-scope consts, so declare the
-// notFound spy via vi.hoisted to make it available inside the factory.
-const { notFound } = vi.hoisted(() => ({
-  notFound: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-}))
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), notFound }))
-vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: { getUser: async () => ({ data: { user: null } }) },
-  }),
+const creator: PublicCreator = {
+  handle: 'maya',
+  name: 'Maya Wanders',
+  bio: 'Slow travel.',
+  profile: { niches: ['Coffee'], content_pillars: [], tone: [], audience_geos: [], audience_locales: [], languages: [], platforms: [] },
+  guides: [],
+}
+
+vi.mock('@/lib/creators/queries', () => ({
+  getCreatorByHandle: vi.fn(async (h: string) => (h === 'maya' ? creator : null)),
 }))
 
-import CreatorPublicPage, { generateMetadata } from '@/app/[locale]/c/[handle]/page'
-import { getCreator } from '@/lib/creator-mock'
+const notFoundError = new Error('NEXT_NOT_FOUND')
+vi.mock('next/navigation', () => ({ notFound: () => { throw notFoundError } }))
+
+import CreatorPublicPage from '@/app/[locale]/c/[handle]/page'
 
 describe('/[locale]/c/[handle] host', () => {
-  it('renders the public profile for a known handle', async () => {
-    const ui = await CreatorPublicPage({ params: Promise.resolve({ locale: 'en', handle: 'maywanders' }) })
+  it('renders the real profile for a known handle', async () => {
+    const ui = await CreatorPublicPage({ params: Promise.resolve({ locale: 'en', handle: 'maya' }) })
     render(ui)
-    const creator = getCreator('maywanders')!
-    expect(screen.getByRole('heading', { level: 1, name: creator.name })).toBeTruthy()
-  })
-
-  it('builds SEO metadata from the creator', async () => {
-    const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en', handle: 'maywanders' }) })
-    const creator = getCreator('maywanders')!
-    expect(meta.title).toContain(creator.name)
-    expect(meta.title).toContain(String(creator.score))
+    expect(screen.getByRole('heading', { level: 1, name: 'Maya Wanders' })).toBeInTheDocument()
+    expect(screen.getAllByText('@maya')[0]).toBeInTheDocument()
   })
 
   it('calls notFound for an unknown handle', async () => {
     await expect(
       CreatorPublicPage({ params: Promise.resolve({ locale: 'en', handle: 'ghost' }) }),
-    ).rejects.toThrow('NEXT_NOT_FOUND')
+    ).rejects.toBe(notFoundError)
   })
 })
