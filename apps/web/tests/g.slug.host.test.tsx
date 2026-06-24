@@ -8,20 +8,29 @@ const { notFound } = vi.hoisted(() => ({
 }))
 vi.mock('next/navigation', () => ({ notFound }))
 
-import { guides } from '@/lib/creator-mock'
+vi.mock('@/lib/guides/queries', () => ({
+  getGuideBySlug: vi.fn(async () => ({
+    slug: 'kyoto-tea',
+    title: 'Kyoto Tea Houses',
+    cover: 'https://example.com/kyoto.jpg',
+    city: 'Kyoto',
+    saves: 5,
+    creatorHandle: 'teafan',
+    creatorName: 'Tea Fan',
+    summary: 'Lovely tea houses.',
+    source: 'db',
+  })),
+}))
 
 describe('/[locale]/g/[slug] host', () => {
-  it('renders a known guide and links back to its creator profile', async () => {
+  it('renders a known guide and links the author to /c/[handle]', async () => {
     const route = await import('@/app/[locale]/g/[slug]/page')
-    const guide = guides[0]
-    const ui = await route.default({ params: Promise.resolve({ locale: 'en', slug: guide.slug }) })
+    const ui = await route.default({ params: Promise.resolve({ locale: 'en', slug: 'kyoto-tea' }) })
 
     render(ui)
 
-    expect(screen.getByRole('heading', { level: 1, name: guide.title })).toBeTruthy()
-    expect(screen.getByRole('link', { name: `@${guide.creatorHandle}` }).getAttribute('href')).toBe(
-      `/en/c/${guide.creatorHandle}`,
-    )
+    expect(screen.getByRole('heading', { level: 1, name: 'Kyoto Tea Houses' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: '@teafan' }).getAttribute('href')).toBe('/en/c/teafan')
     expect(document.querySelector('.k-route-stamp')).toBeTruthy()
   })
 })
