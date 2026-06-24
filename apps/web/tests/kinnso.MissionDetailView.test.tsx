@@ -64,4 +64,20 @@ describe('MissionDetailView', () => {
     render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={vi.fn()} onReviewSubmission={vi.fn()} />)
     expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/missions')
   })
+
+  it('links a participant name to the public profile when a handle exists', () => {
+    const mission = {
+      id: 'm1',
+      title: 'Hybrid mission',
+      participants: [
+        { id: 'p1', creatorName: 'Maya Wanders', creatorHandle: 'maya', status: 'active' },
+        { id: 'p2', creatorName: 'Creator', creatorHandle: null, status: 'applied' },
+      ],
+      submissions: [],
+    }
+    render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={vi.fn()} onReviewSubmission={vi.fn()} />)
+    expect(screen.getByRole('link', { name: 'Maya Wanders' }).getAttribute('href')).toBe('/en/c/maya')
+    expect(screen.queryByRole('link', { name: 'Creator' })).toBeNull()
+    expect(screen.getByText('Creator')).toBeTruthy()
+  })
 })
