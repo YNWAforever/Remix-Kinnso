@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { ArrowRight, MapPin, Sparkles, Trophy, Wallet } from "lucide-react";
 import ScanWidget from "@/components/kinnso/ScanWidget";
-import EarningsTicker from "@/components/kinnso/EarningsTicker";
-import CreatorCard from "@/components/kinnso/CreatorCard";
+import GuideCard from "@/components/kinnso/GuideCard";
 import PassportHeroStack from "@/components/kinnso/PassportHeroStack";
 import { RouteMarkers, RouteStamp, TicketCard } from "@/components/kinnso/MarketPassport";
-import { creators, merchantLogos } from "@/lib/creator-mock";
+import type { Guide } from "@/lib/creator-mock";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 
-export function HomeView({ locale, t }: { locale: Locale; t: Messages["home"] }) {
+export function HomeView({ locale, t, guides }: { locale: Locale; t: Messages["home"]; guides: Guide[] }) {
   const p = (path: string) => `/${locale}${path}`;
   const steps = [
     { n: 1, marker: "SCAN", title: t.step1Title, desc: t.step1Desc, icon: <Sparkles aria-hidden="true" className="h-5 w-5" /> },
@@ -17,7 +16,6 @@ export function HomeView({ locale, t }: { locale: Locale; t: Messages["home"] })
     { n: 3, marker: "MATCH", title: t.step3Title, desc: t.step3Desc, icon: <Trophy aria-hidden="true" className="h-5 w-5" /> },
     { n: 4, marker: "EARN", title: t.step4Title, desc: t.step4Desc, icon: <Wallet aria-hidden="true" className="h-5 w-5" /> },
   ];
-  const featured = creators.slice(0, 6);
 
   return (
     <div>
@@ -37,8 +35,6 @@ export function HomeView({ locale, t }: { locale: Locale; t: Messages["home"] })
           <PassportHeroStack />
         </div>
       </section>
-
-      <EarningsTicker />
 
       <section className="k-page-band border-t border-kinnso-edge py-16">
         <div className="k-container">
@@ -62,17 +58,6 @@ export function HomeView({ locale, t }: { locale: Locale; t: Messages["home"] })
         </div>
       </section>
 
-      <section className="border-y border-kinnso-edge bg-white py-10">
-        <div className="k-container">
-          <p className="text-center text-xs font-bold uppercase tracking-[0.14em] text-kinnso-muted">{t.merchantWall}</p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            {merchantLogos.map((m) => (
-              <RouteStamp key={m}>{m}</RouteStamp>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="k-page-band py-16">
         <div className="k-container">
           <div className="flex items-end justify-between gap-6">
@@ -80,10 +65,18 @@ export function HomeView({ locale, t }: { locale: Locale; t: Messages["home"] })
               <h2 className="k-display text-3xl font-black text-kinnso-ink md:text-4xl">{t.featuredHeading}</h2>
               <p className="mt-2 text-kinnso-muted">{t.featuredSub}</p>
             </div>
-            <Link href={p("/feed")} className="hidden text-sm font-bold text-kinnso-orange hover:text-kinnso-orangeDark md:inline">{t.featuredSeeAll} →</Link>
+            <Link href={p("/explore")} className="hidden text-sm font-bold text-kinnso-orange hover:text-kinnso-orangeDark md:inline">{t.featuredSeeAll} →</Link>
           </div>
           <div className="no-scrollbar mt-6 -mx-4 flex gap-4 overflow-x-auto px-4 pb-2">
-            {featured.map((c) => <CreatorCard key={c.handle} c={c} locale={locale} />)}
+            {guides.length === 0 ? (
+              <p className="text-kinnso-muted">{t.featuredEmpty}</p>
+            ) : (
+              guides.slice(0, 6).map((g) => (
+                <div key={g.slug} className="w-64 shrink-0">
+                  <GuideCard g={g} locale={locale} />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

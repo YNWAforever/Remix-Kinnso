@@ -4,6 +4,7 @@ import { render, screen, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), notFound: vi.fn() }))
+vi.mock('@/lib/guides/queries', () => ({ getPublishedGuides: async () => [] }))
 
 import LocaleHome from '@/app/[locale]/page'
 import en from '@/lib/i18n/messages/en'

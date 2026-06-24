@@ -381,7 +381,7 @@ export interface Messages {
     howHeading: string; howSub: string
     step1Title: string; step1Desc: string; step2Title: string; step2Desc: string
     step3Title: string; step3Desc: string; step4Title: string; step4Desc: string
-    merchantWall: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string
+    merchantWall: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
     travelersTitle: string; travelersDesc: string; travelersCta: string
     merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
@@ -895,9 +895,10 @@ const messages: Messages = {
     step4Title: 'Publish and earn',
     step4Desc: 'Turn guides, partner links, and briefs into payouts.',
     merchantWall: 'Partner stamps',
-    featuredHeading: 'Creator passes this week',
-    featuredSub: 'Real handles, city proof, and score signals.',
+    featuredHeading: 'Featured guides',
+    featuredSub: 'Real city guides published by KINNSO creators.',
     featuredSeeAll: 'See all',
+    featuredEmpty: 'No published guides yet — be the first to publish one.',
     travelersTitle: 'For Travelers',
     travelersDesc: 'Follow real creators, save guide tickets, and book the exact same spots.',
     travelersCta: 'Explore Guides',
