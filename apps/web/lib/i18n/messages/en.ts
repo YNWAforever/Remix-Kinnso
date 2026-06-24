@@ -224,6 +224,16 @@ export interface Messages {
     brandSendBrief: string
     brandSaveToList: string
     brandSignInToContact: string
+    nichesHeading: string
+    pillarsHeading: string
+    toneHeading: string
+    audienceRegionsLabel: string
+    audienceLocalesLabel: string
+    languagesHeading: string
+    platformsHeading: string
+    verifiedLabel: string
+    guidesHeading: string
+    guidesEmpty: string
   }
   merchants: {
     heading: string
@@ -481,6 +491,11 @@ export interface Messages {
     step4Title: string; step4Desc: string
     featuredHeading: string; featuredSub: string
     ctaTitle: string; ctaDesc: string; ctaButton: string
+    directoryHeading: string
+    directorySub: string
+    directoryEmpty: string
+    viewProfile: string
+    guideCount: string
   }
   merchantsLanding: {
     heroPill: string; heroTitle: string; heroSubtitle: string
@@ -742,6 +757,16 @@ const messages: Messages = {
     brandSendBrief: 'Send a brief →',
     brandSaveToList: 'Save to list',
     brandSignInToContact: 'Sign in as merchant to contact',
+    nichesHeading: 'Niches',
+    pillarsHeading: 'Content pillars',
+    toneHeading: 'Tone',
+    audienceRegionsLabel: 'Top regions',
+    audienceLocalesLabel: 'Audience locales',
+    languagesHeading: 'Languages',
+    platformsHeading: 'Platforms',
+    verifiedLabel: 'Verified',
+    guidesHeading: 'Published guides',
+    guidesEmpty: 'No published guides yet.',
   },
   merchants: {
     heading: 'Find the right creator',
@@ -1061,6 +1086,11 @@ const messages: Messages = {
     step4Title: 'Earn missions', step4Desc: 'Publish Guides and get paid.',
     featuredHeading: 'Creators already earning', featuredSub: 'Real handles, scored by our AI Agent.',
     ctaTitle: 'Ready to apply?', ctaDesc: 'It takes two minutes and a couple of handles.', ctaButton: 'Start your application',
+    directoryHeading: 'Browse creators',
+    directorySub: "Real KINNSO creators and the city guides they've published.",
+    directoryEmpty: 'No creators have published a profile yet. Check back soon.',
+    viewProfile: 'View profile',
+    guideCount: '{count} Guides',
   },
   merchantsLanding: {
     heroPill: 'For Merchants',

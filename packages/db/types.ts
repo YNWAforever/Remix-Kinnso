@@ -677,23 +677,32 @@ export type Database = {
       }
       creators: {
         Row: {
+          bio: string | null
           created_at: string
           display_name: string | null
+          handle: string | null
           id: string
+          public_profile: Json | null
           status: string
           updated_at: string
         }
         Insert: {
+          bio?: string | null
           created_at?: string
           display_name?: string | null
+          handle?: string | null
           id: string
+          public_profile?: Json | null
           status?: string
           updated_at?: string
         }
         Update: {
+          bio?: string | null
           created_at?: string
           display_name?: string | null
+          handle?: string | null
           id?: string
+          public_profile?: Json | null
           status?: string
           updated_at?: string
         }
