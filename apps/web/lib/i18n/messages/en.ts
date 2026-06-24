@@ -18,6 +18,10 @@ export interface Messages {
     emailSentUseAnother: string
     alreadyHaveAccount: string
     noAccount: string
+    signUpCreatorTitle: string
+    signUpCreatorSubtitle: string
+    termsPrefix: string
+    termsLink: string
     errorInvalidCredentials: string
     errorEmailTaken: string
     errorInvalidEmail: string
@@ -525,6 +529,10 @@ const messages: Messages = {
     emailSentUseAnother: 'Use another email',
     alreadyHaveAccount: 'Already have an account?',
     noAccount: 'Don\'t have an account?',
+    signUpCreatorTitle: 'Apply as a creator',
+    signUpCreatorSubtitle: 'Create your account, scan your Creator DNA, and start earning with KINNSO.',
+    termsPrefix: 'By creating an account you agree to our',
+    termsLink: 'Creator Terms',
     errorInvalidCredentials: 'Invalid email or password.',
     errorEmailTaken: 'An account with this email already exists.',
     errorInvalidEmail: 'Enter a valid email address.',
