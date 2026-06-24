@@ -40,10 +40,10 @@ async function getAuthedCreator(supabase: Supabase) {
   if (error || !user) return null
   const { data: creator } = await supabase
     .from('creators')
-    .select('display_name')
+    .select('display_name, handle')
     .eq('id', user.id)
     .single()
-  return { id: user.id, displayName: creator?.display_name ?? null }
+  return { id: user.id, displayName: creator?.display_name ?? null, handle: creator?.handle ?? null }
 }
 
 async function revalidate(paths: string[]) {
@@ -75,7 +75,7 @@ export async function createGuideAction(
   if (!creator) return formError('Sign in is required')
 
   const name = creator.displayName?.trim() || 'Creator'
-  const handle = slugify(name)
+  const handle = creator.handle ?? slugify(name)
   const slug = makeSlug(input.title, randomUUID().slice(0, 6))
 
   const payload: GuideInsert = {
