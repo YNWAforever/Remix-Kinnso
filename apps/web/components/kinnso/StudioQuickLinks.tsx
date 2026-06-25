@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Inbox, PenSquare, Sparkles, Tag, Target, Wallet } from 'lucide-react'
+import { ArrowRight, Inbox, PenSquare, Sparkles, Tag, Target, Trophy, Wallet } from 'lucide-react'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
@@ -10,6 +10,7 @@ export function StudioQuickLinks({ locale, t }: { locale: Locale; t: Messages['s
   const tools = [
     { href: '/studio/scan', title: t.scanTitle, desc: t.scanDesc, live: true, icon: <Sparkles aria-hidden="true" className="h-5 w-5" /> },
     { href: '/studio/missions', title: t.missionsTitle, desc: t.missionsDesc, live: true, icon: <Target aria-hidden="true" className="h-5 w-5" /> },
+    { href: '/studio/tier', title: t.tierTitle, desc: t.tierDesc, live: true, icon: <Trophy aria-hidden="true" className="h-5 w-5" /> },
     { href: '/studio/earnings', title: t.earningsTitle, desc: t.earningsDesc, live: true, icon: <Wallet aria-hidden="true" className="h-5 w-5" /> },
     { href: '/studio/offers', title: t.offersTitle, desc: t.offersDesc, live: true, icon: <Tag aria-hidden="true" className="h-5 w-5" /> },
     { href: '/studio/inbox', title: t.inboxTitle, desc: t.inboxDesc, live: false, icon: <Inbox aria-hidden="true" className="h-5 w-5" /> },
