@@ -12,7 +12,6 @@ const EVENT_LABEL_KEY = {
 } as const
 
 export function StudioTierView({
-  locale: _locale,
   t,
   contribution,
   events,
