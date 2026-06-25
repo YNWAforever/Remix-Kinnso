@@ -66,7 +66,7 @@ describe('POST /api/copilot', () => {
     const res = await POST(req({ messages: [{ role: 'user', parts: [{ type: 'text', text: 'ideas?' }] }], locale: 'en' }))
     expect(res.status).toBe(200)
     expect(streamTextMock).toHaveBeenCalledTimes(1)
-    const arg = streamTextMock.mock.calls[0][0] as { system: string; tools: Record<string, unknown> }
+    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { system: string; tools: Record<string, unknown> }
     expect(arg.system).toContain('japan')
     expect(Object.keys(arg.tools)).toContain('n8n') // rising unlocks the tool
   })
@@ -74,7 +74,7 @@ describe('POST /api/copilot', () => {
   it('omits the n8n tool for seed creators', async () => {
     tierMock.mockResolvedValueOnce('seed')
     await POST(req({ messages: [{ role: 'user', parts: [{ type: 'text', text: 'hi' }] }], locale: 'en' }))
-    const arg = streamTextMock.mock.calls[0][0] as { tools: Record<string, unknown> }
+    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { tools: Record<string, unknown> }
     expect(Object.keys(arg.tools)).toHaveLength(0)
   })
 

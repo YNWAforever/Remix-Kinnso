@@ -10,16 +10,17 @@ export interface CopilotMessageRow {
   created_at: string
 }
 
-/** The creator's active (non-archived) thread, oldest first. */
+/** The creator's active (non-archived) thread: the most-recent `limit` messages,
+ *  returned oldest-first for chronological display. */
 export async function getRecentMessages(supabase: Client, creatorId: string, limit = 50): Promise<CopilotMessageRow[]> {
   const { data } = await supabase
     .from('copilot_messages')
     .select('id, role, content, created_at')
     .eq('creator_id', creatorId)
     .eq('archived', false)
-    .order('created_at', { ascending: true })
+    .order('created_at', { ascending: false })
     .limit(limit)
-  return (data ?? []) as CopilotMessageRow[]
+  return ((data ?? []) as CopilotMessageRow[]).reverse()
 }
 
 export async function appendMessage(
@@ -39,8 +40,9 @@ export async function appendMessage(
 }
 
 /** Count this creator's USER messages since UTC midnight (the daily rate-limit window).
- *  Only counts non-archived messages so that archiving a thread (New chat) does not
- *  carry forward stale quota consumption within the same UTC day. */
+ *  Counts ALL user rows regardless of archived state: the daily cap is an abuse/cost
+ *  ceiling that MUST survive a "New chat" (which archives the active thread). Filtering
+ *  by archived here would let a creator reset their quota by starting a new chat. */
 export async function countUserMessagesToday(supabase: Client, creatorId: string): Promise<number> {
   const now = new Date()
   const startIso = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString()
@@ -49,7 +51,6 @@ export async function countUserMessagesToday(supabase: Client, creatorId: string
     .select('id', { count: 'exact', head: true })
     .eq('creator_id', creatorId)
     .eq('role', 'user')
-    .eq('archived', false)
     .gte('created_at', startIso)
   return count ?? 0
 }

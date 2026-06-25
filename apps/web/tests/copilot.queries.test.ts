@@ -73,15 +73,17 @@ describe('copilot queries', () => {
     expect(await countUserMessagesToday(makeClient() as never, 'c1')).toBe(7)
   })
 
-  it('countUserMessagesToday filters by creatorId, user role, archived=false, and UTC midnight', async () => {
+  it('countUserMessagesToday filters by creatorId, user role, and UTC midnight — but NOT by archived (quota survives New chat)', async () => {
     state.count = 3
     const before = new Date()
     const expectedStartIso = new Date(Date.UTC(before.getUTCFullYear(), before.getUTCMonth(), before.getUTCDate())).toISOString()
     await countUserMessagesToday(makeClient() as never, 'c1')
-    // creator_id, role=user, archived=false must all be eq filters
+    // creator_id and role=user must be eq filters
     expect(state.countFilters).toContainEqual(['creator_id', 'c1'])
     expect(state.countFilters).toContainEqual(['role', 'user'])
-    expect(state.countFilters).toContainEqual(['archived', false])
+    // archived MUST NOT be a filter — the daily cap is a cost ceiling that a "New chat"
+    // (which archives the thread) must not be able to reset.
+    expect(state.countFilters).not.toContainEqual(['archived', false])
     // the gte filter must be the UTC-midnight ISO string
     const gteEntry = state.countFilters.find(([col]) => col === 'created_at')
     expect(gteEntry).toBeDefined()

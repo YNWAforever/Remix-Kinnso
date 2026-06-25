@@ -53,6 +53,11 @@ export async function POST(req: Request) {
     ? { n8n: makeN8nTool({ id: user.id, niches: dna.niches, locales: dna.audience.top_locales ?? [] }) }
     : {}
 
+  // The try/catch only guards SYNCHRONOUS setup errors (e.g. convertToModelMessages on
+  // malformed input). Gateway/auth/credit failures resolve lazily and surface DURING the
+  // stream — after a 200 is sent — so they cannot be caught here; `onError` makes them
+  // observable server-side (the default just console.errors with no context) and the
+  // client renders them via useChat's status==='error'.
   try {
     const result = streamText({
       model: policy.model,
@@ -60,6 +65,9 @@ export async function POST(req: Request) {
       messages: await convertToModelMessages(messages),
       tools,
       stopWhen: stepCountIs(5),
+      onError: ({ error }) => {
+        console.error('[copilot] stream error', error)
+      },
       onFinish: async ({ text: out }: { text: string }) => {
         if (out) await appendMessage(supabase, user.id, 'assistant', out)
       },
