@@ -342,6 +342,13 @@ const messages: Messages = {
     missionsEmptyBody: 'โพสต์ภารกิจแรกของคุณเพื่อเริ่มทำงานร่วมกับครีเอเตอร์',
     postMissionCta: 'โพสต์ภารกิจ',
     creatorFallback: 'ครีเอเตอร์',
+    locked: 'ล็อกตามระดับ',
+    lockedHelp: 'ไปถึงระดับนี้เพื่อปลดล็อกภารกิจนี้',
+    minTierLabel: 'ระดับขั้นต่ำ',
+    minTierOpen: 'เปิดให้ทุกคน',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: 'ภารกิจ',
@@ -652,6 +659,9 @@ const messages: Messages = {
     eventMission: 'ยืนยันภารกิจแล้ว',
     eventScan: 'สแกน DNA เสร็จแล้ว',
     pointsSuffix: 'แต้ม',
+    unlocksHeading: 'สิ่งที่ปลดล็อก',
+    unlocksMissions: 'ภารกิจต้องใช้ระดับนี้',
+    unlocksHelp: 'เลื่อนระดับเพื่อเข้าร่วมภารกิจพิเศษ',
   },
 }
 export default messages

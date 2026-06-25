@@ -342,6 +342,13 @@ const messages: Messages = {
     missionsEmptyBody: '發佈你的第一個任務，開始與創作者合作。',
     postMissionCta: '發佈任務',
     creatorFallback: '創作者',
+    locked: '等級鎖定',
+    lockedHelp: '達到此等級即可解鎖此任務。',
+    minTierLabel: '最低等級',
+    minTierOpen: '對所有人開放',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: '任務',
@@ -652,6 +659,9 @@ const messages: Messages = {
     eventMission: '任務已驗證',
     eventScan: 'DNA 掃描完成',
     pointsSuffix: '分',
+    unlocksHeading: '你可解鎖的內容',
+    unlocksMissions: '個任務需要此等級',
+    unlocksHelp: '提升等級即可參加專屬任務。',
   },
 }
 export default messages

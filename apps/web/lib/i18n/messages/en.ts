@@ -344,6 +344,13 @@ export interface Messages {
     missionsEmptyBody: string
     postMissionCta: string
     creatorFallback: string
+    locked: string
+    lockedHelp: string
+    minTierLabel: string
+    minTierOpen: string
+    minTierRising: string
+    minTierPro: string
+    minTierElite: string
   }
   missionDetail: {
     back: string
@@ -569,6 +576,9 @@ export interface Messages {
     currentLabel: string
     allTiersHeading: string
     unlocksPlaceholder: string
+    unlocksHeading: string
+    unlocksMissions: string
+    unlocksHelp: string
     historyHeading: string
     historyEmpty: string
     eventGuide: string
@@ -920,6 +930,13 @@ const messages: Messages = {
     missionsEmptyBody: 'Post your first mission to start working with creators.',
     postMissionCta: 'Post a mission',
     creatorFallback: 'Creator',
+    locked: 'Tier locked',
+    lockedHelp: 'Reach this tier to unlock this mission.',
+    minTierLabel: 'Minimum tier',
+    minTierOpen: 'Open to all',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: 'Missions',
@@ -1230,6 +1247,9 @@ const messages: Messages = {
     eventMission: 'Mission verified',
     eventScan: 'DNA scan completed',
     pointsSuffix: 'pts',
+    unlocksHeading: 'What you unlock',
+    unlocksMissions: 'missions need this tier',
+    unlocksHelp: 'Climb tiers to join exclusive missions.',
   },
 }
 export default messages

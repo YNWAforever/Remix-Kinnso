@@ -342,6 +342,13 @@ const messages: Messages = {
     missionsEmptyBody: '첫 미션을 등록하고 크리에이터와 협업을 시작하세요.',
     postMissionCta: '미션 등록',
     creatorFallback: '크리에이터',
+    locked: '등급 잠김',
+    lockedHelp: '이 등급에 도달하면 미션이 열립니다.',
+    minTierLabel: '최소 등급',
+    minTierOpen: '전체 공개',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: '미션',
@@ -652,6 +659,9 @@ const messages: Messages = {
     eventMission: '미션 인증',
     eventScan: 'DNA 스캔 완료',
     pointsSuffix: 'pt',
+    unlocksHeading: '잠금 해제 항목',
+    unlocksMissions: '개 미션이 이 등급을 요구합니다',
+    unlocksHelp: '등급을 올리면 독점 미션에 참여할 수 있습니다.',
   },
 }
 export default messages

@@ -342,6 +342,13 @@ const messages: Messages = {
     missionsEmptyBody: '最初のミッションを投稿して、クリエイターとの協業を始めましょう。',
     postMissionCta: 'ミッションを投稿',
     creatorFallback: 'クリエイター',
+    locked: 'ティアロック',
+    lockedHelp: 'このティアに到達するとミッションが解放されます。',
+    minTierLabel: '最低ティア',
+    minTierOpen: '全員に公開',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: 'ミッション一覧',
@@ -652,6 +659,9 @@ const messages: Messages = {
     eventMission: 'ミッション認証',
     eventScan: 'DNAスキャン完了',
     pointsSuffix: 'pt',
+    unlocksHeading: 'アンロック内容',
+    unlocksMissions: '件のミッションがこのティアを必要とします',
+    unlocksHelp: 'ティアを上げると限定ミッションに参加できます。',
   },
 }
 export default messages

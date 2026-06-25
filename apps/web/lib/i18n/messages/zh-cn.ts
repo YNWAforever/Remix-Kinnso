@@ -342,6 +342,13 @@ const messages: Messages = {
     missionsEmptyBody: '发布你的第一个任务，开始与创作者合作。',
     postMissionCta: '发布任务',
     creatorFallback: '创作者',
+    locked: '等级锁定',
+    lockedHelp: '达到该等级即可解锁此任务。',
+    minTierLabel: '最低等级',
+    minTierOpen: '面向所有人',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: '任务',
@@ -652,6 +659,9 @@ const messages: Messages = {
     eventMission: '任务已验证',
     eventScan: 'DNA 扫描完成',
     pointsSuffix: '分',
+    unlocksHeading: '你可解锁的内容',
+    unlocksMissions: '个任务需要此等级',
+    unlocksHelp: '提升等级即可参加专属任务。',
   },
 }
 export default messages
