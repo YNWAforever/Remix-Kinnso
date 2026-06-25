@@ -54,3 +54,18 @@ export function progressToNext(points: number): TierProgress {
   const pct = Math.min(100, Math.max(0, Math.round((into / band) * 100)))
   return { tier, nextTier: next.tier, points: p, pointsIntoTier: into, pointsForNext: next.min - p, pct }
 }
+
+/** Tiers that can gate a mission. `seed` is excluded — everyone is >= seed, so a
+ *  seed gate is meaningless and `null` is the canonical "open to all" value. */
+export type GatedTier = Exclude<Tier, 'seed'>
+
+/** Position of a tier in the ladder. Mirrors SQL public.contribution_tier_rank. */
+export function tierRank(tier: Tier): number {
+  return TIERS.indexOf(tier)
+}
+
+/** True when `creatorTier` satisfies `required`. A null requirement is always met. */
+export function meetsTier(creatorTier: Tier, required: GatedTier | null): boolean {
+  if (required === null) return true
+  return tierRank(creatorTier) >= tierRank(required)
+}
