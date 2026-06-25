@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   lastInsert: null as unknown,
   lastUpdate: null as unknown,
   filters: [] as Array<[string, unknown]>,
+  countFilters: [] as Array<[string, unknown]>,
 }))
 
 function makeClient() {
@@ -19,11 +20,11 @@ function makeClient() {
     order: () => b,
     limit: () => Promise.resolve({ data: state.rows }),
   }
-  // count head-select resolves directly
+  // count head-select resolves after chaining eq/gte; captures args for assertion
   const countB: Record<string, unknown> = {
     select: () => countB,
-    eq: () => countB,
-    gte: () => Promise.resolve({ count: state.count }),
+    eq: (col: string, val: unknown) => { state.countFilters.push([col, val]); return countB },
+    gte: (col: string, val: unknown) => { state.countFilters.push([col, val]); return Promise.resolve({ count: state.count }) },
   }
   return {
     from: (table: string) => {
@@ -33,13 +34,20 @@ function makeClient() {
       return {
         ...b,
         select: (_cols?: unknown, opts?: { head?: boolean }) => (opts?.head ? countB : b),
-        update: (v: unknown) => { state.lastUpdate = v; const u: Record<string, unknown> = { eq: () => u, then: (r: (x: unknown) => void) => r({ error: null }) }; return u },
+        update: (v: unknown) => {
+          state.lastUpdate = v
+          const u: Record<string, unknown> = {
+            eq: (col: string, val: unknown) => { state.filters.push([col, val]); return u },
+            then: (r: (x: unknown) => void) => r({ error: null }),
+          }
+          return u
+        },
       }
     },
   }
 }
 
-beforeEach(() => { state.rows = []; state.count = 0; state.lastInsert = null; state.lastUpdate = null; state.filters = [] })
+beforeEach(() => { state.rows = []; state.count = 0; state.lastInsert = null; state.lastUpdate = null; state.filters = []; state.countFilters = [] })
 
 describe('copilot queries', () => {
   it('getRecentMessages returns rows', async () => {
@@ -47,6 +55,12 @@ describe('copilot queries', () => {
     const out = await getRecentMessages(makeClient() as never, 'c1')
     expect(out).toHaveLength(1)
     expect(out[0].content).toBe('hi')
+  })
+
+  it('getRecentMessages filters to archived=false', async () => {
+    state.rows = []
+    await getRecentMessages(makeClient() as never, 'c1')
+    expect(state.filters).toContainEqual(['archived', false])
   })
 
   it('appendMessage inserts the creator_id, role and content', async () => {
@@ -57,6 +71,21 @@ describe('copilot queries', () => {
   it('countUserMessagesToday returns the count', async () => {
     state.count = 7
     expect(await countUserMessagesToday(makeClient() as never, 'c1')).toBe(7)
+  })
+
+  it('countUserMessagesToday filters by creatorId, user role, archived=false, and UTC midnight', async () => {
+    state.count = 3
+    const before = new Date()
+    const expectedStartIso = new Date(Date.UTC(before.getUTCFullYear(), before.getUTCMonth(), before.getUTCDate())).toISOString()
+    await countUserMessagesToday(makeClient() as never, 'c1')
+    // creator_id, role=user, archived=false must all be eq filters
+    expect(state.countFilters).toContainEqual(['creator_id', 'c1'])
+    expect(state.countFilters).toContainEqual(['role', 'user'])
+    expect(state.countFilters).toContainEqual(['archived', false])
+    // the gte filter must be the UTC-midnight ISO string
+    const gteEntry = state.countFilters.find(([col]) => col === 'created_at')
+    expect(gteEntry).toBeDefined()
+    expect(gteEntry![1]).toBe(expectedStartIso)
   })
 
   it('archiveThread sets archived true', async () => {

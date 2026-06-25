@@ -29,15 +29,18 @@ export async function appendMessage(
   content: string,
   toolCalls?: unknown,
 ): Promise<void> {
-  await supabase.from('copilot_messages').insert({
+  const { error } = await supabase.from('copilot_messages').insert({
     creator_id: creatorId,
     role,
     content,
     tool_calls: (toolCalls as never) ?? null,
   })
+  if (error) throw new Error(`appendMessage failed: ${error.message}`)
 }
 
-/** Count this creator's USER messages since UTC midnight (the daily rate-limit window). */
+/** Count this creator's USER messages since UTC midnight (the daily rate-limit window).
+ *  Only counts non-archived messages so that archiving a thread (New chat) does not
+ *  carry forward stale quota consumption within the same UTC day. */
 export async function countUserMessagesToday(supabase: Client, creatorId: string): Promise<number> {
   const now = new Date()
   const startIso = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString()
@@ -46,15 +49,17 @@ export async function countUserMessagesToday(supabase: Client, creatorId: string
     .select('id', { count: 'exact', head: true })
     .eq('creator_id', creatorId)
     .eq('role', 'user')
+    .eq('archived', false)
     .gte('created_at', startIso)
   return count ?? 0
 }
 
 /** Start a "New chat": archive the creator's current active thread (history is kept). */
 export async function archiveThread(supabase: Client, creatorId: string): Promise<void> {
-  await supabase
+  const { error } = await supabase
     .from('copilot_messages')
     .update({ archived: true })
     .eq('creator_id', creatorId)
     .eq('archived', false)
+  if (error) throw new Error(`archiveThread failed: ${error.message}`)
 }
