@@ -170,6 +170,26 @@ describe('mission actions builders', () => {
     vi.resetModules()
     await expect(import('@/lib/missions/actions')).resolves.toBeTruthy()
   })
+
+  it('carries min_tier into the mission insert payload', () => {
+    const payload = buildMissionInsert({
+      input: { ...missionDraftFixture, minTier: 'pro' },
+      merchantProfileId: 'merchant-profile-1',
+      opsMemberId: null,
+      publish: true,
+    })
+    expect(payload.min_tier).toBe('pro')
+  })
+
+  it('defaults min_tier to null when the draft is open to all', () => {
+    const payload = buildMissionInsert({
+      input: { ...missionDraftFixture, minTier: null },
+      merchantProfileId: 'merchant-profile-1',
+      opsMemberId: null,
+      publish: false,
+    })
+    expect(payload.min_tier).toBeNull()
+  })
 })
 
 describe('createMissionAction', () => {

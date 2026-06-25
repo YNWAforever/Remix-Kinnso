@@ -79,6 +79,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
     paidFeeAmount: includesPaid ? numberOrNull(paidFeeAmount) : null,
     paidFeeCurrency: includesPaid ? textOrNull(paidFeeCurrency) : null,
     affiliateNetworkProgramId: null,
+    minTier: null,
     milestones: includesPaid && milestoneTitle.trim() !== ''
       ? [{ title: milestoneTitle, description: milestoneDescription.trim() || milestoneTitle }]
       : [],
