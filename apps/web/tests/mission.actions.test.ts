@@ -358,6 +358,66 @@ describe('joinMissionAction', () => {
   })
 })
 
+describe('joinMissionAction tier gate', () => {
+  it('rejects a creator below the mission minimum tier', async () => {
+    const supabase = createSupabaseMock({
+      kinnso_ops_members: createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }),
+      merchant_profiles: createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }),
+      missions: createBuilder({
+        single: vi.fn(async () => ({
+          data: { id: 'mission-1', mission_type: 'hybrid', mission_source: 'merchant', min_tier: 'pro' },
+          error: null,
+        })),
+      }),
+      creator_contribution: createBuilder({ maybeSingle: vi.fn(async () => ({ data: { tier: 'rising' }, error: null })) }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await joinMissionAction({ missionId: 'mission-1', locale: 'en' })
+
+    expect(result.ok).toBe(false)
+  })
+
+  it('allows a creator at or above the mission minimum tier', async () => {
+    const supabase = createSupabaseMock({
+      kinnso_ops_members: createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }),
+      merchant_profiles: createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }),
+      missions: createBuilder({
+        single: vi.fn(async () => ({
+          data: { id: 'mission-1', mission_type: 'hybrid', mission_source: 'merchant', min_tier: 'pro' },
+          error: null,
+        })),
+      }),
+      creator_contribution: createBuilder({ maybeSingle: vi.fn(async () => ({ data: { tier: 'elite' }, error: null })) }),
+      mission_participants: createBuilder({ single: vi.fn(async () => ({ data: { id: 'participant-1' }, error: null })) }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await joinMissionAction({ missionId: 'mission-1', locale: 'en' })
+
+    expect(result).toEqual({ ok: true, participantId: 'participant-1' })
+  })
+
+  it('allows joining an open (null min_tier) mission without reading tier', async () => {
+    const supabase = createSupabaseMock({
+      kinnso_ops_members: createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }),
+      merchant_profiles: createBuilder({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) }),
+      missions: createBuilder({
+        single: vi.fn(async () => ({
+          data: { id: 'mission-2', mission_type: 'coupon_affiliate', mission_source: 'merchant', min_tier: null },
+          error: null,
+        })),
+      }),
+      mission_participants: createBuilder({ single: vi.fn(async () => ({ data: { id: 'participant-2' }, error: null })) }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await joinMissionAction({ missionId: 'mission-2', locale: 'en' })
+
+    expect(result).toEqual({ ok: true, participantId: 'participant-2' })
+  })
+})
+
 describe('reviewSubmissionAction', () => {
   it('returns an error when the submission update returns no row', async () => {
     const submissionUpdateBuilder = createBuilder({
