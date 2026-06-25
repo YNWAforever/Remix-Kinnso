@@ -519,6 +519,44 @@ export type Database = {
         }
         Relationships: []
       }
+      copilot_messages: {
+        Row: {
+          archived: boolean
+          content: string
+          created_at: string
+          creator_id: string
+          id: string
+          role: string
+          tool_calls: Json | null
+        }
+        Insert: {
+          archived?: boolean
+          content: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          role: string
+          tool_calls?: Json | null
+        }
+        Update: {
+          archived?: boolean
+          content?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          role?: string
+          tool_calls?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_messages_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_contribution: {
         Row: {
           contribution_points: number
