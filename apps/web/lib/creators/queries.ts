@@ -96,3 +96,29 @@ export async function getCreatorByHandle(handle: string): Promise<PublicCreator 
     guides: (guideRows ?? []).map(mapRowToGuide),
   }
 }
+
+export interface CreatorPublicName {
+  name: string
+  handle: string | null
+}
+
+export async function getCreatorPublicNames(
+  ids: string[],
+): Promise<Map<string, CreatorPublicName>> {
+  const unique = [...new Set(ids.filter(Boolean))]
+  const map = new Map<string, CreatorPublicName>()
+  if (unique.length === 0) return map
+
+  const supabase = createSupabasePublicClient()
+  const { data } = await supabase
+    .from('creators')
+    .select('id, handle, display_name')
+    .in('id', unique)
+
+  for (const c of data ?? []) {
+    const handle = (c.handle as string | null) ?? null
+    const name = (c.display_name ?? handle) as string
+    if (name) map.set(c.id as string, { name, handle })
+  }
+  return map
+}

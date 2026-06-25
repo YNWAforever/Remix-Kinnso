@@ -26,7 +26,11 @@ describe('Footer', () => {
     expect(aboutLinks).toHaveLength(1)
     expect(screen.queryByText(en.footer.lCaseStudies)).toBeNull()
     expect(screen.queryByText(en.footer.lPress)).toBeNull()
-    expect(screen.queryByText(en.footer.lContact)).toBeNull()
+  })
+
+  it('links Contact to the real contact route', () => {
+    render(<Footer locale="en" t={en.footer} />)
+    expect(screen.getByRole('link', { name: en.footer.lContact }).getAttribute('href')).toBe('/en/contact')
   })
 
   it('does not render non-functional social labels', () => {

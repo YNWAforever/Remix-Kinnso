@@ -2,7 +2,7 @@ export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
   breadcrumb: { home: string; articles: string }
-  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string }
+  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
   auth: {
@@ -337,6 +337,13 @@ export interface Messages {
     myMissionsEmpty: string
     availableEmpty: string
     viewDetails: string
+    postSuccessTitle: string
+    postSuccessBody: string
+    viewMission: string
+    missionsEmptyTitle: string
+    missionsEmptyBody: string
+    postMissionCta: string
+    creatorFallback: string
   }
   missionDetail: {
     back: string
@@ -400,7 +407,21 @@ export interface Messages {
     travelersTitle: string; travelersDesc: string; travelersCta: string
     merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
+  about: {
+    eyebrow: string; title: string; intro: string
+    missionHeading: string; missionBody: string
+    creatorsHeading: string; creatorsBody: string
+    merchantsHeading: string; merchantsBody: string
+    ctaHeading: string; ctaBody: string; ctaButton: string
+  }
+  contact: {
+    eyebrow: string; title: string; intro: string
+    emailLabel: string; emailCta: string; responseNote: string
+  }
   comingSoon: { heading: string; body: string; back: string }
+  creatorTerms: {
+    eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
+  }
   agent: {
     heroPill: string; heroTitle: string; heroSubtitle: string
     heroCta: string; heroSecondaryCta: string
@@ -538,7 +559,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
   breadcrumb: { home: 'Home', articles: 'Articles' },
-  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By' },
+  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: 'This article isn’t available in your language yet — showing the original version.' },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
   pagination: { prev: 'Previous', next: 'Next', page: 'Page' },
   auth: {
@@ -869,6 +890,13 @@ const messages: Messages = {
     myMissionsEmpty: "You haven't joined any missions yet.",
     availableEmpty: 'No missions available right now. Check back soon.',
     viewDetails: 'View details',
+    postSuccessTitle: 'Mission posted',
+    postSuccessBody: 'Your mission is live. Manage applications and submissions from the mission page.',
+    viewMission: 'View mission',
+    missionsEmptyTitle: 'No missions yet',
+    missionsEmptyBody: 'Post your first mission to start working with creators.',
+    postMissionCta: 'Post a mission',
+    creatorFallback: 'Creator',
   },
   missionDetail: {
     back: 'Missions',
@@ -951,9 +979,38 @@ const messages: Messages = {
     merchantsDesc: 'Issue a mission ticket and match with creators who already own the route.',
     merchantsCta: 'Post a Mission',
   },
+  about: {
+    eyebrow: 'About KINNSO',
+    title: 'A creator-first travel & lifestyle community.',
+    intro: 'KINNSO helps travel and lifestyle creators turn real expertise into published guides, brand missions, and affiliate earnings — with the tools and the audience to grow.',
+    missionHeading: 'What we do',
+    missionBody: 'We connect creators with merchants and travellers across Hong Kong, Taipei, Tokyo and beyond. Creators publish guides, join brand missions, and earn through affiliate offers; merchants reach trusted local voices.',
+    creatorsHeading: 'For creators',
+    creatorsBody: 'Build a public profile, publish guides, and join real missions and affiliate offers — paid honestly, with no fabricated metrics.',
+    merchantsHeading: 'For merchants',
+    merchantsBody: 'Post a mission, work with vetted creators, and track participation through a transparent pipeline.',
+    ctaHeading: 'Want to create with KINNSO?',
+    ctaBody: 'Apply as a creator and start building your profile today.',
+    ctaButton: 'Apply as a creator',
+  },
+  contact: {
+    eyebrow: 'Contact',
+    title: 'Get in touch.',
+    intro: 'Questions, partnerships, or press? Email us and we’ll get back to you.',
+    emailLabel: 'Email',
+    emailCta: 'Email us',
+    responseNote: 'We typically reply within a few business days.',
+  },
   comingSoon: {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
+    back: 'Back to home',
+  },
+  creatorTerms: {
+    eyebrow: 'Creator terms',
+    title: 'Creator Terms (MVP draft)',
+    draftNotice: 'This is an early draft of our creator terms for KINNSO’s soft launch. It is written in plain language, is not a final legal contract, and may change. We’ll notify creators of material updates.',
+    englishNotice: 'These terms are currently provided in English only.',
     back: 'Back to home',
   },
   agent: {

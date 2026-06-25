@@ -26,7 +26,7 @@ export const CreatorMatchCard: React.FC<Props> = ({ creator, saved, locale, onTo
   const locs = creatorLocations.filter((l) => l.creatorHandle === creator.handle).slice(0, 5);
   const topPosts = creatorPosts.filter((p) => p.creatorHandle === creator.handle && p.isTravel).slice(0, 3);
   const history = engagementHistory.filter((h) => h.creatorHandle === creator.handle);
-  const briefHref = `/${locale}/merchants/post?creator=${encodeURIComponent(creator.handle)}`;
+  const briefHref = `/${locale}/merchants/post`;
 
   return (
     <article className="k-ticket overflow-hidden">

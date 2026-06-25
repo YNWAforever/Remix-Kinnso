@@ -47,6 +47,12 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
+vi.mock('@/lib/creators/queries', () => ({
+  getCreatorPublicNames: vi.fn(async () =>
+    new Map([['creator-12345678', { name: 'Maya Wanders', handle: 'maya' }]]),
+  ),
+}))
+
 import MerchantMissionDetailPage from '@/app/[locale]/merchants/missions/[missionId]/page'
 import en from '@/lib/i18n/messages/en'
 
@@ -60,7 +66,7 @@ describe('/[locale]/merchants/missions/[missionId] host', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Hybrid mission' })).toBeTruthy()
     expect(screen.getByRole('heading', { level: 2, name: en.missions.submitMilestone })).toBeTruthy()
-    expect(screen.getAllByText('Creator creator-')).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: 'Maya Wanders' })[0].getAttribute('href')).toBe('/en/c/maya')
     expect(screen.getByText('Verified signal')).toBeTruthy()
   })
 })

@@ -12,6 +12,7 @@ vi.mock('@/lib/supabase/public', () => {
       select: () => builder,
       eq: () => builder,
       not: () => builder,
+      in: () => builder,
       order: () => Promise.resolve({ data: resolveData() }),
       maybeSingle: async () => ({ data: single ? single() : null }),
       then: (onF: (v: { data: unknown }) => unknown) =>
@@ -29,7 +30,7 @@ vi.mock('@/lib/supabase/public', () => {
   }
 })
 
-import { getPublicCreators, getCreatorByHandle } from '@/lib/creators/queries'
+import { getPublicCreators, getCreatorByHandle, getCreatorPublicNames } from '@/lib/creators/queries'
 
 const creatorRow = {
   id: 'c1',
@@ -90,5 +91,28 @@ describe('getCreatorByHandle', () => {
   it('returns null for an unknown handle', async () => {
     state.single = null
     expect(await getCreatorByHandle('nobody')).toBeNull()
+  })
+})
+
+describe('getCreatorPublicNames', () => {
+  it('maps ids to display_name (falling back to handle)', async () => {
+    state.creators = [
+      { id: 'c1', handle: 'maya', display_name: 'Maya Wanders' },
+      { id: 'c2', handle: 'leo', display_name: null },
+    ]
+    const map = await getCreatorPublicNames(['c1', 'c2'])
+    expect(map.get('c1')).toEqual({ name: 'Maya Wanders', handle: 'maya' })
+    expect(map.get('c2')).toEqual({ name: 'leo', handle: 'leo' })
+  })
+
+  it('omits ids with no public row and dedupes/ignores empties', async () => {
+    state.creators = [{ id: 'c1', handle: 'maya', display_name: 'Maya Wanders' }]
+    const map = await getCreatorPublicNames(['c1', 'c1', '', 'unknown'])
+    expect(map.size).toBe(1)
+    expect(map.get('unknown')).toBeUndefined()
+  })
+
+  it('returns an empty map for no ids', async () => {
+    expect((await getCreatorPublicNames([])).size).toBe(0)
   })
 })

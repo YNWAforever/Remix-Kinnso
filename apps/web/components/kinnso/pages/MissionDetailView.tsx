@@ -16,8 +16,8 @@ type SocialSignalStatus = 'verified_signal' | 'needs_review' | 'unavailable'
 export type MissionDetail = {
   id: string
   title: string
-  participants: Array<{ id: string; creatorName: string; status: string }>
-  submissions: Array<{ id: string; creatorName?: string; status: string; snapshotStatus?: SocialSignalStatus }>
+  participants: Array<{ id: string; creatorName: string; creatorHandle?: string | null; status: string }>
+  submissions: Array<{ id: string; creatorName?: string; creatorHandle?: string | null; status: string; snapshotStatus?: SocialSignalStatus }>
 }
 
 type MissionDetailViewProps = {
@@ -69,7 +69,13 @@ export function MissionDetailView({
           {mission.participants.map((participant) => (
             <article key={participant.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="font-bold text-kinnso-ink">{participant.creatorName}</h3>
+                {participant.creatorHandle ? (
+                  <Link href={`/${locale}/c/${participant.creatorHandle}`} className="font-bold text-kinnso-ink hover:text-kinnso-orange hover:underline">
+                    {participant.creatorName}
+                  </Link>
+                ) : (
+                  <h3 className="font-bold text-kinnso-ink">{participant.creatorName}</h3>
+                )}
                 <MissionStatusBadge status={participant.status} />
               </div>
               {participant.status === 'applied' && (
@@ -94,7 +100,13 @@ export function MissionDetailView({
             {mission.submissions.map((submission) => (
               <article key={submission.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-2">
-                  <h3 className="font-bold text-kinnso-ink">{submission.creatorName ?? submission.id}</h3>
+                  {submission.creatorHandle && submission.creatorName ? (
+                    <Link href={`/${locale}/c/${submission.creatorHandle}`} className="font-bold text-kinnso-ink hover:text-kinnso-orange hover:underline">
+                      {submission.creatorName}
+                    </Link>
+                  ) : (
+                    <h3 className="font-bold text-kinnso-ink">{submission.creatorName ?? submission.id}</h3>
+                  )}
                   <div className="flex flex-wrap gap-2">
                     <MissionStatusBadge status={submission.status} />
                     <SocialSignalBadge status={submission.snapshotStatus ?? 'unavailable'} />
