@@ -10,6 +10,8 @@ import { StudioReadinessChecklist } from '@/components/kinnso/StudioReadinessChe
 import { StudioQuickLinks } from '@/components/kinnso/StudioQuickLinks'
 import { AddHandleDialog } from '@/components/kinnso/AddHandleDialog'
 import { StudioRescanButton } from '@/components/kinnso/StudioRescanButton'
+import { TierProgressCard } from '@/components/kinnso/TierProgressCard'
+import type { CreatorContribution } from '@/lib/contribution/queries'
 
 export interface OpportunityPreview {
   id: string
@@ -32,10 +34,12 @@ export interface StudioDashboardViewProps {
   platforms: Platform[]
   missingPlatforms: Platform[]
   activeJobId: string | null
+  contribution: CreatorContribution
+  tierT: Messages['tier']
 }
 
 export function StudioDashboardView(props: StudioDashboardViewProps) {
-  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, opportunities, earnings, platforms, missingPlatforms, activeJobId } = props
+  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT } = props
   const p = (path: string) => `/${locale}${path}`
 
   return (
@@ -51,6 +55,9 @@ export function StudioDashboardView(props: StudioDashboardViewProps) {
 
         {/* 2. DNA snapshot */}
         <DnaSnapshotCard locale={locale} t={t} dna={dna} lastScanned={lastScanned} />
+
+        {/* 2b. Tier progress */}
+        <TierProgressCard locale={locale} t={tierT} contribution={contribution} />
 
         {/* 3. Readiness checklist (hero) with interactive slots */}
         <StudioReadinessChecklist

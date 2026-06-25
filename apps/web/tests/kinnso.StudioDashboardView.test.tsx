@@ -4,6 +4,7 @@ import { render, screen, cleanup } from '@testing-library/react'
 import en from '@/lib/i18n/messages/en'
 import type { Dna } from '@kinnso/scan'
 import { computeReadiness } from '@/lib/studio/readiness'
+import { progressToNext } from '@/lib/contribution/tiers'
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
 
@@ -39,6 +40,8 @@ const baseProps = {
   platforms: ['instagram' as const],
   missingPlatforms: ['youtube' as const, 'threads' as const],
   activeJobId: null,
+  contribution: progressToNext(0),
+  tierT: en.tier,
 }
 
 describe('StudioDashboardView', () => {
@@ -79,5 +82,19 @@ describe('StudioDashboardView', () => {
     )
     expect(screen.getByRole('link', { name: 'Stay at Hotel X' }).getAttribute('href')).toBe('/en/studio/missions/m1')
     expect(screen.getByRole('link', { name: 'Klook affiliate' }).getAttribute('href')).toBe('/en/studio/offers')
+  })
+
+  it('renders the tier progress card', () => {
+    render(
+      <StudioDashboardView
+        {...baseProps}
+        opportunities={[]}
+        earnings={[]}
+        contribution={progressToNext(55)}
+        tierT={en.tier}
+      />,
+    )
+    expect(screen.getByText(en.tier.cardTitle)).toBeTruthy()
+    expect(screen.getByText('Rising')).toBeTruthy()
   })
 })
