@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Messages } from '@/lib/i18n/messages/en'
+import type { GatedTier } from '@/lib/contribution/tiers'
 import type {
   MissionDraftInput,
   MissionType,
@@ -45,6 +46,7 @@ const firstActionError = (errors: Record<string, string[]> | undefined) =>
 export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [missionType, setMissionType] = useState<MissionType>('coupon_affiliate')
   const [visibility, setVisibility] = useState<MissionVisibility>('open')
+  const [minTier, setMinTier] = useState<'open' | GatedTier>('open')
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
   const [couponCode, setCouponCode] = useState('')
@@ -79,7 +81,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
     paidFeeAmount: includesPaid ? numberOrNull(paidFeeAmount) : null,
     paidFeeCurrency: includesPaid ? textOrNull(paidFeeCurrency) : null,
     affiliateNetworkProgramId: null,
-    minTier: null,
+    minTier: minTier === 'open' ? null : minTier,
     milestones: includesPaid && milestoneTitle.trim() !== ''
       ? [{ title: milestoneTitle, description: milestoneDescription.trim() || milestoneTitle }]
       : [],
@@ -202,6 +204,33 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
                   value={value}
                   checked={visibility === value}
                   onChange={() => setVisibility(value as MissionVisibility)}
+                  className="sr-only"
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset className="grid gap-3">
+          <legend className="text-sm font-semibold text-kinnso-ink">{t.minTierLabel}</legend>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ['open', t.minTierOpen],
+              ['rising', t.minTierRising],
+              ['pro', t.minTierPro],
+              ['elite', t.minTierElite],
+            ].map(([value, label]) => (
+              <label
+                key={value}
+                className={minTier === value ? 'k-btn-primary cursor-pointer' : 'k-btn-ghost cursor-pointer'}
+              >
+                <input
+                  type="radio"
+                  name="minTier"
+                  value={value}
+                  checked={minTier === value}
+                  onChange={() => setMinTier(value as 'open' | GatedTier)}
                   className="sr-only"
                 />
                 {label}
