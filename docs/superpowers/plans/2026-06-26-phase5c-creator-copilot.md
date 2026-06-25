@@ -6,7 +6,7 @@
 
 **Architecture:** A Next.js POST route handler (`/api/copilot`) authenticates the creator, loads DNA + tier, enforces a per-tier daily message cap, builds a DNA system prompt, and runs `streamText` with an n8n tool (gated to rising+). The client view uses `@ai-sdk/react` `useChat`. Messages persist in a creator-private `copilot_messages` table (owner RLS, anon revoked) as one rolling thread. All tier logic reuses `lib/contribution/tiers`.
 
-**Tech Stack:** Next.js 16.2.9 (modified — read `node_modules/next/dist/docs/` first), React 19, TypeScript, Vercel AI SDK v5 (`ai` + `@ai-sdk/react`, gateway provider), Zod, Supabase (hosted `scryfkefedzuetfdtrvl`), vitest.
+**Tech Stack:** Next.js 16.2.9 (modified — read `node_modules/next/dist/docs/` first), React 19, TypeScript, Vercel AI SDK **v6** (`ai`@6.0.x + `@ai-sdk/react`@3.0.x, gateway provider), Zod v3, Supabase (hosted `scryfkefedzuetfdtrvl`), vitest.
 
 **Spec:** `docs/superpowers/specs/2026-06-26-phase5c-creator-copilot-design.md`
 
@@ -18,7 +18,7 @@
 - **Run a single test (from `apps/web/`):** `npx vitest run tests/<file>` (host/component tests start with `// @vitest-environment jsdom`).
 - **Creator-gate pattern (server page):** `const supabase = await createSupabaseServerClient(); const { data:{ user } } = await supabase.auth.getUser(); if (!user) redirect(\`/${loc}/sign-in\`); const role = await resolveViewerRole(supabase); if (role !== 'creator') notFound()`.
 - **DNA shape:** `{ bio: string; niches: string[]; content_pillars: string[]; tone: string[]; audience: { top_geos?: string[]; top_locales?: string[] }; platforms: { platform: string; followers?: number; avg_engagement?: number; post_cadence?: string; verified: false }[]; languages: string[] }`.
-- **AI SDK v5 is newer than your training data.** Before Tasks 8 & 9, read `node_modules/ai/README.md` (or `node_modules/ai/dist/**` types) and `node_modules/@ai-sdk/react` for the exact `streamText` / `toUIMessageStreamResponse` / `useChat` / `DefaultChatTransport` / `convertToModelMessages` / `UIMessage` surface. The tests mock these modules, so the testable logic does not depend on getting the streaming internals exactly right — but the runtime code must match the installed version.
+- **AI SDK v6 — verified facts (already probed against the installed `node_modules`):** `ai` exports `streamText`, `tool`, `stepCountIs`, `convertToModelMessages`, `DefaultChatTransport`, and the integrated **gateway** (so a bare model string like `'anthropic/claude-…'` routes through the Vercel AI Gateway). `tool({ inputSchema, execute })` uses **`inputSchema`** (NOT `parameters`). `streamText({ tools, stopWhen, onFinish })` and `result.toUIMessageStreamResponse()` exist. `useChat()` (from `@ai-sdk/react`@3) returns `{ messages, sendMessage, status, setMessages, … }`. The plan's code already matches these. Still skim `node_modules/@ai-sdk/react/dist/index.d.ts` for the exact `useChat` options shape (initial-messages/transport) before Task 9 — tests mock these modules, so green bar isn't blocked by drift, but runtime code must match.
 - **No `Date.now()` ban here** — that restriction is only for Workflow scripts. App runtime code may use `new Date()`.
 
 ## File structure
@@ -559,7 +559,7 @@ export function makeN8nTool(creator: N8nCreatorContext) {
 }
 ```
 
-> If the installed `ai` version names the schema field `parameters` instead of `inputSchema`, follow the installed types (read `node_modules/ai`). The test only exercises `callN8n`, so this won't block the green bar — but fix it for the route to typecheck.
+> Verified: AI SDK v6's `tool()` uses `inputSchema` (as written above). The test only exercises `callN8n`, so the tool wrapper won't block the green bar — but it must typecheck for the route.
 
 - [ ] **Step 4: Run to verify pass**
 
