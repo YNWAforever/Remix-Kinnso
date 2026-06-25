@@ -20,6 +20,9 @@ vi.mock('@/lib/contribution/queries', () => ({
   getCreatorContribution: getContribMock,
   listContributionEvents: listEventsMock,
 }))
+vi.mock('@/lib/missions/queries', () => ({
+  countGatedMissionsByTier: vi.fn(async () => ({ rising: 0, pro: 0, elite: 0 })),
+}))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
     auth: { getUser: async () => ({ data: { user: { id: 'creator-user-1' } } }) },

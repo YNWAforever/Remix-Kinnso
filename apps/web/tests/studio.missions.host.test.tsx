@@ -40,6 +40,10 @@ vi.mock('@/lib/missions/queries', () => ({
   listCreatorMerchantMissions: listCreatorMerchantMissionsMock,
 }))
 
+vi.mock('@/lib/contribution/queries', () => ({
+  getCreatorStoredTier: vi.fn(async () => 'seed'),
+}))
+
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
     auth: {
