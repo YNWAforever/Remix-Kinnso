@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
-import { progressToNext, type TierProgress, type ContributionEventType } from '@/lib/contribution/tiers'
+import { progressToNext, type TierProgress, type ContributionEventType, type Tier } from '@/lib/contribution/tiers'
 
 export type CreatorContribution = TierProgress
 
@@ -15,6 +15,24 @@ export async function getCreatorContribution(
     .eq('creator_id', creatorId)
     .maybeSingle()
   return progressToNext(data?.contribution_points ?? 0)
+}
+
+/**
+ * Owner-scoped read of the *stored* contribution tier column — the authoritative
+ * value used for mission gating (the enforcement path in joinMissionAction and the
+ * display paths on the studio mission pages). Distinct from getCreatorContribution,
+ * which derives a TierProgress from points. A missing row defaults to 'seed' (open).
+ */
+export async function getCreatorStoredTier(
+  supabase: SupabaseClient<Database>,
+  creatorId: string,
+): Promise<Tier> {
+  const { data } = await supabase
+    .from('creator_contribution')
+    .select('tier')
+    .eq('creator_id', creatorId)
+    .maybeSingle()
+  return (data?.tier as Tier | undefined) ?? 'seed'
 }
 
 export interface ContributionEvent {

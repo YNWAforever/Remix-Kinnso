@@ -19,7 +19,8 @@ import {
   validateSettlementUpdate,
   validateSubmission,
 } from '@/lib/missions/validation'
-import { meetsTier, type GatedTier, type Tier } from '@/lib/contribution/tiers'
+import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
+import { getCreatorStoredTier } from '@/lib/contribution/queries'
 
 type MissionInsert = Database['public']['Tables']['missions']['Insert']
 type MissionMilestoneInsert = Database['public']['Tables']['mission_milestones']['Insert']
@@ -313,12 +314,7 @@ export async function joinMissionAction(
   if (missionError || !mission) return formError('Mission is not available')
 
   if (mission.min_tier) {
-    const { data: contribution } = await supabase
-      .from('creator_contribution')
-      .select('tier')
-      .eq('creator_id', user.id)
-      .maybeSingle()
-    const creatorTier = (contribution?.tier as Tier | undefined) ?? 'seed'
+    const creatorTier = await getCreatorStoredTier(supabase, user.id)
     if (!meetsTier(creatorTier, mission.min_tier as GatedTier)) {
       return formError(`This mission requires the ${mission.min_tier} tier`)
     }

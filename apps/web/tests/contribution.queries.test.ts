@@ -23,7 +23,7 @@ function makeClient() {
   }
 }
 
-import { getCreatorContribution, listContributionEvents } from '@/lib/contribution/queries'
+import { getCreatorContribution, getCreatorStoredTier, listContributionEvents } from '@/lib/contribution/queries'
 
 beforeEach(() => {
   state.contribution = null
@@ -46,6 +46,18 @@ describe('getCreatorContribution', () => {
     expect(c.tier).toBe('seed')
     expect(c.points).toBe(0)
     expect(c.pct).toBe(0)
+  })
+})
+
+describe('getCreatorStoredTier', () => {
+  it('returns the stored tier column verbatim', async () => {
+    state.contribution = { tier: 'pro' }
+    expect(await getCreatorStoredTier(makeClient() as never, 'creator-1')).toBe('pro')
+  })
+
+  it('defaults a creator with no contribution row to seed', async () => {
+    state.contribution = null
+    expect(await getCreatorStoredTier(makeClient() as never, 'creator-1')).toBe('seed')
   })
 })
 

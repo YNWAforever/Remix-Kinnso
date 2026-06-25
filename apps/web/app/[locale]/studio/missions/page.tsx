@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { CreatorMissionsView, type CreatorMissionCard } from '@/components/kinnso/pages/CreatorMissionsView'
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { meetsTier, type GatedTier, type Tier } from '@/lib/contribution/tiers'
+import { getCreatorStoredTier } from '@/lib/contribution/queries'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { creatorMissionProgress } from '@/lib/missions/list'
@@ -131,12 +132,7 @@ export default async function StudioMissionsPage({ params }: { params: Params })
   const role = await resolveViewerRole(supabase)
   if (role !== 'creator') notFound()
 
-  const { data: contribution } = await supabase
-    .from('creator_contribution')
-    .select('tier')
-    .eq('creator_id', user.id)
-    .maybeSingle()
-  const creatorTier = (contribution?.tier as Tier | undefined) ?? 'seed'
+  const creatorTier = await getCreatorStoredTier(supabase, user.id)
 
   const { data } = await listCreatorMerchantMissions(supabase)
   const missions = ((data ?? []) as unknown as CreatorMissionRow[]).map((row) =>
