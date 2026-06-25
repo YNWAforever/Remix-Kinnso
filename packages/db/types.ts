@@ -1284,6 +1284,7 @@ export type Database = {
           id: string
           kinnso_commission_rate: number | null
           merchant_profile_id: string | null
+          min_tier: string | null
           mission_source: string
           mission_type: string
           paid_fee_amount: number | null
@@ -1310,6 +1311,7 @@ export type Database = {
           id?: string
           kinnso_commission_rate?: number | null
           merchant_profile_id?: string | null
+          min_tier?: string | null
           mission_source?: string
           mission_type: string
           paid_fee_amount?: number | null
@@ -1336,6 +1338,7 @@ export type Database = {
           id?: string
           kinnso_commission_rate?: number | null
           merchant_profile_id?: string | null
+          min_tier?: string | null
           mission_source?: string
           mission_type?: string
           paid_fee_amount?: number | null
@@ -1411,6 +1414,7 @@ export type Database = {
         Args: { p_points: number }
         Returns: string
       }
+      contribution_tier_rank: { Args: { p_tier: string }; Returns: number }
       create_travelpayouts_partner_link: {
         Args: {
           p_affiliate_network_program_id: string
