@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const { streamTextMock, getUserMock, roleMock, tierMock, countMock, appendMock, configuredMock, dnaRow } = vi.hoisted(() => ({
-  streamTextMock: vi.fn((_opts: { system: string; tools: Record<string, unknown> }) => ({ toUIMessageStreamResponse: () => new Response('stream', { status: 200 }) })),
+  streamTextMock: vi.fn(() => ({ toUIMessageStreamResponse: () => new Response('stream', { status: 200 }) })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'creator-1' } } })),
   roleMock: vi.fn(async () => 'creator'),
   tierMock: vi.fn(async () => 'rising'),

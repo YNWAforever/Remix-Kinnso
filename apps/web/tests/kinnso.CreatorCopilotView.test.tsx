@@ -7,7 +7,7 @@ afterEach(cleanup)
 
 const useChatMock = vi.hoisted(() => vi.fn())
 vi.mock('@ai-sdk/react', () => ({ useChat: useChatMock }))
-vi.mock('ai', () => ({ DefaultChatTransport: class { constructor(_: unknown) {} } }))
+vi.mock('ai', () => ({ DefaultChatTransport: class {} }))
 
 import { CreatorCopilotView } from '@/components/kinnso/pages/CreatorCopilotView'
 
