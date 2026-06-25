@@ -7,30 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -538,6 +518,73 @@ export type Database = {
           views?: number
         }
         Relationships: []
+      }
+      creator_contribution: {
+        Row: {
+          contribution_points: number
+          creator_id: string
+          tier: string
+          tier_updated_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          contribution_points?: number
+          creator_id: string
+          tier?: string
+          tier_updated_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contribution_points?: number
+          creator_id?: string
+          tier?: string
+          tier_updated_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_contribution_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: true
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_contribution_events: {
+        Row: {
+          created_at: string
+          creator_id: string
+          event_type: string
+          id: string
+          points: number
+          source_id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          event_type: string
+          id?: string
+          points: number
+          source_id: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          event_type?: string
+          id?: string
+          points?: number
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_contribution_events_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       creator_dna: {
         Row: {
@@ -1351,6 +1398,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      award_contribution_event: {
+        Args: {
+          p_creator_id: string
+          p_event_type: string
+          p_points: number
+          p_source_id: string
+        }
+        Returns: undefined
+      }
+      contribution_tier_for_points: {
+        Args: { p_points: number }
+        Returns: string
+      }
       create_travelpayouts_partner_link: {
         Args: {
           p_affiliate_network_program_id: string
@@ -1360,8 +1420,12 @@ export type Database = {
           p_partner_url: string
           p_sub_id: string
         }
-        Returns: { id: string; partner_url: string }[]
+        Returns: {
+          id: string
+          partner_url: string
+        }[]
       }
+      creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
       get_you_may_like: {
         Args: { p_article_id: string; p_limit?: number; p_locale: string }
         Returns: {
@@ -1373,6 +1437,18 @@ export type Database = {
         }[]
       }
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
+      recompute_creator_contribution: {
+        Args: { p_creator_id: string }
+        Returns: undefined
+      }
+      revoke_contribution_event: {
+        Args: {
+          p_creator_id: string
+          p_event_type: string
+          p_source_id: string
+        }
+        Returns: undefined
+      }
       search_articles: {
         Args: {
           p_category?: string
@@ -1395,6 +1471,7 @@ export type Database = {
           url: string
         }[]
       }
+      slugify: { Args: { input: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
@@ -1523,9 +1600,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
