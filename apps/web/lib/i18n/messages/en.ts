@@ -575,7 +575,6 @@ export interface Messages {
     pageSubtitle: string
     currentLabel: string
     allTiersHeading: string
-    unlocksPlaceholder: string
     unlocksHeading: string
     unlocksMissions: string
     unlocksHelp: string
@@ -1240,7 +1239,6 @@ const messages: Messages = {
     pageSubtitle: 'Earn points from real activity to climb tiers.',
     currentLabel: 'Current tier',
     allTiersHeading: 'All tiers',
-    unlocksPlaceholder: 'Perks and unlocks arrive soon.',
     historyHeading: 'Points history',
     historyEmpty: 'No points yet — publish a guide or complete a mission to get started.',
     eventGuide: 'Guide published',

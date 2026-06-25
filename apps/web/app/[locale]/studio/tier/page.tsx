@@ -4,6 +4,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { getCreatorContribution, listContributionEvents } from '@/lib/contribution/queries'
+import { countGatedMissionsByTier } from '@/lib/missions/queries'
 import { StudioTierView } from '@/components/kinnso/pages/StudioTierView'
 
 export function generateStaticParams() {
@@ -22,10 +23,11 @@ export default async function StudioTierPage({ params }: { params: Promise<{ loc
   const role = await resolveViewerRole(supabase)
   if (role !== 'creator') redirect(`/${loc}/studio`)
 
-  const [contribution, events] = await Promise.all([
+  const [contribution, events, gatedCounts] = await Promise.all([
     getCreatorContribution(supabase, user.id),
     listContributionEvents(supabase, user.id),
+    countGatedMissionsByTier(supabase),
   ])
 
-  return <StudioTierView t={messages.tier} contribution={contribution} events={events} />
+  return <StudioTierView t={messages.tier} contribution={contribution} events={events} gatedCounts={gatedCounts} />
 }

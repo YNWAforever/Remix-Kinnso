@@ -652,7 +652,6 @@ const messages: Messages = {
     pageSubtitle: '実際の活動でポイントを獲得し、ティアを上げましょう。',
     currentLabel: '現在のティア',
     allTiersHeading: 'すべてのティア',
-    unlocksPlaceholder: '特典とアンロックは近日公開予定です。',
     historyHeading: 'ポイント履歴',
     historyEmpty: 'まだポイントがありません。ガイドを公開するかミッションを完了して始めましょう。',
     eventGuide: 'ガイド公開',

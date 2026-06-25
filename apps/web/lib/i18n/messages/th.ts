@@ -652,7 +652,6 @@ const messages: Messages = {
     pageSubtitle: 'รับแต้มจากกิจกรรมจริงเพื่อเลื่อนระดับ',
     currentLabel: 'ระดับปัจจุบัน',
     allTiersHeading: 'ทุกระดับ',
-    unlocksPlaceholder: 'สิทธิประโยชน์และการปลดล็อกจะมาเร็ว ๆ นี้',
     historyHeading: 'ประวัติแต้ม',
     historyEmpty: 'ยังไม่มีแต้ม — เผยแพร่ไกด์หรือทำภารกิจให้สำเร็จเพื่อเริ่มต้น',
     eventGuide: 'เผยแพร่ไกด์แล้ว',

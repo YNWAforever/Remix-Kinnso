@@ -652,7 +652,6 @@ const messages: Messages = {
     pageSubtitle: '通过真实活动赚取积分，提升等级。',
     currentLabel: '当前等级',
     allTiersHeading: '全部等级',
-    unlocksPlaceholder: '权益与解锁即将推出。',
     historyHeading: '积分记录',
     historyEmpty: '还没有积分 — 发布攻略或完成任务即可开始。',
     eventGuide: '攻略已发布',

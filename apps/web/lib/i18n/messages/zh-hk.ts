@@ -652,7 +652,6 @@ const messages: Messages = {
     pageSubtitle: '透過真實活動賺取積分，提升等級。',
     currentLabel: '目前等級',
     allTiersHeading: '全部等級',
-    unlocksPlaceholder: '權益與解鎖即將推出。',
     historyHeading: '積分記錄',
     historyEmpty: '仲未有積分 — 發佈攻略或完成任務就可以開始。',
     eventGuide: '攻略已發佈',

@@ -1,6 +1,7 @@
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { CreatorContribution, ContributionEvent } from '@/lib/contribution/queries'
 import { TIER_THRESHOLDS } from '@/lib/contribution/tiers'
+import type { GatedTier } from '@/lib/contribution/tiers'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import TierBadge from '@/components/kinnso/TierBadge'
 
@@ -14,10 +15,12 @@ export function StudioTierView({
   t,
   contribution,
   events,
+  gatedCounts,
 }: {
   t: Messages['tier']
   contribution: CreatorContribution
   events: ContributionEvent[]
+  gatedCounts: Record<GatedTier, number>
 }) {
   const { tier, points } = contribution
   return (
@@ -52,7 +55,22 @@ export function StudioTierView({
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-sm text-kinnso-muted">{t.unlocksPlaceholder}</p>
+        </TicketCard>
+
+        {/* What you unlock */}
+        <TicketCard className="p-5">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.unlocksHeading}</h2>
+          <ul className="mt-3 space-y-2">
+            {(['rising', 'pro', 'elite'] as const).map((gt) => (
+              <li key={gt} className="flex items-center justify-between">
+                <TierBadge tier={gt} />
+                <span className="k-mono text-sm text-kinnso-muted">
+                  {gatedCounts[gt]} {t.unlocksMissions}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm text-kinnso-muted">{t.unlocksHelp}</p>
         </TicketCard>
 
         {/* Points history */}

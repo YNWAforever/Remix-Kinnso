@@ -652,7 +652,6 @@ const messages: Messages = {
     pageSubtitle: '실제 활동으로 포인트를 모아 등급을 올리세요.',
     currentLabel: '현재 등급',
     allTiersHeading: '전체 등급',
-    unlocksPlaceholder: '혜택과 잠금 해제가 곧 제공됩니다.',
     historyHeading: '포인트 내역',
     historyEmpty: '아직 포인트가 없습니다 — 가이드를 게시하거나 미션을 완료해 시작하세요.',
     eventGuide: '가이드 게시',
