@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   merchantMissionSelect,
   creatorMissionSelect,
+  creatorMissionDetailSelect,
   affiliateOfferSelect,
   opsSettlementSelect,
   creatorSettlementSelect,
   listAffiliateOffers,
   listCreatorMerchantMissions,
   listCreatorSettlements,
+  countGatedMissionsByTier,
 } from '@/lib/missions/queries'
 
 describe('mission query projections', () => {
@@ -74,5 +76,36 @@ describe('mission query projections', () => {
 
     expect(supabase.from).toHaveBeenCalledWith('mission_settlements')
     expect(query.order).toHaveBeenCalledWith('updated_at', { ascending: false })
+  })
+})
+
+describe('countGatedMissionsByTier', () => {
+  it('counts published open merchant missions per gated tier', async () => {
+    const query = { eq: vi.fn(), not: vi.fn(), select: vi.fn() }
+    query.eq.mockReturnValue(query)
+    query.not.mockReturnValue(query)
+    query.select.mockReturnValue(query)
+    // terminal: `not(...)` returns the awaited result
+    query.not.mockResolvedValue({
+      data: [{ min_tier: 'pro' }, { min_tier: 'pro' }, { min_tier: 'elite' }],
+      error: null,
+    })
+    const supabase = { from: vi.fn(() => query) }
+
+    const counts = await countGatedMissionsByTier(supabase as never)
+
+    expect(supabase.from).toHaveBeenCalledWith('missions')
+    expect(query.eq).toHaveBeenCalledWith('status', 'published')
+    expect(query.eq).toHaveBeenCalledWith('mission_source', 'merchant')
+    expect(query.eq).toHaveBeenCalledWith('visibility', 'open')
+    expect(query.not).toHaveBeenCalledWith('min_tier', 'is', null)
+    expect(counts).toEqual({ rising: 0, pro: 2, elite: 1 })
+  })
+})
+
+describe('creator mission selects', () => {
+  it('include min_tier so the UI can gate', () => {
+    expect(creatorMissionSelect).toContain('min_tier')
+    expect(creatorMissionDetailSelect).toContain('min_tier')
   })
 })
