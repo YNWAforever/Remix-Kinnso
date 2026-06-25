@@ -497,6 +497,8 @@ const messages: Messages = {
     inboxTitle: '收件箱', inboxDesc: '来自商家的消息。',
     guidesTitle: '攻略', guidesDesc: '撰写并发布你的攻略。',
     tierTitle: '等级', tierDesc: '你的贡献积分与等级。',
+    copilotTitle: '副驾驶',
+    copilotDesc: '与 AI 副驾驶对话，获取创意、文案和内容灵感。',
   },
   studioDashboard: {
     greeting: '欢迎回来，{name}',
@@ -661,6 +663,23 @@ const messages: Messages = {
     unlocksHeading: '你可解锁的内容',
     unlocksMissions: '个任务需要此等级',
     unlocksHelp: '提升等级即可参加专属任务。',
+  },
+  copilot: {
+    title: '创作者副驾驶',
+    subtitle: '根据你的创作者 DNA 调校的 AI 副驾驶。询问创意、文案或发布计划。',
+    inputPlaceholder: '向副驾驶提问…',
+    send: '发送',
+    newChat: '新对话',
+    emptyTitle: '开始对话',
+    emptyBody: '试试："给我下次旅行的 5 个 Reel 创意" 或 "帮我写一篇京都美食攻略的文案"。',
+    limitTitle: '今日额度已用完',
+    limitBody: '你已用完今日所有的副驾驶消息。',
+    limitUpsell: '提升等级以增加每日消息额度。',
+    toolWorking: '处理中…',
+    errorGeneric: '出现了错误，请再试一次。',
+    unconfiguredTitle: '副驾驶尚未开启',
+    unconfiguredBody: '副驾驶即将在此处上线，请稍后再来查看。',
+    disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
 }
 export default messages

@@ -497,6 +497,8 @@ const messages: Messages = {
     inboxTitle: '받은 편지함', inboxDesc: '판매자로부터의 메시지.',
     guidesTitle: '가이드', guidesDesc: '가이드를 작성하고 게시하세요.',
     tierTitle: '등급', tierDesc: '기여 포인트와 등급.',
+    copilotTitle: '코파일럿',
+    copilotDesc: 'AI 코파일럿과 채팅하여 아이디어, 캡션, 콘텐츠를 상담하세요.',
   },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',
@@ -661,6 +663,23 @@ const messages: Messages = {
     unlocksHeading: '잠금 해제 항목',
     unlocksMissions: '개 미션이 이 등급을 요구합니다',
     unlocksHelp: '등급을 올리면 독점 미션에 참여할 수 있습니다.',
+  },
+  copilot: {
+    title: '크리에이터 코파일럿',
+    subtitle: '나의 크리에이터 DNA에 맞춰진 AI 코파일럿. 아이디어, 캡션, 게시 계획을 물어보세요.',
+    inputPlaceholder: '코파일럿에게 무엇이든 물어보세요…',
+    send: '전송',
+    newChat: '새 채팅',
+    emptyTitle: '대화를 시작하세요',
+    emptyBody: '"다음 여행을 위한 릴 아이디어 5가지 알려줘" 또는 "교토 음식 가이드 캡션 작성해줘" 같이 시도해 보세요.',
+    limitTitle: '오늘의 한도에 도달했습니다',
+    limitBody: '오늘의 코파일럿 메시지를 모두 사용했습니다.',
+    limitUpsell: '등급을 올려 하루 한도를 늘리세요.',
+    toolWorking: '처리 중…',
+    errorGeneric: '오류가 발생했습니다. 다시 시도해 주세요.',
+    unconfiguredTitle: '코파일럿이 아직 활성화되지 않았습니다',
+    unconfiguredBody: '코파일럿은 곧 이곳에서 이용 가능합니다. 잠시 후 다시 확인해 주세요.',
+    disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
 }
 export default messages

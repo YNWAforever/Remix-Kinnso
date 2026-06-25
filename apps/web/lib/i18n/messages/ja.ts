@@ -497,6 +497,8 @@ const messages: Messages = {
     inboxTitle: '受信箱', inboxDesc: '加盟店からのメッセージ。',
     guidesTitle: 'ガイド', guidesDesc: 'ガイドを作成して公開。',
     tierTitle: 'ティア', tierDesc: '貢献ポイントとティア。',
+    copilotTitle: 'コパイロット',
+    copilotDesc: 'AIコパイロットとチャットして、アイデア、キャプション、コンテンツを相談しましょう。',
   },
   studioDashboard: {
     greeting: 'おかえりなさい、{name}さん',
@@ -661,6 +663,23 @@ const messages: Messages = {
     unlocksHeading: 'アンロック内容',
     unlocksMissions: '件のミッションがこのティアを必要とします',
     unlocksHelp: 'ティアを上げると限定ミッションに参加できます。',
+  },
+  copilot: {
+    title: 'クリエイターコパイロット',
+    subtitle: 'あなたのクリエイターDNAに合わせたAIコパイロット。アイデア、キャプション、投稿プランを相談できます。',
+    inputPlaceholder: 'コパイロットに何でも聞いてみましょう…',
+    send: '送信',
+    newChat: '新しいチャット',
+    emptyTitle: '会話を始めましょう',
+    emptyBody: '「次の旅でリール動画のアイデアを5つ教えて」や「京都グルメガイドのキャプションを作って」など試してみてください。',
+    limitTitle: '本日の上限に達しました',
+    limitBody: '今日のコパイロットメッセージをすべて使い切りました。',
+    limitUpsell: 'ティアをアップグレードして、1日あたりの上限を増やしましょう。',
+    toolWorking: '処理中…',
+    errorGeneric: 'エラーが発生しました。もう一度お試しください。',
+    unconfiguredTitle: 'コパイロットはまだ利用できません',
+    unconfiguredBody: 'コパイロットはまもなくこちらでご利用いただけます。しばらくお待ちください。',
+    disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
 }
 export default messages

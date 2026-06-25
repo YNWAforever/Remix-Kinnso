@@ -497,6 +497,8 @@ const messages: Messages = {
     inboxTitle: '收件箱', inboxDesc: '來自商家的訊息。',
     guidesTitle: '攻略', guidesDesc: '撰寫並發佈你的攻略。',
     tierTitle: '等級', tierDesc: '你的貢獻積分同等級。',
+    copilotTitle: '副機師',
+    copilotDesc: '同 AI 副機師傾偈，搵創意、文案同內容靈感。',
   },
   studioDashboard: {
     greeting: '歡迎返嚟，{name}',
@@ -661,6 +663,23 @@ const messages: Messages = {
     unlocksHeading: '你可解鎖的內容',
     unlocksMissions: '個任務需要此等級',
     unlocksHelp: '提升等級即可參加專屬任務。',
+  },
+  copilot: {
+    title: '創作者副機師',
+    subtitle: '根據你嘅創作者 DNA 調校嘅 AI 副機師。問佢要創意、文案或發帖計劃。',
+    inputPlaceholder: '問副機師任何嘢…',
+    send: '發送',
+    newChat: '新對話',
+    emptyTitle: '開始對話',
+    emptyBody: '試試：「畀我下次旅行嘅 5 個 Reel 創意」或「幫我寫京都美食攻略嘅文案」。',
+    limitTitle: '今日額度用完咗',
+    limitBody: '你已用完今日所有副機師消息。',
+    limitUpsell: '提升等級以增加每日消息額度。',
+    toolWorking: '處理中…',
+    errorGeneric: '出現咗錯誤，請再試一次。',
+    unconfiguredTitle: '副機師未開啟',
+    unconfiguredBody: '副機師即將喺此處上線，請稍後再嚟睇睇。',
+    disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
 }
 export default messages

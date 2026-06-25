@@ -497,6 +497,8 @@ const messages: Messages = {
     inboxTitle: '收件匣', inboxDesc: '來自商家的訊息。',
     guidesTitle: '攻略', guidesDesc: '撰寫並發佈你的攻略。',
     tierTitle: '等級', tierDesc: '你的貢獻積分與等級。',
+    copilotTitle: '副駕駛',
+    copilotDesc: '與 AI 副駕駛對話，獲取創意、文案和內容靈感。',
   },
   studioDashboard: {
     greeting: '歡迎回來，{name}',
@@ -661,6 +663,23 @@ const messages: Messages = {
     unlocksHeading: '你可解鎖的內容',
     unlocksMissions: '個任務需要此等級',
     unlocksHelp: '提升等級即可參加專屬任務。',
+  },
+  copilot: {
+    title: '創作者副駕駛',
+    subtitle: '根據你的創作者 DNA 調校的 AI 副駕駛。詢問創意、文案或發布計劃。',
+    inputPlaceholder: '向副駕駛提問…',
+    send: '傳送',
+    newChat: '新對話',
+    emptyTitle: '開始對話',
+    emptyBody: '試試：「給我下次旅行的 5 個 Reel 創意」或「幫我寫京都美食攻略的文案」。',
+    limitTitle: '今日額度已用完',
+    limitBody: '你已用完今日所有副駕駛訊息。',
+    limitUpsell: '提升等級以增加每日訊息額度。',
+    toolWorking: '處理中…',
+    errorGeneric: '發生錯誤，請再試一次。',
+    unconfiguredTitle: '副駕駛尚未開啟',
+    unconfiguredBody: '副駕駛即將在此處上線，請稍後再來查看。',
+    disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
 }
 export default messages

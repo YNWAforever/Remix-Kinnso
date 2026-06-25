@@ -450,6 +450,8 @@ export interface Messages {
     guidesTitle: string; guidesDesc: string
     tierTitle: string
     tierDesc: string
+    copilotTitle: string
+    copilotDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -584,6 +586,16 @@ export interface Messages {
     eventMission: string
     eventScan: string
     pointsSuffix: string
+  }
+  copilot: {
+    title: string; subtitle: string
+    inputPlaceholder: string; send: string; newChat: string
+    emptyTitle: string; emptyBody: string
+    limitTitle: string; limitBody: string; limitUpsell: string
+    toolWorking: string
+    errorGeneric: string
+    unconfiguredTitle: string; unconfiguredBody: string
+    disclaimer: string
   }
 }
 
@@ -1084,6 +1096,8 @@ const messages: Messages = {
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
     guidesTitle: 'Guides', guidesDesc: 'Draft and publish your guides.',
     tierTitle: 'Tier', tierDesc: 'Your contribution points and tier.',
+    copilotTitle: 'Copilot',
+    copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1248,6 +1262,23 @@ const messages: Messages = {
     unlocksHeading: 'What you unlock',
     unlocksMissions: 'missions need this tier',
     unlocksHelp: 'Climb tiers to join exclusive missions.',
+  },
+  copilot: {
+    title: 'Creator Copilot',
+    subtitle: 'Your AI copilot, tuned to your Creator DNA. Ask for ideas, captions, or a posting plan.',
+    inputPlaceholder: 'Ask your copilot anything…',
+    send: 'Send',
+    newChat: 'New chat',
+    emptyTitle: 'Start a conversation',
+    emptyBody: 'Try: "Give me 5 reel ideas for my next trip" or "Draft a caption for a Kyoto food guide".',
+    limitTitle: "You've hit today's limit",
+    limitBody: "You've used all of today's Copilot messages.",
+    limitUpsell: 'Level up your tier to raise your daily limit.',
+    toolWorking: 'Working on it…',
+    errorGeneric: 'Something went wrong. Please try again.',
+    unconfiguredTitle: "Copilot isn't switched on yet",
+    unconfiguredBody: 'The Copilot will be available here shortly. Check back soon.',
+    disclaimer: 'AI-generated — review before you publish.',
   },
 }
 export default messages
