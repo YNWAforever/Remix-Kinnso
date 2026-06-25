@@ -441,6 +441,8 @@ export interface Messages {
     offersTitle: string; offersDesc: string
     inboxTitle: string; inboxDesc: string
     guidesTitle: string; guidesDesc: string
+    tierTitle: string
+    tierDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -552,6 +554,27 @@ export interface Messages {
     colType: string
     colAmount: string
     colStatus: string
+  }
+  tier: {
+    cardTitle: string
+    toNext: string
+    maxed: string
+    earnHeading: string
+    earnGuide: string
+    earnMission: string
+    earnScan: string
+    viewAll: string
+    pageHeading: string
+    pageSubtitle: string
+    currentLabel: string
+    allTiersHeading: string
+    unlocksPlaceholder: string
+    historyHeading: string
+    historyEmpty: string
+    eventGuide: string
+    eventMission: string
+    eventScan: string
+    pointsSuffix: string
   }
 }
 
@@ -1044,6 +1067,7 @@ const messages: Messages = {
     offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
     guidesTitle: 'Guides', guidesDesc: 'Draft and publish your guides.',
+    tierTitle: 'Tier', tierDesc: 'Your contribution points and tier.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1185,6 +1209,27 @@ const messages: Messages = {
     colType: 'Type',
     colAmount: 'Amount',
     colStatus: 'Status',
+  },
+  tier: {
+    cardTitle: 'Your tier',
+    toNext: '{points} pts to {tier}',
+    maxed: 'Top tier reached',
+    earnHeading: 'Ways to earn points',
+    earnGuide: 'Publish a guide',
+    earnMission: 'Complete a verified mission',
+    earnScan: 'Complete your DNA scan',
+    viewAll: 'Tier details',
+    pageHeading: 'Tier & contribution',
+    pageSubtitle: 'Earn points from real activity to climb tiers.',
+    currentLabel: 'Current tier',
+    allTiersHeading: 'All tiers',
+    unlocksPlaceholder: 'Perks and unlocks arrive soon.',
+    historyHeading: 'Points history',
+    historyEmpty: 'No points yet — publish a guide or complete a mission to get started.',
+    eventGuide: 'Guide published',
+    eventMission: 'Mission verified',
+    eventScan: 'DNA scan completed',
+    pointsSuffix: 'pts',
   },
 }
 export default messages
