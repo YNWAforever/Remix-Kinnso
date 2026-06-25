@@ -169,7 +169,7 @@ TDD throughout, following repo conventions (render tests `// @vitest-environment
 
 ## Implementation sequencing note
 
-At design time, local `main` is at `1a3ae74` (Phase 1 + Phase 2 only); **both Phase 3 (PR #39) and Phase 4 (PR #40) are still open**. 5A directly depends on Phase 3 (the `creators` table, its public-read RLS, and the `SECURITY DEFINER` trigger precedent). The 5A implementation branch must therefore be cut from `main` **after #39 and #40 merge** (same pattern as prior phases branching off main post-merge), so it includes both. The docs (this spec + the forthcoming plan) live on `feat/phase5a-tier-backbone` off the current `main` and will be rebased onto the updated `main` before implementation begins.
+At design time, local `main` is at `1a3ae74` (Phase 1 + Phase 2 only); **both Phase 3 (PR #39) and Phase 4 (PR #40) are still open**, and `feat/phase4-merchant-trust` already **stacks** Phase 1→2→3→4 (commit `161e49a` is Phase 3 #39, with Phase 4 on top). 5A directly depends on Phase 3 (the `creators` table, its public-read RLS, and the `SECURITY DEFINER` trigger precedent) and is built against Phase 4's code. The 5A docs + implementation branch (`feat/phase5a-tier-backbone`) therefore **stacks on `feat/phase4-merchant-trust`** for now (same stacking pattern Phase 4 used on Phase 3), and will be **rebased onto `main` once #39 and #40 merge** before it opens its own PR.
 
 ## Success criteria
 
