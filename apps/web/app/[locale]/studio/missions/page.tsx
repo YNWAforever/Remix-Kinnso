@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { CreatorMissionsView, type CreatorMissionCard } from '@/components/kinnso/pages/CreatorMissionsView'
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { meetsTier, type GatedTier, type Tier } from '@/lib/contribution/tiers'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { creatorMissionProgress } from '@/lib/missions/list'
@@ -20,6 +21,7 @@ type CreatorMissionRow = {
   mission_source: string | null
   mission_type: string | null
   status: string | null
+  min_tier: string | null
   affiliate_commission_rate: number | null
   creator_commission_rate: number | null
   kinnso_commission_rate: number | null
@@ -84,12 +86,14 @@ const formatCompensation = (row: CreatorMissionRow) => {
   return paid ?? affiliate
 }
 
-function mapCreatorMission(row: CreatorMissionRow, creatorId: string): CreatorMissionCard {
+function mapCreatorMission(row: CreatorMissionRow, creatorId: string, creatorTier: Tier): CreatorMissionCard {
   const participant = row.mission_participants?.find((item) => item.creator_id === creatorId) ?? null
   const { milestoneCount, submittedCount } = creatorMissionProgress(
     row.mission_milestones,
     participant?.mission_milestone_submissions,
   )
+  const requiredTier = (row.min_tier ?? null) as GatedTier | null
+  const locked = participant ? false : requiredTier ? !meetsTier(creatorTier, requiredTier) : false
 
   return {
     id: row.id,
@@ -107,6 +111,8 @@ function mapCreatorMission(row: CreatorMissionRow, creatorId: string): CreatorMi
     compensation: formatCompensation(row),
     milestoneCount,
     submittedCount,
+    locked,
+    requiredTier,
   }
 }
 
@@ -125,9 +131,16 @@ export default async function StudioMissionsPage({ params }: { params: Params })
   const role = await resolveViewerRole(supabase)
   if (role !== 'creator') notFound()
 
+  const { data: contribution } = await supabase
+    .from('creator_contribution')
+    .select('tier')
+    .eq('creator_id', user.id)
+    .maybeSingle()
+  const creatorTier = (contribution?.tier as Tier | undefined) ?? 'seed'
+
   const { data } = await listCreatorMerchantMissions(supabase)
   const missions = ((data ?? []) as unknown as CreatorMissionRow[]).map((row) =>
-    mapCreatorMission(row, user.id),
+    mapCreatorMission(row, user.id, creatorTier),
   )
 
   async function join(missionId: string) {
