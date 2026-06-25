@@ -24,11 +24,17 @@ export function CreatorCopilotView({
   initialMessages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
 }) {
   const atLimit = remaining <= 0
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/copilot' }),
     messages: initialMessages.map((m) => ({ id: m.id, role: m.role, parts: [{ type: 'text', text: m.content }] })),
-  } as never) as unknown as { messages: UIMsg[]; sendMessage: (m: { text: string }, o?: unknown) => void; status: string }
+  } as never) as unknown as {
+    messages: UIMsg[]
+    sendMessage: (m: { text: string }, o?: unknown) => void
+    status: string
+    clearError: () => void
+  }
   const [input, setInput] = useState('')
+  const isError = status === 'error'
 
   if (!configured) {
     return (
@@ -42,9 +48,13 @@ export function CreatorCopilotView({
     )
   }
 
+  // Busy while the model is streaming/submitting; 'error' is a retry path, not a busy state.
+  const busy = status !== 'ready' && status !== 'error'
+
   const onSend = () => {
     const text = input.trim()
-    if (!text || atLimit || status !== 'ready') return
+    if (!text || atLimit || busy) return
+    if (isError) clearError() // recover from a prior gateway/network failure before retrying
     sendMessage({ text }, { body: { locale } })
     setInput('')
   }
@@ -71,7 +81,10 @@ export function CreatorCopilotView({
             </div>
           ))
         )}
-        {status !== 'ready' && status !== 'error' ? <p className="text-sm text-kinnso-muted">{t.toolWorking}</p> : null}
+        {busy ? <p className="text-sm text-kinnso-muted">{t.toolWorking}</p> : null}
+        {isError ? (
+          <p role="alert" className="text-sm font-medium text-kinnso-orange">{t.errorGeneric}</p>
+        ) : null}
       </div>
 
       {atLimit ? (
@@ -92,7 +105,7 @@ export function CreatorCopilotView({
           rows={2}
           className="k-input flex-1 resize-none disabled:opacity-60"
         />
-        <button type="button" onClick={onSend} disabled={atLimit || status !== 'ready'} className="k-btn-primary inline-flex">
+        <button type="button" onClick={onSend} disabled={atLimit || busy} className="k-btn-primary inline-flex">
           {t.send} <Send aria-hidden="true" className="ml-2 h-4 w-4" />
         </button>
       </div>
