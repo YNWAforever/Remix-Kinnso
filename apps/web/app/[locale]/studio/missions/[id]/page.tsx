@@ -3,6 +3,7 @@ import { CreatorMissionDetailView } from '@/components/kinnso/pages/CreatorMissi
 import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { meetsTier, type GatedTier, type Tier } from '@/lib/contribution/tiers'
 import { joinMissionAction, submitMilestoneAction } from '@/lib/missions/actions'
 import { toCreatorMissionDetail, type MissionDetailRow } from '@/lib/missions/detail'
 import { getCreatorMissionDetail } from '@/lib/missions/queries'
@@ -34,6 +35,15 @@ export default async function StudioMissionDetailPage({ params }: { params: Para
 
   const mission = toCreatorMissionDetail(data as unknown as MissionDetailRow, user.id)
 
+  const requiredTier = ((data as { min_tier?: string | null }).min_tier ?? null) as GatedTier | null
+  const { data: contribution } = await supabase
+    .from('creator_contribution')
+    .select('tier')
+    .eq('creator_id', user.id)
+    .maybeSingle()
+  const creatorTier = (contribution?.tier as Tier | undefined) ?? 'seed'
+  const lockedTier = mission.participantId ? null : requiredTier && !meetsTier(creatorTier, requiredTier) ? requiredTier : null
+
   async function join() {
     'use server'
     return joinMissionAction({ missionId: id, locale: loc })
@@ -57,6 +67,15 @@ export default async function StudioMissionDetailPage({ params }: { params: Para
   }
 
   return (
-    <CreatorMissionDetailView locale={loc} t={messages.missionDetail} mission={mission} onJoin={join} onApply={apply} onSubmitMilestone={submitMilestone} />
+    <CreatorMissionDetailView
+      locale={loc}
+      t={messages.missionDetail}
+      mission={mission}
+      onJoin={join}
+      onApply={apply}
+      onSubmitMilestone={submitMilestone}
+      lockedTier={lockedTier}
+      gating={{ locked: messages.missions.locked, lockedHelp: messages.missions.lockedHelp }}
+    />
   )
 }

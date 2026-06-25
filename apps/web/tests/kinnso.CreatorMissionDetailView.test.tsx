@@ -149,3 +149,25 @@ describe('CreatorMissionDetailView', () => {
     expect(screen.queryByLabelText(en.missionDetail.proofUrlLabel)).toBeNull()
   })
 })
+
+describe('CreatorMissionDetailView tier lock', () => {
+  it('shows the locked notice and hides join when lockedTier is set', () => {
+    const onJoin = vi.fn()
+    render(
+      <CreatorMissionDetailView
+        locale="en"
+        t={en.missionDetail}
+        mission={{ ...base, missionType: 'coupon_affiliate', cta: 'join' }}
+        onJoin={onJoin}
+        onApply={vi.fn()}
+        onSubmitMilestone={vi.fn(async () => ({ ok: false as const }))}
+        lockedTier="pro"
+        gating={{ locked: en.missions.locked, lockedHelp: en.missions.lockedHelp }}
+      />,
+    )
+    expect(screen.getByText(en.missions.locked)).toBeTruthy()
+    expect(screen.getByText('Pro')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: en.missionDetail.join })).toBeNull()
+    expect(onJoin).not.toHaveBeenCalled()
+  })
+})

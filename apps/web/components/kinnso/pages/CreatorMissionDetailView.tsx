@@ -9,6 +9,8 @@ import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { SocialSignalBadge } from '@/components/kinnso/SocialSignalBadge'
 import { SubmissionVerification } from '@/components/kinnso/SubmissionVerification'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
+import TierBadge from '@/components/kinnso/TierBadge'
+import type { GatedTier } from '@/lib/contribution/tiers'
 import { startVerification } from '@/lib/missions/verify-client'
 import type { CreatorMissionDetail, MilestoneRow } from '@/lib/missions/detail'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -22,6 +24,8 @@ type CreatorMissionDetailViewProps = {
   onJoin: () => KinnsoActionResult | Promise<KinnsoActionResult>
   onApply: (note: string) => KinnsoActionResult | Promise<KinnsoActionResult>
   onSubmitMilestone: (input: { milestoneId: string; proofUrl: string; notes: string }) => Promise<SubmitResult>
+  lockedTier?: GatedTier | null
+  gating?: { locked: string; lockedHelp: string }
 }
 
 function MilestoneSubmit({
@@ -86,7 +90,7 @@ function MilestoneSubmit({
   )
 }
 
-export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, onSubmitMilestone }: CreatorMissionDetailViewProps) {
+export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, onSubmitMilestone, lockedTier, gating }: CreatorMissionDetailViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
@@ -129,7 +133,17 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, 
         <p className="mt-2 text-sm leading-relaxed text-kinnso-muted">{mission.summary}</p>
       </section>
 
-      {mission.cta === 'join' && (
+      {lockedTier && (mission.cta === 'join' || mission.cta === 'apply') && (
+        <div className="mt-6 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-kinnso-ink">{gating?.locked}</span>
+            <TierBadge tier={lockedTier} />
+          </div>
+          <p className="text-sm text-kinnso-muted">{gating?.lockedHelp}</p>
+        </div>
+      )}
+
+      {!lockedTier && mission.cta === 'join' && (
         <div className="mt-6">
           <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runAction(onJoin)}>
             {t.join}
@@ -137,7 +151,7 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, 
         </div>
       )}
 
-      {mission.cta === 'apply' && (
+      {!lockedTier && mission.cta === 'apply' && (
         <div className="mt-6 grid gap-2">
           <label htmlFor="application-note" className="text-sm font-bold text-kinnso-ink">{t.applyNoteLabel}</label>
           <textarea
