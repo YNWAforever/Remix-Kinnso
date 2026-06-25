@@ -27,5 +27,5 @@ export default async function StudioTierPage({ params }: { params: Promise<{ loc
     listContributionEvents(supabase, user.id),
   ])
 
-  return <StudioTierView locale={loc} t={messages.tier} contribution={contribution} events={events} />
+  return <StudioTierView t={messages.tier} contribution={contribution} events={events} />
 }

@@ -14,7 +14,7 @@ const events = [
 
 describe('StudioTierView', () => {
   it('renders current tier, all four tiers, and points history', () => {
-    render(<StudioTierView locale="en" t={en.tier} contribution={progressToNext(55)} events={events} />)
+    render(<StudioTierView t={en.tier} contribution={progressToNext(55)} events={events} />)
     expect(screen.getByText('Tier & contribution')).toBeTruthy()
     expect(screen.getByText('All tiers')).toBeTruthy()
     // all four ladder labels present
@@ -27,7 +27,7 @@ describe('StudioTierView', () => {
   })
 
   it('shows the empty history state when there are no events', () => {
-    render(<StudioTierView locale="en" t={en.tier} contribution={progressToNext(0)} events={[]} />)
+    render(<StudioTierView t={en.tier} contribution={progressToNext(0)} events={[]} />)
     expect(
       screen.getByText('No points yet — publish a guide or complete a mission to get started.'),
     ).toBeTruthy()

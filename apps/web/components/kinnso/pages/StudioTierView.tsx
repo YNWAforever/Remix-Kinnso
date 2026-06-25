@@ -1,4 +1,3 @@
-import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { CreatorContribution, ContributionEvent } from '@/lib/contribution/queries'
 import { TIER_THRESHOLDS } from '@/lib/contribution/tiers'
@@ -16,7 +15,6 @@ export function StudioTierView({
   contribution,
   events,
 }: {
-  locale: Locale
   t: Messages['tier']
   contribution: CreatorContribution
   events: ContributionEvent[]
