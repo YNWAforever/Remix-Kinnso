@@ -63,6 +63,7 @@ describe('searchPublicCreators', () => {
     const out = await searchPublicCreators()
     expect(out).toEqual<SearchableCreator[]>([
       {
+        id: 'c1',
         handle: 'alice',
         name: 'Alice',
         bio: 'hi',
@@ -74,6 +75,7 @@ describe('searchPublicCreators', () => {
         lastGuideAt: '2026-03-01',
       },
       {
+        id: 'c2',
         handle: 'bob',
         name: 'bob',
         bio: '',
@@ -101,7 +103,7 @@ describe('searchPublicCreators', () => {
 describe('deriveFacets', () => {
   it('returns distinct sorted facet values across creators', () => {
     const base = (over: Partial<SearchableCreator>): SearchableCreator => ({
-      handle: 'h', name: 'N', bio: '', niches: [], audienceGeos: [], languages: [], platforms: [], guideCount: 0, lastGuideAt: null, ...over,
+      id: 'id', handle: 'h', name: 'N', bio: '', niches: [], audienceGeos: [], languages: [], platforms: [], guideCount: 0, lastGuideAt: null, ...over,
     })
     const facets = deriveFacets([
       base({ niches: ['food', 'travel'], audienceGeos: ['HK'], languages: ['en'], platforms: ['instagram'] }),

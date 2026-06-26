@@ -24,6 +24,7 @@ export async function searchPublicCreators(): Promise<SearchableCreator[]> {
   return creators.map((c) => {
     const p = (c.public_profile ?? {}) as RawProfile
     return {
+      id: c.id as string,
       handle: c.handle as string,
       name: c.display_name ?? (c.handle as string),
       bio: c.bio ?? '',

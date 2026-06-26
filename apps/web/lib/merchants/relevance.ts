@@ -1,4 +1,5 @@
 export interface SearchableCreator {
+  id: string
   handle: string; name: string; bio: string
   niches: string[]; audienceGeos: string[]; languages: string[]; platforms: string[]
   guideCount: number; lastGuideAt: string | null
@@ -12,7 +13,8 @@ export interface RankedCreator { creator: SearchableCreator; matched: number; re
 const overlap = (a: string[], b: string[]) => a.filter((x) => b.includes(x))
 
 /** Drop creators failing an active filter, then rank by # of matched dimensions
- *  (desc), tie-broken by most recent guide. No filters → recent-guide order. */
+ *  (desc), tie-broken deterministically by guide recency (desc), guide count
+ *  (desc), then handle (asc). No filters → stable recency/count/handle order. */
 export function rankCreators(creators: SearchableCreator[], f: CreatorFilters): RankedCreator[] {
   const recency = (c: SearchableCreator) => (c.lastGuideAt ? Date.parse(c.lastGuideAt) : 0)
   return creators
@@ -33,5 +35,11 @@ export function rankCreators(creators: SearchableCreator[], f: CreatorFilters): 
       if (f.platforms.length && !r.reasons.some((x) => x.dimension === 'platform')) return false
       return true
     })
-    .sort((a, b) => b.matched - a.matched || recency(b.creator) - recency(a.creator))
+    .sort(
+      (a, b) =>
+        b.matched - a.matched ||
+        recency(b.creator) - recency(a.creator) ||
+        b.creator.guideCount - a.creator.guideCount ||
+        a.creator.handle.localeCompare(b.creator.handle),
+    )
 }

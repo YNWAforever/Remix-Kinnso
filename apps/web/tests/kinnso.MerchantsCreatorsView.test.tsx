@@ -1,17 +1,31 @@
 // @vitest-environment jsdom
+import type { ComponentProps } from 'react'
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, fireEvent, within, cleanup } from '@testing-library/react'
+import { render, screen, fireEvent, within, cleanup, waitFor } from '@testing-library/react'
 import { MerchantsCreatorsView } from '@/components/kinnso/pages/MerchantsCreatorsView'
 import type { RankedCreator } from '@/lib/merchants/relevance'
 import type { MerchantTier } from '@/lib/merchants/tier-policy'
+import type { ActionResult } from '@/lib/admin/result'
 import en from '@/lib/i18n/messages/en'
 
-afterEach(cleanup)
+type SavedResult = ActionResult<{ creatorId: string }>
+type InviteResult = ActionResult<{ inviteId: string }>
+
+const refreshMock = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: refreshMock }),
+}))
+
+afterEach(() => {
+  cleanup()
+  refreshMock.mockClear()
+})
 
 const t = en.merchantSearch
 
+// id mirrors handle (e.g. handle 'a' → id 'id-a') so callbacks carry the id.
 const r = (handle: string, niches: string[] = ['food'], lastGuideAt: string | null = '2026-01-01'): RankedCreator => ({
-  creator: { handle, name: handle.toUpperCase(), bio: '', niches, audienceGeos: ['HK'], languages: ['ja'], platforms: ['instagram'], guideCount: 2, lastGuideAt },
+  creator: { id: `id-${handle}`, handle, name: handle.toUpperCase(), bio: '', niches, audienceGeos: ['HK'], languages: ['ja'], platforms: ['instagram'], guideCount: 2, lastGuideAt },
   matched: 0,
   reasons: [],
 })
@@ -20,20 +34,23 @@ const facets = { niches: ['food', 'coffee'], audienceGeos: ['HK', 'TW'], languag
 
 const ranked: RankedCreator[] = [r('a'), r('b'), r('c'), r('d'), r('e')]
 
-const baseProps = {
+const ok = (): SavedResult => ({ ok: true, creatorId: 'x' })
+const okInvite = (): InviteResult => ({ ok: true, inviteId: 'i1' })
+
+const baseProps: ComponentProps<typeof MerchantsCreatorsView> = {
   locale: 'en' as const,
   t,
   ranked,
   tier: 'growth' as MerchantTier,
   facets,
-  savedHandles: [] as string[],
+  savedIds: [] as string[],
   workingHandles: [] as string[],
   invitesRemaining: 5,
   publishedMissions: [{ id: 'm1', title: 'Spring campaign' }],
-  onInvite: vi.fn(),
-  onSave: vi.fn(),
-  onUnsave: vi.fn(),
-  onNote: vi.fn(),
+  onInvite: vi.fn(okInvite),
+  onSave: vi.fn(ok),
+  onUnsave: vi.fn(ok),
+  onNote: vi.fn(ok),
 }
 
 const renderView = (over: Partial<typeof baseProps> = {}) =>
@@ -73,8 +90,8 @@ describe('MerchantsCreatorsView', () => {
   })
 
   it('Saved tab badge reflects only saved creators', () => {
-    renderView({ savedHandles: ['b', 'd'] })
-    // The Saved tab badge derives from savedHandles, not the full list.
+    renderView({ savedIds: ['id-b', 'id-d'] })
+    // The Saved tab badge derives from savedIds, not the full list.
     expect(within(screen.getByRole('tab', { name: new RegExp(t.tabSaved) })).getByText('2')).toBeTruthy()
   })
 
@@ -83,14 +100,14 @@ describe('MerchantsCreatorsView', () => {
     expect(within(screen.getByRole('tab', { name: new RegExp(t.tabWorking) })).getByText('1')).toBeTruthy()
   })
 
-  it('Send brief opens a mission picker that calls onInvite(missionId, handle)', () => {
-    const onInvite = vi.fn()
+  it('Send brief opens a mission picker that calls onInvite(missionId, creatorId)', async () => {
+    const onInvite = vi.fn(okInvite)
     renderView({ onInvite, publishedMissions: [{ id: 'm1', title: 'Spring campaign' }] })
     fireEvent.click(screen.getAllByRole('button', { name: new RegExp(t.sendBrief) })[0])
     const dialog = screen.getByRole('dialog')
     expect(within(dialog).getByText(t.pickMissionTitle)).toBeTruthy()
     fireEvent.click(within(dialog).getByRole('button', { name: 'Spring campaign' }))
-    expect(onInvite).toHaveBeenCalledWith('m1', 'a')
+    await waitFor(() => expect(onInvite).toHaveBeenCalledWith('m1', 'id-a'))
   })
 
   it('mission picker shows an empty state when there are no published missions', () => {
@@ -100,11 +117,34 @@ describe('MerchantsCreatorsView', () => {
     expect(within(dialog).getByText(t.pickMissionEmpty)).toBeTruthy()
   })
 
-  it('Save on a recommended card calls onSave with the handle', () => {
-    const onSave = vi.fn()
+  it('Save on a recommended card calls onSave with the creatorId', async () => {
+    const onSave = vi.fn(ok)
     renderView({ onSave })
     fireEvent.click(screen.getAllByRole('button', { name: new RegExp(`^${t.save}$`) })[0])
-    expect(onSave).toHaveBeenCalledWith('a')
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith('id-a'))
+  })
+
+  it('a successful save toggles the bookmark to Saved and refreshes', async () => {
+    const onSave = vi.fn(ok)
+    renderView({ onSave })
+    const saveBtn = screen.getAllByRole('button', { name: new RegExp(`^${t.save}$`) })[0]
+    fireEvent.click(saveBtn)
+    // Optimistic toggle: the first card's bookmark now reads "Saved".
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: new RegExp(`^${t.saved}$`) }).length).toBeGreaterThan(0),
+    )
+    expect(refreshMock).toHaveBeenCalled()
+  })
+
+  it('a failed invite surfaces the action error in an alert region', async () => {
+    const onInvite = vi.fn(async (): Promise<InviteResult> => ({ ok: false, errors: { form: ['You have used your invite quota'] } }))
+    renderView({ onInvite })
+    fireEvent.click(screen.getAllByRole('button', { name: new RegExp(t.sendBrief) })[0])
+    const dialog = screen.getByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Spring campaign' }))
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('You have used your invite quota')
+    expect(refreshMock).not.toHaveBeenCalled()
   })
 
   it('opens drawers without Radix dialog accessibility warnings', () => {

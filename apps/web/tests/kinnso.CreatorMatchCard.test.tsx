@@ -11,6 +11,7 @@ const t = en.merchantSearch
 
 const ranked = (over: Partial<RankedCreator['creator']> = {}, reasons: RankedCreator['reasons'] = []): RankedCreator => ({
   creator: {
+    id: 'id-mai',
     handle: 'mai',
     name: 'Mai Tanaka',
     bio: 'Tokyo food',
@@ -72,9 +73,9 @@ describe('CreatorMatchCard', () => {
     fireEvent.click(screen.getByRole('button', { name: new RegExp(t.save) }))
     fireEvent.click(screen.getByRole('button', { name: new RegExp(t.viewProfile) }))
     fireEvent.click(screen.getByRole('button', { name: new RegExp(t.sendBrief) }))
-    expect(onSave).toHaveBeenCalledWith('mai')
+    expect(onSave).toHaveBeenCalledWith('id-mai')
     expect(onView).toHaveBeenCalledWith('mai')
-    expect(onSendBrief).toHaveBeenCalledWith('mai')
+    expect(onSendBrief).toHaveBeenCalledWith('id-mai')
   })
 
   it('shows the saved label when already saved', () => {

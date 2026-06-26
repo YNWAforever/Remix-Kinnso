@@ -10,10 +10,11 @@ type SearchMessages = Messages['merchantSearch'];
 interface Props {
   ranked: RankedCreator;
   saved: boolean;
+  invited?: boolean;
   t: SearchMessages;
-  onSave: (handle: string) => void;
+  onSave: (creatorId: string) => void;
   onView: (handle: string) => void;
-  onSendBrief: (handle: string) => void;
+  onSendBrief: (creatorId: string) => void;
 }
 
 const REASON_LABEL: Record<Reason['dimension'], keyof SearchMessages> = {
@@ -23,7 +24,7 @@ const REASON_LABEL: Record<Reason['dimension'], keyof SearchMessages> = {
   platform: 'reasonPlatform',
 };
 
-export const CreatorMatchCard: React.FC<Props> = ({ ranked, saved, t, onSave, onView, onSendBrief }) => {
+export const CreatorMatchCard: React.FC<Props> = ({ ranked, saved, invited = false, t, onSave, onView, onSendBrief }) => {
   const { creator, reasons } = ranked;
 
   return (
@@ -75,12 +76,18 @@ export const CreatorMatchCard: React.FC<Props> = ({ ranked, saved, t, onSave, on
           <button type="button" onClick={() => onView(creator.handle)} className="k-btn-ghost text-xs">
             <ExternalLink className="mr-1 inline h-3 w-3" /> {t.viewProfile}
           </button>
-          <button type="button" onClick={() => onSendBrief(creator.handle)} className="k-btn-primary text-xs">
-            <Send className="mr-1 inline h-3 w-3" /> {t.sendBrief}
+          <button
+            type="button"
+            onClick={() => onSendBrief(creator.id)}
+            disabled={invited}
+            aria-disabled={invited}
+            className="k-btn-primary text-xs disabled:opacity-50"
+          >
+            <Send className="mr-1 inline h-3 w-3" /> {invited ? t.invited : t.sendBrief}
           </button>
           <button
             type="button"
-            onClick={() => onSave(creator.handle)}
+            onClick={() => onSave(creator.id)}
             className={cn("k-btn-ghost text-xs", saved && "bg-kinnso-amber/40 text-kinnso-ink")}
           >
             <Bookmark className={cn("mr-1 inline h-3 w-3", saved && "fill-current")} /> {saved ? t.saved : t.save}

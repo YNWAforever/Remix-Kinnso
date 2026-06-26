@@ -73,37 +73,30 @@ export default async function MerchantsCreatorsPage({
     hasGuides: false,
   })
   const facets = deriveFacets(creators)
-  const savedHandles = saved.map((s) => s.handle).filter((h): h is string => !!h)
+  // Saved-state tracking keys on creatorId end-to-end (no handle round-trip).
+  const savedIds = saved.map((s) => s.creatorId)
 
   // Remaining invites this period mirrors the RPC's derived quota check.
   const invitesRemaining = Math.max(0, tierPolicy(tier).inviteQuota - working.invitesUsed)
 
-  async function onInvite(missionId: string, creatorHandle: string) {
+  async function onInvite(missionId: string, creatorId: string) {
     'use server'
-    const creatorId = await resolveCreatorId(creatorHandle)
-    if (!creatorId) return
-    await inviteCreatorAction(loc, missionId, creatorId)
+    return inviteCreatorAction(loc, missionId, creatorId)
   }
 
-  async function onSave(creatorHandle: string) {
+  async function onSave(creatorId: string) {
     'use server'
-    const creatorId = await resolveCreatorId(creatorHandle)
-    if (!creatorId) return
-    await saveCreatorAction(loc, creatorId)
+    return saveCreatorAction(loc, creatorId)
   }
 
-  async function onUnsave(creatorHandle: string) {
+  async function onUnsave(creatorId: string) {
     'use server'
-    const creatorId = await resolveCreatorId(creatorHandle)
-    if (!creatorId) return
-    await unsaveCreatorAction(loc, creatorId)
+    return unsaveCreatorAction(loc, creatorId)
   }
 
-  async function onNote(creatorHandle: string, note: string) {
+  async function onNote(creatorId: string, note: string) {
     'use server'
-    const creatorId = await resolveCreatorId(creatorHandle)
-    if (!creatorId) return
-    await setSavedNoteAction(loc, creatorId, note)
+    return setSavedNoteAction(loc, creatorId, note)
   }
 
   return (
@@ -113,7 +106,7 @@ export default async function MerchantsCreatorsPage({
       ranked={ranked}
       tier={tier}
       facets={facets}
-      savedHandles={savedHandles}
+      savedIds={savedIds}
       workingHandles={working.handles}
       invitesRemaining={invitesRemaining}
       publishedMissions={publishedMissions}
@@ -126,18 +119,6 @@ export default async function MerchantsCreatorsPage({
 }
 
 type Supabase = Awaited<ReturnType<typeof createSupabaseServerClient>>
-
-/** Resolve a public handle to a creator id (server-action helper). */
-async function resolveCreatorId(handle: string): Promise<string | null> {
-  'use server'
-  const supabase = await createSupabaseServerClient()
-  const { data } = await supabase
-    .from('creators')
-    .select('id')
-    .eq('handle', handle)
-    .maybeSingle()
-  return (data?.id as string | undefined) ?? null
-}
 
 /**
  * Derive the merchant's "Working" creator handles (active/completed

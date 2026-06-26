@@ -11,6 +11,7 @@ const { roleMock, getUserMock, fromMock, searchMock, savedMock, missionsMock } =
   fromMock: vi.fn(),
   searchMock: vi.fn(async () => [
     {
+      id: 'c-ada',
       handle: 'ada',
       name: 'Ada',
       bio: '',
