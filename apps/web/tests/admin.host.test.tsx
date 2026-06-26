@@ -6,7 +6,7 @@ afterEach(cleanup)
 const { roleMock, getUserMock, overviewMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
-  overviewMock: vi.fn(async () => ({ creators: 5, merchants: 2, ops: 1 })),
+  overviewMock: vi.fn(async () => ({ creators: 5, merchants: 2, ops: 1, perksActive: 4, perksTotal: 6, redemptions: 9 })),
 }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },

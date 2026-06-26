@@ -7,6 +7,9 @@ export function AdminDashboardView({ t, overview }: { t: Messages['admin']; over
     { label: t.statCreators, value: overview.creators },
     { label: t.statMerchants, value: overview.merchants },
     { label: t.statOps, value: overview.ops },
+    { label: t.statPerksActive, value: overview.perksActive },
+    { label: t.statPerksTotal, value: overview.perksTotal },
+    { label: t.statRedemptions, value: overview.redemptions },
   ]
   return (
     <main>
