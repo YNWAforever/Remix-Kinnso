@@ -1439,6 +1439,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_overview_counts: {
+        Args: never
+        Returns: {
+          creators: number
+          merchants: number
+          ops: number
+        }[]
+      }
       award_contribution_event: {
         Args: {
           p_creator_id: string
@@ -1479,6 +1487,7 @@ export type Database = {
         }[]
       }
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
+      is_active_ops: { Args: never; Returns: boolean }
       recompute_creator_contribution: {
         Args: { p_creator_id: string }
         Returns: undefined

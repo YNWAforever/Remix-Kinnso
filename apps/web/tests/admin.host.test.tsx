@@ -38,4 +38,8 @@ describe('admin layout + dashboard host', () => {
     render(ui)
     expect(screen.getByText('5')).toBeTruthy()
   })
+  it('dashboard notFounds for non-ops (page gates independently of the layout)', async () => {
+    roleMock.mockResolvedValueOnce('creator')
+    await expect(AdminDashboardPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
+  })
 })
