@@ -1413,6 +1413,93 @@ export type Database = {
           },
         ]
       }
+      partner_perks: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          discount_label: string
+          id: string
+          min_tier: string | null
+          partner_name: string
+          redemption_type: string
+          redemption_value: string
+          slug: string
+          sort_order: number
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          discount_label: string
+          id?: string
+          min_tier?: string | null
+          partner_name: string
+          redemption_type: string
+          redemption_value: string
+          slug: string
+          sort_order?: number
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          discount_label?: string
+          id?: string
+          min_tier?: string | null
+          partner_name?: string
+          redemption_type?: string
+          redemption_value?: string
+          slug?: string
+          sort_order?: number
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      perk_redemptions: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          perk_id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          perk_id: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          perk_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "perk_redemptions_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "perk_redemptions_perk_id_fkey"
+            columns: ["perk_id"]
+            isOneToOne: false
+            referencedRelation: "partner_perks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seo_redirects: {
         Row: {
           from_path: string
@@ -1439,6 +1526,51 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_creators: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          handle: string
+          id: string
+          status: string
+        }[]
+      }
+      admin_list_merchants: {
+        Args: never
+        Returns: {
+          company_name: string
+          contact_email: string
+          created_at: string
+          id: string
+          status: string
+        }[]
+      }
+      admin_list_ops: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          id: string
+          status: string
+          user_id: string
+        }[]
+      }
+      admin_overview_counts: {
+        Args: never
+        Returns: {
+          creators: number
+          merchants: number
+          ops: number
+          perks_active: number
+          perks_total: number
+          redemptions: number
+        }[]
+      }
+      admin_set_user_status: {
+        Args: { p_id: string; p_kind: string; p_status: string }
+        Returns: undefined
+      }
       award_contribution_event: {
         Args: {
           p_creator_id: string
@@ -1479,9 +1611,32 @@ export type Database = {
         }[]
       }
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
+      is_active_ops: { Args: never; Returns: boolean }
+      list_active_perks: {
+        Args: never
+        Returns: {
+          category: string
+          discount_label: string
+          id: string
+          min_tier: string
+          partner_name: string
+          redemption_type: string
+          slug: string
+          sort_order: number
+          summary: string
+          title: string
+        }[]
+      }
       recompute_creator_contribution: {
         Args: { p_creator_id: string }
         Returns: undefined
+      }
+      redeem_perk: {
+        Args: { p_perk_id: string }
+        Returns: {
+          redemption_type: string
+          redemption_value: string
+        }[]
       }
       revoke_contribution_event: {
         Args: {

@@ -34,4 +34,10 @@ describe('StudioQuickLinks', () => {
     expect(link).not.toBeNull()
     expect(link!.getAttribute('href')).toBe('/en/studio/tier')
   })
+
+  it('renders the Perks tile linking to /studio/perks', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+    const link = screen.getByText(en.studioHome.perksTitle).closest('a')
+    expect(link?.getAttribute('href')).toBe('/en/studio/perks')
+  })
 })
