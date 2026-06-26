@@ -1,100 +1,101 @@
 'use client'
 import React, { useMemo, useState } from "react";
 import { Filter, Search, X, Lock } from "lucide-react";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CreatorMatchCard from "@/components/kinnso/CreatorMatchCard";
-import CreatorFilterDrawer, { defaultFilters, type CreatorFilters } from "@/components/kinnso/CreatorFilterDrawer";
-import { CreatorProfileView } from "@/components/kinnso/pages/CreatorProfileView";
-import { extendedCreators, creatorLocations, merchantWorkingWith, getCreator, computeMatch, type ExtendedCreator } from "@/lib/creator-mock";
-import type { PublicCreator } from "@/lib/creators/queries";
+import CreatorFilterDrawer, { defaultFilters, type Facets } from "@/components/kinnso/CreatorFilterDrawer";
+import { rankCreators, type RankedCreator, type CreatorFilters } from "@/lib/merchants/relevance";
+import { tierPolicy, type MerchantTier } from "@/lib/merchants/tier-policy";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
-import type { MerchantProfile } from "@/lib/creator-mock";
 
-// Adapter for the mock merchant creator-search quick-view (a cut-from-nav
-// backlog surface): map a mock ExtendedCreator onto the real PublicCreator
-// shape so the rebuilt profile renders. Real public profiles use /c/[handle].
-function toPublicCreator(c: ExtendedCreator): PublicCreator {
-  return {
-    handle: c.handle,
-    name: c.name,
-    bio: c.bio,
-    profile: { niches: [c.category], content_pillars: [], tone: [], audience_geos: [], audience_locales: [], languages: [], platforms: [] },
-    guides: [],
-  }
+type SearchMessages = Messages['merchantSearch'];
+
+interface PublishedMission {
+  id: string;
+  title: string;
 }
-
-function filterCreators(list: ExtendedCreator[], f: CreatorFilters, query: string): ExtendedCreator[] {
-  const q = query.trim().toLowerCase();
-  return list.filter((c) => {
-    if (c.score < f.scoreRange[0] || c.score > f.scoreRange[1]) return false;
-    if (c.er * 100 < f.minEr) return false;
-    if (f.tiers.length && !f.tiers.includes(c.tier)) return false;
-    if (f.categories.length && !f.categories.includes(c.category)) return false;
-    if (f.primaryAudience.length && !f.primaryAudience.includes(c.primaryAudienceCountry)) return false;
-    if (f.cities.length) {
-      const myCities = creatorLocations.filter((l) => l.creatorHandle === c.handle).map((l) => l.city);
-      if (!f.cities.some((x) => myCities.includes(x))) return false;
-    }
-    if (f.platforms.length) {
-      const has = f.platforms.some((p) => (p === "instagram" && c.followerIg > 0) || (p === "threads" && c.followerTh > 0) || (p === "youtube" && c.followerYt > 0));
-      if (!has) return false;
-    }
-    if (f.minFollowers && c.totalReach < f.minFollowers) return false;
-    if (f.activityDays < 9999) {
-      const last = new Date(c.lastPostedAt).getTime();
-      const days = (Date.now() - last) / (1000 * 60 * 60 * 24);
-      if (days > f.activityDays) return false;
-    }
-    if (q) {
-      const hay = `${c.name} ${c.handle} ${c.homeCity} ${c.category} ${c.topTags.map((t) => t.tag).join(" ")}`.toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
-    return true;
-  });
-}
-
-const FREE_CAP = 3;
 
 interface Props {
-  merchant: MerchantProfile;
   locale: Locale;
-  t: Messages['merchants'] & { creatorProfile: Messages['creatorProfile'] };
+  t: SearchMessages;
+  ranked: RankedCreator[];
+  tier: MerchantTier;
+  facets: Facets;
+  savedHandles: string[];
+  workingHandles: string[];
+  invitesRemaining: number;
+  publishedMissions: PublishedMission[];
+  onInvite: (missionId: string, creatorHandle: string) => void;
+  onSave: (handle: string) => void;
+  onUnsave: (handle: string) => void;
+  onNote: (handle: string, note: string) => void;
 }
 
-const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
+const MerchantsCreatorsView: React.FC<Props> = ({
+  locale,
+  t,
+  ranked,
+  tier,
+  facets,
+  savedHandles,
+  workingHandles,
+  invitesRemaining,
+  publishedMissions,
+  onInvite,
+  onSave,
+  onUnsave,
+  onNote,
+}) => {
+  const policy = tierPolicy(tier);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState<CreatorFilters>(defaultFilters);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<"recommended" | "saved" | "working">("recommended");
-  const [saves, setSaves] = useState<string[]>([]);
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [quickViewHandle, setQuickViewHandle] = useState<string | null>(null);
+  const [briefHandle, setBriefHandle] = useState<string | null>(null);
 
-  const [invitesLeft, setInvitesLeft] = useState(merchant.invitesLeft);
-  const searchesLeft = merchant.searchesLeft;
-  const isFree = merchant.tier === "free";
+  const savedSet = new Set(savedHandles);
 
-  const toggleSave = (handle: string) =>
-    setSaves((s) => (s.includes(handle) ? s.filter((h) => h !== handle) : [...s, handle]));
+  // Re-rank the underlying creators against the active honest filters (Growth
+  // only — Free can't open the drawer). Then apply the free-text name/handle
+  // search. Recommended is capped on Free via the tier policy.
+  const filteredRanked = useMemo(() => {
+    const base = policy.filtersUnlocked
+      ? rankCreators(ranked.map((r) => r.creator), filters)
+      : ranked;
+    const q = query.trim().toLowerCase();
+    if (!q) return base;
+    return base.filter((r) => `${r.creator.name} @${r.creator.handle}`.toLowerCase().includes(q));
+  }, [ranked, filters, query, policy.filtersUnlocked]);
 
-  // ranked recommended
-  const recommended = useMemo(() => {
-    const filtered = filterCreators(extendedCreators, filters, query);
-    return filtered
-      .map((c) => ({ c, match: computeMatch(c, merchant) }))
-      .sort((a, b) => b.match.score - a.match.score);
-  }, [filters, query, merchant]);
+  const recommended = useMemo(
+    () => (policy.resultCap == null ? filteredRanked : filteredRanked.slice(0, policy.resultCap)),
+    [filteredRanked, policy.resultCap],
+  );
+  const isCapped = policy.resultCap != null && filteredRanked.length > policy.resultCap;
 
   const savedCreators = useMemo(
-    () => extendedCreators.filter((c) => saves.includes(c.handle)),
-    [saves]
+    () => ranked.filter((r) => savedHandles.includes(r.creator.handle)),
+    [ranked, savedHandles],
   );
   const workingCreators = useMemo(
-    () => merchantWorkingWith.map((w) => ({ ...w, creator: extendedCreators.find((c) => c.handle === w.handle)! })).filter((x) => x.creator),
-    []
+    () => ranked.filter((r) => workingHandles.includes(r.creator.handle)),
+    [ranked, workingHandles],
   );
+
+  const openFilters = () => {
+    if (policy.filtersUnlocked) setFilterOpen(true);
+  };
+
+  const toggleSave = (handle: string) => {
+    if (savedSet.has(handle)) onUnsave(handle);
+    else onSave(handle);
+  };
+
+  const viewProfile = (handle: string) => {
+    if (typeof window !== "undefined") window.open(`/${locale}/c/${handle}`, "_blank");
+  };
 
   return (
     <>
@@ -106,41 +107,52 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
             <p className="mt-1 text-sm text-kinnso-muted">{t.sub}</p>
           </div>
           <div className="k-ticket px-4 py-2 text-xs">
-            <div className="text-kinnso-muted">{t.yourProfile}</div>
-            <div className="font-semibold text-kinnso-ink">{merchant.name} · {merchant.city} · {merchant.category}</div>
-            <div className="mt-2 flex gap-2 text-xs">
-              <span className="rounded-pill bg-white px-2 py-0.5 text-kinnso-ink">{searchesLeft}/{merchant.searchLimit} {t.searchesLeft}</span>
-              <span className="rounded-pill bg-white px-2 py-0.5 text-kinnso-ink">{invitesLeft}/{merchant.inviteLimit} {t.invitesLeft}</span>
-            </div>
+            <span className="rounded-pill bg-white px-2 py-0.5 text-kinnso-ink">
+              {t.invitesLeft.replace('{count}', String(invitesRemaining))}
+            </span>
           </div>
         </div>
 
-        {/* Sticky filter bar */}
+        {/* Search + filter bar */}
         <div className="sticky top-16 z-30 -mx-4 mt-6 bg-kinnso-cream/90 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-pill sm:px-2">
           <div className="flex items-center gap-2">
             <div className="flex flex-1 items-center gap-2 rounded-pill bg-white px-4 py-2 ring-1 ring-kinnso-cream2">
               <Search className="h-4 w-4 text-kinnso-muted" />
-              <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t.searchPlaceholder} className="flex-1 bg-transparent text-sm outline-none" />
-              {query && <button type="button" onClick={() => setQuery("")}><X className="h-4 w-4 text-kinnso-muted" /></button>}
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t.searchPlaceholder}
+                className="flex-1 bg-transparent text-sm outline-none"
+              />
+              {query && (
+                <button type="button" onClick={() => setQuery("")}>
+                  <X className="h-4 w-4 text-kinnso-muted" />
+                </button>
+              )}
             </div>
             <button
               type="button"
-              onClick={() => { if (!isFree) setFilterOpen(true); }}
-              disabled={isFree}
-              aria-disabled={isFree}
-              title={isFree ? t.upgradeBlurb : undefined}
+              onClick={openFilters}
+              disabled={!policy.filtersUnlocked}
+              aria-disabled={!policy.filtersUnlocked}
+              title={!policy.filtersUnlocked ? t.filtersLocked : undefined}
               className="k-btn-ghost shrink-0 disabled:opacity-50"
             >
-              {isFree ? <Lock className="mr-1 inline h-4 w-4" /> : <Filter className="mr-1 inline h-4 w-4" />} {t.filter}
+              {policy.filtersUnlocked ? (
+                <Filter className="mr-1 inline h-4 w-4" />
+              ) : (
+                <Lock className="mr-1 inline h-4 w-4" />
+              )}{" "}
+              {t.filter}
             </button>
           </div>
         </div>
 
         {/* Upgrade banner (free only) */}
-        {isFree && (
+        {!policy.filtersUnlocked && (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-kinnso-amber/30 px-5 py-4">
             <div>
-              <h3 className="text-sm font-black text-kinnso-ink">{t.upgradeToGrowth}</h3>
+              <h3 className="text-sm font-black text-kinnso-ink">{t.upgradeTitle}</h3>
               <p className="text-xs text-kinnso-muted">{t.upgradeBlurb}</p>
             </div>
             <button type="button" className="k-btn-primary text-sm">{t.upgradeCta}</button>
@@ -148,46 +160,55 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
         )}
 
         {/* Tabs */}
-        <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)} className="mt-6">
+        <Tabs value={tab} onValueChange={(value) => setTab(value as typeof tab)} className="mt-6">
           <TabsList className="bg-kinnso-cream2">
-            <TabsTrigger value="recommended">{t.tabRecommended} <span className="ml-2 rounded-pill bg-kinnso-orange/20 px-1.5 py-0.5 text-[10px] text-kinnso-orange">{recommended.length}</span></TabsTrigger>
-            <TabsTrigger value="saved">{t.tabSaved} <span className="ml-2 rounded-pill bg-kinnso-amber/40 px-1.5 py-0.5 text-[10px] text-kinnso-ink">{savedCreators.length}</span></TabsTrigger>
-            <TabsTrigger value="working">{t.tabWorking} <span className="ml-2 rounded-pill bg-kinnso-green/15 px-1.5 py-0.5 text-[10px] text-kinnso-green">{workingCreators.length}</span></TabsTrigger>
+            <TabsTrigger value="recommended">
+              {t.tabRecommended}{" "}
+              <span className="ml-2 rounded-pill bg-kinnso-orange/20 px-1.5 py-0.5 text-[10px] text-kinnso-orange">{recommended.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="saved">
+              {t.tabSaved}{" "}
+              <span className="ml-2 rounded-pill bg-kinnso-amber/40 px-1.5 py-0.5 text-[10px] text-kinnso-ink">{savedCreators.length}</span>
+            </TabsTrigger>
+            <TabsTrigger value="working">
+              {t.tabWorking}{" "}
+              <span className="ml-2 rounded-pill bg-kinnso-green/15 px-1.5 py-0.5 text-[10px] text-kinnso-green">{workingCreators.length}</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="recommended" className="mt-5 space-y-4">
             {recommended.length === 0 && <p className="text-sm text-kinnso-muted">{t.emptyRecommended}</p>}
-            {(isFree ? recommended.slice(0, FREE_CAP) : recommended).map(({ c }) => (
+            {recommended.map((r) => (
               <CreatorMatchCard
-                key={c.handle}
-                creator={c}
-                saved={saves.includes(c.handle)}
-                locale={locale}
-                onToggleSave={() => toggleSave(c.handle)}
-                onQuickView={() => setQuickViewHandle(c.handle)}
+                key={r.creator.handle}
+                ranked={r}
+                saved={savedSet.has(r.creator.handle)}
+                t={t}
+                onSave={toggleSave}
+                onView={viewProfile}
+                onSendBrief={setBriefHandle}
               />
             ))}
-            {isFree && recommended.length > FREE_CAP && (
-              <p className="text-center text-xs text-kinnso-muted">{t.resultsCapped}</p>
-            )}
+            {isCapped && <p className="text-center text-xs text-kinnso-muted">{t.resultsCapped}</p>}
           </TabsContent>
 
           <TabsContent value="saved" className="mt-5 space-y-4">
             {savedCreators.length === 0 && <p className="text-sm text-kinnso-muted">{t.emptySaved}</p>}
-            {savedCreators.map((c) => (
-              <div key={c.handle}>
+            {savedCreators.map((r) => (
+              <div key={r.creator.handle}>
                 <CreatorMatchCard
-                  creator={c}
+                  ranked={r}
                   saved
-                  locale={locale}
-                  onToggleSave={() => toggleSave(c.handle)}
-                  onQuickView={() => setQuickViewHandle(c.handle)}
+                  t={t}
+                  onSave={toggleSave}
+                  onView={viewProfile}
+                  onSendBrief={setBriefHandle}
                 />
                 <div className="-mt-1 rounded-b-lg bg-kinnso-cream2 px-4 py-2">
                   <input
-                    placeholder={t.addPrivateNote}
-                    value={notes[c.handle] ?? ""}
-                    onChange={(e) => setNotes((n) => ({ ...n, [c.handle]: e.target.value }))}
+                    placeholder={t.addNote}
+                    defaultValue=""
+                    onBlur={(e) => onNote(r.creator.handle, e.target.value)}
                     className="w-full bg-transparent text-xs text-kinnso-ink outline-none placeholder:text-kinnso-muted"
                   />
                 </div>
@@ -197,66 +218,60 @@ const MerchantsCreatorsView: React.FC<Props> = ({ merchant, locale, t }) => {
 
           <TabsContent value="working" className="mt-5 space-y-4">
             {workingCreators.length === 0 && <p className="text-sm text-kinnso-muted">{t.emptyWorking}</p>}
-            {workingCreators.map((w) => (
-              <div key={w.handle} className="k-card p-5">
-                <div className="flex items-center gap-3">
-                  <img src={w.creator.avatar} alt="" className="h-12 w-12 rounded-full object-cover" />
-                  <div className="flex-1">
-                    <div className="font-bold text-kinnso-ink">{w.creator.name}</div>
-                    <div className="k-mono text-xs text-kinnso-muted">@{w.handle}</div>
-                  </div>
-                  <span className={`rounded-pill px-3 py-1 text-xs font-semibold ${
-                    w.status === "in_progress" ? "bg-kinnso-amber/40 text-kinnso-ink"
-                    : w.status === "delivered" ? "bg-kinnso-blue/15 text-kinnso-blue"
-                    : "bg-kinnso-green/15 text-kinnso-green"
-                  }`}>
-                    {w.status.replace("_", " ")}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm text-kinnso-ink">{w.missionTitle}</p>
-              </div>
+            {workingCreators.map((r) => (
+              <CreatorMatchCard
+                key={r.creator.handle}
+                ranked={r}
+                saved={savedSet.has(r.creator.handle)}
+                t={t}
+                onSave={toggleSave}
+                onView={viewProfile}
+                onSendBrief={setBriefHandle}
+              />
             ))}
           </TabsContent>
         </Tabs>
       </div>
 
-      <CreatorFilterDrawer open={filterOpen} onOpenChange={setFilterOpen} value={filters} onChange={setFilters} />
+      <CreatorFilterDrawer
+        open={filterOpen}
+        onOpenChange={setFilterOpen}
+        value={filters}
+        onChange={setFilters}
+        facets={facets}
+        t={t}
+      />
 
-      {/* Quick view drawer */}
-      <Sheet open={!!quickViewHandle} onOpenChange={(o) => !o && setQuickViewHandle(null)}>
-        <SheetContent side="right" className="w-full max-w-2xl overflow-y-auto bg-kinnso-cream p-0">
-          <SheetHeader className="sr-only">
-            <SheetTitle>{t.viewProfile}</SheetTitle>
-            <SheetDescription>{t.sendBrief} {t.save}</SheetDescription>
-          </SheetHeader>
-          {quickViewHandle && (
-            <div className="px-4 pb-24 pt-6">
-              {(() => {
-                const c = getCreator(quickViewHandle);
-                return c ? <CreatorProfileView creator={toPublicCreator(c)} locale={locale} embedded t={t.creatorProfile} /> : null;
-              })()}
+      {/* Send-brief mission picker */}
+      <Dialog open={!!briefHandle} onOpenChange={(o) => !o && setBriefHandle(null)}>
+        <DialogContent className="bg-kinnso-cream">
+          <DialogHeader>
+            <DialogTitle className="text-kinnso-ink">{t.pickMissionTitle}</DialogTitle>
+            <DialogDescription className="sr-only">{t.sub}</DialogDescription>
+          </DialogHeader>
+          {publishedMissions.length === 0 ? (
+            <p className="text-sm text-kinnso-muted">{t.pickMissionEmpty}</p>
+          ) : (
+            <div className="space-y-2">
+              {publishedMissions.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    if (briefHandle) onInvite(m.id, briefHandle);
+                    setBriefHandle(null);
+                  }}
+                  disabled={invitesRemaining <= 0}
+                  aria-disabled={invitesRemaining <= 0}
+                  className="block w-full rounded-lg bg-white px-4 py-3 text-left text-sm text-kinnso-ink ring-1 ring-kinnso-cream2 hover:bg-kinnso-cream2 disabled:opacity-50"
+                >
+                  {m.title}
+                </button>
+              ))}
             </div>
           )}
-          {quickViewHandle && (
-            <div className="sticky bottom-0 flex gap-2 border-t border-kinnso-cream2 bg-kinnso-cream p-4">
-              <button
-                type="button"
-                onClick={() => { setInvitesLeft((n) => n - 1); setQuickViewHandle(null); }}
-                disabled={invitesLeft === 0}
-                aria-disabled={invitesLeft === 0}
-                title={invitesLeft === 0 ? t.inviteDisabled : undefined}
-                className="k-btn-primary flex-1 text-center disabled:opacity-50"
-              >
-                {t.sendBrief}
-              </button>
-              <button type="button" onClick={() => toggleSave(quickViewHandle)} className="k-btn-ghost">
-                {saves.includes(quickViewHandle) ? t.saved : t.save}
-              </button>
-              <button type="button" onClick={() => setQuickViewHandle(null)} className="k-btn-ghost">{t.close}</button>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
