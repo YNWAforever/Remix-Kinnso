@@ -19,7 +19,7 @@ export type CreatorMissionCard = {
   missionSource: 'merchant' | 'travelpayouts'
   missionType: 'coupon_affiliate' | 'hybrid' | 'paid'
   status: string
-  participant: { id: string; status: string } | null
+  participant: { id: string; status: string; source: string } | null
   partnerLinks: Array<{ id: string; partnerUrl: string }>
   programUrl: string | null
   compensation: string
@@ -34,13 +34,18 @@ type CreatorMissionsViewProps = {
   t: Messages['missions']
   missions: CreatorMissionCard[]
   onJoin: (missionId: string) => KinnsoActionResult | Promise<KinnsoActionResult>
+  onAccept: (missionId: string) => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
-export function CreatorMissionsView({ locale, t, missions, onJoin }: CreatorMissionsViewProps) {
+const isMerchantInvitation = (mission: CreatorMissionCard) =>
+  mission.participant?.status === 'invited' && mission.participant.source === 'merchant_invite'
+
+export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: CreatorMissionsViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [pendingId, setPendingId] = useState<string | null>(null)
-  const { mine, available } = segmentMissions(missions)
+  const invitations = missions.filter(isMerchantInvitation)
+  const { mine, available } = segmentMissions(missions.filter((mission) => !isMerchantInvitation(mission)))
 
   const getJoinLabel = (missionType: CreatorMissionCard['missionType']) =>
     missionType === 'coupon_affiliate' ? t.joinMission : t.applyMission
@@ -66,6 +71,39 @@ export function CreatorMissionsView({ locale, t, missions, onJoin }: CreatorMiss
         <p role="alert" className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
           {actionError}
         </p>
+      )}
+
+      {invitations.length > 0 && (
+        <section className="mt-8" aria-label={t.invitationsTitle}>
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.invitationsTitle}</h2>
+          <div className="mt-4 grid gap-4">
+            {invitations.map((mission) => (
+              <TicketCard key={mission.id} as="article" className="p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 space-y-2">
+                    <h3 className="text-lg font-bold text-kinnso-ink">{mission.title}</h3>
+                    <p className="text-sm text-kinnso-muted">{mission.summary}</p>
+                    <MissionCompensationSummary text={mission.compensation} />
+                  </div>
+                  <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
+                </div>
+                <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+                  <Link href={detailHref(mission.id)} className="k-btn-ghost text-sm">
+                    {t.viewDetails}
+                  </Link>
+                  <button
+                    type="button"
+                    className="k-btn-primary text-sm"
+                    disabled={pendingId === mission.id}
+                    onClick={() => void runAction(mission.id, () => onAccept(mission.id))}
+                  >
+                    {t.acceptInvite}
+                  </button>
+                </div>
+              </TicketCard>
+            ))}
+          </div>
+        </section>
       )}
 
       <section className="mt-8" aria-label={t.myMissions}>

@@ -7,6 +7,7 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { creatorMissionProgress } from '@/lib/missions/list'
 import { joinMissionAction } from '@/lib/missions/actions'
+import { acceptInviteAction } from '@/lib/missions/invite-actions'
 import { listCreatorMerchantMissions } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -39,6 +40,7 @@ type CreatorMissionRow = {
   mission_participants?: Array<{
     id: string
     status: string | null
+    source: string | null
     creator_id: string | null
     mission_milestone_submissions?: Array<{ status: string | null; mission_milestone_id: string }> | null
   }> | null
@@ -103,7 +105,9 @@ function mapCreatorMission(row: CreatorMissionRow, creatorId: string, creatorTie
     missionSource: missionSource(row.mission_source),
     missionType: missionType(row.mission_type),
     status: row.status ?? 'published',
-    participant: participant ? { id: participant.id, status: participant.status ?? 'active' } : null,
+    participant: participant
+      ? { id: participant.id, status: participant.status ?? 'active', source: participant.source ?? 'self' }
+      : null,
     partnerLinks: (row.affiliate_partner_links ?? []).map((link) => ({
       id: link.id,
       partnerUrl: link.partner_url ?? '',
@@ -144,5 +148,12 @@ export default async function StudioMissionsPage({ params }: { params: Params })
     return joinMissionAction({ missionId, locale: loc })
   }
 
-  return <CreatorMissionsView locale={loc} t={messages.missions} missions={missions} onJoin={join} />
+  async function accept(missionId: string) {
+    'use server'
+    return acceptInviteAction(loc, missionId)
+  }
+
+  return (
+    <CreatorMissionsView locale={loc} t={messages.missions} missions={missions} onJoin={join} onAccept={accept} />
+  )
 }
