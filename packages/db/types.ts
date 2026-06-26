@@ -1526,6 +1526,36 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_creators: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          handle: string
+          id: string
+          status: string
+        }[]
+      }
+      admin_list_merchants: {
+        Args: never
+        Returns: {
+          company_name: string
+          contact_email: string
+          created_at: string
+          id: string
+          status: string
+        }[]
+      }
+      admin_list_ops: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_name: string
+          id: string
+          status: string
+          user_id: string
+        }[]
+      }
       admin_overview_counts: {
         Args: never
         Returns: {
@@ -1536,6 +1566,10 @@ export type Database = {
           perks_total: number
           redemptions: number
         }[]
+      }
+      admin_set_user_status: {
+        Args: { p_id: string; p_kind: string; p_status: string }
+        Returns: undefined
       }
       award_contribution_event: {
         Args: {
