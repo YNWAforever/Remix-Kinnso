@@ -351,6 +351,9 @@ export interface Messages {
     minTierRising: string
     minTierPro: string
     minTierElite: string
+    invitationsTitle: string
+    acceptInvite: string
+    acceptInviteFailed: string
   }
   missionDetail: {
     back: string
@@ -632,6 +635,46 @@ export interface Messages {
     statusActive: string; statusSuspended: string
     statusOnboarding: string; statusPaused: string; statusArchived: string
     errorGeneric: string
+    tierLabel: string; tierFree: string; tierGrowth: string
+  }
+  merchantSearch: {
+    heading: string
+    sub: string
+    searchPlaceholder: string
+    filter: string
+    filtersLocked: string
+    upgradeTitle: string
+    upgradeBlurb: string
+    upgradeCta: string
+    tabRecommended: string
+    tabSaved: string
+    tabWorking: string
+    emptyRecommended: string
+    emptySaved: string
+    emptyWorking: string
+    resultsCapped: string
+    invitesLeft: string
+    reasonNiche: string
+    reasonGeo: string
+    reasonLanguage: string
+    reasonPlatform: string
+    guidesLabel: string
+    viewProfile: string
+    save: string
+    saved: string
+    sendBrief: string
+    addNote: string
+    pickMissionTitle: string
+    pickMissionEmpty: string
+    invited: string
+    filterNiches: string
+    filterGeos: string
+    filterLanguages: string
+    filterPlatforms: string
+    filterHasGuides: string
+    inviteQuotaExceeded: string
+    alreadyParticipant: string
+    inviteFailed: string
   }
 }
 
@@ -984,6 +1027,9 @@ const messages: Messages = {
     minTierRising: 'Rising+',
     minTierPro: 'Pro+',
     minTierElite: 'Elite+',
+    invitationsTitle: 'Invitations',
+    acceptInvite: 'Accept invitation',
+    acceptInviteFailed: 'Could not accept this invitation. Please try again.',
   },
   missionDetail: {
     back: 'Missions',
@@ -1362,6 +1408,48 @@ const messages: Messages = {
     statusPaused: 'Paused',
     statusArchived: 'Archived',
     errorGeneric: 'User status could not be changed.',
+    tierLabel: 'Tier',
+    tierFree: 'Free',
+    tierGrowth: 'Growth',
+  },
+  merchantSearch: {
+    heading: 'Find creators',
+    sub: 'Discover creators by what they publicly share — niches, audience regions, languages, and platforms.',
+    searchPlaceholder: 'Search by name or handle…',
+    filter: 'Filters',
+    filtersLocked: 'Filters are available on Growth.',
+    upgradeTitle: 'Upgrade to Growth',
+    upgradeBlurb: 'Unlock filters, see every matching creator, and send more invitations.',
+    upgradeCta: 'Upgrade',
+    tabRecommended: 'Recommended',
+    tabSaved: 'Saved',
+    tabWorking: 'Working with',
+    emptyRecommended: 'No creators match your filters yet.',
+    emptySaved: 'You haven’t saved any creators yet.',
+    emptyWorking: 'No creators are working with you yet.',
+    resultsCapped: 'Showing your top matches. Upgrade to Growth to see them all.',
+    invitesLeft: '{count} invitations left this month',
+    reasonNiche: 'Niche match',
+    reasonGeo: 'Audience region match',
+    reasonLanguage: 'Language match',
+    reasonPlatform: 'Platform match',
+    guidesLabel: '{count} Guides',
+    viewProfile: 'View profile',
+    save: 'Save',
+    saved: 'Saved',
+    sendBrief: 'Send brief',
+    addNote: 'Add a private note…',
+    pickMissionTitle: 'Invite to a mission',
+    pickMissionEmpty: 'Publish a mission first to invite creators.',
+    invited: 'Invited',
+    filterNiches: 'Niches',
+    filterGeos: 'Audience regions',
+    filterLanguages: 'Languages',
+    filterPlatforms: 'Platforms',
+    filterHasGuides: 'Has published guides',
+    inviteQuotaExceeded: 'You’ve used all your invitations this month.',
+    alreadyParticipant: 'This creator is already part of that mission.',
+    inviteFailed: 'Could not send the invitation. Please try again.',
   },
 }
 export default messages
