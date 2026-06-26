@@ -499,6 +499,7 @@ const messages: Messages = {
     tierTitle: 'ティア', tierDesc: '貢献ポイントとティア。',
     copilotTitle: 'コパイロット',
     copilotDesc: 'AIコパイロットとチャットして、アイデア、キャプション、コンテンツを相談しましょう。',
+    perksTitle: '特典', perksDesc: 'あなたのティアで解放されるパートナー特典。',
   },
   studioDashboard: {
     greeting: 'おかえりなさい、{name}さん',
@@ -685,6 +686,29 @@ const messages: Messages = {
     navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
+    statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
+  },
+  perks: {
+    catalog: {
+      heading: 'クリエイター特典', subtitle: '貢献ティアで解放されるパートナー特典。',
+      empty: '現在利用できる特典はありません。後ほど確認してください。',
+      lockedBadge: 'ロック中', requiresTier: '{tier} ティアが必要', unlockCta: 'ティアを上げる',
+      redeem: '利用する', redeemed: '利用済み', reveal: '表示', hide: '非表示',
+      copyCode: 'コードをコピー', copied: 'コピーしました', openDeal: '特典を開く',
+      redeemFailed: 'この特典を利用できませんでした。もう一度お試しください。',
+    },
+    admin: {
+      title: '特典', subtitle: 'パートナー特典を作成・管理します。',
+      newPerk: '新規特典', editPerk: '特典を編集', empty: 'まだ特典がありません。最初の特典を作成してください。',
+      fieldPartner: 'パートナー名', fieldTitle: 'タイトル', fieldSummary: '概要', fieldCategory: 'カテゴリ',
+      fieldDiscount: '割引ラベル', fieldMinTier: '最低ティア', fieldRedemptionType: '利用方法',
+      fieldRedemptionValue: '利用コード・URL', fieldSortOrder: '表示順', fieldActive: '有効',
+      tierOpen: '全員対象', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
+      typeCode: 'コード', typeLink: 'リンク',
+      save: '保存', cancel: 'キャンセル', activate: '有効化', deactivate: '無効化',
+      statusActive: '有効', statusInactive: '無効',
+    },
+    tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
 }
 export default messages

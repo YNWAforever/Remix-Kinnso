@@ -499,6 +499,7 @@ const messages: Messages = {
     tierTitle: '等级', tierDesc: '你的贡献积分与等级。',
     copilotTitle: '副驾驶',
     copilotDesc: '与 AI 副驾驶对话，获取创意、文案和内容灵感。',
+    perksTitle: '福利', perksDesc: '根据你的等级解锁的合作伙伴优惠。',
   },
   studioDashboard: {
     greeting: '欢迎回来，{name}',
@@ -685,6 +686,29 @@ const messages: Messages = {
     navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
+    statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
+  },
+  perks: {
+    catalog: {
+      heading: '创作者福利', subtitle: '根据你的贡献等级解锁的合作伙伴优惠。',
+      empty: '暂无福利，请稍后再来。',
+      lockedBadge: '已锁定', requiresTier: '需要 {tier} 等级', unlockCta: '提升你的等级',
+      redeem: '兑换', redeemed: '已兑换', reveal: '显示', hide: '隐藏',
+      copyCode: '复制代码', copied: '已复制', openDeal: '前往优惠',
+      redeemFailed: '无法兑换此福利，请重试。',
+    },
+    admin: {
+      title: '福利', subtitle: '创建并管理合作伙伴福利。',
+      newPerk: '新增福利', editPerk: '编辑福利', empty: '暂无福利，立即创建第一个。',
+      fieldPartner: '合作伙伴名称', fieldTitle: '标题', fieldSummary: '简介', fieldCategory: '分类',
+      fieldDiscount: '折扣标签', fieldMinTier: '最低等级', fieldRedemptionType: '兑换方式',
+      fieldRedemptionValue: '兑换内容', fieldSortOrder: '排序', fieldActive: '启用',
+      tierOpen: '所有人均可', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
+      typeCode: '代码', typeLink: '链接',
+      save: '保存', cancel: '取消', activate: '启用', deactivate: '停用',
+      statusActive: '启用中', statusInactive: '已停用',
+    },
+    tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
 }
 export default messages

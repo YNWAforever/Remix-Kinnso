@@ -499,6 +499,7 @@ const messages: Messages = {
     tierTitle: '등급', tierDesc: '기여 포인트와 등급.',
     copilotTitle: '코파일럿',
     copilotDesc: 'AI 코파일럿과 채팅하여 아이디어, 캡션, 콘텐츠를 상담하세요.',
+    perksTitle: '혜택', perksDesc: '나의 등급에 따라 해제되는 파트너 혜택.',
   },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',
@@ -685,6 +686,29 @@ const messages: Messages = {
     navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
+    statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
+  },
+  perks: {
+    catalog: {
+      heading: '크리에이터 혜택', subtitle: '기여 등급으로 해제되는 파트너 혜택.',
+      empty: '아직 이용 가능한 혜택이 없습니다. 나중에 다시 확인해 주세요.',
+      lockedBadge: '잠김', requiresTier: '{tier} 등급 필요', unlockCta: '등급을 올리세요',
+      redeem: '사용하기', redeemed: '사용 완료', reveal: '보기', hide: '숨기기',
+      copyCode: '코드 복사', copied: '복사됨', openDeal: '혜택 열기',
+      redeemFailed: '혜택을 사용할 수 없습니다. 다시 시도해 주세요.',
+    },
+    admin: {
+      title: '혜택', subtitle: '파트너 혜택을 생성하고 관리하세요.',
+      newPerk: '새 혜택', editPerk: '혜택 편집', empty: '아직 혜택이 없습니다. 첫 번째 혜택을 만들어 보세요.',
+      fieldPartner: '파트너 이름', fieldTitle: '제목', fieldSummary: '요약', fieldCategory: '카테고리',
+      fieldDiscount: '할인 라벨', fieldMinTier: '최소 등급', fieldRedemptionType: '사용 방식',
+      fieldRedemptionValue: '사용 코드·URL', fieldSortOrder: '정렬 순서', fieldActive: '활성화',
+      tierOpen: '모두 이용 가능', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
+      typeCode: '코드', typeLink: '링크',
+      save: '저장', cancel: '취소', activate: '활성화', deactivate: '비활성화',
+      statusActive: '활성', statusInactive: '비활성',
+    },
+    tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
 }
 export default messages

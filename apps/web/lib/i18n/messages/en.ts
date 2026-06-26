@@ -452,6 +452,8 @@ export interface Messages {
     tierDesc: string
     copilotTitle: string
     copilotDesc: string
+    perksTitle: string
+    perksDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -601,6 +603,26 @@ export interface Messages {
     navDashboard: string; navPerks: string; navUsers: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
+    statPerksActive: string; statPerksTotal: string; statRedemptions: string
+  }
+  perks: {
+    catalog: {
+      heading: string; subtitle: string; empty: string
+      lockedBadge: string; requiresTier: string; unlockCta: string
+      redeem: string; redeemed: string; reveal: string; hide: string
+      copyCode: string; copied: string; openDeal: string; redeemFailed: string
+    }
+    admin: {
+      title: string; subtitle: string; newPerk: string; editPerk: string; empty: string
+      fieldPartner: string; fieldTitle: string; fieldSummary: string; fieldCategory: string
+      fieldDiscount: string; fieldMinTier: string; fieldRedemptionType: string
+      fieldRedemptionValue: string; fieldSortOrder: string; fieldActive: string
+      tierOpen: string; tierRising: string; tierPro: string; tierElite: string
+      typeCode: string; typeLink: string
+      save: string; cancel: string; activate: string; deactivate: string
+      statusActive: string; statusInactive: string
+    }
+    tierLabels: { rising: string; pro: string; elite: string }
   }
 }
 
@@ -1103,6 +1125,7 @@ const messages: Messages = {
     tierTitle: 'Tier', tierDesc: 'Your contribution points and tier.',
     copilotTitle: 'Copilot',
     copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
+    perksTitle: 'Perks', perksDesc: 'Partner deals unlocked by your tier.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1289,6 +1312,29 @@ const messages: Messages = {
     navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
+    statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
+  },
+  perks: {
+    catalog: {
+      heading: 'Creator perks', subtitle: 'Partner deals unlocked by your contribution tier.',
+      empty: 'No perks available yet — check back soon.',
+      lockedBadge: 'Locked', requiresTier: 'Requires {tier}', unlockCta: 'Climb your tier',
+      redeem: 'Redeem', redeemed: 'Redeemed', reveal: 'Reveal', hide: 'Hide',
+      copyCode: 'Copy code', copied: 'Copied', openDeal: 'Open deal',
+      redeemFailed: 'Could not redeem this perk. Please try again.',
+    },
+    admin: {
+      title: 'Perks', subtitle: 'Create and manage partner perks.',
+      newPerk: 'New perk', editPerk: 'Edit perk', empty: 'No perks yet. Create the first one.',
+      fieldPartner: 'Partner name', fieldTitle: 'Title', fieldSummary: 'Summary', fieldCategory: 'Category',
+      fieldDiscount: 'Discount label', fieldMinTier: 'Minimum tier', fieldRedemptionType: 'Redemption type',
+      fieldRedemptionValue: 'Redemption value', fieldSortOrder: 'Sort order', fieldActive: 'Active',
+      tierOpen: 'Open to all', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
+      typeCode: 'Code', typeLink: 'Link',
+      save: 'Save', cancel: 'Cancel', activate: 'Activate', deactivate: 'Deactivate',
+      statusActive: 'Active', statusInactive: 'Inactive',
+    },
+    tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
 }
 export default messages

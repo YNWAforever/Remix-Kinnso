@@ -499,6 +499,7 @@ const messages: Messages = {
     tierTitle: '等級', tierDesc: '你的貢獻積分與等級。',
     copilotTitle: '副駕駛',
     copilotDesc: '與 AI 副駕駛對話，獲取創意、文案和內容靈感。',
+    perksTitle: '福利', perksDesc: '根據你的等級解鎖的合作夥伴優惠。',
   },
   studioDashboard: {
     greeting: '歡迎回來，{name}',
@@ -685,6 +686,29 @@ const messages: Messages = {
     navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
     statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
+    statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
+  },
+  perks: {
+    catalog: {
+      heading: '創作者福利', subtitle: '根據你的貢獻等級解鎖的合作夥伴優惠。',
+      empty: '目前尚無福利，請稍後再來。',
+      lockedBadge: '已鎖定', requiresTier: '需要 {tier} 等級', unlockCta: '提升你的等級',
+      redeem: '兌換', redeemed: '已兌換', reveal: '顯示', hide: '隱藏',
+      copyCode: '複製代碼', copied: '已複製', openDeal: '前往優惠',
+      redeemFailed: '無法兌換此福利，請重試。',
+    },
+    admin: {
+      title: '福利', subtitle: '建立並管理合作夥伴福利。',
+      newPerk: '新增福利', editPerk: '編輯福利', empty: '目前尚無福利，立即建立第一個。',
+      fieldPartner: '合作夥伴名稱', fieldTitle: '標題', fieldSummary: '摘要', fieldCategory: '分類',
+      fieldDiscount: '折扣標籤', fieldMinTier: '最低等級', fieldRedemptionType: '兌換方式',
+      fieldRedemptionValue: '兌換內容', fieldSortOrder: '排列順序', fieldActive: '啟用',
+      tierOpen: '所有人均可', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
+      typeCode: '代碼', typeLink: '連結',
+      save: '儲存', cancel: '取消', activate: '啟用', deactivate: '停用',
+      statusActive: '啟用中', statusInactive: '已停用',
+    },
+    tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
 }
 export default messages
