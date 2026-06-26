@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { getAdminOverview } from '@/lib/admin/queries'
 
 function client(counts: Record<string, number>) {
