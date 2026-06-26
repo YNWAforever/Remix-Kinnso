@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { Messages } from '@/lib/i18n/messages/en'
+import type { Locale } from '@/lib/i18n/config'
 import type { AdminUsers } from '@/lib/admin/users-queries'
 import type { ActionResult } from '@/lib/admin/result'
 import type { UserKind, UserStatus } from '@/lib/admin/users-actions'
@@ -21,9 +23,10 @@ function statusLabel(t: T, status: string): string {
   }
 }
 
-function UserSection({ t, heading, kind, rows, onSetStatus }: {
-  t: T; heading: string; kind: UserKind; rows: Row[]; onSetStatus: SetStatus
+function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
+  t: T; locale: Locale; heading: string; kind: UserKind; rows: Row[]; onSetStatus: SetStatus
 }) {
+  const router = useRouter()
   const [items, setItems] = useState(rows)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -34,8 +37,12 @@ function UserSection({ t, heading, kind, rows, onSetStatus }: {
     setErrors((e) => ({ ...e, [row.id]: '' }))
     const res = await onSetStatus(kind, row.id, next)
     setBusyId(null)
-    if (res.ok) setItems((list) => list.map((r) => (r.id === row.id ? { ...r, status: res.status } : r)))
-    else setErrors((e) => ({ ...e, [row.id]: res.errors.form?.[0] ?? t.errorGeneric }))
+    if (res.ok) {
+      setItems((list) => list.map((r) => (r.id === row.id ? { ...r, status: res.status } : r)))
+      router.refresh() // reconcile the optimistic flip with the revalidated server truth
+    } else {
+      setErrors((e) => ({ ...e, [row.id]: res.errors.form?.[0] ?? t.errorGeneric }))
+    }
   }
 
   return (
@@ -55,13 +62,15 @@ function UserSection({ t, heading, kind, rows, onSetStatus }: {
                     <span className={suspended ? 'font-bold text-red-600' : 'font-bold text-kinnso-orange'}>
                       {statusLabel(t, row.status)}
                     </span>
-                    {' · '}{t.joined} {new Date(row.joined).toLocaleDateString()}
+                    {' · '}{t.joined} {new Date(row.joined).toLocaleDateString(locale)}
                   </p>
                   {errors[row.id] ? <p className="mt-1 text-sm text-red-600">{errors[row.id]}</p> : null}
                 </div>
                 <button
                   onClick={() => toggle(row)}
                   disabled={busyId === row.id}
+                  aria-busy={busyId === row.id}
+                  aria-label={`${suspended ? t.activate : t.suspend} ${row.name}`}
                   className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50"
                 >
                   {suspended ? t.activate : t.suspend}
@@ -75,18 +84,18 @@ function UserSection({ t, heading, kind, rows, onSetStatus }: {
   )
 }
 
-export function AdminUsersView({ t, users, onSetStatus }: { t: T; users: AdminUsers; onSetStatus: SetStatus }) {
+export function AdminUsersView({ t, locale, users, onSetStatus }: { t: T; locale: Locale; users: AdminUsers; onSetStatus: SetStatus }) {
   return (
     <main>
       <h1 className="k-display">{t.title}</h1>
       <p className="mt-2 text-kinnso-muted">{t.subtitle}</p>
-      <UserSection t={t} heading={t.sectionCreators} kind="creator"
+      <UserSection t={t} locale={locale} heading={t.sectionCreators} kind="creator"
         rows={users.creators.map((c) => ({ id: c.id, name: c.display_name || c.handle || t.unnamed, status: c.status, joined: c.created_at }))}
         onSetStatus={onSetStatus} />
-      <UserSection t={t} heading={t.sectionMerchants} kind="merchant"
+      <UserSection t={t} locale={locale} heading={t.sectionMerchants} kind="merchant"
         rows={users.merchants.map((m) => ({ id: m.id, name: m.company_name, status: m.status, joined: m.created_at }))}
         onSetStatus={onSetStatus} />
-      <UserSection t={t} heading={t.sectionOps} kind="ops"
+      <UserSection t={t} locale={locale} heading={t.sectionOps} kind="ops"
         rows={users.ops.map((o) => ({ id: o.id, name: o.display_name, status: o.status, joined: o.created_at }))}
         onSetStatus={onSetStatus} />
     </main>

@@ -26,5 +26,5 @@ export default async function AdminUsersPage({ params }: { params: Promise<{ loc
     return setUserStatusAction(loc, kind, id, status)
   }
 
-  return <AdminUsersView t={messages.users} users={users} onSetStatus={onSetStatus} />
+  return <AdminUsersView t={messages.users} locale={loc} users={users} onSetStatus={onSetStatus} />
 }

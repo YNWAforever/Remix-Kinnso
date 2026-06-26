@@ -14,6 +14,7 @@ const { roleMock, getUserMock, listMock } = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
+  useRouter: () => ({ refresh: () => {} }),
 }))
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
 vi.mock('@/lib/admin/users-queries', () => ({ listAdminUsers: listMock }))

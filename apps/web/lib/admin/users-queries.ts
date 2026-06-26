@@ -11,7 +11,9 @@ export type AdminCreator = Omit<RawCreator, 'display_name' | 'handle'> & {
   display_name: string | null
   handle: string | null
 }
-export type AdminMerchant = RawMerchant
+/** contact_email is dropped: the UI never renders it, so it must not be shipped
+ *  to the client (this prop is serialized into the client component's payload). */
+export type AdminMerchant = Omit<RawMerchant, 'contact_email'>
 export type AdminOps = RawOps
 export type AdminUsers = { creators: AdminCreator[]; merchants: AdminMerchant[]; ops: AdminOps[] }
 
@@ -28,7 +30,10 @@ export async function listAdminUsers(supabase: SupabaseClient<Database>): Promis
   if (ops.error) throw ops.error
   return {
     creators: (creators.data ?? []) as AdminCreator[],
-    merchants: (merchants.data ?? []) as AdminMerchant[],
+    // Project to {id, company_name, status, created_at} — drop contact_email (PII) the UI doesn't use.
+    merchants: (merchants.data ?? []).map((m) => ({
+      id: m.id, company_name: m.company_name, status: m.status, created_at: m.created_at,
+    })) as AdminMerchant[],
     ops: (ops.data ?? []) as AdminOps[],
   }
 }
