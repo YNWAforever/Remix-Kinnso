@@ -87,7 +87,7 @@ describe('/[locale]/merchants/creators host', () => {
 
   it('redirects an anonymous viewer to sign-in', async () => {
     roleMock.mockResolvedValueOnce('anon')
-    getUserMock.mockResolvedValueOnce({ data: { user: null } })
+    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
     await expect(
       MerchantsCreatorsPage({ params: Promise.resolve({ locale: 'en' }) }),
     ).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
