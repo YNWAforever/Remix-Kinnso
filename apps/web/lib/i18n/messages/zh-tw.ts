@@ -710,5 +710,23 @@ const messages: Messages = {
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
+  users: {
+    title: '使用者',
+    subtitle: '管理創作者、商家及營運成員。',
+    sectionCreators: '創作者',
+    sectionMerchants: '商家',
+    sectionOps: '營運成員',
+    empty: '目前尚無。',
+    joined: '加入於',
+    unnamed: '未命名',
+    activate: '啟用',
+    suspend: '停用',
+    statusActive: '使用中',
+    statusSuspended: '已停用',
+    statusOnboarding: '設定中',
+    statusPaused: '已暫停',
+    statusArchived: '已封存',
+    errorGeneric: '無法變更使用者狀態。',
+  },
 }
 export default messages

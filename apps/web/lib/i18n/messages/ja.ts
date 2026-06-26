@@ -710,5 +710,23 @@ const messages: Messages = {
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
+  users: {
+    title: 'ユーザー',
+    subtitle: 'クリエイター、加盟店、運営メンバーを管理します。',
+    sectionCreators: 'クリエイター',
+    sectionMerchants: '加盟店',
+    sectionOps: '運営メンバー',
+    empty: 'まだありません。',
+    joined: '登録日',
+    unnamed: '名称未設定',
+    activate: '有効化',
+    suspend: '停止',
+    statusActive: '有効',
+    statusSuspended: '停止中',
+    statusOnboarding: '設定中',
+    statusPaused: '一時停止',
+    statusArchived: 'アーカイブ済み',
+    errorGeneric: 'ユーザーの状態を変更できませんでした。',
+  },
 }
 export default messages

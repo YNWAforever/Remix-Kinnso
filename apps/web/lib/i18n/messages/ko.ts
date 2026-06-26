@@ -710,5 +710,23 @@ const messages: Messages = {
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
+  users: {
+    title: '사용자',
+    subtitle: '크리에이터, 가맹점, 운영 멤버를 관리하세요.',
+    sectionCreators: '크리에이터',
+    sectionMerchants: '가맹점',
+    sectionOps: '운영 멤버',
+    empty: '아직 없습니다.',
+    joined: '가입일',
+    unnamed: '이름 없음',
+    activate: '활성화',
+    suspend: '정지',
+    statusActive: '활성',
+    statusSuspended: '정지됨',
+    statusOnboarding: '설정 중',
+    statusPaused: '일시 중지',
+    statusArchived: '보관됨',
+    errorGeneric: '사용자 상태를 변경할 수 없습니다.',
+  },
 }
 export default messages

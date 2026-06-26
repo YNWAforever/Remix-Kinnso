@@ -710,5 +710,23 @@ const messages: Messages = {
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
+  users: {
+    title: 'ผู้ใช้',
+    subtitle: 'จัดการครีเอเตอร์ ร้านค้า และสมาชิกฝ่ายปฏิบัติการ',
+    sectionCreators: 'ครีเอเตอร์',
+    sectionMerchants: 'ร้านค้า',
+    sectionOps: 'สมาชิกฝ่ายปฏิบัติการ',
+    empty: 'ยังไม่มี',
+    joined: 'เข้าร่วมเมื่อ',
+    unnamed: 'ไม่มีชื่อ',
+    activate: 'เปิดใช้งาน',
+    suspend: 'ระงับ',
+    statusActive: 'ใช้งานอยู่',
+    statusSuspended: 'ถูกระงับ',
+    statusOnboarding: 'กำลังตั้งค่า',
+    statusPaused: 'หยุดชั่วคราว',
+    statusArchived: 'เก็บถาวรแล้ว',
+    errorGeneric: 'ไม่สามารถเปลี่ยนสถานะผู้ใช้ได้',
+  },
 }
 export default messages

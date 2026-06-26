@@ -624,6 +624,15 @@ export interface Messages {
     }
     tierLabels: { rising: string; pro: string; elite: string }
   }
+  users: {
+    title: string; subtitle: string
+    sectionCreators: string; sectionMerchants: string; sectionOps: string
+    empty: string; joined: string; unnamed: string
+    activate: string; suspend: string
+    statusActive: string; statusSuspended: string
+    statusOnboarding: string; statusPaused: string; statusArchived: string
+    errorGeneric: string
+  }
 }
 
 const messages: Messages = {
@@ -1335,6 +1344,24 @@ const messages: Messages = {
       statusActive: 'Active', statusInactive: 'Inactive',
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
+  },
+  users: {
+    title: 'Users',
+    subtitle: 'Manage creators, merchants, and ops members.',
+    sectionCreators: 'Creators',
+    sectionMerchants: 'Merchants',
+    sectionOps: 'Ops members',
+    empty: 'None yet.',
+    joined: 'Joined',
+    unnamed: 'Unnamed',
+    activate: 'Activate',
+    suspend: 'Suspend',
+    statusActive: 'Active',
+    statusSuspended: 'Suspended',
+    statusOnboarding: 'Onboarding',
+    statusPaused: 'Paused',
+    statusArchived: 'Archived',
+    errorGeneric: 'User status could not be changed.',
   },
 }
 export default messages

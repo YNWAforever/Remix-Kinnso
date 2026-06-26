@@ -710,5 +710,23 @@ const messages: Messages = {
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
   },
+  users: {
+    title: '用户',
+    subtitle: '管理创作者、商户及运营成员。',
+    sectionCreators: '创作者',
+    sectionMerchants: '商户',
+    sectionOps: '运营成员',
+    empty: '暂时没有。',
+    joined: '加入于',
+    unnamed: '未命名',
+    activate: '启用',
+    suspend: '停用',
+    statusActive: '使用中',
+    statusSuspended: '已停用',
+    statusOnboarding: '设置中',
+    statusPaused: '已暂停',
+    statusArchived: '已归档',
+    errorGeneric: '无法更改用户状态。',
+  },
 }
 export default messages
