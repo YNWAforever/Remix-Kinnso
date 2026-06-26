@@ -681,5 +681,10 @@ const messages: Messages = {
     unconfiguredBody: '副駕駛即將在此處上線，請稍後再來查看。',
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
+  admin: {
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者',
+    dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
+    statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
+  },
 }
 export default messages

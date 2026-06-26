@@ -681,5 +681,10 @@ const messages: Messages = {
     unconfiguredBody: 'โคไพล็อตจะพร้อมใช้งานในไม่ช้า กรุณากลับมาตรวจสอบอีกครั้ง',
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
+  admin: {
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้',
+    dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
+    statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
+  },
 }
 export default messages

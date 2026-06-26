@@ -681,5 +681,10 @@ const messages: Messages = {
     unconfiguredBody: '副機師即將喺此處上線，請稍後再嚟睇睇。',
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
+  admin: {
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶',
+    dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、用戶同平台內容。',
+    statCreators: '創作者', statMerchants: '商戶', statOps: '營運成員',
+  },
 }
 export default messages

@@ -681,5 +681,10 @@ const messages: Messages = {
     unconfiguredBody: '코파일럿은 곧 이곳에서 이용 가능합니다. 잠시 후 다시 확인해 주세요.',
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
+  admin: {
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자',
+    dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
+    statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
+  },
 }
 export default messages

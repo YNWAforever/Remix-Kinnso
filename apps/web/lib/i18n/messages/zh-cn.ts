@@ -681,5 +681,10 @@ const messages: Messages = {
     unconfiguredBody: '副驾驶即将在此处上线，请稍后再来查看。',
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
+  admin: {
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户',
+    dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
+    statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
+  },
 }
 export default messages

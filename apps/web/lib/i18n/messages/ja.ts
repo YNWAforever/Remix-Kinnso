@@ -681,5 +681,10 @@ const messages: Messages = {
     unconfiguredBody: 'コパイロットはまもなくこちらでご利用いただけます。しばらくお待ちください。',
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
+  admin: {
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー',
+    dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
+    statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
+  },
 }
 export default messages

@@ -597,6 +597,11 @@ export interface Messages {
     unconfiguredTitle: string; unconfiguredBody: string
     disclaimer: string
   }
+  admin: {
+    navDashboard: string; navPerks: string; navUsers: string
+    dashboardTitle: string; dashboardSubtitle: string
+    statCreators: string; statMerchants: string; statOps: string
+  }
 }
 
 const messages: Messages = {
@@ -1279,6 +1284,11 @@ const messages: Messages = {
     unconfiguredTitle: "Copilot isn't switched on yet",
     unconfiguredBody: 'The Copilot will be available here shortly. Check back soon.',
     disclaimer: 'AI-generated — review before you publish.',
+  },
+  admin: {
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users',
+    dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
+    statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
   },
 }
 export default messages
