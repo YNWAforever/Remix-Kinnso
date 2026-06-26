@@ -25,7 +25,7 @@ afterEach(() => vi.clearAllMocks())
 
 describe('/studio/perks host', () => {
   it('redirects an anon viewer to sign-in', async () => {
-    getUserMock.mockResolvedValueOnce({ data: { user: null } })
+    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
     await expect(StudioPerksPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow(/NEXT_REDIRECT/)
   })
   it('notFounds a non-creator', async () => {

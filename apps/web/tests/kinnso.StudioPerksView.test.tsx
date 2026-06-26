@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { StudioPerksView } from '@/components/kinnso/pages/StudioPerksView'
 import en from '@/lib/i18n/messages/en'
 import type { PerkCard } from '@/lib/perks/list'

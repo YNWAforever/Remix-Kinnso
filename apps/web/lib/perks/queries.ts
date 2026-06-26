@@ -1,8 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 
-/** A creator-safe perk row from the list_active_perks RPC — NO redemption_value. */
-export type ActivePerk = Database['public']['Functions']['list_active_perks']['Returns'][number]
+type RawActivePerk = Database['public']['Functions']['list_active_perks']['Returns'][number]
+/**
+ * A creator-safe perk row from the list_active_perks RPC — NO redemption_value.
+ * `min_tier` is widened to nullable: the SQL column is nullable (null = open to all),
+ * but the generated RETURNS-TABLE type marks it non-null.
+ */
+export type ActivePerk = Omit<RawActivePerk, 'min_tier'> & { min_tier: string | null }
 
 /** Creator-safe catalog via the SECURITY DEFINER RPC (metadata only). Errors propagate. */
 export async function listActivePerks(supabase: SupabaseClient<Database>): Promise<ActivePerk[]> {

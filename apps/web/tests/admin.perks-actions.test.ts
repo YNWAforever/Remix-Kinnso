@@ -46,7 +46,7 @@ beforeEach(() => {
 
 describe('createPerkAction', () => {
   it('rejects a non-ops caller before writing', async () => {
-    gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } })
+    gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } } as never)
     const { client } = makeClient()
     serverClientMock.mockResolvedValue(client)
     const r = await createPerkAction('en', input)

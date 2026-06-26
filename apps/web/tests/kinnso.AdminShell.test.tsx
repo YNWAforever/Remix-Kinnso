@@ -21,7 +21,7 @@ describe('AdminShell', () => {
 
 describe('AdminDashboardView', () => {
   it('renders the overview counts', () => {
-    render(<AdminDashboardView t={en.admin} overview={{ creators: 5, merchants: 2, ops: 1 }} />)
+    render(<AdminDashboardView t={en.admin} overview={{ creators: 5, merchants: 2, ops: 1, perksActive: 3, perksTotal: 4, redemptions: 7 }} />)
     expect(screen.getByText('5')).toBeTruthy()
     expect(screen.getByText(en.admin.statCreators)).toBeTruthy()
   })
