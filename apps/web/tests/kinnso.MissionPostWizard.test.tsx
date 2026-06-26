@@ -113,3 +113,22 @@ describe('MissionPostWizard', () => {
     expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/missions')
   })
 })
+
+describe('MissionPostWizard minimum-tier selector', () => {
+  it('renders all four minimum-tier options', () => {
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={vi.fn()} />)
+    expect(screen.getByText(en.missions.minTierOpen)).toBeTruthy()
+    expect(screen.getByText(en.missions.minTierRising)).toBeTruthy()
+    expect(screen.getByText(en.missions.minTierPro)).toBeTruthy()
+    expect(screen.getByText(en.missions.minTierElite)).toBeTruthy()
+  })
+
+  it('selects Pro+ and checks the corresponding radio', () => {
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={vi.fn()} />)
+    const proRadio = document.querySelector('input[name="minTier"][value="pro"]') as HTMLInputElement
+    expect(proRadio).toBeTruthy()
+    expect(proRadio.checked).toBe(false)
+    fireEvent.click(proRadio)
+    expect(proRadio.checked).toBe(true)
+  })
+})

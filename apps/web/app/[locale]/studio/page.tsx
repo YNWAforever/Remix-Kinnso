@@ -7,6 +7,7 @@ import { DnaSchema, type Dna, type Platform } from '@kinnso/scan'
 import { buildStudioIdentity, type HandleRow } from '@/lib/studio/identity'
 import { computeReadiness, REQUIRED_PLATFORMS } from '@/lib/studio/readiness'
 import { listCreatorMerchantMissions, listAffiliateOffers, listCreatorSettlements } from '@/lib/missions/queries'
+import { getCreatorContribution } from '@/lib/contribution/queries'
 import { summarizeCreatorEarnings, toCreatorEarningItem, type CreatorSettlementRow } from '@/lib/missions/earnings'
 import { StudioDashboardView, type OpportunityPreview } from '@/components/kinnso/pages/StudioDashboardView'
 
@@ -53,13 +54,14 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
   const dna: Dna = parsed.data
   const updatedAt = (dnaRow?.updated_at as string | null) ?? new Date().toISOString()
 
-  const [handleRes, guidesRes, activeJobRes, missionsRes, offersRes, settlementsRes] = await Promise.all([
+  const [handleRes, guidesRes, activeJobRes, missionsRes, offersRes, settlementsRes, contribution] = await Promise.all([
     supabase.from('creator_social_handles').select('platform, handle, url').eq('creator_id', user.id),
     supabase.from('guides').select('id').eq('creator_id', user.id),
     supabase.from('creator_scan_jobs').select('id, status').eq('creator_id', user.id).in('status', ['queued', 'fetching', 'analyzing']).limit(1).maybeSingle(),
     listCreatorMerchantMissions(supabase),
     listAffiliateOffers(supabase),
     listCreatorSettlements(supabase),
+    getCreatorContribution(supabase, user.id),
   ])
 
   const handles: HandleRow[] = (handleRes.data ?? []).map((h) => ({
@@ -107,6 +109,8 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
       platforms={handles.map((h) => h.platform)}
       missingPlatforms={missingPlatforms}
       activeJobId={activeJobRes.data?.id ?? null}
+      contribution={contribution}
+      tierT={messages.tier}
     />
   )
 }

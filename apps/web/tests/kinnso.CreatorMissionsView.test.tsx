@@ -31,6 +31,8 @@ const baseAvailable: CreatorMissionCard = {
   compensation: '12% commission',
   milestoneCount: 0,
   submittedCount: 0,
+  locked: false,
+  requiredTier: null,
 }
 
 const baseMine: CreatorMissionCard = {
@@ -125,5 +127,25 @@ describe('CreatorMissionsView', () => {
     expect(links.map((a) => a.getAttribute('href'))).toEqual(
       expect.arrayContaining(['/en/studio/missions/m9', '/en/studio/missions/m1']),
     )
+  })
+
+  it('renders a locked mission with a disabled join and the required tier', () => {
+    const onJoin = vi.fn()
+    const locked: CreatorMissionCard = {
+      ...baseAvailable,
+      id: 'm-locked',
+      title: 'Pro-only mission',
+      locked: true,
+      requiredTier: 'pro',
+    }
+    render(<CreatorMissionsView locale="en" t={en.missions} missions={[locked]} onJoin={onJoin} />)
+    expect(screen.getByText('Pro-only mission')).toBeTruthy()
+    expect(screen.getByText(en.missions.locked)).toBeTruthy()
+    // the requirement badge renders the tier label
+    expect(screen.getByText('Pro')).toBeTruthy()
+    const joinBtn = screen.getByRole('button', { name: en.missions.joinMission })
+    expect(joinBtn.hasAttribute('disabled')).toBe(true)
+    fireEvent.click(joinBtn)
+    expect(onJoin).not.toHaveBeenCalled()
   })
 })

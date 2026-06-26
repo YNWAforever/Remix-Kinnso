@@ -7,7 +7,9 @@ import { actionErrorMessage, actionSucceeded, type KinnsoActionResult } from '@/
 import { MissionCompensationSummary } from '@/components/kinnso/MissionCompensationSummary'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
+import TierBadge from '@/components/kinnso/TierBadge'
 import { segmentMissions } from '@/lib/missions/list'
+import type { GatedTier } from '@/lib/contribution/tiers'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export type CreatorMissionCard = {
@@ -23,6 +25,8 @@ export type CreatorMissionCard = {
   compensation: string
   milestoneCount: number
   submittedCount: number
+  locked: boolean
+  requiredTier: GatedTier | null
 }
 
 type CreatorMissionsViewProps = {
@@ -124,14 +128,24 @@ export function CreatorMissionsView({ locale, t, missions, onJoin }: CreatorMiss
                   <Link href={detailHref(mission.id)} className="k-btn-ghost text-sm">
                     {t.viewDetails}
                   </Link>
-                  <button
-                    type="button"
-                    className="k-btn-primary text-sm"
-                    disabled={pendingId === mission.id}
-                    onClick={() => void runAction(mission.id, () => onJoin(mission.id))}
-                  >
-                    {getJoinLabel(mission.missionType)}
-                  </button>
+                  {mission.locked && mission.requiredTier ? (
+                    <>
+                      <span className="text-xs font-semibold text-kinnso-muted">{t.locked}</span>
+                      <TierBadge tier={mission.requiredTier} />
+                      <button type="button" className="k-btn-primary text-sm" disabled aria-disabled="true">
+                        {getJoinLabel(mission.missionType)}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="k-btn-primary text-sm"
+                      disabled={pendingId === mission.id}
+                      onClick={() => void runAction(mission.id, () => onJoin(mission.id))}
+                    >
+                      {getJoinLabel(mission.missionType)}
+                    </button>
+                  )}
                 </div>
               </TicketCard>
             ))}

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
+import type { GatedTier } from '@/lib/contribution/tiers'
 
 export const merchantMissionSelect = `
   id,title,summary,mission_source,mission_type,visibility,status,published_at,
@@ -13,7 +14,7 @@ export const merchantMissionSelect = `
 `
 
 export const creatorMissionSelect = `
-  id,title,summary,mission_source,mission_type,visibility,status,published_at,
+  id,title,summary,mission_source,mission_type,visibility,status,published_at,min_tier,
   coupon_code,coupon_url,affiliate_commission_rate,creator_commission_rate,kinnso_commission_rate,
   paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
   affiliate_network_programs(id,program_name,program_url,default_commission_description,status),
@@ -85,7 +86,7 @@ export async function listCreatorMerchantMissions(
 }
 
 export const creatorMissionDetailSelect = `
-  id,title,summary,mission_source,mission_type,visibility,status,published_at,
+  id,title,summary,mission_source,mission_type,visibility,status,published_at,min_tier,
   coupon_code,coupon_url,affiliate_commission_rate,creator_commission_rate,kinnso_commission_rate,
   paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
   affiliate_network_programs(id,program_name,program_url,default_commission_description,status),
@@ -123,4 +124,22 @@ export async function listOpsSettlements(supabase: SupabaseClient<Database>) {
     .from('mission_settlements')
     .select(opsSettlementSelect)
     .order('updated_at', { ascending: false })
+}
+
+export async function countGatedMissionsByTier(
+  supabase: SupabaseClient<Database>,
+): Promise<Record<GatedTier, number>> {
+  const counts: Record<GatedTier, number> = { rising: 0, pro: 0, elite: 0 }
+  const { data } = await supabase
+    .from('missions')
+    .select('min_tier')
+    .eq('status', 'published')
+    .eq('mission_source', 'merchant')
+    .eq('visibility', 'open')
+    .not('min_tier', 'is', null)
+  for (const row of (data ?? []) as Array<{ min_tier: string | null }>) {
+    const tier = row.min_tier as GatedTier | null
+    if (tier && tier in counts) counts[tier] += 1
+  }
+  return counts
 }

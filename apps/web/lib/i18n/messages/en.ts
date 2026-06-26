@@ -344,6 +344,13 @@ export interface Messages {
     missionsEmptyBody: string
     postMissionCta: string
     creatorFallback: string
+    locked: string
+    lockedHelp: string
+    minTierLabel: string
+    minTierOpen: string
+    minTierRising: string
+    minTierPro: string
+    minTierElite: string
   }
   missionDetail: {
     back: string
@@ -441,6 +448,10 @@ export interface Messages {
     offersTitle: string; offersDesc: string
     inboxTitle: string; inboxDesc: string
     guidesTitle: string; guidesDesc: string
+    tierTitle: string
+    tierDesc: string
+    copilotTitle: string
+    copilotDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -552,6 +563,39 @@ export interface Messages {
     colType: string
     colAmount: string
     colStatus: string
+  }
+  tier: {
+    cardTitle: string
+    toNext: string
+    maxed: string
+    earnHeading: string
+    earnGuide: string
+    earnMission: string
+    earnScan: string
+    viewAll: string
+    pageHeading: string
+    pageSubtitle: string
+    currentLabel: string
+    allTiersHeading: string
+    unlocksHeading: string
+    unlocksMissions: string
+    unlocksHelp: string
+    historyHeading: string
+    historyEmpty: string
+    eventGuide: string
+    eventMission: string
+    eventScan: string
+    pointsSuffix: string
+  }
+  copilot: {
+    title: string; subtitle: string
+    inputPlaceholder: string; send: string; newChat: string
+    emptyTitle: string; emptyBody: string
+    limitTitle: string; limitBody: string; limitUpsell: string
+    toolWorking: string
+    errorGeneric: string
+    unconfiguredTitle: string; unconfiguredBody: string
+    disclaimer: string
   }
 }
 
@@ -897,6 +941,13 @@ const messages: Messages = {
     missionsEmptyBody: 'Post your first mission to start working with creators.',
     postMissionCta: 'Post a mission',
     creatorFallback: 'Creator',
+    locked: 'Tier locked',
+    lockedHelp: 'Reach this tier to unlock this mission.',
+    minTierLabel: 'Minimum tier',
+    minTierOpen: 'Open to all',
+    minTierRising: 'Rising+',
+    minTierPro: 'Pro+',
+    minTierElite: 'Elite+',
   },
   missionDetail: {
     back: 'Missions',
@@ -1044,6 +1095,9 @@ const messages: Messages = {
     offersTitle: 'Offers', offersDesc: 'Affiliate offers to promote.',
     inboxTitle: 'Inbox', inboxDesc: 'Messages from merchants.',
     guidesTitle: 'Guides', guidesDesc: 'Draft and publish your guides.',
+    tierTitle: 'Tier', tierDesc: 'Your contribution points and tier.',
+    copilotTitle: 'Copilot',
+    copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1185,6 +1239,46 @@ const messages: Messages = {
     colType: 'Type',
     colAmount: 'Amount',
     colStatus: 'Status',
+  },
+  tier: {
+    cardTitle: 'Your tier',
+    toNext: '{points} pts to {tier}',
+    maxed: 'Top tier reached',
+    earnHeading: 'Ways to earn points',
+    earnGuide: 'Publish a guide',
+    earnMission: 'Complete a verified mission',
+    earnScan: 'Complete your DNA scan',
+    viewAll: 'Tier details',
+    pageHeading: 'Tier & contribution',
+    pageSubtitle: 'Earn points from real activity to climb tiers.',
+    currentLabel: 'Current tier',
+    allTiersHeading: 'All tiers',
+    historyHeading: 'Points history',
+    historyEmpty: 'No points yet — publish a guide or complete a mission to get started.',
+    eventGuide: 'Guide published',
+    eventMission: 'Mission verified',
+    eventScan: 'DNA scan completed',
+    pointsSuffix: 'pts',
+    unlocksHeading: 'What you unlock',
+    unlocksMissions: 'missions need this tier',
+    unlocksHelp: 'Climb tiers to join exclusive missions.',
+  },
+  copilot: {
+    title: 'Creator Copilot',
+    subtitle: 'Your AI copilot, tuned to your Creator DNA. Ask for ideas, captions, or a posting plan.',
+    inputPlaceholder: 'Ask your copilot anything…',
+    send: 'Send',
+    newChat: 'New chat',
+    emptyTitle: 'Start a conversation',
+    emptyBody: 'Try: "Give me 5 reel ideas for my next trip" or "Draft a caption for a Kyoto food guide".',
+    limitTitle: "You've hit today's limit",
+    limitBody: "You've used all of today's Copilot messages.",
+    limitUpsell: 'Level up your tier to raise your daily limit.',
+    toolWorking: 'Working on it…',
+    errorGeneric: 'Something went wrong. Please try again.',
+    unconfiguredTitle: "Copilot isn't switched on yet",
+    unconfiguredBody: 'The Copilot will be available here shortly. Check back soon.',
+    disclaimer: 'AI-generated — review before you publish.',
   },
 }
 export default messages

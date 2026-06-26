@@ -25,6 +25,7 @@ const base: MissionDraftInput = {
   paidFeeAmount: null,
   paidFeeCurrency: null,
   affiliateNetworkProgramId: null,
+  minTier: null,
   milestones: [{ title: 'Share coupon post', description: 'Post one IG reel or Threads post.' }],
 }
 

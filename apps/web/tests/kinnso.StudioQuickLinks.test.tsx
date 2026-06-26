@@ -25,4 +25,13 @@ describe('StudioQuickLinks', () => {
     expect(screen.getAllByText(en.studioHome.liveBadge).length).toBeGreaterThan(0)
     expect(screen.getAllByText(en.studioHome.soonBadge).length).toBe(1)
   })
+
+  it('renders a live Tier tile linking to /studio/tier', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+    const tierDesc = screen.getByText('Your contribution points and tier.')
+    expect(tierDesc).toBeTruthy()
+    const link = tierDesc.closest('a')
+    expect(link).not.toBeNull()
+    expect(link!.getAttribute('href')).toBe('/en/studio/tier')
+  })
 })

@@ -57,6 +57,10 @@ vi.mock('@/lib/missions/queries', () => ({
   getCreatorMissionDetail: getCreatorMissionDetailMock,
 }))
 
+vi.mock('@/lib/contribution/queries', () => ({
+  getCreatorStoredTier: vi.fn(async () => 'seed'),
+}))
+
 vi.mock('@/lib/missions/actions', () => ({
   joinMissionAction: vi.fn(async () => ({ ok: true })),
   submitMilestoneAction: submitMilestoneActionMock,
