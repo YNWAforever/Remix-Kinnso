@@ -8,7 +8,8 @@ const { roleMock, getUserMock, listMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
   listMock: vi.fn(async () => ({
     creators: [{ id: 'c1', display_name: 'Ada', handle: 'ada', status: 'active', created_at: '2026-01-01T00:00:00Z' }],
-    merchants: [], ops: [],
+    merchants: [{ id: 'm1', company_name: 'Klook', status: 'active', tier: 'free', created_at: '2026-01-01T00:00:00Z' }],
+    ops: [],
   })),
 }))
 vi.mock('next/navigation', () => ({
@@ -33,5 +34,11 @@ describe('admin users page host', () => {
     const ui = await AdminUsersPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
     expect(screen.getByText('Ada')).toBeTruthy()
+  })
+  it('renders a tier control on merchant rows (page threads onSetMerchantTier)', async () => {
+    const ui = await AdminUsersPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    const select = screen.getByLabelText('Tier Klook') as HTMLSelectElement
+    expect(select.value).toBe('free')
   })
 })

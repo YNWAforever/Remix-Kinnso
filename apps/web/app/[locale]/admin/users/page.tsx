@@ -4,7 +4,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireOpsPage } from '@/lib/admin/guard'
 import { listAdminUsers } from '@/lib/admin/users-queries'
-import { setUserStatusAction, type UserKind, type UserStatus } from '@/lib/admin/users-actions'
+import { setUserStatusAction, setMerchantTierAction, type UserKind, type UserStatus, type MerchantTier } from '@/lib/admin/users-actions'
 import { AdminUsersView } from '@/components/kinnso/admin/AdminUsersView'
 
 export function generateStaticParams() {
@@ -26,5 +26,10 @@ export default async function AdminUsersPage({ params }: { params: Promise<{ loc
     return setUserStatusAction(loc, kind, id, status)
   }
 
-  return <AdminUsersView t={messages.users} locale={loc} users={users} onSetStatus={onSetStatus} />
+  async function onSetMerchantTier(id: string, tier: MerchantTier) {
+    'use server'
+    return setMerchantTierAction(loc, id, tier)
+  }
+
+  return <AdminUsersView t={messages.users} locale={loc} users={users} onSetStatus={onSetStatus} onSetMerchantTier={onSetMerchantTier} />
 }

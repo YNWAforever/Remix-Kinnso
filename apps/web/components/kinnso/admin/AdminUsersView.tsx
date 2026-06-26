@@ -5,12 +5,13 @@ import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
 import type { AdminUsers } from '@/lib/admin/users-queries'
 import type { ActionResult } from '@/lib/admin/result'
-import type { UserKind, UserStatus } from '@/lib/admin/users-actions'
+import type { UserKind, UserStatus, MerchantTier } from '@/lib/admin/users-actions'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 
 type T = Messages['users']
 type SetStatus = (kind: UserKind, id: string, status: UserStatus) => Promise<ActionResult<{ id: string; status: UserStatus }>>
-type Row = { id: string; name: string; status: string; joined: string }
+type SetMerchantTier = (id: string, tier: MerchantTier) => Promise<ActionResult<{ id: string; tier: MerchantTier }>>
+type Row = { id: string; name: string; status: string; joined: string; tier?: string }
 
 function statusLabel(t: T, status: string): string {
   switch (status) {
@@ -23,8 +24,9 @@ function statusLabel(t: T, status: string): string {
   }
 }
 
-function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
+function UserSection({ t, locale, heading, kind, rows, onSetStatus, onSetMerchantTier }: {
   t: T; locale: Locale; heading: string; kind: UserKind; rows: Row[]; onSetStatus: SetStatus
+  onSetMerchantTier?: SetMerchantTier
 }) {
   const router = useRouter()
   const [items, setItems] = useState(rows)
@@ -40,6 +42,20 @@ function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
     if (res.ok) {
       setItems((list) => list.map((r) => (r.id === row.id ? { ...r, status: res.status } : r)))
       router.refresh() // reconcile the optimistic flip with the revalidated server truth
+    } else {
+      setErrors((e) => ({ ...e, [row.id]: res.errors.form?.[0] ?? t.errorGeneric }))
+    }
+  }
+
+  async function changeTier(row: Row, tier: MerchantTier) {
+    if (!onSetMerchantTier) return
+    setBusyId(row.id)
+    setErrors((e) => ({ ...e, [row.id]: '' }))
+    const res = await onSetMerchantTier(row.id, tier)
+    setBusyId(null)
+    if (res.ok) {
+      setItems((list) => list.map((r) => (r.id === row.id ? { ...r, tier: res.tier } : r)))
+      router.refresh() // reconcile the optimistic change with the revalidated server truth
     } else {
       setErrors((e) => ({ ...e, [row.id]: res.errors.form?.[0] ?? t.errorGeneric }))
     }
@@ -66,15 +82,29 @@ function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
                   </p>
                   {errors[row.id] ? <p className="mt-1 text-sm text-red-600">{errors[row.id]}</p> : null}
                 </div>
-                <button
-                  onClick={() => toggle(row)}
-                  disabled={busyId === row.id}
-                  aria-busy={busyId === row.id}
-                  aria-label={`${suspended ? t.activate : t.suspend} ${row.name}`}
-                  className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50"
-                >
-                  {suspended ? t.activate : t.suspend}
-                </button>
+                <div className="flex items-center gap-2">
+                  {onSetMerchantTier ? (
+                    <select
+                      value={row.tier ?? 'free'}
+                      onChange={(e) => changeTier(row, e.target.value as MerchantTier)}
+                      disabled={busyId === row.id}
+                      aria-label={`${t.tierLabel} ${row.name}`}
+                      className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50"
+                    >
+                      <option value="free">{t.tierFree}</option>
+                      <option value="growth">{t.tierGrowth}</option>
+                    </select>
+                  ) : null}
+                  <button
+                    onClick={() => toggle(row)}
+                    disabled={busyId === row.id}
+                    aria-busy={busyId === row.id}
+                    aria-label={`${suspended ? t.activate : t.suspend} ${row.name}`}
+                    className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50"
+                  >
+                    {suspended ? t.activate : t.suspend}
+                  </button>
+                </div>
               </TicketCard>
             )
           })}
@@ -84,7 +114,9 @@ function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
   )
 }
 
-export function AdminUsersView({ t, locale, users, onSetStatus }: { t: T; locale: Locale; users: AdminUsers; onSetStatus: SetStatus }) {
+export function AdminUsersView({ t, locale, users, onSetStatus, onSetMerchantTier }: {
+  t: T; locale: Locale; users: AdminUsers; onSetStatus: SetStatus; onSetMerchantTier: SetMerchantTier
+}) {
   return (
     <main>
       <h1 className="k-display">{t.title}</h1>
@@ -93,8 +125,8 @@ export function AdminUsersView({ t, locale, users, onSetStatus }: { t: T; locale
         rows={users.creators.map((c) => ({ id: c.id, name: c.display_name || c.handle || t.unnamed, status: c.status, joined: c.created_at }))}
         onSetStatus={onSetStatus} />
       <UserSection t={t} locale={locale} heading={t.sectionMerchants} kind="merchant"
-        rows={users.merchants.map((m) => ({ id: m.id, name: m.company_name, status: m.status, joined: m.created_at }))}
-        onSetStatus={onSetStatus} />
+        rows={users.merchants.map((m) => ({ id: m.id, name: m.company_name, status: m.status, joined: m.created_at, tier: m.tier }))}
+        onSetStatus={onSetStatus} onSetMerchantTier={onSetMerchantTier} />
       <UserSection t={t} locale={locale} heading={t.sectionOps} kind="ops"
         rows={users.ops.map((o) => ({ id: o.id, name: o.display_name, status: o.status, joined: o.created_at }))}
         onSetStatus={onSetStatus} />
