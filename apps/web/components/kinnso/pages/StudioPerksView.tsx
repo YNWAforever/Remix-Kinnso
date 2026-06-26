@@ -10,9 +10,12 @@ import { TicketCard, RouteStamp } from '@/components/kinnso/MarketPassport'
 
 type RedeemResult = ActionResult<{ redemptionType: 'code' | 'link'; value: string }>
 
+/** Only http(s) values are safe to put in an href — guards against a javascript: value. */
+const isHttpUrl = (v: string) => /^https?:\/\//i.test(v.trim())
+
 function Reveal({ t, value, type }: { t: Messages['perks']['catalog']; value: string; type: 'code' | 'link' }) {
   const [copied, setCopied] = useState(false)
-  if (type === 'link') {
+  if (type === 'link' && isHttpUrl(value)) {
     return (
       <a href={value} target="_blank" rel="noopener noreferrer"
         className="mt-3 inline-block rounded-full bg-kinnso-orange px-4 py-2 text-sm font-bold text-white">
@@ -20,12 +23,20 @@ function Reveal({ t, value, type }: { t: Messages['perks']['catalog']; value: st
       </a>
     )
   }
+  // A code value, or a link that failed the http(s) guard, is shown as copyable text —
+  // never rendered into an href, so a malformed/unsafe value can't become a clickable link.
+  async function copy() {
+    try {
+      await navigator.clipboard?.writeText(value)
+      setCopied(true)
+    } catch {
+      setCopied(false)
+    }
+  }
   return (
     <div className="mt-3 flex items-center gap-2">
       <code className="rounded bg-kinnso-cream2 px-3 py-1 font-mono text-kinnso-ink">{value}</code>
-      <button
-        onClick={() => { navigator.clipboard?.writeText(value); setCopied(true) }}
-        className="rounded-full border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink">
+      <button onClick={copy} className="rounded-full border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink">
         {copied ? t.copied : t.copyCode}
       </button>
     </div>
@@ -90,12 +101,11 @@ export function StudioPerksView({
 }: {
   locale: Locale
   t: Messages['perks']
-  tierLabel: string  // received from page; available for future use (e.g. tier badge)
   cards: PerkCard[]
   onRedeem: (perkId: string) => Promise<RedeemResult>
 }) {
   return (
-    <main>
+    <main className="k-container py-10">
       <h1 className="k-display">{t.catalog.heading}</h1>
       <p className="mt-2 text-kinnso-muted">{t.catalog.subtitle}</p>
       {cards.length === 0 ? (

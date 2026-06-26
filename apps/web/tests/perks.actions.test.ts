@@ -36,4 +36,10 @@ describe('redeemPerkAction', () => {
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.errors.form[0]).toMatch(/tier/i)
   })
+  it('maps perk_not_found to a friendly error', async () => {
+    rpcMock.mockReturnValueOnce({ single: async () => ({ data: null, error: { message: 'perk_not_found' } }) })
+    const r = await redeemPerkAction('p1')
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.form[0]).toMatch(/no longer available/i)
+  })
 })

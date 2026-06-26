@@ -15,16 +15,16 @@ const redeem = async () => ({ ok: true as const, redemptionType: 'code' as const
 
 describe('StudioPerksView', () => {
   it('shows the empty state', () => {
-    render(<StudioPerksView locale="en" t={en.perks} tierLabel="Rising" cards={[]} onRedeem={redeem} />)
+    render(<StudioPerksView locale="en" t={en.perks} cards={[]} onRedeem={redeem} />)
     expect(screen.getByText(en.perks.catalog.empty)).toBeTruthy()
   })
   it('locked card shows the requirement and the unlock CTA, no redeem button', () => {
-    render(<StudioPerksView locale="en" t={en.perks} tierLabel="Rising" cards={[{ ...base, state: 'locked' }]} onRedeem={redeem} />)
+    render(<StudioPerksView locale="en" t={en.perks} cards={[{ ...base, state: 'locked' }]} onRedeem={redeem} />)
     expect(screen.getByText(en.perks.catalog.unlockCta)).toBeTruthy()
     expect(screen.queryByText(en.perks.catalog.redeem)).toBeNull()
   })
   it('redeemable card reveals the value after Redeem', async () => {
-    render(<StudioPerksView locale="en" t={en.perks} tierLabel="Pro" cards={[base]} onRedeem={redeem} />)
+    render(<StudioPerksView locale="en" t={en.perks} cards={[base]} onRedeem={redeem} />)
     fireEvent.click(screen.getByText(en.perks.catalog.redeem))
     await waitFor(() => expect(screen.getByText('CODE10')).toBeTruthy())
   })

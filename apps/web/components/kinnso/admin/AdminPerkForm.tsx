@@ -108,8 +108,9 @@ export function AdminPerkForm({
         </label>
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldSortOrder}</span>
-          <input type="number" className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.sortOrder}
-            onChange={(e) => set('sortOrder', Number(e.target.value))} />
+          <input type="number" step="1" className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.sortOrder}
+            onChange={(e) => set('sortOrder', Math.trunc(Number(e.target.value)) || 0)} />
+          {errors.sortOrder && <span className="text-sm text-red-600">{errors.sortOrder[0]}</span>}
         </label>
       </div>
       <label className="flex items-center gap-2">

@@ -27,6 +27,22 @@ describe('validatePerkInput', () => {
   it('rejects a non-integer sort order', () => {
     expect(validatePerkInput({ ...valid, sortOrder: 1.5 }).sortOrder).toBeTruthy()
   })
+  it('rejects a non-http(s) link value (javascript: scheme)', () => {
+    const e = validatePerkInput({ ...valid, redemptionType: 'link', redemptionValue: 'javascript:alert(1)' })
+    expect(e.redemptionValue).toBeTruthy()
+  })
+  it('rejects a malformed link value', () => {
+    const e = validatePerkInput({ ...valid, redemptionType: 'link', redemptionValue: 'not a url' })
+    expect(e.redemptionValue).toBeTruthy()
+  })
+  it('accepts an https link value', () => {
+    const e = validatePerkInput({ ...valid, redemptionType: 'link', redemptionValue: 'https://klook.com/deal' })
+    expect(e.redemptionValue).toBeUndefined()
+  })
+  it('does not URL-validate a code value', () => {
+    const e = validatePerkInput({ ...valid, redemptionType: 'code', redemptionValue: 'SAVE10' })
+    expect(e.redemptionValue).toBeUndefined()
+  })
 })
 
 describe('slugify', () => {

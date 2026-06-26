@@ -33,6 +33,18 @@ export function validatePerkInput(input: PerkInput): ValidationErrors {
   if (input.minTier !== null && !TIERS.includes(input.minTier)) errors.minTier = ['Invalid tier']
   if (!TYPES.includes(input.redemptionType)) errors.redemptionType = ['Invalid redemption type']
   if (!Number.isInteger(input.sortOrder)) errors.sortOrder = ['Sort order must be a whole number']
+  // A 'link' value is rendered into an <a href>, so reject non-http(s) schemes
+  // (e.g. javascript:) at write time — defense-in-depth even though only ops can write.
+  if (input.redemptionType === 'link' && String(input.redemptionValue ?? '').trim()) {
+    try {
+      const url = new URL(input.redemptionValue.trim())
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+        errors.redemptionValue = ['Link must be an http(s) URL']
+      }
+    } catch {
+      errors.redemptionValue = ['Link must be a valid URL']
+    }
+  }
   return errors
 }
 

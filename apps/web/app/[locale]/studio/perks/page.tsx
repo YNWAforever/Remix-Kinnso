@@ -38,6 +38,6 @@ export default async function StudioPerksPage({ params }: { params: Promise<{ lo
   }
 
   return (
-    <StudioPerksView locale={loc} t={messages.perks} tierLabel={creatorTier} cards={cards} onRedeem={onRedeem} />
+    <StudioPerksView locale={loc} t={messages.perks} cards={cards} onRedeem={onRedeem} />
   )
 }
