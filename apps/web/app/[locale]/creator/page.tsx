@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { redirect, notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -8,6 +9,9 @@ import type { Platform } from '@/lib/onboarding/validateHandle'
 import type { InitialHandle } from '@/components/onboarding/HandlesStep'
 import { WizardClient } from '@/components/onboarding/WizardClient'
 import type { Dna } from '@kinnso/scan'
+import { noindexMetadata } from '@/lib/seo/metadata'
+
+export const metadata: Metadata = noindexMetadata()
 
 /**
  * /[locale]/creator — the onboarding wizard host.

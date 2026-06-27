@@ -19,7 +19,7 @@ vi.mock('@/lib/supabase/public', () => ({
   }),
 }))
 
-import { mapRowToGuide, getPublishedGuides, getGuideBySlug } from '@/lib/guides/queries'
+import { mapRowToGuide, getPublishedGuides, getGuideBySlug, getGuidesForSitemap } from '@/lib/guides/queries'
 import { guides as mockGuides } from '@/lib/creator-mock'
 
 const row = {
@@ -75,5 +75,17 @@ describe('getGuideBySlug', () => {
   it('returns null for a slug not in the database (no mock fallback)', async () => {
     state.single = null
     expect(await getGuideBySlug(mockGuides[0].slug)).toBeNull()
+  })
+})
+
+describe('getGuidesForSitemap', () => {
+  it('returns published slugs with a lastmod', async () => {
+    state.list = [{ slug: 'kyoto-tea', published_at: '2026-06-02T00:00:00Z' }]
+    const rows = await getGuidesForSitemap()
+    expect(rows).toEqual([{ slug: 'kyoto-tea', lastmod: '2026-06-02T00:00:00Z' }])
+  })
+  it('returns [] when there are no published guides', async () => {
+    state.list = []
+    expect(await getGuidesForSitemap()).toEqual([])
   })
 })

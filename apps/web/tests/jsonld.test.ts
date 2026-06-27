@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { articleJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
+import { articleJsonLd, faqJsonLd, breadcrumbJsonLd, organizationJsonLd, websiteJsonLd, creatorProfileJsonLd } from '@/lib/seo/jsonld'
 
 describe('JSON-LD', () => {
   it('Article includes datePublished AND dateModified (the SEO fix)', () => {
@@ -39,5 +39,48 @@ describe('JSON-LD', () => {
     expect((ld.itemListElement as unknown[])[1]).toEqual({
       '@type': 'ListItem', position: 2, name: 'Dining', item: 'https://x/en/articles/dining',
     })
+  })
+})
+
+describe('organizationJsonLd', () => {
+  it('builds a schema.org Organization', () => {
+    const o = organizationJsonLd({ url: 'https://www.kinnso.ai', logo: 'https://www.kinnso.ai/icon.png' }) as any
+    expect(o['@type']).toBe('Organization')
+    expect(o.name).toBe('KINNSO')
+    expect(o.url).toBe('https://www.kinnso.ai')
+    expect(o.logo).toBe('https://www.kinnso.ai/icon.png')
+  })
+})
+
+describe('websiteJsonLd', () => {
+  it('builds a WebSite with a SearchAction', () => {
+    const w = websiteJsonLd({
+      url: 'https://www.kinnso.ai/en', locale: 'en',
+      searchUrlTemplate: 'https://www.kinnso.ai/en/articles?q={search_term_string}',
+    }) as any
+    expect(w['@type']).toBe('WebSite')
+    expect(w.inLanguage).toBe('en')
+    expect(w.potentialAction['@type']).toBe('SearchAction')
+    expect(w.potentialAction.target.urlTemplate).toContain('{search_term_string}')
+    expect(w.potentialAction['query-input']).toBe('required name=search_term_string')
+  })
+})
+
+describe('creatorProfileJsonLd', () => {
+  it('wraps a Person in a ProfilePage', () => {
+    const p = creatorProfileJsonLd({
+      name: 'Maya', handle: 'maya', url: 'https://www.kinnso.ai/en/c/maya',
+      bio: 'Slow travel', niches: ['Coffee', 'City Walk'],
+    }) as any
+    expect(p['@type']).toBe('ProfilePage')
+    expect(p.mainEntity['@type']).toBe('Person')
+    expect(p.mainEntity.name).toBe('Maya')
+    expect(p.mainEntity.alternateName).toBe('@maya')
+    expect(p.mainEntity.knowsAbout).toEqual(['Coffee', 'City Walk'])
+  })
+  it('omits empty bio and niches', () => {
+    const p = creatorProfileJsonLd({ name: 'Leo', handle: 'leo', url: 'u', bio: '', niches: [] }) as any
+    expect(p.mainEntity.description).toBeUndefined()
+    expect(p.mainEntity.knowsAbout).toBeUndefined()
   })
 })

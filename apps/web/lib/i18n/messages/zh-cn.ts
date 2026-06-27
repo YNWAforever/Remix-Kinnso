@@ -5,6 +5,44 @@ const messages: Messages = {
   categories: { destinations: '目的地', dining: '美食', shopping: '购物' },
   breadcrumb: { home: '首页', articles: '文章' },
   article: { youMayLike: '你可能喜欢', faqTitle: '常见问题', tableOfContents: '本文目录', by: '作者', fallbackNotice: '本文尚未提供你所用语言的版本，现显示原始版本。' },
+  seo: {
+    brandTitle: 'KINNSO — 旅行创作者，真实任务',
+    brandDescription:
+      'KINNSO 将旅行与生活方式创作者与品牌任务、联盟优惠及 AI 副驾驶连接起来，助力账号增长。',
+    home: {
+      title: '旅行创作者，真实任务',
+      description:
+        '加入 KINNSO，寻找品牌任务、通过联盟优惠获得收益，并借助专为旅行创作者打造的 AI 副驾驶实现增长。',
+    },
+    explore: {
+      title: '探索创作者指南',
+      description: '浏览 KINNSO 创作者发布的亚洲及全球真实旅行指南。',
+    },
+    creators: {
+      title: '发现旅行创作者',
+      description: '在 KINNSO 按垂类、受众和平台查找旅行与生活方式创作者。',
+    },
+    agent: {
+      title: '创作者副驾驶 — 您的 AI 增长助手',
+      description: '认识 KINNSO 创作者副驾驶：AI 代理帮助您发掘内容创意、扩大受众并获得更多收益。',
+    },
+    about: {
+      title: '关于 KINNSO',
+      description: 'KINNSO 是连接旅行与生活方式创作者与品牌的创作者平台。',
+    },
+    contact: {
+      title: '联系 KINNSO',
+      description: '欢迎就合作、任务和创作者支持联系 KINNSO 团队。',
+    },
+    merchants: {
+      title: '面向品牌与商家',
+      description: '在 KINNSO 与经过审核的旅行和生活方式创作者开展真实任务合作。',
+    },
+    terms: {
+      title: '创作者条款',
+      description: '适用于使用 KINNSO 的创作者的条款。',
+    },
+  },
   listing: { searchPlaceholder: '搜索文章', filterRegion: '地区', filterTag: '标签', noResults: '找不到文章。', resultsCount: '篇文章' },
   pagination: { prev: '上一页', next: '下一页', page: '第' },
   auth: {

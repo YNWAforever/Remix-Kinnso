@@ -4,6 +4,9 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { CreatorProfileView } from '@/components/kinnso/pages/CreatorProfileView'
 import { getCreatorByHandle } from '@/lib/creators/queries'
+import { buildCreatorMetadata, SITE_URL } from '@/lib/seo/metadata'
+import { creatorProfileJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
+import { JsonLd } from '@/components/JsonLd'
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -14,13 +17,11 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; handle: string }>
 }): Promise<Metadata> {
-  const { handle } = await params
+  const { locale, handle } = await params
+  if (!isLocale(locale)) return {}
   const creator = await getCreatorByHandle(handle)
-  if (!creator) return { title: 'Creator not found · KINNSO' }
-  return {
-    title: `${creator.name} (@${creator.handle}) · KINNSO`,
-    description: creator.bio || `Travel creator @${creator.handle} on KINNSO.`,
-  }
+  if (!creator) return { title: 'Creator not found', robots: { index: false, follow: false } }
+  return buildCreatorMetadata({ handle, locale: locale as Locale, name: creator.name, bio: creator.bio })
 }
 
 /**
@@ -39,5 +40,22 @@ export default async function CreatorPublicPage({
   const messages = await getDictionary(locale as Locale)
   const creator = await getCreatorByHandle(handle)
   if (!creator) notFound()
-  return <CreatorProfileView creator={creator} locale={locale as Locale} t={messages.creatorProfile} />
+  const canonical = `${SITE_URL}/${locale}/c/${handle}`
+  const ld = [
+    creatorProfileJsonLd({
+      name: creator.name, handle: creator.handle, url: canonical,
+      bio: creator.bio, niches: creator.profile.niches,
+    }),
+    breadcrumbJsonLd([
+      { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
+      { name: messages.seo.creators.title, url: `${SITE_URL}/${locale}/creators` },
+      { name: creator.name, url: canonical },
+    ]),
+  ]
+  return (
+    <>
+      <JsonLd data={ld} />
+      <CreatorProfileView creator={creator} locale={locale as Locale} t={messages.creatorProfile} />
+    </>
+  )
 }

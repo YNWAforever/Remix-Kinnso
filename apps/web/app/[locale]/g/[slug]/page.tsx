@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Bookmark, MapPin } from 'lucide-react'
-import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
+import { isLocale, htmlLang, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
 import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
+import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
+import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
+import { JsonLd } from '@/components/JsonLd'
 
 export function generateStaticParams() {
   // Guides are DB-only; resolve on demand (dynamicParams defaults to true).
@@ -17,14 +20,16 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params
+  const { locale, slug } = await params
+  if (!isLocale(locale)) return {}
   const guide = await getGuideBySlug(slug)
-  if (!guide) return { title: 'Guide not found | KINNSO' }
+  if (!guide) return { title: 'Guide not found', robots: { index: false, follow: false } }
   const authorName = guide.creatorName ?? `@${guide.creatorHandle}`
-  return {
-    title: `${guide.title} | KINNSO`,
-    description: `${guide.city} guide by ${authorName}. ${guide.saves.toLocaleString()} saves.`,
-  }
+  return buildGuideMetadata({
+    slug, locale: locale as Locale,
+    title: guide.title,
+    description: `${guide.city} guide by ${authorName}. ${guide.summary ?? ''}`.trim(),
+  })
 }
 
 export default async function GuidePage({
@@ -41,8 +46,25 @@ export default async function GuidePage({
   const messages = await getDictionary(locale as Locale)
   const authorName = guide.creatorName ?? guide.creatorHandle
 
+  const canonical = `${SITE_URL}/${locale}/g/${slug}`
+  const ld = [
+    articleJsonLd({
+      headline: guide.title,
+      description: guide.summary ?? `${guide.city} guide by ${authorName}`,
+      url: canonical, images: guide.cover ? [guide.cover] : [],
+      publishedAt: null, modifiedAt: null,
+      authorName, locale: htmlLang(locale as Locale),
+    }),
+    breadcrumbJsonLd([
+      { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
+      { name: messages.seo.explore.title, url: `${SITE_URL}/${locale}/explore` },
+      { name: guide.title, url: canonical },
+    ]),
+  ]
+
   return (
     <article className="k-container py-8 md:py-12">
+      <JsonLd data={ld} />
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
         <div
           role="img"

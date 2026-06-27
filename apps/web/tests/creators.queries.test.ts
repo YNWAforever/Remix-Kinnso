@@ -30,7 +30,7 @@ vi.mock('@/lib/supabase/public', () => {
   }
 })
 
-import { getPublicCreators, getCreatorByHandle, getCreatorPublicNames } from '@/lib/creators/queries'
+import { getPublicCreators, getCreatorByHandle, getCreatorPublicNames, getCreatorsForSitemap } from '@/lib/creators/queries'
 
 const creatorRow = {
   id: 'c1',
@@ -114,5 +114,17 @@ describe('getCreatorPublicNames', () => {
 
   it('returns an empty map for no ids', async () => {
     expect((await getCreatorPublicNames([])).size).toBe(0)
+  })
+})
+
+describe('getCreatorsForSitemap', () => {
+  it('returns active handles with a lastmod', async () => {
+    state.creators = [{ handle: 'maya', created_at: '2026-06-03T00:00:00Z' }]
+    const rows = await getCreatorsForSitemap()
+    expect(rows).toEqual([{ handle: 'maya', lastmod: '2026-06-03T00:00:00Z' }])
+  })
+  it('returns [] when there are no active creators', async () => {
+    state.creators = []
+    expect(await getCreatorsForSitemap()).toEqual([])
   })
 })

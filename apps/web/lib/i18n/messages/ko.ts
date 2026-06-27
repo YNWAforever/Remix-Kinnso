@@ -5,6 +5,44 @@ const messages: Messages = {
   categories: { destinations: '여행지', dining: '다이닝', shopping: '쇼핑' },
   breadcrumb: { home: '홈', articles: '아티클' },
   article: { youMayLike: '추천 콘텐츠', faqTitle: '자주 묻는 질문', tableOfContents: '목차', by: '작성자', fallbackNotice: '이 글은 아직 사용 중인 언어로 제공되지 않아 원문 버전을 표시합니다.' },
+  seo: {
+    brandTitle: 'KINNSO — 트래블 크리에이터, 리얼 미션',
+    brandDescription:
+      'KINNSO는 트래블·라이프스타일 크리에이터와 브랜드 미션, 제휴 오퍼, AI 코파일럿을 연결하는 플랫폼입니다.',
+    home: {
+      title: '트래블 크리에이터, 리얼 미션',
+      description:
+        'KINNSO에 합류해 브랜드 미션을 찾고, 제휴 오퍼로 수익을 올리고, AI 코파일럿으로 성장하세요.',
+    },
+    explore: {
+      title: '크리에이터 가이드 탐색',
+      description: 'KINNSO 크리에이터가 아시아 전역에 게시한 리얼 트래블 가이드를 둘러보세요.',
+    },
+    creators: {
+      title: '트래블 크리에이터 발견',
+      description: 'KINNSO에서 니치, 오디언스, 플랫폼별로 크리에이터를 찾아보세요.',
+    },
+    agent: {
+      title: '크리에이터 코파일럿 — AI 성장 어시스턴트',
+      description: 'KINNSO AI 에이전트가 콘텐츠 아이디어 발굴, 오디언스 성장, 수익 증대를 돕습니다.',
+    },
+    about: {
+      title: 'KINNSO 소개',
+      description: 'KINNSO는 트래블·라이프스타일 크리에이터와 브랜드를 연결하는 크리에이터 플랫폼입니다.',
+    },
+    contact: {
+      title: 'KINNSO 문의',
+      description: '파트너십, 미션, 크리에이터 지원에 대해 KINNSO 팀에 문의하세요.',
+    },
+    merchants: {
+      title: '브랜드 및 판매자를 위한',
+      description: 'KINNSO에서 검증된 트래블·라이프스타일 크리에이터와 리얼 미션을 진행하세요.',
+    },
+    terms: {
+      title: '크리에이터 이용약관',
+      description: 'KINNSO를 이용하는 크리에이터에게 적용되는 약관.',
+    },
+  },
   listing: { searchPlaceholder: '아티클 검색', filterRegion: '지역', filterTag: '태그', noResults: '검색 결과가 없습니다.', resultsCount: '개' },
   pagination: { prev: '이전', next: '다음', page: '페이지' },
   auth: {

@@ -1,11 +1,23 @@
 import type { Metadata } from 'next'
-import { DEFAULT_LOCALE, type Locale, type UrlCategory } from '@/lib/i18n/config'
+import { DEFAULT_LOCALE, LOCALES, type Locale, type UrlCategory } from '@/lib/i18n/config'
 
-const OG_LOCALE: Record<Locale, string> = {
+export const OG_LOCALE: Record<Locale, string> = {
   en: 'en_US', 'zh-hk': 'zh_HK', 'zh-tw': 'zh_TW', 'zh-cn': 'zh_CN', ja: 'ja_JP', ko: 'ko_KR', th: 'th_TH',
 }
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.kinnso.ai'
+
+const abs = (l: string, path: string) => `${SITE_URL}/${l}${path}` // path is '' or starts with '/'
+
+/** canonical (current locale) + hreflang map (given locales) + x-default → DEFAULT_LOCALE. */
+function hreflangFor(pathFor: (l: Locale) => string, current: Locale, locales: readonly Locale[]) {
+  const languages: Record<string, string> = {}
+  for (const l of locales) languages[l] = pathFor(l)
+  languages['x-default'] = pathFor(DEFAULT_LOCALE)
+  return { canonical: pathFor(current), languages }
+}
+
+// ---------- Articles (existing surface; refactored to bare titles via hreflangFor) ----------
 
 export interface ArticleMetaInput {
   urlCategory: UrlCategory; url: string; locale: Locale; presentLocales: readonly Locale[]
@@ -13,21 +25,15 @@ export interface ArticleMetaInput {
   ogImage: string | null; publishedAt: string | null; editAt: string | null; isCoupon: boolean
 }
 
-const detailPath = (l: string, c: string, u: string) => `${SITE_URL}/${l}/articles/${c}/${u}`
+const articlePath = (l: string, c: string, u: string) => abs(l, `/articles/${c}/${u}`)
 
 export function buildArticleMetadata(i: ArticleMetaInput): Metadata {
   const heading = i.metaTitle ?? i.title ?? ''
   const description = (i.metaDescription && i.metaDescription.trim()) || i.summary || ''
-  const canonical = detailPath(i.locale, i.urlCategory, i.url)
-
-  const languages: Record<string, string> = {}
-  for (const l of i.presentLocales) languages[l] = detailPath(l, i.urlCategory, i.url)
-  languages['x-default'] = detailPath(DEFAULT_LOCALE, i.urlCategory, i.url)
-
+  const { canonical, languages } = hreflangFor((l) => articlePath(l, i.urlCategory, i.url), i.locale, i.presentLocales)
   const index = !(i.isCoupon && i.locale === DEFAULT_LOCALE)
-
   return {
-    title: `${heading} - Kinnso`,
+    title: heading,
     description,
     alternates: { canonical, languages },
     openGraph: {
@@ -47,13 +53,73 @@ export interface ListingMetaInput {
 
 export function buildListingMetadata(i: ListingMetaInput): Metadata {
   const seg = i.urlCategory ? `/articles/${i.urlCategory}` : '/articles'
-  const canonical = `${SITE_URL}/${i.locale}${seg}`
-  const languages: Record<string, string> = {}
-  for (const l of i.presentLocales) languages[l] = `${SITE_URL}/${l}${seg}`
-  languages['x-default'] = `${SITE_URL}/${DEFAULT_LOCALE}${seg}`
+  const { canonical, languages } = hreflangFor((l) => abs(l, seg), i.locale, i.presentLocales)
   return {
-    title: `${i.title} - Kinnso`,
+    title: i.title,
     alternates: { canonical, languages },
     robots: { index: true, follow: true, 'max-image-preview': 'large' },
   }
+}
+
+// ---------- New: marketing pages, guides, creators, noindex ----------
+
+export interface PageMetaInput {
+  path: string; locale: Locale; title: string; description: string
+  type?: 'website' | 'article' | 'profile'
+}
+
+export function buildPageMetadata(i: PageMetaInput): Metadata {
+  const { canonical, languages } = hreflangFor((l) => abs(l, i.path), i.locale, LOCALES)
+  // Marketing pages are child segments of `[locale]`, so they do NOT inherit the
+  // `[locale]/opengraph-image` file-convention card (a page's own openGraph replaces the
+  // inherited one). Reference the default branded card explicitly so every marketing page
+  // has a social image. (Guide/creator pages have their own colocated opengraph-image route.)
+  const ogImage = `${SITE_URL}/${i.locale}/opengraph-image`
+  return {
+    title: i.title,
+    description: i.description,
+    alternates: { canonical, languages },
+    openGraph: {
+      type: i.type ?? 'website', url: canonical, title: i.title, description: i.description,
+      siteName: 'KINNSO', locale: OG_LOCALE[i.locale], images: [ogImage],
+    },
+    twitter: { card: 'summary_large_image', title: i.title, description: i.description, images: [ogImage] },
+    robots: { index: true, follow: true, 'max-image-preview': 'large' },
+  }
+}
+
+export function buildGuideMetadata(i: { slug: string; locale: Locale; title: string; description: string }): Metadata {
+  const { canonical, languages } = hreflangFor((l) => abs(l, `/g/${i.slug}`), i.locale, LOCALES)
+  return {
+    title: i.title,
+    description: i.description,
+    alternates: { canonical, languages },
+    openGraph: {
+      type: 'article', url: canonical, title: i.title, description: i.description,
+      siteName: 'KINNSO', locale: OG_LOCALE[i.locale],
+    },
+    twitter: { card: 'summary_large_image', title: i.title, description: i.description },
+    robots: { index: true, follow: true, 'max-image-preview': 'large' },
+  }
+}
+
+export function buildCreatorMetadata(i: { handle: string; locale: Locale; name: string; bio: string }): Metadata {
+  const title = `${i.name} (@${i.handle})`
+  const description = i.bio || `Travel creator @${i.handle} on KINNSO.`
+  const { canonical, languages } = hreflangFor((l) => abs(l, `/c/${i.handle}`), i.locale, LOCALES)
+  return {
+    title,
+    description,
+    alternates: { canonical, languages },
+    openGraph: {
+      type: 'profile', url: canonical, title, description,
+      siteName: 'KINNSO', locale: OG_LOCALE[i.locale],
+    },
+    twitter: { card: 'summary_large_image', title, description },
+    robots: { index: true, follow: true, 'max-image-preview': 'large' },
+  }
+}
+
+export function noindexMetadata(title?: string): Metadata {
+  return { ...(title ? { title } : {}), robots: { index: false, follow: false } }
 }
