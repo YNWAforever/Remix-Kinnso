@@ -399,6 +399,7 @@ export interface Messages {
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
+    linkInsights: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
   }
@@ -457,6 +458,8 @@ export interface Messages {
     copilotDesc: string
     perksTitle: string
     perksDesc: string
+    insightsTitle: string
+    insightsDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -675,6 +678,46 @@ export interface Messages {
     inviteQuotaExceeded: string
     alreadyParticipant: string
     inviteFailed: string
+  }
+  insights: {
+    navLabel: string
+    empty: string
+    creatorTitle: string
+    creatorSubtitle: string
+    pointsTotal: string
+    pointsTrajectory: string
+    pointsByType: string
+    typeGuide: string
+    typeMission: string
+    typeScan: string
+    tierProgress: string
+    tierAtMax: string
+    pointsToNext: string
+    guidesPublished: string
+    guideSaves: string
+    missionsTitle: string
+    statusApplied: string
+    statusActive: string
+    statusInvited: string
+    statusRejected: string
+    deliverables: string
+    creatorEmptyPoints: string
+    creatorEmptyMissions: string
+    merchantTitle: string
+    merchantSubtitle: string
+    missionsPublished: string
+    participants: string
+    inviteAcceptRate: string
+    deliveredWork: string
+    perMissionTitle: string
+    colMission: string
+    colInvited: string
+    colApplied: string
+    colActive: string
+    colRejected: string
+    colDelivered: string
+    merchantEmpty: string
+    notApplicable: string
   }
 }
 
@@ -1074,6 +1117,7 @@ const messages: Messages = {
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
     linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
+    linkInsights: 'Insights',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },
@@ -1181,6 +1225,7 @@ const messages: Messages = {
     copilotTitle: 'Copilot',
     copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
     perksTitle: 'Perks', perksDesc: 'Partner deals unlocked by your tier.',
+    insightsTitle: 'Insights', insightsDesc: 'Your real activity — points, guides, and missions.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1450,6 +1495,46 @@ const messages: Messages = {
     inviteQuotaExceeded: 'You’ve used all your invitations this month.',
     alreadyParticipant: 'This creator is already part of that mission.',
     inviteFailed: 'Could not send the invitation. Please try again.',
+  },
+  insights: {
+    navLabel: 'Insights',
+    empty: 'No activity yet.',
+    creatorTitle: 'Your insights',
+    creatorSubtitle: 'Your real activity on KINNSO. These are contribution points from your work — not money.',
+    pointsTotal: 'Contribution points',
+    pointsTrajectory: 'Points over the last 12 weeks',
+    pointsByType: 'Where your points come from',
+    typeGuide: 'Published guides',
+    typeMission: 'Verified missions',
+    typeScan: 'DNA scan',
+    tierProgress: 'Tier progress',
+    tierAtMax: 'Top tier reached',
+    pointsToNext: '{points} points to {tier}',
+    guidesPublished: 'Published guides',
+    guideSaves: 'Total saves',
+    missionsTitle: 'Your missions',
+    statusApplied: 'Applied',
+    statusActive: 'Active',
+    statusInvited: 'Invited',
+    statusRejected: 'Not selected',
+    deliverables: 'Approved deliverables',
+    creatorEmptyPoints: 'Publish your first guide or complete a mission to start earning points.',
+    creatorEmptyMissions: 'No mission activity yet. Browse open missions in your studio.',
+    merchantTitle: 'Campaign insights',
+    merchantSubtitle: 'Activity across the missions you have posted.',
+    missionsPublished: 'Published missions',
+    participants: 'Total participants',
+    inviteAcceptRate: 'Invite acceptance',
+    deliveredWork: 'Approved deliverables',
+    perMissionTitle: 'By mission',
+    colMission: 'Mission',
+    colInvited: 'Invited',
+    colApplied: 'Applied',
+    colActive: 'Active',
+    colRejected: 'Rejected',
+    colDelivered: 'Delivered',
+    merchantEmpty: 'Post a mission to start seeing campaign activity.',
+    notApplicable: '—',
   },
 }
 export default messages
