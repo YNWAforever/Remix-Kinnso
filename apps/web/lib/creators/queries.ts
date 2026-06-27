@@ -97,6 +97,21 @@ export async function getCreatorByHandle(handle: string): Promise<PublicCreator 
   }
 }
 
+export async function getCreatorsForSitemap(): Promise<{ handle: string; lastmod: string | null }[]> {
+  const supabase = createSupabasePublicClient()
+  const { data } = await supabase
+    .from('creators')
+    .select('handle, created_at')
+    .eq('status', 'active')
+    .not('handle', 'is', null)
+    .not('public_profile', 'is', null)
+    .order('created_at', { ascending: false })
+  return (data ?? []).map((r) => ({
+    handle: r.handle as string,
+    lastmod: (r.created_at as string | null) ?? null,
+  }))
+}
+
 export interface CreatorPublicName {
   name: string
   handle: string | null

@@ -32,6 +32,19 @@ export async function getPublishedGuides(): Promise<Guide[]> {
   return (data ?? []).map(mapRowToGuide)
 }
 
+export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: string | null }[]> {
+  const supabase = createSupabasePublicClient()
+  const { data } = await supabase
+    .from('guides')
+    .select('slug, published_at')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+  return (data ?? []).map((r) => ({
+    slug: r.slug as string,
+    lastmod: (r.published_at as string | null) ?? null,
+  }))
+}
+
 export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> {
   const supabase = createSupabasePublicClient()
   const { data } = await supabase
