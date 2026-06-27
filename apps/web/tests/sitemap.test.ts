@@ -21,4 +21,15 @@ describe('robots', () => {
     expect(r.sitemap).toBe('https://www.kinnso.ai/sitemap.xml')
     expect(Array.isArray(r.rules) ? r.rules[0].allow : r.rules.allow).toBeTruthy()
   })
+  it('disallows the private trees but allows the public surface', () => {
+    const r = robots()
+    const rule = Array.isArray(r.rules) ? r.rules[0] : r.rules
+    const disallow = (rule.disallow ?? []) as string[]
+    expect(disallow).toContain('/*/studio')
+    expect(disallow).toContain('/*/admin')
+    expect(disallow).toContain('/*/merchants/post')
+    // onboarding is anchored so it does not catch the public /creators directory
+    expect(disallow).toContain('/*/creator$')
+    expect(disallow).not.toContain('/*/merchants') // the public landing stays crawlable
+  })
 })
