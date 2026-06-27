@@ -1,7 +1,11 @@
+import type { Metadata } from 'next'
 import { redirect, notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { noindexMetadata } from '@/lib/seo/metadata'
+
+export const metadata: Metadata = noindexMetadata()
 import { resumeStep, type CreatorStatus, type JobSnapshot } from '@/lib/onboarding/resumeRoute'
 import { isThin, type JobProgress } from '@/lib/onboarding/progress'
 import type { Platform } from '@/lib/onboarding/validateHandle'

@@ -1,10 +1,14 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { noindexMetadata } from '@/lib/seo/metadata'
 import { SignUpForm } from './SignUpForm'
 import { notFound } from 'next/navigation'
+
+export const metadata: Metadata = noindexMetadata()
 
 export default async function SignUpPage({
   params,

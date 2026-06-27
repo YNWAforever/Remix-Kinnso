@@ -1,10 +1,14 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { noindexMetadata } from '@/lib/seo/metadata'
 import { SignInForm } from './SignInForm'
+
+export const metadata: Metadata = noindexMetadata()
 
 export default async function SignInPage({
   params,
