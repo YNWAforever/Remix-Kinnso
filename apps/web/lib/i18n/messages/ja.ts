@@ -5,6 +5,44 @@ const messages: Messages = {
   categories: { destinations: '旅行先', dining: 'グルメ', shopping: 'ショッピング' },
   breadcrumb: { home: 'ホーム', articles: '記事' },
   article: { youMayLike: 'おすすめ記事', faqTitle: 'よくある質問', tableOfContents: '目次', by: '著者', fallbackNotice: 'この記事はまだお使いの言語ではご利用いただけないため、オリジナル版を表示しています。' },
+  seo: {
+    brandTitle: 'KINNSO — トラベルクリエイター、リアルなミッション',
+    brandDescription:
+      'KINNSOは、トラベル・ライフスタイルクリエイターとブランドミッション、アフィリエイトオファー、AIコパイロットをつなぐプラットフォームです。',
+    home: {
+      title: 'トラベルクリエイター、リアルなミッション',
+      description:
+        'KINNSOに参加して、ブランドミッションを見つけ、アフィリエイトで稼ぎ、AIコパイロットで成長しましょう。',
+    },
+    explore: {
+      title: 'クリエイターガイドを探す',
+      description: 'KINNSOクリエイターがアジアを中心に公開するリアルなトラベルガイドをブラウズ。',
+    },
+    creators: {
+      title: 'トラベルクリエイターを見つける',
+      description: 'ニッチ、オーディエンス、プラットフォームでKINNSOのクリエイターを探しましょう。',
+    },
+    agent: {
+      title: 'クリエイターコパイロット — AIグロースアシスタント',
+      description: 'KINNSOのAIエージェントがコンテンツアイデアの発見、オーディエンスの成長、収益アップをサポートします。',
+    },
+    about: {
+      title: 'KINNSOについて',
+      description: 'KINNSOは、トラベル・ライフスタイルクリエイターとブランドをつなぐクリエイタープラットフォームです。',
+    },
+    contact: {
+      title: 'お問い合わせ',
+      description: 'パートナーシップ、ミッション、クリエイターサポートについてKINNSOチームにご連絡ください。',
+    },
+    merchants: {
+      title: 'ブランド・マーチャント向け',
+      description: 'KINNSOの審査済みクリエイターとリアルなミッションを実施しましょう。',
+    },
+    terms: {
+      title: 'クリエイター利用規約',
+      description: 'KINNSOを利用するクリエイターに適用される規約。',
+    },
+  },
   listing: { searchPlaceholder: '記事を検索', filterRegion: '地域', filterTag: 'タグ', noResults: '記事が見つかりません。', resultsCount: '件' },
   pagination: { prev: '前へ', next: '次へ', page: 'ページ' },
   auth: {

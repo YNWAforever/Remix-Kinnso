@@ -5,6 +5,44 @@ const messages: Messages = {
   categories: { destinations: '目的地', dining: '美食', shopping: '購物' },
   breadcrumb: { home: '首頁', articles: '文章' },
   article: { youMayLike: '你可能喜歡', faqTitle: '常見問題', tableOfContents: '本文目錄', by: '作者', fallbackNotice: '本文尚未提供你所用語言的版本，目前顯示原始版本。' },
+  seo: {
+    brandTitle: 'KINNSO — 旅遊創作者，真實任務',
+    brandDescription:
+      'KINNSO 將旅遊與生活風格創作者與品牌任務、聯盟優惠及 AI 副駕駛連接起來，助力帳號成長。',
+    home: {
+      title: '旅遊創作者，真實任務',
+      description:
+        '加入 KINNSO，尋找品牌任務、透過聯盟優惠獲得收益，並借助專為旅遊創作者打造的 AI 副駕駛實現成長。',
+    },
+    explore: {
+      title: '探索創作者指南',
+      description: '瀏覽 KINNSO 創作者發布的亞洲及全球真實旅遊指南。',
+    },
+    creators: {
+      title: '探索旅遊創作者',
+      description: '在 KINNSO 按垂類、受眾和平台尋找旅遊與生活風格創作者。',
+    },
+    agent: {
+      title: '創作者副駕駛 — 您的 AI 成長助手',
+      description: '認識 KINNSO 創作者副駕駛：AI 代理幫助您發掘內容創意、擴大受眾並獲得更多收益。',
+    },
+    about: {
+      title: '關於 KINNSO',
+      description: 'KINNSO 是連接旅遊與生活風格創作者與品牌的創作者平台。',
+    },
+    contact: {
+      title: '聯絡 KINNSO',
+      description: '歡迎就合作、任務和創作者支援聯絡 KINNSO 團隊。',
+    },
+    merchants: {
+      title: '面向品牌與商家',
+      description: '在 KINNSO 與經過審核的旅遊和生活風格創作者開展真實任務合作。',
+    },
+    terms: {
+      title: '創作者條款',
+      description: '適用於使用 KINNSO 的創作者的條款。',
+    },
+  },
   listing: { searchPlaceholder: '搜尋文章', filterRegion: '地區', filterTag: '標籤', noResults: '找不到文章。', resultsCount: '篇文章' },
   pagination: { prev: '上一頁', next: '下一頁', page: '第' },
   auth: {

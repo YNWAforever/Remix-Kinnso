@@ -5,6 +5,44 @@ const messages: Messages = {
   categories: { destinations: 'จุดหมายปลายทาง', dining: 'ร้านอาหาร', shopping: 'ช้อปปิ้ง' },
   breadcrumb: { home: 'หน้าแรก', articles: 'บทความ' },
   article: { youMayLike: 'คุณอาจชอบ', faqTitle: 'คำถามที่พบบ่อย', tableOfContents: 'สารบัญ', by: 'โดย', fallbackNotice: 'บทความนี้ยังไม่มีในภาษาของคุณ จึงแสดงเวอร์ชันต้นฉบับ' },
+  seo: {
+    brandTitle: 'KINNSO — Travel creators, real missions',
+    brandDescription:
+      'KINNSO connects travel and lifestyle creators with real brand missions, affiliate offers, and an AI copilot to grow your audience.',
+    home: {
+      title: 'Travel creators, real missions',
+      description:
+        'Join KINNSO to find real brand missions, earn from affiliate offers, and grow with an AI copilot built for travel creators.',
+    },
+    explore: {
+      title: 'Explore creator guides',
+      description: 'Browse real travel guides published by KINNSO creators across Asia and beyond.',
+    },
+    creators: {
+      title: 'Discover travel creators',
+      description: 'Find travel and lifestyle creators on KINNSO by niche, audience, and platform.',
+    },
+    agent: {
+      title: 'Creator Copilot — your AI growth assistant',
+      description: 'Meet the KINNSO Creator Copilot: AI agents that help you find content ideas, grow your audience, and earn more.',
+    },
+    about: {
+      title: 'About KINNSO',
+      description: 'KINNSO is the creator platform connecting travel and lifestyle creators with real brand missions.',
+    },
+    contact: {
+      title: 'Contact KINNSO',
+      description: 'Get in touch with the KINNSO team about partnerships, missions, and creator support.',
+    },
+    merchants: {
+      title: 'For brands and merchants',
+      description: 'Run real missions with vetted travel and lifestyle creators on KINNSO.',
+    },
+    terms: {
+      title: 'Creator Terms',
+      description: 'The terms that govern creators using KINNSO.',
+    },
+  },
   listing: { searchPlaceholder: 'ค้นหาบทความ', filterRegion: 'ภูมิภาค', filterTag: 'แท็ก', noResults: 'ไม่พบบทความ', resultsCount: 'บทความ' },
   pagination: { prev: 'ก่อนหน้า', next: 'ถัดไป', page: 'หน้า' },
   auth: {

@@ -3,6 +3,18 @@ export interface Messages {
   categories: { destinations: string; dining: string; shopping: string }
   breadcrumb: { home: string; articles: string }
   article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string }
+  seo: {
+    brandTitle: string
+    brandDescription: string
+    home: { title: string; description: string }
+    explore: { title: string; description: string }
+    creators: { title: string; description: string }
+    agent: { title: string; description: string }
+    about: { title: string; description: string }
+    contact: { title: string; description: string }
+    merchants: { title: string; description: string }
+    terms: { title: string; description: string }
+  }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
   auth: {
@@ -682,7 +694,45 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
   breadcrumb: { home: 'Home', articles: 'Articles' },
-  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: 'This article isn’t available in your language yet — showing the original version.' },
+  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version." },
+  seo: {
+    brandTitle: 'KINNSO — Travel creators, real missions',
+    brandDescription:
+      'KINNSO connects travel and lifestyle creators with real brand missions, affiliate offers, and an AI copilot to grow your audience.',
+    home: {
+      title: 'Travel creators, real missions',
+      description:
+        'Join KINNSO to find real brand missions, earn from affiliate offers, and grow with an AI copilot built for travel creators.',
+    },
+    explore: {
+      title: 'Explore creator guides',
+      description: 'Browse real travel guides published by KINNSO creators across Asia and beyond.',
+    },
+    creators: {
+      title: 'Discover travel creators',
+      description: 'Find travel and lifestyle creators on KINNSO by niche, audience, and platform.',
+    },
+    agent: {
+      title: 'Creator Copilot — your AI growth assistant',
+      description: 'Meet the KINNSO Creator Copilot: AI agents that help you find content ideas, grow your audience, and earn more.',
+    },
+    about: {
+      title: 'About KINNSO',
+      description: 'KINNSO is the creator platform connecting travel and lifestyle creators with real brand missions.',
+    },
+    contact: {
+      title: 'Contact KINNSO',
+      description: 'Get in touch with the KINNSO team about partnerships, missions, and creator support.',
+    },
+    merchants: {
+      title: 'For brands and merchants',
+      description: 'Run real missions with vetted travel and lifestyle creators on KINNSO.',
+    },
+    terms: {
+      title: 'Creator Terms',
+      description: 'The terms that govern creators using KINNSO.',
+    },
+  },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
   pagination: { prev: 'Previous', next: 'Next', page: 'Page' },
   auth: {
