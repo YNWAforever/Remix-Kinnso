@@ -17,6 +17,11 @@ export interface MerchantMissionRow {
 export interface MerchantInsights {
   missionsPublished: number
   perMission: MerchantMissionRow[]
+  // NOTE: two distinct senses of "invited". `perMission[].invited` is a current-status
+  // count (still-pending invites in that mission's funnel snapshot). `totals.invited`
+  // counts every merchant-invited participant ever (source = 'merchant_invite'), and is
+  // the denominator for `inviteAcceptRate`. They intentionally measure different things,
+  // so the per-mission column and the headline acceptance rate will not arithmetic-reconcile.
   totals: { participants: number; invited: number; accepted: number; approvedSubmissions: number }
   inviteAcceptRate: number | null
 }

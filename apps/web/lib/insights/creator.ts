@@ -52,6 +52,9 @@ export async function getCreatorInsights(supabase: Client): Promise<CreatorInsig
     tier: progressToNext(pointsTotal),
     guidesPublished: num(raw.guides_published),
     guideSavesTotal: num(raw.guide_saves_total),
+    // The RPC aggregates every participant status, but we surface only the four the
+    // app actually drives. `completed` is never written (delivered work is shown via
+    // submissionsApproved instead) and `cancelled` is rare — both are intentionally omitted.
     missionsByStatus: {
       applied: num(status.applied),
       active: num(status.active),

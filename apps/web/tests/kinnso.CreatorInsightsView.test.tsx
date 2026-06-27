@@ -25,6 +25,8 @@ describe('CreatorInsightsView', () => {
     expect(screen.getByRole('heading', { level: 1, name: en.insights.creatorTitle })).toBeTruthy()
     expect(screen.getByText('65')).toBeTruthy()
     expect(screen.getByRole('img', { name: en.insights.pointsTrajectory })).toBeTruthy()
+    // accessibility: the shape-only sparkline has a screen-reader text fallback of the series
+    expect(screen.getByText('2026-06-08: 65')).toBeTruthy()
   })
 
   it('shows the empty-points state when the creator has zero points', () => {

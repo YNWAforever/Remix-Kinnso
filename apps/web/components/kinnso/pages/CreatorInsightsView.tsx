@@ -41,6 +41,13 @@ export function CreatorInsightsView({
             <div className="text-primary">
               <Sparkline values={data.trajectory.map((p) => p.cumulative)} label={t.pointsTrajectory} />
             </div>
+            {/* The sparkline is shape-only (aria-hidden polyline); expose the weekly
+                cumulative series as text so screen-reader users get the actual data. */}
+            <ol className="sr-only">
+              {data.trajectory.map((p) => (
+                <li key={p.weekStart}>{`${p.weekStart}: ${p.cumulative}`}</li>
+              ))}
+            </ol>
           </section>
           <section className="space-y-2 rounded-lg border p-5">
             <h2 className="mb-3 text-sm font-medium">{t.pointsByType}</h2>
