@@ -32,8 +32,8 @@ describe('Navbar', () => {
     render(<Navbar locale="en" role="merchant" t={en.nav} />)
     expect(screen.getByRole('link', { name: en.nav.linkMissions }).getAttribute('href')).toBe('/en/merchants/missions')
     expect(screen.getByRole('link', { name: en.nav.ctaPostMission }).getAttribute('href')).toBe('/en/merchants/post')
-    // mock "Find Creators" landing is no longer in nav
-    expect(screen.queryByRole('link', { name: en.nav.linkFindCreators })).toBeNull()
+    // Find Creators now points at the real gated creator-search surface.
+    expect(screen.getAllByRole('link', { name: en.nav.linkFindCreators })[0].getAttribute('href')).toBe('/en/merchants/creators')
   })
 
   it('does not render a Travelers/feed anchor (consolidated into /explore)', () => {

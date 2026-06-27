@@ -9,7 +9,7 @@ vi.mock('next/cache', () => ({ revalidatePath: revalidateMock }))
 vi.mock('@/lib/admin/guard', () => ({ requireOpsAction: gateMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ rpc: rpcMock }) }))
 
-import { setUserStatusAction } from '@/lib/admin/users-actions'
+import { setUserStatusAction, setMerchantTierAction } from '@/lib/admin/users-actions'
 
 beforeEach(() => {
   gateMock.mockResolvedValue({ ok: true, user: { id: 'ops1' } } as never)
@@ -52,5 +52,29 @@ describe('setUserStatusAction', () => {
     const r = await setUserStatusAction('en', 'ops', 'o1', 'suspended')
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.errors.form[0]).toMatch(/last active ops/i)
+  })
+})
+
+describe('setMerchantTierAction', () => {
+  it('rejects a non-ops caller', async () => {
+    gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['nope'] } } as never)
+    expect((await setMerchantTierAction('en', 'm1', 'growth')).ok).toBe(false)
+  })
+  it('rejects a bad tier', async () => {
+    rpcMock.mockClear()
+    expect((await setMerchantTierAction('en', 'm1', 'enterprise' as never)).ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+  it('sets a merchant tier via the RPC and revalidates the page', async () => {
+    const r = await setMerchantTierAction('en', 'm1', 'growth')
+    expect(r.ok).toBe(true)
+    expect(rpcMock).toHaveBeenCalledWith('admin_set_merchant_tier', { p_id: 'm1', p_tier: 'growth' })
+    expect(revalidateMock).toHaveBeenCalledWith('/en/admin/users')
+  })
+  it('maps a DB error to the generic fallback', async () => {
+    rpcMock.mockResolvedValueOnce({ error: { message: 'some unexpected db failure' } } as never)
+    const r = await setMerchantTierAction('en', 'm1', 'free')
+    expect(r.ok).toBe(false)
+    expect(revalidateMock).not.toHaveBeenCalled()
   })
 })

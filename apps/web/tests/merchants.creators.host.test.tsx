@@ -1,18 +1,96 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), notFound: vi.fn() }))
+
+const { roleMock, getUserMock, fromMock, searchMock, savedMock, missionsMock } = vi.hoisted(() => ({
+  roleMock: vi.fn(async () => 'merchant'),
+  getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
+  // merchant_profiles (tier) lookup + mission_participants working-set lookup
+  fromMock: vi.fn(),
+  searchMock: vi.fn(async () => [
+    {
+      id: 'c-ada',
+      handle: 'ada',
+      name: 'Ada',
+      bio: '',
+      niches: ['food'],
+      audienceGeos: ['HK'],
+      languages: ['en'],
+      platforms: ['instagram'],
+      guideCount: 2,
+      lastGuideAt: '2026-06-01T00:00:00Z',
+    },
+  ]),
+  savedMock: vi.fn(async () => []),
+  missionsMock: vi.fn(async () => [{ id: 'm1', title: 'Summer brief' }]),
+}))
+
+vi.mock('next/navigation', () => ({
+  notFound: () => { throw new Error('NEXT_NOT_FOUND') },
+  redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}))
+vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/supabase/server', () => ({
+  createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock }, from: fromMock }),
+}))
+vi.mock('@/lib/merchants/creator-search', () => ({
+  searchPublicCreators: searchMock,
+  deriveFacets: () => ({ niches: ['food'], audienceGeos: ['HK'], languages: ['en'], platforms: ['instagram'] }),
+}))
+vi.mock('@/lib/merchants/saved', () => ({ listSavedCreators: savedMock }))
+vi.mock('@/lib/merchants/invite', () => ({ listMerchantPublishedMissions: missionsMock }))
 
 import MerchantsCreatorsPage from '@/app/[locale]/merchants/creators/page'
 import en from '@/lib/i18n/messages/en'
 
+// A merchant_profiles row carrying id + tier; the merchant has no missions, so
+// the derived working set + invite usage resolve empty.
+function wireQueries() {
+  fromMock.mockImplementation((table: string) => {
+    if (table === 'merchant_profiles') {
+      return {
+        select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: { id: 'mp1', tier: 'growth' } }) }) }),
+      }
+    }
+    if (table === 'missions') {
+      return { select: () => ({ eq: () => ({ data: [], error: null }) }) }
+    }
+    if (table === 'mission_participants') {
+      return { select: () => ({ in: () => ({ data: [], error: null }) }) }
+    }
+    return { select: () => ({ data: [], error: null }) }
+  })
+}
+
+beforeEach(() => {
+  roleMock.mockResolvedValue('merchant')
+  getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+  wireQueries()
+})
+
 describe('/[locale]/merchants/creators host', () => {
-  it('renders the search surface with the mock merchant tier/quota', async () => {
+  it('renders the search surface for a merchant viewer', async () => {
     const ui = await MerchantsCreatorsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
-    expect(screen.getByRole('heading', { level: 1, name: en.merchants.heading })).toBeTruthy()
-    expect(screen.getByText(new RegExp(en.merchants.searchesLeft))).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: en.merchantSearch.heading })).toBeTruthy()
+    expect(screen.getByText('Ada')).toBeTruthy()
+  })
+
+  it('notFounds for a non-merchant signed-in viewer', async () => {
+    roleMock.mockResolvedValueOnce('creator')
+    await expect(
+      MerchantsCreatorsPage({ params: Promise.resolve({ locale: 'en' }) }),
+    ).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('redirects an anonymous viewer to sign-in', async () => {
+    roleMock.mockResolvedValueOnce('anon')
+    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
+    await expect(
+      MerchantsCreatorsPage({ params: Promise.resolve({ locale: 'en' }) }),
+    ).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
   })
 })

@@ -887,6 +887,7 @@ export type Database = {
           created_at: string
           id: string
           status: string
+          tier: string
           updated_at: string
           user_id: string
           website_url: string | null
@@ -898,6 +899,7 @@ export type Database = {
           created_at?: string
           id?: string
           status?: string
+          tier?: string
           updated_at?: string
           user_id: string
           website_url?: string | null
@@ -909,11 +911,48 @@ export type Database = {
           created_at?: string
           id?: string
           status?: string
+          tier?: string
           updated_at?: string
           user_id?: string
           website_url?: string | null
         }
         Relationships: []
+      }
+      merchant_saved_creators: {
+        Row: {
+          created_at: string
+          creator_id: string
+          merchant_id: string
+          note: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          merchant_id: string
+          note?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          merchant_id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_saved_creators_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchant_saved_creators_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mission_milestone_submissions: {
         Row: {
@@ -1526,6 +1565,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_mission_invite: {
+        Args: { p_mission_id: string }
+        Returns: undefined
+      }
       admin_list_creators: {
         Args: never
         Returns: {
@@ -1544,6 +1587,7 @@ export type Database = {
           created_at: string
           id: string
           status: string
+          tier: string
         }[]
       }
       admin_list_ops: {
@@ -1566,6 +1610,10 @@ export type Database = {
           perks_total: number
           redemptions: number
         }[]
+      }
+      admin_set_merchant_tier: {
+        Args: { p_id: string; p_tier: string }
+        Returns: undefined
       }
       admin_set_user_status: {
         Args: { p_id: string; p_kind: string; p_status: string }
@@ -1626,6 +1674,10 @@ export type Database = {
           summary: string
           title: string
         }[]
+      }
+      merchant_invite_creator: {
+        Args: { p_creator_id: string; p_mission_id: string }
+        Returns: string
       }
       recompute_creator_contribution: {
         Args: { p_creator_id: string }

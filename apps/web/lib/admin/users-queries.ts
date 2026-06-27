@@ -30,9 +30,9 @@ export async function listAdminUsers(supabase: SupabaseClient<Database>): Promis
   if (ops.error) throw ops.error
   return {
     creators: (creators.data ?? []) as AdminCreator[],
-    // Project to {id, company_name, status, created_at} — drop contact_email (PII) the UI doesn't use.
+    // Project to {id, company_name, status, tier, created_at} — drop contact_email (PII) the UI doesn't use.
     merchants: (merchants.data ?? []).map((m) => ({
-      id: m.id, company_name: m.company_name, status: m.status, created_at: m.created_at,
+      id: m.id, company_name: m.company_name, status: m.status, tier: m.tier, created_at: m.created_at,
     })) as AdminMerchant[],
     ops: (ops.data ?? []) as AdminOps[],
   }
