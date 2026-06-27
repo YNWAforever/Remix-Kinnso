@@ -396,6 +396,7 @@ const messages: Messages = {
   nav: {
     linkCreators: '크리에이터', linkMerchants: '가맹점', linkAgent: 'AI 에이전트', linkTravelers: '여행자',
     linkGuides: '가이드', linkArticles: '아티클', linkFindCreators: '크리에이터 찾기', linkMissions: '미션',
+    linkInsights: '인사이트',
     ctaApply: '크리에이터 지원', ctaOpenStudio: '스튜디오 열기', ctaPending: '신청 검토 중', ctaPostMission: '미션 등록',
     signIn: '로그인', language: '언어', menuToggle: '메뉴', skipToContent: '본문으로 건너뛰기',
   },
@@ -503,6 +504,7 @@ const messages: Messages = {
     copilotTitle: '코파일럿',
     copilotDesc: 'AI 코파일럿과 채팅하여 아이디어, 캡션, 콘텐츠를 상담하세요.',
     perksTitle: '혜택', perksDesc: '나의 등급에 따라 해제되는 파트너 혜택.',
+    insightsTitle: '인사이트', insightsDesc: '나의 실제 활동 — 포인트, 가이드, 미션.',
   },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',

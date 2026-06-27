@@ -396,6 +396,7 @@ const messages: Messages = {
   nav: {
     linkCreators: 'ครีเอเตอร์', linkMerchants: 'ร้านค้า', linkAgent: 'ผู้ช่วย AI', linkTravelers: 'นักเดินทาง',
     linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์', linkMissions: 'ภารกิจ',
+    linkInsights: 'ข้อมูลเชิงลึก',
     ctaApply: 'สมัครเป็นครีเอเตอร์', ctaOpenStudio: 'เปิดสตูดิโอ', ctaPending: 'กำลังตรวจสอบใบสมัคร', ctaPostMission: 'โพสต์ภารกิจ',
     signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู', skipToContent: 'ข้ามไปยังเนื้อหา',
   },
@@ -503,6 +504,7 @@ const messages: Messages = {
     copilotTitle: 'โคไพล็อต',
     copilotDesc: 'แชทกับ AI โคไพล็อตเพื่อขอไอเดีย คำบรรยาย และเนื้อหา',
     perksTitle: 'สิทธิพิเศษ', perksDesc: 'ดีลจากพาร์ทเนอร์ที่ปลดล็อกตามระดับของคุณ',
+    insightsTitle: 'ข้อมูลเชิงลึก', insightsDesc: 'กิจกรรมจริงของคุณ — คะแนน, ไกด์, และภารกิจ',
   },
   studioDashboard: {
     greeting: 'ยินดีต้อนรับกลับมา {name}',

@@ -399,6 +399,7 @@ export interface Messages {
   nav: {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
+    linkInsights: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
   }
@@ -457,6 +458,8 @@ export interface Messages {
     copilotDesc: string
     perksTitle: string
     perksDesc: string
+    insightsTitle: string
+    insightsDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -1114,6 +1117,7 @@ const messages: Messages = {
   nav: {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
     linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
+    linkInsights: 'Insights',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },
@@ -1221,6 +1225,7 @@ const messages: Messages = {
     copilotTitle: 'Copilot',
     copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
     perksTitle: 'Perks', perksDesc: 'Partner deals unlocked by your tier.',
+    insightsTitle: 'Insights', insightsDesc: 'Your real activity — points, guides, and missions.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',

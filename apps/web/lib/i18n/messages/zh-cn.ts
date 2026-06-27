@@ -396,6 +396,7 @@ const messages: Messages = {
   nav: {
     linkCreators: '创作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
     linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '寻找创作者', linkMissions: '任务',
+    linkInsights: '数据洞察',
     ctaApply: '申请成为创作者', ctaOpenStudio: '打开工作室', ctaPending: '申请审核中', ctaPostMission: '发布任务',
     signIn: '登录', language: '语言', menuToggle: '菜单', skipToContent: '跳到内容',
   },
@@ -503,6 +504,7 @@ const messages: Messages = {
     copilotTitle: '副驾驶',
     copilotDesc: '与 AI 副驾驶对话，获取创意、文案和内容灵感。',
     perksTitle: '福利', perksDesc: '根据你的等级解锁的合作伙伴优惠。',
+    insightsTitle: '数据洞察', insightsDesc: '你的真实活动 — 积分、攻略、任务。',
   },
   studioDashboard: {
     greeting: '欢迎回来，{name}',

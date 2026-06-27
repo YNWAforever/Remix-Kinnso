@@ -396,6 +396,7 @@ const messages: Messages = {
   nav: {
     linkCreators: '創作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
     linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '尋找創作者', linkMissions: '任務',
+    linkInsights: '數據洞察',
     ctaApply: '申請成為創作者', ctaOpenStudio: '開啟工作室', ctaPending: '申請審核中', ctaPostMission: '發佈任務',
     signIn: '登入', language: '語言', menuToggle: '選單', skipToContent: '跳到內容',
   },
@@ -503,6 +504,7 @@ const messages: Messages = {
     copilotTitle: '副機師',
     copilotDesc: '同 AI 副機師傾偈，搵創意、文案同內容靈感。',
     perksTitle: '福利', perksDesc: '根據你的等級解鎖的合作夥伴優惠。',
+    insightsTitle: '數據洞察', insightsDesc: '你的真實活動 — 積分、攻略、任務。',
   },
   studioDashboard: {
     greeting: '歡迎返嚟，{name}',

@@ -396,6 +396,7 @@ const messages: Messages = {
   nav: {
     linkCreators: 'クリエイター', linkMerchants: '加盟店', linkAgent: 'AIエージェント', linkTravelers: '旅行者',
     linkGuides: 'ガイド', linkArticles: '記事', linkFindCreators: 'クリエイターを探す', linkMissions: 'ミッション',
+    linkInsights: 'インサイト',
     ctaApply: 'クリエイター応募', ctaOpenStudio: 'スタジオを開く', ctaPending: '申請審査中', ctaPostMission: 'ミッションを投稿',
     signIn: 'ログイン', language: '言語', menuToggle: 'メニュー', skipToContent: '本文へスキップ',
   },
@@ -503,6 +504,7 @@ const messages: Messages = {
     copilotTitle: 'コパイロット',
     copilotDesc: 'AIコパイロットとチャットして、アイデア、キャプション、コンテンツを相談しましょう。',
     perksTitle: '特典', perksDesc: 'あなたのティアで解放されるパートナー特典。',
+    insightsTitle: 'インサイト', insightsDesc: 'あなたの実際の活動 — ポイント、ガイド、ミッション。',
   },
   studioDashboard: {
     greeting: 'おかえりなさい、{name}さん',
