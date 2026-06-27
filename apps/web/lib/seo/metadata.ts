@@ -9,6 +9,15 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.kinnso.
 
 const abs = (l: string, path: string) => `${SITE_URL}/${l}${path}` // path is '' or starts with '/'
 
+/**
+ * URL of the branded default OG card (the `[locale]/opengraph-image` file-convention
+ * route). Marketing pages are child segments that define their own `openGraph`, which
+ * replaces the inherited card, so they must reference this explicitly. Single place to
+ * update if that route ever moves. (Guide/creator pages have their own colocated
+ * opengraph-image route and don't use this.)
+ */
+export const defaultOgImagePath = (locale: Locale): string => abs(locale, '/opengraph-image')
+
 /** canonical (current locale) + hreflang map (given locales) + x-default → DEFAULT_LOCALE. */
 function hreflangFor(pathFor: (l: Locale) => string, current: Locale, locales: readonly Locale[]) {
   const languages: Record<string, string> = {}
@@ -70,11 +79,7 @@ export interface PageMetaInput {
 
 export function buildPageMetadata(i: PageMetaInput): Metadata {
   const { canonical, languages } = hreflangFor((l) => abs(l, i.path), i.locale, LOCALES)
-  // Marketing pages are child segments of `[locale]`, so they do NOT inherit the
-  // `[locale]/opengraph-image` file-convention card (a page's own openGraph replaces the
-  // inherited one). Reference the default branded card explicitly so every marketing page
-  // has a social image. (Guide/creator pages have their own colocated opengraph-image route.)
-  const ogImage = `${SITE_URL}/${i.locale}/opengraph-image`
+  const ogImage = defaultOgImagePath(i.locale)
   return {
     title: i.title,
     description: i.description,

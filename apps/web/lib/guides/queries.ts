@@ -39,6 +39,7 @@ export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: st
     .select('slug, published_at')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
+    .order('slug') // stable tie-break so sitemap sharding partitions a deterministic order
   return (data ?? []).map((r) => ({
     slug: r.slug as string,
     lastmod: (r.published_at as string | null) ?? null,

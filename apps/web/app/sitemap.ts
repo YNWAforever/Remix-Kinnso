@@ -4,12 +4,20 @@ import { getGuidesForSitemap } from '@/lib/guides/queries'
 import { getCreatorsForSitemap } from '@/lib/creators/queries'
 import { LOCALES, URL_CATEGORIES, toUrlCategory } from '@/lib/i18n/config'
 import { SITE_URL } from '@/lib/seo/metadata'
+import { MARKETING_PATHS } from '@/lib/seo/routes'
 
 export const revalidate = 21600 // 6h
 
-const MARKETING_PATHS = ['', '/explore', '/creators', '/agent', '/about', '/contact', '/merchants', '/legal/creator-terms']
+// The sitemap protocol caps a single file at 50,000 URLs / 50 MB. Because guides and
+// creators each fan out across every locale, the URL count grows fast, so we shard well
+// under the cap and let Next emit a sitemap index (/sitemap.xml) over /sitemap/<id>.xml
+// instead of silently overflowing one file.
+const SITEMAP_CHUNK = 40000
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+/** The full, deterministically-ordered URL set. Stable order matters: generateSitemaps
+ *  and each sitemap({id}) call must partition the SAME sequence or shards would overlap
+ *  or drop URLs. */
+async function buildAllSitemapEntries(): Promise<MetadataRoute.Sitemap> {
   const [articles, guides, creators] = await Promise.all([
     getPublishedForSitemap(), getGuidesForSitemap(), getCreatorsForSitemap(),
   ])
@@ -50,4 +58,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
   return out
+}
+
+// Next calls this once to learn the shard ids, then sitemap({id}) per shard. Rebuilding
+// the list (here for the count, then once per shard) is the accepted cost of having no
+// cheap total-count API; the 6h revalidate amortises it.
+export async function generateSitemaps(): Promise<{ id: number }[]> {
+  const total = (await buildAllSitemapEntries()).length
+  const count = Math.max(1, Math.ceil(total / SITEMAP_CHUNK))
+  return Array.from({ length: count }, (_, id) => ({ id }))
+}
+
+// Next 16 passes the shard id as a Promise that resolves to a STRING (the filename
+// without `.xml`), so await + numeric-coerce before slicing. `id` is absent only when
+// called directly (e.g. tests) → return the whole set.
+export default async function sitemap(
+  { id }: { id?: number | string | Promise<number | string> } = {},
+): Promise<MetadataRoute.Sitemap> {
+  const all = await buildAllSitemapEntries()
+  const resolved = await id
+  if (resolved === undefined || resolved === null) return all
+  const shard = Number(resolved)
+  if (!Number.isFinite(shard)) return all
+  return all.slice(shard * SITEMAP_CHUNK, (shard + 1) * SITEMAP_CHUNK)
 }

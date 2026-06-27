@@ -9,10 +9,12 @@ vi.mock('@/lib/supabase/public', () => ({
       const builder = {
         select: () => builder,
         eq: () => builder,
-        // getPublishedGuides awaits the .order() result
-        order: () => Promise.resolve({ data: state.list }),
+        // queries chain one or more .order() calls, then await the builder (thenable)
+        order: () => builder,
         // getGuideBySlug awaits .maybeSingle()
         maybeSingle: async () => ({ data: state.single }),
+        then: (onF: (v: { data: unknown }) => unknown) =>
+          Promise.resolve({ data: state.list }).then(onF),
       }
       return builder
     },
