@@ -40,4 +40,10 @@ describe('StudioQuickLinks', () => {
     const link = screen.getByText(en.studioHome.perksTitle).closest('a')
     expect(link?.getAttribute('href')).toBe('/en/studio/perks')
   })
+
+  it('renders an Insights tile linking to /studio/insights', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+    const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
+    expect(hrefs).toContain('/en/studio/insights')
+  })
 })

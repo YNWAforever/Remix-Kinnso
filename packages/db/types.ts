@@ -1647,6 +1647,7 @@ export type Database = {
           partner_url: string
         }[]
       }
+      creator_insights: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
       get_you_may_like: {
         Args: { p_article_id: string; p_limit?: number; p_locale: string }
@@ -1675,6 +1676,7 @@ export type Database = {
           title: string
         }[]
       }
+      merchant_insights: { Args: never; Returns: Json }
       merchant_invite_creator: {
         Args: { p_creator_id: string; p_mission_id: string }
         Returns: string

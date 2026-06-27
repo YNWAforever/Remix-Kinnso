@@ -36,6 +36,12 @@ describe('Navbar', () => {
     expect(screen.getAllByRole('link', { name: en.nav.linkFindCreators })[0].getAttribute('href')).toBe('/en/merchants/creators')
   })
 
+  it('merchant nav renders an Insights link to /merchants/insights', () => {
+    render(<Navbar locale="en" role="merchant" t={en.nav} />)
+    const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
+    expect(hrefs).toContain('/en/merchants/insights')
+  })
+
   it('does not render a Travelers/feed anchor (consolidated into /explore)', () => {
     render(<Navbar locale="en" role="anon" t={en.nav} />)
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
