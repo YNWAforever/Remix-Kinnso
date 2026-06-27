@@ -41,7 +41,7 @@ export function GuideCard({ title, city, handle, cover }: { title: string; city:
       {cover ? <img src={cover} width={1200} height={360} style={{ objectFit: 'cover' }} /> : <div style={{ width: 1200, height: 360, background: OG.orange }} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 56, flex: 1, justifyContent: 'center' }}>
         <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.05 }}>{title}</div>
-        <div style={{ fontSize: 30, color: '#D9D2C7' }}>{city} · @{handle}</div>
+        <div style={{ fontSize: 30, color: '#D9D2C7' }}>{`${city} · @${handle}`}</div>
         <div style={{ fontSize: 28, fontWeight: 700, color: OG.orange }}>KINNSO</div>
       </div>
     </div>
@@ -53,7 +53,7 @@ export function CreatorCard({ name, handle, niches, guideCount }: { name: string
     <Frame>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ fontSize: 64, fontWeight: 700 }}>{name}</div>
-        <div style={{ fontSize: 34, color: OG.muted }}>@{handle} · {guideCount} guides</div>
+        <div style={{ fontSize: 34, color: OG.muted }}>{`@${handle} · ${guideCount} guides`}</div>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {niches.map((n) => (
             <div key={n} style={{ display: 'flex', fontSize: 26, padding: '8px 18px', borderRadius: 999, background: OG.orange, color: OG.cream }}>{n}</div>

@@ -70,15 +70,20 @@ export interface PageMetaInput {
 
 export function buildPageMetadata(i: PageMetaInput): Metadata {
   const { canonical, languages } = hreflangFor((l) => abs(l, i.path), i.locale, LOCALES)
+  // Marketing pages are child segments of `[locale]`, so they do NOT inherit the
+  // `[locale]/opengraph-image` file-convention card (a page's own openGraph replaces the
+  // inherited one). Reference the default branded card explicitly so every marketing page
+  // has a social image. (Guide/creator pages have their own colocated opengraph-image route.)
+  const ogImage = `${SITE_URL}/${i.locale}/opengraph-image`
   return {
     title: i.title,
     description: i.description,
     alternates: { canonical, languages },
     openGraph: {
       type: i.type ?? 'website', url: canonical, title: i.title, description: i.description,
-      siteName: 'KINNSO', locale: OG_LOCALE[i.locale],
+      siteName: 'KINNSO', locale: OG_LOCALE[i.locale], images: [ogImage],
     },
-    twitter: { card: 'summary_large_image', title: i.title, description: i.description },
+    twitter: { card: 'summary_large_image', title: i.title, description: i.description, images: [ogImage] },
     robots: { index: true, follow: true, 'max-image-preview': 'large' },
   }
 }
