@@ -22,5 +22,6 @@ export interface GuideListItem {
 export interface GuideDetail extends Guide {
   summary: string | null
   creatorName: string | null
+  publishedAt: string | null
   source: 'db' | 'mock'
 }

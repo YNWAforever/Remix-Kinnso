@@ -52,7 +52,7 @@ export default async function GuidePage({
       headline: guide.title,
       description: guide.summary ?? `${guide.city} guide by ${authorName}`,
       url: canonical, images: guide.cover ? [guide.cover] : [],
-      publishedAt: null, modifiedAt: null,
+      publishedAt: guide.publishedAt, modifiedAt: null,
       authorName, locale: htmlLang(locale as Locale),
     }),
     breadcrumbJsonLd([

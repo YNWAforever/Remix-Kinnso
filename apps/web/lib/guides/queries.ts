@@ -49,7 +49,7 @@ export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> 
   const supabase = createSupabasePublicClient()
   const { data } = await supabase
     .from('guides')
-    .select('slug, title, cover_url, city, saves_count, creator_handle, creator_name, summary')
+    .select('slug, title, cover_url, city, saves_count, creator_handle, creator_name, summary, published_at')
     .eq('slug', slug)
     .eq('status', 'published')
     .maybeSingle()
@@ -59,6 +59,7 @@ export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> 
     ...mapRowToGuide(data),
     summary: data.summary,
     creatorName: data.creator_name,
+    publishedAt: (data.published_at as string | null) ?? null,
     source: 'db',
   }
 }

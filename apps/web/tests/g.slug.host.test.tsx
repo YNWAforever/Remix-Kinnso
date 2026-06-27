@@ -18,6 +18,7 @@ vi.mock('@/lib/guides/queries', () => ({
     creatorHandle: 'teafan',
     creatorName: 'Tea Fan',
     summary: 'Lovely tea houses.',
+    publishedAt: '2026-06-02T00:00:00Z',
     source: 'db',
   })),
 }))
@@ -32,5 +33,9 @@ describe('/[locale]/g/[slug] host', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Kyoto Tea Houses' })).toBeTruthy()
     expect(screen.getByRole('link', { name: '@teafan' }).getAttribute('href')).toBe('/en/c/teafan')
     expect(document.querySelector('.k-route-stamp')).toBeTruthy()
+    // The Article JSON-LD threads the guide's published_at into datePublished/dateModified.
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).toContain('"datePublished":"2026-06-02T00:00:00Z"')
+    expect(ld).toContain('"dateModified":"2026-06-02T00:00:00Z"')
   })
 })

@@ -10,10 +10,15 @@ export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ locale: string; handle: string }> }) {
   const { handle } = await params
-  const creator = await getCreatorByHandle(handle)
   const fonts = await loadOgFonts()
-  const card = creator
-    ? <CreatorCard name={creator.name} handle={creator.handle} niches={pickNiches(creator.profile.niches)} guideCount={creator.guides.length} />
-    : <DefaultCard title="Creator" subtitle="KINNSO" />
-  return new ImageResponse(card, { ...OG_SIZE, fonts })
+  const fontOpt = fonts.length ? { fonts } : {}
+  try {
+    const creator = await getCreatorByHandle(handle)
+    const card = creator
+      ? <CreatorCard name={creator.name} handle={creator.handle} niches={pickNiches(creator.profile.niches)} guideCount={creator.guides.length} />
+      : <DefaultCard title="Creator" subtitle="KINNSO" />
+    return new ImageResponse(card, { ...OG_SIZE, ...fontOpt })
+  } catch {
+    return new ImageResponse(<DefaultCard title="Creator" subtitle="KINNSO" />, { ...OG_SIZE, ...fontOpt })
+  }
 }
