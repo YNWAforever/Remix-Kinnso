@@ -47,6 +47,7 @@ export default async function CreatorPublicPage({
       bio: creator.bio, niches: creator.profile.niches,
     }),
     breadcrumbJsonLd([
+      { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
       { name: messages.seo.creators.title, url: `${SITE_URL}/${locale}/creators` },
       { name: creator.name, url: canonical },
     ]),

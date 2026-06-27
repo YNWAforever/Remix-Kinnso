@@ -11,7 +11,7 @@ export function articleJsonLd(i: ArticleLdInput): Record<string, unknown> {
     image: i.images, inLanguage: i.locale,
     datePublished: i.publishedAt ?? undefined,
     dateModified: i.modifiedAt ?? i.publishedAt ?? undefined,   // <-- the fix: never omit dateModified
-    publisher: { '@type': 'Organization', name: 'Kinnso' },
+    publisher: { '@type': 'Organization', name: 'KINNSO' },
   }
   if (i.authorName) ld.author = { '@type': 'Person', name: i.authorName }
   return ld

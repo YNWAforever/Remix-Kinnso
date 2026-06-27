@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Bookmark, MapPin } from 'lucide-react'
-import { isLocale, type Locale } from '@/lib/i18n/config'
+import { isLocale, htmlLang, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
 import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
@@ -53,9 +53,10 @@ export default async function GuidePage({
       description: guide.summary ?? `${guide.city} guide by ${authorName}`,
       url: canonical, images: guide.cover ? [guide.cover] : [],
       publishedAt: null, modifiedAt: null,
-      authorName, locale,
+      authorName, locale: htmlLang(locale as Locale),
     }),
     breadcrumbJsonLd([
+      { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
       { name: messages.seo.explore.title, url: `${SITE_URL}/${locale}/explore` },
       { name: guide.title, url: canonical },
     ]),
