@@ -12,6 +12,7 @@ export function MissionsTab({ t, missions }: { t: T; missions: CreatorDetailMiss
         <tr className="border-b border-kinnso-line">
           <th className="py-2 font-bold">{t.colMission}</th>
           <th className="py-2 font-bold">{t.colStatus}</th>
+          <th className="py-2 font-bold">{t.colMilestones}</th>
           <th className="py-2 font-bold">{t.colSource}</th>
           <th className="py-2 font-bold">{t.colJoined}</th>
         </tr>
@@ -21,6 +22,10 @@ export function MissionsTab({ t, missions }: { t: T; missions: CreatorDetailMiss
           <tr key={m.participantId} className="border-b border-kinnso-line/60">
             <td className="py-2 font-bold text-kinnso-ink">{m.title}</td>
             <td className="py-2 text-kinnso-muted">{m.status}</td>
+            <td className="py-2 text-kinnso-muted">
+              {m.submissionsApproved}/{m.submissionsTotal}
+              {m.submissionsPending > 0 ? <span className="text-kinnso-muted/70"> (+{m.submissionsPending})</span> : null}
+            </td>
             <td className="py-2 text-kinnso-muted">{m.source}</td>
             <td className="py-2 text-kinnso-muted">{day(m.createdAt)}</td>
           </tr>

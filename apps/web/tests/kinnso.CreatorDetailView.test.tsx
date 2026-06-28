@@ -15,7 +15,7 @@ const detail: CreatorDetail = {
   creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: false, bio: 'Hi', createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-20T00:00:00Z' },
   contribution: { points: 320, tier: 'pro', tierUpdatedAt: null },
   dna: null, scan: null, socials: [],
-  missions: [{ participantId: 'p1', missionId: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approvedAt: null, createdAt: '2026-06-02T00:00:00Z' }],
+  missions: [{ participantId: 'p1', missionId: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approvedAt: null, createdAt: '2026-06-02T00:00:00Z', submissionsTotal: 3, submissionsApproved: 1, submissionsPending: 2 }],
   settlements: [], pointsEvents: [],
   content: [{ id: 'g1', title: 'Best ramen', slug: 'best-ramen', status: 'published', savesCount: 12, publishedAt: null, createdAt: '2026-06-06T00:00:00Z' }],
 }

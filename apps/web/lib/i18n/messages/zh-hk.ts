@@ -760,7 +760,7 @@ const messages: Messages = {
     secDna: '創作者 DNA', secScan: '最近掃描', secSocials: '社交帳號', secContribution: '貢獻',
     dnaNoData: '尚無 DNA', scanNoData: '尚無掃描', socialsNoData: '尚無社交帳號',
     scanStatus: '狀態', scanError: '錯誤', scanCompleted: '完成於',
-    colMission: '任務', colStatus: '狀態', colSource: '來源', missionsNoData: '尚無任務',
+    colMission: '任務', colStatus: '狀態', colSource: '來源', colMilestones: '里程碑', missionsNoData: '尚無任務',
     colAmount: '金額', colPayout: '派付', colSettlement: '結算', settlementsNoData: '尚無結算',
     pointsHistory: '積分紀錄', colEvent: '事件', colPoints: '積分', pointsNoData: '尚無積分活動', totalPoints: '總積分',
     colTitle: '標題', colSaves: '收藏', colStatusContent: '狀態', contentNoData: '尚無內容',

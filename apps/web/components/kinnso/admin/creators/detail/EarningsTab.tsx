@@ -16,6 +16,7 @@ export function EarningsTab({
   return (
     <div className="flex flex-col gap-6">
       <section className="rounded-xl border border-kinnso-line p-4">
+        <p className="text-xs font-bold uppercase text-kinnso-muted">{t.secContribution}</p>
         <p className="text-sm font-bold text-kinnso-ink">{t.totalPoints}</p>
         <p className="mt-1 text-2xl font-black text-kinnso-ink">{contribution?.points ?? 0}</p>
       </section>

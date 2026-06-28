@@ -14,7 +14,7 @@ const payload = {
   dna: { id: 'd1', status: 'published', model: 'gpt', draft_ready_at: null, updated_at: '2026-06-05T00:00:00Z' },
   scan: { id: 'j1', status: 'completed', error: null, started_at: null, completed_at: '2026-06-04T00:00:00Z', created_at: '2026-06-04T00:00:00Z' },
   socials: [{ platform: 'instagram', handle: 'mia', url: 'https://ig/mia' }],
-  missions: [{ participant_id: 'p1', mission_id: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approved_at: null, created_at: '2026-06-02T00:00:00Z' }],
+  missions: [{ participant_id: 'p1', mission_id: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approved_at: null, created_at: '2026-06-02T00:00:00Z', submissions_total: 3, submissions_approved: 1, submissions_pending: 2 }],
   settlements: [{ id: 's1', mission_title: 'Tokyo eats', status: 'pending', creator_payout_status: 'pending', creator_commission_amount: 120.5, amount_currency: 'HKD', created_at: '2026-06-03T00:00:00Z' }],
   points_events: [{ id: 'e1', event_type: 'guide_published', points: 50, created_at: '2026-06-06T00:00:00Z' }],
   content: [{ id: 'g1', title: 'Best ramen', slug: 'best-ramen', status: 'published', saves_count: 12, published_at: '2026-06-07T00:00:00Z', created_at: '2026-06-06T00:00:00Z' }],
@@ -30,7 +30,7 @@ describe('getCreatorDetail', () => {
     expect(detail!.dna).toMatchObject({ status: 'published' })
     expect(detail!.scan).toMatchObject({ status: 'completed' })
     expect(detail!.socials[0]).toMatchObject({ platform: 'instagram', handle: 'mia' })
-    expect(detail!.missions[0]).toMatchObject({ participantId: 'p1', title: 'Tokyo eats', status: 'active' })
+    expect(detail!.missions[0]).toMatchObject({ participantId: 'p1', title: 'Tokyo eats', status: 'active', submissionsTotal: 3, submissionsApproved: 1, submissionsPending: 2 })
     expect(detail!.settlements[0]).toMatchObject({ missionTitle: 'Tokyo eats', creatorCommissionAmount: 120.5, currency: 'HKD' })
     expect(detail!.pointsEvents[0]).toMatchObject({ eventType: 'guide_published', points: 50 })
     expect(detail!.content[0]).toMatchObject({ title: 'Best ramen', savesCount: 12 })

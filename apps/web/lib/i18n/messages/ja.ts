@@ -760,7 +760,7 @@ const messages: Messages = {
     secDna: 'クリエイター DNA', secScan: '最新スキャン', secSocials: 'ソーシャルアカウント', secContribution: '貢献',
     dnaNoData: 'DNA はまだありません', scanNoData: 'スキャンはまだありません', socialsNoData: 'ソーシャルアカウントなし',
     scanStatus: 'ステータス', scanError: 'エラー', scanCompleted: '完了日',
-    colMission: 'ミッション', colStatus: 'ステータス', colSource: 'ソース', missionsNoData: 'ミッションはまだありません',
+    colMission: 'ミッション', colStatus: 'ステータス', colSource: 'ソース', colMilestones: 'マイルストーン', missionsNoData: 'ミッションはまだありません',
     colAmount: '金額', colPayout: '支払い', colSettlement: '精算', settlementsNoData: '精算はまだありません',
     pointsHistory: 'ポイント履歴', colEvent: 'イベント', colPoints: 'ポイント', pointsNoData: 'ポイント活動はまだありません', totalPoints: '合計ポイント',
     colTitle: 'タイトル', colSaves: '保存数', colStatusContent: 'ステータス', contentNoData: 'コンテンツはまだありません',

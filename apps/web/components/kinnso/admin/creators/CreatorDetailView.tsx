@@ -65,8 +65,9 @@ export function CreatorDetailView({
   }
 
   async function saveNote() {
-    setNoteError(null)
+    setNoteError(null); setBusy(true)
     const res = await actions.addCreatorNote(locale, creator.id, note)
+    setBusy(false)
     if (res.ok) { setNote(''); router.refresh() }
     else setNoteError(firstError(res))
   }
@@ -148,7 +149,7 @@ export function CreatorDetailView({
                 className="min-w-[16rem] flex-1 rounded-lg border border-kinnso-line px-3 py-1.5 text-sm"
                 placeholder={t.notePlaceholder} value={note} onChange={(e) => setNote(e.target.value)}
               />
-              <button type="button" className={btn} disabled={note.trim() === ''} onClick={saveNote}>{t.saveNote}</button>
+              <button type="button" className={btn} disabled={busy || note.trim() === ''} onClick={saveNote}>{t.saveNote}</button>
               {noteError ? <p className="w-full text-sm text-red-700">{noteError}</p> : null}
             </div>
             <ModerationTab t={t} entries={audit} />
