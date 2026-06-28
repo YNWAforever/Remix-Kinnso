@@ -1617,6 +1617,10 @@ export type Database = {
         Args: { p_days?: number }
         Returns: Json
       }
+      admin_creator_detail: {
+        Args: { p_creator_id: string }
+        Returns: Json
+      }
       admin_set_creator_status: {
         Args: { p_id: string; p_status: string; p_reason: string }
         Returns: undefined
