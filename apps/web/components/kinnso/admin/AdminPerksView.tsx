@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { AdminPerk } from '@/lib/admin/perks-queries'
 import type { PerkInput } from '@/lib/admin/perks-validation'
@@ -19,7 +20,24 @@ export function AdminPerksView({
   onUpdate: (id: string, input: PerkInput) => Promise<SaveResult>
   onToggle: (id: string, active: boolean) => Promise<ToggleResult>
 }) {
+  const router = useRouter()
   const [editing, setEditing] = useState<AdminPerk | null | 'new'>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  async function toggle(perk: AdminPerk) {
+    setBusyId(perk.id)
+    setErrors((e) => ({ ...e, [perk.id]: '' }))
+    const res = await onToggle(perk.id, !perk.active)
+    setBusyId(null)
+    if (res.ok) {
+      router.refresh() // reconcile the list with the revalidated server truth
+    } else {
+      // The action returns formError(...) on failure (expired ops session, no-op write, …);
+      // surface it so the button does not silently appear to do nothing.
+      setErrors((e) => ({ ...e, [perk.id]: res.errors.form?.[0] ?? 'Perk status could not be changed.' }))
+    }
+  }
 
   if (editing !== null) {
     const perk = editing === 'new' ? null : editing
@@ -60,12 +78,15 @@ export function AdminPerksView({
                 <span className={`mt-1 inline-block text-xs font-bold ${perk.active ? 'text-kinnso-orange' : 'text-kinnso-muted'}`}>
                   {perk.active ? t.admin.statusActive : t.admin.statusInactive}
                 </span>
+                {errors[perk.id] ? <p className="mt-1 text-sm text-red-600">{errors[perk.id]}</p> : null}
               </div>
               <div className="flex gap-2">
                 <button onClick={() => setEditing(perk)}
                   className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink">{t.admin.editPerk}</button>
-                <button onClick={() => onToggle(perk.id, !perk.active)}
-                  className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink">
+                <button onClick={() => toggle(perk)}
+                  disabled={busyId === perk.id}
+                  aria-busy={busyId === perk.id}
+                  className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
                   {perk.active ? t.admin.deactivate : t.admin.activate}
                 </button>
               </div>

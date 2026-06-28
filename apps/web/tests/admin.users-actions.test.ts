@@ -53,6 +53,16 @@ describe('setUserStatusAction', () => {
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.errors.form[0]).toMatch(/last active ops/i)
   })
+  it('maps not_found (stale/deleted user) to a friendly error, not the generic fallback', async () => {
+    rpcMock.mockResolvedValueOnce({ error: { message: 'not_found' } } as never)
+    const r = await setUserStatusAction('en', 'creator', 'gone', 'suspended')
+    expect(r.ok).toBe(false)
+    if (!r.ok) {
+      expect(r.errors.form[0]).toMatch(/no longer exists/i)
+      expect(r.errors.form[0]).not.toMatch(/could not be changed/i)
+    }
+    expect(revalidateMock).not.toHaveBeenCalled()
+  })
 })
 
 describe('setMerchantTierAction', () => {
@@ -75,6 +85,16 @@ describe('setMerchantTierAction', () => {
     rpcMock.mockResolvedValueOnce({ error: { message: 'some unexpected db failure' } } as never)
     const r = await setMerchantTierAction('en', 'm1', 'free')
     expect(r.ok).toBe(false)
+    expect(revalidateMock).not.toHaveBeenCalled()
+  })
+  it('maps not_found (stale/deleted merchant) to a friendly error, not the generic fallback', async () => {
+    rpcMock.mockResolvedValueOnce({ error: { message: 'not_found' } } as never)
+    const r = await setMerchantTierAction('en', 'gone', 'growth')
+    expect(r.ok).toBe(false)
+    if (!r.ok) {
+      expect(r.errors.form[0]).toMatch(/no longer exists/i)
+      expect(r.errors.form[0]).not.toMatch(/could not be changed/i)
+    }
     expect(revalidateMock).not.toHaveBeenCalled()
   })
 })

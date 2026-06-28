@@ -65,4 +65,24 @@ describe('OpsSettlementView', () => {
     render(<OpsSettlementView locale="en" t={en.ops} settlements={[settlement]} onUpdate={vi.fn()} />)
     expect(screen.getByRole('link', { name: en.ops.backHome }).getAttribute('href')).toBe('/en')
   })
+
+  it('hides mark-paid for non-payable states and shows the real status', () => {
+    const disputed = { ...settlement, id: 'disputed-1', status: 'disputed' }
+    const notStarted = { ...settlement, id: 'not-started-1', status: 'not_started' }
+    render(<OpsSettlementView locale="en" t={en.ops} settlements={[disputed, notStarted]} onUpdate={vi.fn()} />)
+
+    expect(screen.queryByRole('button', { name: en.ops.markPaid })).toBeNull()
+    expect(screen.getByText('Disputed')).toBeTruthy()
+    expect(screen.getByText('Not started')).toBeTruthy()
+    expect(screen.queryByText(en.ops.statusPending)).toBeNull()
+  })
+
+  it('keeps mark-paid for partially_paid settlements', () => {
+    const onUpdate = vi.fn()
+    const partial = { ...settlement, id: 'partial-1', status: 'partially_paid' }
+    render(<OpsSettlementView locale="en" t={en.ops} settlements={[partial]} onUpdate={onUpdate} />)
+
+    fireEvent.click(screen.getByRole('button', { name: en.ops.markPaid }))
+    expect(onUpdate).toHaveBeenCalledWith('partial-1', 'paid')
+  })
 })

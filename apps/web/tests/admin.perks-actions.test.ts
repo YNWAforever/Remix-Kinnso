@@ -18,8 +18,18 @@ const input: PerkInput = {
 }
 
 /** Captures the insert/update payload and returns a configurable result. */
-function makeClient(opts: { existingSlugs?: string[]; insert?: unknown; updateError?: unknown } = {}) {
+function makeClient(
+  opts: {
+    existingSlugs?: string[]
+    insert?: unknown
+    updateError?: unknown
+    // The row the UPDATE…RETURNING resolves to; null models "no row matched" (RLS/stale id).
+    updateRow?: unknown
+  } = {},
+) {
   const calls: { insert?: Record<string, unknown>; update?: Record<string, unknown> } = {}
+  // Default: a matching row was touched (id echoed back from .select('id')).
+  const updateRow = 'updateRow' in opts ? opts.updateRow : { id: 'p1' }
   const client = {
     from: () => ({
       select: () => ({
@@ -33,7 +43,13 @@ function makeClient(opts: { existingSlugs?: string[]; insert?: unknown; updateEr
       },
       update: (row: Record<string, unknown>) => {
         calls.update = row
-        return { eq: async () => ({ error: opts.updateError ?? null }) }
+        return {
+          eq: () => ({
+            select: () => ({
+              maybeSingle: async () => ({ data: updateRow, error: opts.updateError ?? null }),
+            }),
+          }),
+        }
       },
     }),
   }
@@ -83,6 +99,12 @@ describe('updatePerkAction', () => {
     const r = await updatePerkAction('en', 'p1', input)
     expect(r.ok).toBe(false)
   })
+  it('fails when no row is updated (stale/wrong id under RLS, zero rows, no error)', async () => {
+    const { client } = makeClient({ updateRow: null })
+    serverClientMock.mockResolvedValue(client)
+    const r = await updatePerkAction('en', 'missing', input)
+    expect(r.ok).toBe(false)
+  })
 })
 
 describe('togglePerkActiveAction', () => {
@@ -93,5 +115,11 @@ describe('togglePerkActiveAction', () => {
     expect(r.ok).toBe(true)
     if (r.ok) expect(r.active).toBe(false)
     expect(calls.update?.active).toBe(false)
+  })
+  it('fails when no row is toggled (stale/wrong id under RLS, zero rows, no error)', async () => {
+    const { client } = makeClient({ updateRow: null })
+    serverClientMock.mockResolvedValue(client)
+    const r = await togglePerkActiveAction('en', 'missing', false)
+    expect(r.ok).toBe(false)
   })
 })
