@@ -662,6 +662,7 @@ export interface Messages {
     actMarkPaid: string; actMarkDisputed: string
     confirmMarkPaid: string; confirmMarkDisputed: string
     payoutsEmpty: string
+    reasonRequired: string
   }
   perks: {
     catalog: {
@@ -1546,6 +1547,7 @@ const messages: Messages = {
     confirmMarkPaid: 'Mark this settlement fully paid? This records a creator payout.',
     confirmMarkDisputed: 'Flag this settlement as disputed?',
     payoutsEmpty: 'No settlements match this filter',
+    reasonRequired: 'A reason is required.',
   },
   perks: {
     catalog: {

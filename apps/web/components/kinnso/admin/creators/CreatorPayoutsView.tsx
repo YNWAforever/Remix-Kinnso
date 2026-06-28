@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { CreatorsTabs } from '@/components/kinnso/admin/creators/CreatorsTabs'
 import type { PayoutRow, PayoutsQueue } from '@/lib/admin/creators-queries'
@@ -44,13 +44,17 @@ export function CreatorPayoutsView({
   const [reason, setReason] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const reasonRef = useRef<HTMLTextAreaElement>(null)
+
+  // Focus the reason field when the confirm dialog opens (a11y for the money action).
+  useEffect(() => { if (pending) reasonRef.current?.focus() }, [pending])
 
   const open = (row: PayoutRow, kind: 'paid' | 'disputed') => { setPending({ row, kind }); setReason(''); setError(null) }
   const cancel = () => { setPending(null); setReason(''); setError(null) }
 
   const confirm = () => {
     if (!pending) return
-    if (!reason.trim()) { setError(t.actionFailed); return }
+    if (!reason.trim()) { setError(t.reasonRequired); return }
     const input: SettlementStatusInput = pending.kind === 'paid'
       ? { status: 'paid', creatorPayoutStatus: 'paid', kinnsoCommissionStatus: 'paid', affiliateCommissionStatus: 'paid' }
       : { status: 'disputed' }
@@ -156,19 +160,21 @@ export function CreatorPayoutsView({
 
       {/* Confirm + reason panel (money-touching → required per spec §6). */}
       {pending && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" role="dialog" aria-modal="true"
+          aria-labelledby="payout-confirm-title" onKeyDown={(e) => { if (e.key === 'Escape') cancel() }}>
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
-            <p className="mb-3 text-sm font-bold text-kinnso-ink">
+            <p id="payout-confirm-title" className="mb-3 text-sm font-bold text-kinnso-ink">
               {pending.kind === 'paid' ? t.confirmMarkPaid : t.confirmMarkDisputed}
             </p>
             <p className="mb-2 text-xs text-kinnso-muted">{pending.row.missionTitle}</p>
-            <textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t.reasonPlaceholder}
+            <textarea ref={reasonRef} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t.reasonPlaceholder}
+              aria-label={t.reasonPlaceholder}
               className="mb-2 w-full rounded-md border border-kinnso-line p-2 text-sm" rows={3} />
             {error && <p className="mb-2 text-xs font-bold text-red-600">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={cancel} disabled={isPending}
                 className="rounded-md border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink">{t.actCancel}</button>
-              <button type="button" onClick={confirm} disabled={isPending}
+              <button type="button" onClick={confirm} disabled={isPending || !reason.trim()}
                 className="rounded-md bg-kinnso-orange px-3 py-1 text-sm font-bold text-white disabled:opacity-50">{t.actApply}</button>
             </div>
           </div>

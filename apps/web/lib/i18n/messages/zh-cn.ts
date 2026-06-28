@@ -773,6 +773,7 @@ const messages: Messages = {
     confirmMarkPaid: '确认此结算已全额支付？此操作会记录一笔创作者付款。',
     confirmMarkDisputed: '将此结算标记为争议？',
     payoutsEmpty: '没有符合此筛选的结算',
+    reasonRequired: '需要填写原因。',
   },
   perks: {
     catalog: {

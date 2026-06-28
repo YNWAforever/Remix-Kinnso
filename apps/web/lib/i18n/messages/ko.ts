@@ -773,6 +773,7 @@ const messages: Messages = {
     confirmMarkPaid: '이 정산을 전액 지급 완료로 표시할까요? 크리에이터 지급으로 기록됩니다.',
     confirmMarkDisputed: '이 정산을 분쟁으로 표시할까요?',
     payoutsEmpty: '이 필터와 일치하는 정산이 없습니다',
+    reasonRequired: '사유를 입력해 주세요.',
   },
   perks: {
     catalog: {

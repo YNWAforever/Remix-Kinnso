@@ -773,6 +773,7 @@ const messages: Messages = {
     confirmMarkPaid: '確認此結算已全額支付？此操作會記錄一筆創作者付款。',
     confirmMarkDisputed: '將此結算標記為爭議？',
     payoutsEmpty: '沒有符合此篩選的結算',
+    reasonRequired: '需要填寫原因。',
   },
   perks: {
     catalog: {

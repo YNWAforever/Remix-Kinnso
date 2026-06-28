@@ -773,6 +773,7 @@ const messages: Messages = {
     confirmMarkPaid: 'この精算を全額支払い済みにしますか？クリエイターへの支払いとして記録されます。',
     confirmMarkDisputed: 'この精算を異議ありとしてフラグしますか？',
     payoutsEmpty: 'このフィルターに一致する精算はありません',
+    reasonRequired: '理由を入力してください。',
   },
   perks: {
     catalog: {
