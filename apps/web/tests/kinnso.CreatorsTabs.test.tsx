@@ -16,4 +16,9 @@ describe('CreatorsTabs', () => {
     expect(directory.getAttribute('href')).toBe('/en/admin/creators/directory')
     expect(directory.getAttribute('aria-current')).toBe('page')
   })
+  it('renders the Payouts tab link', () => {
+    render(<CreatorsTabs t={en.creators} locale="en" />)
+    const payouts = screen.getByRole('link', { name: en.creators.tabPayouts }) as HTMLAnchorElement
+    expect(payouts.getAttribute('href')).toBe('/en/admin/creators/payouts')
+  })
 })

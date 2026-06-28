@@ -14,6 +14,8 @@ const { roleMock, getUserMock, overviewMock } = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
+  usePathname: () => '/en/admin/creators',
+  useSearchParams: () => new URLSearchParams(''),
 }))
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
 vi.mock('@/lib/admin/creators-queries', () => ({ getCreatorsOverview: overviewMock }))
