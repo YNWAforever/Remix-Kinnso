@@ -63,3 +63,77 @@ export async function getCreatorsOverview(supabase: Client, days = 30): Promise<
     recentActivity,
   }
 }
+
+export interface DirectoryRow {
+  id: string
+  displayName: string | null
+  handle: string | null
+  status: string
+  verified: boolean
+  tier: string | null
+  dnaStatus: string | null
+  contributionPoints: number
+  createdAt: string
+}
+
+export interface CreatorsDirectory {
+  rows: DirectoryRow[]
+  nextCursor: { createdAt: string; id: string } | null
+}
+
+export interface ListDirectoryParams {
+  search?: string
+  statuses?: string[]
+  tiers?: string[]
+  dna?: 'published' | 'draft' | 'none'
+  verified?: boolean
+  limit?: number
+  cursor?: { createdAt: string; id: string } | null
+}
+
+type SearchRow = {
+  id: string
+  display_name: string | null
+  handle: string | null
+  status: string
+  verified: boolean
+  tier: string | null
+  dna_status: string | null
+  contribution_points: number | null
+  created_at: string
+}
+
+/**
+ * Filtered, keyset-paginated creator directory for ops. Goes through the
+ * SECURITY DEFINER `admin_search_creators` RPC (is_active_ops()-gated) so an ops
+ * user sees all creators despite owner-scoped RLS. Errors propagate.
+ */
+export async function listCreatorsDirectory(supabase: Client, params: ListDirectoryParams): Promise<CreatorsDirectory> {
+  const limit = params.limit ?? 25
+  const { data, error } = await supabase.rpc('admin_search_creators', {
+    p_search: params.search ?? null,
+    p_statuses: params.statuses ?? null,
+    p_tiers: params.tiers ?? null,
+    p_dna: params.dna ?? null,
+    p_verified: params.verified ?? null,
+    p_limit: limit,
+    p_cursor_created_at: params.cursor?.createdAt ?? null,
+    p_cursor_id: params.cursor?.id ?? null,
+  })
+  if (error) throw error
+  const raw = (data ?? []) as SearchRow[]
+  const rows: DirectoryRow[] = raw.map((r) => ({
+    id: r.id,
+    displayName: r.display_name,
+    handle: r.handle,
+    status: r.status,
+    verified: r.verified,
+    tier: r.tier,
+    dnaStatus: r.dna_status,
+    contributionPoints: Number(r.contribution_points ?? 0),
+    createdAt: r.created_at,
+  }))
+  const last = rows[rows.length - 1]
+  const nextCursor = rows.length === limit && last ? { createdAt: last.createdAt, id: last.id } : null
+  return { rows, nextCursor }
+}
