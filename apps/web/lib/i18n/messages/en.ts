@@ -645,6 +645,16 @@ export interface Messages {
     bulkApply: string; bulkSelected: string; bulkChooseAction: string
     actionFailed: string
     tabOverview: string; tabDirectory: string
+    detailBack: string; detailJoined: string; detailUpdated: string; detailBio: string; detailNoBio: string
+    tabProfile: string; tabMissions: string; tabEarnings: string; tabContent: string; tabModeration: string
+    secDna: string; secScan: string; secSocials: string; secContribution: string
+    dnaNoData: string; scanNoData: string; socialsNoData: string
+    scanStatus: string; scanError: string; scanCompleted: string
+    colMission: string; colStatus: string; colSource: string; colMilestones: string; missionsNoData: string
+    colAmount: string; colPayout: string; colSettlement: string; settlementsNoData: string
+    pointsHistory: string; colEvent: string; colPoints: string; pointsNoData: string; totalPoints: string
+    colTitle: string; colSaves: string; colStatusContent: string; contentNoData: string
+    secAudit: string; auditNoData: string; addNote: string; saveNote: string
   }
   perks: {
     catalog: {
@@ -1511,6 +1521,16 @@ const messages: Messages = {
     bulkApply: 'Apply to selected', bulkSelected: 'selected', bulkChooseAction: 'Choose an action',
     actionFailed: 'Action failed. Try again.',
     tabOverview: 'Overview', tabDirectory: 'Directory',
+    detailBack: 'Back to directory', detailJoined: 'Joined', detailUpdated: 'Updated', detailBio: 'Bio', detailNoBio: 'No bio',
+    tabProfile: 'Profile & DNA', tabMissions: 'Missions', tabEarnings: 'Earnings', tabContent: 'Content', tabModeration: 'Moderation',
+    secDna: 'Creator DNA', secScan: 'Latest scan', secSocials: 'Social handles', secContribution: 'Contribution',
+    dnaNoData: 'No DNA yet', scanNoData: 'No scans yet', socialsNoData: 'No social handles',
+    scanStatus: 'Status', scanError: 'Error', scanCompleted: 'Completed',
+    colMission: 'Mission', colStatus: 'Status', colSource: 'Source', colMilestones: 'Milestones', missionsNoData: 'No missions yet',
+    colAmount: 'Amount', colPayout: 'Payout', colSettlement: 'Settlement', settlementsNoData: 'No settlements yet',
+    pointsHistory: 'Points history', colEvent: 'Event', colPoints: 'Points', pointsNoData: 'No points activity yet', totalPoints: 'Total points',
+    colTitle: 'Title', colSaves: 'Saves', colStatusContent: 'Status', contentNoData: 'No content yet',
+    secAudit: 'Moderation history', auditNoData: 'No moderation activity yet', addNote: 'Add a note', saveNote: 'Save note',
   },
   perks: {
     catalog: {
