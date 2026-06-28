@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export interface OgFont { name: string; data: ArrayBuffer; weight: 400 | 700; style: 'normal' }
@@ -9,15 +9,23 @@ const toArrayBuffer = (b: Buffer): ArrayBuffer =>
 
 /**
  * Candidate directories that may hold the bundled brand fonts, most reliable first:
- *  1. resolved relative to THIS module via `import.meta.url` — the Next-documented
- *     pattern, so the `.ttf` files get traced into the OG route's serverless bundle
- *     regardless of the runtime cwd;
+ *  1. resolved relative to THIS module from `import.meta.url`, so the `.ttf` files
+ *     resolve regardless of the runtime cwd. NOTE: we derive the dir with
+ *     `dirname(fileURLToPath(import.meta.url))` rather than
+ *     `new URL('../../../public/fonts/', import.meta.url)` — the latter is a pattern
+ *     webpack statically resolves as a module request and a *directory* literal fails
+ *     `next build` with "Module not found";
  *  2. `<cwd>/public/fonts` — when cwd is `apps/web`;
  *  3. `<cwd>/apps/web/public/fonts` — when cwd is the monorepo root.
- * Trying all three removes the fragile single-cwd assumption the previous version had.
+ * Trying all of them removes the fragile single-cwd assumption the previous version had.
  */
 function candidateDirs(): string[] {
-  const dirs = [fileURLToPath(new URL('../../../public/fonts/', import.meta.url))]
+  const dirs: string[] = []
+  try {
+    dirs.push(join(dirname(fileURLToPath(import.meta.url)), '../../../public/fonts'))
+  } catch {
+    // import.meta.url unavailable in some bundling contexts — cwd candidates below stand.
+  }
   try {
     dirs.push(join(process.cwd(), 'public', 'fonts'))
     dirs.push(join(process.cwd(), 'apps', 'web', 'public', 'fonts'))
