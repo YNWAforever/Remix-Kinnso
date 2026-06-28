@@ -755,6 +755,16 @@ const messages: Messages = {
     bulkApply: '套用至已選', bulkSelected: '已選', bulkChooseAction: '選擇操作',
     actionFailed: '操作失敗，請重試。',
     tabOverview: '概覽', tabDirectory: '目錄',
+    detailBack: '返回目錄', detailJoined: '加入於', detailUpdated: '更新於', detailBio: '簡介', detailNoBio: '沒有簡介',
+    tabProfile: '檔案與 DNA', tabMissions: '任務', tabEarnings: '收益', tabContent: '內容', tabModeration: '審核',
+    secDna: '創作者 DNA', secScan: '最近掃描', secSocials: '社交帳號', secContribution: '貢獻',
+    dnaNoData: '尚無 DNA', scanNoData: '尚無掃描', socialsNoData: '尚無社交帳號',
+    scanStatus: '狀態', scanError: '錯誤', scanCompleted: '完成於',
+    colMission: '任務', colStatus: '狀態', colSource: '來源', missionsNoData: '尚無任務',
+    colAmount: '金額', colPayout: '派付', colSettlement: '結算', settlementsNoData: '尚無結算',
+    pointsHistory: '積分紀錄', colEvent: '事件', colPoints: '積分', pointsNoData: '尚無積分活動', totalPoints: '總積分',
+    colTitle: '標題', colSaves: '收藏', colStatusContent: '狀態', contentNoData: '尚無內容',
+    secAudit: '審核紀錄', auditNoData: '尚無審核活動', addNote: '新增備註', saveNote: '儲存備註',
   },
   perks: {
     catalog: {

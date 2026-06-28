@@ -755,6 +755,16 @@ const messages: Messages = {
     bulkApply: '選択に適用', bulkSelected: '選択中', bulkChooseAction: '操作を選択',
     actionFailed: '操作に失敗しました。もう一度お試しください。',
     tabOverview: '概要', tabDirectory: 'ディレクトリ',
+    detailBack: 'ディレクトリへ戻る', detailJoined: '参加日', detailUpdated: '更新日', detailBio: '自己紹介', detailNoBio: '自己紹介なし',
+    tabProfile: 'プロフィールと DNA', tabMissions: 'ミッション', tabEarnings: '収益', tabContent: 'コンテンツ', tabModeration: 'モデレーション',
+    secDna: 'クリエイター DNA', secScan: '最新スキャン', secSocials: 'ソーシャルアカウント', secContribution: '貢献',
+    dnaNoData: 'DNA はまだありません', scanNoData: 'スキャンはまだありません', socialsNoData: 'ソーシャルアカウントなし',
+    scanStatus: 'ステータス', scanError: 'エラー', scanCompleted: '完了日',
+    colMission: 'ミッション', colStatus: 'ステータス', colSource: 'ソース', missionsNoData: 'ミッションはまだありません',
+    colAmount: '金額', colPayout: '支払い', colSettlement: '精算', settlementsNoData: '精算はまだありません',
+    pointsHistory: 'ポイント履歴', colEvent: 'イベント', colPoints: 'ポイント', pointsNoData: 'ポイント活動はまだありません', totalPoints: '合計ポイント',
+    colTitle: 'タイトル', colSaves: '保存数', colStatusContent: 'ステータス', contentNoData: 'コンテンツはまだありません',
+    secAudit: 'モデレーション履歴', auditNoData: 'モデレーション活動はまだありません', addNote: 'メモを追加', saveNote: 'メモを保存',
   },
   perks: {
     catalog: {
