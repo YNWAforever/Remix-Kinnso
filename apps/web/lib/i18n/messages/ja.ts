@@ -726,10 +726,24 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
+  },
+  creators: {
+    title: 'クリエイター',
+    subtitle: 'クリエイターを把握・管理・分析し、支払います。',
+    kpiTotal: 'クリエイター総数', kpiActive: 'アクティブ', kpiSuspended: '停止中', kpiOnboarding: '登録中',
+    kpiNew: '今期の新規', kpiPayoutsPending: '支払い保留',
+    trendSignups: '登録', trendEngagement: 'エンゲージメント（ポイント）', trendEmpty: 'この期間のデータはありません',
+    leaderboardTitle: 'トップ貢献者', leaderboardEmpty: '貢献者はまだいません', points: 'ポイント',
+    atRiskTitle: 'リスクのあるクリエイター', atRiskEmpty: 'リスクのあるクリエイターはいません',
+    reasonScanFailed: 'スキャン失敗', reasonNoMissions: '進行中のミッションなし',
+    activityTitle: '最近のモデレーション活動', activityEmpty: 'モデレーション活動はまだありません',
+    statusOnboarding: '登録中', statusActive: 'アクティブ', statusSuspended: '停止中', statusBanned: '禁止',
+    tierSeed: 'シード', tierRising: 'ライジング', tierPro: 'プロ', tierElite: 'エリート',
+    verified: '認証済み',
   },
   perks: {
     catalog: {

@@ -726,10 +726,24 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
+  },
+  creators: {
+    title: '크리에이터',
+    subtitle: '크리에이터를 파악·관리·분석하고 정산합니다.',
+    kpiTotal: '전체 크리에이터', kpiActive: '활성', kpiSuspended: '정지됨', kpiOnboarding: '온보딩',
+    kpiNew: '이번 기간 신규', kpiPayoutsPending: '정산 대기',
+    trendSignups: '가입', trendEngagement: '참여(포인트)', trendEmpty: '이 기간에 데이터가 없습니다',
+    leaderboardTitle: '상위 기여자', leaderboardEmpty: '아직 기여자가 없습니다', points: '포인트',
+    atRiskTitle: '위험 크리에이터', atRiskEmpty: '위험 크리에이터가 없습니다',
+    reasonScanFailed: '스캔 실패', reasonNoMissions: '진행 중인 미션 없음',
+    activityTitle: '최근 모더레이션 활동', activityEmpty: '아직 모더레이션 활동이 없습니다',
+    statusOnboarding: '온보딩', statusActive: '활성', statusSuspended: '정지됨', statusBanned: '차단됨',
+    tierSeed: '시드', tierRising: '라이징', tierPro: '프로', tierElite: '엘리트',
+    verified: '인증됨',
   },
   perks: {
     catalog: {

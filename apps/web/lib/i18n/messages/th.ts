@@ -726,10 +726,24 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
+  },
+  creators: {
+    title: 'ครีเอเตอร์',
+    subtitle: 'ทำความเข้าใจ จัดการ วิเคราะห์ และจ่ายเงินให้ครีเอเตอร์ของคุณ',
+    kpiTotal: 'ครีเอเตอร์ทั้งหมด', kpiActive: 'ใช้งาน', kpiSuspended: 'ระงับ', kpiOnboarding: 'กำลังเริ่มต้น',
+    kpiNew: 'ใหม่ในช่วงนี้', kpiPayoutsPending: 'รอจ่ายเงิน',
+    trendSignups: 'การสมัคร', trendEngagement: 'การมีส่วนร่วม (คะแนน)', trendEmpty: 'ไม่มีข้อมูลในช่วงนี้',
+    leaderboardTitle: 'ผู้มีส่วนร่วมสูงสุด', leaderboardEmpty: 'ยังไม่มีผู้มีส่วนร่วม', points: 'คะแนน',
+    atRiskTitle: 'ครีเอเตอร์ที่มีความเสี่ยง', atRiskEmpty: 'ไม่มีครีเอเตอร์ที่มีความเสี่ยง',
+    reasonScanFailed: 'สแกนล้มเหลว', reasonNoMissions: 'ไม่มีภารกิจที่ดำเนินอยู่',
+    activityTitle: 'กิจกรรมการกลั่นกรองล่าสุด', activityEmpty: 'ยังไม่มีกิจกรรมการกลั่นกรอง',
+    statusOnboarding: 'กำลังเริ่มต้น', statusActive: 'ใช้งาน', statusSuspended: 'ระงับ', statusBanned: 'แบน',
+    tierSeed: 'เริ่มต้น', tierRising: 'กำลังมา', tierPro: 'โปร', tierElite: 'อีลิท',
+    verified: 'ยืนยันแล้ว',
   },
   perks: {
     catalog: {

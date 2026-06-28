@@ -618,10 +618,22 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
+  }
+  creators: {
+    title: string; subtitle: string
+    kpiTotal: string; kpiActive: string; kpiSuspended: string; kpiOnboarding: string
+    kpiNew: string; kpiPayoutsPending: string
+    trendSignups: string; trendEngagement: string; trendEmpty: string
+    leaderboardTitle: string; leaderboardEmpty: string; points: string
+    atRiskTitle: string; atRiskEmpty: string; reasonScanFailed: string; reasonNoMissions: string
+    activityTitle: string; activityEmpty: string
+    statusOnboarding: string; statusActive: string; statusSuspended: string; statusBanned: string
+    tierSeed: string; tierRising: string; tierPro: string; tierElite: string
+    verified: string
   }
   perks: {
     catalog: {
@@ -1459,10 +1471,24 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
+  },
+  creators: {
+    title: 'Creators',
+    subtitle: 'Understand, moderate, analyze, and pay your creators.',
+    kpiTotal: 'Total creators', kpiActive: 'Active', kpiSuspended: 'Suspended', kpiOnboarding: 'Onboarding',
+    kpiNew: 'New this period', kpiPayoutsPending: 'Payouts pending',
+    trendSignups: 'Signups', trendEngagement: 'Engagement (points)', trendEmpty: 'No data in this period',
+    leaderboardTitle: 'Top contributors', leaderboardEmpty: 'No contributors yet', points: 'points',
+    atRiskTitle: 'At-risk creators', atRiskEmpty: 'No at-risk creators',
+    reasonScanFailed: 'Scan failed', reasonNoMissions: 'No active missions',
+    activityTitle: 'Recent moderation activity', activityEmpty: 'No moderation activity yet',
+    statusOnboarding: 'Onboarding', statusActive: 'Active', statusSuspended: 'Suspended', statusBanned: 'Banned',
+    tierSeed: 'Seed', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
+    verified: 'Verified',
   },
   perks: {
     catalog: {
