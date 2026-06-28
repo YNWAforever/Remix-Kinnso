@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
@@ -181,7 +182,10 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
                     checked={checked.has(row.id)}
                     onChange={(e) => setChecked((s) => { const n = new Set(s); if (e.target.checked) n.add(row.id); else n.delete(row.id); return n })} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-kinnso-ink">{name} {row.handle ? <span className="text-kinnso-muted">@{row.handle}</span> : null}</p>
+                    <p className="font-bold text-kinnso-ink">
+                      <Link href={`/${locale}/admin/creators/${row.id}`} className="text-kinnso-ink hover:text-kinnso-orange hover:underline">{name}</Link>
+                      {row.handle ? <span className="text-kinnso-muted"> @{row.handle}</span> : null}
+                    </p>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                       <StatusBadge status={row.status} t={t} />
                       {row.tier ? <TierBadge tier={row.tier} t={t} /> : null}
