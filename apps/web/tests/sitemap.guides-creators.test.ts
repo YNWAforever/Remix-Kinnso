@@ -12,7 +12,7 @@ vi.mock('@/lib/creators/queries', () => ({
   getCreatorsForSitemap: async () => [{ handle: 'maya', lastmod: '2026-06-03T00:00:00Z' }],
 }))
 
-import sitemap from '@/app/sitemap'
+import sitemap, { generateSitemaps } from '@/app/sitemap'
 import { LOCALES } from '@/lib/i18n/config'
 
 const SITE = 'https://www.kinnso.ai'
@@ -35,5 +35,26 @@ describe('sitemap — guides, creators, marketing', () => {
     const urls = (await sitemap()).map((e) => e.url)
     expect(urls).toContain(`${SITE}/en/articles`)
     expect(urls).toContain(`${SITE}/en/articles/dining/ramen`)
+  })
+})
+
+describe('sitemap — sharding (50k-URL protocol cap)', () => {
+  it('reports at least one shard, starting at id 0', async () => {
+    const shards = await generateSitemaps()
+    expect(shards.length).toBeGreaterThanOrEqual(1)
+    expect(shards[0]).toEqual({ id: 0 })
+  })
+  // Next 16 calls sitemap({ id }) with id as a Promise<string> — exercise that real
+  // contract (a literal number would mask a NaN/empty-shard regression).
+  it('shards reassemble to exactly the full set, no drops or duplicates', async () => {
+    const all = await sitemap()
+    const shards = await generateSitemaps()
+    const reassembled = (
+      await Promise.all(shards.map((s) => sitemap({ id: Promise.resolve(String(s.id)) })))
+    ).flat()
+    expect(reassembled.map((e) => e.url)).toEqual(all.map((e) => e.url))
+  })
+  it('an out-of-range shard id resolves to an empty list, not an error', async () => {
+    expect(await sitemap({ id: Promise.resolve('99') })).toEqual([])
   })
 })

@@ -35,6 +35,7 @@ export function gateDecision(pathname: string, hasSession: boolean): GateDecisio
     'merchants/missions/',
     'studio/missions',
     'ops/settlements',
+    'admin',
   ]
   const needsAuth = gatedPrefixes.some((prefix) =>
     rest === prefix || rest.startsWith(prefix.endsWith('/') ? prefix : `${prefix}/`),

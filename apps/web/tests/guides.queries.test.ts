@@ -9,10 +9,12 @@ vi.mock('@/lib/supabase/public', () => ({
       const builder = {
         select: () => builder,
         eq: () => builder,
-        // getPublishedGuides awaits the .order() result
-        order: () => Promise.resolve({ data: state.list }),
+        // queries chain one or more .order() calls, then await the builder (thenable)
+        order: () => builder,
         // getGuideBySlug awaits .maybeSingle()
         maybeSingle: async () => ({ data: state.single }),
+        then: (onF: (v: { data: unknown }) => unknown) =>
+          Promise.resolve({ data: state.list }).then(onF),
       }
       return builder
     },
@@ -65,11 +67,18 @@ describe('getPublishedGuides', () => {
 })
 
 describe('getGuideBySlug', () => {
-  it('returns the db guide (source: db) when a row exists', async () => {
-    state.single = { ...row, creator_name: 'Tea Fan', summary: 'Lovely tea houses.' }
+  it('returns the db guide (source: db) when a row exists, threading published_at', async () => {
+    state.single = { ...row, creator_name: 'Tea Fan', summary: 'Lovely tea houses.', published_at: '2026-06-02T00:00:00Z' }
     const guide = await getGuideBySlug('kyoto-tea')
     expect(guide?.slug).toBe('kyoto-tea')
     expect(guide?.source).toBe('db')
+    expect(guide?.publishedAt).toBe('2026-06-02T00:00:00Z')
+  })
+
+  it('defaults publishedAt to null when the row has no published_at', async () => {
+    state.single = { ...row, creator_name: 'Tea Fan', summary: null }
+    const guide = await getGuideBySlug('kyoto-tea')
+    expect(guide?.publishedAt).toBeNull()
   })
 
   it('returns null for a slug not in the database (no mock fallback)', async () => {

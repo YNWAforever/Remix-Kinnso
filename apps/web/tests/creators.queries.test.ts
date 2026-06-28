@@ -13,7 +13,8 @@ vi.mock('@/lib/supabase/public', () => {
       eq: () => builder,
       not: () => builder,
       in: () => builder,
-      order: () => Promise.resolve({ data: resolveData() }),
+      // queries chain one or more .order() calls, then await the builder (thenable)
+      order: () => builder,
       maybeSingle: async () => ({ data: single ? single() : null }),
       then: (onF: (v: { data: unknown }) => unknown) =>
         Promise.resolve({ data: resolveData() }).then(onF),

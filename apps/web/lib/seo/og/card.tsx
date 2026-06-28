@@ -1,5 +1,7 @@
 /* OG card primitives for next/og ImageResponse. JSX uses inline styles only
-   (ImageResponse supports a flexbox CSS subset). Colors match app/globals.css @theme. */
+   (ImageResponse supports a flexbox CSS subset). satori needs literal hex (CSS vars
+   don't resolve here), so these mirror the @theme brand tokens in app/globals.css.
+   That file is the source of truth — tests/og.palette-parity.test.ts fails if they drift. */
 
 export const OG = {
   cream: '#F8F1E6',

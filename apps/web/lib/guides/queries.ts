@@ -39,6 +39,7 @@ export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: st
     .select('slug, published_at')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
+    .order('slug') // stable tie-break so sitemap sharding partitions a deterministic order
   return (data ?? []).map((r) => ({
     slug: r.slug as string,
     lastmod: (r.published_at as string | null) ?? null,
@@ -49,7 +50,7 @@ export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> 
   const supabase = createSupabasePublicClient()
   const { data } = await supabase
     .from('guides')
-    .select('slug, title, cover_url, city, saves_count, creator_handle, creator_name, summary')
+    .select('slug, title, cover_url, city, saves_count, creator_handle, creator_name, summary, published_at')
     .eq('slug', slug)
     .eq('status', 'published')
     .maybeSingle()
@@ -59,6 +60,7 @@ export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> 
     ...mapRowToGuide(data),
     summary: data.summary,
     creatorName: data.creator_name,
+    publishedAt: (data.published_at as string | null) ?? null,
     source: 'db',
   }
 }

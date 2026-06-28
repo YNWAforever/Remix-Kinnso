@@ -13,8 +13,9 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const loc: Locale = isLocale(locale) ? (locale as Locale) : DEFAULT_LOCALE
   const dict = await getDictionary(loc)
   const fonts = await loadOgFonts()
+  const fontOpt = fonts.length ? { fonts } : {}
   return new ImageResponse(
     <DefaultCard title={dict.seo.brandTitle} subtitle={dict.seo.home.description} />,
-    { ...OG_SIZE, fonts },
+    { ...OG_SIZE, ...fontOpt },
   )
 }

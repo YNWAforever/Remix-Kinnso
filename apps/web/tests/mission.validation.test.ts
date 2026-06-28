@@ -178,6 +178,40 @@ describe('mission validation', () => {
     expect(result.ok).toBe(false)
     expect(result.errors.actorIsOps).toContain('ops')
   })
+
+  it('rejects negative creator commission amounts', () => {
+    const result = validateSettlementUpdate({
+      actorIsOps: true,
+      status: 'partially_paid',
+      creatorPayoutStatus: 'pending',
+      kinnsoCommissionStatus: 'paid',
+      creatorCommissionAmount: -5,
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.creatorCommissionAmount).toContain('non-negative')
+  })
+
+  it('rejects unknown settlement statuses', () => {
+    const result = validateSettlementUpdate({
+      actorIsOps: true,
+      status: 'bogus' as SettlementUpdateInput['status'],
+      creatorPayoutStatus: 'pending',
+      kinnsoCommissionStatus: 'paid',
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.status).toContain('invalid')
+  })
+
+  it('rejects unknown creator payout statuses', () => {
+    const result = validateSettlementUpdate({
+      actorIsOps: true,
+      status: 'partially_paid',
+      creatorPayoutStatus: 'frozen' as SettlementUpdateInput['creatorPayoutStatus'],
+      kinnsoCommissionStatus: 'paid',
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.creatorPayoutStatus).toContain('invalid')
+  })
 })
 
 describe('validateSubmission', () => {

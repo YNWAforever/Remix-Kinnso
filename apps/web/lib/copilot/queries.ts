@@ -20,7 +20,15 @@ export async function getRecentMessages(supabase: Client, creatorId: string, lim
     .eq('archived', false)
     .order('created_at', { ascending: false })
     .limit(limit)
-  return ((data ?? []) as CopilotMessageRow[]).reverse()
+  // Display oldest-first. `id` is a random uuid (gen_random_uuid), so it is NOT a usable
+  // chronological tie-break; for rows sharing a created_at, place the user prompt before
+  // its assistant reply (the user row is always written first, before the stream starts).
+  const rows = (data ?? []) as CopilotMessageRow[]
+  return rows.sort((a, b) => {
+    if (a.created_at !== b.created_at) return a.created_at < b.created_at ? -1 : 1
+    if (a.role === b.role) return 0
+    return a.role === 'user' ? -1 : 1
+  })
 }
 
 export async function appendMessage(

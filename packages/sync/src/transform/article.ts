@@ -9,15 +9,26 @@ const toIso = (s: string | null): string | null => {
   return Number.isNaN(d.getTime()) ? null : d.toISOString()
 }
 
+// Stable, locale-aware comparator so hashing is independent of reader row order
+// (the legacy SELECTs don't fully ORDER BY, so array order isn't guaranteed).
+const cmp = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0)
+const sortBy = <T>(arr: readonly T[] | undefined, key: (x: T) => string): T[] =>
+  [...(arr ?? [])].sort((a, b) => cmp(key(a), key(b)))
+
 /** Deterministic content hash for idempotent upserts (excludes volatile fields like views). */
 export function sourceHash(bundle: LegacyPostBundle): string {
+  // Sort COPIES of every array by a natural key so identical content with a
+  // different row order produces the same hash (don't mutate the bundle).
   const material = JSON.stringify({
     post: { ...bundle.post, views: undefined, updated_at: undefined },
-    translations: bundle.translations,
-    faqs: bundle.faqs,
-    authors: bundle.authors,
-    tags: bundle.tags,
-    categoryWeights: bundle.categoryWeights,
+    translations: sortBy(bundle.translations, (t) => t.locale),
+    faqs: sortBy(bundle.faqs, (f) => `${f.language}${f.question}${f.weight ?? ''}`),
+    authors: sortBy(bundle.authors, (a) => `${a.slug}${a.language}`),
+    tags: sortBy(bundle.tags, (t) => t.slug).map((t) => ({
+      ...t,
+      translations: sortBy(t.translations, (tt) => tt.locale),
+    })),
+    categoryWeights: sortBy(bundle.categoryWeights, (c) => c.category_slug),
   })
   return createHash('sha256').update(material).digest('hex')
 }

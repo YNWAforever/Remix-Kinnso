@@ -24,6 +24,13 @@ describe('buildArticleMetadata', () => {
     expect(langs['zh-hk']).toBe(`${SITE_URL}/zh-hk/articles/dining/ramen-guide`)
     expect(langs['x-default']).toBe(`${SITE_URL}/en/articles/dining/ramen-guide`)
   })
+  it('points x-default at the current locale when EN is not a present translation', () => {
+    const m = buildArticleMetadata({ ...base, locale: 'zh-hk', presentLocales: ['zh-hk'] })
+    const langs = m.alternates!.languages as Record<string, string>
+    expect(Object.keys(langs).sort()).toEqual(['x-default', 'zh-hk'])
+    expect(langs['x-default']).toBe(`${SITE_URL}/zh-hk/articles/dining/ramen-guide`)
+    expect(langs['x-default']).not.toBe(`${SITE_URL}/en/articles/dining/ramen-guide`)
+  })
   it('prefers meta_title; description falls back to summary', () => {
     const m = buildArticleMetadata({ ...base, metaTitle: 'SEO Title', metaDescription: null })
     expect(m.title).toBe('SEO Title')

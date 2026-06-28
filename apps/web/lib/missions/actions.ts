@@ -479,6 +479,8 @@ export async function updateSettlementAction(
     creatorPayoutStatus: input.creatorPayoutStatus,
     kinnsoCommissionStatus: input.kinnsoCommissionStatus,
     affiliateCommissionAmount: input.affiliateCommissionAmount,
+    creatorCommissionAmount: input.creatorCommissionAmount,
+    kinnsoCommissionAmount: input.kinnsoCommissionAmount,
   })
   if (!validation.ok) return validation
   if (!opsMember) return formError('Active ops member access is required')

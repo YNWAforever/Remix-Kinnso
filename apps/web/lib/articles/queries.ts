@@ -188,6 +188,7 @@ export async function getPublishedForSitemap() {
   const { data, error } = await db()
     .from('articles')
     .select('url, category, edit_at, updated_at, published_at, article_translations(locale)')
+    .order('url') // stable order so sitemap.ts sharding partitions a deterministic sequence
   if (error) throw error
   return (data ?? []).map((a) => ({
     url: a.url, category: a.category,

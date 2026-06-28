@@ -6,6 +6,7 @@ import { getCreatorStoredTier } from '@/lib/contribution/queries'
 import { policyForTier } from '@/lib/copilot/policy'
 import { isCopilotConfigured } from '@/lib/copilot/config'
 import { buildCopilotSystemPrompt } from '@/lib/copilot/system-prompt'
+import { validateCopilotMessages } from '@/lib/copilot/request'
 import { makeN8nTool } from '@/lib/copilot/tools/n8n'
 import { appendMessage, countUserMessagesToday } from '@/lib/copilot/queries'
 import { DnaSchema } from '@kinnso/scan'
@@ -31,7 +32,9 @@ export async function POST(req: Request) {
   if (role !== 'creator') return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
   const body = (await req.json().catch(() => ({}))) as { messages?: UIMessage[]; locale?: unknown }
-  const messages = body.messages ?? []
+  const check = validateCopilotMessages(body.messages)
+  if (!check.ok) return NextResponse.json({ error: check.reason === 'too_large' ? 'payload_too_large' : 'invalid_request' }, { status: check.reason === 'too_large' ? 413 : 400 })
+  const messages = check.messages
   const locale = typeof body.locale === 'string' && isLocale(body.locale) ? body.locale : 'en'
 
   const { data: dnaRow } = await supabase.from('creator_dna').select('final').eq('creator_id', user.id).single()
