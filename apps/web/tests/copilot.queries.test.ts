@@ -63,6 +63,17 @@ describe('copilot queries', () => {
     expect(state.filters).toContainEqual(['archived', false])
   })
 
+  it('getRecentMessages sorts oldest-first and puts the user prompt before its assistant reply on created_at ties', async () => {
+    // Deliberately unsorted; a plain .reverse() would yield the wrong order here.
+    state.rows = [
+      { id: 'x', role: 'user', content: 'q', created_at: '2026-01-01T00:00:01Z' },
+      { id: 'y', role: 'assistant', content: 'reply', created_at: '2026-01-01T00:00:02Z' },
+      { id: 'z', role: 'assistant', content: 'a', created_at: '2026-01-01T00:00:01Z' },
+    ]
+    const out = await getRecentMessages(makeClient() as never, 'c1')
+    expect(out.map((m) => m.content)).toEqual(['q', 'a', 'reply'])
+  })
+
   it('appendMessage inserts the creator_id, role and content', async () => {
     await appendMessage(makeClient() as never, 'c1', 'assistant', 'hello')
     expect(state.lastInsert).toMatchObject({ creator_id: 'c1', role: 'assistant', content: 'hello' })

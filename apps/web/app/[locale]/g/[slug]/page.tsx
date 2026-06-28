@@ -9,6 +9,7 @@ import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
 import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
+import { cssUrl } from '@/lib/utils'
 
 export function generateStaticParams() {
   // Guides are DB-only; resolve on demand (dynamicParams defaults to true).
@@ -71,7 +72,7 @@ export default async function GuidePage({
           aria-label={guide.title}
           className="relative min-h-[360px] bg-cover bg-center"
           style={{
-            backgroundImage: `url("${encodeURI(guide.cover)}")`,
+            backgroundImage: cssUrl(guide.cover),
           }}
         >
           {/* Gradient overlay for legibility */}

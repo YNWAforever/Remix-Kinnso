@@ -41,6 +41,25 @@ describe('transformPost', () => {
     expect(sourceHash(edited)).not.toBe(h1)
   })
 
+  it('source_hash is invariant to reader row order (translations/tags/faqs reordered)', () => {
+    const base = sourceHash(legacyPost)
+    const reordered = {
+      ...legacyPost,
+      translations: [...legacyPost.translations].reverse(),
+      faqs: [...legacyPost.faqs].reverse(),
+      authors: [...legacyPost.authors].reverse(),
+      categoryWeights: [...legacyPost.categoryWeights].reverse(),
+      tags: [...legacyPost.tags].reverse().map((t) => ({ ...t, translations: [...t.translations].reverse() })),
+    }
+    expect(sourceHash(reordered)).toBe(base)
+  })
+
+  it('source_hash does not mutate the input bundle while sorting', () => {
+    const before = JSON.stringify(legacyPost)
+    sourceHash(legacyPost)
+    expect(JSON.stringify(legacyPost)).toBe(before)
+  })
+
   it('rewrites og_image from meta_tags through the CDN', () => {
     const en = out.translations.find((t) => t.locale === 'en')!
     expect(en.og_image).toBe('https://cdn.x/og.webp')

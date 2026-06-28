@@ -5,6 +5,7 @@ import type {
   ValidationErrors,
   ValidationResult,
 } from '@/lib/missions/types'
+import { settlementStatuses } from '@/lib/missions/types'
 import { parseProofUrl } from '@/lib/missions/proof-url'
 
 const isBlank = (value: string | null | undefined) => value == null || value.trim() === ''
@@ -108,7 +109,18 @@ export const validateSettlementUpdate = (input: SettlementUpdateInput): Validati
   const errors: ValidationErrors = {}
 
   if (!input.actorIsOps) addError(errors, 'actorIsOps', 'ops')
+  if (!(settlementStatuses as readonly string[]).includes(input.status)) {
+    addError(errors, 'status', 'invalid')
+  }
+  if (input.creatorPayoutStatus !== 'pending' && input.creatorPayoutStatus !== 'paid') {
+    addError(errors, 'creatorPayoutStatus', 'invalid')
+  }
+  if (input.kinnsoCommissionStatus !== 'pending' && input.kinnsoCommissionStatus !== 'paid') {
+    addError(errors, 'kinnsoCommissionStatus', 'invalid')
+  }
   validateNonNegative(errors, 'affiliateCommissionAmount', input.affiliateCommissionAmount)
+  validateNonNegative(errors, 'creatorCommissionAmount', input.creatorCommissionAmount)
+  validateNonNegative(errors, 'kinnsoCommissionAmount', input.kinnsoCommissionAmount)
 
   return resultFrom(errors)
 }

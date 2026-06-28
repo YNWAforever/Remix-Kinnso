@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Bookmark, MapPin } from 'lucide-react'
 import { RouteStamp, TicketCard, TicketDivider } from '@/components/kinnso/MarketPassport'
+import { cssUrl } from '@/lib/utils'
 import type { Guide } from '@/lib/creator-mock'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -23,7 +24,7 @@ export function FeedView({ locale, t, items }: { locale: Locale; t: Messages['fe
             {items.map((g) => (
               <Link key={g.slug} href={`/${locale}/g/${g.slug}`} className="group block">
                 <TicketCard as="article" className="overflow-hidden">
-                  <div className="aspect-[16/9] bg-cover bg-center" style={{ backgroundImage: `url('${g.cover}')` }} />
+                  <div className="aspect-[16/9] bg-cover bg-center" style={g.cover ? { backgroundImage: cssUrl(g.cover) } : undefined} />
                   <div className="p-5">
                     <div className="flex items-center gap-3">
                       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-kinnso-cream2 text-sm font-bold text-kinnso-ink">

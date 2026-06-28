@@ -43,6 +43,10 @@ export default async function CategoryPage(
     region: sp.region ?? null, tag: sp.tag ?? null, page, perPage: 12,
   })
 
+  // Out-of-range ?page= (beyond the last page) yields 0 rows: 404 rather than a
+  // misleading empty-but-200 dead-end. Page 1 may legitimately be empty, so keep it.
+  if (page > 1 && items.length === 0) notFound()
+
   return (
     <main className="k-container py-8">
       <h1 className="k-display text-3xl font-black text-kinnso-ink mb-6">{dict.categories[category as UrlCategory]}</h1>

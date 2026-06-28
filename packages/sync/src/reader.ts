@@ -29,7 +29,7 @@ export class LegacyReader {
     const slug: string = post.slug
 
     const [translations] = await this.pool.query<any[]>(
-      'select locale, title, content, meta_tags, analyze_tags, faq_title, labels, validated_at, deleted_at from post_translations where post_id = :id',
+      'select locale, title, content, meta_tags, analyze_tags, faq_title, labels, validated_at, deleted_at from post_translations where post_id = :id order by locale asc',
       { id },
     )
     const [faqs] = await this.pool.query<any[]>(
@@ -39,11 +39,11 @@ export class LegacyReader {
     // FIND_IN_SET is whitespace-sensitive; legacy stores `posts.authors` space-free, but
     // strip any stray whitespace defensively so `author-a, author-b` still resolves both.
     const [authorRows] = await this.pool.query<any[]>(
-      'select slug, language, name, image, job_title, description, show_in_author_page, labels from post_authors where deleted_at is null and find_in_set(slug, :authors)',
+      'select slug, language, name, image, job_title, description, show_in_author_page, labels from post_authors where deleted_at is null and find_in_set(slug, :authors) order by slug asc, language asc',
       { authors: (post.authors ?? '').replace(/\s+/g, '') },
     )
     const [catW] = await this.pool.query<any[]>(
-      'select category_slug, weight from post_category_weights where post_slug = :slug and deleted_at is null',
+      'select category_slug, weight from post_category_weights where post_slug = :slug and deleted_at is null order by category_slug asc',
       { slug },
     )
     const [tagRows] = await this.pool.query<any[]>(
@@ -52,7 +52,8 @@ export class LegacyReader {
        join tags t on t.id = pa.model_id
        left join tag_translations tt on tt.tag_id = t.id
        where pa.post_id = :id and pa.model_type = 'App\\\\Models\\\\Tag'
-         and pa.deleted_at is null and t.deleted_at is null and t.is_active = 1`,
+         and pa.deleted_at is null and t.deleted_at is null and t.is_active = 1
+       order by t.slug asc, tt.locale asc`,
       { id },
     )
 

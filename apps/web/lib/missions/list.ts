@@ -6,9 +6,11 @@ export function creatorMissionProgress(
   submissions: SubmissionRef[] | null | undefined,
 ): { milestoneCount: number; submittedCount: number } {
   const milestoneCount = milestones?.length ?? 0
+  const ids = new Set((milestones ?? []).map((m) => m.id))
   const submittedMilestones = new Set(
     (submissions ?? [])
       .filter((s) => s.status !== 'pending')
+      .filter((s) => ids.has(s.mission_milestone_id))
       .map((s) => s.mission_milestone_id),
   )
   return { milestoneCount, submittedCount: Math.min(submittedMilestones.size, milestoneCount) }

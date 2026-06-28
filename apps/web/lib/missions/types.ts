@@ -83,4 +83,6 @@ export type SettlementUpdateInput = {
   creatorPayoutStatus: SettlementPaymentStatus
   kinnsoCommissionStatus: SettlementPaymentStatus
   affiliateCommissionAmount?: number | null
+  creatorCommissionAmount?: number | null
+  kinnsoCommissionAmount?: number | null
 }

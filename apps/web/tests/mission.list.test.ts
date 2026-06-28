@@ -19,10 +19,10 @@ describe('creatorMissionProgress', () => {
     expect(creatorMissionProgress(null, null)).toEqual({ milestoneCount: 0, submittedCount: 0 })
   })
 
-  it('never reports more submitted than there are milestones', () => {
+  it('ignores submissions for milestones not in the mission', () => {
     expect(
       creatorMissionProgress([{ id: 'a' }], [{ status: 'submitted', mission_milestone_id: 'ghost' }]),
-    ).toEqual({ milestoneCount: 1, submittedCount: 1 })
+    ).toEqual({ milestoneCount: 1, submittedCount: 0 })
   })
 })
 

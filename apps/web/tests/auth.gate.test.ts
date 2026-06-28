@@ -60,6 +60,17 @@ describe('gateDecision', () => {
     })
   })
 
+  it('redirects unauthenticated users from admin pages', () => {
+    expect(gateDecision('/en/admin/users', false)).toEqual({
+      type: 'redirect',
+      location: '/en/sign-in',
+    })
+  })
+
+  it('allows an authenticated user on admin pages', () => {
+    expect(gateDecision('/en/admin/users', true)).toEqual({ type: 'allow' })
+  })
+
   // ---- non-creator paths — always allow regardless of auth ----
   it('allows any user on a public path', () => {
     expect(gateDecision('/en/articles', false)).toEqual({ type: 'allow' })
