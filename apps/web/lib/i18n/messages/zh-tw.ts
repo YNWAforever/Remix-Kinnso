@@ -726,10 +726,24 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
     statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
     statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
+  },
+  creators: {
+    title: '創作者',
+    subtitle: '了解、管理、分析並向您的創作者付款。',
+    kpiTotal: '創作者總數', kpiActive: '活躍', kpiSuspended: '已停權', kpiOnboarding: '加入中',
+    kpiNew: '本期新增', kpiPayoutsPending: '待付款',
+    trendSignups: '註冊', trendEngagement: '互動（點數）', trendEmpty: '此期間沒有資料',
+    leaderboardTitle: '頂尖貢獻者', leaderboardEmpty: '尚無貢獻者', points: '點數',
+    atRiskTitle: '高風險創作者', atRiskEmpty: '沒有高風險創作者',
+    reasonScanFailed: '掃描失敗', reasonNoMissions: '沒有進行中的任務',
+    activityTitle: '最近審核活動', activityEmpty: '尚無審核活動',
+    statusOnboarding: '加入中', statusActive: '活躍', statusSuspended: '已停權', statusBanned: '已封鎖',
+    tierSeed: '萌芽', tierRising: '崛起', tierPro: '專業', tierElite: '菁英',
+    verified: '已驗證',
   },
   perks: {
     catalog: {

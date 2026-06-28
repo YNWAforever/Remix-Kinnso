@@ -10,11 +10,12 @@ import { AdminShell } from '@/components/kinnso/admin/AdminShell'
 import { AdminDashboardView } from '@/components/kinnso/admin/AdminDashboardView'
 
 describe('AdminShell', () => {
-  it('renders the three nav links with correct hrefs and the children', () => {
+  it('renders the nav links with correct hrefs and the children', () => {
     render(<AdminShell locale="en" t={en.admin}><p>child-content</p></AdminShell>)
     expect((screen.getByRole('link', { name: en.admin.navDashboard }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin')
     expect((screen.getByRole('link', { name: en.admin.navPerks }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/perks')
     expect((screen.getByRole('link', { name: en.admin.navUsers }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/users')
+    expect((screen.getByRole('link', { name: en.admin.navCreators }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/creators')
     expect(screen.getByText('child-content')).toBeTruthy()
   })
 })

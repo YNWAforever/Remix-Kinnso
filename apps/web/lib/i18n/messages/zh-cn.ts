@@ -726,10 +726,24 @@ const messages: Messages = {
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
   admin: {
-    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户',
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
+  },
+  creators: {
+    title: '创作者',
+    subtitle: '了解、管理、分析并向你的创作者付款。',
+    kpiTotal: '创作者总数', kpiActive: '活跃', kpiSuspended: '已停用', kpiOnboarding: '加入中',
+    kpiNew: '本期新增', kpiPayoutsPending: '待付款',
+    trendSignups: '注册', trendEngagement: '互动（积分）', trendEmpty: '此期间没有数据',
+    leaderboardTitle: '顶尖贡献者', leaderboardEmpty: '暂无贡献者', points: '积分',
+    atRiskTitle: '高风险创作者', atRiskEmpty: '没有高风险创作者',
+    reasonScanFailed: '扫描失败', reasonNoMissions: '没有进行中的任务',
+    activityTitle: '最近审核活动', activityEmpty: '暂无审核活动',
+    statusOnboarding: '加入中', statusActive: '活跃', statusSuspended: '已停用', statusBanned: '已封禁',
+    tierSeed: '萌芽', tierRising: '崛起', tierPro: '专业', tierElite: '精英',
+    verified: '已验证',
   },
   perks: {
     catalog: {
