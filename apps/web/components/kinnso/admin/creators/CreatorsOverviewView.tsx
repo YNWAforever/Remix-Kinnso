@@ -35,11 +35,11 @@ export function CreatorsOverviewView({ t, overview }: { t: Messages['creators'];
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         <TicketCard className="p-5">
           <p className="mb-3 text-sm font-bold text-kinnso-ink">{t.trendSignups}</p>
-          <TrendChart points={signups.map((s) => ({ label: s.day, value: s.count }))} emptyText={t.trendEmpty} />
+          <TrendChart points={signups.map((s) => ({ label: s.day, value: s.count }))} emptyText={t.trendEmpty} ariaLabel={t.trendSignups} />
         </TicketCard>
         <TicketCard className="p-5">
           <p className="mb-3 text-sm font-bold text-kinnso-ink">{t.trendEngagement}</p>
-          <TrendChart points={engagement.map((e) => ({ label: e.day, value: e.points }))} emptyText={t.trendEmpty} />
+          <TrendChart points={engagement.map((e) => ({ label: e.day, value: e.points }))} emptyText={t.trendEmpty} ariaLabel={t.trendEngagement} />
         </TicketCard>
       </div>
 

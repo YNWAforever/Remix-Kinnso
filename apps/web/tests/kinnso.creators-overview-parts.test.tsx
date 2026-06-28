@@ -34,6 +34,10 @@ describe('TrendChart', () => {
     render(<TrendChart points={[]} emptyText="none" />)
     expect(screen.getByText('none')).toBeTruthy()
   })
+  it('names the chart for screen readers via ariaLabel', () => {
+    render(<TrendChart points={[{ label: 'a', value: 1 }]} emptyText="none" ariaLabel="Signups" />)
+    expect(screen.getByRole('img', { name: 'Signups' })).toBeTruthy()
+  })
 })
 
 describe('Leaderboard', () => {

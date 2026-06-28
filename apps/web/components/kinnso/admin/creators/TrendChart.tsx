@@ -4,13 +4,21 @@ export interface TrendPoint {
 }
 
 /** Minimal dependency-free bar sparkline. Heights are scaled to the series max. */
-export function TrendChart({ points, emptyText }: { points: TrendPoint[]; emptyText: string }) {
+export function TrendChart({
+  points,
+  emptyText,
+  ariaLabel,
+}: {
+  points: TrendPoint[]
+  emptyText: string
+  ariaLabel?: string
+}) {
   if (points.length === 0) {
     return <p className="py-6 text-sm text-kinnso-muted">{emptyText}</p>
   }
   const max = Math.max(...points.map((p) => p.value), 1)
   return (
-    <div className="flex h-24 items-end gap-1" role="img">
+    <div className="flex h-24 items-end gap-1" role="img" aria-label={ariaLabel}>
       {points.map((p, i) => (
         <div
           key={`${p.label}-${i}`}

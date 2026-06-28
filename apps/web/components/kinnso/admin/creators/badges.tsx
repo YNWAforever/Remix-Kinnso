@@ -27,7 +27,7 @@ const pill = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bol
 
 export function StatusBadge({ status, t }: { status: string; t: T }) {
   return (
-    <span className={`${pill} ${STATUS_STYLE[status] ?? 'bg-kinnso-paper text-kinnso-muted'}`}>
+    <span className={`${pill} ${STATUS_STYLE[status] ?? 'bg-kinnso-cream2 text-kinnso-muted'}`}>
       {STATUS_LABEL(t)[status] ?? status}
     </span>
   )
@@ -35,7 +35,7 @@ export function StatusBadge({ status, t }: { status: string; t: T }) {
 
 export function TierBadge({ tier, t }: { tier: string; t: T }) {
   return (
-    <span className={`${pill} bg-kinnso-paper text-kinnso-ink`}>
+    <span className={`${pill} bg-kinnso-cream2 text-kinnso-ink`}>
       {TIER_LABEL(t)[tier] ?? tier}
     </span>
   )
