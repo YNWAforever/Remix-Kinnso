@@ -744,6 +744,17 @@ const messages: Messages = {
     statusOnboarding: '온보딩', statusActive: '활성', statusSuspended: '정지됨', statusBanned: '차단됨',
     tierSeed: '시드', tierRising: '라이징', tierPro: '프로', tierElite: '엘리트',
     verified: '인증됨',
+    dirSearch: '이름 또는 핸들 검색', dirStatus: '상태', dirTier: '등급', dirDna: 'DNA', dirVerifiedOnly: '인증됨만',
+    dirAll: '전체', dirLoadMore: '다음 페이지', dirEmpty: '필터에 맞는 크리에이터가 없습니다',
+    colName: '크리에이터', colTier: '등급', colDna: 'DNA', colJoined: '가입일', colActions: '작업',
+    dnaPublished: '게시됨', dnaDraft: '초안', dnaNone: '없음',
+    actActivate: '활성화', actSuspend: '정지', actBan: '차단', actReinstate: '복구',
+    actVerify: '인증', actUnverify: '인증 해제', actNote: '메모 추가', actApply: '적용', actCancel: '취소',
+    reasonPlaceholder: '사유 (필수)', notePlaceholder: '메모 (필수)',
+    confirmBan: '이 크리에이터를 차단하시겠습니까? 영구적인 상태입니다.', confirmReinstate: '차단된 이 크리에이터를 복구하시겠습니까?',
+    bulkApply: '선택 항목에 적용', bulkSelected: '선택됨', bulkChooseAction: '작업 선택',
+    actionFailed: '작업에 실패했습니다. 다시 시도하세요.',
+    tabOverview: '개요', tabDirectory: '디렉터리',
   },
   perks: {
     catalog: {

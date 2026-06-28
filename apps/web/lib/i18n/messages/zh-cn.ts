@@ -744,6 +744,17 @@ const messages: Messages = {
     statusOnboarding: '加入中', statusActive: '活跃', statusSuspended: '已停用', statusBanned: '已封禁',
     tierSeed: '萌芽', tierRising: '崛起', tierPro: '专业', tierElite: '精英',
     verified: '已验证',
+    dirSearch: '搜索名称或账号', dirStatus: '状态', dirTier: '等级', dirDna: 'DNA', dirVerifiedOnly: '仅显示已验证',
+    dirAll: '全部', dirLoadMore: '下一页', dirEmpty: '没有符合筛选的创作者',
+    colName: '创作者', colTier: '等级', colDna: 'DNA', colJoined: '加入日期', colActions: '操作',
+    dnaPublished: '已发布', dnaDraft: '草稿', dnaNone: '无',
+    actActivate: '启用', actSuspend: '停用', actBan: '封禁', actReinstate: '恢复',
+    actVerify: '验证', actUnverify: '取消验证', actNote: '添加备注', actApply: '应用', actCancel: '取消',
+    reasonPlaceholder: '原因（必填）', notePlaceholder: '备注（必填）',
+    confirmBan: '封禁此创作者？这是永久状态。', confirmReinstate: '恢复这位已封禁的创作者？',
+    bulkApply: '应用到已选', bulkSelected: '已选', bulkChooseAction: '选择操作',
+    actionFailed: '操作失败，请重试。',
+    tabOverview: '概览', tabDirectory: '目录',
   },
   perks: {
     catalog: {

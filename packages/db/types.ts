@@ -811,6 +811,7 @@ export type Database = {
           public_profile: Json | null
           status: string
           updated_at: string
+          verified: boolean
         }
         Insert: {
           bio?: string | null
@@ -821,6 +822,7 @@ export type Database = {
           public_profile?: Json | null
           status?: string
           updated_at?: string
+          verified?: boolean
         }
         Update: {
           bio?: string | null
@@ -831,6 +833,7 @@ export type Database = {
           public_profile?: Json | null
           status?: string
           updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }
@@ -1613,6 +1616,49 @@ export type Database = {
       admin_creator_analytics: {
         Args: { p_days?: number }
         Returns: Json
+      }
+      admin_set_creator_status: {
+        Args: { p_id: string; p_status: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_reinstate_creator: {
+        Args: { p_id: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_set_creator_verified: {
+        Args: { p_id: string; p_verified: boolean; p_reason: string }
+        Returns: undefined
+      }
+      admin_add_creator_note: {
+        Args: { p_id: string; p_note: string }
+        Returns: undefined
+      }
+      admin_bulk_set_creator_status: {
+        Args: { p_ids: string[]; p_status: string; p_reason: string }
+        Returns: number
+      }
+      admin_search_creators: {
+        Args: {
+          p_search?: string | null
+          p_statuses?: string[] | null
+          p_tiers?: string[] | null
+          p_dna?: string | null
+          p_verified?: boolean | null
+          p_limit?: number | null
+          p_cursor_created_at?: string | null
+          p_cursor_id?: string | null
+        }
+        Returns: {
+          id: string
+          display_name: string
+          handle: string
+          status: string
+          verified: boolean
+          tier: string
+          dna_status: string
+          contribution_points: number
+          created_at: string
+        }[]
       }
       ops_audit_log_append: {
         Args: {

@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 import { CreatorsOverviewView } from '@/components/kinnso/admin/creators/CreatorsOverviewView'
 import type { CreatorsOverview } from '@/lib/admin/creators-queries'
 
+vi.mock('next/navigation', () => ({ usePathname: () => '/en/admin/creators' }))
 afterEach(cleanup)
 
 const overview: CreatorsOverview = {
@@ -20,7 +21,7 @@ const overview: CreatorsOverview = {
 
 describe('CreatorsOverviewView', () => {
   it('renders the title, KPI values, leaderboard, at-risk, and activity', () => {
-    render(<CreatorsOverviewView t={en.creators} overview={overview} />)
+    render(<CreatorsOverviewView t={en.creators} locale="en" overview={overview} />)
     expect(screen.getByText(en.creators.title)).toBeTruthy()
     expect(screen.getByText('12')).toBeTruthy()           // total
     expect(screen.getByText('8')).toBeTruthy()            // active
@@ -30,7 +31,7 @@ describe('CreatorsOverviewView', () => {
     expect(screen.getByText('status.suspend')).toBeTruthy() // activity feed
   })
   it('shows honest empty states when there is no data', () => {
-    render(<CreatorsOverviewView t={en.creators} overview={{
+    render(<CreatorsOverviewView t={en.creators} locale="en" overview={{
       kpis: { total: 0, byStatus: {}, newInPeriod: 0, newPrevPeriod: 0, payoutsPending: 0 },
       signups: [], engagement: [], leaderboard: [], atRisk: [], recentActivity: [],
     }} />)

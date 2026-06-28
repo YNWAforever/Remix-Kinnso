@@ -744,6 +744,17 @@ const messages: Messages = {
     statusOnboarding: 'กำลังเริ่มต้น', statusActive: 'ใช้งาน', statusSuspended: 'ระงับ', statusBanned: 'แบน',
     tierSeed: 'เริ่มต้น', tierRising: 'กำลังมา', tierPro: 'โปร', tierElite: 'อีลิท',
     verified: 'ยืนยันแล้ว',
+    dirSearch: 'ค้นหาชื่อหรือแฮนเดิล', dirStatus: 'สถานะ', dirTier: 'ระดับ', dirDna: 'DNA', dirVerifiedOnly: 'เฉพาะที่ยืนยันแล้ว',
+    dirAll: 'ทั้งหมด', dirLoadMore: 'หน้าถัดไป', dirEmpty: 'ไม่มีครีเอเตอร์ที่ตรงกับตัวกรอง',
+    colName: 'ครีเอเตอร์', colTier: 'ระดับ', colDna: 'DNA', colJoined: 'วันที่เข้าร่วม', colActions: 'การดำเนินการ',
+    dnaPublished: 'เผยแพร่แล้ว', dnaDraft: 'ฉบับร่าง', dnaNone: 'ไม่มี',
+    actActivate: 'เปิดใช้งาน', actSuspend: 'ระงับ', actBan: 'แบน', actReinstate: 'คืนสถานะ',
+    actVerify: 'ยืนยัน', actUnverify: 'ยกเลิกการยืนยัน', actNote: 'เพิ่มบันทึก', actApply: 'ใช้', actCancel: 'ยกเลิก',
+    reasonPlaceholder: 'เหตุผล (จำเป็น)', notePlaceholder: 'บันทึก (จำเป็น)',
+    confirmBan: 'แบนครีเอเตอร์นี้? นี่เป็นสถานะถาวร', confirmReinstate: 'คืนสถานะครีเอเตอร์ที่ถูกแบนนี้?',
+    bulkApply: 'ใช้กับรายการที่เลือก', bulkSelected: 'เลือกแล้ว', bulkChooseAction: 'เลือกการดำเนินการ',
+    actionFailed: 'การดำเนินการล้มเหลว ลองอีกครั้ง',
+    tabOverview: 'ภาพรวม', tabDirectory: 'ไดเรกทอรี',
   },
   perks: {
     catalog: {
