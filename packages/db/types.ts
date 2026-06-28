@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      ops_audit_log: {
+        Row: {
+          action: string
+          actor_ops_member_id: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_ops_member_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_ops_member_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_audit_log_actor_ops_member_id_fkey"
+            columns: ["actor_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliate_network_events: {
         Row: {
           affiliate_network_program_id: string | null
@@ -1568,6 +1609,20 @@ export type Database = {
       accept_mission_invite: {
         Args: { p_mission_id: string }
         Returns: undefined
+      }
+      admin_creator_analytics: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
+      ops_audit_log_append: {
+        Args: {
+          p_entity_type: string
+          p_entity_id: string
+          p_action: string
+          p_reason?: string
+          p_metadata?: Json
+        }
+        Returns: string
       }
       admin_list_creators: {
         Args: never
