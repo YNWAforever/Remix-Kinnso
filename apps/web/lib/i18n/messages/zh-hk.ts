@@ -744,6 +744,16 @@ const messages: Messages = {
     statusOnboarding: '加入中', statusActive: '活躍', statusSuspended: '已停用', statusBanned: '已封禁',
     tierSeed: '萌芽', tierRising: '冒起', tierPro: '專業', tierElite: '精英',
     verified: '已驗證',
+    dirSearch: '搜尋名稱或帳號', dirStatus: '狀態', dirTier: '等級', dirDna: 'DNA', dirVerifiedOnly: '只顯示已驗證',
+    dirAll: '全部', dirLoadMore: '載入更多', dirEmpty: '沒有符合篩選的創作者',
+    colName: '創作者', colTier: '等級', colDna: 'DNA', colJoined: '加入日期', colActions: '操作',
+    dnaPublished: '已發佈', dnaDraft: '草稿', dnaNone: '無',
+    actActivate: '啟用', actSuspend: '停用', actBan: '封禁', actReinstate: '恢復',
+    actVerify: '驗證', actUnverify: '取消驗證', actNote: '加入備註', actApply: '套用', actCancel: '取消',
+    reasonPlaceholder: '原因（必填）', notePlaceholder: '備註（必填）',
+    confirmBan: '封禁此創作者？這是永久狀態。', confirmReinstate: '恢復這位已封禁的創作者？',
+    bulkApply: '套用至已選', bulkSelected: '已選', bulkChooseAction: '選擇操作',
+    actionFailed: '操作失敗，請重試。',
   },
   perks: {
     catalog: {

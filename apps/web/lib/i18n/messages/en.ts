@@ -634,6 +634,16 @@ export interface Messages {
     statusOnboarding: string; statusActive: string; statusSuspended: string; statusBanned: string
     tierSeed: string; tierRising: string; tierPro: string; tierElite: string
     verified: string
+    dirSearch: string; dirStatus: string; dirTier: string; dirDna: string; dirVerifiedOnly: string
+    dirAll: string; dirLoadMore: string; dirEmpty: string
+    colName: string; colTier: string; colDna: string; colJoined: string; colActions: string
+    dnaPublished: string; dnaDraft: string; dnaNone: string
+    actActivate: string; actSuspend: string; actBan: string; actReinstate: string
+    actVerify: string; actUnverify: string; actNote: string; actApply: string; actCancel: string
+    reasonPlaceholder: string; notePlaceholder: string
+    confirmBan: string; confirmReinstate: string
+    bulkApply: string; bulkSelected: string; bulkChooseAction: string
+    actionFailed: string
   }
   perks: {
     catalog: {
@@ -1489,6 +1499,16 @@ const messages: Messages = {
     statusOnboarding: 'Onboarding', statusActive: 'Active', statusSuspended: 'Suspended', statusBanned: 'Banned',
     tierSeed: 'Seed', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
     verified: 'Verified',
+    dirSearch: 'Search name or handle', dirStatus: 'Status', dirTier: 'Tier', dirDna: 'DNA', dirVerifiedOnly: 'Verified only',
+    dirAll: 'All', dirLoadMore: 'Load more', dirEmpty: 'No creators match your filters',
+    colName: 'Creator', colTier: 'Tier', colDna: 'DNA', colJoined: 'Joined', colActions: 'Actions',
+    dnaPublished: 'Published', dnaDraft: 'Draft', dnaNone: 'None',
+    actActivate: 'Activate', actSuspend: 'Suspend', actBan: 'Ban', actReinstate: 'Reinstate',
+    actVerify: 'Verify', actUnverify: 'Unverify', actNote: 'Add note', actApply: 'Apply', actCancel: 'Cancel',
+    reasonPlaceholder: 'Reason (required)', notePlaceholder: 'Note (required)',
+    confirmBan: 'Ban this creator? This is a permanent state.', confirmReinstate: 'Reinstate this banned creator?',
+    bulkApply: 'Apply to selected', bulkSelected: 'selected', bulkChooseAction: 'Choose an action',
+    actionFailed: 'Action failed. Try again.',
   },
   perks: {
     catalog: {

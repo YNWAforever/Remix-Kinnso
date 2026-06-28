@@ -744,6 +744,16 @@ const messages: Messages = {
     statusOnboarding: '登録中', statusActive: 'アクティブ', statusSuspended: '停止中', statusBanned: '禁止',
     tierSeed: 'シード', tierRising: 'ライジング', tierPro: 'プロ', tierElite: 'エリート',
     verified: '認証済み',
+    dirSearch: '名前またはハンドルで検索', dirStatus: 'ステータス', dirTier: 'ティア', dirDna: 'DNA', dirVerifiedOnly: '認証済みのみ',
+    dirAll: 'すべて', dirLoadMore: 'さらに読み込む', dirEmpty: '条件に一致するクリエイターがいません',
+    colName: 'クリエイター', colTier: 'ティア', colDna: 'DNA', colJoined: '登録日', colActions: '操作',
+    dnaPublished: '公開', dnaDraft: '下書き', dnaNone: 'なし',
+    actActivate: '有効化', actSuspend: '停止', actBan: '禁止', actReinstate: '復帰',
+    actVerify: '認証', actUnverify: '認証解除', actNote: 'メモを追加', actApply: '適用', actCancel: 'キャンセル',
+    reasonPlaceholder: '理由（必須）', notePlaceholder: 'メモ（必須）',
+    confirmBan: 'このクリエイターを禁止しますか？これは永久的な状態です。', confirmReinstate: 'この禁止されたクリエイターを復帰させますか？',
+    bulkApply: '選択に適用', bulkSelected: '選択中', bulkChooseAction: '操作を選択',
+    actionFailed: '操作に失敗しました。もう一度お試しください。',
   },
   perks: {
     catalog: {
