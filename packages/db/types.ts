@@ -1639,14 +1639,14 @@ export type Database = {
       }
       admin_search_creators: {
         Args: {
-          p_search?: string
-          p_statuses?: string[]
-          p_tiers?: string[]
-          p_dna?: string
-          p_verified?: boolean
-          p_limit?: number
-          p_cursor_created_at?: string
-          p_cursor_id?: string
+          p_search?: string | null
+          p_statuses?: string[] | null
+          p_tiers?: string[] | null
+          p_dna?: string | null
+          p_verified?: boolean | null
+          p_limit?: number | null
+          p_cursor_created_at?: string | null
+          p_cursor_id?: string | null
         }
         Returns: {
           id: string

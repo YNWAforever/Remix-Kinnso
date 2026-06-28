@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+type RpcResult = { data: unknown; error: { message: string } | null }
+type GateResult = { ok: true; user: { id: string } } | { ok: false; errors: Record<string, string[]> }
 const { rpcMock, gateMock, revalidateMock } = vi.hoisted(() => ({
-  rpcMock: vi.fn(async () => ({ data: null, error: null })),
-  gateMock: vi.fn(async () => ({ ok: true, user: { id: 'u1' } })),
+  rpcMock: vi.fn(async (): Promise<RpcResult> => ({ data: null, error: null })),
+  gateMock: vi.fn(async (): Promise<GateResult> => ({ ok: true, user: { id: 'u1' } })),
   revalidateMock: vi.fn(),
 }))
 vi.mock('next/cache', () => ({ revalidatePath: revalidateMock }))
