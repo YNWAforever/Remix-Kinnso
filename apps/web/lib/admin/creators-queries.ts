@@ -137,3 +137,91 @@ export async function listCreatorsDirectory(supabase: Client, params: ListDirect
   const nextCursor = rows.length === limit && last ? { createdAt: last.createdAt, id: last.id } : null
   return { rows, nextCursor }
 }
+
+export interface CreatorDetailProfile {
+  id: string
+  displayName: string | null
+  handle: string | null
+  status: string
+  verified: boolean
+  bio: string | null
+  createdAt: string
+  updatedAt: string
+}
+export interface CreatorDetailContribution { points: number; tier: string; tierUpdatedAt: string | null }
+export interface CreatorDetailDna { id: string; status: string; model: string | null; draftReadyAt: string | null; updatedAt: string }
+export interface CreatorDetailScan { id: string; status: string; error: string | null; startedAt: string | null; completedAt: string | null; createdAt: string }
+export interface CreatorDetailSocial { platform: string; handle: string; url: string | null }
+export interface CreatorDetailMission { participantId: string; missionId: string; title: string; status: string; source: string; approvedAt: string | null; createdAt: string }
+export interface CreatorDetailSettlement { id: string; missionTitle: string; status: string; creatorPayoutStatus: string | null; creatorCommissionAmount: number | null; currency: string | null; createdAt: string }
+export interface CreatorDetailPointsEvent { id: string; eventType: string; points: number; createdAt: string }
+export interface CreatorDetailContent { id: string; title: string; slug: string; status: string; savesCount: number; publishedAt: string | null; createdAt: string }
+
+export interface CreatorDetail {
+  creator: CreatorDetailProfile
+  contribution: CreatorDetailContribution | null
+  dna: CreatorDetailDna | null
+  scan: CreatorDetailScan | null
+  socials: CreatorDetailSocial[]
+  missions: CreatorDetailMission[]
+  settlements: CreatorDetailSettlement[]
+  pointsEvents: CreatorDetailPointsEvent[]
+  content: CreatorDetailContent[]
+}
+
+type DetailPayload = {
+  creator: { id: string; display_name: string | null; handle: string | null; status: string; verified: boolean; bio: string | null; created_at: string; updated_at: string }
+  contribution: { points: number; tier: string; tier_updated_at: string | null } | null
+  dna: { id: string; status: string; model: string | null; draft_ready_at: string | null; updated_at: string } | null
+  scan: { id: string; status: string; error: string | null; started_at: string | null; completed_at: string | null; created_at: string } | null
+  socials: { platform: string; handle: string; url: string | null }[]
+  missions: { participant_id: string; mission_id: string; title: string; status: string; source: string; approved_at: string | null; created_at: string }[]
+  settlements: { id: string; mission_title: string; status: string; creator_payout_status: string | null; creator_commission_amount: number | null; amount_currency: string | null; created_at: string }[]
+  points_events: { id: string; event_type: string; points: number; created_at: string }[]
+  content: { id: string; title: string; slug: string; status: string; saves_count: number; published_at: string | null; created_at: string }[]
+}
+
+/**
+ * Full ops-aggregate 360 for one creator. Single SECURITY DEFINER RPC
+ * (`admin_creator_detail`, is_active_ops()-gated) so ops sees all sections despite
+ * owner-scoped RLS. Returns null when the creator id does not exist (page -> notFound()).
+ * Audit history is fetched separately by the page via listAudit(). Errors propagate.
+ */
+export async function getCreatorDetail(supabase: Client, creatorId: string): Promise<CreatorDetail | null> {
+  const { data, error } = await supabase.rpc('admin_creator_detail', { p_creator_id: creatorId })
+  if (error) throw error
+  if (!data) return null
+  const p = data as unknown as DetailPayload
+  return {
+    creator: {
+      id: p.creator.id, displayName: p.creator.display_name, handle: p.creator.handle,
+      status: p.creator.status, verified: p.creator.verified, bio: p.creator.bio,
+      createdAt: p.creator.created_at, updatedAt: p.creator.updated_at,
+    },
+    contribution: p.contribution
+      ? { points: Number(p.contribution.points), tier: p.contribution.tier, tierUpdatedAt: p.contribution.tier_updated_at }
+      : null,
+    dna: p.dna
+      ? { id: p.dna.id, status: p.dna.status, model: p.dna.model, draftReadyAt: p.dna.draft_ready_at, updatedAt: p.dna.updated_at }
+      : null,
+    scan: p.scan
+      ? { id: p.scan.id, status: p.scan.status, error: p.scan.error, startedAt: p.scan.started_at, completedAt: p.scan.completed_at, createdAt: p.scan.created_at }
+      : null,
+    socials: (p.socials ?? []).map((s) => ({ platform: s.platform, handle: s.handle, url: s.url })),
+    missions: (p.missions ?? []).map((m) => ({
+      participantId: m.participant_id, missionId: m.mission_id, title: m.title,
+      status: m.status, source: m.source, approvedAt: m.approved_at, createdAt: m.created_at,
+    })),
+    settlements: (p.settlements ?? []).map((s) => ({
+      id: s.id, missionTitle: s.mission_title, status: s.status,
+      creatorPayoutStatus: s.creator_payout_status,
+      creatorCommissionAmount: s.creator_commission_amount === null ? null : Number(s.creator_commission_amount),
+      currency: s.amount_currency, createdAt: s.created_at,
+    })),
+    pointsEvents: (p.points_events ?? []).map((e) => ({ id: e.id, eventType: e.event_type, points: Number(e.points), createdAt: e.created_at })),
+    content: (p.content ?? []).map((g) => ({
+      id: g.id, title: g.title, slug: g.slug, status: g.status,
+      savesCount: Number(g.saves_count), publishedAt: g.published_at, createdAt: g.created_at,
+    })),
+  }
+}
