@@ -52,3 +52,17 @@ export function normalizeDirectoryParams(raw: RawSearchParams): DirectoryParams 
   const verified = raw.verified === 'true' ? true : raw.verified === 'false' ? false : undefined
   return { search, statuses, tiers, dna, verified }
 }
+
+export const SETTLEMENT_STATUSES = ['not_started', 'pending', 'partially_paid', 'paid', 'disputed'] as const
+export type SettlementStatus = (typeof SETTLEMENT_STATUSES)[number]
+
+export const LEG_STATUSES = ['pending', 'paid'] as const
+export type LegStatus = (typeof LEG_STATUSES)[number]
+
+export function isSettlementStatus(s: string): s is SettlementStatus {
+  return (SETTLEMENT_STATUSES as readonly string[]).includes(s)
+}
+
+export function isLegStatus(s: string): s is LegStatus {
+  return (LEG_STATUSES as readonly string[]).includes(s)
+}

@@ -1,8 +1,114 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import { listRecentAudit, type AuditEntry } from '@/lib/admin/audit'
+import { listOpsSettlements } from '@/lib/missions/queries'
+import { type SettlementStatus } from '@/lib/admin/creators-validation'
 
 type Client = SupabaseClient<Database>
+
+export interface PayoutRow {
+  id: string
+  missionTitle: string
+  creatorId: string | null
+  status: string
+  creatorPayoutStatus: string | null
+  kinnsoCommissionStatus: string | null
+  affiliateCommissionStatus: string | null
+  currency: string | null
+  creatorCommissionAmount: number | null
+  kinnsoCommissionAmount: number | null
+  affiliateCommissionAmount: number | null
+  opsNote: string | null
+}
+
+/** Money figures are grouped by currency — settlements may be in different currencies,
+ *  so summing across them would be dishonest. Empty arrays mean "nothing owed/settled". */
+export interface PayoutsSummary {
+  total: number
+  byStatus: Record<string, number>
+  owed: { currency: string; amount: number }[]
+  settled: { currency: string; amount: number }[]
+}
+
+export interface PayoutsQueue {
+  rows: PayoutRow[]
+  summary: PayoutsSummary
+}
+
+type OpsSettlementJoinRow = {
+  id: string
+  status: string | null
+  creator_payout_status: string | null
+  kinnso_commission_status: string | null
+  affiliate_commission_status: string | null
+  amount_currency: string | null
+  creator_commission_amount: number | null
+  kinnso_commission_amount: number | null
+  affiliate_commission_amount: number | null
+  ops_note: string | null
+  missions?: { title?: string | null } | Array<{ title?: string | null }> | null
+  mission_participants?: { creator_id?: string | null } | Array<{ creator_id?: string | null }> | null
+}
+
+const oneJoin = <T>(v: T | T[] | null | undefined): T | null =>
+  (Array.isArray(v) ? (v[0] ?? null) : (v ?? null))
+
+const toPayoutRow = (r: OpsSettlementJoinRow): PayoutRow => {
+  const mission = oneJoin(r.missions)
+  const participant = oneJoin(r.mission_participants)
+  return {
+    id: r.id,
+    missionTitle: mission?.title ?? 'Untitled mission',
+    creatorId: participant?.creator_id ?? null,
+    status: r.status ?? 'not_started',
+    creatorPayoutStatus: r.creator_payout_status,
+    kinnsoCommissionStatus: r.kinnso_commission_status,
+    affiliateCommissionStatus: r.affiliate_commission_status,
+    currency: r.amount_currency,
+    creatorCommissionAmount: r.creator_commission_amount,
+    kinnsoCommissionAmount: r.kinnso_commission_amount,
+    affiliateCommissionAmount: r.affiliate_commission_amount,
+    opsNote: r.ops_note,
+  }
+}
+
+const sumByCurrency = (rows: PayoutRow[]): { currency: string; amount: number }[] => {
+  const acc = new Map<string, number>()
+  for (const r of rows) {
+    const cur = r.currency ?? 'unknown'
+    const amt = r.creatorCommissionAmount ?? 0
+    acc.set(cur, (acc.get(cur) ?? 0) + amt)
+  }
+  return [...acc.entries()].map(([currency, amount]) => ({ currency, amount }))
+}
+
+/**
+ * The full settlement queue across all creators (ops-aggregate). Reads via the ops
+ * RLS path (`mission_settlements_visible_select` exposes all rows to ops). Errors
+ * propagate. The summary always reflects the FULL queue; `opts.status` only filters
+ * the returned `rows` so the money-flow cards stay stable while ops drills into a status.
+ */
+export async function getSettlementsQueue(
+  supabase: Client,
+  opts: { status?: SettlementStatus },
+): Promise<PayoutsQueue> {
+  const { data, error } = await listOpsSettlements(supabase)
+  if (error) throw error
+  const all = ((data ?? []) as unknown as OpsSettlementJoinRow[]).map(toPayoutRow)
+
+  const byStatus: Record<string, number> = {}
+  for (const r of all) byStatus[r.status] = (byStatus[r.status] ?? 0) + 1
+
+  const summary: PayoutsSummary = {
+    total: all.length,
+    byStatus,
+    owed: sumByCurrency(all.filter((r) => r.creatorPayoutStatus === 'pending')),
+    settled: sumByCurrency(all.filter((r) => r.creatorPayoutStatus === 'paid')),
+  }
+
+  const rows = opts.status ? all.filter((r) => r.status === opts.status) : all
+  return { rows, summary }
+}
 
 export interface CreatorsOverview {
   kpis: {
