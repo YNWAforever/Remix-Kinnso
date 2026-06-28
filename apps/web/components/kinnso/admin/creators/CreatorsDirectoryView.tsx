@@ -44,7 +44,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
 
   function onSearch(e: React.FormEvent) {
     e.preventDefault()
-    setQuery((sp) => { search ? sp.set('q', search) : sp.delete('q') })
+    setQuery((sp) => { if (search) sp.set('q', search); else sp.delete('q') })
   }
 
   function startAction(p: NonNullable<Pending>) {
@@ -103,7 +103,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <select aria-label={t.dirStatus} defaultValue={params.get('status') ?? ''}
-          onChange={(e) => setQuery((sp) => { e.target.value ? sp.set('status', e.target.value) : sp.delete('status') })}
+          onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('status', e.target.value); else sp.delete('status') })}
           className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirStatus}: {t.dirAll}</option>
           <option value="onboarding">{t.dirStatus}: {t.statusOnboarding}</option>
@@ -112,7 +112,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
           <option value="banned">{t.dirStatus}: {t.statusBanned}</option>
         </select>
         <select aria-label={t.dirTier} defaultValue={params.get('tier') ?? ''}
-          onChange={(e) => setQuery((sp) => { e.target.value ? sp.set('tier', e.target.value) : sp.delete('tier') })}
+          onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('tier', e.target.value); else sp.delete('tier') })}
           className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirTier}: {t.dirAll}</option>
           <option value="seed">{t.tierSeed}</option>
@@ -121,7 +121,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
           <option value="elite">{t.tierElite}</option>
         </select>
         <select aria-label={t.dirDna} defaultValue={params.get('dna') ?? ''}
-          onChange={(e) => setQuery((sp) => { e.target.value ? sp.set('dna', e.target.value) : sp.delete('dna') })}
+          onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('dna', e.target.value); else sp.delete('dna') })}
           className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirDna}: {t.dirAll}</option>
           <option value="published">{t.dnaPublished}</option>
@@ -130,7 +130,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
         </select>
         <label className="flex items-center gap-2 text-sm font-bold text-kinnso-ink">
           <input type="checkbox" defaultChecked={params.get('verified') === 'true'}
-            onChange={(e) => setQuery((sp) => { e.target.checked ? sp.set('verified', 'true') : sp.delete('verified') })} />
+            onChange={(e) => setQuery((sp) => { if (e.target.checked) sp.set('verified', 'true'); else sp.delete('verified') })} />
           {t.dirVerifiedOnly}
         </label>
       </div>
@@ -170,7 +170,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
                 <div className="flex flex-wrap items-center gap-3">
                   <input type="checkbox" aria-label={`Select ${name}`}
                     checked={checked.has(row.id)}
-                    onChange={(e) => setChecked((s) => { const n = new Set(s); e.target.checked ? n.add(row.id) : n.delete(row.id); return n })} />
+                    onChange={(e) => setChecked((s) => { const n = new Set(s); if (e.target.checked) n.add(row.id); else n.delete(row.id); return n })} />
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-kinnso-ink">{name} {row.handle ? <span className="text-kinnso-muted">@{row.handle}</span> : null}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
