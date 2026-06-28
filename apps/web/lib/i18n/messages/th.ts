@@ -765,6 +765,14 @@ const messages: Messages = {
     pointsHistory: 'ประวัติคะแนน', colEvent: 'เหตุการณ์', colPoints: 'คะแนน', pointsNoData: 'ยังไม่มีกิจกรรมคะแนน', totalPoints: 'คะแนนรวม',
     colTitle: 'ชื่อเรื่อง', colSaves: 'การบันทึก', colStatusContent: 'สถานะ', contentNoData: 'ยังไม่มีเนื้อหา',
     secAudit: 'ประวัติการกำกับดูแล', auditNoData: 'ยังไม่มีกิจกรรมการกำกับดูแล', addNote: 'เพิ่มบันทึก', saveNote: 'บันทึกหมายเหตุ',
+    tabPayouts: 'การจ่ายเงิน',
+    payoutsQueue: 'การชำระเงิน', payoutsOwed: 'ยอดค้างจ่ายครีเอเตอร์', payoutsSettled: 'ยอดจ่ายครีเอเตอร์แล้ว',
+    setNotStarted: 'ยังไม่เริ่ม', setPending: 'รอดำเนินการ', setPartiallyPaid: 'จ่ายบางส่วน', setPaid: 'จ่ายแล้ว', setDisputed: 'มีข้อพิพาท',
+    colOpsNote: 'บันทึกทีมงาน',
+    actMarkPaid: 'ทำเครื่องหมายว่าจ่ายแล้ว', actMarkDisputed: 'ทำเครื่องหมายว่ามีข้อพิพาท',
+    confirmMarkPaid: 'ทำเครื่องหมายว่าการชำระเงินนี้จ่ายครบแล้วหรือไม่? ระบบจะบันทึกเป็นการจ่ายเงินให้ครีเอเตอร์',
+    confirmMarkDisputed: 'ทำเครื่องหมายการชำระเงินนี้ว่ามีข้อพิพาทหรือไม่?',
+    payoutsEmpty: 'ไม่มีการชำระเงินที่ตรงกับตัวกรองนี้',
   },
   perks: {
     catalog: {

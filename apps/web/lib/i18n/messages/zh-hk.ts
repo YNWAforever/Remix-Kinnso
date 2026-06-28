@@ -765,6 +765,14 @@ const messages: Messages = {
     pointsHistory: '積分紀錄', colEvent: '事件', colPoints: '積分', pointsNoData: '尚無積分活動', totalPoints: '總積分',
     colTitle: '標題', colSaves: '收藏', colStatusContent: '狀態', contentNoData: '尚無內容',
     secAudit: '審核紀錄', auditNoData: '尚無審核活動', addNote: '新增備註', saveNote: '儲存備註',
+    tabPayouts: '付款',
+    payoutsQueue: '結算', payoutsOwed: '應付創作者款項', payoutsSettled: '已付創作者款項',
+    setNotStarted: '未開始', setPending: '待處理', setPartiallyPaid: '部分支付', setPaid: '已支付', setDisputed: '有爭議',
+    colOpsNote: '營運備註',
+    actMarkPaid: '標記已支付', actMarkDisputed: '標記爭議',
+    confirmMarkPaid: '確認此結算已全額支付？此操作會記錄一筆創作者付款。',
+    confirmMarkDisputed: '將此結算標記為爭議？',
+    payoutsEmpty: '沒有符合此篩選的結算',
   },
   perks: {
     catalog: {

@@ -765,6 +765,14 @@ const messages: Messages = {
     pointsHistory: 'ポイント履歴', colEvent: 'イベント', colPoints: 'ポイント', pointsNoData: 'ポイント活動はまだありません', totalPoints: '合計ポイント',
     colTitle: 'タイトル', colSaves: '保存数', colStatusContent: 'ステータス', contentNoData: 'コンテンツはまだありません',
     secAudit: 'モデレーション履歴', auditNoData: 'モデレーション活動はまだありません', addNote: 'メモを追加', saveNote: 'メモを保存',
+    tabPayouts: '支払い',
+    payoutsQueue: '精算', payoutsOwed: 'クリエイター未払い額', payoutsSettled: 'クリエイター支払い済み額',
+    setNotStarted: '未開始', setPending: '保留中', setPartiallyPaid: '一部支払い済み', setPaid: '支払い済み', setDisputed: '異議あり',
+    colOpsNote: '運用メモ',
+    actMarkPaid: '支払い済みにする', actMarkDisputed: '異議ありにする',
+    confirmMarkPaid: 'この精算を全額支払い済みにしますか？クリエイターへの支払いとして記録されます。',
+    confirmMarkDisputed: 'この精算を異議ありとしてフラグしますか？',
+    payoutsEmpty: 'このフィルターに一致する精算はありません',
   },
   perks: {
     catalog: {

@@ -655,6 +655,13 @@ export interface Messages {
     pointsHistory: string; colEvent: string; colPoints: string; pointsNoData: string; totalPoints: string
     colTitle: string; colSaves: string; colStatusContent: string; contentNoData: string
     secAudit: string; auditNoData: string; addNote: string; saveNote: string
+    tabPayouts: string
+    payoutsQueue: string; payoutsOwed: string; payoutsSettled: string
+    setNotStarted: string; setPending: string; setPartiallyPaid: string; setPaid: string; setDisputed: string
+    colOpsNote: string
+    actMarkPaid: string; actMarkDisputed: string
+    confirmMarkPaid: string; confirmMarkDisputed: string
+    payoutsEmpty: string
   }
   perks: {
     catalog: {
@@ -1531,6 +1538,14 @@ const messages: Messages = {
     pointsHistory: 'Points history', colEvent: 'Event', colPoints: 'Points', pointsNoData: 'No points activity yet', totalPoints: 'Total points',
     colTitle: 'Title', colSaves: 'Saves', colStatusContent: 'Status', contentNoData: 'No content yet',
     secAudit: 'Moderation history', auditNoData: 'No moderation activity yet', addNote: 'Add a note', saveNote: 'Save note',
+    tabPayouts: 'Payouts',
+    payoutsQueue: 'Settlements', payoutsOwed: 'Creator payout owed', payoutsSettled: 'Creator payout settled',
+    setNotStarted: 'Not started', setPending: 'Pending', setPartiallyPaid: 'Partially paid', setPaid: 'Paid', setDisputed: 'Disputed',
+    colOpsNote: 'Ops note',
+    actMarkPaid: 'Mark paid', actMarkDisputed: 'Mark disputed',
+    confirmMarkPaid: 'Mark this settlement fully paid? This records a creator payout.',
+    confirmMarkDisputed: 'Flag this settlement as disputed?',
+    payoutsEmpty: 'No settlements match this filter',
   },
   perks: {
     catalog: {

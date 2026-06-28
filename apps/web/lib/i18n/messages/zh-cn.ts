@@ -765,6 +765,14 @@ const messages: Messages = {
     pointsHistory: '积分记录', colEvent: '事件', colPoints: '积分', pointsNoData: '暂无积分活动', totalPoints: '总积分',
     colTitle: '标题', colSaves: '收藏', colStatusContent: '状态', contentNoData: '暂无内容',
     secAudit: '审核记录', auditNoData: '暂无审核活动', addNote: '添加备注', saveNote: '保存备注',
+    tabPayouts: '付款',
+    payoutsQueue: '结算', payoutsOwed: '应付创作者款项', payoutsSettled: '已付创作者款项',
+    setNotStarted: '未开始', setPending: '待处理', setPartiallyPaid: '部分支付', setPaid: '已支付', setDisputed: '有争议',
+    colOpsNote: '运营备注',
+    actMarkPaid: '标记已支付', actMarkDisputed: '标记争议',
+    confirmMarkPaid: '确认此结算已全额支付？此操作会记录一笔创作者付款。',
+    confirmMarkDisputed: '将此结算标记为争议？',
+    payoutsEmpty: '没有符合此筛选的结算',
   },
   perks: {
     catalog: {
