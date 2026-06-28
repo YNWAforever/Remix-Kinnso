@@ -16,6 +16,7 @@ const FRIENDLY: Record<string, string> = {
   bad_status: 'Invalid status.',
   bad_kind: 'Invalid user type.',
   bad_tier: 'Invalid tier.',
+  not_found: 'That user no longer exists. Refresh and try again.',
 }
 
 export async function setUserStatusAction(

@@ -23,6 +23,12 @@ type OpsSettlementViewProps = {
   onUpdate: (settlementId: string, status: 'paid') => KinnsoActionResult | Promise<KinnsoActionResult>
 }
 
+const payableStatuses = new Set(['pending', 'partially_paid'])
+
+function humanizeStatus(status: string) {
+  return status.replaceAll('_', ' ').replace(/^\w/, (char) => char.toUpperCase())
+}
+
 export function OpsSettlementView({ locale, t, settlements, onUpdate }: OpsSettlementViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
@@ -66,9 +72,13 @@ export function OpsSettlementView({ locale, t, settlements, onUpdate }: OpsSettl
               </div>
             </div>
             <p className="text-sm font-semibold text-kinnso-muted">
-              {settlement.status === 'paid' ? t.statusPaid : t.statusPending}
+              {settlement.status === 'paid'
+                ? t.statusPaid
+                : settlement.status === 'pending'
+                  ? t.statusPending
+                  : humanizeStatus(settlement.status)}
             </p>
-            {settlement.status !== 'paid' && (
+            {payableStatuses.has(settlement.status) && (
               <button type="button" className="k-btn-primary text-sm" disabled={isPending} onClick={() => void runUpdate(settlement.id)}>
                 {t.markPaid}
               </button>

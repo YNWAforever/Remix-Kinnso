@@ -59,11 +59,13 @@ export async function updatePerkAction(
   const errors = validatePerkInput(input)
   if (Object.keys(errors).length) return { ok: false, errors }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('partner_perks')
     .update({ ...toRow(input), updated_at: new Date().toISOString() })
     .eq('id', id)
-  if (error) return formError('Perk could not be updated')
+    .select('id')
+    .maybeSingle()
+  if (error || !data) return formError('Perk could not be updated')
 
   revalidatePath(adminPerksPath(locale))
   return { ok: true, id }
@@ -79,11 +81,13 @@ export async function togglePerkActiveAction(
   const gate = await requireOpsAction(supabase)
   if (!gate.ok) return gate
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('partner_perks')
     .update({ active, updated_at: new Date().toISOString() })
     .eq('id', id)
-  if (error) return formError('Perk status could not be changed')
+    .select('id')
+    .maybeSingle()
+  if (error || !data) return formError('Perk status could not be changed')
 
   revalidatePath(adminPerksPath(locale))
   return { ok: true, id, active }
