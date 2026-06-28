@@ -754,6 +754,7 @@ const messages: Messages = {
     confirmBan: 'このクリエイターを禁止しますか？これは永久的な状態です。', confirmReinstate: 'この禁止されたクリエイターを復帰させますか？',
     bulkApply: '選択に適用', bulkSelected: '選択中', bulkChooseAction: '操作を選択',
     actionFailed: '操作に失敗しました。もう一度お試しください。',
+    tabOverview: '概要', tabDirectory: 'ディレクトリ',
   },
   perks: {
     catalog: {

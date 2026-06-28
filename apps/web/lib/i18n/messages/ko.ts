@@ -754,6 +754,7 @@ const messages: Messages = {
     confirmBan: '이 크리에이터를 차단하시겠습니까? 영구적인 상태입니다.', confirmReinstate: '차단된 이 크리에이터를 복구하시겠습니까?',
     bulkApply: '선택 항목에 적용', bulkSelected: '선택됨', bulkChooseAction: '작업 선택',
     actionFailed: '작업에 실패했습니다. 다시 시도하세요.',
+    tabOverview: '개요', tabDirectory: '디렉터리',
   },
   perks: {
     catalog: {

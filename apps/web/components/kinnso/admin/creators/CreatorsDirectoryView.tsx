@@ -8,6 +8,7 @@ import type { ActionResult } from '@/lib/admin/result'
 import type { CreatorStatus } from '@/lib/admin/creators-validation'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { StatusBadge, TierBadge, VerifiedBadge } from '@/components/kinnso/admin/creators/badges'
+import { CreatorsTabs } from '@/components/kinnso/admin/creators/CreatorsTabs'
 
 type T = Messages['creators']
 
@@ -87,6 +88,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
 
   return (
     <main>
+      <CreatorsTabs t={t} locale={locale} />
       <h1 className="k-display">{t.title}</h1>
 
       <form data-testid="directory-search-form" onSubmit={onSearch} className="mt-6 flex gap-2">

@@ -644,6 +644,7 @@ export interface Messages {
     confirmBan: string; confirmReinstate: string
     bulkApply: string; bulkSelected: string; bulkChooseAction: string
     actionFailed: string
+    tabOverview: string; tabDirectory: string
   }
   perks: {
     catalog: {
@@ -1509,6 +1510,7 @@ const messages: Messages = {
     confirmBan: 'Ban this creator? This is a permanent state.', confirmReinstate: 'Reinstate this banned creator?',
     bulkApply: 'Apply to selected', bulkSelected: 'selected', bulkChooseAction: 'Choose an action',
     actionFailed: 'Action failed. Try again.',
+    tabOverview: 'Overview', tabDirectory: 'Directory',
   },
   perks: {
     catalog: {

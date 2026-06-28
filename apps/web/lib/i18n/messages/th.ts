@@ -754,6 +754,7 @@ const messages: Messages = {
     confirmBan: 'แบนครีเอเตอร์นี้? นี่เป็นสถานะถาวร', confirmReinstate: 'คืนสถานะครีเอเตอร์ที่ถูกแบนนี้?',
     bulkApply: 'ใช้กับรายการที่เลือก', bulkSelected: 'เลือกแล้ว', bulkChooseAction: 'เลือกการดำเนินการ',
     actionFailed: 'การดำเนินการล้มเหลว ลองอีกครั้ง',
+    tabOverview: 'ภาพรวม', tabDirectory: 'ไดเรกทอรี',
   },
   perks: {
     catalog: {

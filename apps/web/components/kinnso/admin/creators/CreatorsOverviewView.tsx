@@ -1,16 +1,18 @@
 import type { Messages } from '@/lib/i18n/messages/en'
+import type { Locale } from '@/lib/i18n/config'
 import type { CreatorsOverview } from '@/lib/admin/creators-queries'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { KpiCard } from '@/components/kinnso/admin/creators/KpiCard'
 import { TrendChart } from '@/components/kinnso/admin/creators/TrendChart'
 import { Leaderboard } from '@/components/kinnso/admin/creators/Leaderboard'
+import { CreatorsTabs } from '@/components/kinnso/admin/creators/CreatorsTabs'
 
 const REASON_LABEL = (t: Messages['creators']): Record<string, string> => ({
   scan_failed: t.reasonScanFailed,
   no_active_missions: t.reasonNoMissions,
 })
 
-export function CreatorsOverviewView({ t, overview }: { t: Messages['creators']; overview: CreatorsOverview }) {
+export function CreatorsOverviewView({ t, locale, overview }: { t: Messages['creators']; locale: Locale; overview: CreatorsOverview }) {
   const { kpis, signups, engagement, leaderboard, atRisk, recentActivity } = overview
   const reasons = REASON_LABEL(t)
   const kpiCards = [
@@ -23,6 +25,7 @@ export function CreatorsOverviewView({ t, overview }: { t: Messages['creators'];
   ]
   return (
     <main>
+      <CreatorsTabs t={t} locale={locale} />
       <h1 className="k-display">{t.title}</h1>
       <p className="mt-2 text-kinnso-muted">{t.subtitle}</p>
 

@@ -754,6 +754,7 @@ const messages: Messages = {
     confirmBan: '封禁此創作者？這是永久狀態。', confirmReinstate: '恢復這位已封禁的創作者？',
     bulkApply: '套用至已選', bulkSelected: '已選', bulkChooseAction: '選擇操作',
     actionFailed: '操作失敗，請重試。',
+    tabOverview: '概覽', tabDirectory: '目錄',
   },
   perks: {
     catalog: {

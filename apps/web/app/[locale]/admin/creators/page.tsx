@@ -20,5 +20,5 @@ export default async function CreatorsOverviewPage({ params }: { params: Promise
   await requireOpsPage(supabase, loc)
   const messages = await getDictionary(loc)
   const overview = await getCreatorsOverview(supabase)
-  return <CreatorsOverviewView t={messages.creators} overview={overview} />
+  return <CreatorsOverviewView t={messages.creators} locale={loc} overview={overview} />
 }
