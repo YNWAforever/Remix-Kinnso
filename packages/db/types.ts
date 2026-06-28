@@ -1641,6 +1641,18 @@ export type Database = {
         Args: { p_ids: string[]; p_status: string; p_reason: string }
         Returns: number
       }
+      admin_set_settlement_status: {
+        Args: {
+          p_id: string
+          p_status?: string | null
+          p_creator_payout_status?: string | null
+          p_kinnso_commission_status?: string | null
+          p_affiliate_commission_status?: string | null
+          p_allow_revert?: boolean
+          p_reason?: string | null
+        }
+        Returns: undefined
+      }
       admin_search_creators: {
         Args: {
           p_search?: string | null
