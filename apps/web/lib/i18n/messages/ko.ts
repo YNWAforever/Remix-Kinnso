@@ -745,7 +745,7 @@ const messages: Messages = {
     tierSeed: '시드', tierRising: '라이징', tierPro: '프로', tierElite: '엘리트',
     verified: '인증됨',
     dirSearch: '이름 또는 핸들 검색', dirStatus: '상태', dirTier: '등급', dirDna: 'DNA', dirVerifiedOnly: '인증됨만',
-    dirAll: '전체', dirLoadMore: '더 보기', dirEmpty: '필터에 맞는 크리에이터가 없습니다',
+    dirAll: '전체', dirLoadMore: '다음 페이지', dirEmpty: '필터에 맞는 크리에이터가 없습니다',
     colName: '크리에이터', colTier: '등급', colDna: 'DNA', colJoined: '가입일', colActions: '작업',
     dnaPublished: '게시됨', dnaDraft: '초안', dnaNone: '없음',
     actActivate: '활성화', actSuspend: '정지', actBan: '차단', actReinstate: '복구',

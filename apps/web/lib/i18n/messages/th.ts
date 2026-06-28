@@ -745,7 +745,7 @@ const messages: Messages = {
     tierSeed: 'เริ่มต้น', tierRising: 'กำลังมา', tierPro: 'โปร', tierElite: 'อีลิท',
     verified: 'ยืนยันแล้ว',
     dirSearch: 'ค้นหาชื่อหรือแฮนเดิล', dirStatus: 'สถานะ', dirTier: 'ระดับ', dirDna: 'DNA', dirVerifiedOnly: 'เฉพาะที่ยืนยันแล้ว',
-    dirAll: 'ทั้งหมด', dirLoadMore: 'โหลดเพิ่ม', dirEmpty: 'ไม่มีครีเอเตอร์ที่ตรงกับตัวกรอง',
+    dirAll: 'ทั้งหมด', dirLoadMore: 'หน้าถัดไป', dirEmpty: 'ไม่มีครีเอเตอร์ที่ตรงกับตัวกรอง',
     colName: 'ครีเอเตอร์', colTier: 'ระดับ', colDna: 'DNA', colJoined: 'วันที่เข้าร่วม', colActions: 'การดำเนินการ',
     dnaPublished: 'เผยแพร่แล้ว', dnaDraft: 'ฉบับร่าง', dnaNone: 'ไม่มี',
     actActivate: 'เปิดใช้งาน', actSuspend: 'ระงับ', actBan: 'แบน', actReinstate: 'คืนสถานะ',

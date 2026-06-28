@@ -5,17 +5,18 @@ import en from '@/lib/i18n/messages/en'
 import { CreatorsDirectoryView } from '@/components/kinnso/admin/creators/CreatorsDirectoryView'
 import type { CreatorsDirectory } from '@/lib/admin/creators-queries'
 
-const pushMock = vi.fn()
-const refreshMock = vi.fn()
+const { pushMock, refreshMock, spHolder } = vi.hoisted(() => ({
+  pushMock: vi.fn(), refreshMock: vi.fn(), spHolder: { value: '' },
+}))
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: pushMock, refresh: refreshMock }),
   usePathname: () => '/en/admin/creators/directory',
-  useSearchParams: () => new URLSearchParams(''),
+  useSearchParams: () => new URLSearchParams(spHolder.value),
 }))
 
 afterEach(cleanup)
-beforeEach(() => { pushMock.mockReset(); refreshMock.mockReset() })
+beforeEach(() => { pushMock.mockReset(); refreshMock.mockReset(); spHolder.value = '' })
 
 const data: CreatorsDirectory = {
   rows: [
@@ -30,7 +31,7 @@ const actions = {
   reinstateCreator: vi.fn(async () => ({ ok: true as const, id: 'c2', status: 'active' as const })),
   setCreatorVerified: vi.fn(async () => ({ ok: true as const, id: 'c1', verified: false })),
   addCreatorNote: vi.fn(async () => ({ ok: true as const, id: 'c1' })),
-  bulkSetCreatorStatus: vi.fn(async () => ({ ok: true as const, count: 1 })),
+  bulkSetCreatorStatus: vi.fn(async (): Promise<{ ok: true; count: number } | { ok: false; errors: Record<string, string[]> }> => ({ ok: true, count: 1 })),
 }
 
 function renderView() {
@@ -72,5 +73,25 @@ describe('CreatorsDirectoryView', () => {
     fireEvent.change(screen.getByTestId('bulk-reason'), { target: { value: 'cleanup' } })
     fireEvent.click(screen.getByRole('button', { name: en.creators.bulkApply }))
     await waitFor(() => expect(actions.bulkSetCreatorStatus).toHaveBeenCalledWith('en', ['c1'], 'suspended', 'cleanup'))
+  })
+  it('surfaces a bulk action failure instead of swallowing it', async () => {
+    actions.bulkSetCreatorStatus.mockResolvedValueOnce({ ok: false, errors: { form: ['Select between 1 and 100 creators.'] } })
+    renderView()
+    fireEvent.click(screen.getByLabelText('Select Mia'))
+    fireEvent.change(screen.getByTestId('bulk-action-select'), { target: { value: 'banned' } })
+    fireEvent.change(screen.getByTestId('bulk-reason'), { target: { value: 'cleanup' } })
+    fireEvent.click(screen.getByRole('button', { name: en.creators.bulkApply }))
+    expect(await screen.findByText('Select between 1 and 100 creators.')).toBeTruthy()
+    expect(refreshMock).not.toHaveBeenCalled()
+  })
+  it('resets the keyset cursor to page 1 when a filter changes', () => {
+    spHolder.value = 'cursor_at=2026-06-27T10:00:00Z&cursor_id=c2'
+    renderView()
+    fireEvent.change(screen.getByLabelText(en.creators.dirStatus), { target: { value: 'active' } })
+    expect(pushMock).toHaveBeenCalled()
+    const url = String(pushMock.mock.calls[0][0])
+    expect(url).toContain('status=active')
+    expect(url).not.toContain('cursor_at')
+    expect(url).not.toContain('cursor_id')
   })
 })

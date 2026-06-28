@@ -745,7 +745,7 @@ const messages: Messages = {
     tierSeed: '萌芽', tierRising: '冒起', tierPro: '專業', tierElite: '精英',
     verified: '已驗證',
     dirSearch: '搜尋名稱或帳號', dirStatus: '狀態', dirTier: '等級', dirDna: 'DNA', dirVerifiedOnly: '只顯示已驗證',
-    dirAll: '全部', dirLoadMore: '載入更多', dirEmpty: '沒有符合篩選的創作者',
+    dirAll: '全部', dirLoadMore: '下一頁', dirEmpty: '沒有符合篩選的創作者',
     colName: '創作者', colTier: '等級', colDna: 'DNA', colJoined: '加入日期', colActions: '操作',
     dnaPublished: '已發佈', dnaDraft: '草稿', dnaNone: '無',
     actActivate: '啟用', actSuspend: '停用', actBan: '封禁', actReinstate: '恢復',

@@ -745,7 +745,7 @@ const messages: Messages = {
     tierSeed: '萌芽', tierRising: '崛起', tierPro: '专业', tierElite: '精英',
     verified: '已验证',
     dirSearch: '搜索名称或账号', dirStatus: '状态', dirTier: '等级', dirDna: 'DNA', dirVerifiedOnly: '仅显示已验证',
-    dirAll: '全部', dirLoadMore: '加载更多', dirEmpty: '没有符合筛选的创作者',
+    dirAll: '全部', dirLoadMore: '下一页', dirEmpty: '没有符合筛选的创作者',
     colName: '创作者', colTier: '等级', colDna: 'DNA', colJoined: '加入日期', colActions: '操作',
     dnaPublished: '已发布', dnaDraft: '草稿', dnaNone: '无',
     actActivate: '启用', actSuspend: '停用', actBan: '封禁', actReinstate: '恢复',

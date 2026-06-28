@@ -35,9 +35,14 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
   const [checked, setChecked] = useState<Set<string>>(new Set())
   const [bulkStatus, setBulkStatus] = useState<'' | CreatorStatus>('')
   const [bulkReason, setBulkReason] = useState('')
+  const [bulkError, setBulkError] = useState('')
 
   const setQuery = (mut: (sp: URLSearchParams) => void) => {
     const sp = new URLSearchParams(params.toString())
+    // Any filter/search change resets keyset pagination to the first page.
+    // "Next page" re-sets the cursor inside its own mutation, after this delete.
+    sp.delete('cursor_at')
+    sp.delete('cursor_id')
     mut(sp)
     router.push(`${pathname}?${sp.toString()}`)
   }
@@ -73,6 +78,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
   async function applyBulk() {
     if (!bulkStatus || checked.size === 0) return
     setBusy(true)
+    setBulkError('')
     const res = await actions.bulkSetCreatorStatus(locale, [...checked], bulkStatus, bulkReason)
     setBusy(false)
     if (res.ok) {
@@ -80,6 +86,8 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
       setBulkStatus('')
       setBulkReason('')
       router.refresh()
+    } else {
+      setBulkError(res.errors.form?.[0] ?? t.actionFailed)
     }
   }
 
@@ -153,6 +161,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
             className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
             {t.bulkApply}
           </button>
+          {bulkError ? <p className="w-full text-sm text-red-600">{bulkError}</p> : null}
         </TicketCard>
       )}
 

@@ -1501,7 +1501,7 @@ const messages: Messages = {
     tierSeed: 'Seed', tierRising: 'Rising', tierPro: 'Pro', tierElite: 'Elite',
     verified: 'Verified',
     dirSearch: 'Search name or handle', dirStatus: 'Status', dirTier: 'Tier', dirDna: 'DNA', dirVerifiedOnly: 'Verified only',
-    dirAll: 'All', dirLoadMore: 'Load more', dirEmpty: 'No creators match your filters',
+    dirAll: 'All', dirLoadMore: 'Next page', dirEmpty: 'No creators match your filters',
     colName: 'Creator', colTier: 'Tier', colDna: 'DNA', colJoined: 'Joined', colActions: 'Actions',
     dnaPublished: 'Published', dnaDraft: 'Draft', dnaNone: 'None',
     actActivate: 'Activate', actSuspend: 'Suspend', actBan: 'Ban', actReinstate: 'Reinstate',

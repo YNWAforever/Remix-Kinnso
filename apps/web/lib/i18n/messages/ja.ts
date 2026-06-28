@@ -745,7 +745,7 @@ const messages: Messages = {
     tierSeed: 'シード', tierRising: 'ライジング', tierPro: 'プロ', tierElite: 'エリート',
     verified: '認証済み',
     dirSearch: '名前またはハンドルで検索', dirStatus: 'ステータス', dirTier: 'ティア', dirDna: 'DNA', dirVerifiedOnly: '認証済みのみ',
-    dirAll: 'すべて', dirLoadMore: 'さらに読み込む', dirEmpty: '条件に一致するクリエイターがいません',
+    dirAll: 'すべて', dirLoadMore: '次のページ', dirEmpty: '条件に一致するクリエイターがいません',
     colName: 'クリエイター', colTier: 'ティア', colDna: 'DNA', colJoined: '登録日', colActions: '操作',
     dnaPublished: '公開', dnaDraft: '下書き', dnaNone: 'なし',
     actActivate: '有効化', actSuspend: '停止', actBan: '禁止', actReinstate: '復帰',
