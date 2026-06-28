@@ -755,6 +755,16 @@ const messages: Messages = {
     bulkApply: 'ใช้กับรายการที่เลือก', bulkSelected: 'เลือกแล้ว', bulkChooseAction: 'เลือกการดำเนินการ',
     actionFailed: 'การดำเนินการล้มเหลว ลองอีกครั้ง',
     tabOverview: 'ภาพรวม', tabDirectory: 'ไดเรกทอรี',
+    detailBack: 'กลับไปยังไดเรกทอรี', detailJoined: 'เข้าร่วมเมื่อ', detailUpdated: 'อัปเดตเมื่อ', detailBio: 'ประวัติ', detailNoBio: 'ไม่มีประวัติ',
+    tabProfile: 'โปรไฟล์และ DNA', tabMissions: 'ภารกิจ', tabEarnings: 'รายได้', tabContent: 'เนื้อหา', tabModeration: 'การกำกับดูแล',
+    secDna: 'DNA ครีเอเตอร์', secScan: 'การสแกนล่าสุด', secSocials: 'บัญชีโซเชียล', secContribution: 'การมีส่วนร่วม',
+    dnaNoData: 'ยังไม่มี DNA', scanNoData: 'ยังไม่มีการสแกน', socialsNoData: 'ไม่มีบัญชีโซเชียล',
+    scanStatus: 'สถานะ', scanError: 'ข้อผิดพลาด', scanCompleted: 'เสร็จเมื่อ',
+    colMission: 'ภารกิจ', colStatus: 'สถานะ', colSource: 'แหล่งที่มา', missionsNoData: 'ยังไม่มีภารกิจ',
+    colAmount: 'จำนวนเงิน', colPayout: 'การจ่าย', colSettlement: 'การชำระบัญชี', settlementsNoData: 'ยังไม่มีการชำระบัญชี',
+    pointsHistory: 'ประวัติคะแนน', colEvent: 'เหตุการณ์', colPoints: 'คะแนน', pointsNoData: 'ยังไม่มีกิจกรรมคะแนน', totalPoints: 'คะแนนรวม',
+    colTitle: 'ชื่อเรื่อง', colSaves: 'การบันทึก', colStatusContent: 'สถานะ', contentNoData: 'ยังไม่มีเนื้อหา',
+    secAudit: 'ประวัติการกำกับดูแล', auditNoData: 'ยังไม่มีกิจกรรมการกำกับดูแล', addNote: 'เพิ่มบันทึก', saveNote: 'บันทึกหมายเหตุ',
   },
   perks: {
     catalog: {

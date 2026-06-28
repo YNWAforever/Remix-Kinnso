@@ -755,6 +755,16 @@ const messages: Messages = {
     bulkApply: '应用到已选', bulkSelected: '已选', bulkChooseAction: '选择操作',
     actionFailed: '操作失败，请重试。',
     tabOverview: '概览', tabDirectory: '目录',
+    detailBack: '返回目录', detailJoined: '加入于', detailUpdated: '更新于', detailBio: '简介', detailNoBio: '暂无简介',
+    tabProfile: '资料与 DNA', tabMissions: '任务', tabEarnings: '收益', tabContent: '内容', tabModeration: '审核',
+    secDna: '创作者 DNA', secScan: '最近扫描', secSocials: '社交账号', secContribution: '贡献',
+    dnaNoData: '暂无 DNA', scanNoData: '暂无扫描', socialsNoData: '暂无社交账号',
+    scanStatus: '状态', scanError: '错误', scanCompleted: '完成于',
+    colMission: '任务', colStatus: '状态', colSource: '来源', missionsNoData: '暂无任务',
+    colAmount: '金额', colPayout: '支付', colSettlement: '结算', settlementsNoData: '暂无结算',
+    pointsHistory: '积分记录', colEvent: '事件', colPoints: '积分', pointsNoData: '暂无积分活动', totalPoints: '总积分',
+    colTitle: '标题', colSaves: '收藏', colStatusContent: '状态', contentNoData: '暂无内容',
+    secAudit: '审核记录', auditNoData: '暂无审核活动', addNote: '添加备注', saveNote: '保存备注',
   },
   perks: {
     catalog: {
