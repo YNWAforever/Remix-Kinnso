@@ -760,7 +760,7 @@ const messages: Messages = {
     secDna: 'DNA ครีเอเตอร์', secScan: 'การสแกนล่าสุด', secSocials: 'บัญชีโซเชียล', secContribution: 'การมีส่วนร่วม',
     dnaNoData: 'ยังไม่มี DNA', scanNoData: 'ยังไม่มีการสแกน', socialsNoData: 'ไม่มีบัญชีโซเชียล',
     scanStatus: 'สถานะ', scanError: 'ข้อผิดพลาด', scanCompleted: 'เสร็จเมื่อ',
-    colMission: 'ภารกิจ', colStatus: 'สถานะ', colSource: 'แหล่งที่มา', missionsNoData: 'ยังไม่มีภารกิจ',
+    colMission: 'ภารกิจ', colStatus: 'สถานะ', colSource: 'แหล่งที่มา', colMilestones: 'ไมล์สโตน', missionsNoData: 'ยังไม่มีภารกิจ',
     colAmount: 'จำนวนเงิน', colPayout: 'การจ่าย', colSettlement: 'การชำระบัญชี', settlementsNoData: 'ยังไม่มีการชำระบัญชี',
     pointsHistory: 'ประวัติคะแนน', colEvent: 'เหตุการณ์', colPoints: 'คะแนน', pointsNoData: 'ยังไม่มีกิจกรรมคะแนน', totalPoints: 'คะแนนรวม',
     colTitle: 'ชื่อเรื่อง', colSaves: 'การบันทึก', colStatusContent: 'สถานะ', contentNoData: 'ยังไม่มีเนื้อหา',

@@ -760,7 +760,7 @@ const messages: Messages = {
     secDna: '创作者 DNA', secScan: '最近扫描', secSocials: '社交账号', secContribution: '贡献',
     dnaNoData: '暂无 DNA', scanNoData: '暂无扫描', socialsNoData: '暂无社交账号',
     scanStatus: '状态', scanError: '错误', scanCompleted: '完成于',
-    colMission: '任务', colStatus: '状态', colSource: '来源', missionsNoData: '暂无任务',
+    colMission: '任务', colStatus: '状态', colSource: '来源', colMilestones: '里程碑', missionsNoData: '暂无任务',
     colAmount: '金额', colPayout: '支付', colSettlement: '结算', settlementsNoData: '暂无结算',
     pointsHistory: '积分记录', colEvent: '事件', colPoints: '积分', pointsNoData: '暂无积分活动', totalPoints: '总积分',
     colTitle: '标题', colSaves: '收藏', colStatusContent: '状态', contentNoData: '暂无内容',

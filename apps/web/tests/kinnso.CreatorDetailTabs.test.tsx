@@ -19,7 +19,7 @@ const detail: CreatorDetail = {
   dna: { id: 'd1', status: 'published', model: 'gpt', draftReadyAt: null, updatedAt: '2026-06-05T00:00:00Z' },
   scan: { id: 'j1', status: 'completed', error: null, startedAt: null, completedAt: '2026-06-04T00:00:00Z', createdAt: '2026-06-04T00:00:00Z' },
   socials: [{ platform: 'instagram', handle: 'mia', url: 'https://ig/mia' }],
-  missions: [{ participantId: 'p1', missionId: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approvedAt: null, createdAt: '2026-06-02T00:00:00Z' }],
+  missions: [{ participantId: 'p1', missionId: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approvedAt: null, createdAt: '2026-06-02T00:00:00Z', submissionsTotal: 3, submissionsApproved: 1, submissionsPending: 2 }],
   settlements: [{ id: 's1', missionTitle: 'Tokyo eats', status: 'pending', creatorPayoutStatus: 'pending', creatorCommissionAmount: 120.5, currency: 'HKD', createdAt: '2026-06-03T00:00:00Z' }],
   pointsEvents: [{ id: 'e1', eventType: 'guide_published', points: 50, createdAt: '2026-06-06T00:00:00Z' }],
   content: [{ id: 'g1', title: 'Best ramen', slug: 'best-ramen', status: 'published', savesCount: 12, publishedAt: '2026-06-07T00:00:00Z', createdAt: '2026-06-06T00:00:00Z' }],
@@ -40,6 +40,7 @@ describe('Creator detail tabs', () => {
   it('MissionsTab lists missions', () => {
     render(<MissionsTab t={t} missions={detail.missions} />)
     expect(screen.getByText('Tokyo eats')).toBeTruthy()
+    expect(screen.getByText('1/3')).toBeTruthy()
   })
   it('MissionsTab shows empty state', () => {
     render(<MissionsTab t={t} missions={[]} />)
