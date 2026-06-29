@@ -2,8 +2,8 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import en from '@/lib/i18n/messages/en'
-import { KpiCard } from '@/components/kinnso/admin/creators/KpiCard'
-import { TrendChart } from '@/components/kinnso/admin/creators/TrendChart'
+import { KpiCard } from '@/components/kinnso/admin/KpiCard'
+import { TrendChart } from '@/components/kinnso/admin/TrendChart'
 import { Leaderboard } from '@/components/kinnso/admin/creators/Leaderboard'
 
 afterEach(cleanup)
