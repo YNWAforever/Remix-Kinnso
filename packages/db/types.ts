@@ -1613,6 +1613,10 @@ export type Database = {
         Args: { p_mission_id: string }
         Returns: undefined
       }
+      admin_merchant_analytics: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
       admin_creator_analytics: {
         Args: { p_days?: number }
         Returns: Json
