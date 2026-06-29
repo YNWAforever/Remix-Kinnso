@@ -3,6 +3,9 @@
 -- is_active_ops() so non-ops are rejected at the DB boundary. Read-only (no audit).
 -- Heuristics (documented + tunable here):
 --   missions_live        = missions with status='published'
+--   settlements_pending  = overall settlement lifecycle count (status pending/partially_paid);
+--                          intentionally DISTINCT from the creator-payout `owed` leg below
+--                          (a settlement can be overall paid yet still owe the creator, or vice versa).
 --   owed / settled       = mission_settlements creator-payout leg, grouped by currency
 --                          (never summed across currencies)
 --   at_risk reasons:
@@ -78,6 +81,10 @@ begin
       select jsonb_agg(jsonb_build_object(
         'id', r.id, 'company_name', r.company_name, 'reason', r.reason))
       from (
+        -- The WHERE below admits a merchant via EITHER the settlement branch OR the
+        -- growth-idle branch; the CASE arm order encodes reason priority and MUST keep
+        -- the settlement reasons (disputed, pending_overdue) ahead of the growth_idle
+        -- fallback, so a merchant flagged for a settlement is never mislabeled growth_idle.
         select mp.id, mp.company_name,
           case
             when exists (

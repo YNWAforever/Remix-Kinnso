@@ -41,14 +41,19 @@ All functions: `SECURITY DEFINER`, first statement raises `forbidden` (SQLSTATE 
 | 11C | `admin_merchant_detail` | `(p_merchant_id uuid) returns jsonb` | One 360 payload (see §6). Returns `null` when missing → `notFound()`. Read-only. |
 
 ### 4.1 `admin_merchant_analytics` payload
+Status/tier counts use **nested maps** (`by_status` / `by_tier`), mirroring the proven Creators
+`admin_creator_analytics` — this auto-handles any future status/tier bucket without a code change.
 ```
-kpis: { total, active, paused, suspended, archived, free, growth, new_in_period,
-        missions_live, settlements_pending_count,
-        owed: [{currency, amount}], settled: [{currency, amount}] }
-signups:        [{ day, count }]                 // merchant_profiles.created_at, p_days window
+kpis: { total,
+        by_status: { active, paused, suspended, archived },   // nested map, coalesced to {}
+        by_tier:   { free, growth },                          // nested map, coalesced to {}
+        new_in_period, new_prev_period,
+        missions_live, settlements_pending,                   // settlements_pending = lifecycle count
+        owed: [{currency, amount}], settled: [{currency, amount}] }  // creator-payout leg, per-currency
+signups:         [{ day, count }]                // merchant_profiles.created_at, p_days window
 missions_created:[{ day, count }]                // missions.created_at, p_days window
-leaderboard:    [{ id, company_name, tier, missions_count, creators_engaged }]  // top N by missions_count
-at_risk:        [{ id, company_name, reason }]   // reasons below
+leaderboard:     [{ id, company_name, tier, missions_count, creators_engaged }]  // top N by missions_count
+at_risk:         [{ id, company_name, reason }]  // reason ∈ {disputed, pending_overdue, growth_idle}
 ```
 **At-risk heuristics (defined once in SQL, tunable):** (a) `tier='growth'` with 0 live missions ("paying-but-idle"); (b) any settlement in `disputed`; (c) a settlement `pending` older than 30 days. Each row carries a machine `reason` key the UI localizes.
 
