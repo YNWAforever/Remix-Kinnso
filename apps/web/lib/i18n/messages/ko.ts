@@ -755,6 +755,16 @@ const messages: Messages = {
     bulkApply: '선택 항목에 적용', bulkSelected: '선택됨', bulkChooseAction: '작업 선택',
     actionFailed: '작업에 실패했습니다. 다시 시도하세요.',
     tabOverview: '개요', tabDirectory: '디렉터리',
+    detailBack: '디렉터리로 돌아가기', detailJoined: '가입일', detailUpdated: '업데이트', detailBio: '소개', detailNoBio: '소개 없음',
+    tabProfile: '프로필 및 DNA', tabMissions: '미션', tabEarnings: '수익', tabContent: '콘텐츠', tabModeration: '모더레이션',
+    secDna: '크리에이터 DNA', secScan: '최근 스캔', secSocials: '소셜 계정', secContribution: '기여',
+    dnaNoData: '아직 DNA가 없습니다', scanNoData: '아직 스캔이 없습니다', socialsNoData: '소셜 계정이 없습니다',
+    scanStatus: '상태', scanError: '오류', scanCompleted: '완료일',
+    colMission: '미션', colStatus: '상태', colSource: '출처', colMilestones: '마일스톤', missionsNoData: '아직 미션이 없습니다',
+    colAmount: '금액', colPayout: '지급', colSettlement: '정산', settlementsNoData: '아직 정산이 없습니다',
+    pointsHistory: '포인트 기록', colEvent: '이벤트', colPoints: '포인트', pointsNoData: '아직 포인트 활동이 없습니다', totalPoints: '총 포인트',
+    colTitle: '제목', colSaves: '저장 수', colStatusContent: '상태', contentNoData: '아직 콘텐츠가 없습니다',
+    secAudit: '모더레이션 기록', auditNoData: '아직 모더레이션 활동이 없습니다', addNote: '메모 추가', saveNote: '메모 저장',
   },
   perks: {
     catalog: {

@@ -45,6 +45,11 @@ describe('CreatorsDirectoryView', () => {
     expect(screen.getByText('lee')).toBeTruthy()
     expect(screen.getByText(en.creators.statusBanned)).toBeTruthy()
   })
+  it('links each creator name to its 360 detail page', () => {
+    renderView()
+    const link = screen.getByRole('link', { name: 'Mia' })
+    expect(link.getAttribute('href')).toBe('/en/admin/creators/c1')
+  })
   it('shows Suspend for an active creator and requires a reason before calling the action', async () => {
     renderView()
     fireEvent.click(screen.getByRole('button', { name: `${en.creators.actSuspend} Mia` }))
