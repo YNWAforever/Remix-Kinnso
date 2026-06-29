@@ -9,6 +9,7 @@ export function CreatorsTabs({ t, locale }: { t: Messages['creators']; locale: L
   const tabs = [
     { href: `/${locale}/admin/creators`, label: t.tabOverview },
     { href: `/${locale}/admin/creators/directory`, label: t.tabDirectory },
+    { href: `/${locale}/admin/creators/payouts`, label: t.tabPayouts },
   ]
   return (
     <nav className="mb-6 flex gap-2 border-b border-kinnso-line">

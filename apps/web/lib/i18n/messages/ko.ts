@@ -765,6 +765,15 @@ const messages: Messages = {
     pointsHistory: '포인트 기록', colEvent: '이벤트', colPoints: '포인트', pointsNoData: '아직 포인트 활동이 없습니다', totalPoints: '총 포인트',
     colTitle: '제목', colSaves: '저장 수', colStatusContent: '상태', contentNoData: '아직 콘텐츠가 없습니다',
     secAudit: '모더레이션 기록', auditNoData: '아직 모더레이션 활동이 없습니다', addNote: '메모 추가', saveNote: '메모 저장',
+    tabPayouts: '지급',
+    payoutsQueue: '정산', payoutsOwed: '크리에이터 미지급액', payoutsSettled: '크리에이터 지급 완료액',
+    setNotStarted: '시작 안 함', setPending: '대기 중', setPartiallyPaid: '부분 지급', setPaid: '지급 완료', setDisputed: '분쟁',
+    colOpsNote: '운영 메모',
+    actMarkPaid: '지급 완료 표시', actMarkDisputed: '분쟁 표시',
+    confirmMarkPaid: '이 정산을 전액 지급 완료로 표시할까요? 크리에이터 지급으로 기록됩니다.',
+    confirmMarkDisputed: '이 정산을 분쟁으로 표시할까요?',
+    payoutsEmpty: '이 필터와 일치하는 정산이 없습니다',
+    reasonRequired: '사유를 입력해 주세요.',
   },
   perks: {
     catalog: {

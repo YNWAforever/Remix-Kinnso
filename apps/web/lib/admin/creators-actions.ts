@@ -2,10 +2,11 @@ import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireOpsAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
-import { isCreatorStatus, validateReason, validateBulkIds, type CreatorStatus } from '@/lib/admin/creators-validation'
+import { isCreatorStatus, validateReason, validateBulkIds, isSettlementStatus, isLegStatus, type CreatorStatus, type SettlementStatus, type LegStatus } from '@/lib/admin/creators-validation'
 import type { Locale } from '@/lib/i18n/config'
 
 const dirPath = (locale: Locale) => `/${locale}/admin/creators/directory`
+const payoutsPath = (locale: Locale) => `/${locale}/admin/creators/payouts`
 
 /** DB raise-message → friendly copy. The RPCs raise these bare messages. */
 const FRIENDLY: Record<string, string> = {
@@ -17,6 +18,8 @@ const FRIENDLY: Record<string, string> = {
   not_found: 'That creator no longer exists. Refresh and try again.',
   not_banned: 'Only a banned creator can be reinstated.',
   bad_bulk: 'Select between 1 and 100 creators.',
+  bad_leg_status: 'Invalid payout status.',
+  no_change: 'Nothing to change — pick a different status.',
 }
 
 const mapError = (message: string, fallback: string): string => {
@@ -105,4 +108,45 @@ export async function bulkSetCreatorStatus(
   const { data, error } = await supabase.rpc('admin_bulk_set_creator_status', { p_ids: ids, p_status: status, p_reason: reason.trim() })
   if (error) return formError(mapError(error.message, 'Bulk update failed'))
   return { ok: true, count: Number(data ?? 0) }
+}
+
+export interface SettlementStatusInput {
+  status?: SettlementStatus
+  creatorPayoutStatus?: LegStatus
+  kinnsoCommissionStatus?: LegStatus
+  affiliateCommissionStatus?: LegStatus
+  allowRevert?: boolean
+}
+
+export async function setSettlementStatus(
+  locale: Locale, id: string, input: SettlementStatusInput, reason: string,
+): Promise<ActionResult<{ id: string }>> {
+  'use server'
+  const supabase = await createSupabaseServerClient()
+  const gate = await requireOpsAction(supabase)
+  if (!gate.ok) return gate
+
+  if (input.status !== undefined && !isSettlementStatus(input.status)) return formError(FRIENDLY.bad_status)
+  for (const leg of [input.creatorPayoutStatus, input.kinnsoCommissionStatus, input.affiliateCommissionStatus]) {
+    if (leg !== undefined && !isLegStatus(leg)) return formError(FRIENDLY.bad_leg_status)
+  }
+  if (input.status === undefined && input.creatorPayoutStatus === undefined
+      && input.kinnsoCommissionStatus === undefined && input.affiliateCommissionStatus === undefined) {
+    return formError(FRIENDLY.no_change)
+  }
+  const rErr = validateReason(reason)
+  if (rErr) return formError(FRIENDLY[rErr])
+
+  const { error } = await supabase.rpc('admin_set_settlement_status', {
+    p_id: id,
+    p_status: input.status ?? null,
+    p_creator_payout_status: input.creatorPayoutStatus ?? null,
+    p_kinnso_commission_status: input.kinnsoCommissionStatus ?? null,
+    p_affiliate_commission_status: input.affiliateCommissionStatus ?? null,
+    p_allow_revert: input.allowRevert ?? false,
+    p_reason: reason.trim(),
+  })
+  if (error) return formError(mapError(error.message, 'Settlement status could not be changed'))
+  revalidatePath(payoutsPath(locale))
+  return { ok: true, id }
 }

@@ -6,7 +6,53 @@ vi.mock('@/lib/admin/audit', () => ({
   ]),
 }))
 
-import { getCreatorsOverview } from '@/lib/admin/creators-queries'
+import { getCreatorsOverview, getSettlementsQueue } from '@/lib/admin/creators-queries'
+
+function fakeSettlements(rows: unknown[], error: unknown = null) {
+  return {
+    from: () => ({ select: () => ({ order: () => Promise.resolve({ data: rows, error }) }) }),
+  } as never
+}
+
+const SETTLEMENT_ROWS = [
+  { id: 's1', status: 'pending', creator_payout_status: 'pending', kinnso_commission_status: 'pending',
+    affiliate_commission_status: null, amount_currency: 'USD', creator_commission_amount: 100,
+    kinnso_commission_amount: 10, affiliate_commission_amount: null, paid_fee_amount: null, ops_note: null,
+    missions: { id: 'm1', title: 'Mission One' }, mission_participants: { id: 'p1', creator_id: 'c1', status: 'active' } },
+  { id: 's2', status: 'paid', creator_payout_status: 'paid', kinnso_commission_status: 'paid',
+    affiliate_commission_status: 'paid', amount_currency: 'USD', creator_commission_amount: 50,
+    kinnso_commission_amount: 5, affiliate_commission_amount: 5, paid_fee_amount: null, ops_note: 'done',
+    missions: { id: 'm2', title: 'Mission Two' }, mission_participants: { id: 'p2', creator_id: 'c2', status: 'completed' } },
+  { id: 's3', status: 'disputed', creator_payout_status: 'pending', kinnso_commission_status: null,
+    affiliate_commission_status: null, amount_currency: 'HKD', creator_commission_amount: 80,
+    kinnso_commission_amount: null, affiliate_commission_amount: null, paid_fee_amount: null, ops_note: null,
+    missions: { id: 'm3', title: 'Mission Three' }, mission_participants: null },
+]
+
+describe('getSettlementsQueue', () => {
+  it('maps rows and groups by status with honest per-currency money flow', async () => {
+    const q = await getSettlementsQueue(fakeSettlements(SETTLEMENT_ROWS), {})
+    expect(q.rows).toHaveLength(3)
+    expect(q.rows[0]).toMatchObject({ id: 's1', missionTitle: 'Mission One', creatorId: 'c1', status: 'pending', creatorPayoutStatus: 'pending', creatorCommissionAmount: 100, currency: 'USD' })
+    expect(q.summary.total).toBe(3)
+    expect(q.summary.byStatus).toMatchObject({ pending: 1, paid: 1, disputed: 1 })
+    expect(q.summary.owed).toEqual(expect.arrayContaining([{ currency: 'USD', amount: 100 }, { currency: 'HKD', amount: 80 }]))
+    expect(q.summary.settled).toEqual([{ currency: 'USD', amount: 50 }])
+  })
+  it('filters returned rows by overall status while the summary stays full-queue', async () => {
+    const q = await getSettlementsQueue(fakeSettlements(SETTLEMENT_ROWS), { status: 'disputed' })
+    expect(q.rows.map((r) => r.id)).toEqual(['s3'])
+    expect(q.summary.total).toBe(3)
+  })
+  it('propagates query errors (never swallows to empty)', async () => {
+    await expect(getSettlementsQueue(fakeSettlements(null as never, { message: 'boom' }), {})).rejects.toBeTruthy()
+  })
+  it('returns honest zeros on an empty queue', async () => {
+    const q = await getSettlementsQueue(fakeSettlements([]), {})
+    expect(q.rows).toEqual([])
+    expect(q.summary).toMatchObject({ total: 0, byStatus: {}, owed: [], settled: [] })
+  })
+})
 
 const analytics = {
   kpis: { total: 12, by_status: { onboarding: 2, active: 8, suspended: 2 }, new_in_period: 3, new_prev_period: 1, payouts_pending: 4 },

@@ -13,6 +13,7 @@ vi.mock('@/lib/admin/guard', () => ({ requireOpsAction: gateMock }))
 
 import {
   setCreatorStatus, reinstateCreator, setCreatorVerified, addCreatorNote, bulkSetCreatorStatus,
+  setSettlementStatus,
 } from '@/lib/admin/creators-actions'
 
 beforeEach(() => {
@@ -97,6 +98,52 @@ describe('bulkSetCreatorStatus', () => {
   })
   it('rejects an empty id list (no RPC call)', async () => {
     const res = await bulkSetCreatorStatus('en', [], 'banned', 'x')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('setSettlementStatus', () => {
+  it('calls admin_set_settlement_status and revalidates on success', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: null })
+    const res = await setSettlementStatus('en', 'set-1', { status: 'paid', creatorPayoutStatus: 'paid' }, 'invoice cleared')
+    expect(res).toEqual({ ok: true, id: 'set-1' })
+    expect(rpcMock).toHaveBeenCalledWith('admin_set_settlement_status', {
+      p_id: 'set-1', p_status: 'paid', p_creator_payout_status: 'paid',
+      p_kinnso_commission_status: null, p_affiliate_commission_status: null,
+      p_allow_revert: false, p_reason: 'invoice cleared',
+    })
+    expect(revalidateMock).toHaveBeenCalled()
+  })
+  it('requires a reason (no RPC call)', async () => {
+    const res = await setSettlementStatus('en', 'set-1', { status: 'paid' }, '   ')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+  it('rejects when no field is provided (no RPC call)', async () => {
+    const res = await setSettlementStatus('en', 'set-1', {}, 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+  it('rejects an invalid overall status without hitting the DB', async () => {
+    const res = await setSettlementStatus('en', 'set-1', { status: 'refunded' as never }, 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+  it('rejects an invalid leg status without hitting the DB', async () => {
+    const res = await setSettlementStatus('en', 'set-1', { creatorPayoutStatus: 'partially_paid' as never }, 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+  it('maps a bad_transition DB raise to friendly copy', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'bad_transition' } })
+    const res = await setSettlementStatus('en', 'set-1', { status: 'pending' }, 'reason')
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.errors.form?.[0]).toMatch(/transition|cannot/i)
+  })
+  it('returns the gate failure for a non-ops caller', async () => {
+    gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } })
+    const res = await setSettlementStatus('en', 'set-1', { status: 'paid' }, 'reason')
     expect(res.ok).toBe(false)
     expect(rpcMock).not.toHaveBeenCalled()
   })

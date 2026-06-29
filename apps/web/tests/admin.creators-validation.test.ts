@@ -1,8 +1,26 @@
 import { describe, it, expect } from 'vitest'
 import {
   isCreatorStatus, validateReason, validateBulkIds, normalizeDirectoryParams,
+  isSettlementStatus, isLegStatus,
   type CreatorStatus,
 } from '@/lib/admin/creators-validation'
+
+describe('settlement validation guards', () => {
+  it('accepts every overall settlement status', () => {
+    for (const s of ['not_started', 'pending', 'partially_paid', 'paid', 'disputed']) {
+      expect(isSettlementStatus(s)).toBe(true)
+    }
+  })
+  it('rejects unknown overall statuses', () => {
+    expect(isSettlementStatus('refunded')).toBe(false)
+    expect(isSettlementStatus('')).toBe(false)
+  })
+  it('accepts only pending/paid leg statuses', () => {
+    expect(isLegStatus('pending')).toBe(true)
+    expect(isLegStatus('paid')).toBe(true)
+    expect(isLegStatus('partially_paid')).toBe(false)
+  })
+})
 
 describe('isCreatorStatus', () => {
   it('accepts the four lifecycle states', () => {
