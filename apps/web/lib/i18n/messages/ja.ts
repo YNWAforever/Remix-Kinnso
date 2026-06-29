@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
@@ -774,6 +774,17 @@ const messages: Messages = {
     confirmMarkDisputed: 'この精算を異議ありとしてフラグしますか？',
     payoutsEmpty: 'このフィルターに一致する精算はありません',
     reasonRequired: '理由を入力してください。',
+  },
+  merchantsOps: {
+    title: 'マーチャント', subtitle: 'マーチャントを把握・管理・分析します。',
+    tabOverview: '概要', tabDirectory: 'ディレクトリ',
+    kpiTotal: 'マーチャント総数', kpiActive: 'アクティブ', kpiPaused: '一時停止', kpiSuspended: '停止中', kpiArchived: 'アーカイブ済み',
+    kpiFree: 'フリープラン', kpiGrowth: 'グロースプラン', kpiNew: '今期の新規', kpiMissionsLive: '公開中のミッション', kpiSettlementsPending: '精算待ち',
+    trendSignups: 'マーチャント登録', trendMissions: '作成されたミッション', trendEmpty: 'この期間のデータはありません',
+    leaderboardTitle: 'トップマーチャント', leaderboardEmpty: 'まだマーチャントがいません', lbMissions: '件のミッション', lbCreators: '人のクリエイター',
+    atRiskTitle: 'リスクのあるマーチャント', atRiskEmpty: 'リスクのあるマーチャントはいません',
+    reasonGrowthIdle: 'グロースプランだが公開中のミッションなし', reasonDisputed: '精算に異議あり', reasonPendingOverdue: '精算が期限超過',
+    activityTitle: '最近のモデレーション活動', activityEmpty: 'モデレーション活動はまだありません',
   },
   perks: {
     catalog: {

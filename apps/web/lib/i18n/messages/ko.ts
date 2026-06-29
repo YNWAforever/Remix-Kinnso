@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
@@ -774,6 +774,17 @@ const messages: Messages = {
     confirmMarkDisputed: '이 정산을 분쟁으로 표시할까요?',
     payoutsEmpty: '이 필터와 일치하는 정산이 없습니다',
     reasonRequired: '사유를 입력해 주세요.',
+  },
+  merchantsOps: {
+    title: '머천트', subtitle: '머천트를 파악, 관리, 분석하세요.',
+    tabOverview: '개요', tabDirectory: '디렉터리',
+    kpiTotal: '전체 머천트', kpiActive: '활성', kpiPaused: '일시중지', kpiSuspended: '정지됨', kpiArchived: '보관됨',
+    kpiFree: '무료 등급', kpiGrowth: '그로스 등급', kpiNew: '이번 기간 신규', kpiMissionsLive: '진행 중 미션', kpiSettlementsPending: '정산 대기',
+    trendSignups: '머천트 가입', trendMissions: '생성된 미션', trendEmpty: '이 기간에 데이터가 없습니다',
+    leaderboardTitle: '상위 머천트', leaderboardEmpty: '아직 머천트가 없습니다', lbMissions: '개 미션', lbCreators: '명 크리에이터',
+    atRiskTitle: '위험 머천트', atRiskEmpty: '위험 머천트가 없습니다',
+    reasonGrowthIdle: '그로스 등급이지만 진행 중 미션 없음', reasonDisputed: '정산 분쟁', reasonPendingOverdue: '정산 기한 초과',
+    activityTitle: '최근 모더레이션 활동', activityEmpty: '아직 모더레이션 활동이 없습니다',
   },
   perks: {
     catalog: {

@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
@@ -774,6 +774,17 @@ const messages: Messages = {
     confirmMarkDisputed: 'ทำเครื่องหมายการชำระเงินนี้ว่ามีข้อพิพาทหรือไม่?',
     payoutsEmpty: 'ไม่มีการชำระเงินที่ตรงกับตัวกรองนี้',
     reasonRequired: 'ต้องระบุเหตุผล',
+  },
+  merchantsOps: {
+    title: 'ร้านค้า', subtitle: 'ทำความเข้าใจ ดูแล และวิเคราะห์ร้านค้าของคุณ',
+    tabOverview: 'ภาพรวม', tabDirectory: 'ไดเรกทอรี',
+    kpiTotal: 'ร้านค้าทั้งหมด', kpiActive: 'ใช้งาน', kpiPaused: 'หยุดชั่วคราว', kpiSuspended: 'ถูกระงับ', kpiArchived: 'เก็บถาวร',
+    kpiFree: 'แพ็กเกจฟรี', kpiGrowth: 'แพ็กเกจ Growth', kpiNew: 'ใหม่ในช่วงนี้', kpiMissionsLive: 'ภารกิจที่เผยแพร่', kpiSettlementsPending: 'รอการชำระ',
+    trendSignups: 'การสมัครร้านค้า', trendMissions: 'ภารกิจที่สร้าง', trendEmpty: 'ไม่มีข้อมูลในช่วงนี้',
+    leaderboardTitle: 'ร้านค้ายอดนิยม', leaderboardEmpty: 'ยังไม่มีร้านค้า', lbMissions: 'ภารกิจ', lbCreators: 'ครีเอเตอร์',
+    atRiskTitle: 'ร้านค้าเสี่ยง', atRiskEmpty: 'ไม่มีร้านค้าเสี่ยง',
+    reasonGrowthIdle: 'แพ็กเกจ Growth แต่ไม่มีภารกิจที่เผยแพร่', reasonDisputed: 'การชำระมีข้อพิพาท', reasonPendingOverdue: 'การชำระเกินกำหนด',
+    activityTitle: 'กิจกรรมการกลั่นกรองล่าสุด', activityEmpty: 'ยังไม่มีกิจกรรมการกลั่นกรอง',
   },
   perks: {
     catalog: {
