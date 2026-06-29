@@ -618,7 +618,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -663,6 +663,17 @@ export interface Messages {
     confirmMarkPaid: string; confirmMarkDisputed: string
     payoutsEmpty: string
     reasonRequired: string
+  }
+  merchantsOps: {
+    title: string; subtitle: string
+    tabOverview: string; tabDirectory: string
+    kpiTotal: string; kpiActive: string; kpiPaused: string; kpiSuspended: string; kpiArchived: string
+    kpiFree: string; kpiGrowth: string; kpiNew: string; kpiMissionsLive: string; kpiSettlementsPending: string
+    trendSignups: string; trendMissions: string; trendEmpty: string
+    leaderboardTitle: string; leaderboardEmpty: string; lbMissions: string; lbCreators: string
+    atRiskTitle: string; atRiskEmpty: string
+    reasonGrowthIdle: string; reasonDisputed: string; reasonPendingOverdue: string
+    activityTitle: string; activityEmpty: string
   }
   perks: {
     catalog: {
@@ -1500,7 +1511,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -1548,6 +1559,18 @@ const messages: Messages = {
     confirmMarkDisputed: 'Flag this settlement as disputed?',
     payoutsEmpty: 'No settlements match this filter',
     reasonRequired: 'A reason is required.',
+  },
+  merchantsOps: {
+    title: 'Merchants',
+    subtitle: 'Understand, moderate, and analyze your merchants.',
+    tabOverview: 'Overview', tabDirectory: 'Directory',
+    kpiTotal: 'Total merchants', kpiActive: 'Active', kpiPaused: 'Paused', kpiSuspended: 'Suspended', kpiArchived: 'Archived',
+    kpiFree: 'Free tier', kpiGrowth: 'Growth tier', kpiNew: 'New this period', kpiMissionsLive: 'Live missions', kpiSettlementsPending: 'Settlements pending',
+    trendSignups: 'Merchant signups', trendMissions: 'Missions created', trendEmpty: 'No data in this period',
+    leaderboardTitle: 'Top merchants', leaderboardEmpty: 'No merchants yet', lbMissions: 'missions', lbCreators: 'creators',
+    atRiskTitle: 'At-risk merchants', atRiskEmpty: 'No at-risk merchants',
+    reasonGrowthIdle: 'Growth tier, no live missions', reasonDisputed: 'Disputed settlement', reasonPendingOverdue: 'Settlement overdue',
+    activityTitle: 'Recent moderation activity', activityEmpty: 'No moderation activity yet',
   },
   perks: {
     catalog: {

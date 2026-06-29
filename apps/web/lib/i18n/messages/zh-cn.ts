@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
   admin: {
-    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者',
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
@@ -774,6 +774,17 @@ const messages: Messages = {
     confirmMarkDisputed: '将此结算标记为争议？',
     payoutsEmpty: '没有符合此筛选的结算',
     reasonRequired: '需要填写原因。',
+  },
+  merchantsOps: {
+    title: '商家', subtitle: '了解、管理和分析你的商家。',
+    tabOverview: '概览', tabDirectory: '商家目录',
+    kpiTotal: '商家总数', kpiActive: '活跃', kpiPaused: '已暂停', kpiSuspended: '已封禁', kpiArchived: '已归档',
+    kpiFree: '免费方案', kpiGrowth: '成长方案', kpiNew: '本期新增', kpiMissionsLive: '进行中任务', kpiSettlementsPending: '待结算',
+    trendSignups: '商家注册', trendMissions: '已创建任务', trendEmpty: '此期间没有数据',
+    leaderboardTitle: '顶级商家', leaderboardEmpty: '暂无商家', lbMissions: '个任务', lbCreators: '位创作者',
+    atRiskTitle: '高风险商家', atRiskEmpty: '没有高风险商家',
+    reasonGrowthIdle: '成长方案但无进行中任务', reasonDisputed: '结算有争议', reasonPendingOverdue: '结算逾期',
+    activityTitle: '近期审核活动', activityEmpty: '暂无审核活动',
   },
   perks: {
     catalog: {

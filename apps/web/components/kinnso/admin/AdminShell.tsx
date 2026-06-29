@@ -10,6 +10,7 @@ export function AdminShell({ locale, t, children }: { locale: Locale; t: Message
   const nav = [
     { href: `/${locale}/admin`, label: t.navDashboard },
     { href: `/${locale}/admin/creators`, label: t.navCreators },
+    { href: `/${locale}/admin/merchants`, label: t.navMerchants },
     { href: `/${locale}/admin/perks`, label: t.navPerks },
     { href: `/${locale}/admin/users`, label: t.navUsers },
   ]

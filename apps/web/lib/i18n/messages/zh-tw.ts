@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
     statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
     statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
@@ -774,6 +774,17 @@ const messages: Messages = {
     confirmMarkDisputed: '將此結算標記為爭議？',
     payoutsEmpty: '沒有符合此篩選的結算',
     reasonRequired: '需要填寫原因。',
+  },
+  merchantsOps: {
+    title: '商家', subtitle: '了解、管理及分析您的商家。',
+    tabOverview: '總覽', tabDirectory: '商家目錄',
+    kpiTotal: '商家總數', kpiActive: '使用中', kpiPaused: '已暫停', kpiSuspended: '已停權', kpiArchived: '已封存',
+    kpiFree: '免費方案', kpiGrowth: '成長方案', kpiNew: '本期新增', kpiMissionsLive: '進行中任務', kpiSettlementsPending: '待結算',
+    trendSignups: '商家註冊', trendMissions: '已建立任務', trendEmpty: '此期間沒有資料',
+    leaderboardTitle: '頂尖商家', leaderboardEmpty: '尚無商家', lbMissions: '個任務', lbCreators: '位創作者',
+    atRiskTitle: '高風險商家', atRiskEmpty: '沒有高風險商家',
+    reasonGrowthIdle: '成長方案但無進行中任務', reasonDisputed: '結算有爭議', reasonPendingOverdue: '結算逾期',
+    activityTitle: '近期審核活動', activityEmpty: '尚無審核活動',
   },
   perks: {
     catalog: {
