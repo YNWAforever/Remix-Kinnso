@@ -795,6 +795,16 @@ const messages: Messages = {
     confirmArchive: '이 머천트를 보관하시겠습니까? 해당 미션에 영향을 줍니다.',
     bulkApply: '선택 항목에 적용', bulkSelected: '선택됨', bulkChooseAction: '상태 선택',
     actionFailed: '작업에 실패했습니다. 다시 시도하세요.',
+    detailBack: '디렉터리로 돌아가기', detailJoined: '가입일', detailUpdated: '업데이트',
+    tabProfile: '프로필', tabMissions: '미션', tabCreators: '크리에이터', tabBilling: '결제', tabModeration: '모더레이션',
+    secContact: '연락처', secWebsite: '웹사이트', contactName: '담당자', contactEmail: '연락처 이메일', noContact: '연락처 정보 없음',
+    colMission: '미션', colVisibility: '공개 범위', colParticipants: '참여자', colMilestones: '마일스톤', missionsEmpty: '아직 미션이 없습니다',
+    secEngaged: '참여 크리에이터', secSaved: '저장된 크리에이터', colCreator: '크리에이터', colHandle: '핸들', colParticipantStatus: '상태',
+    creatorsEmpty: '아직 참여 크리에이터가 없습니다', savedCount: '저장됨',
+    billingReadonly: '읽기 전용 — 정산 기록은 지급 대기열에서 처리됩니다.', colSettlement: '정산', colPayout: '지급', colKinnso: 'KINNSO', colAffiliate: '제휴',
+    colAmount: '금액', colCurrency: '통화', settlementsEmpty: '아직 정산이 없습니다', owedTitle: '미지급', settledTitle: '정산됨', moneyEmpty: '없음',
+    secAudit: '모더레이션 기록', auditEmpty: '아직 모더레이션 활동이 없습니다', addNote: '메모 추가', saveNote: '메모 저장',
+    viewDetail: '360 보기',
   },
   perks: {
     catalog: {
@@ -838,6 +848,7 @@ const messages: Messages = {
     tierLabel: '등급',
     tierFree: 'Free',
     tierGrowth: 'Growth',
+    manageInConsole: '콘솔에서 관리',
   },
   merchantSearch: {
     heading: '크리에이터 찾기',

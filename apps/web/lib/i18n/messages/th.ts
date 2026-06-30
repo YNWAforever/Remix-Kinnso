@@ -795,6 +795,16 @@ const messages: Messages = {
     confirmArchive: 'เก็บถาวรร้านค้านี้? ภารกิจของร้านจะได้รับผลกระทบ',
     bulkApply: 'ใช้กับรายการที่เลือก', bulkSelected: 'เลือกแล้ว', bulkChooseAction: 'เลือกสถานะ',
     actionFailed: 'การดำเนินการล้มเหลว โปรดลองอีกครั้ง',
+    detailBack: 'กลับไปยังไดเรกทอรี', detailJoined: 'เข้าร่วมเมื่อ', detailUpdated: 'อัปเดตเมื่อ',
+    tabProfile: 'โปรไฟล์', tabMissions: 'ภารกิจ', tabCreators: 'ครีเอเตอร์', tabBilling: 'การเรียกเก็บเงิน', tabModeration: 'การกำกับดูแล',
+    secContact: 'ติดต่อ', secWebsite: 'เว็บไซต์', contactName: 'ชื่อผู้ติดต่อ', contactEmail: 'อีเมลติดต่อ', noContact: 'ไม่มีข้อมูลติดต่อ',
+    colMission: 'ภารกิจ', colVisibility: 'การมองเห็น', colParticipants: 'ผู้เข้าร่วม', colMilestones: 'เหตุการณ์สำคัญ', missionsEmpty: 'ยังไม่มีภารกิจ',
+    secEngaged: 'ครีเอเตอร์ที่เข้าร่วม', secSaved: 'ครีเอเตอร์ที่บันทึก', colCreator: 'ครีเอเตอร์', colHandle: 'แฮนเดิล', colParticipantStatus: 'สถานะ',
+    creatorsEmpty: 'ยังไม่มีครีเอเตอร์ที่เข้าร่วม', savedCount: 'บันทึกแล้ว',
+    billingReadonly: 'อ่านอย่างเดียว — การบันทึกการชำระบัญชีทำในคิวการจ่าย', colSettlement: 'การชำระบัญชี', colPayout: 'การจ่าย', colKinnso: 'KINNSO', colAffiliate: 'พันธมิตร',
+    colAmount: 'จำนวนเงิน', colCurrency: 'สกุลเงิน', settlementsEmpty: 'ยังไม่มีการชำระบัญชี', owedTitle: 'ค้างจ่าย', settledTitle: 'ชำระแล้ว', moneyEmpty: 'ไม่มี',
+    secAudit: 'ประวัติการกำกับดูแล', auditEmpty: 'ยังไม่มีกิจกรรมการกำกับดูแล', addNote: 'เพิ่มบันทึก', saveNote: 'บันทึกหมายเหตุ',
+    viewDetail: 'ดู 360',
   },
   perks: {
     catalog: {
@@ -838,6 +848,7 @@ const messages: Messages = {
     tierLabel: 'ระดับ',
     tierFree: 'Free',
     tierGrowth: 'Growth',
+    manageInConsole: 'จัดการในคอนโซล',
   },
   merchantSearch: {
     heading: 'ค้นหาครีเอเตอร์',

@@ -4,9 +4,8 @@ import { requireOpsAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 import type { Locale } from '@/lib/i18n/config'
 
-export type UserKind = 'creator' | 'merchant' | 'ops'
+export type UserKind = 'creator' | 'ops'
 export type UserStatus = 'active' | 'suspended'
-export type MerchantTier = 'free' | 'growth'
 
 /** DB raise-message → friendly copy. The setter raises these bare messages. */
 const FRIENDLY: Record<string, string> = {
@@ -15,7 +14,6 @@ const FRIENDLY: Record<string, string> = {
   forbidden: 'Active ops access is required.',
   bad_status: 'Invalid status.',
   bad_kind: 'Invalid user type.',
-  bad_tier: 'Invalid tier.',
   not_found: 'That user no longer exists. Refresh and try again.',
 }
 
@@ -29,7 +27,7 @@ export async function setUserStatusAction(
   const supabase = await createSupabaseServerClient()
   const gate = await requireOpsAction(supabase)
   if (!gate.ok) return gate
-  if (kind !== 'creator' && kind !== 'merchant' && kind !== 'ops') return formError(FRIENDLY.bad_kind)
+  if (kind !== 'creator' && kind !== 'ops') return formError(FRIENDLY.bad_kind)
   if (status !== 'active' && status !== 'suspended') return formError(FRIENDLY.bad_status)
 
   const { error } = await supabase.rpc('admin_set_user_status', { p_kind: kind, p_id: id, p_status: status })
@@ -39,24 +37,4 @@ export async function setUserStatusAction(
   }
   revalidatePath(`/${locale}/admin/users`)
   return { ok: true, id, status }
-}
-
-export async function setMerchantTierAction(
-  locale: Locale,
-  id: string,
-  tier: MerchantTier,
-): Promise<ActionResult<{ id: string; tier: MerchantTier }>> {
-  'use server'
-  const supabase = await createSupabaseServerClient()
-  const gate = await requireOpsAction(supabase)
-  if (!gate.ok) return gate
-  if (tier !== 'free' && tier !== 'growth') return formError(FRIENDLY.bad_tier)
-
-  const { error } = await supabase.rpc('admin_set_merchant_tier', { p_id: id, p_tier: tier })
-  if (error) {
-    const key = Object.keys(FRIENDLY).find((k) => error.message.includes(k))
-    return formError(key ? FRIENDLY[key] : 'Merchant tier could not be changed')
-  }
-  revalidatePath(`/${locale}/admin/users`)
-  return { ok: true, id, tier }
 }

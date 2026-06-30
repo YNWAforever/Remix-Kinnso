@@ -795,6 +795,16 @@ const messages: Messages = {
     confirmArchive: 'このマーチャントをアーカイブしますか？ミッションに影響します。',
     bulkApply: '選択した項目に適用', bulkSelected: '件選択中', bulkChooseAction: 'ステータスを選択',
     actionFailed: '操作に失敗しました。もう一度お試しください。',
+    detailBack: 'ディレクトリへ戻る', detailJoined: '参加日', detailUpdated: '更新日',
+    tabProfile: 'プロフィール', tabMissions: 'ミッション', tabCreators: 'クリエイター', tabBilling: '請求', tabModeration: 'モデレーション',
+    secContact: '連絡先', secWebsite: 'ウェブサイト', contactName: '担当者名', contactEmail: '連絡先メール', noContact: '連絡先情報なし',
+    colMission: 'ミッション', colVisibility: '公開範囲', colParticipants: '参加者', colMilestones: 'マイルストーン', missionsEmpty: 'ミッションはまだありません',
+    secEngaged: '参加クリエイター', secSaved: '保存済みクリエイター', colCreator: 'クリエイター', colHandle: 'ハンドル', colParticipantStatus: 'ステータス',
+    creatorsEmpty: '参加クリエイターはまだいません', savedCount: '保存済み',
+    billingReadonly: '読み取り専用 — 精算の書き込みは支払いキューで行います。', colSettlement: '精算', colPayout: '支払い', colKinnso: 'KINNSO', colAffiliate: 'アフィリエイト',
+    colAmount: '金額', colCurrency: '通貨', settlementsEmpty: '精算はまだありません', owedTitle: '未払い', settledTitle: '精算済み', moneyEmpty: 'なし',
+    secAudit: 'モデレーション履歴', auditEmpty: 'モデレーション活動はまだありません', addNote: 'メモを追加', saveNote: 'メモを保存',
+    viewDetail: '360 を表示',
   },
   perks: {
     catalog: {
@@ -838,6 +848,7 @@ const messages: Messages = {
     tierLabel: 'ティア',
     tierFree: 'フリー',
     tierGrowth: 'グロース',
+    manageInConsole: 'コンソールで管理',
   },
   merchantSearch: {
     heading: 'クリエイターを探す',

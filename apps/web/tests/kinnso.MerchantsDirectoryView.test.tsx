@@ -26,4 +26,9 @@ describe('MerchantsDirectoryView', () => {
     render(<MerchantsDirectoryView {...props} directory={{ rows: [], nextCursor: null }} />)
     expect(screen.getByText(en.merchantsOps.dirEmpty)).toBeTruthy()
   })
+  it('links each company name to its 360 detail page', () => {
+    render(<MerchantsDirectoryView {...props} />)
+    const link = screen.getByRole('link', { name: 'Acme Co' })
+    expect(link.getAttribute('href')).toBe('/en/admin/merchants/m1')
+  })
 })

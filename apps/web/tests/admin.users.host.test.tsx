@@ -35,10 +35,11 @@ describe('admin users page host', () => {
     render(ui)
     expect(screen.getByText('Ada')).toBeTruthy()
   })
-  it('renders a tier control on merchant rows (page threads onSetMerchantTier)', async () => {
+  it('renders the merchant row as a link to its 360 (no inline tier control)', async () => {
     const ui = await AdminUsersPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
-    const select = screen.getByLabelText('Tier Klook') as HTMLSelectElement
-    expect(select.value).toBe('free')
+    const link = screen.getByRole('link', { name: 'Klook' })
+    expect(link.getAttribute('href')).toBe('/en/admin/merchants/m1')
+    expect(screen.queryByLabelText('Tier Klook')).toBeNull()
   })
 })

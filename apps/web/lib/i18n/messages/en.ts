@@ -684,6 +684,16 @@ export interface Messages {
     confirmArchive: string
     bulkApply: string; bulkSelected: string; bulkChooseAction: string
     actionFailed: string
+    detailBack: string; detailJoined: string; detailUpdated: string
+    tabProfile: string; tabMissions: string; tabCreators: string; tabBilling: string; tabModeration: string
+    secContact: string; secWebsite: string; contactName: string; contactEmail: string; noContact: string
+    colMission: string; colVisibility: string; colParticipants: string; colMilestones: string; missionsEmpty: string
+    secEngaged: string; secSaved: string; colCreator: string; colHandle: string; colParticipantStatus: string
+    creatorsEmpty: string; savedCount: string
+    billingReadonly: string; colSettlement: string; colPayout: string; colKinnso: string; colAffiliate: string
+    colAmount: string; colCurrency: string; settlementsEmpty: string; owedTitle: string; settledTitle: string; moneyEmpty: string
+    secAudit: string; auditEmpty: string; addNote: string; saveNote: string
+    viewDetail: string
   }
   perks: {
     catalog: {
@@ -713,6 +723,7 @@ export interface Messages {
     statusOnboarding: string; statusPaused: string; statusArchived: string
     errorGeneric: string
     tierLabel: string; tierFree: string; tierGrowth: string
+    manageInConsole: string
   }
   merchantSearch: {
     heading: string
@@ -1591,6 +1602,16 @@ const messages: Messages = {
     confirmArchive: 'Archive this merchant? Their missions are affected.',
     bulkApply: 'Apply to selected', bulkSelected: 'selected', bulkChooseAction: 'Choose a status',
     actionFailed: 'Action failed. Try again.',
+    detailBack: 'Back to directory', detailJoined: 'Joined', detailUpdated: 'Updated',
+    tabProfile: 'Profile', tabMissions: 'Missions', tabCreators: 'Creators', tabBilling: 'Billing', tabModeration: 'Moderation',
+    secContact: 'Contact', secWebsite: 'Website', contactName: 'Contact name', contactEmail: 'Contact email', noContact: 'No contact on file',
+    colMission: 'Mission', colVisibility: 'Visibility', colParticipants: 'Participants', colMilestones: 'Milestones', missionsEmpty: 'No missions yet',
+    secEngaged: 'Engaged creators', secSaved: 'Saved creators', colCreator: 'Creator', colHandle: 'Handle', colParticipantStatus: 'Status',
+    creatorsEmpty: 'No engaged creators yet', savedCount: 'saved',
+    billingReadonly: 'Read-only — settlement writes happen in the Payouts queue.', colSettlement: 'Settlement', colPayout: 'Payout', colKinnso: 'KINNSO', colAffiliate: 'Affiliate',
+    colAmount: 'Amount', colCurrency: 'Currency', settlementsEmpty: 'No settlements yet', owedTitle: 'Owed', settledTitle: 'Settled', moneyEmpty: 'None',
+    secAudit: 'Moderation history', auditEmpty: 'No moderation activity yet', addNote: 'Add a note', saveNote: 'Save note',
+    viewDetail: 'View 360',
   },
   perks: {
     catalog: {
@@ -1634,6 +1655,7 @@ const messages: Messages = {
     tierLabel: 'Tier',
     tierFree: 'Free',
     tierGrowth: 'Growth',
+    manageInConsole: 'Manage in console',
   },
   merchantSearch: {
     heading: 'Find creators',

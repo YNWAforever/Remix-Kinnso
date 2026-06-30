@@ -16,36 +16,34 @@ const users: AdminUsers = {
   ops: [{ id: 'o1', user_id: 'u1', display_name: 'Opsy', status: 'active', created_at: '2026-01-01T00:00:00Z' }],
 }
 const ok = async (_k: unknown, id: string, status: 'active' | 'suspended') => ({ ok: true as const, id, status })
-const okTier = async (id: string, tier: 'free' | 'growth') => ({ ok: true as const, id, tier })
 
 describe('AdminUsersView', () => {
   it('lists all three sections', () => {
-    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={ok} onSetMerchantTier={okTier} />)
+    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={ok} />)
     expect(screen.getByText('Ada')).toBeTruthy()
     expect(screen.getByText('Klook')).toBeTruthy()
     expect(screen.getByText('Opsy')).toBeTruthy()
   })
   it('suspends an active row (its button flips to Activate) and reconciles via router.refresh', async () => {
     refreshMock.mockClear()
-    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={ok} onSetMerchantTier={okTier} />)
+    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={ok} />)
     fireEvent.click(screen.getAllByText(en.users.suspend)[0]) // creator
     await waitFor(() => expect(screen.getAllByText(en.users.activate).length).toBeGreaterThan(0))
     expect(refreshMock).toHaveBeenCalled()
   })
   it('shows the guard error when a suspend fails', async () => {
     const fail = async () => ({ ok: false as const, errors: { form: ['You cannot suspend the last active ops member.'] } })
-    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={fail} onSetMerchantTier={okTier} />)
-    fireEvent.click(screen.getAllByText(en.users.suspend)[2]) // ops row
+    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={fail} />)
+    fireEvent.click(screen.getAllByText(en.users.suspend)[1]) // ops row (no merchant toggle now)
     await waitFor(() => expect(screen.getByText(/last active ops/i)).toBeTruthy())
   })
-  it('changing a merchant tier control calls onSetMerchantTier', async () => {
-    refreshMock.mockClear()
-    const spy = vi.fn(okTier)
-    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={ok} onSetMerchantTier={spy} />)
-    const select = screen.getByLabelText(`${en.users.tierLabel} Klook`) as HTMLSelectElement
-    expect(select.value).toBe('free')
-    fireEvent.change(select, { target: { value: 'growth' } })
-    await waitFor(() => expect(spy).toHaveBeenCalledWith('m1', 'growth'))
-    expect(refreshMock).toHaveBeenCalled()
+  it('renders the merchant row as a link to its 360 and exposes no inline merchant mutation', () => {
+    render(<AdminUsersView t={en.users} locale="en" users={users} onSetStatus={ok} />)
+    const link = screen.getByRole('link', { name: 'Klook' })
+    expect(link.getAttribute('href')).toBe('/en/admin/merchants/m1')
+    // no tier select for the merchant row
+    expect(screen.queryByLabelText(`${en.users.tierLabel} Klook`)).toBeNull()
+    // the merchant row exposes no Suspend/Activate button
+    expect(link.closest('button')).toBeNull()
   })
 })
