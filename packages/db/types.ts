@@ -1617,6 +1617,10 @@ export type Database = {
         Args: { p_days?: number }
         Returns: Json
       }
+      admin_merchant_detail: {
+        Args: { p_merchant_id: string }
+        Returns: Json
+      }
       admin_creator_analytics: {
         Args: { p_days?: number }
         Returns: Json
@@ -1737,7 +1741,7 @@ export type Database = {
         Returns: undefined
       }
       admin_set_merchant_tier: {
-        Args: { p_id: string; p_tier: string; p_reason?: string }
+        Args: { p_id: string; p_tier: string; p_reason: string }
         Returns: undefined
       }
       admin_add_merchant_note: {

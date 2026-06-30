@@ -795,6 +795,16 @@ const messages: Messages = {
     confirmArchive: '归档此商家？其任务将受影响。',
     bulkApply: '应用到已选', bulkSelected: '已选', bulkChooseAction: '选择状态',
     actionFailed: '操作失败，请重试。',
+    detailBack: '返回目录', detailJoined: '加入于', detailUpdated: '更新于',
+    tabProfile: '资料', tabMissions: '任务', tabCreators: '创作者', tabBilling: '账务', tabModeration: '审核',
+    secContact: '联系', secWebsite: '网站', contactName: '联系人', contactEmail: '联系邮箱', noContact: '暂无联系资料',
+    colMission: '任务', colVisibility: '可见度', colParticipants: '参与者', colMilestones: '里程碑', missionsEmpty: '暂无任务',
+    secEngaged: '参与创作者', secSaved: '已收藏创作者', colCreator: '创作者', colHandle: '账号', colParticipantStatus: '状态',
+    creatorsEmpty: '暂无参与创作者', savedCount: '已收藏',
+    billingReadonly: '只读 — 结算写入在支付队列进行。', colSettlement: '结算', colPayout: '支付', colKinnso: 'KINNSO', colAffiliate: '联盟',
+    colAmount: '金额', colCurrency: '货币', settlementsEmpty: '暂无结算', owedTitle: '应付', settledTitle: '已结算', moneyEmpty: '无',
+    secAudit: '审核记录', auditEmpty: '暂无审核活动', addNote: '添加备注', saveNote: '保存备注',
+    viewDetail: '查看 360',
   },
   perks: {
     catalog: {
@@ -838,6 +848,7 @@ const messages: Messages = {
     tierLabel: '等级',
     tierFree: 'Free',
     tierGrowth: 'Growth',
+    manageInConsole: '前往控制台管理',
   },
   merchantSearch: {
     heading: '寻找创作者',

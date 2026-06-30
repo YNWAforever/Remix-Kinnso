@@ -115,3 +115,111 @@ export async function getMerchantsOverview(supabase: Client, days = 30): Promise
     recentActivity,
   }
 }
+
+export interface MerchantDetailProfile {
+  id: string
+  companyName: string
+  contactName: string | null
+  contactEmail: string | null
+  websiteUrl: string | null
+  status: string
+  tier: string
+  createdAt: string
+  updatedAt: string
+}
+export interface MerchantDetailMission {
+  id: string
+  title: string
+  status: string
+  visibility: string | null
+  participantsCount: number
+  milestonesTotal: number
+  milestonesApproved: number
+  createdAt: string
+}
+export interface MerchantDetailEngagedCreator {
+  creatorId: string
+  displayName: string | null
+  handle: string | null
+  participantStatus: string
+}
+export interface MerchantDetailSettlement {
+  id: string
+  missionTitle: string
+  status: string
+  creatorPayoutStatus: string | null
+  kinnsoCommissionStatus: string | null
+  affiliateCommissionStatus: string | null
+  currency: string | null
+  creatorPayoutAmount: number | null
+  updatedAt: string
+}
+export interface MerchantDetailMoney { currency: string; amount: number }
+
+export interface MerchantDetail {
+  profile: MerchantDetailProfile
+  missions: MerchantDetailMission[]
+  creators: { engaged: MerchantDetailEngagedCreator[]; savedCount: number }
+  billing: {
+    settlements: MerchantDetailSettlement[]
+    owed: MerchantDetailMoney[]
+    settled: MerchantDetailMoney[]
+  }
+}
+
+type DetailPayload = {
+  profile: { id: string; company_name: string; contact_name: string | null; contact_email: string | null; website_url: string | null; status: string; tier: string; created_at: string; updated_at: string }
+  missions: { id: string; title: string; status: string; visibility: string | null; participants_count: number; milestones_total: number; milestones_approved: number; created_at: string }[]
+  creators: { engaged: { creator_id: string; display_name: string | null; handle: string | null; participant_status: string }[]; saved_count: number }
+  billing: {
+    settlements: { id: string; mission_title: string; status: string; creator_payout_status: string | null; kinnso_commission_status: string | null; affiliate_commission_status: string | null; currency: string | null; creator_payout_amount: number | null; updated_at: string }[]
+    owed: { currency: string; amount: number }[]
+    settled: { currency: string; amount: number }[]
+  }
+}
+
+/**
+ * Full ops-aggregate 360 for one merchant. Single SECURITY DEFINER RPC
+ * (`admin_merchant_detail`, is_active_ops()-gated) so ops sees all sections despite
+ * owner-scoped RLS, including ops-only contact PII. Returns null when the merchant id
+ * does not exist (page -> notFound()). Billing is READ-ONLY; owed/settled stay per-currency
+ * (never summed). Audit history is fetched separately by the page via listAudit(). Errors propagate.
+ */
+export async function getMerchantDetail(supabase: Client, merchantId: string): Promise<MerchantDetail | null> {
+  const { data, error } = await supabase.rpc('admin_merchant_detail', { p_merchant_id: merchantId })
+  if (error) throw error
+  if (!data) return null
+  const p = data as unknown as DetailPayload
+  return {
+    profile: {
+      id: p.profile.id, companyName: p.profile.company_name,
+      contactName: p.profile.contact_name, contactEmail: p.profile.contact_email,
+      websiteUrl: p.profile.website_url, status: p.profile.status, tier: p.profile.tier,
+      createdAt: p.profile.created_at, updatedAt: p.profile.updated_at,
+    },
+    missions: (p.missions ?? []).map((m) => ({
+      id: m.id, title: m.title, status: m.status, visibility: m.visibility,
+      participantsCount: Number(m.participants_count), milestonesTotal: Number(m.milestones_total),
+      milestonesApproved: Number(m.milestones_approved), createdAt: m.created_at,
+    })),
+    creators: {
+      engaged: (p.creators?.engaged ?? []).map((e) => ({
+        creatorId: e.creator_id, displayName: e.display_name, handle: e.handle, participantStatus: e.participant_status,
+      })),
+      savedCount: Number(p.creators?.saved_count ?? 0),
+    },
+    billing: {
+      settlements: (p.billing?.settlements ?? []).map((s) => ({
+        id: s.id, missionTitle: s.mission_title, status: s.status,
+        creatorPayoutStatus: s.creator_payout_status,
+        kinnsoCommissionStatus: s.kinnso_commission_status,
+        affiliateCommissionStatus: s.affiliate_commission_status,
+        currency: s.currency,
+        creatorPayoutAmount: s.creator_payout_amount === null ? null : Number(s.creator_payout_amount),
+        updatedAt: s.updated_at,
+      })),
+      owed: (p.billing?.owed ?? []).map((o) => ({ currency: o.currency, amount: Number(o.amount) })),
+      settled: (p.billing?.settled ?? []).map((s) => ({ currency: s.currency, amount: Number(s.amount) })),
+    },
+  }
+}

@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
@@ -163,7 +164,11 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
                     checked={checked.has(row.id)}
                     onChange={(e) => setChecked((s) => { const n = new Set(s); if (e.target.checked) n.add(row.id); else n.delete(row.id); return n })} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold text-kinnso-ink">{row.companyName}</p>
+                    <p className="font-bold">
+                      <Link href={`/${locale}/admin/merchants/${row.id}`} className="text-kinnso-ink hover:text-kinnso-orange hover:underline">
+                        {row.companyName}
+                      </Link>
+                    </p>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                       <MerchantStatusBadge status={row.status} t={t} />
                       <MerchantTierBadge tier={row.tier} t={t} />

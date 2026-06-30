@@ -795,6 +795,16 @@ const messages: Messages = {
     confirmArchive: '封存此商戶？其任務將受影響。',
     bulkApply: '套用至已選', bulkSelected: '已選', bulkChooseAction: '選擇狀態',
     actionFailed: '操作失敗，請重試。',
+    detailBack: '返回目錄', detailJoined: '加入於', detailUpdated: '更新於',
+    tabProfile: '檔案', tabMissions: '任務', tabCreators: '創作者', tabBilling: '帳務', tabModeration: '審核',
+    secContact: '聯絡', secWebsite: '網站', contactName: '聯絡人', contactEmail: '聯絡電郵', noContact: '沒有聯絡資料',
+    colMission: '任務', colVisibility: '可見度', colParticipants: '參與者', colMilestones: '里程碑', missionsEmpty: '尚無任務',
+    secEngaged: '參與創作者', secSaved: '已收藏創作者', colCreator: '創作者', colHandle: '帳號', colParticipantStatus: '狀態',
+    creatorsEmpty: '尚無參與創作者', savedCount: '已收藏',
+    billingReadonly: '唯讀 — 結算寫入於派付佇列進行。', colSettlement: '結算', colPayout: '派付', colKinnso: 'KINNSO', colAffiliate: '聯盟',
+    colAmount: '金額', colCurrency: '貨幣', settlementsEmpty: '尚無結算', owedTitle: '應付', settledTitle: '已結算', moneyEmpty: '無',
+    secAudit: '審核紀錄', auditEmpty: '尚無審核活動', addNote: '新增備註', saveNote: '儲存備註',
+    viewDetail: '查看 360',
   },
   perks: {
     catalog: {
@@ -838,6 +848,7 @@ const messages: Messages = {
     tierLabel: '等級',
     tierFree: 'Free',
     tierGrowth: 'Growth',
+    manageInConsole: '前往控制台管理',
   },
   merchantSearch: {
     heading: '尋找創作者',
