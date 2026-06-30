@@ -674,6 +674,16 @@ export interface Messages {
     atRiskTitle: string; atRiskEmpty: string
     reasonGrowthIdle: string; reasonDisputed: string; reasonPendingOverdue: string
     activityTitle: string; activityEmpty: string
+    dirSearch: string; dirStatus: string; dirTier: string; dirAll: string
+    dirLoadMore: string; dirEmpty: string
+    colName: string; colStatus: string; colTier: string; colJoined: string; colActions: string
+    statusActive: string; statusPaused: string; statusSuspended: string; statusArchived: string
+    tierFree: string; tierGrowth: string
+    actSetStatus: string; actSetTier: string; actNote: string; actApply: string; actCancel: string
+    reasonPlaceholder: string; notePlaceholder: string
+    confirmArchive: string
+    bulkApply: string; bulkSelected: string; bulkChooseAction: string
+    actionFailed: string
   }
   perks: {
     catalog: {
@@ -1571,6 +1581,16 @@ const messages: Messages = {
     atRiskTitle: 'At-risk merchants', atRiskEmpty: 'No at-risk merchants',
     reasonGrowthIdle: 'Growth tier, no live missions', reasonDisputed: 'Disputed settlement', reasonPendingOverdue: 'Settlement overdue',
     activityTitle: 'Recent moderation activity', activityEmpty: 'No moderation activity yet',
+    dirSearch: 'Search company name', dirStatus: 'Status', dirTier: 'Tier', dirAll: 'All',
+    dirLoadMore: 'Next page', dirEmpty: 'No merchants match your filters',
+    colName: 'Merchant', colStatus: 'Status', colTier: 'Tier', colJoined: 'Joined', colActions: 'Actions',
+    statusActive: 'Active', statusPaused: 'Paused', statusSuspended: 'Suspended', statusArchived: 'Archived',
+    tierFree: 'Free', tierGrowth: 'Growth',
+    actSetStatus: 'Set status', actSetTier: 'Set tier', actNote: 'Add note', actApply: 'Apply', actCancel: 'Cancel',
+    reasonPlaceholder: 'Reason (required)', notePlaceholder: 'Note (required)',
+    confirmArchive: 'Archive this merchant? Their missions are affected.',
+    bulkApply: 'Apply to selected', bulkSelected: 'selected', bulkChooseAction: 'Choose a status',
+    actionFailed: 'Action failed. Try again.',
   },
   perks: {
     catalog: {

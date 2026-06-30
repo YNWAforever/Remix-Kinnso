@@ -4,6 +4,48 @@ import { listRecentAudit, type AuditEntry } from '@/lib/admin/audit'
 
 type Client = SupabaseClient<Database>
 
+export interface MerchantDirectoryRow {
+  id: string
+  companyName: string
+  status: string
+  tier: string
+  createdAt: string
+}
+export interface MerchantsDirectory {
+  rows: MerchantDirectoryRow[]
+  nextCursor: { createdAt: string; id: string } | null
+}
+export interface ListMerchantsParams {
+  search?: string
+  statuses?: string[]
+  tiers?: string[]
+  limit?: number
+  cursor?: { createdAt: string; id: string } | null
+}
+
+type SearchRow = { id: string; company_name: string; status: string; tier: string; created_at: string }
+
+/** Ops-aggregate merchant directory via SECURITY DEFINER admin_search_merchants (keyset).
+ *  Fetches limit+1 to derive nextCursor, then trims. Errors propagate. */
+export async function listMerchantsDirectory(supabase: Client, params: ListMerchantsParams): Promise<MerchantsDirectory> {
+  const limit = Math.min(Math.max(params.limit ?? 25, 1), 100)
+  const { data, error } = await supabase.rpc('admin_search_merchants', {
+    p_search: params.search ?? null,
+    p_statuses: params.statuses ?? null,
+    p_tiers: params.tiers ?? null,
+    p_limit: limit + 1,
+    p_cursor_created_at: params.cursor?.createdAt ?? null,
+    p_cursor_id: params.cursor?.id ?? null,
+  })
+  if (error) throw error
+  const all = ((data ?? []) as unknown as SearchRow[]).map((r) => ({
+    id: r.id, companyName: r.company_name, status: r.status, tier: r.tier, createdAt: r.created_at,
+  }))
+  const rows = all.slice(0, limit)
+  const nextCursor = all.length > limit ? { createdAt: rows[rows.length - 1].createdAt, id: rows[rows.length - 1].id } : null
+  return { rows, nextCursor }
+}
+
 export interface MerchantsOverview {
   kpis: {
     total: number

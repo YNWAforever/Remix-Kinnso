@@ -1732,9 +1732,38 @@ export type Database = {
           redemptions: number
         }[]
       }
-      admin_set_merchant_tier: {
-        Args: { p_id: string; p_tier: string }
+      admin_set_merchant_status: {
+        Args: { p_id: string; p_status: string; p_reason: string }
         Returns: undefined
+      }
+      admin_set_merchant_tier: {
+        Args: { p_id: string; p_tier: string; p_reason?: string }
+        Returns: undefined
+      }
+      admin_add_merchant_note: {
+        Args: { p_id: string; p_note: string }
+        Returns: undefined
+      }
+      admin_bulk_set_merchant_status: {
+        Args: { p_ids: string[]; p_status: string; p_reason: string }
+        Returns: number
+      }
+      admin_search_merchants: {
+        Args: {
+          p_search?: string | null
+          p_statuses?: string[] | null
+          p_tiers?: string[] | null
+          p_limit?: number | null
+          p_cursor_created_at?: string | null
+          p_cursor_id?: string | null
+        }
+        Returns: {
+          id: string
+          company_name: string
+          status: string
+          tier: string
+          created_at: string
+        }[]
       }
       admin_set_user_status: {
         Args: { p_id: string; p_kind: string; p_status: string }

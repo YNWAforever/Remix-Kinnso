@@ -785,6 +785,16 @@ const messages: Messages = {
     atRiskTitle: '위험 머천트', atRiskEmpty: '위험 머천트가 없습니다',
     reasonGrowthIdle: '그로스 등급이지만 진행 중 미션 없음', reasonDisputed: '정산 분쟁', reasonPendingOverdue: '정산 기한 초과',
     activityTitle: '최근 모더레이션 활동', activityEmpty: '아직 모더레이션 활동이 없습니다',
+    dirSearch: '회사명 검색', dirStatus: '상태', dirTier: '등급', dirAll: '전체',
+    dirLoadMore: '다음 페이지', dirEmpty: '필터 조건에 맞는 머천트가 없습니다',
+    colName: '머천트', colStatus: '상태', colTier: '등급', colJoined: '가입일', colActions: '작업',
+    statusActive: '활성', statusPaused: '일시중지', statusSuspended: '정지됨', statusArchived: '보관됨',
+    tierFree: '무료', tierGrowth: '그로스',
+    actSetStatus: '상태 설정', actSetTier: '등급 설정', actNote: '메모 추가', actApply: '적용', actCancel: '취소',
+    reasonPlaceholder: '사유(필수)', notePlaceholder: '메모(필수)',
+    confirmArchive: '이 머천트를 보관하시겠습니까? 해당 미션에 영향을 줍니다.',
+    bulkApply: '선택 항목에 적용', bulkSelected: '선택됨', bulkChooseAction: '상태 선택',
+    actionFailed: '작업에 실패했습니다. 다시 시도하세요.',
   },
   perks: {
     catalog: {
