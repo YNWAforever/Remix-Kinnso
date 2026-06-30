@@ -785,6 +785,16 @@ const messages: Messages = {
     atRiskTitle: '高风险商家', atRiskEmpty: '没有高风险商家',
     reasonGrowthIdle: '成长方案但无进行中任务', reasonDisputed: '结算有争议', reasonPendingOverdue: '结算逾期',
     activityTitle: '近期审核活动', activityEmpty: '暂无审核活动',
+    dirSearch: '搜索公司名称', dirStatus: '状态', dirTier: '方案', dirAll: '全部',
+    dirLoadMore: '下一页', dirEmpty: '没有符合筛选条件的商家',
+    colName: '商家', colStatus: '状态', colTier: '方案', colJoined: '加入日期', colActions: '操作',
+    statusActive: '活跃', statusPaused: '已暂停', statusSuspended: '已封禁', statusArchived: '已归档',
+    tierFree: '免费', tierGrowth: '成长',
+    actSetStatus: '设置状态', actSetTier: '设置方案', actNote: '添加备注', actApply: '应用', actCancel: '取消',
+    reasonPlaceholder: '原因（必填）', notePlaceholder: '备注（必填）',
+    confirmArchive: '归档此商家？其任务将受影响。',
+    bulkApply: '应用到已选', bulkSelected: '已选', bulkChooseAction: '选择状态',
+    actionFailed: '操作失败，请重试。',
   },
   perks: {
     catalog: {

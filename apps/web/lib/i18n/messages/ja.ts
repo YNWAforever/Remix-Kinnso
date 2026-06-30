@@ -785,6 +785,16 @@ const messages: Messages = {
     atRiskTitle: 'リスクのあるマーチャント', atRiskEmpty: 'リスクのあるマーチャントはいません',
     reasonGrowthIdle: 'グロースプランだが公開中のミッションなし', reasonDisputed: '精算に異議あり', reasonPendingOverdue: '精算が期限超過',
     activityTitle: '最近のモデレーション活動', activityEmpty: 'モデレーション活動はまだありません',
+    dirSearch: '会社名で検索', dirStatus: 'ステータス', dirTier: 'プラン', dirAll: 'すべて',
+    dirLoadMore: '次のページ', dirEmpty: '条件に一致するマーチャントがありません',
+    colName: 'マーチャント', colStatus: 'ステータス', colTier: 'プラン', colJoined: '登録日', colActions: '操作',
+    statusActive: 'アクティブ', statusPaused: '一時停止', statusSuspended: '停止中', statusArchived: 'アーカイブ済み',
+    tierFree: 'フリー', tierGrowth: 'グロース',
+    actSetStatus: 'ステータスを設定', actSetTier: 'プランを設定', actNote: 'メモを追加', actApply: '適用', actCancel: 'キャンセル',
+    reasonPlaceholder: '理由（必須）', notePlaceholder: 'メモ（必須）',
+    confirmArchive: 'このマーチャントをアーカイブしますか？ミッションに影響します。',
+    bulkApply: '選択した項目に適用', bulkSelected: '件選択中', bulkChooseAction: 'ステータスを選択',
+    actionFailed: '操作に失敗しました。もう一度お試しください。',
   },
   perks: {
     catalog: {

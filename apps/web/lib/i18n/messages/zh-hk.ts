@@ -785,6 +785,16 @@ const messages: Messages = {
     atRiskTitle: '高風險商戶', atRiskEmpty: '沒有高風險商戶',
     reasonGrowthIdle: '成長方案但無進行中任務', reasonDisputed: '結算有爭議', reasonPendingOverdue: '結算逾期',
     activityTitle: '近期審核活動', activityEmpty: '暫無審核活動',
+    dirSearch: '搜尋公司名稱', dirStatus: '狀態', dirTier: '方案', dirAll: '全部',
+    dirLoadMore: '下一頁', dirEmpty: '沒有符合篩選條件的商戶',
+    colName: '商戶', colStatus: '狀態', colTier: '方案', colJoined: '加入日期', colActions: '操作',
+    statusActive: '活躍', statusPaused: '已暫停', statusSuspended: '已停權', statusArchived: '已封存',
+    tierFree: '免費', tierGrowth: '成長',
+    actSetStatus: '設定狀態', actSetTier: '設定方案', actNote: '新增備註', actApply: '套用', actCancel: '取消',
+    reasonPlaceholder: '原因（必填）', notePlaceholder: '備註（必填）',
+    confirmArchive: '封存此商戶？其任務將受影響。',
+    bulkApply: '套用至已選', bulkSelected: '已選', bulkChooseAction: '選擇狀態',
+    actionFailed: '操作失敗，請重試。',
   },
   perks: {
     catalog: {

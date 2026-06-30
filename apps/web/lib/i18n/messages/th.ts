@@ -785,6 +785,16 @@ const messages: Messages = {
     atRiskTitle: 'ร้านค้าเสี่ยง', atRiskEmpty: 'ไม่มีร้านค้าเสี่ยง',
     reasonGrowthIdle: 'แพ็กเกจ Growth แต่ไม่มีภารกิจที่เผยแพร่', reasonDisputed: 'การชำระมีข้อพิพาท', reasonPendingOverdue: 'การชำระเกินกำหนด',
     activityTitle: 'กิจกรรมการกลั่นกรองล่าสุด', activityEmpty: 'ยังไม่มีกิจกรรมการกลั่นกรอง',
+    dirSearch: 'ค้นหาชื่อบริษัท', dirStatus: 'สถานะ', dirTier: 'แพ็กเกจ', dirAll: 'ทั้งหมด',
+    dirLoadMore: 'หน้าถัดไป', dirEmpty: 'ไม่มีร้านค้าที่ตรงกับตัวกรอง',
+    colName: 'ร้านค้า', colStatus: 'สถานะ', colTier: 'แพ็กเกจ', colJoined: 'วันที่เข้าร่วม', colActions: 'การดำเนินการ',
+    statusActive: 'ใช้งาน', statusPaused: 'หยุดชั่วคราว', statusSuspended: 'ถูกระงับ', statusArchived: 'เก็บถาวร',
+    tierFree: 'ฟรี', tierGrowth: 'Growth',
+    actSetStatus: 'ตั้งสถานะ', actSetTier: 'ตั้งแพ็กเกจ', actNote: 'เพิ่มหมายเหตุ', actApply: 'ใช้', actCancel: 'ยกเลิก',
+    reasonPlaceholder: 'เหตุผล (จำเป็น)', notePlaceholder: 'หมายเหตุ (จำเป็น)',
+    confirmArchive: 'เก็บถาวรร้านค้านี้? ภารกิจของร้านจะได้รับผลกระทบ',
+    bulkApply: 'ใช้กับรายการที่เลือก', bulkSelected: 'เลือกแล้ว', bulkChooseAction: 'เลือกสถานะ',
+    actionFailed: 'การดำเนินการล้มเหลว โปรดลองอีกครั้ง',
   },
   perks: {
     catalog: {
