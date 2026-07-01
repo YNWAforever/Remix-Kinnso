@@ -732,6 +732,13 @@ export interface Messages {
     statusActive: string; statusSuspended: string
     directoryTitle: string
     colName: string; colRole: string; colStatus: string; colJoined: string
+    invitePanelTitle: string; inviteEmailLabel: string; inviteRoleLabel: string
+    inviteGenerate: string; inviteCopied: string; inviteExpiry: string
+    actionSetRole: string; actionSuspend: string; actionReactivate: string
+    actionConfirm: string; actionCancel: string; reasonPlaceholder: string
+    acceptTitle: string; acceptLoading: string
+    acceptSuccess: string; acceptExpired: string
+    acceptEmailMismatch: string; acceptNotFound: string; acceptSignInPrompt: string
   }
   merchantSearch: {
     heading: string
@@ -1672,6 +1679,16 @@ const messages: Messages = {
     statusActive: 'Active', statusSuspended: 'Suspended',
     directoryTitle: 'Member directory',
     colName: 'Name', colRole: 'Role', colStatus: 'Status', colJoined: 'Joined',
+    invitePanelTitle: 'Invite a member', inviteEmailLabel: 'Email address', inviteRoleLabel: 'Role',
+    inviteGenerate: 'Generate invite link', inviteCopied: 'Copied!', inviteExpiry: 'Link expires in 7 days.',
+    actionSetRole: 'Change role', actionSuspend: 'Suspend', actionReactivate: 'Reactivate',
+    actionConfirm: 'Confirm', actionCancel: 'Cancel', reasonPlaceholder: 'Reason (required)',
+    acceptTitle: 'Accept invitation', acceptLoading: 'Accepting…',
+    acceptSuccess: 'You now have ops access. Go to the admin panel to get started.',
+    acceptExpired: 'This invite has expired or been revoked. Ask an owner for a new one.',
+    acceptEmailMismatch: 'This invite was sent to a different email address.',
+    acceptNotFound: 'Invite not found.',
+    acceptSignInPrompt: 'Sign in to accept this invitation.',
   },
   merchantSearch: {
     heading: 'Find creators',
