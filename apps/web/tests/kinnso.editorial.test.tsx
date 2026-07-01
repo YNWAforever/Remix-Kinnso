@@ -36,7 +36,8 @@ describe('editorial primitives (R1A)', () => {
 
   it('EditorialCard renders media slot, kicker, title, body and footer', () => {
     render(
-      <EditorialCard media={<span>MEDIA</span>} kicker="Tokyo" title="Night markets" footer={<a href="/x">Read</a>}>
+      // external href: @next/next/no-html-link-for-pages forbids raw <a> to app pages
+      <EditorialCard media={<span>MEDIA</span>} kicker="Tokyo" title="Night markets" footer={<a href="https://example.com/read">Read</a>}>
         Body copy
       </EditorialCard>,
     )
