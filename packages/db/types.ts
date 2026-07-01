@@ -1663,6 +1663,10 @@ export type Database = {
         Args: { p_merchant_id: string }
         Returns: Json
       }
+      admin_mission_analytics: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
       admin_creator_analytics: {
         Args: { p_days?: number }
         Returns: Json

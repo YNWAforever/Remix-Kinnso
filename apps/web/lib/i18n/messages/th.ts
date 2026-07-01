@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
@@ -805,6 +805,17 @@ const messages: Messages = {
     colAmount: 'จำนวนเงิน', colCurrency: 'สกุลเงิน', settlementsEmpty: 'ยังไม่มีการชำระบัญชี', owedTitle: 'ค้างจ่าย', settledTitle: 'ชำระแล้ว', moneyEmpty: 'ไม่มี',
     secAudit: 'ประวัติการกำกับดูแล', auditEmpty: 'ยังไม่มีกิจกรรมการกำกับดูแล', addNote: 'เพิ่มบันทึก', saveNote: 'บันทึกหมายเหตุ',
     viewDetail: 'ดู 360',
+  },
+  missionsOps: {
+    title: 'ภารกิจ', subtitle: 'ภารกิจของผู้ค้าทั้งหมดในแพลตฟอร์ม',
+    tabOverview: 'ภาพรวม', tabDirectory: 'ไดเรกทอรี',
+    kpiTotal: 'ภารกิจทั้งหมด', kpiPublished: 'เผยแพร่แล้ว', kpiDraft: 'ฉบับร่าง', kpiPaused: 'หยุดชั่วคราว',
+    kpiCompleted: 'เสร็จสิ้น', kpiCancelled: 'ยกเลิกแล้ว',
+    kpiOpenForApplications: 'เปิดรับสมัคร', kpiSubmissionsAwaitingReview: 'งานที่รอตรวจสอบ',
+    trendMissionsCreated: 'ภารกิจที่สร้างใหม่', trendSubmissionsReviewed: 'งานที่ตรวจสอบแล้ว', trendEmpty: 'ไม่มีข้อมูลในช่วงนี้',
+    atRiskTitle: 'มีความเสี่ยง', atRiskEmpty: 'ขณะนี้ไม่มีรายการที่มีความเสี่ยง',
+    reasonPublishedNoParticipants: 'เผยแพร่แล้วแต่ยังไม่มีผู้เข้าร่วม', reasonStalledSubmissions: 'งานส่งรอตรวจสอบเกิน 7 วัน',
+    reasonVerificationFailed: 'การตรวจสอบล้มเหลว',
   },
   perks: {
     catalog: {
