@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
@@ -849,6 +849,14 @@ const messages: Messages = {
     tierFree: 'Free',
     tierGrowth: 'Growth',
     manageInConsole: 'จัดการในคอนโซล',
+  },
+  team: {
+    overviewTitle: 'ทีม', overviewSubtitle: 'จัดการสมาชิกทีมปฏิบัติการและบทบาทของพวกเขา',
+    kpiMembers: 'สมาชิกทั้งหมด', kpiPending: 'คำเชิญที่รอดำเนินการ',
+    roleOwner: 'เจ้าของ', roleAdmin: 'ผู้ดูแลระบบ', roleModerator: 'ผู้ดูแล', roleAnalyst: 'นักวิเคราะห์',
+    statusActive: 'ใช้งานอยู่', statusSuspended: 'ถูกระงับ',
+    directoryTitle: 'ไดเรกทอรีสมาชิก',
+    colName: 'ชื่อ', colRole: 'บทบาท', colStatus: 'สถานะ', colJoined: 'เข้าร่วมเมื่อ',
   },
   merchantSearch: {
     heading: 'ค้นหาครีเอเตอร์',

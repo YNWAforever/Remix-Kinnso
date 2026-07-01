@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
@@ -849,6 +849,14 @@ const messages: Messages = {
     tierFree: 'フリー',
     tierGrowth: 'グロース',
     manageInConsole: 'コンソールで管理',
+  },
+  team: {
+    overviewTitle: 'チーム', overviewSubtitle: '運営チームメンバーとその役割を管理します。',
+    kpiMembers: 'メンバー総数', kpiPending: '保留中の招待',
+    roleOwner: 'オーナー', roleAdmin: '管理者', roleModerator: 'モデレーター', roleAnalyst: 'アナリスト',
+    statusActive: 'アクティブ', statusSuspended: '停止中',
+    directoryTitle: 'メンバーディレクトリ',
+    colName: '名前', colRole: '役割', colStatus: 'ステータス', colJoined: '参加日',
   },
   merchantSearch: {
     heading: 'クリエイターを探す',

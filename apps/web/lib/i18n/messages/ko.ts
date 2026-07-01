@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
@@ -849,6 +849,14 @@ const messages: Messages = {
     tierFree: 'Free',
     tierGrowth: 'Growth',
     manageInConsole: '콘솔에서 관리',
+  },
+  team: {
+    overviewTitle: '팀', overviewSubtitle: '운영 팀원과 역할을 관리합니다.',
+    kpiMembers: '총 멤버 수', kpiPending: '대기 중인 초대',
+    roleOwner: '소유자', roleAdmin: '관리자', roleModerator: '모더레이터', roleAnalyst: '분석가',
+    statusActive: '활성', statusSuspended: '정지됨',
+    directoryTitle: '멤버 디렉토리',
+    colName: '이름', colRole: '역할', colStatus: '상태', colJoined: '가입일',
   },
   merchantSearch: {
     heading: '크리에이터 찾기',

@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶', navCreators: '創作者', navMerchants: '商戶',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶', navCreators: '創作者', navMerchants: '商戶', navTeam: '團隊',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、用戶同平台內容。',
     statCreators: '創作者', statMerchants: '商戶', statOps: '營運成員',
     statPerksActive: '啟用中福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
@@ -849,6 +849,14 @@ const messages: Messages = {
     tierFree: 'Free',
     tierGrowth: 'Growth',
     manageInConsole: '前往控制台管理',
+  },
+  team: {
+    overviewTitle: '團隊', overviewSubtitle: '管理運營團隊成員及其角色。',
+    kpiMembers: '成員總數', kpiPending: '待處理邀請',
+    roleOwner: '擁有者', roleAdmin: '管理員', roleModerator: '協調員', roleAnalyst: '分析師',
+    statusActive: '活躍', statusSuspended: '已暫停',
+    directoryTitle: '成員目錄',
+    colName: '名稱', colRole: '角色', colStatus: '狀態', colJoined: '加入時間',
   },
   merchantSearch: {
     heading: '尋找創作者',

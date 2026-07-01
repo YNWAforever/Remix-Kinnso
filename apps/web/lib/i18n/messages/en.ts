@@ -618,7 +618,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -724,6 +724,14 @@ export interface Messages {
     errorGeneric: string
     tierLabel: string; tierFree: string; tierGrowth: string
     manageInConsole: string
+  }
+  team: {
+    overviewTitle: string; overviewSubtitle: string
+    kpiMembers: string; kpiPending: string
+    roleOwner: string; roleAdmin: string; roleModerator: string; roleAnalyst: string
+    statusActive: string; statusSuspended: string
+    directoryTitle: string
+    colName: string; colRole: string; colStatus: string; colJoined: string
   }
   merchantSearch: {
     heading: string
@@ -1532,7 +1540,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -1656,6 +1664,14 @@ const messages: Messages = {
     tierFree: 'Free',
     tierGrowth: 'Growth',
     manageInConsole: 'Manage in console',
+  },
+  team: {
+    overviewTitle: 'Team', overviewSubtitle: 'Manage ops team members and their roles.',
+    kpiMembers: 'Total members', kpiPending: 'Pending invites',
+    roleOwner: 'Owner', roleAdmin: 'Admin', roleModerator: 'Moderator', roleAnalyst: 'Analyst',
+    statusActive: 'Active', statusSuspended: 'Suspended',
+    directoryTitle: 'Member directory',
+    colName: 'Name', colRole: 'Role', colStatus: 'Status', colJoined: 'Joined',
   },
   merchantSearch: {
     heading: 'Find creators',
