@@ -13,6 +13,7 @@ export function AdminShell({ locale, t, children }: { locale: Locale; t: Message
     { href: `/${locale}/admin/merchants`, label: t.navMerchants },
     { href: `/${locale}/admin/perks`, label: t.navPerks },
     { href: `/${locale}/admin/users`, label: t.navUsers },
+    { href: `/${locale}/admin/team`, label: t.navTeam },
   ]
   return (
     <div className="k-container flex flex-col gap-6 py-8 md:flex-row">
