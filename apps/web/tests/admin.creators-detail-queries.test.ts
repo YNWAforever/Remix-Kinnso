@@ -46,6 +46,11 @@ describe('getCreatorDetail', () => {
     await expect(getCreatorDetail(supabase, 'c1')).rejects.toThrow('boom')
   })
 
+  it('propagates a forbidden error from an under-privileged caller (12C role gate)', async () => {
+    const supabase = clientReturning(null, { message: 'forbidden' })
+    await expect(getCreatorDetail(supabase, 'c1')).rejects.toMatchObject({ message: 'forbidden' })
+  })
+
   it('tolerates null optional sections', async () => {
     const supabase = clientReturning({ ...payload, contribution: null, dna: null, scan: null })
     const detail = await getCreatorDetail(supabase, 'c1')

@@ -45,6 +45,11 @@ describe('getMerchantDetail', () => {
     await expect(getMerchantDetail(supabase, 'm1')).rejects.toThrow('boom')
   })
 
+  it('propagates a forbidden error from an under-privileged caller (12C role gate)', async () => {
+    const supabase = clientReturning(null, { message: 'forbidden' })
+    await expect(getMerchantDetail(supabase, 'm1')).rejects.toMatchObject({ message: 'forbidden' })
+  })
+
   it('tolerates empty sections', async () => {
     const supabase = clientReturning({ ...payload, missions: [], creators: { engaged: [], saved_count: 0 }, billing: { settlements: [], owed: [], settled: [] } })
     const detail = await getMerchantDetail(supabase, 'm1')

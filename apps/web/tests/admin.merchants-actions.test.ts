@@ -54,3 +54,16 @@ describe('merchants-actions', () => {
     expect(res.ok).toBe(false); expect(rpcMock).not.toHaveBeenCalled()
   })
 })
+
+describe('role-gate (12C)', () => {
+  it('setMerchantStatus surfaces forbidden when the DB rejects an under-privileged caller (analyst)', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await setMerchantStatus('en', 'm1', 'suspended', 'reason')
+    expect(res.ok).toBe(false)
+  })
+  it('setMerchantTier surfaces forbidden when the DB rejects an under-privileged caller (analyst)', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await setMerchantTier('en', 'm1', 'growth', 'reason')
+    expect(res.ok).toBe(false)
+  })
+})
