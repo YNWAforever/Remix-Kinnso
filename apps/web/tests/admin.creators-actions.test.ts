@@ -148,3 +148,22 @@ describe('setSettlementStatus', () => {
     expect(rpcMock).not.toHaveBeenCalled()
   })
 })
+
+describe('role-gate (12C)', () => {
+  it('setCreatorStatus surfaces forbidden when the DB rejects an under-privileged caller', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await setCreatorStatus('en', 'c1', 'active', 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).toHaveBeenCalled()
+  })
+  it('setCreatorVerified surfaces forbidden when the DB rejects an under-privileged caller', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await setCreatorVerified('en', 'c1', true, 'reason')
+    expect(res.ok).toBe(false)
+  })
+  it('setSettlementStatus surfaces forbidden when a moderator (not admin) calls it', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await setSettlementStatus('en', 'set-1', { status: 'paid' }, 'reason')
+    expect(res.ok).toBe(false)
+  })
+})
