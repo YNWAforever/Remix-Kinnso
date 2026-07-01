@@ -69,6 +69,23 @@
   --k-blue:        211 60% 45%;
 }
 
+/* ------------------------------------------------------------------------- */
+/* R1A "editorial travel journal" tokens (kinnso2-*).                         */
+/* Added ALONGSIDE the legacy kinnso-* market-passport system so unmigrated   */
+/* pages keep rendering; the final R1C task deletes the legacy block.         */
+/* Grep "kinnso2" / "k2-" to find every new-system usage.                     */
+/* ------------------------------------------------------------------------- */
+@theme {
+  --color-kinnso2-paper: #FAF6EF; /* warm cream page background */
+  --color-kinnso2-ink: #26201A; /* deep warm brown-black text */
+  --color-kinnso2-clay: #B9482B; /* terracotta primary */
+  --color-kinnso2-clay-deep: #93361F; /* terracotta hover / pressed */
+  --color-kinnso2-sand: #E8DCC8; /* soft panel & chip background */
+  --color-kinnso2-moss: #4A5D43; /* sage accent */
+  --color-kinnso2-sun: #D99A2B; /* ochre highlight */
+  --color-kinnso2-line: #D8CDBB; /* hairline borders */
+}
+
 /* `shadow-kinnso` utility (redesign used a custom boxShadow). */
 @utility shadow-kinnso {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
