@@ -21,6 +21,12 @@ vi.mock('@/lib/admin/team-queries', () => ({
   getTeamMembers:  listMock,
   getTeamOverview: vi.fn(async () => ({ members: [{ id: 'm1', displayName: 'Alice', userId: 'u1', role: 'owner', status: 'active', joinedAt: '2026-01-01T00:00:00Z' }], byRole: { owner: 1, admin: 0, moderator: 0, analyst: 0 }, pendingInvites: 0 })),
 }))
+vi.mock('@/lib/admin/team-actions', () => ({
+  inviteMemberAction:     vi.fn(),
+  setMemberRoleAction:    vi.fn(),
+  suspendMemberAction:    vi.fn(),
+  reactivateMemberAction: vi.fn(),
+}))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }),
 }))
