@@ -86,11 +86,16 @@
   --color-kinnso2-sun: #D99A2B; /* ochre highlight */
   --color-kinnso2-line: #D8CDBB; /* hairline borders */
 
-  /* Editorial type. Serif applies to Latin (Fraunces); each CJK locale falls
-     back to its system serif so zh-hk/zh-tw/zh-cn/ja/ko headings stay elegant;
-     th has no meaningful serif tradition and falls through to `serif`. */
+  /* Editorial type. Fraunces covers Latin; CJK falls through the shared stack
+     below. Font matching is per-glyph and ignores lang, so the stack is
+     TC-first — correct for zh-hk/zh-tw, but on Apple platforms ja/ko text
+     matches the TC faces' kanji/hanja glyphs before Hiragino/Nanum is reached
+     (ja renders in Chinese glyph forms). Acceptable for R1A; revisit with
+     :lang() overrides if ja/ko typography matters later. Thai has no serif
+     tradition and falls to generic `serif`. On Windows, zh/ko coverage relies
+     on the generic fallback resolving per the html lang attribute. */
   --font-k2-display: var(--font-fraunces), 'Noto Serif TC', 'Songti TC', 'Noto Serif SC', 'Songti SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'Nanum Myeongjo', 'AppleMyungjo', serif;
-  --font-k2-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
+  --font-k2-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
 }
 
 /* `shadow-kinnso` utility (redesign used a custom boxShadow). */
