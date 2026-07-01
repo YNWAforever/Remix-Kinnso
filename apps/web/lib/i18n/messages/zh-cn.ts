@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
   admin: {
-    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家',
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
@@ -849,6 +849,14 @@ const messages: Messages = {
     tierFree: 'Free',
     tierGrowth: 'Growth',
     manageInConsole: '前往控制台管理',
+  },
+  team: {
+    overviewTitle: '团队', overviewSubtitle: '管理运营团队成员及其角色。',
+    kpiMembers: '成员总数', kpiPending: '待处理邀请',
+    roleOwner: '所有者', roleAdmin: '管理员', roleModerator: '协调员', roleAnalyst: '分析师',
+    statusActive: '活跃', statusSuspended: '已暂停',
+    directoryTitle: '成员目录',
+    colName: '名称', colRole: '角色', colStatus: '状态', colJoined: '加入时间',
   },
   merchantSearch: {
     heading: '寻找创作者',

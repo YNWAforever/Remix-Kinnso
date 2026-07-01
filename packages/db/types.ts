@@ -901,6 +901,7 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          role: string
           status: string
           updated_at: string
           user_id: string
@@ -909,6 +910,7 @@ export type Database = {
           created_at?: string
           display_name: string
           id?: string
+          role?: string
           status?: string
           updated_at?: string
           user_id: string
@@ -917,6 +919,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           id?: string
+          role?: string
           status?: string
           updated_at?: string
           user_id?: string
@@ -1724,6 +1727,10 @@ export type Database = {
           status: string
           user_id: string
         }[]
+      }
+      admin_list_ops_members: {
+        Args: Record<string, never>
+        Returns: Json
       }
       admin_overview_counts: {
         Args: never
