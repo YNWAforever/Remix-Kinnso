@@ -1,16 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 type RpcResult = { data: unknown; error: { message: string } | null }
-const { rpcMock } = vi.hoisted(() => ({
-  rpcMock: vi.fn(async (): Promise<RpcResult> => ({ data: null, error: null })),
+type CountResult = { count: number | null; error: { message: string } | null }
+const { rpcMock, fromMock } = vi.hoisted(() => ({
+  rpcMock:  vi.fn(async (): Promise<RpcResult> => ({ data: null, error: null })),
+  fromMock: vi.fn(() => ({
+    select: vi.fn(() => ({
+      eq: vi.fn(async (): Promise<CountResult> => ({ count: 0, error: null })),
+    })),
+  })),
 }))
-vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ rpc: rpcMock }) }))
+vi.mock('@/lib/supabase/server', () => ({
+  createSupabaseServerClient: async () => ({ rpc: rpcMock, from: fromMock }),
+}))
 
 import { getTeamMembers, getTeamOverview } from '@/lib/admin/team-queries'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 
-const supabase = { rpc: rpcMock } as unknown as SupabaseClient<Database>
+const supabase = { rpc: rpcMock, from: fromMock } as unknown as SupabaseClient<Database>
 
 const RAW = [
   { id: 'm1', display_name: 'Alice', user_id: 'u1', role: 'owner',     status: 'active',    joined_at: '2026-01-01T00:00:00Z' },
@@ -20,6 +28,11 @@ const RAW = [
 
 beforeEach(() => {
   rpcMock.mockReset().mockResolvedValue({ data: RAW, error: null })
+  fromMock.mockReset().mockReturnValue({
+    select: vi.fn(() => ({
+      eq: vi.fn(async () => ({ count: 0, error: null })),
+    })),
+  })
 })
 
 describe('getTeamMembers', () => {
@@ -44,6 +57,15 @@ describe('getTeamOverview', () => {
     const overview = await getTeamOverview(supabase)
     expect(overview.members).toHaveLength(3)
     expect(overview.byRole).toEqual({ owner: 1, moderator: 1, analyst: 1, admin: 0 })
-    expect(overview.pendingInvites).toBe(0) // always 0 in 12A
+  })
+  it('fetches pending invite count from kinnso_ops_invites', async () => {
+    fromMock.mockReturnValueOnce({
+      select: vi.fn(() => ({
+        eq: vi.fn(async () => ({ count: 3, error: null })),
+      })),
+    })
+    const overview = await getTeamOverview(supabase)
+    expect(fromMock).toHaveBeenCalledWith('kinnso_ops_invites')
+    expect(overview.pendingInvites).toBe(3)
   })
 })

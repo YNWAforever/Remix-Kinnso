@@ -34,15 +34,17 @@ export async function getTeamMembers(supabase: Client): Promise<MemberRow[]> {
   }))
 }
 
-/**
- * Team overview: full member list + by-role counts.
- * pendingInvites is 0 in 12A (kinnso_ops_invites table added in 12B).
- */
+/** Team overview: full member list + by-role counts + pending invite count. */
 export async function getTeamOverview(supabase: Client): Promise<TeamOverview> {
   const members = await getTeamMembers(supabase)
   const byRole: Record<string, number> = { owner: 0, admin: 0, moderator: 0, analyst: 0 }
   for (const m of members) {
     if (m.role in byRole) byRole[m.role]++
   }
-  return { members, byRole, pendingInvites: 0 }
+  const { count, error } = await supabase
+    .from('kinnso_ops_invites')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending')
+  if (error) throw error
+  return { members, byRole, pendingInvites: count ?? 0 }
 }
