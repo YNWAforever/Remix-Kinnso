@@ -926,6 +926,45 @@ export type Database = {
         }
         Relationships: []
       }
+      kinnso_ops_invites: {
+        Row: {
+          id: string
+          email: string
+          role: string
+          token: string
+          status: string
+          invited_by: string
+          created_at: string
+          expires_at: string
+          accepted_at: string | null
+          accepted_user_id: string | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          role: string
+          token?: string
+          status?: string
+          invited_by: string
+          created_at?: string
+          expires_at?: string
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          role?: string
+          token?: string
+          status?: string
+          invited_by?: string
+          created_at?: string
+          expires_at?: string
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+        }
+        Relationships: []
+      }
       merchant_profiles: {
         Row: {
           company_name: string
@@ -1732,6 +1771,30 @@ export type Database = {
         Args: Record<string, never>
         Returns: Json
       }
+      admin_invite_ops_member: {
+        Args: { p_email: string; p_role: string }
+        Returns: string
+      }
+      admin_revoke_ops_invite: {
+        Args: { p_invite_id: string }
+        Returns: undefined
+      }
+      admin_accept_ops_invite: {
+        Args: { p_token: string }
+        Returns: undefined
+      }
+      admin_set_ops_member_role: {
+        Args: { p_member_id: string; p_role: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_suspend_ops_member: {
+        Args: { p_member_id: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_reactivate_ops_member: {
+        Args: { p_member_id: string; p_reason: string }
+        Returns: undefined
+      }
       admin_overview_counts: {
         Args: never
         Returns: {
@@ -1822,6 +1885,7 @@ export type Database = {
       }
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
       is_active_ops: { Args: never; Returns: boolean }
+      is_active_ops_role: { Args: { p_min: string }; Returns: boolean }
       list_active_perks: {
         Args: never
         Returns: {
