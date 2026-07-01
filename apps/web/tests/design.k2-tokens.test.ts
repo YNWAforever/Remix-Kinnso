@@ -27,4 +27,11 @@ describe('kinnso2 editorial design tokens (R1A)', () => {
     expect(css).toContain('--color-kinnso-orange: #F26A1F')
     expect(css).toContain('--color-kinnso-cream: #F8F1E6')
   })
+
+  it('registers the k2 font tokens with CJK-safe fallback stacks', () => {
+    expect(css).toContain('--font-k2-display: var(--font-fraunces)')
+    expect(css).toContain("'Noto Serif TC'")
+    expect(css).toContain('--font-k2-sans: var(--font-inter)')
+    expect(css).toContain("'Noto Sans Thai'")
+  })
 })

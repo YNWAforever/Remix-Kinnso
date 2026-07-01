@@ -16,6 +16,8 @@ vi.mock('next/font/google', () => ({
   Bricolage_Grotesque: () => ({ variable: 'font-bricolage' }),
   DM_Sans: () => ({ variable: 'font-dm-sans' }),
   JetBrains_Mono: () => ({ variable: 'font-jetbrains-mono' }),
+  Fraunces: () => ({ variable: 'font-fraunces' }),
+  Inter: () => ({ variable: 'font-inter' }),
 }))
 
 import LocaleLayout from '@/app/[locale]/layout'

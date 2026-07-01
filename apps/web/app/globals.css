@@ -73,7 +73,8 @@
 /* R1A "editorial travel journal" tokens (kinnso2-*).                         */
 /* Added ALONGSIDE the legacy kinnso-* market-passport system so unmigrated   */
 /* pages keep rendering; the final R1C task deletes the legacy block.         */
-/* Grep "kinnso2" / "k2-" to find every new-system usage.                     */
+/* Grep "kinnso2" / "k2-" to find every new-system usage. Keep declarations   */
+/* single-spaced ("token: value") — tests/design.k2-tokens.test.ts matches. */
 /* ------------------------------------------------------------------------- */
 @theme {
   --color-kinnso2-paper: #FAF6EF; /* warm cream page background */
@@ -84,6 +85,12 @@
   --color-kinnso2-moss: #4A5D43; /* sage accent */
   --color-kinnso2-sun: #D99A2B; /* ochre highlight */
   --color-kinnso2-line: #D8CDBB; /* hairline borders */
+
+  /* Editorial type. Serif applies to Latin (Fraunces); each CJK locale falls
+     back to its system serif so zh-hk/zh-tw/zh-cn/ja/ko headings stay elegant;
+     th has no meaningful serif tradition and falls through to `serif`. */
+  --font-k2-display: var(--font-fraunces), 'Noto Serif TC', 'Songti TC', 'Noto Serif SC', 'Songti SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'Nanum Myeongjo', 'AppleMyungjo', serif;
+  --font-k2-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
 }
 
 /* `shadow-kinnso` utility (redesign used a custom boxShadow). */
