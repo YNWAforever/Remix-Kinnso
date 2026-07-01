@@ -34,4 +34,11 @@ describe('kinnso2 editorial design tokens (R1A)', () => {
     expect(css).toContain('--font-k2-sans: var(--font-inter)')
     expect(css).toContain("'Noto Sans Thai'")
   })
+
+  it.each(['k2-container', 'k2-display', 'k2-eyebrow', 'k2-card', 'k2-hairline', 'k2-btn-primary', 'k2-btn-ghost'])(
+    'registers the .%s utility class',
+    (cls) => {
+      expect(css).toContain(`.${cls}`)
+    },
+  )
 })

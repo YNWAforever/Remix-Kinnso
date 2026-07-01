@@ -167,6 +167,22 @@
   .k-route-markers__dot:nth-child(2) { background: var(--color-kinnso-green); }
   .k-route-markers__dot:nth-child(3) { background: var(--color-kinnso-amber); }
   .k-route-markers__labels { @apply flex items-center justify-between gap-3; }
+
+  /* R1A editorial primitives (k2-*) — used by components/kinnso/editorial/*
+     and the rebuilt chrome. Same utility-class-in-globals.css pattern as k-*. */
+  .k2-container   { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
+  .k2-display     { font-family: var(--font-k2-display); letter-spacing: -0.01em; }
+  .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-clay; }
+  .k2-card        { @apply overflow-hidden rounded-[4px] border border-kinnso2-line bg-white; }
+  .k2-hairline    { @apply border-t border-kinnso2-line; }
+  .k2-btn-primary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso2-clay px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-kinnso2-clay-deep; }
+  .k2-btn-ghost   { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] border border-kinnso2-ink/25 px-6 py-2.5 text-sm font-semibold tracking-wide text-kinnso2-ink transition hover:border-kinnso2-ink hover:bg-kinnso2-sand/40; }
+
+  .k2-btn-primary:focus-visible,
+  .k2-btn-ghost:focus-visible {
+    outline: 2px solid var(--color-kinnso2-clay);
+    outline-offset: 2px;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }

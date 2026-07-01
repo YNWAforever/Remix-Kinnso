@@ -1,0 +1,54 @@
+// @vitest-environment jsdom
+import { describe, it, expect, afterEach } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
+import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
+import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
+
+afterEach(cleanup)
+
+describe('editorial primitives (R1A)', () => {
+  it('SectionShell wraps children in the k2 container band', () => {
+    render(
+      <SectionShell>
+        <p>INNER</p>
+      </SectionShell>,
+    )
+    const inner = screen.getByText('INNER')
+    expect(inner.closest('.k2-container')).toBeTruthy()
+    expect(inner.closest('section')).toBeTruthy()
+  })
+
+  it('SectionShell can render as a div and merge classes', () => {
+    render(
+      <SectionShell as="div" className="bg-kinnso2-paper">
+        <p>INNER2</p>
+      </SectionShell>,
+    )
+    const band = screen.getByText('INNER2').closest('div.bg-kinnso2-paper')
+    expect(band).toBeTruthy()
+  })
+
+  it('Eyebrow renders a small-caps kicker', () => {
+    render(<Eyebrow>From the journal</Eyebrow>)
+    expect(screen.getByText('From the journal').className).toContain('k2-eyebrow')
+  })
+
+  it('EditorialCard renders media slot, kicker, title, body and footer', () => {
+    render(
+      <EditorialCard media={<span>MEDIA</span>} kicker="Tokyo" title="Night markets" footer={<a href="/x">Read</a>}>
+        Body copy
+      </EditorialCard>,
+    )
+    expect(screen.getByText('MEDIA')).toBeTruthy()
+    expect(screen.getByText('Tokyo')).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 3, name: 'Night markets' })).toBeTruthy()
+    expect(screen.getByText('Body copy')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Read' })).toBeTruthy()
+  })
+
+  it('EditorialCard omits the media band when no media is given', () => {
+    const { container } = render(<EditorialCard title="No photo" />)
+    expect(container.querySelector('[data-slot="media"]')).toBeNull()
+  })
+})
