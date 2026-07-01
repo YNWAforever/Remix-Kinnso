@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
@@ -805,6 +805,17 @@ const messages: Messages = {
     colAmount: '금액', colCurrency: '통화', settlementsEmpty: '아직 정산이 없습니다', owedTitle: '미지급', settledTitle: '정산됨', moneyEmpty: '없음',
     secAudit: '모더레이션 기록', auditEmpty: '아직 모더레이션 활동이 없습니다', addNote: '메모 추가', saveNote: '메모 저장',
     viewDetail: '360 보기',
+  },
+  missionsOps: {
+    title: '미션', subtitle: '플랫폼 전체의 모든 머천트 미션.',
+    tabOverview: '개요', tabDirectory: '디렉터리',
+    kpiTotal: '총 미션 수', kpiPublished: '게시됨', kpiDraft: '초안', kpiPaused: '일시중지됨',
+    kpiCompleted: '완료됨', kpiCancelled: '취소됨',
+    kpiOpenForApplications: '지원 접수 중', kpiSubmissionsAwaitingReview: '검토 대기 중인 제출물',
+    trendMissionsCreated: '생성된 미션', trendSubmissionsReviewed: '검토된 제출물', trendEmpty: '이 기간에는 데이터가 없습니다',
+    atRiskTitle: '위험 항목', atRiskEmpty: '현재 위험 항목이 없습니다',
+    reasonPublishedNoParticipants: '게시되었지만 참여자 없음', reasonStalledSubmissions: '제출물이 7일 이상 미검토 상태',
+    reasonVerificationFailed: '검증 실패',
   },
   perks: {
     catalog: {

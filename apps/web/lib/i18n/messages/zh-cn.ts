@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
   admin: {
-    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队',
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队', navMissions: '任务',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
@@ -805,6 +805,17 @@ const messages: Messages = {
     colAmount: '金额', colCurrency: '货币', settlementsEmpty: '暂无结算', owedTitle: '应付', settledTitle: '已结算', moneyEmpty: '无',
     secAudit: '审核记录', auditEmpty: '暂无审核活动', addNote: '添加备注', saveNote: '保存备注',
     viewDetail: '查看 360',
+  },
+  missionsOps: {
+    title: '任务', subtitle: '平台上每个商户任务的总览。',
+    tabOverview: '总览', tabDirectory: '目录',
+    kpiTotal: '任务总数', kpiPublished: '已发布', kpiDraft: '草稿', kpiPaused: '已暂停',
+    kpiCompleted: '已完成', kpiCancelled: '已取消',
+    kpiOpenForApplications: '开放申请中', kpiSubmissionsAwaitingReview: '待审核提交',
+    trendMissionsCreated: '新建任务', trendSubmissionsReviewed: '已审核提交', trendEmpty: '此期间暂无数据',
+    atRiskTitle: '风险任务', atRiskEmpty: '目前没有风险项目',
+    reasonPublishedNoParticipants: '已发布但尚无参与者', reasonStalledSubmissions: '提交待审核超过7天',
+    reasonVerificationFailed: '验证失败',
   },
   perks: {
     catalog: {

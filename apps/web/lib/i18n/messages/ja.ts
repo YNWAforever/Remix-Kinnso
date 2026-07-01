@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
@@ -805,6 +805,17 @@ const messages: Messages = {
     colAmount: '金額', colCurrency: '通貨', settlementsEmpty: '精算はまだありません', owedTitle: '未払い', settledTitle: '精算済み', moneyEmpty: 'なし',
     secAudit: 'モデレーション履歴', auditEmpty: 'モデレーション活動はまだありません', addNote: 'メモを追加', saveNote: 'メモを保存',
     viewDetail: '360 を表示',
+  },
+  missionsOps: {
+    title: 'ミッション', subtitle: 'プラットフォーム全体のすべての企業ミッション。',
+    tabOverview: '概要', tabDirectory: 'ディレクトリ',
+    kpiTotal: 'ミッション総数', kpiPublished: '公開中', kpiDraft: '下書き', kpiPaused: '一時停止中',
+    kpiCompleted: '完了', kpiCancelled: 'キャンセル済み',
+    kpiOpenForApplications: '応募受付中', kpiSubmissionsAwaitingReview: '審査待ちの提出物',
+    trendMissionsCreated: '作成されたミッション', trendSubmissionsReviewed: '審査済みの提出物', trendEmpty: 'この期間のデータはありません',
+    atRiskTitle: '要注意', atRiskEmpty: '現在、要注意の項目はありません',
+    reasonPublishedNoParticipants: '公開済み・参加者なし', reasonStalledSubmissions: '提出物が7日以上未審査',
+    reasonVerificationFailed: '検証に失敗',
   },
   perks: {
     catalog: {

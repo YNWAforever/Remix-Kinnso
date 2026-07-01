@@ -726,7 +726,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家', navTeam: '團隊',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家', navTeam: '團隊', navMissions: '任務',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
     statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
     statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
@@ -805,6 +805,17 @@ const messages: Messages = {
     colAmount: '金額', colCurrency: '貨幣', settlementsEmpty: '尚無結算', owedTitle: '應付', settledTitle: '已結算', moneyEmpty: '無',
     secAudit: '審核紀錄', auditEmpty: '尚無審核活動', addNote: '新增備註', saveNote: '儲存備註',
     viewDetail: '查看 360',
+  },
+  missionsOps: {
+    title: '任務', subtitle: '平台上每個商戶任務的總覽。',
+    tabOverview: '總覽', tabDirectory: '目錄',
+    kpiTotal: '任務總數', kpiPublished: '已發布', kpiDraft: '草稿', kpiPaused: '已暫停',
+    kpiCompleted: '已完成', kpiCancelled: '已取消',
+    kpiOpenForApplications: '開放申請中', kpiSubmissionsAwaitingReview: '待審核提交',
+    trendMissionsCreated: '新建任務', trendSubmissionsReviewed: '已審核提交', trendEmpty: '此期間暫無數據',
+    atRiskTitle: '風險任務', atRiskEmpty: '目前沒有風險項目',
+    reasonPublishedNoParticipants: '已發布但尚無參與者', reasonStalledSubmissions: '提交待審核超過7天',
+    reasonVerificationFailed: '驗證失敗',
   },
   perks: {
     catalog: {

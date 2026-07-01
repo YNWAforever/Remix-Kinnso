@@ -1,3 +1,26 @@
+export interface MissionsOpsMessages {
+  title: string
+  subtitle: string
+  tabOverview: string
+  tabDirectory: string
+  kpiTotal: string
+  kpiPublished: string
+  kpiDraft: string
+  kpiPaused: string
+  kpiCompleted: string
+  kpiCancelled: string
+  kpiOpenForApplications: string
+  kpiSubmissionsAwaitingReview: string
+  trendMissionsCreated: string
+  trendSubmissionsReviewed: string
+  trendEmpty: string
+  atRiskTitle: string
+  atRiskEmpty: string
+  reasonPublishedNoParticipants: string
+  reasonStalledSubmissions: string
+  reasonVerificationFailed: string
+}
+
 export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
@@ -618,7 +641,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -695,6 +718,7 @@ export interface Messages {
     secAudit: string; auditEmpty: string; addNote: string; saveNote: string
     viewDetail: string
   }
+  missionsOps: MissionsOpsMessages
   perks: {
     catalog: {
       heading: string; subtitle: string; empty: string
@@ -1547,7 +1571,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -1627,6 +1651,28 @@ const messages: Messages = {
     colAmount: 'Amount', colCurrency: 'Currency', settlementsEmpty: 'No settlements yet', owedTitle: 'Owed', settledTitle: 'Settled', moneyEmpty: 'None',
     secAudit: 'Moderation history', auditEmpty: 'No moderation activity yet', addNote: 'Add a note', saveNote: 'Save note',
     viewDetail: 'View 360',
+  },
+  missionsOps: {
+    title: 'Missions',
+    subtitle: 'Every merchant mission, platform-wide.',
+    tabOverview: 'Overview',
+    tabDirectory: 'Directory',
+    kpiTotal: 'Total missions',
+    kpiPublished: 'Published',
+    kpiDraft: 'Draft',
+    kpiPaused: 'Paused',
+    kpiCompleted: 'Completed',
+    kpiCancelled: 'Cancelled',
+    kpiOpenForApplications: 'Open for applications',
+    kpiSubmissionsAwaitingReview: 'Submissions awaiting review',
+    trendMissionsCreated: 'Missions created',
+    trendSubmissionsReviewed: 'Submissions reviewed',
+    trendEmpty: 'No data in this period',
+    atRiskTitle: 'At risk',
+    atRiskEmpty: 'Nothing at risk right now',
+    reasonPublishedNoParticipants: 'Published, no participants yet',
+    reasonStalledSubmissions: 'Submission awaiting review >7 days',
+    reasonVerificationFailed: 'Verification failed',
   },
   perks: {
     catalog: {
