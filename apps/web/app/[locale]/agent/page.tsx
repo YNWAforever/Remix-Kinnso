@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { AgentCopilotView } from '@/components/kinnso/pages/AgentCopilotView'
+import { AgentLandingView } from '@/components/kinnso/pages/AgentLandingView'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export function generateStaticParams() {
@@ -20,5 +20,5 @@ export default async function AgentPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
-  return <AgentCopilotView locale={locale as Locale} t={messages.agent} />
+  return <AgentLandingView locale={locale as Locale} t={messages.agent} />
 }

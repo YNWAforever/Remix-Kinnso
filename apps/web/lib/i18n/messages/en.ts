@@ -484,14 +484,15 @@ export interface Messages {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
   agent: {
-    heroPill: string; heroTitle: string; heroSubtitle: string
-    heroCta: string; heroSecondaryCta: string
-    valuesHeading: string
-    value1Title: string; value1Desc: string
-    value2Title: string; value2Desc: string
-    value3Title: string; value3Desc: string
-    tiersHeading: string; tiersSub: string; comingNote: string
-    ctaTitle: string; ctaDesc: string; ctaButton: string
+    eyebrow: string; title: string; body: string
+    pointsHeading: string
+    point1Title: string; point1Body: string
+    point2Title: string; point2Body: string
+    point3Title: string; point3Body: string
+    formHeading: string; formBody: string
+    emailLabel: string; emailPlaceholder: string; submitCta: string
+    successNote: string; errorInvalid: string; errorGeneric: string
+    honestNote: string; exploreCta: string; articlesCta: string
   }
   studioHome: {
     pill: string; heading: string; subtitle: string
@@ -894,8 +895,8 @@ const messages: Messages = {
       description: 'Find travel and lifestyle creators on KINNSO by niche, audience, and platform.',
     },
     agent: {
-      title: 'Creator Copilot — your AI growth assistant',
-      description: 'Meet the KINNSO Creator Copilot: AI agents that help you find content ideas, grow your audience, and earn more.',
+      title: 'KINNSO AI travel agent — join the waitlist',
+      description: 'An AI travel agent grounded in real creator guides. Join the waitlist to be first in when it opens.',
     },
     about: {
       title: 'About KINNSO',
@@ -1426,24 +1427,19 @@ const messages: Messages = {
     back: 'Back to home',
   },
   agent: {
-    heroPill: 'Creator Copilot',
-    heroTitle: 'Your AI copilot for growing as a creator',
-    heroSubtitle: 'KINNSO Copilot is a growing library of saved AI agents that help you grow your audience, find your next idea, and produce content that earns.',
-    heroCta: 'Join as a creator',
-    heroSecondaryCta: 'See how it works',
-    valuesHeading: 'What your copilot will do',
-    value1Title: 'Grow your audience',
-    value1Desc: 'Data-backed prompts on what to post, when, and where — tuned to your Creator DNA.',
-    value2Title: 'Never run out of ideas',
-    value2Desc: 'Surface fresh content angles and trending places that fit your niche and audience.',
-    value3Title: 'Produce better content',
-    value3Desc: 'Turn a rough idea into captions, shot lists, and guide drafts you can publish in minutes.',
-    tiersHeading: 'A better copilot as you climb',
-    tiersSub: 'Publish guides and complete missions to level up. Higher tiers unlock more agents, higher limits, better commissions, and exclusive missions.',
-    comingNote: 'The copilot ships inside Studio in a later release. Join now to be first in line.',
-    ctaTitle: 'Get your copilot',
-    ctaDesc: 'Sign up as a creator, scan your DNA, and be first to use the copilot when it lands.',
-    ctaButton: 'Join KINNSO',
+    eyebrow: 'KINNSO AI Agent',
+    title: 'A travel agent grounded in real creators’ guides',
+    body: 'Ask for a plan and get real places pulled from published creator guides and articles — not generic lists. The agent is in private preview while we wire it to live guides.',
+    pointsHeading: 'What the agent does',
+    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide or article — no invented spots.',
+    point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',
+    point3Title: 'Built for booking', point3Body: 'When direct booking ships, recommendations will link straight to bookable stays and experiences.',
+    formHeading: 'Be first in line', formBody: 'Leave your email and we’ll invite you when the agent opens.',
+    emailLabel: 'Email address', emailPlaceholder: 'you@example.com', submitCta: 'Join the waitlist',
+    successNote: 'You’re on the list — we’ll email you when the agent opens.',
+    errorInvalid: 'Enter a valid email address.', errorGeneric: 'Something went wrong — please try again.',
+    honestNote: 'The agent isn’t live yet — we only ship it when it’s genuinely useful. Until then, the same knowledge is all here:',
+    exploreCta: 'Explore guides', articlesCta: 'Read articles',
   },
   studioHome: {
     pill: 'Creator Studio',
