@@ -64,7 +64,7 @@ function StepBullet({ state }: { state: StepState }) {
   }
   if (state === 'active') {
     return (
-      <span className="size-6 flex-none animate-spin rounded-full border-2 border-ink/20 border-t-ink" aria-hidden="true" />
+      <span className="size-6 flex-none animate-spin rounded-full border-2 border-kinnso-ink/20 border-t-kinnso-ink" aria-hidden="true" />
     )
   }
   if (state === 'failed') {
@@ -76,7 +76,7 @@ function StepBullet({ state }: { state: StepState }) {
       </span>
     )
   }
-  return <span className="size-6 flex-none rounded-full border-2 border-ink/15" aria-hidden="true" />
+  return <span className="size-6 flex-none rounded-full border-2 border-kinnso-ink/15" aria-hidden="true" />
 }
 
 async function bearer(): Promise<string | null> {
@@ -264,14 +264,14 @@ export function LiveProgress({
       </p>
 
       <div
-        className="h-1.5 w-full overflow-hidden rounded-full bg-ink/10"
+        className="h-1.5 w-full overflow-hidden rounded-full bg-kinnso-ink/10"
         role="progressbar"
         aria-valuenow={barPct}
         aria-valuemin={0}
         aria-valuemax={100}
       >
         <div
-          className="h-full rounded-full bg-ink transition-[width] duration-700 ease-linear"
+          className="h-full rounded-full bg-kinnso-ink transition-[width] duration-700 ease-linear"
           style={{ width: `${barPct}%` }}
         />
       </div>
@@ -284,11 +284,11 @@ export function LiveProgress({
               <StepBullet state={st} />
               <div className={st === 'upcoming' ? 'opacity-50' : undefined}>
                 <p className="text-sm font-medium">{t[s.titleKey]}</p>
-                <p className={`text-xs ${st === 'active' ? 'text-ink/60' : 'text-ink/45'}`}>{t[s.descKey]}</p>
+                <p className={`text-xs ${st === 'active' ? 'text-kinnso-ink/60' : 'text-kinnso-ink/45'}`}>{t[s.descKey]}</p>
                 {i === 0 && platforms.length > 1 ? (
                   <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
                     {rows.map((r) => (
-                      <li key={r.platform} className="text-[11px] text-ink/50">
+                      <li key={r.platform} className="text-[11px] text-kinnso-ink/50">
                         <span className="capitalize">{r.platform}</span> · {t[STATE_KEY[r.state]]}
                       </li>
                     ))}
@@ -301,7 +301,7 @@ export function LiveProgress({
       </ol>
 
       {!blockingNotice && status !== 'failed' ? (
-        <p className="flex items-center gap-1.5 border-t border-ink/10 pt-3 text-xs text-ink/50">
+        <p className="flex items-center gap-1.5 border-t border-kinnso-ink/10 pt-3 text-xs text-kinnso-ink/50">
           <svg viewBox="0 0 20 20" className="size-3.5 flex-none" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
             <circle cx="10" cy="10" r="7.5" />
             <path d="M10 6v4l2.5 2" strokeLinecap="round" strokeLinejoin="round" />
@@ -320,7 +320,7 @@ export function LiveProgress({
       {status === 'failed' ? (
         <button
           type="button"
-          className="rounded bg-ink px-4 py-2 text-sm font-medium text-white"
+          className="rounded bg-kinnso-ink px-4 py-2 text-sm font-medium text-white"
           onClick={retry}
         >
           {t.retry}

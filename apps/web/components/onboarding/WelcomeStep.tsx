@@ -45,15 +45,15 @@ export function WelcomeStep({ t, onStart }: { t: WelcomeDict; onStart: () => voi
   return (
     <section className="w-full max-w-md space-y-5">
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-ink/50">Kinnso</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-kinnso-ink/50">Kinnso</p>
         <h2 className="text-2xl font-semibold leading-tight">{t.heading}</h2>
-        <p className="text-sm leading-relaxed text-ink/70">{t.intro}</p>
+        <p className="text-sm leading-relaxed text-kinnso-ink/70">{t.intro}</p>
       </div>
 
       <ul className="space-y-3">
         {points.map(({ Icon, text }) => (
           <li key={text} className="flex items-center gap-3">
-            <span className="flex size-8 flex-none items-center justify-center rounded-full bg-ink/5 text-ink">
+            <span className="flex size-8 flex-none items-center justify-center rounded-full bg-kinnso-ink/5 text-kinnso-ink">
               <Icon />
             </span>
             <span className="text-sm">{text}</span>
@@ -64,12 +64,12 @@ export function WelcomeStep({ t, onStart }: { t: WelcomeDict; onStart: () => voi
       <button
         type="button"
         onClick={onStart}
-        className="w-full rounded bg-ink px-4 py-3 text-sm font-medium text-white"
+        className="w-full rounded bg-kinnso-ink px-4 py-3 text-sm font-medium text-white"
       >
         {t.cta}
       </button>
 
-      <p className="text-center text-xs text-ink/50">{t.platforms}</p>
+      <p className="text-center text-xs text-kinnso-ink/50">{t.platforms}</p>
     </section>
   )
 }

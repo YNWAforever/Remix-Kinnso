@@ -1,5 +1,4 @@
 import GuideCard from '@/components/kinnso/GuideCard'
-import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { initialsFrom } from '@/lib/studio/identity'
 import type { PublicCreator } from '@/lib/creators/queries'
 import type { Locale } from '@/lib/i18n/config'
@@ -29,7 +28,7 @@ function Chips({ items }: { items: string[] }) {
 }
 
 export function CreatorProfileView({ creator, locale, embedded, t }: Props) {
-  const wrap = embedded ? '' : 'k-container py-8 md:py-12'
+  const wrap = embedded ? '' : 'k2-container py-8 md:py-12'
   const p = (path: string) => `/${locale}${path}`
   const hue = hueFromHandle(creator.handle)
   const pr = creator.profile
@@ -41,14 +40,14 @@ export function CreatorProfileView({ creator, locale, embedded, t }: Props) {
           className="h-40 w-full sm:h-56"
           style={{ background: `linear-gradient(135deg, hsl(${hue} 70% 55%), hsl(${(hue + 40) % 360} 70% 45%))` }}
         />
-        <TicketCard className="rounded-t-none p-6 sm:p-8">
+        <div className="k2-card rounded-t-none p-6 sm:p-8">
           <span className="-mt-16 grid h-20 w-20 place-items-center rounded-full bg-kinnso-ink text-2xl font-black text-white ring-4 ring-kinnso-cream">
             {initialsFrom(creator.name)}
           </span>
-          <h1 className="mt-3 text-3xl font-black text-kinnso-ink md:text-4xl">{creator.name}</h1>
-          <p className="k-mono mt-1 text-sm text-kinnso-muted">@{creator.handle}</p>
+          <h1 className="mt-3 k2-display text-3xl font-semibold text-kinnso-ink md:text-4xl">{creator.name}</h1>
+          <p className="mt-1 text-sm text-kinnso-muted">@{creator.handle}</p>
           {creator.bio && <p className="mt-3 max-w-xl text-sm text-kinnso-ink/80">{creator.bio}</p>}
-        </TicketCard>
+        </div>
       </header>
 
       {pr.niches.length > 0 && (
@@ -76,7 +75,11 @@ export function CreatorProfileView({ creator, locale, embedded, t }: Props) {
             {pr.platforms.map((pl) => (
               <span key={pl.platform} className="inline-flex items-center gap-1 rounded-md bg-kinnso-cream2 px-2 py-0.5 text-xs capitalize text-kinnso-ink">
                 {pl.platform}
-                {pl.verified && <span className="text-kinnso-orange">✓ {t.verifiedLabel}</span>}
+                {pl.verified && (
+                  <span className="text-kinnso-ink">
+                    <span aria-hidden="true" className="text-kinnso-green">✓</span> {t.verifiedLabel}
+                  </span>
+                )}
               </span>
             ))}
           </div>

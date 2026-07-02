@@ -95,7 +95,7 @@ export function DnaReviewForm({
   return (
     <section className="w-full max-w-lg space-y-4">
       <h2 className="text-xl font-semibold">{t.reviewHeading}</h2>
-      <p className="text-sm text-ink/70">{t.reviewIntro}</p>
+      <p className="text-sm text-kinnso-ink/70">{t.reviewIntro}</p>
       {thin ? <p className="rounded bg-amber-50 p-2 text-sm text-amber-700">{t.thinNotice}</p> : null}
 
       <label className="block space-y-1">
@@ -125,7 +125,7 @@ export function DnaReviewForm({
                 {p.platform}
                 {typeof p.followers === 'number' ? ` · ${p.followers}` : ''}
               </span>
-              <span className="rounded bg-ink/10 px-2 py-0.5 text-xs">{t.unverified}</span>
+              <span className="rounded bg-kinnso-ink/10 px-2 py-0.5 text-xs">{t.unverified}</span>
             </li>
           ))}
         </ul>
@@ -136,7 +136,7 @@ export function DnaReviewForm({
 
       <button
         type="button"
-        className="rounded bg-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+        className="rounded bg-kinnso-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
         onClick={publish}
         disabled={saving}
       >
@@ -166,7 +166,7 @@ function ListField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
-      <span className="text-xs text-ink/50">{hint}</span>
+      <span className="text-xs text-kinnso-ink/50">{hint}</span>
     </label>
   )
 }

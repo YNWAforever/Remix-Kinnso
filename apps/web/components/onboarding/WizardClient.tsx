@@ -99,7 +99,7 @@ export function WizardClient(props: WizardClientProps) {
   if (step === 'wait') {
     return (
       <section className="space-y-3 text-center">
-        <p className="text-sm text-ink/70">Setting up your account…</p>
+        <p className="text-sm text-kinnso-ink/70">Setting up your account…</p>
         <button
           type="button"
           className="text-sm underline"
@@ -159,7 +159,7 @@ export function WizardClient(props: WizardClientProps) {
       // Draft not on the server snapshot yet — the effect above is pulling it
       // from creator_dna; show the "analysis ready" line until it arrives.
       return (
-        <section className="text-center text-sm text-ink/70">
+        <section className="text-center text-sm text-kinnso-ink/70">
           {onb.progressStep.phaseReady}
         </section>
       )

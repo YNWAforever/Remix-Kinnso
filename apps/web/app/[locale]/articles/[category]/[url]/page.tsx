@@ -100,7 +100,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
               <h2 className="text-2xl font-bold mb-4">{a.translation.faq_title || dict.article.faqTitle}</h2>
               <dl className="space-y-4">
                 {a.faqs.map((f, i) => (
-                  <div key={`${f.question}-${i}`} className="rounded-card border border-cream-2 p-4">
+                  <div key={`${f.question}-${i}`} className="rounded-card border border-kinnso-cream2 p-4">
                     <dt className="font-semibold">{f.question}</dt>
                     <dd className="text-muted mt-1">{f.answer}</dd>
                   </div>

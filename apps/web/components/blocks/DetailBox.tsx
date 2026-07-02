@@ -26,8 +26,8 @@ export function DetailBox({
       ? <a href={websiteHref} target="_blank" rel="noopener noreferrer nofollow" className="text-info underline">{website.label}</a>
       : website.label])
   return (
-    <section id={id} className="scroll-mt-24 mb-8 rounded-card border border-cream-2 p-5">
-      {title && <h3 className="text-lg font-bold text-ink mb-3">{title}</h3>}
+    <section id={id} className="scroll-mt-24 mb-8 rounded-card border border-kinnso-cream2 p-5">
+      {title && <h3 className="text-lg font-bold text-kinnso-ink mb-3">{title}</h3>}
       <dl className="grid gap-2">
         {rows.map(([icon, val]) => (
           <div key={icon as string} className="flex gap-2"><dt aria-hidden>{icon}</dt><dd>{val}</dd></div>
