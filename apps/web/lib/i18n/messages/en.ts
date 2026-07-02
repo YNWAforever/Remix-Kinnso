@@ -38,6 +38,7 @@ export interface Messages {
     merchants: { title: string; description: string }
     terms: { title: string; description: string }
     forCreators: { title: string; description: string }
+    forMerchants: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -506,6 +507,17 @@ export interface Messages {
     testimonialsHeading: string
     ctaTitle: string; ctaBody: string; ctaButton: string
   }
+  forMerchants: {
+    heroEyebrow: string; heroTitle: string; heroSub: string
+    heroCtaPrimary: string; heroCtaSecondary: string
+    howEyebrow: string; howHeading: string
+    step1Title: string; step1Body: string
+    step2Title: string; step2Body: string
+    step3Title: string; step3Body: string
+    whyHeading: string; why1: string; why2: string; why3: string
+    testimonialsHeading: string
+    ctaTitle: string; ctaBody: string; ctaButton: string
+  }
   studioHome: {
     pill: string; heading: string; subtitle: string
     liveBadge: string; soonBadge: string; open: string
@@ -601,14 +613,14 @@ export interface Messages {
     guideCount: string
   }
   merchantsLanding: {
-    heroPill: string; heroTitle: string; heroSubtitle: string
-    postCta: string; browseCta: string
-    howHeading: string; howSub: string
-    step1Title: string; step1Desc: string
-    step2Title: string; step2Desc: string
-    step3Title: string; step3Desc: string
-    samplesHeading: string; samplesSub: string
-    ctaTitle: string; ctaDesc: string; ctaButton: string
+    heroPill: string
+    hubTitle: string; hubSub: string
+    cardsHeading: string
+    cardPostTitle: string; cardPostBody: string
+    cardCreatorsTitle: string; cardCreatorsBody: string
+    cardMissionsTitle: string; cardMissionsBody: string
+    cardOpen: string
+    newHereNote: string; newHereCta: string
   }
   studioOffers: {
     heading: string
@@ -929,6 +941,10 @@ const messages: Messages = {
     forCreators: {
       title: 'Become a KINNSO travel creator',
       description: 'Publish travel guides, run vetted brand missions, and earn from the places you genuinely recommend.',
+    },
+    forMerchants: {
+      title: 'Work with vetted travel creators — KINNSO for merchants',
+      description: 'Brief vetted travel creators, pay on published results, and reach travellers who trust them.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -1475,6 +1491,24 @@ const messages: Messages = {
     ctaBody: 'Apply in minutes. Publish your first guide this week.',
     ctaButton: 'Apply as a creator',
   },
+  forMerchants: {
+    heroEyebrow: 'For Merchants',
+    heroTitle: 'Reach travellers through creators they trust',
+    heroSub: 'Brief vetted travel creators, pay on published results, and turn their genuine recommendations into your next customers.',
+    heroCtaPrimary: 'Post a mission', heroCtaSecondary: 'Talk to us',
+    howEyebrow: 'How it works', howHeading: 'Launch a campaign in three steps',
+    step1Title: 'Post a brief', step1Body: 'Describe the mission, target cities and payout — it takes minutes.',
+    step2Title: 'Creators apply', step2Body: 'Vetted creators who fit your brand pick up the brief and produce real content.',
+    step3Title: 'Pay on results', step3Body: 'Approve published work and pay for outcomes — with attribution you can verify.',
+    whyHeading: 'Why merchants choose KINNSO',
+    why1: 'Creators are vetted with real audience data, not follower counts.',
+    why2: 'You approve work before you pay — no surprises.',
+    why3: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.',
+    testimonialsHeading: 'Merchants on KINNSO',
+    ctaTitle: 'Your next campaign starts with a brief',
+    ctaBody: 'Post your first mission today — our team reviews every brief within 48 hours.',
+    ctaButton: 'Post a mission',
+  },
   studioHome: {
     pill: 'Creator Studio',
     heading: 'Your Studio',
@@ -1598,15 +1632,15 @@ const messages: Messages = {
   },
   merchantsLanding: {
     heroPill: 'For Merchants',
-    heroTitle: 'Reach travelers through creators they trust.',
-    heroSubtitle: 'Post a mission and pay only when a real creator publishes and drives clicks.',
-    postCta: 'Post a Mission', browseCta: 'Browse creators',
-    howHeading: 'How it works', howSub: 'Launch a campaign in three steps.',
-    step1Title: 'Post a brief', step1Desc: 'Describe the mission, cities and payout.',
-    step2Title: 'Creators apply', step2Desc: 'Qualified creators join and submit work.',
-    step3Title: 'Pay on results', step3Desc: 'Approve submissions and pay on publish.',
-    samplesHeading: 'Open missions right now', samplesSub: 'A sample of live briefs from merchants.',
-    ctaTitle: 'Ready to launch?', ctaDesc: 'Post your first mission today.', ctaButton: 'Post a Mission',
+    hubTitle: 'Your missions, creators and results — one place',
+    hubSub: 'Everything you run on KINNSO starts here.',
+    cardsHeading: 'Your merchant tools',
+    cardPostTitle: 'Post a mission', cardPostBody: 'Write a brief and put it in front of vetted creators.',
+    cardCreatorsTitle: 'Find creators', cardCreatorsBody: 'Search vetted creators by niche, audience and platform.',
+    cardMissionsTitle: 'Track missions', cardMissionsBody: 'Review applications, approve work and follow results.',
+    cardOpen: 'Open',
+    newHereNote: 'New to KINNSO? See how missions work and what creators can do for your brand.',
+    newHereCta: 'Why KINNSO for merchants',
   },
   studioOffers: {
     heading: 'Affiliate offers',
