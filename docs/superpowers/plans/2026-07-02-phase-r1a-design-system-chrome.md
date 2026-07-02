@@ -648,13 +648,13 @@ New keys: `nav.linkExplore/linkDestinations/linkSessions/linkForMerchants`; `foo
     destinationsSoon: {
       eyebrow: '目的地',
       title: '每個城市，由最熟路嘅人講畀你聽。',
-      body: '我哋正將 KINNSO 創作者嘅攻略同故事，整合成一個可以慢慢逛嘅目的地地圖——地道食街、橫街窄巷、本地人真係會去嘅一日遊。整理期間，不妨先由目的地文章開始睇起。',
-      cta: '睇目的地故事',
+      body: '我哋而家將 KINNSO 創作者嘅攻略同故事，整合成一個可以慢慢逛嘅目的地地圖——地道食街、橫街窄巷、本地人真係會去嘅一日遊。整理期間，不妨先由目的地文章開始睇起。',
+      cta: '睇目的地文章',
     },
     sessionsSoon: {
       eyebrow: '社群活動',
       title: '創作者現場連線，畀你第一手旅遊情報。',
-      body: 'Community Sessions 係小型直播聚會——目的地簡報、創作者問答、商家焦點，全部由寫攻略嘅創作者親自主持。第一批主持人已經喺度準備緊。',
+      body: '社群活動係小型直播聚會——目的地簡報、創作者問答、商家焦點，全部由寫攻略嘅創作者親自主持。第一批主持人已經喺度準備緊。',
       cta: '認識我哋嘅創作者',
     },
   ```
@@ -670,13 +670,13 @@ New keys: `nav.linkExplore/linkDestinations/linkSessions/linkForMerchants`; `foo
     destinationsSoon: {
       eyebrow: '目的地',
       title: '每座城市，由最懂它的人來說。',
-      body: '我們正在把 KINNSO 創作者的攻略與故事，整理成一份可以慢慢瀏覽的目的地地圖——道地美食街、巷弄小店、在地人真正會去的一日遊。在完成之前,先從目的地文章開始探索吧。',
-      cta: '閱讀目的地故事',
+      body: '我們正在把 KINNSO 創作者的攻略與故事，整理成一份可以慢慢瀏覽的目的地地圖——道地美食街、巷弄小店、在地人真正會去的一日遊。在完成之前，先從目的地文章開始探索吧。',
+      cta: '閱讀目的地文章',
     },
     sessionsSoon: {
       eyebrow: '社群活動',
       title: '來自現場創作者的即時分享。',
-      body: 'Community Sessions 是小型線上聚會——目的地簡報、創作者問答、商家焦點，都由撰寫攻略的創作者親自主持。首批主持人正在籌備中。',
+      body: '社群活動是小型線上聚會——目的地簡報、創作者問答、商家焦點，都由撰寫攻略的創作者親自主持。首批主持人正在籌備中。',
       cta: '認識我們的創作者',
     },
   ```
@@ -694,22 +694,22 @@ New keys: `nav.linkExplore/linkDestinations/linkSessions/linkForMerchants`; `foo
       eyebrow: '目的地',
       title: '每座城市，都由最懂它的人来讲述。',
       body: '我们正在把 KINNSO 创作者的攻略和故事，整理成一份可以慢慢浏览的目的地地图——地道美食街、小巷店铺、本地人真正会去的一日游。在完成之前，先从目的地文章开始探索吧。',
-      cta: '阅读目的地故事',
+      cta: '阅读目的地文章',
     },
     sessionsSoon: {
       eyebrow: '社区活动',
       title: '来自一线创作者的实时分享。',
-      body: 'Community Sessions 是小型线上聚会——目的地简报、创作者问答、商家焦点，均由撰写攻略的创作者亲自主持。首批主持人正在筹备中。',
+      body: '社区活动是小型线上聚会——目的地简报、创作者问答、商家焦点，均由撰写攻略的创作者亲自主持。首批主持人正在筹备中。',
       cta: '认识我们的创作者',
     },
   ```
 
   **`ja.ts`**:
   ```ts
-      linkExplore: '見つける', linkDestinations: '旅行先', linkSessions: 'セッション', linkForMerchants: '加盟店の方へ',
+      linkExplore: '探す', linkDestinations: '旅行先', linkSessions: 'セッション', linkForMerchants: '加盟店の方へ',
   ```
   ```ts
-      colExplore: '見つける', lGuides: 'ガイド', lDestinations: '旅行先', lArticles: '記事', lSessions: 'セッション',
+      colExplore: '探す', lGuides: 'ガイド', lDestinations: '旅行先', lArticles: '記事', lSessions: 'セッション',
   ```
   ```ts
     destinationsSoon: {
@@ -743,7 +743,7 @@ New keys: `nav.linkExplore/linkDestinations/linkSessions/linkForMerchants`; `foo
     sessionsSoon: {
       eyebrow: '커뮤니티 세션',
       title: '현지 크리에이터의 라이브 브리핑.',
-      body: '커뮤니티 세션은 소규모 라이브 모임입니다. 여행지 브리핑, 크리에이터 Q&A, 가맹점 스포트라이트까지 — 가이드를 쓴 크리에이터가 직접 진행해요. 첫 호스트들을 지금 준비하고 있어요.',
+      body: '커뮤니티 세션은 소규모 라이브 모임이에요. 여행지 브리핑, 크리에이터 Q&A, 가맹점 스포트라이트까지 — 가이드를 쓴 크리에이터가 직접 진행해요. 첫 호스트들을 지금 준비하고 있어요.',
       cta: '크리에이터 만나기',
     },
   ```
@@ -760,7 +760,7 @@ New keys: `nav.linkExplore/linkDestinations/linkSessions/linkForMerchants`; `foo
       eyebrow: 'จุดหมาย',
       title: 'ทุกเมือง เล่าโดยคนที่รู้จักมันดีที่สุด',
       body: 'เรากำลังรวบรวมไกด์และเรื่องราวจากครีเอเตอร์ KINNSO ให้กลายเป็นแผนที่จุดหมายที่ค่อยๆ เลือกดูได้ — ถนนสายของกิน ตรอกซอกซอย และทริปวันเดียวที่คนท้องถิ่นไปกันจริงๆ ระหว่างนี้เริ่มต้นจากบทความจุดหมายก่อนได้เลย',
-      cta: 'อ่านเรื่องราวจุดหมาย',
+      cta: 'อ่านบทความจุดหมาย',
     },
     sessionsSoon: {
       eyebrow: 'คอมมูนิตี้เซสชัน',
