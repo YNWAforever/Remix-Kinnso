@@ -434,8 +434,8 @@ export interface Messages {
     statusPaid: string
   }
   nav: {
-    linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
-    linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
+    linkCreators: string; linkAgent: string
+    linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
     linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
@@ -446,8 +446,8 @@ export interface Messages {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
     colExplore: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
-    lPostMission: string; lPricing: string; lCaseStudies: string; lContact: string
-    lAbout: string; lAgent: string; lPress: string; lLegal: string; rights: string
+    lPostMission: string; lPricing: string; lContact: string
+    lAbout: string; lAgent: string; lLegal: string; rights: string
     lForCreators: string
   }
   home: {
@@ -1339,8 +1339,8 @@ const messages: Messages = {
     statusPaid: 'Paid',
   },
   nav: {
-    linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
-    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
+    linkCreators: 'Creators', linkAgent: 'AI Agent',
+    linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
     linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
@@ -1352,8 +1352,8 @@ const messages: Messages = {
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
     colExplore: 'Explore', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
-    lPostMission: 'Post a mission', lPricing: 'How it works', lCaseStudies: 'Case studies', lContact: 'Contact',
-    lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
+    lPostMission: 'Post a mission', lPricing: 'How it works', lContact: 'Contact',
+    lAbout: 'About', lAgent: 'AI Agent', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
     lForCreators: 'For Creators',
   },
@@ -1606,14 +1606,14 @@ const messages: Messages = {
   explore: {
     pill: 'Explore',
     heading: 'Travel Guides from real creators',
-    subtitle: 'Discover hand-picked spots, saved by travelers like you.',
+    subtitle: 'Discover hand-picked spots, saved by travellers like you.',
     gridHeading: 'All guides',
     savesLabel: 'saves',
     emptyNote: 'More guides are added every week.',
   },
   feed: {
     pill: 'Feed',
-    heading: 'What travelers are saving now',
+    heading: 'What travellers are saving now',
     subtitle: 'A live look at the guides and spots trending across KINNSO.',
     savesLabel: 'saves',
     empty: 'No guides yet. Check back soon for new travel guides.',

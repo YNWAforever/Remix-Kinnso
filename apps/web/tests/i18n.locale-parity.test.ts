@@ -11,14 +11,10 @@ function keyPaths(obj: unknown, prefix = ''): string[] {
     .sort()
 }
 
-const GROUPS = [
-  'studio', 'creatorProfile', 'merchants', 'missions', 'missionDetail', 'ops', 'nav', 'footer', 'home', 'comingSoon',
-  'destinationsSoon', 'sessionsSoon',
-  'studioHome', 'explore', 'feed', 'creatorsLanding', 'merchantsLanding', 'studioGuides',
-  'studioOffers', 'studioEarnings', 'about', 'contact', 'creatorTerms', 'article', 'tier', 'copilot', 'admin', 'perks',
-  'testimonialsAdmin',
-  'users', 'merchantSearch', 'insights', 'seo', 'creators', 'merchantsOps', 'missionsOps', 'agent', 'forCreators', 'forMerchants',
-] as const
+// Every top-level group in the en dictionary is parity-checked — nothing can be
+// forgotten (R1C carry-forward #6: 'agent', 'breadcrumb', 'categories' were live
+// but unregistered under the old hand list).
+const GROUPS = Object.keys(en).sort() as (keyof typeof en)[]
 
 describe('i18n locale parity for new creator-profile groups', () => {
   const enPaths = Object.fromEntries(
@@ -35,6 +31,7 @@ describe('i18n locale parity for new creator-profile groups', () => {
     it(`${locale} has identical keys to en for each group`, async () => {
       const dict = (await getDictionary(locale)) as unknown as Record<string, unknown>
       for (const g of GROUPS) {
+        expect(dict[g], `${locale} is missing group "${g}"`).toBeDefined()
         expect(keyPaths(dict[g])).toEqual(enPaths[g])
       }
     })
