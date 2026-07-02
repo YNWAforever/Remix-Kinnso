@@ -435,11 +435,13 @@ export interface Messages {
     linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
     linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
+    linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
+    colExplore: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
     lPostMission: string; lPricing: string; lCaseStudies: string; lContact: string
     lAbout: string; lAgent: string; lPress: string; lLegal: string; rights: string
@@ -465,6 +467,8 @@ export interface Messages {
     emailLabel: string; emailCta: string; responseNote: string
   }
   comingSoon: { heading: string; body: string; back: string }
+  destinationsSoon: { eyebrow: string; title: string; body: string; cta: string }
+  sessionsSoon: { eyebrow: string; title: string; body: string; cta: string }
   creatorTerms: {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
@@ -1280,12 +1284,14 @@ const messages: Messages = {
     linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
     linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
+    linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
   },
   footer: {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
+    colExplore: 'Explore', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
     lPostMission: 'Post a mission', lPricing: 'How it works', lCaseStudies: 'Case studies', lContact: 'Contact',
     lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
@@ -1344,6 +1350,18 @@ const messages: Messages = {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
     back: 'Back to home',
+  },
+  destinationsSoon: {
+    eyebrow: 'Destinations',
+    title: 'Every city, told by the people who know it.',
+    body: 'We are stitching KINNSO guides and stories into a browsable atlas of destinations — the food streets, the side alleys, the day trips locals actually take. While we finish it, our destination stories are the best place to start.',
+    cta: 'Read destination stories',
+  },
+  sessionsSoon: {
+    eyebrow: 'Community Sessions',
+    title: 'Live briefings from creators on the ground.',
+    body: 'Community Sessions are small live conversations — destination briefings, ask-a-creator hours, and merchant spotlights, hosted by the creators behind our guides. We are lining up the first hosts now.',
+    cta: 'Meet the creators',
   },
   creatorTerms: {
     eyebrow: 'Creator terms',

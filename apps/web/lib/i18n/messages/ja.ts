@@ -435,12 +435,14 @@ const messages: Messages = {
     linkCreators: 'クリエイター', linkMerchants: '加盟店', linkAgent: 'AIエージェント', linkTravelers: '旅行者',
     linkGuides: 'ガイド', linkArticles: '記事', linkFindCreators: 'クリエイターを探す', linkMissions: 'ミッション',
     linkInsights: 'インサイト',
+    linkExplore: '見つける', linkDestinations: '旅行先', linkSessions: 'セッション', linkForMerchants: '加盟店の方へ',
     ctaApply: 'クリエイター応募', ctaOpenStudio: 'スタジオを開く', ctaPending: '申請審査中', ctaPostMission: 'ミッションを投稿',
     signIn: 'ログイン', language: '言語', menuToggle: 'メニュー', skipToContent: '本文へスキップ',
   },
   footer: {
     tagline: 'AIトラベルコンテンツスタジオ · クリエイターに報酬 · 香港 · 台北 · 東京',
     colCreators: 'クリエイター', colMerchants: '加盟店', colCompany: '会社',
+    colExplore: '見つける', lGuides: 'ガイド', lDestinations: '旅行先', lArticles: '記事', lSessions: 'セッション',
     lApply: '応募', lStudio: 'スタジオ', lMissions: 'ミッション', lEarnings: '収益',
     lPostMission: 'ミッションを投稿', lPricing: '仕組み', lCaseStudies: '事例', lContact: 'お問い合わせ',
     lAbout: '会社概要', lAgent: 'AIエージェント', lPress: 'プレス', lLegal: '規約',
@@ -499,6 +501,18 @@ const messages: Messages = {
     heading: '近日公開',
     body: 'KINNSOのこの部分は準備中です。しばらくしてからもう一度ご確認ください。',
     back: 'ホームに戻る',
+  },
+  destinationsSoon: {
+    eyebrow: '旅行先',
+    title: 'その街を一番知る人が、その街を語る。',
+    body: 'KINNSOのクリエイターが書いたガイドやストーリーを、旅行先ごとにゆっくり眺められる地図に編集しています。地元の人が本当に通う食の路地や日帰りコースまで。完成までの間は、旅行先の記事からぜひご覧ください。',
+    cta: '旅行先の記事を読む',
+  },
+  sessionsSoon: {
+    eyebrow: 'コミュニティセッション',
+    title: '現地クリエイターによるライブブリーフィング。',
+    body: 'コミュニティセッションは少人数のライブイベントです。旅行先ブリーフィング、クリエイターへのQ&A、加盟店スポットライトなど、ガイドを書いた本人がホストを務めます。最初のホストを現在準備中です。',
+    cta: 'クリエイターに会う',
   },
   creatorTerms: {
     eyebrow: 'クリエイター規約',

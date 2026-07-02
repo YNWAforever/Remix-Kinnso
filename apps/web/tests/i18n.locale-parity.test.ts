@@ -13,6 +13,7 @@ function keyPaths(obj: unknown, prefix = ''): string[] {
 
 const GROUPS = [
   'studio', 'creatorProfile', 'merchants', 'missions', 'missionDetail', 'ops', 'nav', 'footer', 'home', 'comingSoon',
+  'destinationsSoon', 'sessionsSoon',
   'studioHome', 'explore', 'feed', 'creatorsLanding', 'merchantsLanding', 'studioGuides',
   'studioOffers', 'studioEarnings', 'about', 'contact', 'creatorTerms', 'article', 'tier', 'copilot', 'admin', 'perks',
   'users', 'merchantSearch', 'insights', 'seo', 'creators', 'merchantsOps', 'missionsOps',

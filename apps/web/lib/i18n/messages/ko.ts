@@ -435,12 +435,14 @@ const messages: Messages = {
     linkCreators: '크리에이터', linkMerchants: '가맹점', linkAgent: 'AI 에이전트', linkTravelers: '여행자',
     linkGuides: '가이드', linkArticles: '아티클', linkFindCreators: '크리에이터 찾기', linkMissions: '미션',
     linkInsights: '인사이트',
+    linkExplore: '둘러보기', linkDestinations: '여행지', linkSessions: '세션', linkForMerchants: '가맹점 안내',
     ctaApply: '크리에이터 지원', ctaOpenStudio: '스튜디오 열기', ctaPending: '신청 검토 중', ctaPostMission: '미션 등록',
     signIn: '로그인', language: '언어', menuToggle: '메뉴', skipToContent: '본문으로 건너뛰기',
   },
   footer: {
     tagline: 'AI 트래블 콘텐츠 스튜디오 · 크리에이터에게 지급 · 홍콩 · 타이베이 · 도쿄',
     colCreators: '크리에이터', colMerchants: '가맹점', colCompany: '회사',
+    colExplore: '둘러보기', lGuides: '가이드', lDestinations: '여행지', lArticles: '아티클', lSessions: '세션',
     lApply: '지원', lStudio: '스튜디오', lMissions: '미션', lEarnings: '수익',
     lPostMission: '미션 등록', lPricing: '이용 방법', lCaseStudies: '사례', lContact: '문의',
     lAbout: '소개', lAgent: 'AI 에이전트', lPress: '보도자료', lLegal: '약관',
@@ -499,6 +501,18 @@ const messages: Messages = {
     heading: '곧 출시',
     body: 'KINNSO의 이 부분은 준비 중입니다. 잠시 후 다시 확인해 주세요.',
     back: '홈으로',
+  },
+  destinationsSoon: {
+    eyebrow: '여행지',
+    title: '그 도시를 가장 잘 아는 사람이 들려주는 이야기.',
+    body: 'KINNSO 크리에이터의 가이드와 스토리를 여행지별로 천천히 둘러볼 수 있는 지도로 엮고 있어요. 현지인이 진짜 가는 먹자골목과 당일치기 코스까지. 완성될 때까지는 여행지 아티클부터 먼저 만나보세요.',
+    cta: '여행지 아티클 읽기',
+  },
+  sessionsSoon: {
+    eyebrow: '커뮤니티 세션',
+    title: '현지 크리에이터의 라이브 브리핑.',
+    body: '커뮤니티 세션은 소규모 라이브 모임입니다. 여행지 브리핑, 크리에이터 Q&A, 가맹점 스포트라이트까지 — 가이드를 쓴 크리에이터가 직접 진행해요. 첫 호스트들을 지금 준비하고 있어요.',
+    cta: '크리에이터 만나기',
   },
   creatorTerms: {
     eyebrow: '크리에이터 약관',

@@ -435,12 +435,14 @@ const messages: Messages = {
     linkCreators: '創作者', linkMerchants: '商家', linkAgent: 'AI 助手', linkTravelers: '旅人',
     linkGuides: '攻略', linkArticles: '文章', linkFindCreators: '尋找創作者', linkMissions: '任務',
     linkInsights: '數據洞察',
+    linkExplore: '探索', linkDestinations: '目的地', linkSessions: '社群活動', linkForMerchants: '商家專區',
     ctaApply: '申請成為創作者', ctaOpenStudio: '開啟工作室', ctaPending: '申請審核中', ctaPostMission: '發佈任務',
     signIn: '登入', language: '語言', menuToggle: '選單', skipToContent: '跳到內容',
   },
   footer: {
     tagline: 'AI 旅遊內容工作室 · 為創作者付費 · 香港 · 台北 · 東京',
     colCreators: '創作者', colMerchants: '商家', colCompany: '公司',
+    colExplore: '探索', lGuides: '攻略', lDestinations: '目的地', lArticles: '文章', lSessions: '社群活動',
     lApply: '申請', lStudio: '工作室', lMissions: '任務', lEarnings: '收益',
     lPostMission: '發佈任務', lPricing: '運作方式', lCaseStudies: '案例', lContact: '聯絡我們',
     lAbout: '關於', lAgent: 'AI 助手', lPress: '媒體', lLegal: '條款',
@@ -499,6 +501,18 @@ const messages: Messages = {
     heading: '即將推出',
     body: 'KINNSO 的這個部分即將上線，請稍後再回來看看。',
     back: '返回首頁',
+  },
+  destinationsSoon: {
+    eyebrow: '目的地',
+    title: '每個城市，由最熟路嘅人講畀你聽。',
+    body: '我哋正將 KINNSO 創作者嘅攻略同故事，整合成一個可以慢慢逛嘅目的地地圖——地道食街、橫街窄巷、本地人真係會去嘅一日遊。整理期間，不妨先由目的地文章開始睇起。',
+    cta: '睇目的地故事',
+  },
+  sessionsSoon: {
+    eyebrow: '社群活動',
+    title: '創作者現場連線，畀你第一手旅遊情報。',
+    body: 'Community Sessions 係小型直播聚會——目的地簡報、創作者問答、商家焦點，全部由寫攻略嘅創作者親自主持。第一批主持人已經喺度準備緊。',
+    cta: '認識我哋嘅創作者',
   },
   creatorTerms: {
     eyebrow: '創作者條款',

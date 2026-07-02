@@ -435,12 +435,14 @@ const messages: Messages = {
     linkCreators: 'ครีเอเตอร์', linkMerchants: 'ร้านค้า', linkAgent: 'ผู้ช่วย AI', linkTravelers: 'นักเดินทาง',
     linkGuides: 'ไกด์', linkArticles: 'บทความ', linkFindCreators: 'ค้นหาครีเอเตอร์', linkMissions: 'ภารกิจ',
     linkInsights: 'ข้อมูลเชิงลึก',
+    linkExplore: 'สำรวจ', linkDestinations: 'จุดหมาย', linkSessions: 'เซสชัน', linkForMerchants: 'สำหรับร้านค้า',
     ctaApply: 'สมัครเป็นครีเอเตอร์', ctaOpenStudio: 'เปิดสตูดิโอ', ctaPending: 'กำลังตรวจสอบใบสมัคร', ctaPostMission: 'โพสต์ภารกิจ',
     signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู', skipToContent: 'ข้ามไปยังเนื้อหา',
   },
   footer: {
     tagline: 'สตูดิโอคอนเทนต์ท่องเที่ยว AI · จ่ายให้ครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',
     colCreators: 'ครีเอเตอร์', colMerchants: 'ร้านค้า', colCompany: 'บริษัท',
+    colExplore: 'สำรวจ', lGuides: 'ไกด์', lDestinations: 'จุดหมาย', lArticles: 'บทความ', lSessions: 'เซสชัน',
     lApply: 'สมัคร', lStudio: 'สตูดิโอ', lMissions: 'ภารกิจ', lEarnings: 'รายได้',
     lPostMission: 'โพสต์ภารกิจ', lPricing: 'วิธีการทำงาน', lCaseStudies: 'กรณีศึกษา', lContact: 'ติดต่อ',
     lAbout: 'เกี่ยวกับ', lAgent: 'ผู้ช่วย AI', lPress: 'ข่าวสาร', lLegal: 'ข้อกำหนด',
@@ -499,6 +501,18 @@ const messages: Messages = {
     heading: 'เร็วๆ นี้',
     body: 'ส่วนนี้ของ KINNSO กำลังจะมา โปรดกลับมาตรวจสอบอีกครั้งในไม่ช้า',
     back: 'กลับสู่หน้าแรก',
+  },
+  destinationsSoon: {
+    eyebrow: 'จุดหมาย',
+    title: 'ทุกเมือง เล่าโดยคนที่รู้จักมันดีที่สุด',
+    body: 'เรากำลังรวบรวมไกด์และเรื่องราวจากครีเอเตอร์ KINNSO ให้กลายเป็นแผนที่จุดหมายที่ค่อยๆ เลือกดูได้ — ถนนสายของกิน ตรอกซอกซอย และทริปวันเดียวที่คนท้องถิ่นไปกันจริงๆ ระหว่างนี้เริ่มต้นจากบทความจุดหมายก่อนได้เลย',
+    cta: 'อ่านเรื่องราวจุดหมาย',
+  },
+  sessionsSoon: {
+    eyebrow: 'คอมมูนิตี้เซสชัน',
+    title: 'ไลฟ์สดจากครีเอเตอร์ตัวจริงในพื้นที่',
+    body: 'คอมมูนิตี้เซสชันคือวงพูดคุยสดขนาดเล็ก — บรีฟจุดหมาย ถามตอบกับครีเอเตอร์ และสปอตไลต์ร้านค้า โดยครีเอเตอร์เจ้าของไกด์เป็นผู้ดำเนินรายการเอง เรากำลังเตรียมโฮสต์รุ่นแรกอยู่',
+    cta: 'ทำความรู้จักครีเอเตอร์',
   },
   creatorTerms: {
     eyebrow: 'ข้อกำหนดครีเอเตอร์',
