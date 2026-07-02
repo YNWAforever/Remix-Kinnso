@@ -1780,7 +1780,7 @@ This task is atomic on purpose: HomeView's props change, so its page host, its t
                     <blockquote className="k2-display text-xl leading-snug text-kinnso2-ink">
                       &ldquo;{q.quote}&rdquo;
                     </blockquote>
-                    <figcaption className="mt-3 text-sm text-kinnso2-ink/60">
+                    <figcaption className="mt-3 text-sm text-kinnso2-ink/70">
                       — {q.authorName} · {roleLabel[q.authorRole]}
                     </figcaption>
                   </figure>
@@ -1806,7 +1806,7 @@ This task is atomic on purpose: HomeView's props change, so its page host, its t
             </Link>
           </div>
           {guides.length === 0 ? (
-            <p className="mt-8 text-kinnso2-ink/60">{t.featuredEmpty}</p>
+            <p className="mt-8 text-kinnso2-ink/70">{t.featuredEmpty}</p>
           ) : (
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {guides.slice(0, 6).map((g) => (
@@ -1892,7 +1892,7 @@ This task is atomic on purpose: HomeView's props change, so its page host, its t
             <ul className="mt-8 grid gap-5 md:grid-cols-3">
               {sessions.map((s) => (
                 <li key={s.id} className="k2-card p-5">
-                  <p className="text-sm text-kinnso2-ink/60">{dateTimeFmt.format(new Date(s.startsAt))}</p>
+                  <p className="text-sm text-kinnso2-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
                   <h3 className="mt-2 text-lg font-semibold text-kinnso2-ink">{s.title}</h3>
                   <p className="mt-1 text-sm text-kinnso2-ink/70">@{s.hostHandle}</p>
                 </li>
