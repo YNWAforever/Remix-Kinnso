@@ -4,7 +4,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: '目的地', dining: '美食', shopping: '購物' },
   breadcrumb: { home: '首頁', articles: '文章' },
-  article: { youMayLike: '你可能喜歡', faqTitle: '常見問題', tableOfContents: '本文目錄', by: '作者', fallbackNotice: '本文尚未提供你所用語言的版本，目前顯示原始版本。' },
+  article: { youMayLike: '你可能喜歡', faqTitle: '常見問題', tableOfContents: '本文目錄', by: '作者', fallbackNotice: '本文尚未提供你所用語言的版本，目前顯示原始版本。', guidesNearbyEyebrow: '正計劃去這裡？', guidesNearbyHeading: '這個目的地的創作者攻略' },
   seo: {
     brandTitle: 'KINNSO — 旅遊創作者，真實任務',
     brandDescription:

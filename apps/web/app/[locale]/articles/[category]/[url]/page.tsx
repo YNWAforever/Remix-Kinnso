@@ -7,6 +7,7 @@ import { isLocale, toDbCategory, toUrlCategory, type Locale } from '@/lib/i18n/c
 import { buildArticleMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { ArticleBlockRenderer } from '@/components/ArticleBlockRenderer'
+import { ArticleGuideLinks } from '@/components/kinnso/articles/ArticleGuideLinks'
 import { ArticleToc } from '@/components/ArticleToc'
 import { ArticleCard } from '@/components/ArticleCard'
 import { ViewPing } from '@/components/ViewPing'
@@ -92,6 +93,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
         <article>
           {a.thumbnails[0] && <img src={a.thumbnails[0]} alt={a.translation.title ?? ''} className="rounded-card w-full mb-6" />}
           <ArticleBlockRenderer blocks={a.translation.content} />
+          <ArticleGuideLinks locale={loc} regions={[...(a.regions ?? []), ...(a.tag_slugs ?? [])]} t={dict.article} />
 
           {a.faqs.length > 0 && (
             <section className="mt-10">

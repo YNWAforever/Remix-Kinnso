@@ -4,7 +4,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: '旅行先', dining: 'グルメ', shopping: 'ショッピング' },
   breadcrumb: { home: 'ホーム', articles: '記事' },
-  article: { youMayLike: 'おすすめ記事', faqTitle: 'よくある質問', tableOfContents: '目次', by: '著者', fallbackNotice: 'この記事はまだお使いの言語ではご利用いただけないため、オリジナル版を表示しています。' },
+  article: { youMayLike: 'おすすめ記事', faqTitle: 'よくある質問', tableOfContents: '目次', by: '著者', fallbackNotice: 'この記事はまだお使いの言語ではご利用いただけないため、オリジナル版を表示しています。', guidesNearbyEyebrow: 'ここへ旅行を計画中？', guidesNearbyHeading: 'この目的地のクリエイターガイド' },
   seo: {
     brandTitle: 'KINNSO — トラベルクリエイター、リアルなミッション',
     brandDescription:
