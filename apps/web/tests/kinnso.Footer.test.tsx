@@ -27,8 +27,13 @@ describe('Footer (R1A editorial IA)', () => {
 
   it('routes "How it works" to the merchant landing, not a pricing page', () => {
     render(<Footer locale="en" t={en.footer} />)
-    expect(screen.getByRole('link', { name: en.footer.lPricing }).getAttribute('href')).toBe('/en/merchants')
+    expect(screen.getByRole('link', { name: en.footer.lPricing }).getAttribute('href')).toBe('/en/for-merchants')
     expect(screen.getByRole('link', { name: en.footer.lPostMission }).getAttribute('href')).toBe('/en/merchants/post')
+  })
+
+  it('links the For Creators label to the creator landing', () => {
+    render(<Footer locale="en" t={en.footer} />)
+    expect(screen.getByRole('link', { name: en.footer.lForCreators }).getAttribute('href')).toBe('/en/for-creators')
   })
 
   it('keeps the Company column honest (single /about, no Case studies / Press)', () => {

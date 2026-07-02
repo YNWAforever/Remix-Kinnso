@@ -445,6 +445,7 @@ const messages: Messages = {
     linkExplore: '둘러보기', linkDestinations: '여행지', linkSessions: '세션', linkForMerchants: '가맹점 안내',
     ctaApply: '크리에이터 지원', ctaOpenStudio: '스튜디오 열기', ctaPending: '신청 검토 중', ctaPostMission: '미션 등록',
     signIn: '로그인', language: '언어', menuToggle: '메뉴', skipToContent: '본문으로 건너뛰기',
+    merchantMenuLabel: '가맹점 메뉴',
   },
   footer: {
     tagline: 'AI 트래블 콘텐츠 스튜디오 · 크리에이터에게 지급 · 홍콩 · 타이베이 · 도쿄',
@@ -454,6 +455,7 @@ const messages: Messages = {
     lPostMission: '미션 등록', lPricing: '이용 방법', lCaseStudies: '사례', lContact: '문의',
     lAbout: '소개', lAgent: 'AI 에이전트', lPress: '보도자료', lLegal: '약관',
     rights: '© 2026 KINNSO. 모든 권리 보유.',
+    lForCreators: '크리에이터 안내',
   },
   home: {
     heroEyebrow: '여행 크리에이터 마켓플레이스',

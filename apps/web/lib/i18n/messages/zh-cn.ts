@@ -445,6 +445,7 @@ const messages: Messages = {
     linkExplore: '探索', linkDestinations: '目的地', linkSessions: '社区活动', linkForMerchants: '商家专区',
     ctaApply: '申请成为创作者', ctaOpenStudio: '打开工作室', ctaPending: '申请审核中', ctaPostMission: '发布任务',
     signIn: '登录', language: '语言', menuToggle: '菜单', skipToContent: '跳到内容',
+    merchantMenuLabel: '商家菜单',
   },
   footer: {
     tagline: 'AI 旅游内容工作室 · 为创作者付费 · 香港 · 台北 · 东京',
@@ -454,6 +455,7 @@ const messages: Messages = {
     lPostMission: '发布任务', lPricing: '运作方式', lCaseStudies: '案例', lContact: '联系我们',
     lAbout: '关于', lAgent: 'AI 助手', lPress: '媒体', lLegal: '条款',
     rights: '© 2026 KINNSO. 版权所有。',
+    lForCreators: '创作者专区',
   },
   home: {
     heroEyebrow: '旅行创作者平台',

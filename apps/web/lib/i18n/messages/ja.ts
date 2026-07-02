@@ -445,6 +445,7 @@ const messages: Messages = {
     linkExplore: '探す', linkDestinations: '旅行先', linkSessions: 'セッション', linkForMerchants: '加盟店の方へ',
     ctaApply: 'クリエイター応募', ctaOpenStudio: 'スタジオを開く', ctaPending: '申請審査中', ctaPostMission: 'ミッションを投稿',
     signIn: 'ログイン', language: '言語', menuToggle: 'メニュー', skipToContent: '本文へスキップ',
+    merchantMenuLabel: '加盟店メニュー',
   },
   footer: {
     tagline: 'AIトラベルコンテンツスタジオ · クリエイターに報酬 · 香港 · 台北 · 東京',
@@ -454,6 +455,7 @@ const messages: Messages = {
     lPostMission: 'ミッションを投稿', lPricing: '仕組み', lCaseStudies: '事例', lContact: 'お問い合わせ',
     lAbout: '会社概要', lAgent: 'AIエージェント', lPress: 'プレス', lLegal: '規約',
     rights: '© 2026 KINNSO. 無断転載を禁じます。',
+    lForCreators: 'クリエイター向け',
   },
   home: {
     heroEyebrow: 'トラベルクリエイターのマーケットプレイス',

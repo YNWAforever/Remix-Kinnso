@@ -25,8 +25,7 @@ export function MerchantValue({ locale, t }: { locale: Locale; t: Messages['home
               </li>
             ))}
           </ul>
-          {/* → /merchants until R1C ships the /for-merchants landing; retarget there in the R1C sweep. */}
-          <Link href={`/${locale}/merchants`} className="k2-btn-ghost mt-8">{t.merchantCta}</Link>
+          <Link href={`/${locale}/for-merchants`} className="k2-btn-ghost mt-8">{t.merchantCta}</Link>
         </div>
       </div>
     </SectionShell>

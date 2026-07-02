@@ -445,6 +445,7 @@ const messages: Messages = {
     linkExplore: 'สำรวจ', linkDestinations: 'จุดหมาย', linkSessions: 'เซสชัน', linkForMerchants: 'สำหรับร้านค้า',
     ctaApply: 'สมัครเป็นครีเอเตอร์', ctaOpenStudio: 'เปิดสตูดิโอ', ctaPending: 'กำลังตรวจสอบใบสมัคร', ctaPostMission: 'โพสต์ภารกิจ',
     signIn: 'เข้าสู่ระบบ', language: 'ภาษา', menuToggle: 'เมนู', skipToContent: 'ข้ามไปยังเนื้อหา',
+    merchantMenuLabel: 'เมนูร้านค้า',
   },
   footer: {
     tagline: 'สตูดิโอคอนเทนต์ท่องเที่ยว AI · จ่ายให้ครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',
@@ -454,6 +455,7 @@ const messages: Messages = {
     lPostMission: 'โพสต์ภารกิจ', lPricing: 'วิธีการทำงาน', lCaseStudies: 'กรณีศึกษา', lContact: 'ติดต่อ',
     lAbout: 'เกี่ยวกับ', lAgent: 'ผู้ช่วย AI', lPress: 'ข่าวสาร', lLegal: 'ข้อกำหนด',
     rights: '© 2026 KINNSO สงวนลิขสิทธิ์',
+    lForCreators: 'สำหรับครีเอเตอร์',
   },
   home: {
     heroEyebrow: 'มาร์เก็ตเพลสของทราเวลครีเอเตอร์',

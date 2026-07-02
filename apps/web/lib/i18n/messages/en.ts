@@ -440,6 +440,7 @@ export interface Messages {
     linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
+    merchantMenuLabel: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
@@ -447,6 +448,7 @@ export interface Messages {
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
     lPostMission: string; lPricing: string; lCaseStudies: string; lContact: string
     lAbout: string; lAgent: string; lPress: string; lLegal: string; rights: string
+    lForCreators: string
   }
   home: {
     heroEyebrow: string; heroTitle: string; heroSubtitle: string
@@ -1342,6 +1344,7 @@ const messages: Messages = {
     linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
+    merchantMenuLabel: 'Merchant menu',
   },
   footer: {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
@@ -1351,6 +1354,7 @@ const messages: Messages = {
     lPostMission: 'Post a mission', lPricing: 'How it works', lCaseStudies: 'Case studies', lContact: 'Contact',
     lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
+    lForCreators: 'For Creators',
   },
   home: {
     heroEyebrow: 'The travel creator marketplace',

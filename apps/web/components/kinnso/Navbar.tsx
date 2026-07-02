@@ -12,8 +12,8 @@ import type { Messages } from "@/lib/i18n/messages/en";
  * R1A editorial navbar. Role is resolved CLIENT-side (useViewerRole in SiteChrome)
  * so public pages stay statically generable — this component only receives the
  * resolved role. IA (all roles): Explore · Destinations · Articles · Sessions ·
- * AI Agent · Creators; right side carries "For Merchants" (→ /merchants until the
- * R1C landing split moves it to /for-merchants) + the role-aware CTA.
+ * AI Agent · Creators; right side carries "For Merchants" (→ /for-merchants, the
+ * R1C merchant acquisition landing) + the role-aware CTA.
  * Merchant deep links (mission queue / creator search / insights) live on a slim
  * second row under the main row — nine top-row anchors overflow the container at
  * every width — and merchants skip the redundant "For Merchants" link. Desktop
@@ -56,7 +56,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
     return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
   })();
 
-  const forMerchantsHref = p("/merchants");
+  const forMerchantsHref = p("/for-merchants");
 
   return (
     <header className="sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
@@ -111,7 +111,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
       </div>
 
       {role === "merchant" && (
-        <nav aria-label={t.linkMissions} className="hidden border-t border-kinnso-edge xl:block">
+        <nav aria-label={t.merchantMenuLabel} className="hidden border-t border-kinnso-edge xl:block">
           <div className="k2-container flex h-10 items-center gap-1">
             {merchantAnchors.map((a) => {
               const href = p(a.to);

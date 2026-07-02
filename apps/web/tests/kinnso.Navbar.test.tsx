@@ -35,9 +35,14 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(screen.getByRole('link', { name: 'KINNSO' }).getAttribute('href')).toBe('/en')
   })
 
-  it('shows a For Merchants link → /en/merchants (href swaps to /for-merchants in R1C)', () => {
+  it('shows a For Merchants link → /en/for-merchants', () => {
     render(<Navbar locale="en" role="anon" t={en.nav} />)
-    expect(screen.getByRole('link', { name: en.nav.linkForMerchants }).getAttribute('href')).toBe('/en/merchants')
+    expect(screen.getByRole('link', { name: en.nav.linkForMerchants }).getAttribute('href')).toBe('/en/for-merchants')
+  })
+
+  it('labels the merchant sub-row landmark with the dedicated menu label', () => {
+    render(<Navbar locale="en" role="merchant" t={en.nav} />)
+    expect(screen.getByRole('navigation', { name: en.nav.merchantMenuLabel })).toBeTruthy()
   })
 
   it('anon shows Sign in + Apply CTA → /en/sign-up', () => {
