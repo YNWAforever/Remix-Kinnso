@@ -655,7 +655,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -751,6 +751,17 @@ export interface Messages {
       statusActive: string; statusInactive: string
     }
     tierLabels: { rising: string; pro: string; elite: string }
+  }
+  testimonialsAdmin: {
+    title: string; subtitle: string; newCta: string; empty: string
+    colAuthor: string; colStatus: string
+    roleCreator: string; roleTraveller: string; roleMerchant: string; localeAll: string
+    statusDraft: string; statusPublished: string
+    actPublish: string; actUnpublish: string; actEdit: string; actDelete: string; deleteConfirm: string
+    formNewTitle: string; formEditTitle: string
+    formQuote: string; formAuthorName: string; formAuthorRole: string
+    formLocale: string; formLocaleHint: string; formSortOrder: string
+    formSave: string; formCancel: string
   }
   users: {
     title: string; subtitle: string
@@ -1631,7 +1642,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -1755,6 +1766,21 @@ const messages: Messages = {
       statusActive: 'Active', statusInactive: 'Inactive',
     },
     tierLabels: { rising: 'Rising', pro: 'Pro', elite: 'Elite' },
+  },
+  testimonialsAdmin: {
+    title: 'Testimonials',
+    subtitle: 'Curate the quotes shown in the homepage social-proof section.',
+    newCta: 'New testimonial',
+    empty: 'No testimonials yet — add the first one.',
+    colAuthor: 'Author', colStatus: 'Status',
+    roleCreator: 'Creator', roleTraveller: 'Traveller', roleMerchant: 'Merchant', localeAll: 'All locales',
+    statusDraft: 'Draft', statusPublished: 'Published',
+    actPublish: 'Publish', actUnpublish: 'Unpublish', actEdit: 'Edit', actDelete: 'Delete',
+    deleteConfirm: 'Delete this testimonial? This cannot be undone.',
+    formNewTitle: 'New testimonial', formEditTitle: 'Edit testimonial',
+    formQuote: 'Quote', formAuthorName: 'Author name', formAuthorRole: 'Author role',
+    formLocale: 'Locale', formLocaleHint: 'Leave on "All locales" to show it in every language.', formSortOrder: 'Sort order',
+    formSave: 'Save', formCancel: 'Cancel',
   },
   users: {
     title: 'Users',

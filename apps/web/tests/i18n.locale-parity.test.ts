@@ -16,6 +16,7 @@ const GROUPS = [
   'destinationsSoon', 'sessionsSoon',
   'studioHome', 'explore', 'feed', 'creatorsLanding', 'merchantsLanding', 'studioGuides',
   'studioOffers', 'studioEarnings', 'about', 'contact', 'creatorTerms', 'article', 'tier', 'copilot', 'admin', 'perks',
+  'testimonialsAdmin',
   'users', 'merchantSearch', 'insights', 'seo', 'creators', 'merchantsOps', 'missionsOps',
 ] as const
 
