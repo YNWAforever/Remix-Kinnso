@@ -16,6 +16,7 @@ describe('AdminShell', () => {
     expect((screen.getByRole('link', { name: en.admin.navPerks }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/perks')
     expect((screen.getByRole('link', { name: en.admin.navUsers }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/users')
     expect((screen.getByRole('link', { name: en.admin.navCreators }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/creators')
+    expect((screen.getByRole('link', { name: en.admin.navTestimonials }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/testimonials')
     expect(screen.getByText('child-content')).toBeTruthy()
   })
 })

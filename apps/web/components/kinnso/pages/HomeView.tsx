@@ -1,122 +1,192 @@
-import Link from "next/link";
-import { ArrowRight, MapPin, Sparkles, Trophy, Wallet } from "lucide-react";
-import ScanWidget from "@/components/kinnso/ScanWidget";
-import GuideCard from "@/components/kinnso/GuideCard";
-import PassportHeroStack from "@/components/kinnso/PassportHeroStack";
-import { RouteMarkers, RouteStamp, TicketCard } from "@/components/kinnso/MarketPassport";
-import type { Guide } from "@/lib/creator-mock";
-import type { Locale } from "@/lib/i18n/config";
-import type { Messages } from "@/lib/i18n/messages/en";
+import Link from 'next/link'
+import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
+import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
+import { AgentTeaser } from '@/components/kinnso/home/AgentTeaser'
+import { CreatorCta } from '@/components/kinnso/home/CreatorCta'
+import { Hero } from '@/components/kinnso/home/Hero'
+import { HowItWorks } from '@/components/kinnso/home/HowItWorks'
+import { MerchantValue } from '@/components/kinnso/home/MerchantValue'
+import { StatsBar } from '@/components/kinnso/home/StatsBar'
+import type { SearchResult } from '@/lib/articles/queries'
+// The Guide TYPE stays sourced from creator-mock until the R1C sweep relocates it.
+import type { Guide } from '@/lib/creator-mock'
+import type { PlatformStats, Testimonial, UpcomingSession } from '@/lib/home/queries'
+import { toUrlCategory, type Locale } from '@/lib/i18n/config'
+import type { Messages } from '@/lib/i18n/messages/en'
 
-export function HomeView({ locale, t, guides }: { locale: Locale; t: Messages["home"]; guides: Guide[] }) {
-  const p = (path: string) => `/${locale}${path}`;
-  const steps = [
-    { n: 1, marker: "SCAN", title: t.step1Title, desc: t.step1Desc, icon: <Sparkles aria-hidden="true" className="h-5 w-5" /> },
-    { n: 2, marker: "CITY", title: t.step2Title, desc: t.step2Desc, icon: <MapPin aria-hidden="true" className="h-5 w-5" /> },
-    { n: 3, marker: "MATCH", title: t.step3Title, desc: t.step3Desc, icon: <Trophy aria-hidden="true" className="h-5 w-5" /> },
-    { n: 4, marker: "EARN", title: t.step4Title, desc: t.step4Desc, icon: <Wallet aria-hidden="true" className="h-5 w-5" /> },
-  ];
+/**
+ * R1B homepage — the 10 sections of master spec §4.1, in order:
+ *  1 Hero · 2 Social proof (stats bar + pull-quotes) · 3 How it works ·
+ *  4 Featured guides · 5 AI Agent (waitlist) · 6 Articles highlight ·
+ *  7 Community Sessions (data-gated until R5) · 8 Merchant value ·
+ *  9 Creator CTA · 10 Footer (rendered by SiteChrome — no work here).
+ * Every proof section is data-gated: empty data renders nothing, never filler.
+ */
+export function HomeView({
+  locale, t, guides, stats, testimonials, articles, sessions,
+}: {
+  locale: Locale
+  t: Messages['home']
+  guides: Guide[]
+  stats: PlatformStats | null
+  testimonials: Testimonial[]
+  articles: SearchResult['items']
+  sessions: UpcomingSession[]
+}) {
+  const p = (path: string) => `/${locale}${path}`
+  const roleLabel: Record<Testimonial['authorRole'], string> = {
+    creator: t.roleCreator, traveller: t.roleTraveller, merchant: t.roleMerchant,
+  }
+  const dateFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' })
+  const dateTimeFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' })
 
   return (
-    <div>
-      <section className="k-page-band relative isolate overflow-hidden">
-        <div className="k-container grid gap-12 py-16 md:grid-cols-[1.05fr_0.95fr] md:py-24">
+    <div className="bg-kinnso2-paper font-k2-sans">
+      {/* 1 — Hero (locked copy; real covers or typographic fallback) */}
+      <Hero locale={locale} t={t} guides={guides} />
+
+      {/* 2 — Social proof: threshold-gated counts + curated pull-quotes */}
+      <StatsBar locale={locale} t={t} stats={stats} />
+      {testimonials.length > 0 ? (
+        <SectionShell className="k2-hairline">
+          <ul className="grid gap-10 md:grid-cols-3">
+            {testimonials.map((q) => (
+              <li key={q.id}>
+                <figure>
+                  <blockquote className="k2-display text-xl leading-snug text-kinnso2-ink">
+                    &ldquo;{q.quote}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-3 text-sm text-kinnso2-ink/70">
+                    — {q.authorName} · {roleLabel[q.authorRole]}
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+        </SectionShell>
+      ) : null}
+
+      {/* 3 — How it works (traveller default; client tabs, no URL state) */}
+      <HowItWorks t={t} />
+
+      {/* 4 — Featured guides (up to 6, real DB) */}
+      <SectionShell className="k2-hairline">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <RouteStamp>{t.heroPill}</RouteStamp>
-            <h1 className="k-display mt-5 max-w-3xl text-5xl font-black leading-[0.92] text-kinnso-ink md:text-7xl">
-              {t.heroTitle}
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-kinnso-muted">{t.heroSubtitle}</p>
-            <div className="mt-8 max-w-xl"><ScanWidget /></div>
-            <Link href={p("/sign-up")} className="k-btn-primary mt-6 inline-flex">
-              {t.applyCta} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" />
+            <Eyebrow>{t.featuredEyebrow}</Eyebrow>
+            <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.featuredHeading}</h2>
+            <p className="mt-2 text-kinnso2-ink/70">{t.featuredSub}</p>
+          </div>
+          <Link href={p('/explore')} className="text-sm font-semibold text-kinnso2-clay transition hover:text-kinnso2-clay-deep">
+            {t.featuredSeeAll} →
+          </Link>
+        </div>
+        {guides.length === 0 ? (
+          <p className="mt-8 text-kinnso2-ink/70">{t.featuredEmpty}</p>
+        ) : (
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {guides.slice(0, 6).map((g) => (
+              <Link key={g.slug} href={p(`/g/${g.slug}`)} className="group">
+                <EditorialCard
+                  media={
+                    g.cover ? (
+                      <img
+                        src={g.cover}
+                        alt={g.title}
+                        width={640}
+                        height={480}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : undefined
+                  }
+                  kicker={g.city}
+                  title={g.title}
+                >
+                  @{g.creatorHandle}
+                </EditorialCard>
+              </Link>
+            ))}
+          </div>
+        )}
+      </SectionShell>
+
+      {/* 5 — AI Agent (waitlist framing until R4) */}
+      <AgentTeaser locale={locale} t={t} />
+
+      {/* 6 — Articles highlight (3 latest; hidden when none) */}
+      {articles.length > 0 ? (
+        <SectionShell>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <Eyebrow>{t.articlesEyebrow}</Eyebrow>
+              <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.articlesHeading}</h2>
+            </div>
+            <Link href={p('/articles')} className="text-sm font-semibold text-kinnso2-clay transition hover:text-kinnso2-clay-deep">
+              {t.articlesSeeAll} →
             </Link>
           </div>
-          <PassportHeroStack />
-        </div>
-      </section>
-
-      <section className="k-page-band border-t border-kinnso-edge py-16">
-        <div className="k-container">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="k-display text-3xl font-black text-kinnso-ink md:text-4xl">{t.howHeading}</h2>
-            <p className="mt-3 text-kinnso-muted">{t.howSub}</p>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {articles.slice(0, 3).map((a) => {
+              const cat = toUrlCategory(a.category)
+              if (!cat) return null
+              return (
+                <Link key={a.url} href={p(`/articles/${cat}/${a.url}`)} className="group">
+                  <EditorialCard
+                    media={
+                      a.thumbnails[0] ? (
+                        <img
+                          src={a.thumbnails[0]}
+                          alt={a.title ?? ''}
+                          width={640}
+                          height={480}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                        />
+                      ) : undefined
+                    }
+                    kicker={a.published_at ? dateFmt.format(new Date(a.published_at)) : undefined}
+                    title={a.title ?? a.url}
+                  >
+                    {a.summary}
+                  </EditorialCard>
+                </Link>
+              )
+            })}
           </div>
-          <RouteMarkers className="mx-auto mt-8 max-w-3xl" points={steps.map((s) => s.marker)} />
-          <ol className="mt-8 grid gap-4 md:grid-cols-4">
-            {steps.map((s) => (
-              <TicketCard key={s.n} as="li" className="p-5">
-                <div className="flex items-center justify-between">
-                  <span className="k-mono text-3xl font-black text-kinnso-orange">0{s.n}</span>
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orange">{s.icon}</span>
-                </div>
-                <h3 className="mt-4 text-lg font-bold text-kinnso-ink">{s.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-kinnso-muted">{s.desc}</p>
-              </TicketCard>
+        </SectionShell>
+      ) : null}
+
+      {/* 7 — Community Sessions: DATA-GATED. getUpcomingSessions() returns []
+          until R5 ships community_sessions, so this renders null today — no
+          fake content, no empty carousel. */}
+      {sessions.length > 0 ? (
+        <SectionShell className="k2-hairline">
+          <Eyebrow>{t.sessionsEyebrow}</Eyebrow>
+          <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.sessionsHeading}</h2>
+          <p className="mt-2 max-w-xl text-kinnso2-ink/70">{t.sessionsSub}</p>
+          <ul className="mt-8 grid gap-5 md:grid-cols-3">
+            {sessions.map((s) => (
+              <li key={s.id} className="k2-card p-5">
+                <p className="text-sm text-kinnso2-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
+                <h3 className="mt-2 text-lg font-semibold text-kinnso2-ink">{s.title}</h3>
+                <p className="mt-1 text-sm text-kinnso2-ink/70">@{s.hostHandle}</p>
+              </li>
             ))}
-          </ol>
-        </div>
-      </section>
+          </ul>
+        </SectionShell>
+      ) : null}
 
-      <section className="k-page-band py-16">
-        <div className="k-container">
-          <div className="flex items-end justify-between gap-6">
-            <div>
-              <h2 className="k-display text-3xl font-black text-kinnso-ink md:text-4xl">{t.featuredHeading}</h2>
-              <p className="mt-2 text-kinnso-muted">{t.featuredSub}</p>
-            </div>
-            <Link href={p("/explore")} className="hidden text-sm font-bold text-kinnso-orange hover:text-kinnso-orangeDark md:inline">{t.featuredSeeAll} →</Link>
-          </div>
-          <div className="no-scrollbar mt-6 -mx-4 flex gap-4 overflow-x-auto px-4 pb-2">
-            {guides.length === 0 ? (
-              <p className="text-kinnso-muted">{t.featuredEmpty}</p>
-            ) : (
-              guides.slice(0, 6).map((g) => (
-                <div key={g.slug} className="w-64 shrink-0">
-                  <GuideCard g={g} locale={locale} />
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
+      {/* 8 — Merchant value prop */}
+      <MerchantValue locale={locale} t={t} />
 
-      <section className="k-page-band pb-20">
-        <div className="k-container grid gap-5 md:grid-cols-2">
-          <TicketCard className="overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1600&auto=format&fit=crop"
-              alt="Traveler checking a saved city guide"
-              width={800}
-              height={400}
-              loading="lazy"
-              className="aspect-[2/1] w-full object-cover"
-            />
-            <div className="p-6">
-              <h3 className="k-display text-2xl font-black text-kinnso-ink">{t.travelersTitle}</h3>
-              <p className="mt-2 text-kinnso-muted">{t.travelersDesc}</p>
-              <Link href={p("/explore")} className="k-btn-primary mt-4 inline-flex">{t.travelersCta} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" /></Link>
-            </div>
-          </TicketCard>
-          <TicketCard className="overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1600&auto=format&fit=crop"
-              alt="Merchant team preparing a creator mission"
-              width={800}
-              height={400}
-              loading="lazy"
-              className="aspect-[2/1] w-full object-cover"
-            />
-            <div className="p-6">
-              <h3 className="k-display text-2xl font-black text-kinnso-ink">{t.merchantsTitle}</h3>
-              <p className="mt-2 text-kinnso-muted">{t.merchantsDesc}</p>
-              <Link href={p("/merchants/post")} className="k-btn-primary mt-4 inline-flex">{t.merchantsCta} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" /></Link>
-            </div>
-          </TicketCard>
-        </div>
-      </section>
+      {/* 9 — Creator CTA */}
+      <CreatorCta locale={locale} t={t} />
+
+      {/* 10 — Footer: R1A chrome renders it via SiteChrome. No work here. */}
     </div>
-  );
+  )
 }
 
-export default HomeView;
+export default HomeView

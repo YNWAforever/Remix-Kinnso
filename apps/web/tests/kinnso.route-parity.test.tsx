@@ -56,7 +56,9 @@ describe('front-of-house route parity', () => {
       collectInternalLinks(<Navbar locale="en" role={role} t={en.nav} />).forEach((href) => hrefs.add(href))
     })
     collectInternalLinks(<Footer locale="en" t={en.footer} />).forEach((href) => hrefs.add(href))
-    collectInternalLinks(<HomeView locale="en" t={en.home} guides={[]} />).forEach((href) => hrefs.add(href))
+    collectInternalLinks(
+      <HomeView locale="en" t={en.home} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[]} />,
+    ).forEach((href) => hrefs.add(href))
 
     const missing = Array.from(hrefs).filter((href) => !isImplementedLocalRoute(href))
     expect(missing).toEqual([])

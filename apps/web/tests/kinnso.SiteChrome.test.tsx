@@ -15,6 +15,7 @@ vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
 
 import { SiteChrome } from '@/components/kinnso/SiteChrome'
 import en from '@/lib/i18n/messages/en'
+import zhHk from '@/lib/i18n/messages/zh-hk'
 
 function renderAt(path: string) {
   pathname.value = path
@@ -42,11 +43,21 @@ describe('SiteChrome', () => {
 
   it('renders a skip link and stable main target on normal paths', () => {
     renderAt('/en/articles')
-    const skip = screen.getByRole('link', { name: 'Skip to content' })
+    const skip = screen.getByRole('link', { name: en.nav.skipToContent })
     expect(skip.getAttribute('href')).toBe('#main-content')
     const main = document.querySelector('#main-content')
     expect(main).toBeTruthy()
     // The skip target must be programmatically focusable so focus actually lands there.
     expect(main?.getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('localizes the skip link (drive-by fix: was hardcoded English)', () => {
+    pathname.value = '/zh-hk/articles'
+    render(
+      <SiteChrome locale="zh-hk" nav={zhHk.nav} footer={zhHk.footer}>
+        <div>PAGE_BODY</div>
+      </SiteChrome>,
+    )
+    expect(screen.getByRole('link', { name: zhHk.nav.skipToContent }).getAttribute('href')).toBe('#main-content')
   })
 })
