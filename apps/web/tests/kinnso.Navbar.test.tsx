@@ -2,10 +2,16 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 
-afterEach(cleanup)
+let mockPathname = '/en'
+
+afterEach(() => {
+  cleanup()
+  mockPathname = '/en'
+})
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
-  usePathname: () => '/en',
+  usePathname: () => mockPathname,
   useSearchParams: () => new URLSearchParams(),
 }))
 
@@ -45,10 +51,10 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(screen.getByRole('link', { name: en.nav.ctaOpenStudio }).getAttribute('href')).toBe('/en/studio')
     cleanup()
     render(<Navbar locale="en" role="merchant" t={en.nav} />)
-    expect(screen.getByRole('link', { name: en.nav.linkMissions }).getAttribute('href')).toBe('/en/merchants/missions')
+    expect(screen.getAllByRole('link', { name: en.nav.linkMissions })[0].getAttribute('href')).toBe('/en/merchants/missions')
     expect(screen.getByRole('link', { name: en.nav.ctaPostMission }).getAttribute('href')).toBe('/en/merchants/post')
     expect(screen.getAllByRole('link', { name: en.nav.linkFindCreators })[0].getAttribute('href')).toBe('/en/merchants/creators')
-    expect(screen.getByRole('link', { name: en.nav.linkInsights }).getAttribute('href')).toBe('/en/merchants/insights')
+    expect(screen.getAllByRole('link', { name: en.nav.linkInsights })[0].getAttribute('href')).toBe('/en/merchants/insights')
   })
 
   it('creator-pending renders the pending pill CTA → /en/creators/apply', () => {
@@ -82,5 +88,39 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(button.getAttribute('aria-expanded')).toBe('true')
     expect(button.getAttribute('aria-controls')).toBe('kinnso-mobile-menu')
     expect(document.getElementById('kinnso-mobile-menu')).toBeTruthy()
+  })
+
+  it('marks the matching base anchor with aria-current="page" and leaves siblings unmarked', () => {
+    mockPathname = '/en/explore'
+    render(<Navbar locale="en" role="anon" t={en.nav} />)
+    expect(screen.getByRole('link', { name: en.nav.linkExplore }).getAttribute('aria-current')).toBe('page')
+    expect(screen.getByRole('link', { name: en.nav.linkDestinations }).getAttribute('aria-current')).toBeNull()
+  })
+
+  it('prefix-matches nested paths for aria-current (e.g. /creators/apply → Creators)', () => {
+    mockPathname = '/en/creators/apply'
+    render(<Navbar locale="en" role="anon" t={en.nav} />)
+    expect(screen.getByRole('link', { name: en.nav.linkCreators }).getAttribute('aria-current')).toBe('page')
+  })
+
+  it('merchant sub-row owns the active state on /merchants/creators; base Creators stays inactive', () => {
+    mockPathname = '/en/merchants/creators'
+    render(<Navbar locale="en" role="merchant" t={en.nav} />)
+    expect(screen.getByRole('link', { name: en.nav.linkFindCreators }).getAttribute('aria-current')).toBe('page')
+    expect(screen.getByRole('link', { name: en.nav.linkCreators }).getAttribute('aria-current')).toBeNull()
+  })
+
+  it('merchant does not get a For Merchants link (desktop or tray)', () => {
+    render(<Navbar locale="en" role="merchant" t={en.nav} />)
+    expect(screen.queryByRole('link', { name: en.nav.linkForMerchants })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
+    expect(screen.queryByRole('link', { name: en.nav.linkForMerchants })).toBeNull()
+  })
+
+  it('merchant deep-links render in the desktop sub-row and again in the open mobile tray', () => {
+    render(<Navbar locale="en" role="merchant" t={en.nav} />)
+    expect(screen.getAllByRole('link', { name: en.nav.linkMissions }).length).toBeGreaterThanOrEqual(1)
+    fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
+    expect(screen.getAllByRole('link', { name: en.nav.linkMissions }).length).toBeGreaterThanOrEqual(2)
   })
 })

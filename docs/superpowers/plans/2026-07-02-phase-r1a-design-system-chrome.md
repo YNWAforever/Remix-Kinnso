@@ -802,10 +802,16 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
   import { describe, it, expect, afterEach, vi } from 'vitest'
   import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 
-  afterEach(cleanup)
+  let mockPathname = '/en'
+
+  afterEach(() => {
+    cleanup()
+    mockPathname = '/en'
+  })
+
   vi.mock('next/navigation', () => ({
     useRouter: () => ({ push: vi.fn() }),
-    usePathname: () => '/en',
+    usePathname: () => mockPathname,
     useSearchParams: () => new URLSearchParams(),
   }))
 
@@ -845,10 +851,10 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
       expect(screen.getByRole('link', { name: en.nav.ctaOpenStudio }).getAttribute('href')).toBe('/en/studio')
       cleanup()
       render(<Navbar locale="en" role="merchant" t={en.nav} />)
-      expect(screen.getByRole('link', { name: en.nav.linkMissions }).getAttribute('href')).toBe('/en/merchants/missions')
+      expect(screen.getAllByRole('link', { name: en.nav.linkMissions })[0].getAttribute('href')).toBe('/en/merchants/missions')
       expect(screen.getByRole('link', { name: en.nav.ctaPostMission }).getAttribute('href')).toBe('/en/merchants/post')
       expect(screen.getAllByRole('link', { name: en.nav.linkFindCreators })[0].getAttribute('href')).toBe('/en/merchants/creators')
-      expect(screen.getByRole('link', { name: en.nav.linkInsights }).getAttribute('href')).toBe('/en/merchants/insights')
+      expect(screen.getAllByRole('link', { name: en.nav.linkInsights })[0].getAttribute('href')).toBe('/en/merchants/insights')
     })
 
     it('creator-pending renders the pending pill CTA → /en/creators/apply', () => {
@@ -883,6 +889,40 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
       expect(button.getAttribute('aria-controls')).toBe('kinnso-mobile-menu')
       expect(document.getElementById('kinnso-mobile-menu')).toBeTruthy()
     })
+
+    it('marks the matching base anchor with aria-current="page" and leaves siblings unmarked', () => {
+      mockPathname = '/en/explore'
+      render(<Navbar locale="en" role="anon" t={en.nav} />)
+      expect(screen.getByRole('link', { name: en.nav.linkExplore }).getAttribute('aria-current')).toBe('page')
+      expect(screen.getByRole('link', { name: en.nav.linkDestinations }).getAttribute('aria-current')).toBeNull()
+    })
+
+    it('prefix-matches nested paths for aria-current (e.g. /creators/apply → Creators)', () => {
+      mockPathname = '/en/creators/apply'
+      render(<Navbar locale="en" role="anon" t={en.nav} />)
+      expect(screen.getByRole('link', { name: en.nav.linkCreators }).getAttribute('aria-current')).toBe('page')
+    })
+
+    it('merchant sub-row owns the active state on /merchants/creators; base Creators stays inactive', () => {
+      mockPathname = '/en/merchants/creators'
+      render(<Navbar locale="en" role="merchant" t={en.nav} />)
+      expect(screen.getByRole('link', { name: en.nav.linkFindCreators }).getAttribute('aria-current')).toBe('page')
+      expect(screen.getByRole('link', { name: en.nav.linkCreators }).getAttribute('aria-current')).toBeNull()
+    })
+
+    it('merchant does not get a For Merchants link (desktop or tray)', () => {
+      render(<Navbar locale="en" role="merchant" t={en.nav} />)
+      expect(screen.queryByRole('link', { name: en.nav.linkForMerchants })).toBeNull()
+      fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
+      expect(screen.queryByRole('link', { name: en.nav.linkForMerchants })).toBeNull()
+    })
+
+    it('merchant deep-links render in the desktop sub-row and again in the open mobile tray', () => {
+      render(<Navbar locale="en" role="merchant" t={en.nav} />)
+      expect(screen.getAllByRole('link', { name: en.nav.linkMissions }).length).toBeGreaterThanOrEqual(1)
+      fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
+      expect(screen.getAllByRole('link', { name: en.nav.linkMissions }).length).toBeGreaterThanOrEqual(2)
+    })
   })
   ```
 
@@ -910,11 +950,23 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
    * resolved role. IA (all roles): Explore · Destinations · Articles · Sessions ·
    * AI Agent · Creators; right side carries "For Merchants" (→ /merchants until the
    * R1C landing split moves it to /for-merchants) + the role-aware CTA.
+   * Merchant deep links (mission queue / creator search / insights) live on a slim
+   * second row under the main row — nine top-row anchors overflow the container at
+   * every width — and merchants skip the redundant "For Merchants" link. Desktop
+   * chrome is gated at xl: (tablets get the hamburger) so the row never overflows
+   * at 768–1100px.
    */
   export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["nav"] }> = ({ locale, role, t }) => {
     const [open, setOpen] = useState(false);
     const pathname = usePathname();
     const p = (path: string) => `/${locale}${path}`;
+    const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+    // Active state is underline + clay (not color-only); the on-skin focus ring
+    // overrides the legacy global orange focus rule.
+    const navLinkClass = (active: boolean) =>
+      `whitespace-nowrap px-3 py-2 text-sm font-medium tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay ${
+        active ? "text-kinnso2-clay underline underline-offset-8 decoration-2 decoration-kinnso2-clay" : "text-kinnso2-ink/75 hover:text-kinnso2-ink"
+      }`;
 
     const baseAnchors = [
       { to: "/explore",      label: t.linkExplore },
@@ -924,17 +976,23 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
       { to: "/agent",        label: t.linkAgent },
       { to: "/creators",     label: t.linkCreators },
     ];
-    // Merchants keep direct links to their real mission queue + creator search + insights.
-    const anchors = role === "merchant"
-      ? [...baseAnchors, { to: "/merchants/missions", label: t.linkMissions }, { to: "/merchants/creators", label: t.linkFindCreators }, { to: "/merchants/insights", label: t.linkInsights }]
-      : baseAnchors;
+    // Merchant deep links: slim second row on desktop + tray entries on mobile —
+    // never on the top row, which cannot fit nine anchors.
+    const merchantAnchors = [
+      { to: "/merchants/missions", label: t.linkMissions },
+      { to: "/merchants/creators", label: t.linkFindCreators },
+      { to: "/merchants/insights", label: t.linkInsights },
+    ];
+    const trayAnchors = role === "merchant" ? [...baseAnchors, ...merchantAnchors] : baseAnchors;
 
     const cta = (() => {
       if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k2-btn-primary" };
-      if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex items-center rounded-[3px] bg-kinnso2-sand px-4 py-2 text-sm font-semibold text-kinnso2-ink" };
+      if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso2-sand px-4 py-2 text-sm font-semibold text-kinnso2-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay" };
       if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/post", className: "k2-btn-primary" };
       return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
     })();
+
+    const forMerchantsHref = p("/merchants");
 
     return (
       <header className="sticky top-0 z-40 border-b border-kinnso2-line bg-kinnso2-paper/95 font-k2-sans backdrop-blur">
@@ -944,37 +1002,39 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-kinnso2-clay" />
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            {anchors.map((a) => {
+          <nav className="hidden items-center gap-1 xl:flex">
+            {baseAnchors.map((a) => {
               const href = p(a.to);
-              const isActive = pathname === href || pathname.startsWith(`${href}/`);
               return (
-                <Link
-                  key={a.to}
-                  href={href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`px-3 py-2 text-sm font-medium tracking-wide transition ${isActive ? "text-kinnso2-clay" : "text-kinnso2-ink/75 hover:text-kinnso2-ink"}`}
-                >
+                <Link key={a.to} href={href} aria-current={isActive(href) ? "page" : undefined} className={navLinkClass(isActive(href))}>
                   {a.label}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
-            <Link href={p("/merchants")} className="px-2 py-2 text-sm font-medium text-kinnso2-ink/75 transition hover:text-kinnso2-ink">
-              {t.linkForMerchants}
-            </Link>
+          <div className="hidden items-center gap-3 xl:flex">
+            {role !== "merchant" && (
+              <Link
+                href={forMerchantsHref}
+                aria-current={isActive(forMerchantsHref) ? "page" : undefined}
+                className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay ${
+                  isActive(forMerchantsHref) ? "text-kinnso2-clay underline underline-offset-8 decoration-2 decoration-kinnso2-clay" : "text-kinnso2-ink/75 hover:text-kinnso2-ink"
+                }`}
+              >
+                {t.linkForMerchants}
+              </Link>
+            )}
             <LocaleSwitcher locale={locale} t={t} />
             {role === "anon" && (
-              <Link href={p("/sign-in")} className="px-3 py-2 text-sm font-semibold text-kinnso2-ink transition hover:text-kinnso2-clay">{t.signIn}</Link>
+              <Link href={p("/sign-in")} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso2-ink transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">{t.signIn}</Link>
             )}
             <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
           </div>
 
           <button
             type="button"
-            className="grid h-10 w-10 place-items-center rounded-full text-kinnso2-ink transition hover:bg-kinnso2-sand/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full text-kinnso2-ink transition hover:bg-kinnso2-sand/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay xl:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label={t.menuToggle}
             aria-expanded={open}
@@ -986,22 +1046,41 @@ Contract preserved: same props `{ locale, role, t: Messages['nav'] }`; role reso
           </button>
         </div>
 
+        {role === "merchant" && (
+          <nav aria-label={t.linkMissions} className="hidden border-t border-kinnso2-line xl:block">
+            <div className="k2-container flex h-10 items-center gap-1">
+              {merchantAnchors.map((a) => {
+                const href = p(a.to);
+                return (
+                  <Link key={a.to} href={href} aria-current={isActive(href) ? "page" : undefined} className={navLinkClass(isActive(href))}>
+                    {a.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+        )}
+
         {open && (
-          <div id="kinnso-mobile-menu" className="border-t border-kinnso2-line bg-kinnso2-paper md:hidden">
+          <div id="kinnso-mobile-menu" className="border-t border-kinnso2-line bg-kinnso2-paper xl:hidden">
             <div className="k2-container flex flex-col gap-1 py-3">
-              {anchors.map((a) => (
-                <Link key={a.to} href={p(a.to)} onClick={() => setOpen(false)} className="px-3 py-2 text-sm font-medium text-kinnso2-ink transition hover:text-kinnso2-clay">
-                  {a.label}
-                </Link>
-              ))}
-              <Link href={p("/merchants")} onClick={() => setOpen(false)} className="px-3 py-2 text-sm font-medium text-kinnso2-ink/75 transition hover:text-kinnso2-clay">
-                {t.linkForMerchants}
-              </Link>
+              <nav aria-label={t.menuToggle} className="flex flex-col gap-1">
+                {trayAnchors.map((a) => (
+                  <Link key={a.to} href={p(a.to)} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso2-ink transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">
+                    {a.label}
+                  </Link>
+                ))}
+                {role !== "merchant" && (
+                  <Link href={forMerchantsHref} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso2-ink/75 transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">
+                    {t.linkForMerchants}
+                  </Link>
+                )}
+              </nav>
               <div className="mt-2 flex items-center justify-between gap-3">
                 <LocaleSwitcher locale={locale} t={t} />
                 <div className="flex items-center gap-2">
                   {role === "anon" && (
-                    <Link href={p("/sign-in")} onClick={() => setOpen(false)} className="px-3 py-2 text-sm font-semibold text-kinnso2-ink transition hover:text-kinnso2-clay">{t.signIn}</Link>
+                    <Link href={p("/sign-in")} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso2-ink transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">{t.signIn}</Link>
                   )}
                   <Link href={p(cta.to)} onClick={() => setOpen(false)} className={cta.className}>{cta.label}</Link>
                 </div>
