@@ -126,9 +126,9 @@ Both DB objects ship in ONE timestamped migration (timestamp format matches the 
   )
 
   describe('platform_stats() RPC', () => {
-    it('is a SECURITY DEFINER aggregate with a pinned search_path', () => {
+    it('is a SECURITY INVOKER aggregate with a pinned search_path', () => {
       expect(sql).toContain('create or replace function public.platform_stats()')
-      expect(sql).toContain('security definer')
+      expect(sql).toContain('security invoker')
       expect(sql).toContain('set search_path = public')
     })
     it('counts active public creators, published guides, and distinct guide cities', () => {
@@ -151,6 +151,7 @@ Both DB objects ship in ONE timestamped migration (timestamp format matches the 
       expect(sql).toContain('author_name text not null')
       expect(sql).toContain("author_role text not null check (author_role in ('creator','traveller','merchant'))")
       expect(sql).toContain("status text not null default 'draft' check (status in ('draft','published'))")
+      expect(sql).toContain("check (locale is null or locale in ('en','zh-hk','zh-tw','zh-cn','ja','ko','th'))")
       expect(sql).toContain('sort_order int not null default 0')
     })
     it('is RLS-locked: anon reads published only; ops manage all', () => {
@@ -174,14 +175,16 @@ Both DB objects ship in ONE timestamped migration (timestamp format matches the 
   -- Reuses public.is_active_ops() (6A, 20260626130000) — do NOT redefine here.
 
   -- 1. Honest aggregate counts for the homepage social-proof bar.
-  --    SECURITY DEFINER because anon RLS hides creators rows entirely; the function
-  --    returns ONLY aggregate counts, so no row data can leak. "Active creator" =
-  --    active status + claimed handle + published public profile. Destinations =
-  --    distinct cities across published guides. Deliberately NO bookings count
-  --    until R3 ships direct booking (master spec §5, threshold-gated display).
+  --    SECURITY INVOKER: anon's RLS (creators_public_read, guides_public_read_published)
+  --    already permits exactly these rows, so the counts run under caller rights and
+  --    automatically track any future policy tightening. The WHERE predicates mirror
+  --    those policies for explicitness/defense-in-depth. "Active creator" = active
+  --    status + claimed handle + published public profile. Destinations = distinct
+  --    cities across published guides. Deliberately NO bookings count until R3 ships
+  --    direct booking (master spec §5, threshold-gated display).
   create or replace function public.platform_stats()
   returns table (active_creators bigint, published_guides bigint, destinations bigint)
-  language sql stable security definer set search_path = public as $$
+  language sql stable security invoker set search_path = public as $$
     select
       (select count(*) from public.creators
          where status = 'active' and handle is not null and public_profile is not null),
@@ -190,7 +193,7 @@ Both DB objects ship in ONE timestamped migration (timestamp format matches the 
          where status = 'published' and city is not null and city <> '');
   $$;
   -- Public homepage read: unlike the ops RPCs, anon MUST be able to execute this.
-  revoke all on function public.platform_stats() from public;
+  revoke all on function public.platform_stats() from public, anon;
   grant execute on function public.platform_stats() to anon, authenticated;
 
   -- 2. Curated testimonials — ops-managed; surfaced on the homepage now and the
@@ -200,7 +203,7 @@ Both DB objects ship in ONE timestamped migration (timestamp format matches the 
     quote text not null,
     author_name text not null,
     author_role text not null check (author_role in ('creator','traveller','merchant')),
-    locale text,
+    locale text check (locale is null or locale in ('en','zh-hk','zh-tw','zh-cn','ja','ko','th')),
     status text not null default 'draft' check (status in ('draft','published')),
     sort_order int not null default 0,
     created_at timestamptz not null default now()

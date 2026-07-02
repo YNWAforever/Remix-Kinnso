@@ -11,9 +11,9 @@ const sql = readFileSync(
 )
 
 describe('platform_stats() RPC', () => {
-  it('is a SECURITY DEFINER aggregate with a pinned search_path', () => {
+  it('is a SECURITY INVOKER aggregate with a pinned search_path', () => {
     expect(sql).toContain('create or replace function public.platform_stats()')
-    expect(sql).toContain('security definer')
+    expect(sql).toContain('security invoker')
     expect(sql).toContain('set search_path = public')
   })
   it('counts active public creators, published guides, and distinct guide cities', () => {
@@ -36,6 +36,7 @@ describe('testimonials table', () => {
     expect(sql).toContain('author_name text not null')
     expect(sql).toContain("author_role text not null check (author_role in ('creator','traveller','merchant'))")
     expect(sql).toContain("status text not null default 'draft' check (status in ('draft','published'))")
+    expect(sql).toContain("check (locale is null or locale in ('en','zh-hk','zh-tw','zh-cn','ja','ko','th'))")
     expect(sql).toContain('sort_order int not null default 0')
   })
   it('is RLS-locked: anon reads published only; ops manage all', () => {
