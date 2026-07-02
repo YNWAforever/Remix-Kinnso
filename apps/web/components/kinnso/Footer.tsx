@@ -2,36 +2,37 @@ import Link from "next/link";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
 
+/** R1A editorial footer: dark-ink band, four columns (Explore / Creators / Merchants / Company). */
 const Footer = ({ locale, t }: { locale: Locale; t: Messages["footer"] }) => {
   const p = (path: string) => `/${locale}${path}`;
   const cols = [
-    { title: t.colCreators, links: [[t.lApply, "/sign-up"], [t.lStudio, "/studio"], [t.lMissions, "/studio/missions"], [t.lEarnings, "/studio/earnings"]] as const },
+    { title: t.colExplore,   links: [[t.lGuides, "/explore"], [t.lDestinations, "/destinations"], [t.lArticles, "/articles"], [t.lSessions, "/sessions"]] as const },
+    { title: t.colCreators,  links: [[t.lApply, "/sign-up"], [t.lStudio, "/studio"], [t.lMissions, "/studio/missions"], [t.lEarnings, "/studio/earnings"]] as const },
     { title: t.colMerchants, links: [[t.lPostMission, "/merchants/post"], [t.lPricing, "/merchants"]] as const },
-    { title: t.colCompany, links: [[t.lAbout, "/about"], [t.lAgent, "/agent"], [t.lContact, "/contact"], [t.lLegal, "/legal/creator-terms"]] as const },
+    { title: t.colCompany,   links: [[t.lAbout, "/about"], [t.lAgent, "/agent"], [t.lContact, "/contact"], [t.lLegal, "/legal/creator-terms"]] as const },
   ];
   return (
-    <footer className="border-t border-kinnso-cream2 bg-white">
-      <div className="k-container grid gap-10 py-12 md:grid-cols-4">
+    <footer className="bg-kinnso2-ink font-k2-sans text-kinnso2-paper">
+      <div className="k2-container grid gap-10 py-14 md:grid-cols-5">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-kinnso-orange text-white font-black">K</span>
-            <span className="text-xl font-black tracking-tight text-kinnso-ink">KINNSO</span>
-          </div>
-          <p className="mt-3 text-sm text-kinnso-muted">{t.tagline}</p>
+          <span className="k2-display text-2xl font-semibold tracking-tight text-kinnso2-paper">KINNSO</span>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-kinnso2-paper/60">{t.tagline}</p>
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-kinnso-muted">{c.title}</h4>
-            <ul className="mt-3 space-y-2 text-sm">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-sun">{c.title}</h4>
+            <ul className="mt-4 space-y-2.5 text-sm">
               {c.links.map(([label, href]) => (
-                <li key={label}><Link href={p(href)} className="text-kinnso-ink hover:text-kinnso-orange">{label}</Link></li>
+                <li key={`${label}-${href}`}>
+                  <Link href={p(href)} className="text-kinnso2-paper/80 transition hover:text-kinnso2-paper">{label}</Link>
+                </li>
               ))}
             </ul>
           </div>
         ))}
       </div>
-      <div className="border-t border-kinnso-cream2">
-        <div className="k-container flex items-center justify-center py-4 text-xs text-kinnso-muted sm:justify-start">
+      <div className="border-t border-kinnso2-paper/15">
+        <div className="k2-container flex items-center justify-center py-4 text-xs text-kinnso2-paper/50 sm:justify-start">
           <span>{t.rights}</span>
         </div>
       </div>
