@@ -32,9 +32,9 @@
   --radius-chip: 8px;
   --radius-pill: 999px;
 
-  --font-display: var(--font-bricolage), var(--font-dm-sans), "WQY Zen Hei", sans-serif;
-  --font-sans: var(--font-dm-sans), "WQY Zen Hei", sans-serif;
-  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-display: var(--font-fraunces), 'Noto Serif TC', 'Songti TC', 'Noto Serif SC', 'Songti SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'Nanum Myeongjo', 'AppleMyungjo', serif;
+  --font-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   /* kinnso-* utility aliases (ported components use the `kinnso-` namespace) */
   --color-kinnso-orange: #F26A1F;
@@ -69,34 +69,10 @@
   --k-blue:        211 60% 45%;
 }
 
-/* ------------------------------------------------------------------------- */
-/* R1A "editorial travel journal" tokens (kinnso2-*).                         */
-/* Added ALONGSIDE the legacy kinnso-* market-passport system so unmigrated   */
-/* pages keep rendering; the final R1C task deletes the legacy block.         */
-/* Grep "kinnso2" / "k2-" to find every new-system usage. Keep declarations   */
-/* single-spaced ("token: value") — tests/design.k2-tokens.test.ts matches. */
-/* ------------------------------------------------------------------------- */
-@theme {
-  --color-kinnso2-paper: #FAF6EF; /* warm cream page background */
-  --color-kinnso2-ink: #26201A; /* deep warm brown-black text */
-  --color-kinnso2-clay: #B9482B; /* terracotta primary */
-  --color-kinnso2-clay-deep: #93361F; /* terracotta hover / pressed */
-  --color-kinnso2-sand: #E8DCC8; /* soft panel & chip background */
-  --color-kinnso2-moss: #4A5D43; /* sage accent */
-  --color-kinnso2-sun: #D99A2B; /* ochre highlight */
-  --color-kinnso2-line: #D8CDBB; /* hairline borders */
-
-  /* Editorial type. Fraunces covers Latin; CJK falls through the shared stack
-     below. Font matching is per-glyph and ignores lang, so the stack is
-     TC-first — correct for zh-hk/zh-tw, but on Apple platforms ja/ko text
-     matches the TC faces' kanji/hanja glyphs before Hiragino/Nanum is reached
-     (ja renders in Chinese glyph forms). Acceptable for R1A; revisit with
-     :lang() overrides if ja/ko typography matters later. Thai has no serif
-     tradition and falls to generic `serif`. On Windows, zh/ko coverage relies
-     on the generic fallback resolving per the html lang attribute. */
-  --font-k2-display: var(--font-fraunces), 'Noto Serif TC', 'Songti TC', 'Noto Serif SC', 'Songti SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'Nanum Myeongjo', 'AppleMyungjo', serif;
-  --font-k2-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
-}
+/* R1C: the ORIGINAL kinnso-* palette is the canonical design system again    */
+/* (user decision 2026-07-02). k2-* utilities below are the editorial         */
+/* component layer on top of it; k-* ticket utilities remain for studio/admin */
+/* only and are retired when those surfaces are redesigned.                   */
 
 /* `shadow-kinnso` utility (redesign used a custom boxShadow). */
 @utility shadow-kinnso {
@@ -168,19 +144,19 @@
   .k-route-markers__dot:nth-child(3) { background: var(--color-kinnso-amber); }
   .k-route-markers__labels { @apply flex items-center justify-between gap-3; }
 
-  /* R1A editorial primitives (k2-*) — used by components/kinnso/editorial/*
+  /* Editorial primitives (k2-*) — used by components/kinnso/editorial/*
      and the rebuilt chrome. Same utility-class-in-globals.css pattern as k-*. */
   .k2-container   { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
-  .k2-display     { font-family: var(--font-k2-display); letter-spacing: -0.01em; }
-  .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-clay; } /* clay on sand is ~3.85:1 — don't place eyebrows on kinnso2-sand panels (AA fail); white/paper only */
-  .k2-card        { @apply overflow-hidden rounded-[4px] border border-kinnso2-line bg-white; }
-  .k2-hairline    { @apply border-t border-kinnso2-line; }
-  .k2-btn-primary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso2-clay px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-kinnso2-clay-deep; }
-  .k2-btn-ghost   { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] border border-kinnso2-ink/25 px-6 py-2.5 text-sm font-semibold tracking-wide text-kinnso2-ink transition hover:border-kinnso2-ink hover:bg-kinnso2-sand/40; }
+  .k2-display     { font-family: var(--font-display); letter-spacing: -0.01em; }
+  .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso-orangeDark; } /* 4.79:1 on white, 4.26:1 on cream (fails AA-normal by 0.24 — accepted brand deviation ②, see R1C plan D-R1C-2). Never swap to kinnso-orange (2.73:1). */
+  .k2-card        { @apply overflow-hidden rounded-[4px] border border-kinnso-edge bg-white; }
+  .k2-hairline    { @apply border-t border-kinnso-edge; }
+  .k2-btn-primary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso-orange px-6 py-2.5 text-sm font-bold tracking-wide text-white transition hover:bg-kinnso-orangeDark; }
+  .k2-btn-ghost   { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] border border-kinnso-ink/25 px-6 py-2.5 text-sm font-semibold tracking-wide text-kinnso-ink transition hover:border-kinnso-ink hover:bg-kinnso-cream2/40; }
 
   .k2-btn-primary:focus-visible,
   .k2-btn-ghost:focus-visible {
-    outline: 2px solid var(--color-kinnso2-clay);
+    outline: 2px solid var(--color-kinnso-orange);
     outline-offset: 2px;
   }
 }
