@@ -455,6 +455,7 @@ const messages: Messages = {
     heroSecondaryCta: '睇下創作者',
     statCreators: '位活躍創作者', statGuides: '份已發佈攻略', statDestinations: '個目的地',
     roleCreator: '創作者', roleTraveller: '旅人', roleMerchant: '商家',
+    testimonialsHeading: '大家點睇 KINNSO',
     howEyebrow: '點樣運作',
     howHeading: '一個平台，三種玩法。',
     howSub: '去旅行、做創作、定係做地膽——KINNSO 將地道知識變成真正嘅旅程。',

@@ -48,6 +48,23 @@ describe('getPublishedTestimonials', () => {
     expect(limit).toHaveBeenCalledWith(3)
     expect(rows).toEqual([{ id: 't1', quote: 'q', authorName: 'Mei', authorRole: 'creator' }])
   })
+
+  it('filters by author_role when given', async () => {
+    const limit = vi.fn(async () => ({
+      data: [{ id: 't2', quote: 'q2', author_name: 'Sam', author_role: 'creator' }],
+      error: null,
+    }))
+    const eqRole = vi.fn(() => ({ limit }))
+    const order2 = vi.fn(() => ({ limit, eq: eqRole }))
+    const order1 = vi.fn(() => ({ order: order2 }))
+    const or = vi.fn(() => ({ order: order1 }))
+    const eq = vi.fn(() => ({ or }))
+    const select = vi.fn(() => ({ eq }))
+    publicClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) })
+
+    await getPublishedTestimonials('en', 'creator')
+    expect(eqRole).toHaveBeenCalledWith('author_role', 'creator')
+  })
 })
 
 describe('getUpcomingSessions (R5 stub)', () => {

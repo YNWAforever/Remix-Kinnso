@@ -451,6 +451,7 @@ export interface Messages {
     heroPrimaryCta: string; heroSecondaryCta: string
     statCreators: string; statGuides: string; statDestinations: string
     roleCreator: string; roleTraveller: string; roleMerchant: string
+    testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
     howTabTravellers: string; howTabCreators: string; howTabMerchants: string
     howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3Desc: string
@@ -1326,6 +1327,7 @@ const messages: Messages = {
     heroSecondaryCta: 'Browse Creators',
     statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered',
     roleCreator: 'Creator', roleTraveller: 'Traveller', roleMerchant: 'Merchant',
+    testimonialsHeading: 'What people say about KINNSO',
     howEyebrow: 'How it works',
     howHeading: 'One platform, three ways in.',
     howSub: 'Travel it, create it, or host it — KINNSO turns real local knowledge into real trips.',

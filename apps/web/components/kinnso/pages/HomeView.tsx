@@ -40,6 +40,7 @@ export function HomeView({
   }
   const dateFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' })
   const dateTimeFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' })
+  const linkableArticles = articles.filter((a) => toUrlCategory(a.category))
 
   return (
     <div className="bg-kinnso-cream font-sans">
@@ -49,7 +50,8 @@ export function HomeView({
       {/* 2 — Social proof: threshold-gated counts + curated pull-quotes */}
       <StatsBar locale={locale} t={t} stats={stats} />
       {testimonials.length > 0 ? (
-        <SectionShell className="k2-hairline">
+        <SectionShell className="k2-hairline" aria-labelledby="home-testimonials-heading">
+          <h2 id="home-testimonials-heading" className="sr-only">{t.testimonialsHeading}</h2>
           <ul className="grid gap-10 md:grid-cols-3">
             {testimonials.map((q) => (
               <li key={q.id}>
@@ -86,7 +88,7 @@ export function HomeView({
           <p className="mt-8 text-kinnso-ink/70">{t.featuredEmpty}</p>
         ) : (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {guides.slice(0, 6).map((g) => (
+            {guides.map((g) => (
               <Link key={g.slug} href={p(`/g/${g.slug}`)} className="group">
                 <EditorialCard
                   media={
@@ -115,8 +117,8 @@ export function HomeView({
       {/* 5 — AI Agent (waitlist framing until R4) */}
       <AgentTeaser locale={locale} t={t} />
 
-      {/* 6 — Articles highlight (3 latest; hidden when none) */}
-      {articles.length > 0 ? (
+      {/* 6 — Articles highlight (3 latest with a resolvable category; hidden when none) */}
+      {linkableArticles.length > 0 ? (
         <SectionShell>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -128,7 +130,7 @@ export function HomeView({
             </Link>
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {articles.slice(0, 3).map((a) => {
+            {linkableArticles.slice(0, 3).map((a) => {
               const cat = toUrlCategory(a.category)
               if (!cat) return null
               return (

@@ -22,13 +22,15 @@ export function mapRowToGuide(r: GuideRowLite): Guide {
   }
 }
 
-export async function getPublishedGuides(): Promise<Guide[]> {
+export async function getPublishedGuides(limit?: number): Promise<Guide[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  let query = supabase
     .from('guides')
     .select('slug, title, cover_url, city, saves_count, creator_handle')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
+  if (limit !== undefined) query = query.limit(limit)
+  const { data } = await query
   return (data ?? []).map(mapRowToGuide)
 }
 

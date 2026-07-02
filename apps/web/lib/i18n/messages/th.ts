@@ -455,6 +455,7 @@ const messages: Messages = {
     heroSecondaryCta: 'ดูครีเอเตอร์',
     statCreators: 'ครีเอเตอร์ที่แอ็กทีฟ', statGuides: 'ไกด์ที่เผยแพร่แล้ว', statDestinations: 'จุดหมาย',
     roleCreator: 'ครีเอเตอร์', roleTraveller: 'นักเดินทาง', roleMerchant: 'ร้านค้า',
+    testimonialsHeading: 'เสียงจากผู้ใช้ KINNSO',
     howEyebrow: 'วิธีใช้งาน',
     howHeading: 'แพลตฟอร์มเดียว สามทางเข้า',
     howSub: 'จะเที่ยว จะสร้างคอนเทนต์ หรือจะต้อนรับนักเดินทาง — KINNSO เปลี่ยนความรู้ท้องถิ่นของจริงให้กลายเป็นทริปจริง',

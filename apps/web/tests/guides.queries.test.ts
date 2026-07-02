@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mutable mock state, read fresh on each query call.
 const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown }))
+const limitSpy = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/supabase/public', () => ({
   createSupabasePublicClient: () => ({
@@ -13,6 +14,10 @@ vi.mock('@/lib/supabase/public', () => ({
         order: () => builder,
         // getGuideBySlug awaits .maybeSingle()
         maybeSingle: async () => ({ data: state.single }),
+        limit: (n: number) => {
+          limitSpy(n)
+          return Promise.resolve({ data: state.list })
+        },
         then: (onF: (v: { data: unknown }) => unknown) =>
           Promise.resolve({ data: state.list }).then(onF),
       }
@@ -36,6 +41,7 @@ const row = {
 beforeEach(() => {
   state.list = []
   state.single = null
+  limitSpy.mockClear()
 })
 
 describe('mapRowToGuide', () => {
@@ -63,6 +69,16 @@ describe('getPublishedGuides', () => {
   it('returns an empty array when the DB has no published guides', async () => {
     state.list = []
     expect(await getPublishedGuides()).toEqual([])
+  })
+
+  it('forwards a row limit when given', async () => {
+    await getPublishedGuides(6)
+    expect(limitSpy).toHaveBeenCalledWith(6)
+  })
+
+  it('does not call limit when no limit is given', async () => {
+    await getPublishedGuides()
+    expect(limitSpy).not.toHaveBeenCalled()
   })
 })
 

@@ -455,6 +455,7 @@ const messages: Messages = {
     heroSecondaryCta: '크리에이터 둘러보기',
     statCreators: '명의 활동 중인 크리에이터', statGuides: '개의 공개 가이드', statDestinations: '곳의 여행지',
     roleCreator: '크리에이터', roleTraveller: '여행자', roleMerchant: '가맹점',
+    testimonialsHeading: 'KINNSO 사용자들의 이야기',
     howEyebrow: '이용 방법',
     howHeading: '하나의 플랫폼, 세 가지 방식.',
     howSub: '여행하든, 만들든, 맞이하든 — KINNSO는 현지의 진짜 지식을 진짜 여행으로 바꿔요.',

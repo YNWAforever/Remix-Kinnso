@@ -455,6 +455,7 @@ const messages: Messages = {
     heroSecondaryCta: 'クリエイターを見る',
     statCreators: '人のアクティブクリエイター', statGuides: '本の公開ガイド', statDestinations: 'の旅行先',
     roleCreator: 'クリエイター', roleTraveller: '旅行者', roleMerchant: '加盟店',
+    testimonialsHeading: 'KINNSO利用者の声',
     howEyebrow: '使い方',
     howHeading: 'ひとつのプラットフォーム、3つの入り口。',
     howSub: '旅する人も、つくる人も、迎える人も——KINNSOは地元の知恵を本物の旅に変えます。',
