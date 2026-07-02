@@ -190,21 +190,23 @@
   import { describe, it, expect, vi } from 'vitest'
 
   // next/font/google factories are not callable under vitest (no SWC font
-  // transform) — stub them to `{ variable }`, same pattern as
-  // tests/layout.siteChrome.test.tsx.
+  // transform) — stub them, same pattern as tests/layout.siteChrome.test.tsx.
+  // Each stub echoes the `variable` option it was called with, so the assertions
+  // below bind layout.tsx's option strings to the var(--font-*) references that
+  // globals.css uses.
   vi.mock('next/font/google', () => ({
-    Bricolage_Grotesque: () => ({ variable: 'font-bricolage' }),
-    DM_Sans: () => ({ variable: 'font-dm-sans' }),
-    JetBrains_Mono: () => ({ variable: 'font-jetbrains-mono' }),
-    Fraunces: () => ({ variable: 'font-fraunces' }),
-    Inter: () => ({ variable: 'font-inter' }),
+    Bricolage_Grotesque: (o: { variable: string }) => ({ variable: o.variable }),
+    DM_Sans: (o: { variable: string }) => ({ variable: o.variable }),
+    JetBrains_Mono: (o: { variable: string }) => ({ variable: o.variable }),
+    Fraunces: (o: { variable: string }) => ({ variable: o.variable }),
+    Inter: (o: { variable: string }) => ({ variable: o.variable }),
   }))
 
   import { fontVariables } from '@/app/layout'
 
   describe('R1A typography wiring', () => {
     it('exposes Fraunces + Inter variables alongside the legacy fonts', () => {
-      for (const v of ['font-fraunces', 'font-inter', 'font-bricolage', 'font-dm-sans', 'font-jetbrains-mono']) {
+      for (const v of ['--font-fraunces', '--font-inter', '--font-bricolage', '--font-dm-sans', '--font-jetbrains-mono']) {
         expect(fontVariables).toContain(v)
       }
     })
@@ -215,7 +217,7 @@
   ```bash
   cd apps/web && npx vitest run tests/layout.fonts.test.ts
   ```
-  Expected failure: `fontVariables` does not contain `font-fraunces`.
+  Expected failure: `fontVariables` does not contain `--font-fraunces`.
 
 - [ ] Implement. Replace the ENTIRE contents of `apps/web/app/layout.tsx` with:
 
@@ -271,11 +273,16 @@
 
   ```css
 
-    /* Editorial type. Serif applies to Latin (Fraunces); each CJK locale falls
-       back to its system serif so zh-hk/zh-tw/zh-cn/ja/ko headings stay elegant;
-       th has no meaningful serif tradition and falls through to `serif`. */
+    /* Editorial type. Fraunces covers Latin; CJK falls through the shared stack
+       below. Font matching is per-glyph and ignores lang, so the stack is
+       TC-first — correct for zh-hk/zh-tw, but on Apple platforms ja/ko text
+       matches the TC faces' kanji/hanja glyphs before Hiragino/Nanum is reached
+       (ja renders in Chinese glyph forms). Acceptable for R1A; revisit with
+       :lang() overrides if ja/ko typography matters later. Thai has no serif
+       tradition and falls to generic `serif`. On Windows, zh/ko coverage relies
+       on the generic fallback resolving per the html lang attribute. */
     --font-k2-display: var(--font-fraunces), 'Noto Serif TC', 'Songti TC', 'Noto Serif SC', 'Songti SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'Nanum Myeongjo', 'AppleMyungjo', serif;
-    --font-k2-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
+    --font-k2-sans: var(--font-inter), 'PingFang TC', 'PingFang SC', 'Hiragino Sans', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans KR', 'Noto Sans Thai', system-ui, sans-serif;
   ```
 
   (Tailwind v4 generates `font-k2-display` / `font-k2-sans` utilities from these.)
