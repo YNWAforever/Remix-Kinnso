@@ -37,6 +37,7 @@ export interface Messages {
     contact: { title: string; description: string }
     merchants: { title: string; description: string }
     terms: { title: string; description: string }
+    forCreators: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -494,6 +495,17 @@ export interface Messages {
     successNote: string; errorInvalid: string; errorGeneric: string
     honestNote: string; exploreCta: string; articlesCta: string
   }
+  forCreators: {
+    heroEyebrow: string; heroTitle: string; heroSub: string
+    heroCtaPrimary: string; heroCtaSecondary: string
+    howEyebrow: string; howHeading: string
+    step1Title: string; step1Body: string
+    step2Title: string; step2Body: string
+    step3Title: string; step3Body: string
+    whyHeading: string; why1: string; why2: string; why3: string
+    testimonialsHeading: string
+    ctaTitle: string; ctaBody: string; ctaButton: string
+  }
   studioHome: {
     pill: string; heading: string; subtitle: string
     liveBadge: string; soonBadge: string; open: string
@@ -913,6 +925,10 @@ const messages: Messages = {
     terms: {
       title: 'Creator Terms',
       description: 'The terms that govern creators using KINNSO.',
+    },
+    forCreators: {
+      title: 'Become a KINNSO travel creator',
+      description: 'Publish travel guides, run vetted brand missions, and earn from the places you genuinely recommend.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -1440,6 +1456,24 @@ const messages: Messages = {
     errorInvalid: 'Enter a valid email address.', errorGeneric: 'Something went wrong — please try again.',
     honestNote: 'The agent isn’t live yet — we only ship it when it’s genuinely useful. Until then, the same knowledge is all here:',
     exploreCta: 'Explore guides', articlesCta: 'Read articles',
+  },
+  forCreators: {
+    heroEyebrow: 'For Creators',
+    heroTitle: 'Turn your travel taste into income',
+    heroSub: 'Publish the guides you already give friends, run real brand missions, and earn from the places you genuinely recommend.',
+    heroCtaPrimary: 'Apply as a creator', heroCtaSecondary: 'See creator guides',
+    howEyebrow: 'How it works', howHeading: 'Three steps to your first payout',
+    step1Title: 'Publish guides', step1Body: 'Turn your favourite city into a guide travellers actually use — your voice, your picks.',
+    step2Title: 'Run missions', step2Body: 'Take on briefs from vetted brands that fit your niche. No spray-and-pray sponsorships.',
+    step3Title: 'Earn and grow', step3Body: 'Get paid per mission, earn affiliate commissions, and level up to unlock better offers.',
+    whyHeading: 'Why creators choose KINNSO',
+    why1: 'You keep your voice — merchants brief you, they don’t script you.',
+    why2: 'Transparent payouts with a real ledger, not a black box.',
+    why3: 'Your guides keep earning after the trip ends — bookings are coming, and your recommendations power them.',
+    testimonialsHeading: 'Creators on KINNSO',
+    ctaTitle: 'Your next trip could pay for itself',
+    ctaBody: 'Apply in minutes. Publish your first guide this week.',
+    ctaButton: 'Apply as a creator',
   },
   studioHome: {
     pill: 'Creator Studio',

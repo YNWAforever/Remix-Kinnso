@@ -17,7 +17,7 @@ const GROUPS = [
   'studioHome', 'explore', 'feed', 'creatorsLanding', 'merchantsLanding', 'studioGuides',
   'studioOffers', 'studioEarnings', 'about', 'contact', 'creatorTerms', 'article', 'tier', 'copilot', 'admin', 'perks',
   'testimonialsAdmin',
-  'users', 'merchantSearch', 'insights', 'seo', 'creators', 'merchantsOps', 'missionsOps', 'agent',
+  'users', 'merchantSearch', 'insights', 'seo', 'creators', 'merchantsOps', 'missionsOps', 'agent', 'forCreators',
 ] as const
 
 describe('i18n locale parity for new creator-profile groups', () => {
