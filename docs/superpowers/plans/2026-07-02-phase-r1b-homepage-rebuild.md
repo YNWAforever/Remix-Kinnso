@@ -1255,7 +1255,7 @@ House pattern notes: guide covers render with plain `<img>` (same as `GuideCard.
           {entries.map((s) => (
             <li key={s.key} className="flex items-baseline gap-2">
               <span className="k2-display text-3xl font-semibold text-kinnso2-ink">{fmt.format(s.value)}</span>
-              <span className="text-sm text-kinnso2-ink/60">{s.label}</span>
+              <span className="text-sm text-kinnso2-ink/70">{s.label}</span>
             </li>
           ))}
         </ul>
