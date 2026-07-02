@@ -35,4 +35,16 @@ describe('/[locale] home host', () => {
   it('404s unknown locales', async () => {
     await expect(LocaleHome({ params: Promise.resolve({ locale: 'xx' }) })).rejects.toThrow('NEXT_NOT_FOUND')
   })
+  it('never 500s when searchArticles rejects', async () => {
+    vi.resetModules()
+    vi.doMock('@/lib/articles/queries', () => ({
+      searchArticles: async () => {
+        throw new Error('boom')
+      },
+    }))
+    const { default: LocaleHomeWithFailingArticles } = await import('@/app/[locale]/page')
+    const ui = await LocaleHomeWithFailingArticles({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.getByRole('heading', { level: 1, name: en.home.heroTitle })).toBeTruthy()
+  })
 })
