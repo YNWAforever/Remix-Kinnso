@@ -1,6 +1,6 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import { mapRowToGuide } from '@/lib/guides/queries'
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 
 export interface PublicProfile {
   niches: string[]

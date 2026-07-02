@@ -2,10 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { DnaSchema } from '@kinnso/scan'
 import {
   getCreator,
-  computeMatch,
   computeBreakdown,
-  merchantProfile,
-  extendedCreators,
   creatorLocations,
   sampleDna,
 } from '@/lib/creator-mock'
@@ -21,48 +18,6 @@ describe('getCreator', () => {
 
   it('returns undefined for an unknown handle', () => {
     expect(getCreator('nobody')).toBeUndefined()
-  })
-})
-
-describe('computeMatch', () => {
-  it('reasons object sums to the score', () => {
-    const c = getCreator('maywanders')!
-    const m = computeMatch(c)
-    const { city_overlap, category_match, tier_fit, audience_fit } = m.reasons
-    expect(city_overlap + category_match + tier_fit + audience_fit).toBe(m.score)
-  })
-
-  it('every creator: reasons sum equals score and score is 0–100', () => {
-    for (const c of extendedCreators) {
-      const m = computeMatch(c)
-      const sum =
-        m.reasons.city_overlap +
-        m.reasons.category_match +
-        m.reasons.tier_fit +
-        m.reasons.audience_fit
-      expect(sum).toBe(m.score)
-      expect(m.score).toBeGreaterThanOrEqual(0)
-      expect(m.score).toBeLessThanOrEqual(100)
-    }
-  })
-
-  it('exposes a ranked reasonList for the UI', () => {
-    const m = computeMatch(getCreator('maywanders')!)
-    expect(Array.isArray(m.reasonList)).toBe(true)
-    // tier_fit is always pushed
-    expect(m.reasonList.some((r) => r.key === 'tier_fit')).toBe(true)
-  })
-})
-
-describe('merchantProfile', () => {
-  it('has the Growth-tier + quota fields', () => {
-    expect(merchantProfile.tier === 'free' || merchantProfile.tier === 'growth').toBe(true)
-    expect(typeof merchantProfile.searchesLeft).toBe('number')
-    expect(typeof merchantProfile.searchLimit).toBe('number')
-    expect(typeof merchantProfile.invitesLeft).toBe('number')
-    expect(typeof merchantProfile.inviteLimit).toBe('number')
-    expect(merchantProfile.searchesLeft).toBeLessThanOrEqual(merchantProfile.searchLimit)
-    expect(merchantProfile.invitesLeft).toBeLessThanOrEqual(merchantProfile.inviteLimit)
   })
 })
 

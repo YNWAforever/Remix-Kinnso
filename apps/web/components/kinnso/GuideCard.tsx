@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Bookmark, MapPin } from "lucide-react";
 import { EditorialCard } from "@/components/kinnso/editorial/EditorialCard";
-import type { Guide } from "@/lib/creator-mock";
+import type { Guide } from '@/lib/guides/types';
 import type { Locale } from "@/lib/i18n/config";
 
 const GuideCard = ({ g, locale, savesLabel = 'Saves' }: { g: Guide; locale: Locale; savesLabel?: string }) => (

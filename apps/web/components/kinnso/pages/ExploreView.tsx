@@ -1,7 +1,7 @@
 import GuideCard from '@/components/kinnso/GuideCard'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 

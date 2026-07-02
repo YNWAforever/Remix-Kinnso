@@ -1,5 +1,5 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 import type { GuideDetail } from '@/lib/guides/types'
 
 interface GuideRowLite {

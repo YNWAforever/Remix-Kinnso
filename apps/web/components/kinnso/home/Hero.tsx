@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
-// The Guide TYPE still lives in creator-mock until the R1C sweep relocates it.
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
