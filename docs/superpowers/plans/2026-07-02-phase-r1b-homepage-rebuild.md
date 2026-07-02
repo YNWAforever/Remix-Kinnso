@@ -388,7 +388,7 @@ Articles are deliberately NOT re-implemented here: `searchArticles({ locale, pag
   import { createSupabasePublicClient } from '@/lib/supabase/public'
   import type { Locale } from '@/lib/i18n/config'
 
-  /** Aggregate counts from the `platform_stats()` SECURITY DEFINER RPC. */
+  /** Aggregate counts from the `platform_stats()` SECURITY INVOKER RPC. */
   export interface PlatformStats {
     activeCreators: number
     publishedGuides: number
