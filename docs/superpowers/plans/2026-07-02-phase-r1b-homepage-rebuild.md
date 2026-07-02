@@ -1689,7 +1689,9 @@ This task is atomic on purpose: HomeView's props change, so its page host, its t
       published_at: '2026-06-01T00:00:00Z', edit_at: null, title: 'Osaka food streets', summary: 'Where locals actually eat.',
     },
   ]
-  const sessions = [{ id: 's1', title: 'Tokyo briefing', hostHandle: 'aki', startsAt: '2026-08-01T10:00:00Z' }]
+  // hostHandle intentionally distinct from any guides[].creatorHandle above ('aki' collided
+  // with the real-tokyo guide's `@aki` card text, making the assertion below ambiguous).
+  const sessions = [{ id: 's1', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
 
   const base = { locale: 'en' as const, t: en.home, guides, stats, testimonials, articles, sessions }
 
@@ -1729,7 +1731,7 @@ This task is atomic on purpose: HomeView's props change, so its page host, its t
       render(<HomeView {...base} />)
       expect(screen.getByText(en.home.sessionsHeading)).toBeTruthy()
       expect(screen.getByText('Tokyo briefing')).toBeTruthy()
-      expect(screen.getByText('@aki')).toBeTruthy()
+      expect(screen.getByText('@sora')).toBeTruthy()
     })
 
     it('merchant and creator CTAs land on their locked routes', () => {

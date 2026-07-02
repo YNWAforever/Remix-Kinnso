@@ -464,13 +464,6 @@ export interface Messages {
     merchantBullet1: string; merchantBullet2: string; merchantBullet3: string; merchantCta: string
     creatorEyebrow: string; creatorHeading: string
     creatorBullet1: string; creatorBullet2: string; creatorBullet3: string; creatorCta: string
-    // R1B-legacy — pre-rebuild HomeView only; Task 7 deletes these with their consumer:
-    heroPill: string; applyCta: string
-    step1Title: string; step1Desc: string; step2Title: string; step2Desc: string
-    step3Title: string; step3Desc: string; step4Title: string; step4Desc: string
-    merchantWall: string
-    travelersTitle: string; travelersDesc: string; travelersCta: string
-    merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
   about: {
     eyebrow: string; title: string; intro: string
@@ -1372,16 +1365,6 @@ const messages: Messages = {
     creatorBullet2: 'Take on missions from merchants who value your route.',
     creatorBullet3: 'Earn honestly — real work, real payouts, no fabricated metrics.',
     creatorCta: 'Apply as a creator',
-    // R1B-legacy — pre-rebuild HomeView only; Task 7 deletes these with their consumer:
-    heroPill: 'Creator route / HK -> JP -> TW',
-    applyCta: 'Apply as Creator',
-    step1Title: 'Scan a handle', step1Desc: 'Connect IG, Threads, TikTok, or YouTube signals.',
-    step2Title: 'Prove your cities', step2Desc: 'KINNSO maps travel posts, places, and audience fit.',
-    step3Title: 'Match with missions', step3Desc: 'Merchants send briefs based on your route and score.',
-    step4Title: 'Publish and earn', step4Desc: 'Turn guides, partner links, and briefs into payouts.',
-    merchantWall: 'Partner stamps',
-    travelersTitle: 'For Travelers', travelersDesc: 'Follow real creators, save guide tickets, and book the exact same spots.', travelersCta: 'Explore Guides',
-    merchantsTitle: 'For Merchants', merchantsDesc: 'Issue a mission ticket and match with creators who already own the route.', merchantsCta: 'Post a Mission',
   },
   about: {
     eyebrow: 'About KINNSO',
