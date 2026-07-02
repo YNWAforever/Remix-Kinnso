@@ -1472,7 +1472,7 @@ House pattern notes: guide covers render with plain `<img>` (same as `GuideCard.
 - Create: `apps/web/tests/kinnso.home-bands.test.tsx`
 - Test: `apps/web/tests/kinnso.home-bands.test.tsx`
 
-Color discipline (locked): `kinnso2-sun` (ochre) appears ONLY on dark ink (AgentTeaser eyebrow) or as decorative dots (CreatorCta bullets on moss) — never as text on paper, never under white text. Body copy on dark bands uses `text-kinnso2-paper/70` or stronger; `paper/50` is reserved for ≥12px meta text like the Footer rights bar.
+Color discipline (locked): `kinnso2-sun` (ochre) appears ONLY on dark ink (AgentTeaser eyebrow) or as decorative dots (CreatorCta bullets on moss) — never as text on paper, never under white text. Body copy on dark bands uses `text-kinnso2-paper/70` or stronger; `paper/50` is reserved for ≥12px meta text like the Footer rights bar. On moss, the muted paper text floor is `/80` (not `/70` — that floor was calibrated on ink; `paper/70` on moss is only 4.21:1).
 
 - [ ] Write the failing test. Create `apps/web/tests/kinnso.home-bands.test.tsx` with EXACTLY:
 
@@ -1616,7 +1616,7 @@ Color discipline (locked): `kinnso2-sun` (ochre) appears ONLY on dark ink (Agent
     return (
       <section className="bg-kinnso2-moss py-16 md:py-24">
         <div className="k2-container">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-paper/70">{t.creatorEyebrow}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-paper/80">{t.creatorEyebrow}</p>
           <h2 className="k2-display mt-4 max-w-2xl text-3xl font-semibold text-kinnso2-paper md:text-4xl">{t.creatorHeading}</h2>
           <ul className="mt-6 max-w-2xl space-y-3">
             {bullets.map((b) => (

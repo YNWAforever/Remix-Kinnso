@@ -12,7 +12,7 @@ export function CreatorCta({ locale, t }: { locale: Locale; t: Messages['home'] 
   return (
     <section className="bg-kinnso2-moss py-16 md:py-24">
       <div className="k2-container">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-paper/70">{t.creatorEyebrow}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-paper/80">{t.creatorEyebrow}</p>
         <h2 className="k2-display mt-4 max-w-2xl text-3xl font-semibold text-kinnso2-paper md:text-4xl">{t.creatorHeading}</h2>
         <ul className="mt-6 max-w-2xl space-y-3">
           {bullets.map((b) => (
