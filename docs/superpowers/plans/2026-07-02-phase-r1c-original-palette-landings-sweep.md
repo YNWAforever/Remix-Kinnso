@@ -1478,7 +1478,15 @@ Expected: ALL PASS. (route-parity is on the list per carry-forward #22.) Then th
 ```bash
 # Scope every gate to source dirs (.next/ build artifacts contain stale matches)
 grep -rn "kinnso2-\|font-k2-" apps/web/app apps/web/components apps/web/lib apps/web/tests | grep -v tests/design.k2-tokens.test.ts  # → zero (that test keeps the literals in negative assertions)
-grep -rn "Bricolage\|DM_Sans\|dmSans\|bricolage" apps/web/app apps/web/components apps/web/lib apps/web/tests --include='*.ts*'  # → zero, comments included (Task 2 purged them)
+grep -rn "Bricolage\|DM_Sans\|dmSans\|bricolage" apps/web/app apps/web/components apps/web/tests --include='*.ts*'  # → zero, comments included (Task 2 purged them)
+# EXCEPTION (found during Task 2 execution): apps/web/lib/seo/og/{fonts.ts,card.tsx} bundle actual
+# Bricolage-{Bold,Regular}.ttf binaries for next/og ImageResponse social-card generation — a
+# SEPARATE system from next/font/google that Task 2 never touches. Renaming the label without
+# matching Fraunces/Inter .ttf assets would silently regress OG-card typography, and this sandbox
+# has no outbound network to source those binaries (same constraint as the R1B production-build
+# note). Scoped exception: lib/seo/og/ keeps Bricolage. CARRY-FORWARD to a future task: source real
+# Fraunces/Inter static .ttf files and migrate lib/seo/og/fonts.ts + card.tsx to match the canonical
+# typography.
 grep -rn "MarketPassport" apps/web/app apps/web/components/kinnso/pages apps/web/components/kinnso/home apps/web/components/kinnso/articles apps/web/components/kinnso/editorial  # → zero PUBLIC consumers (studio/admin/missions files are allowed)
 grep -rn "from '@/lib/creator-mock'" apps/web/app apps/web/components apps/web/lib --include='*.tsx' --include='*.ts' | grep -vE "studio|Studio|Tier|Dna|admin"  # → zero
 grep -rn "ravelers" apps/web/lib/i18n/messages/en.ts             # → zero
