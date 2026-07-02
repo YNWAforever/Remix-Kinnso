@@ -32,9 +32,9 @@ export function SiteChrome({
     <>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-kinnso-ink focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-kinnso2-ink focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-kinnso2-paper focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-kinnso2-sun"
       >
-        Skip to content
+        {nav.skipToContent}
       </a>
       <Navbar locale={locale} role={role} t={nav} />
       <main id="main-content" className="flex-1" tabIndex={-1}>
