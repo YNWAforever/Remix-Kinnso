@@ -1646,6 +1646,39 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          author_name: string
+          author_role: string
+          created_at: string
+          id: string
+          locale: string | null
+          quote: string
+          sort_order: number
+          status: string
+        }
+        Insert: {
+          author_name: string
+          author_role: string
+          created_at?: string
+          id?: string
+          locale?: string | null
+          quote: string
+          sort_order?: number
+          status?: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string
+          created_at?: string
+          id?: string
+          locale?: string | null
+          quote?: string
+          sort_order?: number
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1906,6 +1939,14 @@ export type Database = {
         }[]
       }
       merchant_insights: { Args: never; Returns: Json }
+      platform_stats: {
+        Args: never
+        Returns: {
+          active_creators: number
+          published_guides: number
+          destinations: number
+        }[]
+      }
       merchant_invite_creator: {
         Args: { p_creator_id: string; p_mission_id: string }
         Returns: string

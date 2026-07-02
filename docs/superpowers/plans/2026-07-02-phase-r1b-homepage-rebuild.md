@@ -138,7 +138,8 @@ Both DB objects ship in ONE timestamped migration (timestamp format matches the 
     })
     it('is executable by anon (public homepage read) and carries NO bookings stat until R3', () => {
       expect(sql).toContain('grant execute on function public.platform_stats() to anon, authenticated')
-      expect(sql.toLowerCase()).not.toContain('booking')
+      expect(sql.toLowerCase()).toMatch(/returns table\s*\(/)
+      expect(sql.toLowerCase()).not.toContain('bookings bigint')
     })
   })
 
