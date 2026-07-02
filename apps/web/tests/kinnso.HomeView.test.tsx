@@ -16,7 +16,7 @@ const sampleGuides = [
 describe('HomeView', () => {
   it('renders hero, how-it-works, and locale-correct CTAs', () => {
     render(<HomeView locale="en" t={en.home} guides={sampleGuides} />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Trips that pay their way.' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Real creators. Real places. Book the trip you actually want.' })).toBeTruthy()
     expect(screen.getByText('Creator route / HK -> JP -> TW')).toBeTruthy()
     expect(document.querySelector('.k-ticket')).toBeTruthy()
     expect(screen.getByText(en.home.howHeading)).toBeTruthy()

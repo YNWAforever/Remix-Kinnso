@@ -447,11 +447,28 @@ export interface Messages {
     lAbout: string; lAgent: string; lPress: string; lLegal: string; rights: string
   }
   home: {
-    heroPill: string; heroTitle: string; heroSubtitle: string; applyCta: string
-    howHeading: string; howSub: string
+    heroEyebrow: string; heroTitle: string; heroSubtitle: string
+    heroPrimaryCta: string; heroSecondaryCta: string
+    statCreators: string; statGuides: string; statDestinations: string
+    roleCreator: string; roleTraveller: string; roleMerchant: string
+    howEyebrow: string; howHeading: string; howSub: string
+    howTabTravellers: string; howTabCreators: string; howTabMerchants: string
+    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3Desc: string
+    howC1Title: string; howC1Desc: string; howC2Title: string; howC2Desc: string; howC3Title: string; howC3Desc: string
+    howM1Title: string; howM1Desc: string; howM2Title: string; howM2Desc: string; howM3Title: string; howM3Desc: string
+    featuredEyebrow: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
+    agentEyebrow: string; agentTitle: string; agentBody: string; agentCta: string; agentNote: string
+    articlesEyebrow: string; articlesHeading: string; articlesSeeAll: string
+    sessionsEyebrow: string; sessionsHeading: string; sessionsSub: string
+    merchantEyebrow: string; merchantHeading: string
+    merchantBullet1: string; merchantBullet2: string; merchantBullet3: string; merchantCta: string
+    creatorEyebrow: string; creatorHeading: string
+    creatorBullet1: string; creatorBullet2: string; creatorBullet3: string; creatorCta: string
+    // R1B-legacy — pre-rebuild HomeView only; Task 7 deletes these with their consumer:
+    heroPill: string; applyCta: string
     step1Title: string; step1Desc: string; step2Title: string; step2Desc: string
     step3Title: string; step3Desc: string; step4Title: string; step4Desc: string
-    merchantWall: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
+    merchantWall: string
     travelersTitle: string; travelersDesc: string; travelersCta: string
     merchantsTitle: string; merchantsDesc: string; merchantsCta: string
   }
@@ -859,9 +876,9 @@ const messages: Messages = {
     brandDescription:
       'KINNSO connects travel and lifestyle creators with real brand missions, affiliate offers, and an AI copilot to grow your audience.',
     home: {
-      title: 'Travel creators, real missions',
+      title: 'Real travel guides by real creators',
       description:
-        'Join KINNSO to find real brand missions, earn from affiliate offers, and grow with an AI copilot built for travel creators.',
+        'Discover city guides from trusted travel creators, plan with the KINNSO AI agent, and book the trip you actually want — all in one place.',
     },
     explore: {
       title: 'Explore creator guides',
@@ -1298,31 +1315,73 @@ const messages: Messages = {
     rights: '© 2026 KINNSO. All rights reserved.',
   },
   home: {
+    heroEyebrow: 'The travel creator marketplace',
+    heroTitle: 'Real creators. Real places. Book the trip you actually want.',
+    heroSubtitle: 'Discover guides from trusted travel creators. Plan with AI. Book in one place.',
+    heroPrimaryCta: 'Start Planning',
+    heroSecondaryCta: 'Browse Creators',
+    statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered',
+    roleCreator: 'Creator', roleTraveller: 'Traveller', roleMerchant: 'Merchant',
+    howEyebrow: 'How it works',
+    howHeading: 'One platform, three ways in.',
+    howSub: 'Travel it, create it, or host it — KINNSO turns real local knowledge into real trips.',
+    howTabTravellers: 'For Travellers', howTabCreators: 'For Creators', howTabMerchants: 'For Merchants',
+    howT1Title: 'Find your people',
+    howT1Desc: 'Browse guides by creators who actually live and travel the places you want to go.',
+    howT2Title: 'Save the real spots',
+    howT2Desc: 'Every guide is a route of real cafés, streets, and stays — not top-ten filler.',
+    howT3Title: 'Plan and book in one place',
+    howT3Desc: 'Shape the trip with AI help, then book your picks without leaving KINNSO.',
+    howC1Title: 'Scan your profile',
+    howC1Desc: 'Connect your socials and KINNSO maps the cities you genuinely know.',
+    howC2Title: 'Publish your guides',
+    howC2Desc: 'Turn your routes into guides travellers can follow, save, and book from.',
+    howC3Title: 'Earn from your knowledge',
+    howC3Desc: 'Brand missions, affiliate offers, and booking commissions — paid honestly.',
+    howM1Title: 'Post a mission',
+    howM1Desc: 'Brief vetted creators who already cover your city and your kind of customer.',
+    howM2Title: 'Get authentic coverage',
+    howM2Desc: 'Creators fold your experience into guides that travellers actually trust.',
+    howM3Title: 'See what it drives',
+    howM3Desc: 'Track creator coverage today — and attributed bookings once direct booking opens.',
+    featuredEyebrow: 'Featured guides',
+    featuredHeading: 'Guides worth packing.',
+    featuredSub: 'The latest city guides published by KINNSO creators.',
+    featuredSeeAll: 'See all guides',
+    featuredEmpty: 'No published guides yet — the first ones are on their way.',
+    agentEyebrow: 'KINNSO AI Agent',
+    agentTitle: 'An agent that plans like a local.',
+    agentBody: 'Tell it where you are going and how you like to travel — the KINNSO agent draws on real creator guides, not generic lists, to shape your trip. It is in private preview while we teach it the streets.',
+    agentCta: 'Join the agent waitlist',
+    agentNote: 'In private preview — live trip chat is coming soon.',
+    articlesEyebrow: 'From the journal',
+    articlesHeading: 'Stories from the ground.',
+    articlesSeeAll: 'Read all articles',
+    sessionsEyebrow: 'Community Sessions',
+    sessionsHeading: 'Live from the places you are going.',
+    sessionsSub: 'Small live briefings hosted by the creators behind our guides.',
+    merchantEyebrow: 'For merchants',
+    merchantHeading: 'Put your experience inside the guides travellers trust.',
+    merchantBullet1: 'Work with vetted creators who already cover your city.',
+    merchantBullet2: 'Reach travellers while they plan — inside real guides, not ad slots.',
+    merchantBullet3: 'Follow every collaboration in one transparent pipeline.',
+    merchantCta: 'Explore KINNSO for merchants',
+    creatorEyebrow: 'For creators',
+    creatorHeading: 'Your city knowledge is worth more than exposure.',
+    creatorBullet1: 'Publish guides that keep working long after you post them.',
+    creatorBullet2: 'Take on missions from merchants who value your route.',
+    creatorBullet3: 'Earn honestly — real work, real payouts, no fabricated metrics.',
+    creatorCta: 'Apply as a creator',
+    // R1B-legacy — pre-rebuild HomeView only; Task 7 deletes these with their consumer:
     heroPill: 'Creator route / HK -> JP -> TW',
-    heroTitle: 'Trips that pay their way.',
-    heroSubtitle: 'KINNSO scans your social route, proves your city authority, and matches you with missions that turn guides into income.',
     applyCta: 'Apply as Creator',
-    howHeading: 'Your route to paid travel work',
-    howSub: 'A real sequence: scan, qualify, match, publish, earn.',
-    step1Title: 'Scan a handle',
-    step1Desc: 'Connect IG, Threads, TikTok, or YouTube signals.',
-    step2Title: 'Prove your cities',
-    step2Desc: 'KINNSO maps travel posts, places, and audience fit.',
-    step3Title: 'Match with missions',
-    step3Desc: 'Merchants send briefs based on your route and score.',
-    step4Title: 'Publish and earn',
-    step4Desc: 'Turn guides, partner links, and briefs into payouts.',
+    step1Title: 'Scan a handle', step1Desc: 'Connect IG, Threads, TikTok, or YouTube signals.',
+    step2Title: 'Prove your cities', step2Desc: 'KINNSO maps travel posts, places, and audience fit.',
+    step3Title: 'Match with missions', step3Desc: 'Merchants send briefs based on your route and score.',
+    step4Title: 'Publish and earn', step4Desc: 'Turn guides, partner links, and briefs into payouts.',
     merchantWall: 'Partner stamps',
-    featuredHeading: 'Featured guides',
-    featuredSub: 'Real city guides published by KINNSO creators.',
-    featuredSeeAll: 'See all',
-    featuredEmpty: 'No published guides yet — be the first to publish one.',
-    travelersTitle: 'For Travelers',
-    travelersDesc: 'Follow real creators, save guide tickets, and book the exact same spots.',
-    travelersCta: 'Explore Guides',
-    merchantsTitle: 'For Merchants',
-    merchantsDesc: 'Issue a mission ticket and match with creators who already own the route.',
-    merchantsCta: 'Post a Mission',
+    travelersTitle: 'For Travelers', travelersDesc: 'Follow real creators, save guide tickets, and book the exact same spots.', travelersCta: 'Explore Guides',
+    merchantsTitle: 'For Merchants', merchantsDesc: 'Issue a mission ticket and match with creators who already own the route.', merchantsCta: 'Post a Mission',
   },
   about: {
     eyebrow: 'About KINNSO',
