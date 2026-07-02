@@ -2368,15 +2368,38 @@ Follows the Phase-6B perks slice patterns exactly: `requireOpsAction` gate first
   })
 
   describe('updateTestimonialAction', () => {
+    it('rejects a non-ops caller BEFORE writing', async () => {
+      gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } } as never)
+      const { client, calls } = makeClient()
+      serverClientMock.mockResolvedValue(client)
+      const r = await updateTestimonialAction('en', 't1', input)
+      expect(r.ok).toBe(false)
+      expect(calls.update).toBeUndefined()
+    })
     it('returns a form error when no row matched', async () => {
       const { client } = makeClient({ row: null })
       serverClientMock.mockResolvedValue(client)
       const r = await updateTestimonialAction('en', 't-stale', input)
       expect(r.ok).toBe(false)
     })
+    it('does NOT revalidate any path when the write fails', async () => {
+      const { client } = makeClient({ row: null })
+      serverClientMock.mockResolvedValue(client)
+      const r = await updateTestimonialAction('en', 't-stale', input)
+      expect(r.ok).toBe(false)
+      expect(revalidateMock).not.toHaveBeenCalled()
+    })
   })
 
   describe('setTestimonialStatusAction', () => {
+    it('rejects a non-ops caller BEFORE writing', async () => {
+      gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } } as never)
+      const { client, calls } = makeClient()
+      serverClientMock.mockResolvedValue(client)
+      const r = await setTestimonialStatusAction('en', 't1', 'published')
+      expect(r.ok).toBe(false)
+      expect(calls.update).toBeUndefined()
+    })
     it('publishes a testimonial', async () => {
       const { client, calls } = makeClient()
       serverClientMock.mockResolvedValue(client)
@@ -2394,6 +2417,14 @@ Follows the Phase-6B perks slice patterns exactly: `requireOpsAction` gate first
   })
 
   describe('deleteTestimonialAction', () => {
+    it('rejects a non-ops caller BEFORE writing', async () => {
+      gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } } as never)
+      const { client, calls } = makeClient()
+      serverClientMock.mockResolvedValue(client)
+      const r = await deleteTestimonialAction('en', 't1')
+      expect(r.ok).toBe(false)
+      expect(calls.deleted).toBeUndefined()
+    })
     it('deletes and reports ok', async () => {
       const { client, calls } = makeClient()
       serverClientMock.mockResolvedValue(client)
