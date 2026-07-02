@@ -1273,6 +1273,7 @@ export function ExploreView({ locale, t, guides }: { locale: Locale; t: Messages
         <Eyebrow>{t.pill}</Eyebrow>
         <h1 className="k2-display mt-4 max-w-3xl text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-6xl">{t.heading}</h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-kinnso-ink/70">{t.subtitle}</p>
+        <h2 className="sr-only">{t.gridHeading}</h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {guides.map((g) => <GuideCard key={g.slug} g={g} locale={locale} />)}
         </div>
@@ -1284,7 +1285,8 @@ export function ExploreView({ locale, t, guides }: { locale: Locale; t: Messages
 
 export default ExploreView
 ```
-- [ ] **Step 3:** Run the suites that render these: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx tests/home.host.test.tsx` plus any explore view test (`ls tests | grep -i explore`) — Expected: PASS (fix any assertion pinned to ticket-motif DOM).
+**Heading-hierarchy fix (same class of defect already fixed in Tasks 6 and 8 — pre-empted here):** `GuideCard` renders each guide title via `EditorialCard`, which defaults to `h3` — without an `h2` between the page's `h1` and those `h3`s, the hierarchy skips a level. Add a new `gridHeading` key to the `explore` i18n group (interface + all 7 locales) with natural copy like `'All guides'` (translate per-locale, matching each file's existing `explore` group register) — the `<h2 className="sr-only">` above renders it.
+- [ ] **Step 3:** Run the suites that render these: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx tests/home.host.test.tsx` plus any explore view test (`ls tests | grep -i explore`) — Expected: PASS (fix any assertion pinned to ticket-motif DOM). Add an assertion to the explore view's own test confirming `screen.getByRole('heading', { level: 2, name: en.explore.gridHeading })` exists.
 - [ ] **Step 4: Commit:** `git commit -am "refactor(web): GuideCard + ExploreView on editorial primitives (ticket motif off public surfaces)"`
 
 ---
