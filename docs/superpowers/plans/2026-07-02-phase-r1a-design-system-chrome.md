@@ -368,6 +368,18 @@
       expect(band).toBeTruthy()
     })
 
+    it('SectionShell className override wins over the default rhythm', () => {
+      render(
+        <SectionShell className="py-8">
+          <p>INNER3</p>
+        </SectionShell>,
+      )
+      const section = screen.getByText('INNER3').closest('section')
+      expect(section?.className).toContain('py-8')
+      // tailwind-merge drops the conflicting py-14 default so the caller wins
+      expect(section?.className).not.toContain('py-14')
+    })
+
     it('Eyebrow renders a small-caps kicker', () => {
       render(<Eyebrow>From the journal</Eyebrow>)
       expect(screen.getByText('From the journal').className).toContain('k2-eyebrow')
@@ -391,6 +403,11 @@
       const { container } = render(<EditorialCard title="No photo" />)
       expect(container.querySelector('[data-slot="media"]')).toBeNull()
     })
+
+    it('EditorialCard titleAs="h2" renders a level-2 heading', () => {
+      render(<EditorialCard titleAs="h2" title="Top story" />)
+      expect(screen.getByRole('heading', { level: 2, name: 'Top story' })).toBeTruthy()
+    })
   })
   ```
 
@@ -403,6 +420,8 @@
 
   ```tsx
   import type { ReactNode } from 'react'
+
+  import { cn } from '@/lib/utils'
 
   /**
    * R1A editorial band: consistent max-width + vertical rhythm for every
@@ -418,7 +437,7 @@
     children: ReactNode
   }) {
     return (
-      <Tag className={`py-14 md:py-20 ${className}`.trim()}>
+      <Tag className={cn('py-14 md:py-20', className)}>
         <div className="k2-container">{children}</div>
       </Tag>
     )
@@ -430,9 +449,11 @@
   ```tsx
   import type { ReactNode } from 'react'
 
+  import { cn } from '@/lib/utils'
+
   /** Small-caps kicker above editorial headlines ("DESTINATIONS", "FROM THE JOURNAL"). */
   export function Eyebrow({ children, className = '' }: { children: ReactNode; className?: string }) {
-    return <p className={`k2-eyebrow ${className}`.trim()}>{children}</p>
+    return <p className={cn('k2-eyebrow', className)}>{children}</p>
   }
   ```
 
@@ -441,36 +462,43 @@
   ```tsx
   import type { ReactNode } from 'react'
 
+  import { cn } from '@/lib/utils'
+
+  import { Eyebrow } from './Eyebrow'
+
   /**
    * Magazine-style card: media band on top, hairline border, generous text block.
    * `media` is a slot (pass your own <Image>) so this stays a dumb server component
-   * and tests never need a next/image mock.
+   * and tests never need a next/image mock. The media child must fill the 4:3 box
+   * (e.g. next/image `fill` + `object-cover`) or it letterboxes on the sand background.
    */
   export function EditorialCard({
     media,
     kicker,
     title,
+    titleAs: TitleTag = 'h3',
     children,
     footer,
     className = '',
   }: {
     media?: ReactNode
-    kicker?: string
+    kicker?: ReactNode
     title: string
+    titleAs?: 'h2' | 'h3' | 'h4'
     children?: ReactNode
     footer?: ReactNode
     className?: string
   }) {
     return (
-      <article className={`k2-card flex flex-col ${className}`.trim()}>
+      <article className={cn('k2-card flex flex-col', className)}>
         {media ? (
           <div data-slot="media" className="aspect-[4/3] w-full overflow-hidden bg-kinnso2-sand">
             {media}
           </div>
         ) : null}
         <div className="flex flex-1 flex-col gap-2 p-5">
-          {kicker ? <p className="k2-eyebrow">{kicker}</p> : null}
-          <h3 className="k2-display text-xl font-semibold text-kinnso2-ink">{title}</h3>
+          {kicker ? <Eyebrow>{kicker}</Eyebrow> : null}
+          <TitleTag className="k2-display text-xl font-semibold text-kinnso2-ink">{title}</TitleTag>
           {children ? <div className="text-sm leading-relaxed text-kinnso2-ink/70">{children}</div> : null}
           {footer ? <div className="mt-auto pt-3">{footer}</div> : null}
         </div>
@@ -493,7 +521,7 @@
        and the rebuilt chrome. Same utility-class-in-globals.css pattern as k-*. */
     .k2-container   { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
     .k2-display     { font-family: var(--font-k2-display); letter-spacing: -0.01em; }
-    .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-clay; }
+    .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso2-clay; } /* clay on sand is ~3.85:1 — don't place eyebrows on kinnso2-sand panels (AA fail); white/paper only */
     .k2-card        { @apply overflow-hidden rounded-[4px] border border-kinnso2-line bg-white; }
     .k2-hairline    { @apply border-t border-kinnso2-line; }
     .k2-btn-primary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso2-clay px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-kinnso2-clay-deep; }

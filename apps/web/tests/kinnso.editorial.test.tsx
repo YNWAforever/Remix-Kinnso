@@ -29,6 +29,18 @@ describe('editorial primitives (R1A)', () => {
     expect(band).toBeTruthy()
   })
 
+  it('SectionShell className override wins over the default rhythm', () => {
+    render(
+      <SectionShell className="py-8">
+        <p>INNER3</p>
+      </SectionShell>,
+    )
+    const section = screen.getByText('INNER3').closest('section')
+    expect(section?.className).toContain('py-8')
+    // tailwind-merge drops the conflicting py-14 default so the caller wins
+    expect(section?.className).not.toContain('py-14')
+  })
+
   it('Eyebrow renders a small-caps kicker', () => {
     render(<Eyebrow>From the journal</Eyebrow>)
     expect(screen.getByText('From the journal').className).toContain('k2-eyebrow')
@@ -51,5 +63,10 @@ describe('editorial primitives (R1A)', () => {
   it('EditorialCard omits the media band when no media is given', () => {
     const { container } = render(<EditorialCard title="No photo" />)
     expect(container.querySelector('[data-slot="media"]')).toBeNull()
+  })
+
+  it('EditorialCard titleAs="h2" renders a level-2 heading', () => {
+    render(<EditorialCard titleAs="h2" title="Top story" />)
+    expect(screen.getByRole('heading', { level: 2, name: 'Top story' })).toBeTruthy()
   })
 })
