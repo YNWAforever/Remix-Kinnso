@@ -56,8 +56,8 @@ export function HowItWorks({ t }: { t: Messages['home'] }) {
   return (
     <SectionShell>
       <Eyebrow>{t.howEyebrow}</Eyebrow>
-      <h2 className="k2-display mt-3 max-w-xl text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.howHeading}</h2>
-      <p className="mt-3 max-w-xl text-kinnso2-ink/70">{t.howSub}</p>
+      <h2 className="k2-display mt-3 max-w-xl text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.howHeading}</h2>
+      <p className="mt-3 max-w-xl text-kinnso-ink/70">{t.howSub}</p>
       <div role="tablist" aria-label={t.howEyebrow} onKeyDown={onTablistKeyDown} className="mt-8 flex flex-wrap gap-2">
         {tabs.map((tab) => (
           <button
@@ -69,10 +69,10 @@ export function HowItWorks({ t }: { t: Messages['home'] }) {
             aria-controls="how-steps"
             tabIndex={audience === tab.id ? 0 : -1}
             onClick={() => setAudience(tab.id)}
-            className={`min-h-[40px] rounded-[3px] px-4 py-2 text-sm font-semibold tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay ${
+            className={`min-h-[40px] rounded-[3px] px-4 py-2 text-sm font-semibold tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
               audience === tab.id
-                ? 'border border-kinnso2-ink bg-kinnso2-ink text-kinnso2-paper'
-                : 'border border-kinnso2-ink/25 text-kinnso2-ink hover:border-kinnso2-ink'
+                ? 'border border-kinnso-ink bg-kinnso-ink text-kinnso-cream'
+                : 'border border-kinnso-ink/25 text-kinnso-ink hover:border-kinnso-ink'
             }`}
           >
             {tab.label}
@@ -82,10 +82,10 @@ export function HowItWorks({ t }: { t: Messages['home'] }) {
       <div id="how-steps" role="tabpanel" aria-labelledby={`how-tab-${audience}`} tabIndex={0}>
         <ol className="mt-10 grid gap-8 md:grid-cols-3">
           {steps[audience].map((s, i) => (
-            <li key={s.title} className="border-t-2 border-kinnso2-ink pt-4">
-              <span className="k2-display text-sm font-semibold text-kinnso2-clay">{`0${i + 1}`}</span>
-              <h3 className="mt-2 text-lg font-semibold text-kinnso2-ink">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-kinnso2-ink/70">{s.desc}</p>
+            <li key={s.title} className="border-t-2 border-kinnso-ink pt-4">
+              <span className="k2-display text-sm font-semibold text-kinnso-orangeDark">{`0${i + 1}`}</span>
+              <h3 className="mt-2 text-lg font-semibold text-kinnso-ink">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-kinnso-ink/70">{s.desc}</p>
             </li>
           ))}
         </ol>

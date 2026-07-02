@@ -28,8 +28,8 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
   // Active state is underline + clay (not color-only); the on-skin focus ring
   // overrides the legacy global orange focus rule.
   const navLinkClass = (active: boolean) =>
-    `whitespace-nowrap px-3 py-2 text-sm font-medium tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay ${
-      active ? "text-kinnso2-clay underline underline-offset-8 decoration-2 decoration-kinnso2-clay" : "text-kinnso2-ink/75 hover:text-kinnso2-ink"
+    `whitespace-nowrap px-3 py-2 text-sm font-medium tracking-wide transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
+      active ? "text-kinnso-orangeDark underline underline-offset-8 decoration-2 decoration-kinnso-orangeDark" : "text-kinnso-ink/75 hover:text-kinnso-ink"
     }`;
 
   const baseAnchors = [
@@ -51,7 +51,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
 
   const cta = (() => {
     if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k2-btn-primary" };
-    if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso2-sand px-4 py-2 text-sm font-semibold text-kinnso2-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay" };
+    if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso-cream2 px-4 py-2 text-sm font-semibold text-kinnso-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange" };
     if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/post", className: "k2-btn-primary" };
     return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
   })();
@@ -59,11 +59,11 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
   const forMerchantsHref = p("/merchants");
 
   return (
-    <header className="sticky top-0 z-40 border-b border-kinnso2-line bg-kinnso2-paper/95 font-k2-sans backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
       <div className="k2-container flex h-16 items-center justify-between gap-4">
         <Link href={p("")} aria-label="KINNSO" className="flex items-baseline gap-1.5">
-          <span className="k2-display text-2xl font-semibold tracking-tight text-kinnso2-ink">KINNSO</span>
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-kinnso2-clay" />
+          <span className="k2-display text-2xl font-semibold tracking-tight text-kinnso-ink">KINNSO</span>
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-kinnso-orange" />
         </Link>
 
         <nav className="hidden items-center gap-1 xl:flex">
@@ -82,8 +82,8 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
             <Link
               href={forMerchantsHref}
               aria-current={isActive(forMerchantsHref) ? "page" : undefined}
-              className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay ${
-                isActive(forMerchantsHref) ? "text-kinnso2-clay underline underline-offset-8 decoration-2 decoration-kinnso2-clay" : "text-kinnso2-ink/75 hover:text-kinnso2-ink"
+              className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
+                isActive(forMerchantsHref) ? "text-kinnso-orangeDark underline underline-offset-8 decoration-2 decoration-kinnso-orangeDark" : "text-kinnso-ink/75 hover:text-kinnso-ink"
               }`}
             >
               {t.linkForMerchants}
@@ -91,14 +91,14 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
           )}
           <LocaleSwitcher locale={locale} t={t} />
           {role === "anon" && (
-            <Link href={p("/sign-in")} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso2-ink transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">{t.signIn}</Link>
+            <Link href={p("/sign-in")} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso-ink transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">{t.signIn}</Link>
           )}
           <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
         </div>
 
         <button
           type="button"
-          className="grid h-10 w-10 place-items-center rounded-full text-kinnso2-ink transition hover:bg-kinnso2-sand/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay xl:hidden"
+          className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange xl:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-label={t.menuToggle}
           aria-expanded={open}
@@ -111,7 +111,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
       </div>
 
       {role === "merchant" && (
-        <nav aria-label={t.linkMissions} className="hidden border-t border-kinnso2-line xl:block">
+        <nav aria-label={t.linkMissions} className="hidden border-t border-kinnso-edge xl:block">
           <div className="k2-container flex h-10 items-center gap-1">
             {merchantAnchors.map((a) => {
               const href = p(a.to);
@@ -126,16 +126,16 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
       )}
 
       {open && (
-        <div id="kinnso-mobile-menu" className="border-t border-kinnso2-line bg-kinnso2-paper xl:hidden">
+        <div id="kinnso-mobile-menu" className="border-t border-kinnso-edge bg-kinnso-cream xl:hidden">
           <div className="k2-container flex flex-col gap-1 py-3">
             <nav aria-label={t.menuToggle} className="flex flex-col gap-1">
               {trayAnchors.map((a) => (
-                <Link key={a.to} href={p(a.to)} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso2-ink transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">
+                <Link key={a.to} href={p(a.to)} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso-ink transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">
                   {a.label}
                 </Link>
               ))}
               {role !== "merchant" && (
-                <Link href={forMerchantsHref} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso2-ink/75 transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">
+                <Link href={forMerchantsHref} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso-ink/75 transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">
                   {t.linkForMerchants}
                 </Link>
               )}
@@ -144,7 +144,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
               <LocaleSwitcher locale={locale} t={t} />
               <div className="flex items-center gap-2">
                 {role === "anon" && (
-                  <Link href={p("/sign-in")} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso2-ink transition hover:text-kinnso2-clay focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso2-clay">{t.signIn}</Link>
+                  <Link href={p("/sign-in")} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso-ink transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">{t.signIn}</Link>
                 )}
                 <Link href={p(cta.to)} onClick={() => setOpen(false)} className={cta.className}>{cta.label}</Link>
               </div>
