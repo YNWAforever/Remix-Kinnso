@@ -448,7 +448,7 @@ const messages: Messages = {
     rights: '© 2026 KINNSO. 版权所有。',
   },
   home: {
-    heroEyebrow: '旅行创作者市集',
+    heroEyebrow: '旅行创作者平台',
     heroTitle: '真实创作者、真实地方。预订你真正想要的旅程。',
     heroSubtitle: '发现值得信赖的旅行创作者攻略、用 AI 规划行程，一站完成预订。',
     heroPrimaryCta: '开始规划',
@@ -499,7 +499,7 @@ const messages: Messages = {
     merchantBullet2: '在旅行者规划行程的当下触达他们——在真实攻略里，而非广告位。',
     merchantBullet3: '在一条透明的流程中跟进每一次合作。',
     merchantCta: '了解 KINNSO 商家方案',
-    creatorEyebrow: '创作者',
+    creatorEyebrow: '创作者专区',
     creatorHeading: '你的城市知识，值得的不只是曝光。',
     creatorBullet1: '发布持续带来价值的攻略，发出之后仍不断运作。',
     creatorBullet2: '承接重视你路线的商家任务。',

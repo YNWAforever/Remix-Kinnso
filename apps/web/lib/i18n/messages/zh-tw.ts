@@ -499,7 +499,7 @@ const messages: Messages = {
     merchantBullet2: '在旅人規劃行程的當下觸及他們——在真實攻略裡，而非廣告版位。',
     merchantBullet3: '在一條透明的流程中追蹤每一次合作。',
     merchantCta: '了解 KINNSO 商家方案',
-    creatorEyebrow: '創作者',
+    creatorEyebrow: '創作者專區',
     creatorHeading: '你的城市知識，值得的不只是曝光。',
     creatorBullet1: '發布持續帶來價值的攻略，貼文之後仍不斷運作。',
     creatorBullet2: '承接重視你路線的商家任務。',
