@@ -707,6 +707,7 @@ const messages: Messages = {
     pill: '探索',
     heading: '來自真實創作者的旅遊攻略',
     subtitle: '探索由旅行者精選收藏的景點。',
+    gridHeading: '全部攻略',
     savesLabel: '次收藏',
     emptyNote: '每週都會新增更多攻略。',
   },

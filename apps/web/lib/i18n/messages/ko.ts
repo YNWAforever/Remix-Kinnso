@@ -707,6 +707,7 @@ const messages: Messages = {
     pill: '탐색',
     heading: '실제 크리에이터의 여행 가이드',
     subtitle: '당신 같은 여행자들이 저장한 엄선된 장소를 발견하세요.',
+    gridHeading: '모든 가이드',
     savesLabel: '회 저장',
     emptyNote: '매주 더 많은 가이드가 추가됩니다.',
   },

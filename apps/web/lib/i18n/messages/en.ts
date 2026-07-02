@@ -593,6 +593,7 @@ export interface Messages {
   }
   explore: {
     pill: string; heading: string; subtitle: string
+    gridHeading: string
     savesLabel: string; emptyNote: string
   }
   feed: {
@@ -1606,6 +1607,7 @@ const messages: Messages = {
     pill: 'Explore',
     heading: 'Travel Guides from real creators',
     subtitle: 'Discover hand-picked spots, saved by travelers like you.',
+    gridHeading: 'All guides',
     savesLabel: 'saves',
     emptyNote: 'More guides are added every week.',
   },

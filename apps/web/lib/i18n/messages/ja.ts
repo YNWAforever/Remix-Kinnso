@@ -707,6 +707,7 @@ const messages: Messages = {
     pill: '探索',
     heading: '本物のクリエイターによる旅行ガイド',
     subtitle: 'あなたのような旅行者が保存した厳選スポットを発見しましょう。',
+    gridHeading: 'すべてのガイド',
     savesLabel: '件の保存',
     emptyNote: '毎週新しいガイドが追加されます。',
   },
