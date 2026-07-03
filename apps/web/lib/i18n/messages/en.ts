@@ -135,6 +135,33 @@ export interface MerchantDashboardMessages {
   errInvalidNumber: string
 }
 
+export interface MerchantsDirectoryMessages {
+  heading: string
+  subtitle: string
+  empty: string
+  viewProfile: string
+  newHereNote: string
+  newHereCta: string
+}
+
+export interface MerchantProfileMessages {
+  websiteLabel: string
+  experiencesHeading: string
+  experiencesEmpty: string
+  workWithCreatorsNote: string
+  workWithCreatorsCta: string
+}
+
+export interface ExperiencePublicMessages {
+  hostedBy: string
+  bookingSoonBadge: string
+  bookingSoonNote: string
+  priceLabel: string
+  durationLabel: string
+  minutesSuffix: string
+  backToMerchant: string
+}
+
 export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
@@ -548,7 +575,7 @@ export interface Messages {
     statusPaid: string
   }
   nav: {
-    linkCreators: string; linkAgent: string
+    linkCreators: string; linkAgent: string; linkMerchants: string
     linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
     linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
@@ -560,7 +587,7 @@ export interface Messages {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
     colExplore: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
-    lPostMission: string; lPricing: string; lContact: string
+    lPostMission: string; lPricing: string; lContact: string; lDirectory: string
     lAbout: string; lAgent: string; lLegal: string; rights: string
     lForCreators: string
   }
@@ -729,16 +756,9 @@ export interface Messages {
     viewProfile: string
     guideCount: string
   }
-  merchantsLanding: {
-    heroPill: string
-    hubTitle: string; hubSub: string
-    cardsHeading: string
-    cardPostTitle: string; cardPostBody: string
-    cardCreatorsTitle: string; cardCreatorsBody: string
-    cardMissionsTitle: string; cardMissionsBody: string
-    cardOpen: string
-    newHereNote: string; newHereCta: string
-  }
+  merchantsDirectory: MerchantsDirectoryMessages
+  merchantProfile: MerchantProfileMessages
+  experiencePublic: ExperiencePublicMessages
   studioOffers: {
     heading: string
     subtitle: string
@@ -1051,8 +1071,8 @@ const messages: Messages = {
       description: 'Get in touch with the KINNSO team about partnerships, missions, and creator support.',
     },
     merchants: {
-      title: 'For brands and merchants',
-      description: 'Run real missions with vetted travel and lifestyle creators on KINNSO.',
+      title: 'Merchant Directory',
+      description: 'Discover the merchants and experiences building on KINNSO.',
     },
     terms: {
       title: 'Creator Terms',
@@ -1456,7 +1476,7 @@ const messages: Messages = {
     statusPaid: 'Paid',
   },
   nav: {
-    linkCreators: 'Creators', linkAgent: 'AI Agent',
+    linkCreators: 'Creators', linkAgent: 'AI Agent', linkMerchants: 'Merchants',
     linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
     linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
@@ -1469,7 +1489,7 @@ const messages: Messages = {
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
     colExplore: 'Explore', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
-    lPostMission: 'Post a mission', lPricing: 'How it works', lContact: 'Contact',
+    lPostMission: 'Post a mission', lPricing: 'How it works', lContact: 'Contact', lDirectory: 'Directory',
     lAbout: 'About', lAgent: 'AI Agent', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
     lForCreators: 'For Creators',
@@ -1753,17 +1773,29 @@ const messages: Messages = {
     viewProfile: 'View profile',
     guideCount: '{count} Guides',
   },
-  merchantsLanding: {
-    heroPill: 'For Merchants',
-    hubTitle: 'Your missions, creators and results — one place',
-    hubSub: 'Everything you run on KINNSO starts here.',
-    cardsHeading: 'Your merchant tools',
-    cardPostTitle: 'Post a mission', cardPostBody: 'Write a brief and put it in front of vetted creators.',
-    cardCreatorsTitle: 'Find creators', cardCreatorsBody: 'Search vetted creators by niche, audience and platform.',
-    cardMissionsTitle: 'Track missions', cardMissionsBody: 'Review applications, approve work and follow results.',
-    cardOpen: 'Open',
-    newHereNote: 'New to KINNSO? See how missions work and what creators can do for your brand.',
+  merchantsDirectory: {
+    heading: 'Merchant directory',
+    subtitle: 'The founding merchants building on KINNSO — more join every week.',
+    empty: 'No merchants yet — check back soon.',
+    viewProfile: 'View profile',
+    newHereNote: 'Run a travel or lifestyle business? Reach travellers through creators they trust.',
     newHereCta: 'Why KINNSO for merchants',
+  },
+  merchantProfile: {
+    websiteLabel: 'Website',
+    experiencesHeading: 'Experiences',
+    experiencesEmpty: 'No experiences published yet.',
+    workWithCreatorsNote: 'Are you a creator? See how you can work with merchants like this one.',
+    workWithCreatorsCta: 'For creators',
+  },
+  experiencePublic: {
+    hostedBy: 'Hosted by',
+    bookingSoonBadge: 'Booking opens soon',
+    bookingSoonNote: "We're finishing direct booking for this experience. Check back soon.",
+    priceLabel: 'From',
+    durationLabel: 'Duration',
+    minutesSuffix: 'min',
+    backToMerchant: 'Back to',
   },
   studioOffers: {
     heading: 'Affiliate offers',
