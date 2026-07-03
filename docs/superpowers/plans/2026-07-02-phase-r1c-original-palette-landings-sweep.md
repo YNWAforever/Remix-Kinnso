@@ -76,8 +76,8 @@ No booking/experiences/Stripe (R2/R3); no `/api/agent` or live agent chat (R4 �
 
 **Files:** Create: `docs/superpowers/plans/2026-07-02-phase-r1c-original-palette-landings-sweep.md` (this file)
 
-- [ ] **Step 1:** Confirm branch state — `git status --porcelain` must be clean except this plan file; `git log --oneline -1` must show `0fc1f69`. Current branch must be `feat/redesign-r1c`.
-- [ ] **Step 2:** Commit:
+- [x] **Step 1:** Confirm branch state — `git status --porcelain` must be clean except this plan file; `git log --oneline -1` must show `0fc1f69`. Current branch must be `feat/redesign-r1c`.
+- [x] **Step 2:** Commit:
 
 ```bash
 git add docs/superpowers/plans/2026-07-02-phase-r1c-original-palette-landings-sweep.md
@@ -93,7 +93,7 @@ git commit -m "docs(web): Phase R1C plan — original-palette revert, landings, 
 - Modify: `apps/web/app/layout.tsx` (font exports)
 - Test: `apps/web/tests/design.k2-tokens.test.ts` (rewrite)
 
-- [ ] **Step 1: Rewrite the token-contract test to the NEW contract (fails first).** Replace the whole body of `apps/web/tests/design.k2-tokens.test.ts` with:
+- [x] **Step 1: Rewrite the token-contract test to the NEW contract (fails first).** Replace the whole body of `apps/web/tests/design.k2-tokens.test.ts` with:
 
 ```ts
 import { readFileSync } from 'node:fs'
@@ -155,14 +155,14 @@ describe('R1C canonical design tokens', () => {
 })
 ```
 
-- [ ] **Step 2: Run it — must FAIL** (kinnso2 tokens still present):
+- [x] **Step 2: Run it — must FAIL** (kinnso2 tokens still present):
 
 ```bash
 cd apps/web && npx vitest run tests/design.k2-tokens.test.ts
 ```
 Expected: FAIL on `has no kinnso2 color tokens` and the font assertions.
 
-- [ ] **Step 3: Edit `apps/web/app/globals.css`.** Precise edits (line refs are pre-edit):
+- [x] **Step 3: Edit `apps/web/app/globals.css`.** Precise edits (line refs are pre-edit):
   1. In the LEGACY `@theme` block (lines ~35–37), repoint the font tokens (copy the CJK stacks from the current `--font-k2-*` values verbatim):
      ```css
      --font-display: var(--font-fraunces), 'Noto Serif TC', 'Songti TC', 'Noto Serif SC', 'Songti SC', 'Hiragino Mincho ProN', 'Yu Mincho', 'Nanum Myeongjo', 'AppleMyungjo', serif;
@@ -195,12 +195,12 @@ Expected: FAIL on `has no kinnso2 color tokens` and the font assertions.
      ```
   Do NOT touch the legacy `k-*` rules, the raw `--k-*` HSL channels, the radius tokens, keyframes, or either focus-visible rule (they already reference `kinnso-orange`).
 
-- [ ] **Step 4: Edit `apps/web/app/layout.tsx`.** Delete the `Bricolage_Grotesque` and `DM_Sans` imports and their two `export const` blocks; update the import line to `import { JetBrains_Mono, Fraunces, Inter } from 'next/font/google'`; update the comment (line ~8) to `// JetBrains Mono stays for studio k-mono; Fraunces/Inter are the canonical display/body faces (R1C).`; set:
+- [x] **Step 4: Edit `apps/web/app/layout.tsx`.** Delete the `Bricolage_Grotesque` and `DM_Sans` imports and their two `export const` blocks; update the import line to `import { JetBrains_Mono, Fraunces, Inter } from 'next/font/google'`; update the comment (line ~8) to `// JetBrains Mono stays for studio k-mono; Fraunces/Inter are the canonical display/body faces (R1C).`; set:
   ```ts
   export const fontVariables = `${jetBrainsMono.variable} ${fraunces.variable} ${inter.variable}`
   ```
   Then purge every other reference to the deleted fonts — code AND comments (the Task 17 gate requires absolute zero): `grep -rn "Bricolage\|DM_Sans\|dmSans\|bricolage" apps/web --include='*.ts*'` → fix each hit by deleting it.
-- [ ] **Step 4b: Rewrite `apps/web/tests/layout.fonts.test.ts`** — it currently mocks `Bricolage_Grotesque`/`DM_Sans` factories (L9-10) and asserts `fontVariables` contains `--font-bricolage`/`--font-dm-sans` (L20-21). Keep only the `JetBrains_Mono`/`Fraunces`/`Inter` mocks and assert:
+- [x] **Step 4b: Rewrite `apps/web/tests/layout.fonts.test.ts`** — it currently mocks `Bricolage_Grotesque`/`DM_Sans` factories (L9-10) and asserts `fontVariables` contains `--font-bricolage`/`--font-dm-sans` (L20-21). Keep only the `JetBrains_Mono`/`Fraunces`/`Inter` mocks and assert:
 
 ```ts
 expect(fontVariables).toContain('--font-jetbrains-mono')
@@ -209,8 +209,8 @@ expect(fontVariables).toContain('--font-inter')
 expect(fontVariables).not.toContain('--font-bricolage')
 expect(fontVariables).not.toContain('--font-dm-sans')
 ```
-- [ ] **Step 5:** `cd apps/web && npx vitest run tests/design.k2-tokens.test.ts tests/layout.fonts.test.ts` — Expected: PASS. Note: the app now has dangling `kinnso2-*` CLASS references in 17 files (colors silently resolve to nothing) — that is Task 3, immediately next; do not run the dev server between these tasks expecting correct colors.
-- [ ] **Step 6: Commit:**
+- [x] **Step 5:** `cd apps/web && npx vitest run tests/design.k2-tokens.test.ts tests/layout.fonts.test.ts` — Expected: PASS. Note: the app now has dangling `kinnso2-*` CLASS references in 17 files (colors silently resolve to nothing) — that is Task 3, immediately next; do not run the dev server between these tasks expecting correct colors.
+- [x] **Step 6: Commit:**
 
 ```bash
 git add apps/web/app/globals.css apps/web/app/layout.tsx apps/web/tests/design.k2-tokens.test.ts apps/web/tests/layout.fonts.test.ts
@@ -223,7 +223,7 @@ git commit -m "feat(web): R1C palette revert — original kinnso-* tokens canoni
 
 **Files:** Modify every file matching `grep -rl 'kinnso2-\|font-k2-' apps/web/app apps/web/components apps/web/lib apps/web/tests` — as of planning: `SiteChrome.tsx`, `Navbar.tsx`, `Footer.tsx`, `LocaleSwitcher.tsx` (no kinnso2 — verify only), `editorial/{SectionShell,EditorialCard,Eyebrow}.tsx`, `home/{Hero,StatsBar,HowItWorks,AgentTeaser,MerchantValue,CreatorCta}.tsx`, `pages/HomeView.tsx`, `app/[locale]/{page,destinations/page,sessions/page}.tsx`, plus any test referencing the classes.
 
-- [ ] **Step 1: Mechanical sed (ORDER MATTERS — text/decoration variants before generic, deep before base):**
+- [x] **Step 1: Mechanical sed (ORDER MATTERS — text/decoration variants before generic, deep before base):**
 
 ```bash
 cd apps/web
@@ -246,7 +246,7 @@ grep -rl 'kinnso2-\|font-k2-' app components lib tests | xargs sed -i '' \
 
 Rationale: `text-…-clay` sites (10: nav active/For-Merchants links, "see all →" links in HomeView) become `orangeDark` text; `text-…-clay-deep` only occurs in hover states (HomeView "see all" links) and maps to `hover:text-kinnso-ink` — hover DARKENS, never brightens to orange (D-R1C-2: hover text is still text). Fills/dots/focus-outlines take plain `orange` (the original focus/button language). `kinnso2-sun` TEXT sites (Footer column headers, AgentTeaser eyebrow) sit on dark bands where amber is 9.9:1 ✓; the CreatorCta dot is decorative; the SiteChrome skip-link OUTLINE is a hand exception (Step 3) because the outline draws against the cream page where amber is ~1.5:1. `kinnso2-moss` is deliberately NOT in the sed — its 2 sites are hand-redesigned next.
 
-- [ ] **Step 2: Hand-redesign the two moss sites.**
+- [x] **Step 2: Hand-redesign the two moss sites.**
   1. **`components/kinnso/home/CreatorCta.tsx`** — the moss band becomes the brand's orange moment (ink text = 5.6:1 ✓). Replace the whole file body:
 
 ```tsx
@@ -288,18 +288,18 @@ export function CreatorCta({ locale, t }: { locale: Locale; t: Messages['home'] 
 ```
   2. **`app/[locale]/sessions/page.tsx` line 31** — `<Eyebrow className="text-kinnso2-moss">` (post-sed it still says `kinnso2-moss` because moss was excluded) → drop the override entirely: `<Eyebrow>{t.eyebrow}</Eyebrow>`.
 
-- [ ] **Step 3: Hand exceptions (post-sed touch-ups):**
+- [x] **Step 3: Hand exceptions (post-sed touch-ups):**
   1. `components/kinnso/Footer.tsx` line 35: `text-kinnso-cream/50` → `text-kinnso-cream/60` (carry-forward #21 — a readability bump: cream/50 composites to 4.74:1 which already met AA; /60 = 6.2:1 gives real headroom).
   2. `components/kinnso/LocaleSwitcher.tsx` line 33: align the control with the new chrome — replace `rounded-pill` with `rounded-[3px]` (rest of the classes are already canonical `kinnso-*`; carry-forward #2 otherwise dissolves under the revert).
   3. `components/kinnso/SiteChrome.tsx` line 35 (skip link): the sed produced `focus:outline-kinnso-amber`, but the outline draws against the CREAM page (amber ≈1.5:1 there) — change it to `focus:outline-kinnso-orange` (matches the global focus rule; covered by accepted deviation ③).
   4. Verify no stray `kinnso2`/`k2 font` refs: `grep -rn "kinnso2-\|font-k2-" apps/web/app apps/web/components apps/web/lib apps/web/tests | grep -v tests/design.k2-tokens.test.ts` → **zero matches** (the design-token test keeps the literals in its negative assertions; never grep the repo root — `.next/` build artifacts contain stale matches).
-- [ ] **Step 4: Run the design-affected suites:**
+- [x] **Step 4: Run the design-affected suites:**
 
 ```bash
 cd apps/web && npx vitest run tests/design.k2-tokens.test.ts tests/kinnso.route-parity.test.tsx tests/kinnso.Navbar.test.tsx tests/kinnso.home-bands.test.tsx tests/kinnso.home-hero-stats.test.tsx tests/home.host.test.tsx
 ```
 Expected: PASS (these assert roles/text/hrefs, not color classes; fix any class-string assertion the sweep broke by updating it to the kinnso-* equivalent).
-- [ ] **Step 5: Commit:**
+- [x] **Step 5: Commit:**
 
 ```bash
 git add -A apps/web
@@ -314,7 +314,7 @@ git commit -m "refactor(web): rename kinnso2-* usages to canonical kinnso-* pale
 - Create: `supabase/migrations/20260703090000_r1c_agent_waitlist_and_testimonials_updated_at.sql`
 - Modify: `packages/db/types.ts` (hand-add, MCP regen reconciles at PR time)
 
-- [ ] **Step 1: Write the migration** (reuses `public.set_updated_at()` from `20260614000010_creator_triggers.sql`; `is_active_ops()` from the ops migrations):
+- [x] **Step 1: Write the migration** (reuses `public.set_updated_at()` from `20260614000010_creator_triggers.sql`; `is_active_ops()` from the ops migrations):
 
 ```sql
 -- R1C: (1) agent_waitlist — honest traveller-agent waitlist capture for /agent.
@@ -361,9 +361,9 @@ create trigger testimonials_set_updated_at
   for each row execute procedure public.set_updated_at();
 ```
 
-- [ ] **Step 2: Hand-update `packages/db/types.ts`:** add `agent_waitlist` to `Tables` (Row: `{ id: string; email: string; locale: string | null; created_at: string }`; Insert: `{ id?: string; email: string; locale?: string | null; created_at?: string }`; Update: all optional; `Relationships: []`) following the exact shape of the `testimonials` entry beside it, and add `updated_at: string` to `testimonials` Row (+ optional in Insert/Update).
-- [ ] **Step 3:** `pnpm --filter web typecheck` — Expected: PASS (no consumers yet).
-- [ ] **Step 4: Commit:**
+- [x] **Step 2: Hand-update `packages/db/types.ts`:** add `agent_waitlist` to `Tables` (Row: `{ id: string; email: string; locale: string | null; created_at: string }`; Insert: `{ id?: string; email: string; locale?: string | null; created_at?: string }`; Update: all optional; `Relationships: []`) following the exact shape of the `testimonials` entry beside it, and add `updated_at: string` to `testimonials` Row (+ optional in Insert/Update).
+- [x] **Step 3:** `pnpm --filter web typecheck` — Expected: PASS (no consumers yet).
+- [x] **Step 4: Commit:**
 
 ```bash
 git add supabase/migrations/20260703090000_r1c_agent_waitlist_and_testimonials_updated_at.sql packages/db/types.ts
@@ -379,7 +379,7 @@ git commit -m "feat(db): agent_waitlist (insert-only RLS) + testimonials.updated
 - Modify: `apps/web/lib/guides/queries.ts:25-33` · `apps/web/lib/home/queries.ts:54-70` · `apps/web/app/[locale]/page.tsx:30-44` · `apps/web/components/kinnso/pages/HomeView.tsx` · `apps/web/lib/i18n/messages/*.ts` ×7 (`home.testimonialsHeading`)
 - Test: `apps/web/tests/guides.queries.test.ts` · `apps/web/tests/home.queries.test.ts` · `apps/web/tests/home.host.test.tsx`
 
-- [ ] **Step 1: Failing tests first.** In `tests/guides.queries.test.ts` add (if the file's existing supabase chain mock does not already expose per-method spies, add this self-contained one):
+- [x] **Step 1: Failing tests first.** In `tests/guides.queries.test.ts` add (if the file's existing supabase chain mock does not already expose per-method spies, add this self-contained one):
 
 ```ts
 const limitSpy = vi.fn().mockResolvedValue({ data: [] })
@@ -405,7 +405,7 @@ it('getPublishedTestimonials filters by author_role when given', async () => {
 ```
 Run: `cd apps/web && npx vitest run tests/guides.queries.test.ts tests/home.queries.test.ts` — Expected: FAIL (new params unknown).
 
-- [ ] **Step 2: Implement.**
+- [x] **Step 2: Implement.**
   1. `lib/guides/queries.ts` — `getPublishedGuides(limit?: number)`: after `.order('published_at', { ascending: false })` add `if (limit !== undefined) query = query.limit(limit)` (restructure to `let query = supabase.from(…)…`; `const { data } = await query`).
   2. `lib/home/queries.ts` — `getPublishedTestimonials(locale: Locale, role?: Testimonial['authorRole'])`: build the query in a `let`, and before `.limit(3)` add `if (role) query = query.eq('author_role', role)`.
   3. `app/[locale]/page.tsx` line ~32: `getPublishedGuides()` → `getPublishedGuides(6)`; AND line 44: `guides={guides.slice(0, 6)}` → `guides={guides}` (carry-forward #16 names BOTH slices — this is the second one).
@@ -419,8 +419,8 @@ Run: `cd apps/web && npx vitest run tests/guides.queries.test.ts tests/home.quer
 ```
   `SectionShell` doesn't forward unknown props — extend it: add `...rest` spread (`{ as, className, children, ...rest }: { … } & HTMLAttributes<HTMLElement>`) and apply to `<Tag {...rest}>`.
   7. Add `testimonialsHeading` to the `home` group in the `Messages` interface and ALL 7 locale files: en `'What people say about KINNSO'` · zh-hk `'大家點睇 KINNSO'` · zh-tw `'大家怎麼看 KINNSO'` · zh-cn `'大家怎么看 KINNSO'` · ja `'KINNSO利用者の声'` · ko `'KINNSO 사용자들의 이야기'` · th `'เสียงจากผู้ใช้ KINNSO'`.
-- [ ] **Step 3:** Run: `cd apps/web && npx vitest run tests/guides.queries.test.ts tests/home.queries.test.ts tests/home.host.test.tsx tests/i18n.locale-parity.test.ts` — Expected: PASS.
-- [ ] **Step 4: Commit:** `git add -A apps/web && git commit -m "feat(web): guide limit at query, testimonial role filter, homepage articles guard + a11y section name"`
+- [x] **Step 3:** Run: `cd apps/web && npx vitest run tests/guides.queries.test.ts tests/home.queries.test.ts tests/home.host.test.tsx tests/i18n.locale-parity.test.ts` — Expected: PASS.
+- [x] **Step 4: Commit:** `git add -A apps/web && git commit -m "feat(web): guide limit at query, testimonial role filter, homepage articles guard + a11y section name"`
 
 ---
 
@@ -434,7 +434,7 @@ The current `AgentCopilotView` markets the CREATOR copilot while the homepage's 
 - Modify: `apps/web/app/[locale]/agent/page.tsx` (swap view import only) · `lib/i18n/messages/*.ts` ×7 (`agent` group REWRITE + `seo.agent` values) · `tests/i18n.locale-parity.test.ts` (GROUPS gains `'agent'` — it was never registered: confirmed missing from the list, exactly the class of bug carry-forward #6 predicts)
 - Test: Create `apps/web/tests/agent.waitlist-actions.test.ts` · `apps/web/tests/agent.landing.test.tsx`
 
-- [ ] **Step 1: Failing action test.** Create `tests/agent.waitlist-actions.test.ts` (mock `@/lib/supabase/public` the same way `tests/home.queries.test.ts` does):
+- [x] **Step 1: Failing action test.** Create `tests/agent.waitlist-actions.test.ts` (mock `@/lib/supabase/public` the same way `tests/home.queries.test.ts` does):
 
 ```ts
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -478,7 +478,7 @@ describe('joinAgentWaitlistAction', () => {
 ```
 Run: `cd apps/web && npx vitest run tests/agent.waitlist-actions.test.ts` — Expected: FAIL (module missing).
 
-- [ ] **Step 2: `lib/agent/waitlist-actions.ts`:**
+- [x] **Step 2: `lib/agent/waitlist-actions.ts`:**
 
 ```ts
 'use server'
@@ -515,8 +515,8 @@ export async function joinAgentWaitlistAction(locale: Locale, email: string, hp?
 }
 ```
 
-- [ ] **Step 3:** `npx vitest run tests/agent.waitlist-actions.test.ts` — Expected: PASS.
-- [ ] **Step 4: `components/kinnso/agent/AgentWaitlistForm.tsx`** (client; try/finally per carry-forward #14's lesson; `aria-live` status):
+- [x] **Step 3:** `npx vitest run tests/agent.waitlist-actions.test.ts` — Expected: PASS.
+- [x] **Step 4: `components/kinnso/agent/AgentWaitlistForm.tsx`** (client; try/finally per carry-forward #14's lesson; `aria-live` status):
 
 ```tsx
 'use client'
@@ -582,7 +582,7 @@ export function AgentWaitlistForm({ locale, t }: { locale: Locale; t: Messages['
 }
 ```
 
-- [ ] **Step 5: `components/kinnso/pages/AgentLandingView.tsx`:**
+- [x] **Step 5: `components/kinnso/pages/AgentLandingView.tsx`:**
 
 ```tsx
 import Link from 'next/link'
@@ -647,8 +647,8 @@ export function AgentLandingView({ locale, t }: { locale: Locale; t: Messages['a
 export default AgentLandingView
 ```
 
-- [ ] **Step 6:** Delete `components/kinnso/pages/AgentCopilotView.tsx` AND its test `tests/kinnso.AgentCopilotView.test.tsx` (it imports the deleted module and asserts deleted `agent.heroTitle`/`value1Title` keys — typecheck breaks otherwise). Rewrite `tests/agent.host.test.tsx`: it asserts `en.agent.heroTitle`; replace its host assertion with the new keys (heading = `en.agent.title`, waitlist button = `en.agent.submitCta`). In `app/[locale]/agent/page.tsx` swap the import/usage to `AgentLandingView` (same `t={messages.agent}` prop; metadata line already uses `dict.seo.agent` — unchanged shape). **JSON-LD/robots decision (spec §7):** `/agent` keeps the layout-level Organization/WebSite JSON-LD like every marketing page (no per-page JSON-LD, matching /about, /contact); `ROBOTS_DISALLOW` untouched (route is public and already in MARKETING_PATHS).
-- [ ] **Step 7: i18n — REWRITE the `agent` group** (interface in `en.ts` + values in all 7; delete every old key: `heroPill…ctaButton`). New interface:
+- [x] **Step 6:** Delete `components/kinnso/pages/AgentCopilotView.tsx` AND its test `tests/kinnso.AgentCopilotView.test.tsx` (it imports the deleted module and asserts deleted `agent.heroTitle`/`value1Title` keys — typecheck breaks otherwise). Rewrite `tests/agent.host.test.tsx`: it asserts `en.agent.heroTitle`; replace its host assertion with the new keys (heading = `en.agent.title`, waitlist button = `en.agent.submitCta`). In `app/[locale]/agent/page.tsx` swap the import/usage to `AgentLandingView` (same `t={messages.agent}` prop; metadata line already uses `dict.seo.agent` — unchanged shape). **JSON-LD/robots decision (spec §7):** `/agent` keeps the layout-level Organization/WebSite JSON-LD like every marketing page (no per-page JSON-LD, matching /about, /contact); `ROBOTS_DISALLOW` untouched (route is public and already in MARKETING_PATHS).
+- [x] **Step 7: i18n — REWRITE the `agent` group** (interface in `en.ts` + values in all 7; delete every old key: `heroPill…ctaButton`). New interface:
 
 ```ts
 agent: {
@@ -785,8 +785,8 @@ agent: {
 
 Also update `seo.agent` values in all 7 (same `{title, description}` shape) to traveller framing — en: `title: 'KINNSO AI travel agent — join the waitlist'`, `description: 'An AI travel agent grounded in real creator guides. Join the waitlist to be first in when it opens.'`; translate in the same register as the blocks above (zh-hk `'KINNSO AI 旅行助理 — 加入等候名單'` etc.).
 
-- [ ] **Step 8: Register `'agent'` in the parity GROUPS** (`tests/i18n.locale-parity.test.ts` line ~14 — it was missing; the Task 15 hardening makes such gaps impossible).
-- [ ] **Step 9: Host test.** Create `tests/agent.landing.test.tsx` (mirror `tests/home.host.test.tsx`'s render pattern):
+- [x] **Step 8: Register `'agent'` in the parity GROUPS** (`tests/i18n.locale-parity.test.ts` line ~14 — it was missing; the Task 15 hardening makes such gaps impossible).
+- [x] **Step 9: Host test.** Create `tests/agent.landing.test.tsx` (mirror `tests/home.host.test.tsx`'s render pattern):
 
 ```tsx
 import { render, screen } from '@testing-library/react'
@@ -806,8 +806,8 @@ describe('AgentLandingView', () => {
   })
 })
 ```
-- [ ] **Step 10:** Run: `cd apps/web && npx vitest run tests/agent.waitlist-actions.test.ts tests/agent.landing.test.tsx tests/agent.host.test.tsx tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx` — Expected: PASS. Then `pnpm --filter web typecheck` — PASS (proves no stale `agent.*` key consumers survive).
-- [ ] **Step 11: Commit:** `git add -A apps/web && git commit -m "feat(web): honest traveller-agent waitlist page with real email capture (i18n ×7)"`
+- [x] **Step 10:** Run: `cd apps/web && npx vitest run tests/agent.waitlist-actions.test.ts tests/agent.landing.test.tsx tests/agent.host.test.tsx tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx` — Expected: PASS. Then `pnpm --filter web typecheck` — PASS (proves no stale `agent.*` key consumers survive).
+- [x] **Step 11: Commit:** `git add -A apps/web && git commit -m "feat(web): honest traveller-agent waitlist page with real email capture (i18n ×7)"`
 
 ---
 
@@ -817,7 +817,7 @@ describe('AgentLandingView', () => {
 - Create: `apps/web/app/[locale]/for-creators/page.tsx` · `apps/web/components/kinnso/pages/ForCreatorsView.tsx` · `apps/web/tests/for-creators.host.test.tsx`
 - Modify: `apps/web/lib/seo/routes.ts:8-10` (MARKETING_PATHS) · `lib/i18n/messages/*.ts` ×7 (new `forCreators` group + `seo.forCreators`) · `tests/i18n.locale-parity.test.ts` (GROUPS + `'forCreators'`)
 
-- [ ] **Step 1: `ForCreatorsView.tsx`:**
+- [x] **Step 1: `ForCreatorsView.tsx`:**
 
 ```tsx
 import Link from 'next/link'
@@ -913,7 +913,7 @@ export function ForCreatorsView({ locale, t, testimonials }: {
 export default ForCreatorsView
 ```
 
-- [ ] **Step 2: `app/[locale]/for-creators/page.tsx`** (exact R1A/R1B page pattern):
+- [x] **Step 2: `app/[locale]/for-creators/page.tsx`** (exact R1A/R1B page pattern):
 
 ```tsx
 import type { Metadata } from 'next'
@@ -948,7 +948,7 @@ export default async function ForCreatorsPage({ params }: { params: Promise<{ lo
 }
 ```
 
-- [ ] **Step 3: i18n `forCreators` group** — interface (en.ts) + values ×7. Interface:
+- [x] **Step 3: i18n `forCreators` group** — interface (en.ts) + values ×7. Interface:
 
 ```ts
 forCreators: {
@@ -972,8 +972,8 @@ forCreators: {
 
 Also add `seo.forCreators: { title, description }` to the `seo` group interface + all 7 values — en: `title: 'Become a KINNSO travel creator'`, `description: 'Publish travel guides, run vetted brand missions, and earn from the places you genuinely recommend.'`
 
-- [ ] **Step 4:** `lib/seo/routes.ts` — add `'/for-creators'` to `MARKETING_PATHS` (this task) — sitemap picks it up automatically. Register `'forCreators'` in parity GROUPS. **JSON-LD/robots decision (spec §7):** like every marketing route, the page inherits the layout-level Organization/WebSite JSON-LD (no per-page structured data — same as /about and /contact); `ROBOTS_DISALLOW` needs no change (public route).
-- [ ] **Step 5: Host test** `tests/for-creators.host.test.tsx`:
+- [x] **Step 4:** `lib/seo/routes.ts` — add `'/for-creators'` to `MARKETING_PATHS` (this task) — sitemap picks it up automatically. Register `'forCreators'` in parity GROUPS. **JSON-LD/robots decision (spec §7):** like every marketing route, the page inherits the layout-level Organization/WebSite JSON-LD (no per-page structured data — same as /about and /contact); `ROBOTS_DISALLOW` needs no change (public route).
+- [x] **Step 5: Host test** `tests/for-creators.host.test.tsx`:
 
 ```tsx
 import { render, screen } from '@testing-library/react'
@@ -996,8 +996,8 @@ describe('ForCreatorsView', () => {
   })
 })
 ```
-- [ ] **Step 6:** Run: `cd apps/web && npx vitest run tests/for-creators.host.test.tsx tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx` — Expected: PASS.
-- [ ] **Step 7: Commit:** `git add -A apps/web && git commit -m "feat(web): /for-creators acquisition landing (i18n ×7, sitemap, role-filtered testimonials)"`
+- [x] **Step 6:** Run: `cd apps/web && npx vitest run tests/for-creators.host.test.tsx tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx` — Expected: PASS.
+- [x] **Step 7: Commit:** `git add -A apps/web && git commit -m "feat(web): /for-creators acquisition landing (i18n ×7, sitemap, role-filtered testimonials)"`
 
 ---
 
@@ -1007,16 +1007,16 @@ describe('ForCreatorsView', () => {
 - Create: `apps/web/app/[locale]/for-merchants/page.tsx` · `apps/web/components/kinnso/pages/ForMerchantsView.tsx` · `apps/web/tests/for-merchants.host.test.tsx`
 - Modify: `components/kinnso/pages/MerchantsLandingView.tsx` (de-mock + de-ticket) · `lib/seo/routes.ts` (`'/for-merchants'`) · `lib/i18n/messages/*.ts` ×7 (`forMerchants` group, `seo.forMerchants`, DELETE `merchantsLanding.samplesHeading/samplesSub`) · parity GROUPS + `'forMerchants'`
 
-- [ ] **Step 1: `ForMerchantsView.tsx`** — created by copying a file that exists in the working tree at this point: `cp apps/web/components/kinnso/pages/ForCreatorsView.tsx apps/web/components/kinnso/pages/ForMerchantsView.tsx`, then apply exactly these deltas (Task 7 must be complete first — it is, per task order):
+- [x] **Step 1: `ForMerchantsView.tsx`** — created by copying a file that exists in the working tree at this point: `cp apps/web/components/kinnso/pages/ForCreatorsView.tsx apps/web/components/kinnso/pages/ForMerchantsView.tsx`, then apply exactly these deltas (Task 7 must be complete first — it is, per task order):
   1. Rename component/export `ForCreatorsView` → `ForMerchantsView`; prop type `Messages['forCreators']` → `Messages['forMerchants']`; doc comment audience → merchants.
   2. Icons import: `{ BadgeDollarSign, Compass, PenLine }` → `{ FileText, Send, Users }`; steps array icons in order: `FileText`, `Users`, `Send`.
   3. Hero primary CTA href `p('/sign-up')` → `p('/merchants/post')`; secondary `p('/explore')` → `p('/contact')`.
   4. Final CTA band button href `p('/sign-up')` → `p('/merchants/post')`.
   5. Testimonials strip: both `id` and `aria-labelledby` `for-creators-testimonials` → `for-merchants-testimonials`.
   Nothing else changes — the `t.` key names are identical because the `forMerchants` interface mirrors `forCreators`.
-- [ ] **Step 2: `app/[locale]/for-merchants/page.tsx`** — identical to Task 7 Step 2 with `/for-merchants`, `seo.forMerchants`, `messages.forMerchants`, `getPublishedTestimonials(locale, 'merchant')`, `ForMerchantsView`.
-- [ ] **Step 3: i18n `forMerchants` group** — same key shape as `forCreators` (interface identical, rename group). **en:** `heroEyebrow: 'For Merchants'` · `heroTitle: 'Reach travellers through creators they trust'` · `heroSub: 'Brief vetted travel creators, pay on published results, and turn their genuine recommendations into your next customers.'` · `heroCtaPrimary: 'Post a mission'` · `heroCtaSecondary: 'Talk to us'` · `howEyebrow: 'How it works'` · `howHeading: 'Launch a campaign in three steps'` · `step1Title: 'Post a brief'` / `step1Body: 'Describe the mission, target cities and payout — it takes minutes.'` · `step2Title: 'Creators apply'` / `step2Body: 'Vetted creators who fit your brand pick up the brief and produce real content.'` · `step3Title: 'Pay on results'` / `step3Body: 'Approve published work and pay for outcomes — with attribution you can verify.'` · `whyHeading: 'Why merchants choose KINNSO'` · `why1: 'Creators are vetted with real audience data, not follower counts.'` · `why2: 'You approve work before you pay — no surprises.'` · `why3: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.'` · `testimonialsHeading: 'Merchants on KINNSO'` · `ctaTitle: 'Your next campaign starts with a brief'` · `ctaBody: 'Post your first mission today — our team reviews every brief within 48 hours.'` · `ctaButton: 'Post a mission'` — author ALL six remaining locale blocks IN THIS TASK before the commit (registers per Task 6's blocks; no English placeholders), and `seo.forMerchants` ×7 (en `title: 'Work with vetted travel creators — KINNSO for merchants'`, `description: 'Brief vetted travel creators, pay on published results, and reach travellers who trust them.'`). **JSON-LD/robots decision (spec §7):** layout-level Organization/WebSite JSON-LD covers this route (matches all marketing pages); `ROBOTS_DISALLOW` unchanged.
-- [ ] **Step 4: Rewrite `/merchants` as a merchant HUB** (de-mock per master spec §4.1 + de-duplicate: with `/for-merchants` as the canonical acquisition landing, keeping a second acquisition pitch at `/merchants` would be near-duplicate indexable content — instead it becomes the signed-in merchant's front door, with an acquisition pointer for newcomers; R2 replaces it with the public directory — D-R1C-5). Replace `MerchantsLandingView.tsx` with:
+- [x] **Step 2: `app/[locale]/for-merchants/page.tsx`** — identical to Task 7 Step 2 with `/for-merchants`, `seo.forMerchants`, `messages.forMerchants`, `getPublishedTestimonials(locale, 'merchant')`, `ForMerchantsView`.
+- [x] **Step 3: i18n `forMerchants` group** — same key shape as `forCreators` (interface identical, rename group). **en:** `heroEyebrow: 'For Merchants'` · `heroTitle: 'Reach travellers through creators they trust'` · `heroSub: 'Brief vetted travel creators, pay on published results, and turn their genuine recommendations into your next customers.'` · `heroCtaPrimary: 'Post a mission'` · `heroCtaSecondary: 'Talk to us'` · `howEyebrow: 'How it works'` · `howHeading: 'Launch a campaign in three steps'` · `step1Title: 'Post a brief'` / `step1Body: 'Describe the mission, target cities and payout — it takes minutes.'` · `step2Title: 'Creators apply'` / `step2Body: 'Vetted creators who fit your brand pick up the brief and produce real content.'` · `step3Title: 'Pay on results'` / `step3Body: 'Approve published work and pay for outcomes — with attribution you can verify.'` · `whyHeading: 'Why merchants choose KINNSO'` · `why1: 'Creators are vetted with real audience data, not follower counts.'` · `why2: 'You approve work before you pay — no surprises.'` · `why3: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.'` · `testimonialsHeading: 'Merchants on KINNSO'` · `ctaTitle: 'Your next campaign starts with a brief'` · `ctaBody: 'Post your first mission today — our team reviews every brief within 48 hours.'` · `ctaButton: 'Post a mission'` — author ALL six remaining locale blocks IN THIS TASK before the commit (registers per Task 6's blocks; no English placeholders), and `seo.forMerchants` ×7 (en `title: 'Work with vetted travel creators — KINNSO for merchants'`, `description: 'Brief vetted travel creators, pay on published results, and reach travellers who trust them.'`). **JSON-LD/robots decision (spec §7):** layout-level Organization/WebSite JSON-LD covers this route (matches all marketing pages); `ROBOTS_DISALLOW` unchanged.
+- [x] **Step 4: Rewrite `/merchants` as a merchant HUB** (de-mock per master spec §4.1 + de-duplicate: with `/for-merchants` as the canonical acquisition landing, keeping a second acquisition pitch at `/merchants` would be near-duplicate indexable content — instead it becomes the signed-in merchant's front door, with an acquisition pointer for newcomers; R2 replaces it with the public directory — D-R1C-5). Replace `MerchantsLandingView.tsx` with:
 
 ```tsx
 import Link from 'next/link'
@@ -1070,9 +1070,9 @@ export default MerchantsLandingView
 ```
 **i18n `merchantsLanding` group rewrite** (interface + ALL 7 locales; delete old keys `heroTitle, heroSubtitle, postCta, browseCta, howHeading, howSub, step1Title…step3Desc, samplesHeading, samplesSub, ctaTitle, ctaDesc, ctaButton`; keep `heroPill`): new keys — `hubTitle, hubSub, cardPostTitle, cardPostBody, cardCreatorsTitle, cardCreatorsBody, cardMissionsTitle, cardMissionsBody, cardOpen, newHereNote, newHereCta`. **en:** `hubTitle: 'Your missions, creators and results — one place'` · `hubSub: 'Everything you run on KINNSO starts here.'` · `cardPostTitle: 'Post a mission'` / `cardPostBody: 'Write a brief and put it in front of vetted creators.'` · `cardCreatorsTitle: 'Find creators'` / `cardCreatorsBody: 'Search vetted creators by niche, audience and platform.'` · `cardMissionsTitle: 'Track missions'` / `cardMissionsBody: 'Review applications, approve work and follow results.'` · `cardOpen: 'Open'` · `newHereNote: 'New to KINNSO? See how missions work and what creators can do for your brand.'` · `newHereCta: 'Why KINNSO for merchants'` — author the 6 remaining locale blocks IN THIS TASK (registers per Task 6). Note: deleting `merchantsLanding.heroTitle` also removes an American-spelling instance Task 15 would otherwise fix.
 Then check `MissionCard` remaining consumers: `grep -rn "MissionCard" apps/web --include='*.tsx' | grep -v tests/` — if this view was the last production consumer, delete `components/kinnso/MissionCard.tsx` (its data type lives on for studio missions).
-- [ ] **Step 5: Tests.** (a) Create `tests/for-merchants.host.test.tsx` — mirror Task 7 Step 5's code with `forMerchants` keys and href assertions on `/en/merchants/post` and `/en/contact`. (b) **Rewrite `tests/kinnso.MerchantsLandingView.test.tsx`** — it currently imports `missions` from creator-mock and asserts `missions[0].title` renders (the exact grid this step deletes): drop the creator-mock import, assert the hub instead — h1 = `en.merchantsLanding.hubTitle`, links to `/en/merchants/post|creators|missions`, link to `/en/for-merchants`, and `expect(screen.queryByText(/Sample|mission grid/i)).toBeNull()` is unnecessary once the import is gone.
-- [ ] **Step 6:** Run: `cd apps/web && npx vitest run tests/for-merchants.host.test.tsx tests/kinnso.MerchantsLandingView.test.tsx tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx tests/home.host.test.tsx` — Expected: PASS. Note: `/merchants` links to `/for-merchants` from this task on, and `/for-merchants` exists (this task) — route-parity green.
-- [ ] **Step 7: Commit:** `git add -A apps/web && git commit -m "feat(web): /for-merchants landing; de-mock and de-ticket /merchants (sample missions removed)"`
+- [x] **Step 5: Tests.** (a) Create `tests/for-merchants.host.test.tsx` — mirror Task 7 Step 5's code with `forMerchants` keys and href assertions on `/en/merchants/post` and `/en/contact`. (b) **Rewrite `tests/kinnso.MerchantsLandingView.test.tsx`** — it currently imports `missions` from creator-mock and asserts `missions[0].title` renders (the exact grid this step deletes): drop the creator-mock import, assert the hub instead — h1 = `en.merchantsLanding.hubTitle`, links to `/en/merchants/post|creators|missions`, link to `/en/for-merchants`, and `expect(screen.queryByText(/Sample|mission grid/i)).toBeNull()` is unnecessary once the import is gone.
+- [x] **Step 6:** Run: `cd apps/web && npx vitest run tests/for-merchants.host.test.tsx tests/kinnso.MerchantsLandingView.test.tsx tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx tests/home.host.test.tsx` — Expected: PASS. Note: `/merchants` links to `/for-merchants` from this task on, and `/for-merchants` exists (this task) — route-parity green.
+- [x] **Step 7: Commit:** `git add -A apps/web && git commit -m "feat(web): /for-merchants landing; de-mock and de-ticket /merchants (sample missions removed)"`
 
 ---
 
@@ -1082,7 +1082,7 @@ Then check `MissionCard` remaining consumers: `grep -rn "MissionCard" apps/web -
 - Modify: `components/kinnso/Navbar.tsx` · `components/kinnso/Footer.tsx` · `components/kinnso/home/{MerchantValue,CreatorCta}.tsx` · `lib/i18n/messages/*.ts` ×7 (`nav.merchantMenuLabel`, `footer.lForCreators`)
 - Test: `tests/kinnso.Navbar.test.tsx` · `tests/kinnso.route-parity.test.tsx` (existing — reruns)
 
-- [ ] **Step 1: Update ALL affected tests FIRST** (three files assert the old hrefs):
+- [x] **Step 1: Update ALL affected tests FIRST** (three files assert the old hrefs):
   1. `tests/kinnso.Navbar.test.tsx` line ~38's test `'shows a For Merchants link → /en/merchants (href swaps to /for-merchants in R1C)'`: rename to `'shows a For Merchants link → /en/for-merchants'` and assert `href === '/en/for-merchants'`. Add:
 
 ```ts
@@ -1094,16 +1094,16 @@ it('labels the merchant sub-row landmark with the dedicated menu label', () => {
   2. `tests/kinnso.home-bands.test.tsx`: line ~30 asserts the MerchantValue CTA href `'/en/merchants'` → `'/en/for-merchants'`; line ~40 asserts the CreatorCta href `'/en/sign-up'` → `'/en/for-creators'` (rename both test descriptions to match).
   3. `tests/kinnso.Footer.test.tsx`: line ~31 asserts `lPricing` href `'/en/merchants'` → `'/en/for-merchants'`; add an assertion that `en.footer.lForCreators` links to `'/en/for-creators'`.
 Run: `cd apps/web && npx vitest run tests/kinnso.Navbar.test.tsx tests/kinnso.home-bands.test.tsx tests/kinnso.Footer.test.tsx` — Expected: FAIL (retargets not applied yet).
-- [ ] **Step 2: Retargets.**
+- [x] **Step 2: Retargets.**
   1. `Navbar.tsx:59` — `const forMerchantsHref = p("/for-merchants");` and update the file-header comment (line ~15-16) to say the link now points at the landing.
   2. `Navbar.tsx:114` — `aria-label={t.linkMissions}` → `aria-label={t.merchantMenuLabel}`.
   3. `Footer.tsx:11` — `[t.lPricing, "/merchants"]` → `[t.lPricing, "/for-merchants"]`.
   4. `Footer.tsx:10` — colCreators gains the landing as the first link: `links: [[t.lForCreators, "/for-creators"], [t.lApply, "/sign-up"], [t.lStudio, "/studio"], [t.lMissions, "/studio/missions"], [t.lEarnings, "/studio/earnings"]]`.
   5. `MerchantValue.tsx:28-29` — delete the retarget comment; `href={`/${locale}/for-merchants`}`.
   6. `CreatorCta.tsx` — `href={`/${locale}/sign-up`}` (Task 3 interim) → `href={`/${locale}/for-creators`}` (master spec §4.1 section 9).
-- [ ] **Step 3: i18n:** add `merchantMenuLabel` to `nav` and `lForCreators` to `footer` (interface + 7 locales): en `'Merchant menu'` / `'For Creators'` · zh-hk `'商戶選單'` / `'創作者專區'` · zh-tw `'商戶選單'` / `'創作者專區'` · zh-cn `'商户菜单'` / `'创作者专区'` · ja `'マーチャントメニュー'` / `'クリエイター向け'` · ko `'머천트 메뉴'` / `'크리에이터 안내'` · th `'เมนูร้านค้า'` / `'สำหรับครีเอเตอร์'`.
-- [ ] **Step 4:** Run: `cd apps/web && npx vitest run tests/kinnso.Navbar.test.tsx tests/kinnso.Footer.test.tsx tests/kinnso.route-parity.test.tsx tests/kinnso.home-bands.test.tsx tests/i18n.locale-parity.test.ts` — Expected: PASS (route-parity now proves `/for-creators` + `/for-merchants` are linked AND routed).
-- [ ] **Step 5: Commit:** `git add -A apps/web && git commit -m "feat(web): retarget acquisition links to /for-creators + /for-merchants; dedicated merchant-menu label"`
+- [x] **Step 3: i18n:** add `merchantMenuLabel` to `nav` and `lForCreators` to `footer` (interface + 7 locales): en `'Merchant menu'` / `'For Creators'` · zh-hk `'商戶選單'` / `'創作者專區'` · zh-tw `'商戶選單'` / `'創作者專區'` · zh-cn `'商户菜单'` / `'创作者专区'` · ja `'マーチャントメニュー'` / `'クリエイター向け'` · ko `'머천트 메뉴'` / `'크리에이터 안내'` · th `'เมนูร้านค้า'` / `'สำหรับครีเอเตอร์'`.
+- [x] **Step 4:** Run: `cd apps/web && npx vitest run tests/kinnso.Navbar.test.tsx tests/kinnso.Footer.test.tsx tests/kinnso.route-parity.test.tsx tests/kinnso.home-bands.test.tsx tests/i18n.locale-parity.test.ts` — Expected: PASS (route-parity now proves `/for-creators` + `/for-merchants` are linked AND routed).
+- [x] **Step 5: Commit:** `git add -A apps/web && git commit -m "feat(web): retarget acquisition links to /for-creators + /for-merchants; dedicated merchant-menu label"`
 
 ---
 
@@ -1113,7 +1113,7 @@ Run: `cd apps/web && npx vitest run tests/kinnso.Navbar.test.tsx tests/kinnso.ho
 - Create: `apps/web/components/kinnso/articles/ArticleGuideLinks.tsx` · `apps/web/tests/articles.guide-links.test.ts`
 - Modify: `lib/guides/queries.ts` (new query) · `app/[locale]/articles/[category]/[url]/page.tsx` (~line 94, after `<ArticleBlockRenderer>`) · `lib/i18n/messages/*.ts` ×7 (`article.guidesNearbyEyebrow/guidesNearbyHeading`)
 
-- [ ] **Step 1: Failing query test** — create `tests/articles.guide-links.test.ts` with self-contained chain-mock plumbing:
+- [x] **Step 1: Failing query test** — create `tests/articles.guide-links.test.ts` with self-contained chain-mock plumbing:
 
 ```ts
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -1150,7 +1150,7 @@ describe('getGuidesForRegions', () => {
 })
 ```
 Run — Expected: FAIL (function missing).
-- [ ] **Step 2: Query** — append to `lib/guides/queries.ts`:
+- [x] **Step 2: Query** — append to `lib/guides/queries.ts`:
 
 ```ts
 /**
@@ -1181,7 +1181,7 @@ export async function getGuidesForRegions(regions: string[], limit = 3): Promise
 }
 ```
 Run — Expected: PASS.
-- [ ] **Step 3: Component** `components/kinnso/articles/ArticleGuideLinks.tsx` (async server component, data-gated):
+- [x] **Step 3: Component** `components/kinnso/articles/ArticleGuideLinks.tsx` (async server component, data-gated):
 
 ```tsx
 import Link from 'next/link'
@@ -1208,14 +1208,14 @@ export async function ArticleGuideLinks({ locale, regions, t }: {
   )
 }
 ```
-- [ ] **Step 4: Wire it** — in `app/[locale]/articles/[category]/[url]/page.tsx`, directly after the `<ArticleBlockRenderer blocks={a.translation.content} />` line (~94), inside the `<article>`:
+- [x] **Step 4: Wire it** — in `app/[locale]/articles/[category]/[url]/page.tsx`, directly after the `<ArticleBlockRenderer blocks={a.translation.content} />` line (~94), inside the `<article>`:
 
 ```tsx
 <ArticleGuideLinks locale={locale as Locale} regions={[...(a.regions ?? []), ...(a.tag_slugs ?? [])]} t={dict.article} />
 ```
 (Import it; spec §5 says "city/TAG matching", so tag slugs join the candidate list — the sanitizer strips slug hyphens' neighbours safely since hyphens are kept. Confirm the detail object exposes `regions` and `tag_slugs` — `ArticleDetail` has both; if the page destructures a narrower shape, add them to the select/mapping. Confirm the dictionary variable name in that page — it may be `dict` or `messages`.)
-- [ ] **Step 5: i18n** — extend `article` group (interface + 7): `guidesNearbyEyebrow` / `guidesNearbyHeading` — en `'Planning a trip here?'` / `'Creator guides for this destination'` · zh-hk `'諗緊去呢度玩？'` / `'呢個目的地嘅創作者攻略'` · zh-tw `'正計劃去這裡？'` / `'這個目的地的創作者攻略'` · zh-cn `'正计划去这里？'` / `'这个目的地的创作者攻略'` · ja `'ここへ旅行を計画中？'` / `'この目的地のクリエイターガイド'` · ko `'이곳 여행을 계획 중이신가요?'` / `'이 여행지의 크리에이터 가이드'` · th `'กำลังวางแผนไปที่นี่?'` / `'ไกด์จากครีเอเตอร์สำหรับจุดหมายนี้'`.
-- [ ] **Step 6:** Run: `cd apps/web && npx vitest run tests/articles.guide-links.test.ts tests/i18n.locale-parity.test.ts` — Expected: PASS. Commit: `git commit -am "feat(web): article→guide heuristic cross-links (Planning a trip here?)"`
+- [x] **Step 5: i18n** — extend `article` group (interface + 7): `guidesNearbyEyebrow` / `guidesNearbyHeading` — en `'Planning a trip here?'` / `'Creator guides for this destination'` · zh-hk `'諗緊去呢度玩？'` / `'呢個目的地嘅創作者攻略'` · zh-tw `'正計劃去這裡？'` / `'這個目的地的創作者攻略'` · zh-cn `'正计划去这里？'` / `'这个目的地的创作者攻略'` · ja `'ここへ旅行を計画中？'` / `'この目的地のクリエイターガイド'` · ko `'이곳 여행을 계획 중이신가요?'` / `'이 여행지의 크리에이터 가이드'` · th `'กำลังวางแผนไปที่นี่?'` / `'ไกด์จากครีเอเตอร์สำหรับจุดหมายนี้'`.
+- [x] **Step 6:** Run: `cd apps/web && npx vitest run tests/articles.guide-links.test.ts tests/i18n.locale-parity.test.ts` — Expected: PASS. Commit: `git commit -am "feat(web): article→guide heuristic cross-links (Planning a trip here?)"`
 
 ---
 
@@ -1225,7 +1225,7 @@ export async function ArticleGuideLinks({ locale, regions, t }: {
 - Modify: `components/kinnso/GuideCard.tsx` (rebuild; same props — consumers untouched) · `components/kinnso/pages/ExploreView.tsx`
 - Test: existing explore/home suites
 
-- [ ] **Step 1: Rebuild `GuideCard.tsx`** (drops TicketCard/TicketDivider/ReceiptRow):
+- [x] **Step 1: Rebuild `GuideCard.tsx`** (drops TicketCard/TicketDivider/ReceiptRow):
 
 ```tsx
 import Link from "next/link";
@@ -1256,7 +1256,7 @@ const GuideCard = ({ g, locale }: { g: Guide; locale: Locale }) => (
 export default GuideCard;
 ```
 (The `Guide` import flips to `@/lib/guides/types` in Task 14.)
-- [ ] **Step 2: Rebuild `ExploreView.tsx`:**
+- [x] **Step 2: Rebuild `ExploreView.tsx`:**
 
 ```tsx
 import GuideCard from '@/components/kinnso/GuideCard'
@@ -1286,8 +1286,8 @@ export function ExploreView({ locale, t, guides }: { locale: Locale; t: Messages
 export default ExploreView
 ```
 **Heading-hierarchy fix (same class of defect already fixed in Tasks 6 and 8 — pre-empted here):** `GuideCard` renders each guide title via `EditorialCard`, which defaults to `h3` — without an `h2` between the page's `h1` and those `h3`s, the hierarchy skips a level. Add a new `gridHeading` key to the `explore` i18n group (interface + all 7 locales) with natural copy like `'All guides'` (translate per-locale, matching each file's existing `explore` group register) — the `<h2 className="sr-only">` above renders it.
-- [ ] **Step 3:** Run the suites that render these: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx tests/home.host.test.tsx` plus any explore view test (`ls tests | grep -i explore`) — Expected: PASS (fix any assertion pinned to ticket-motif DOM). Add an assertion to the explore view's own test confirming `screen.getByRole('heading', { level: 2, name: en.explore.gridHeading })` exists.
-- [ ] **Step 4: Commit:** `git commit -am "refactor(web): GuideCard + ExploreView on editorial primitives (ticket motif off public surfaces)"`
+- [x] **Step 3:** Run the suites that render these: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx tests/home.host.test.tsx` plus any explore view test (`ls tests | grep -i explore`) — Expected: PASS (fix any assertion pinned to ticket-motif DOM). Add an assertion to the explore view's own test confirming `screen.getByRole('heading', { level: 2, name: en.explore.gridHeading })` exists.
+- [x] **Step 4: Commit:** `git commit -am "refactor(web): GuideCard + ExploreView on editorial primitives (ticket motif off public surfaces)"`
 
 ---
 
@@ -1295,7 +1295,7 @@ export default ExploreView
 
 **Files:** Modify: `app/[locale]/g/[slug]/page.tsx` · `app/[locale]/articles/page.tsx:37-38` · `app/[locale]/articles/[category]/page.tsx:51-53` · `app/[locale]/articles/[category]/[url]/page.tsx:69,82-84`
 
-- [ ] **Step 1: `/g/[slug]` edits** (line refs pre-edit):
+- [x] **Step 1: `/g/[slug]` edits** (line refs pre-edit):
   - L8: `import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'` → `import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'`
   - L67: `k-container py-8 md:py-12` → `k2-container py-8 md:py-12`
   - L83: `<RouteStamp>{guide.city}</RouteStamp>` → `<Eyebrow className="rounded-[3px] bg-white/90 px-3 py-1">{guide.city}</Eyebrow>`
@@ -1305,9 +1305,9 @@ export default ExploreView
   - L111: `k-btn-ghost` → `k2-btn-ghost` (keep `mt-5 inline-flex text-sm`)
   - L116: `rounded-lg bg-kinnso-cream2` → `k2-card bg-kinnso-cream2` (aside)
   - L122: drop `k-mono`; `text-kinnso-orange hover:text-kinnso-orangeDark` → `text-kinnso-orangeDark hover:text-kinnso-ink` (accent-text rule: hover darkens, never to orange)
-- [ ] **Step 2: Articles headers** — in all three files: `k-container` → `k2-container`; `k-display text-3xl font-black` → `k2-display text-3xl font-semibold` (`[url]/page.tsx` L82 also `md:text-4xl` keeps); `text-kinnso-muted` lines stay (canonical). L84 fallback notice: `rounded-lg bg-kinnso-cream2` → `rounded-[4px] border border-kinnso-edge bg-kinnso-cream2`.
-- [ ] **Step 3:** Run: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx` + any guide/article page tests (`ls tests | grep -iE 'guide|article'`) — Expected: PASS. `pnpm --filter web typecheck` — PASS.
-- [ ] **Step 4: Commit:** `git commit -am "refactor(web): guide detail + article pages on editorial chrome"`
+- [x] **Step 2: Articles headers** — in all three files: `k-container` → `k2-container`; `k-display text-3xl font-black` → `k2-display text-3xl font-semibold` (`[url]/page.tsx` L82 also `md:text-4xl` keeps); `text-kinnso-muted` lines stay (canonical). L84 fallback notice: `rounded-lg bg-kinnso-cream2` → `rounded-[4px] border border-kinnso-edge bg-kinnso-cream2`.
+- [x] **Step 3:** Run: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx` + any guide/article page tests (`ls tests | grep -iE 'guide|article'`) — Expected: PASS. `pnpm --filter web typecheck` — PASS.
+- [x] **Step 4: Commit:** `git commit -am "refactor(web): guide detail + article pages on editorial chrome"`
 
 ---
 
@@ -1315,9 +1315,9 @@ export default ExploreView
 
 **Files:** Modify: `components/kinnso/pages/CreatorsLandingView.tsx` · `components/kinnso/pages/CreatorProfileView.tsx` · `app/[locale]/_components/ComingSoonPage.tsx` · `app/[locale]/sign-in/page.tsx` · `app/[locale]/sign-up/page.tsx` · `components/onboarding/LiveProgress.tsx` + `components/onboarding/HandlesStep.tsx`
 
-- [ ] **Step 1: `CreatorsLandingView.tsx`** (line refs pre-edit): L3 import → `{ EditorialCard }` from editorial + `{ Eyebrow }`, `{ SectionShell }`; L22 `k-page-band py-12 md:py-16` → `SectionShell as="header"` wrapper (keep the flex layout inside); L25 `RouteStamp` → `Eyebrow`; L26 `k-display mt-3 max-w-2xl` → `k2-display mt-3 max-w-2xl text-4xl font-semibold leading-[1.08] md:text-5xl text-kinnso-ink`; L29+L80 `k-btn-primary` → `k2-btn-primary`; L41-66 creator card: `TicketCard className="flex h-full flex-col p-5"` → `div className="k2-card flex h-full flex-col p-5"`; L48 drop `k-mono`; L55 chips `rounded-md bg-kinnso-cream2` stays; L62 `k-btn-ghost` → `k2-btn-ghost`; L71 empty state `rounded-lg` → `rounded-[4px] border border-kinnso-edge`; L76-83 final CTA `TicketCard p-8 text-center` → `div className="k2-card p-8 text-center"`; L36+L76 `k-container` → `k2-container`; heading weights `font-black` → `font-semibold` + `k2-display` where display-scale. Wrap page root in `bg-kinnso-cream font-sans` if not inherited.
-- [ ] **Step 2: `CreatorProfileView.tsx`:** L2 drop MarketPassport import; L32 `k-container` → `k2-container`; L44 `TicketCard className="rounded-t-none p-6 sm:p-8"` → `div className="k2-card rounded-t-none p-6 sm:p-8"`; L45 `ring-kinnso-cream` stays; L48 `font-black` → `k2-display font-semibold`; L49+L77 drop `k-mono`; L79 (verified ✓ mark): change ONLY the ✓ glyph to `text-kinnso-green` inside an `aria-hidden` span — decorative; the adjacent verified LABEL becomes `text-kinnso-ink`, which carries the AA obligation. All other `kinnso-*` classes are canonical — leave.
-- [ ] **Step 3: `ComingSoonPage.tsx`** — align with the destinations/sessions placeholders:
+- [x] **Step 1: `CreatorsLandingView.tsx`** (line refs pre-edit): L3 import → `{ EditorialCard }` from editorial + `{ Eyebrow }`, `{ SectionShell }`; L22 `k-page-band py-12 md:py-16` → `SectionShell as="header"` wrapper (keep the flex layout inside); L25 `RouteStamp` → `Eyebrow`; L26 `k-display mt-3 max-w-2xl` → `k2-display mt-3 max-w-2xl text-4xl font-semibold leading-[1.08] md:text-5xl text-kinnso-ink`; L29+L80 `k-btn-primary` → `k2-btn-primary`; L41-66 creator card: `TicketCard className="flex h-full flex-col p-5"` → `div className="k2-card flex h-full flex-col p-5"`; L48 drop `k-mono`; L55 chips `rounded-md bg-kinnso-cream2` stays; L62 `k-btn-ghost` → `k2-btn-ghost`; L71 empty state `rounded-lg` → `rounded-[4px] border border-kinnso-edge`; L76-83 final CTA `TicketCard p-8 text-center` → `div className="k2-card p-8 text-center"`; L36+L76 `k-container` → `k2-container`; heading weights `font-black` → `font-semibold` + `k2-display` where display-scale. Wrap page root in `bg-kinnso-cream font-sans` if not inherited.
+- [x] **Step 2: `CreatorProfileView.tsx`:** L2 drop MarketPassport import; L32 `k-container` → `k2-container`; L44 `TicketCard className="rounded-t-none p-6 sm:p-8"` → `div className="k2-card rounded-t-none p-6 sm:p-8"`; L45 `ring-kinnso-cream` stays; L48 `font-black` → `k2-display font-semibold`; L49+L77 drop `k-mono`; L79 (verified ✓ mark): change ONLY the ✓ glyph to `text-kinnso-green` inside an `aria-hidden` span — decorative; the adjacent verified LABEL becomes `text-kinnso-ink`, which carries the AA obligation. All other `kinnso-*` classes are canonical — leave.
+- [x] **Step 3: `ComingSoonPage.tsx`** — align with the destinations/sessions placeholders:
 
 ```tsx
 import Link from 'next/link'
@@ -1341,9 +1341,9 @@ export function ComingSoonPage({ locale, title, t }: { locale: Locale; title: st
   )
 }
 ```
-- [ ] **Step 4: Auth pages** — `sign-in/page.tsx` L38-40: keep `k-page-band` wrapper → replace with `bg-kinnso-cream font-sans`; `k-auth-card k-ticket … p-8` → `k-auth-card k2-card p-8`; `k-display text-2xl font-bold` → `k2-display text-2xl font-semibold`. Same treatment in `sign-up/page.tsx` (find the equivalent wrapper/card/heading lines). Stray unnamespaced ink classes (carry-forward #10): `sign-up/page.tsx` L77-86 `text-ink/70|text-ink/60|text-ink` → `text-kinnso-ink/70|text-kinnso-ink/60|text-kinnso-ink`; `LiveProgress.tsx` L67,79,267,274,287,291 and `HandlesStep.tsx` L135,173: every `ink/NN` / `border-ink` / `bg-ink` → the `kinnso-ink` equivalent (pure rename, keep opacities; L287's `text-ink/60 : text-ink/45` → `text-kinnso-ink/60 : text-kinnso-ink/45`).
-- [ ] **Step 5:** Grep gate for this task (scope to source dirs — never the repo root, `.next/` has stale matches): `grep -rnE "(^|[^-])\b(text|bg|border)-ink\b|ink/[0-9]" apps/web/app apps/web/components --include='*.tsx' | grep -v kinnso-ink` → zero. Run: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx` + any creators/onboarding suites (`ls tests | grep -iE 'creator|onboard|sign'`) — Expected: PASS. `pnpm --filter web typecheck && pnpm --filter web lint` — PASS.
-- [ ] **Step 6: Commit:** `git commit -am "refactor(web): creators/auth/coming-soon surfaces on editorial chrome; namespace stray ink/* classes"`
+- [x] **Step 4: Auth pages** — `sign-in/page.tsx` L38-40: keep `k-page-band` wrapper → replace with `bg-kinnso-cream font-sans`; `k-auth-card k-ticket … p-8` → `k-auth-card k2-card p-8`; `k-display text-2xl font-bold` → `k2-display text-2xl font-semibold`. Same treatment in `sign-up/page.tsx` (find the equivalent wrapper/card/heading lines). Stray unnamespaced ink classes (carry-forward #10): `sign-up/page.tsx` L77-86 `text-ink/70|text-ink/60|text-ink` → `text-kinnso-ink/70|text-kinnso-ink/60|text-kinnso-ink`; `LiveProgress.tsx` L67,79,267,274,287,291 and `HandlesStep.tsx` L135,173: every `ink/NN` / `border-ink` / `bg-ink` → the `kinnso-ink` equivalent (pure rename, keep opacities; L287's `text-ink/60 : text-ink/45` → `text-kinnso-ink/60 : text-kinnso-ink/45`).
+- [x] **Step 5:** Grep gate for this task (scope to source dirs — never the repo root, `.next/` has stale matches): `grep -rnE "(^|[^-])\b(text|bg|border)-ink\b|ink/[0-9]" apps/web/app apps/web/components --include='*.tsx' | grep -v kinnso-ink` → zero. Run: `cd apps/web && npx vitest run tests/kinnso.route-parity.test.tsx` + any creators/onboarding suites (`ls tests | grep -iE 'creator|onboard|sign'`) — Expected: PASS. `pnpm --filter web typecheck && pnpm --filter web lint` — PASS.
+- [x] **Step 6: Commit:** `git commit -am "refactor(web): creators/auth/coming-soon surfaces on editorial chrome; namespace stray ink/* classes"`
 
 ---
 
@@ -1351,7 +1351,7 @@ export function ComingSoonPage({ locale, title, t }: { locale: Locale; title: st
 
 **Files:** Modify: `lib/guides/types.ts` · `lib/creator-mock/types.ts` · `lib/creator-mock/data.ts` · `lib/creator-mock/helpers.ts` · `lib/creator-mock/index.ts` · importers: `lib/guides/queries.ts:2`, `components/kinnso/GuideCard.tsx`, `components/kinnso/pages/{HomeView,ExploreView}.tsx`, `components/kinnso/home/Hero.tsx:5`, `components/kinnso/pages/FeedView.tsx` (if alive)
 
-- [ ] **Step 1: Relocate the type.** In `lib/guides/types.ts`: remove `import type { Guide } from '@/lib/creator-mock'` and define at the top:
+- [x] **Step 1: Relocate the type.** In `lib/guides/types.ts`: remove `import type { Guide } from '@/lib/creator-mock'` and define at the top:
 
 ```ts
 /** Public guide-card shape (R1C: relocated from creator-mock — it was never mock data). */
@@ -1372,12 +1372,12 @@ grep -rlE "import type \{ Guide \} from ['\"]@/lib/creator-mock['\"]" apps/web \
 grep -rn "Guide } from" apps/web --include='*.ts*' | grep creator-mock   # → zero
 ```
 Then remove the now-stale "Guide TYPE stays in creator-mock" comments in `HomeView.tsx:12` and `Hero.tsx:4`. In `lib/creator-mock/types.ts` delete the `Guide` interface; in creator-mock, re-import it from `@/lib/guides/types` wherever the mock `guides` array needs the type.
-- [ ] **Step 2: Delete zero-consumer exports** — confirmed orphans (re-verified during Task 14 execution with a corrected grep methodology — see note below): `tickerSeed` + `TickerItem`, `merchantWorkingWith` (+ `MerchantWorkingWith` type), `merchantProfile` (+ `MerchantProfile` type), `computeMatch` (+ its helper types `MatchResult`/`MatchReason`/`MatchReasonBreakdown`). For each: `grep -rn "<name>" apps/web apps/scan packages | grep -v creator-mock` → if only test hits, delete the export AND slim those tests; if zero hits, just delete. KEEP `tierMeta`, `sampleDna`, `engagementHistory` (studio-scan surface) and any array a surviving test imports as fixture (`guides`, `feedItems`, `merchantLogos`, `creators`).
+- [x] **Step 2: Delete zero-consumer exports** — confirmed orphans (re-verified during Task 14 execution with a corrected grep methodology — see note below): `tickerSeed` + `TickerItem`, `merchantWorkingWith` (+ `MerchantWorkingWith` type), `merchantProfile` (+ `MerchantProfile` type), `computeMatch` (+ its helper types `MatchResult`/`MatchReason`/`MatchReasonBreakdown`). For each: `grep -rn "<name>" apps/web apps/scan packages | grep -v creator-mock` → if only test hits, delete the export AND slim those tests; if zero hits, just delete. KEEP `tierMeta`, `sampleDna`, `engagementHistory` (studio-scan surface) and any array a surviving test imports as fixture (`guides`, `feedItems`, `merchantLogos`, `creators`).
 
   **CORRECTION (found during Task 14 execution — the plan's original claim was wrong for two exports):** `missions` and `extendedCreators`/`ExtendedCreator` are **NOT orphans — KEEP both**. `StudioScanView.tsx` imports `missions` directly (`const matched = missions.slice(0, 3)` for a "matched missions" demo block) and is routed live at `app/[locale]/studio/scan/page.tsx`; `getCreator()` (backed by `extendedCreators`) is called by that same page and passed as `metrics: ExtendedCreator` into `StudioScanView`, and `ExtendedCreator` is also used directly by `BrandContactCard.tsx` and `ShareDnaDialog.tsx`. The studio-scan surface is explicitly out of scope for this entire R1C phase, so do not touch `StudioScanView.tsx` or any of its dependents to "free up" these exports for deletion — they stay as-is, unchanged, alongside `tierMeta`/`sampleDna`/`engagementHistory`. (Root cause of the plan's original error: the R1C planning pass tracked `missions`'/`extendedCreators`' consumers only through the merchant/creator-directory public surfaces already being touched in this phase, and didn't cross-check the separate, unrelated studio-scan consumer.)
-- [ ] **Step 3: FeedView liveness check** — `/feed` redirects to `/explore`; `grep -rn "FeedView" apps/web --include='*.tsx' --include='*.ts'` → if nothing routes to it, delete `components/kinnso/pages/FeedView.tsx` + its tests.
-- [ ] **Step 4:** Run: `pnpm --filter web typecheck` then the full scoped suite touched by mocks: `cd apps/web && npx vitest run tests/` scoped to failures if any — Expected: green after fixture slimming.
-- [ ] **Step 5: Commit:** `git commit -am "refactor(web): relocate Guide type to lib/guides; prune orphaned creator-mock exports"`
+- [x] **Step 3: FeedView liveness check** — `/feed` redirects to `/explore`; `grep -rn "FeedView" apps/web --include='*.tsx' --include='*.ts'` → if nothing routes to it, delete `components/kinnso/pages/FeedView.tsx` + its tests.
+- [x] **Step 4:** Run: `pnpm --filter web typecheck` then the full scoped suite touched by mocks: `cd apps/web && npx vitest run tests/` scoped to failures if any — Expected: green after fixture slimming.
+- [x] **Step 5: Commit:** `git commit -am "refactor(web): relocate Guide type to lib/guides; prune orphaned creator-mock exports"`
 
 ---
 
@@ -1385,7 +1385,7 @@ Then remove the now-stale "Guide TYPE stays in creator-mock" comments in `HomeVi
 
 **Files:** Modify: `lib/i18n/messages/*.ts` ×7 · `tests/i18n.locale-parity.test.ts`
 
-- [ ] **Step 1: Harden the parity test FIRST** (this is the guard that makes the deletions safe). In `tests/i18n.locale-parity.test.ts`, two fixes:
+- [x] **Step 1: Harden the parity test FIRST** (this is the guard that makes the deletions safe). In `tests/i18n.locale-parity.test.ts`, two fixes:
   1. Derive coverage from the dictionary instead of the hand-maintained list — a hand list can never catch UNREGISTERED groups (today `agent` was missing, and `breadcrumb`/`categories` are live on the article page yet unchecked). Replace the `GROUPS` constant with:
 
 ```ts
@@ -1400,10 +1400,10 @@ const GROUPS = Object.keys(en).sort() as (keyof typeof en)[]
 expect(dict[g], `${locale} is missing group "${g}"`).toBeDefined()
 ```
 Run the test — it may now FAIL by exposing REAL parity gaps in previously-unchecked groups (breadcrumb/categories/auth/…): fix each surfaced gap in the offending locale file — these are genuine bugs the old list hid, not test regressions.
-- [ ] **Step 2: Delete orphan keys** from interface + ALL 7 locales: `nav.linkMerchants`, `nav.linkGuides`, `nav.linkTravelers`, `footer.lCaseStudies`, `footer.lPress`. Consumers first: `grep -rn "linkMerchants\|linkGuides\|linkTravelers\|lCaseStudies\|lPress" apps/web --include='*.tsx' --include='*.ts' | grep -v messages/` — zero COMPONENT consumers (confirmed at planning), but `tests/kinnso.Footer.test.tsx` references `en.footer.lCaseStudies`/`lPress` (~L38-39, honesty assertions on dead links): rewrite those two assertions to use the literal strings or delete them — otherwise typecheck breaks.
-- [ ] **Step 3: British-spelling harmonization (en.ts only — carry-forward #5;** the DB CHECK bakes `'traveller'`): `explore.subtitle` → `'Discover hand-picked spots, saved by travellers like you.'` · `feed.heading` → `'What travellers are saving now'` (CORRECTED during Task 15 execution: this string lives in `feed.heading`, not `explore.heading` — `explore.heading` is `'Travel Guides from real creators'` and never contained "travelers") · (`merchantsLanding.heroTitle` no longer exists — deleted in Task 8's hub rewrite) · check `home.roleTraveller` value, then `grep -n "ravelers" apps/web/lib/i18n/messages/en.ts` → zero after edits.
-- [ ] **Step 4: Register polish:** zh-hk/zh-tw: `sed -i '' 's/社會認證/社會證明/g' lib/i18n/messages/zh-hk.ts lib/i18n/messages/zh-tw.ts`; zh-cn: `sed -i '' 's/社会认证/社会证明/g' lib/i18n/messages/zh-cn.ts`. ko `testimonialsAdmin` block: print it (`awk '/^  testimonialsAdmin: \{/,/^  \},$/' lib/i18n/messages/ko.ts`) and rewrite casual 해요체 endings to the formal register used elsewhere in the file — e.g. `'…추가해요'` → `'…추가하세요'`, `'…없어요'` → `'…없습니다'`; every value ends -합니다/-하세요/-십시오 or is a noun phrase.
-- [ ] **Step 5:** Run: `cd apps/web && npx vitest run tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx` — Expected: PASS. Commit: `git commit -am "i18n(web): drop orphan nav/footer keys, harmonize traveller spelling, polish ko/zh registers, harden parity test"`
+- [x] **Step 2: Delete orphan keys** from interface + ALL 7 locales: `nav.linkMerchants`, `nav.linkGuides`, `nav.linkTravelers`, `footer.lCaseStudies`, `footer.lPress`. Consumers first: `grep -rn "linkMerchants\|linkGuides\|linkTravelers\|lCaseStudies\|lPress" apps/web --include='*.tsx' --include='*.ts' | grep -v messages/` — zero COMPONENT consumers (confirmed at planning), but `tests/kinnso.Footer.test.tsx` references `en.footer.lCaseStudies`/`lPress` (~L38-39, honesty assertions on dead links): rewrite those two assertions to use the literal strings or delete them — otherwise typecheck breaks.
+- [x] **Step 3: British-spelling harmonization (en.ts only — carry-forward #5;** the DB CHECK bakes `'traveller'`): `explore.subtitle` → `'Discover hand-picked spots, saved by travellers like you.'` · `feed.heading` → `'What travellers are saving now'` (CORRECTED during Task 15 execution: this string lives in `feed.heading`, not `explore.heading` — `explore.heading` is `'Travel Guides from real creators'` and never contained "travelers") · (`merchantsLanding.heroTitle` no longer exists — deleted in Task 8's hub rewrite) · check `home.roleTraveller` value, then `grep -n "ravelers" apps/web/lib/i18n/messages/en.ts` → zero after edits.
+- [x] **Step 4: Register polish:** zh-hk/zh-tw: `sed -i '' 's/社會認證/社會證明/g' lib/i18n/messages/zh-hk.ts lib/i18n/messages/zh-tw.ts`; zh-cn: `sed -i '' 's/社会认证/社会证明/g' lib/i18n/messages/zh-cn.ts`. ko `testimonialsAdmin` block: print it (`awk '/^  testimonialsAdmin: \{/,/^  \},$/' lib/i18n/messages/ko.ts`) and rewrite casual 해요체 endings to the formal register used elsewhere in the file — e.g. `'…추가해요'` → `'…추가하세요'`, `'…없어요'` → `'…없습니다'`; every value ends -합니다/-하세요/-십시오 or is a noun phrase.
+- [x] **Step 5:** Run: `cd apps/web && npx vitest run tests/i18n.locale-parity.test.ts tests/kinnso.route-parity.test.tsx` — Expected: PASS. Commit: `git commit -am "i18n(web): drop orphan nav/footer keys, harmonize traveller spelling, polish ko/zh registers, harden parity test"`
 
 ---
 
@@ -1412,7 +1412,7 @@ Run the test — it may now FAIL by exposing REAL parity gaps in previously-unch
 **Files:** Modify: `lib/admin/testimonials-actions.ts` · `lib/admin/testimonials-validation.ts` · `components/kinnso/admin/AdminTestimonialsView.tsx` · every `lib/admin/*-actions.ts` with the swallow pattern (perks, creators, merchants, team, users) · AdminPerksView (same busy pattern)
 **Test:** `tests/admin.testimonials-actions.test.ts` (extend existing), `tests/admin.testimonials-view.test.tsx` (extend existing component coverage)
 
-- [ ] **Step 1: #13 DB-error logging, tree-wide.** Pattern — in `testimonials-actions.ts` all four actions, change:
+- [x] **Step 1: #13 DB-error logging, tree-wide.** Pattern — in `testimonials-actions.ts` all four actions, change:
 
 ```ts
 if (error || !data) return formError('Testimonial could not be created')
@@ -1425,7 +1425,7 @@ if (error || !data) {
 }
 ```
 (action name varies per site). Then sweep the rest: `grep -rn "formError(" apps/web/lib/admin/*-actions.ts` — at every site where a Supabase `error` object is in scope and unlogged, add the same tagged `console.error('[admin:<domain>] <action> failed', error)` line. Do NOT change return values or messages.
-- [ ] **Step 2: #12 sort_order bounds as field errors.** `testimonials-validation.ts` — after the `Number.isInteger` check:
+- [x] **Step 2: #12 sort_order bounds as field errors.** `testimonials-validation.ts` — after the `Number.isInteger` check:
 
 ```ts
 else if (input.sortOrder < -2147483648 || input.sortOrder > 2147483647) {
@@ -1433,7 +1433,7 @@ else if (input.sortOrder < -2147483648 || input.sortOrder > 2147483647) {
 }
 ```
 And in `AdminTestimonialsView.tsx`'s `TestimonialForm`, make the empty field fail validation instead of silently coercing to 0. The form currently keeps sortOrder as NUMBER state (L141: `useState<number>(testimonial?.sort_order ?? 0)`) with coercion in the input's onChange — refactor: change the state to `useState<string>(String(testimonial?.sort_order ?? 0))`, bind the input `value`/`onChange` to the raw string, and convert only at submit: `sortOrder: sortOrderValue.trim() === '' ? Number.NaN : Number(sortOrderValue)` — the validation's `Number.isInteger` check then rejects the NaN with the existing field error.
-- [ ] **Step 3: #14 try/finally.** `AdminTestimonialsView.tsx` `mutate()` (L39-48):
+- [x] **Step 3: #14 try/finally.** `AdminTestimonialsView.tsx` `mutate()` (L39-48):
 
 ```ts
 async function mutate(id: string, run: () => Promise<MutateResult>, fallback: string) {
@@ -1451,8 +1451,8 @@ async function mutate(id: string, run: () => Promise<MutateResult>, fallback: st
 }
 ```
 Same shape for `TestimonialForm`'s `setSaving` (L143-155) and the matching `busy`/`saving` handlers in `AdminPerksView` (locate: `grep -n "setBusy\|setSaving" apps/web/components/kinnso/admin/AdminPerksView.tsx`).
-- [ ] **Step 4: Tests.** Extend the existing testimonials suites: (a) action test asserting `console.error` called on DB error (spy on console.error); (b) view test: `onSave` rejects → busy state clears and row error shows; (c) validation test: `sortOrder: 2 ** 31` → field error; `Number.NaN` → field error.
-- [ ] **Step 5:** Run: `cd apps/web && npx vitest run tests/admin.testimonials-actions.test.ts tests/admin.testimonials-view.test.tsx` (adjust to actual test filenames: `ls tests | grep -i testimonial`) — Expected: PASS. Commit: `git commit -am "fix(web): admin actions log DB errors, sort_order bounds as field errors, busy-state try/finally"`
+- [x] **Step 4: Tests.** Extend the existing testimonials suites: (a) action test asserting `console.error` called on DB error (spy on console.error); (b) view test: `onSave` rejects → busy state clears and row error shows; (c) validation test: `sortOrder: 2 ** 31` → field error; `Number.NaN` → field error.
+- [x] **Step 5:** Run: `cd apps/web && npx vitest run tests/admin.testimonials-actions.test.ts tests/admin.testimonials-view.test.tsx` (adjust to actual test filenames: `ls tests | grep -i testimonial`) — Expected: PASS. Commit: `git commit -am "fix(web): admin actions log DB errors, sort_order bounds as field errors, busy-state try/finally"`
 
 ---
 
@@ -1460,13 +1460,13 @@ Same shape for `TestimonialForm`'s `setSaving` (L143-155) and the matching `busy
 
 **Files:** Modify: `docs/superpowers/notes/2026-07-02-r1-carryforwards.md` (status sweep) · this plan (checkboxes)
 
-- [ ] **Step 1: Full gates from repo root:**
+- [x] **Step 1: Full gates from repo root:**
 
 ```bash
 pnpm --filter web typecheck   # PASS, zero errors
 pnpm --filter web lint        # PASS
 ```
-- [ ] **Step 2: Scoped test sweep** (memory gotcha: run vitest from apps/web, NOT via pnpm filter args):
+- [x] **Step 2: Scoped test sweep** (memory gotcha: run vitest from apps/web, NOT via pnpm filter args):
 
 ```bash
 cd apps/web && npx vitest run \
@@ -1477,12 +1477,12 @@ cd apps/web && npx vitest run \
   tests/for-creators.host.test.tsx tests/for-merchants.host.test.tsx tests/articles.guide-links.test.ts
 ```
 Expected: ALL PASS. (route-parity is on the list per carry-forward #22.) Then the full web unit suite: `npx vitest run` — expected green except the documented real-Supabase timeouts on dummy creds.
-- [ ] **Step 3: Grep gates:**
+- [x] **Step 3: Grep gates:**
 
 ```bash
 # Scope every gate to source dirs (.next/ build artifacts contain stale matches)
 grep -rn "kinnso2-\|font-k2-" apps/web/app apps/web/components apps/web/lib apps/web/tests | grep -v tests/design.k2-tokens.test.ts  # → zero (that test keeps the literals in negative assertions)
-grep -rn "Bricolage\|DM_Sans\|dmSans\|bricolage" apps/web/app apps/web/components apps/web/tests --include='*.ts*'  # → zero, comments included (Task 2 purged them)
+grep -rn "Bricolage\|DM_Sans\|dmSans\|bricolage" apps/web/app apps/web/components apps/web/tests --include='*.ts*' | grep -vE "design\.k2-tokens\.test\.ts|layout\.fonts\.test\.ts"  # → zero (both files keep the literal strings only in negative test assertions proving the fonts are retired — CORRECTED during Task 17: the original filter only excluded design.k2-tokens.test.ts and missed layout.fonts.test.ts, an equally benign match of the same shape)
 # EXCEPTION (found during Task 2 execution): apps/web/lib/seo/og/{fonts.ts,card.tsx} bundle actual
 # Bricolage-{Bold,Regular}.ttf binaries for next/og ImageResponse social-card generation — a
 # SEPARATE system from next/font/google that Task 2 never touches. Renaming the label without
@@ -1496,8 +1496,8 @@ grep -rn "from '@/lib/creator-mock'" apps/web/app apps/web/components apps/web/l
 grep -rn "ravelers" apps/web/lib/i18n/messages/en.ts             # → zero
 grep -rnE '["'"'"']/merchants["'"'"']' apps/web/components/kinnso/Navbar.tsx apps/web/components/kinnso/Footer.tsx apps/web/components/kinnso/home  # → zero acquisition links left (quote-agnostic; '/merchants/post' etc. don't match the closing-quote anchor)
 ```
-- [ ] **Step 4: Visual smoke** — `pnpm --filter web dev` and eyeball `/en`, `/en/for-creators`, `/en/for-merchants`, `/en/agent`, `/en/explore`, one `/en/g/…`, one article (with a region match → cross-link block), `/en/creators`, `/en/merchants` (hub), `/en/sign-in`: original cream/orange palette everywhere, Fraunces headings, no terracotta/ochre/sage remnants, no ticket stubs on public pages. Repeat `/zh-hk/for-creators` + `/ja/agent` to sanity-check CJK copy renders (register + line-breaking). (Production build needs Vercel — Google Fonts is blocked in the sandbox, known from R1B.)
-- [ ] **Step 5: Reconcile docs.** Update `docs/superpowers/notes/2026-07-02-r1-carryforwards.md`: mark items 2–22 done/dissolved with one-line notes (#1 dissolved by palette revert; #8 partially — Bricolage/DM Sans removed, JetBrains Mono deliberately KEPT for studio `k-mono`, retired with the studio re-skin; #9 ja/ko `:lang()` still optional-open). Record as NEW carry-forwards: the THREE accepted AA brand deviations from D-R1C-2 (future brand-a11y pass), per-IP rate limiting for `agent_waitlist` (R4 agent hardening), and the marketing-pages-JSON-LD decision (layout-level Organization/WebSite only). R3 notes: REPLACE the moss/sun contrast-floor line with the D-R1C-2 floors. Keep this plan's checkboxes in lockstep with shipped code.
+- [x] **Step 4: Visual smoke** — `pnpm --filter web dev` and eyeball `/en`, `/en/for-creators`, `/en/for-merchants`, `/en/agent`, `/en/explore`, one `/en/g/…`, one article (with a region match → cross-link block), `/en/creators`, `/en/merchants` (hub), `/en/sign-in`: original cream/orange palette everywhere, Fraunces headings, no terracotta/ochre/sage remnants, no ticket stubs on public pages. Repeat `/zh-hk/for-creators` + `/ja/agent` to sanity-check CJK copy renders (register + line-breaking). (Production build needs Vercel — Google Fonts is blocked in the sandbox, known from R1B.)
+- [x] **Step 5: Reconcile docs.** Update `docs/superpowers/notes/2026-07-02-r1-carryforwards.md`: mark items 2–22 done/dissolved with one-line notes (#1 dissolved by palette revert; #8 partially — Bricolage/DM Sans removed, JetBrains Mono deliberately KEPT for studio `k-mono`, retired with the studio re-skin; #9 ja/ko `:lang()` still optional-open). Record as NEW carry-forwards: the THREE accepted AA brand deviations from D-R1C-2 (future brand-a11y pass), per-IP rate limiting for `agent_waitlist` (R4 agent hardening), and the marketing-pages-JSON-LD decision (layout-level Organization/WebSite only). R3 notes: REPLACE the moss/sun contrast-floor line with the D-R1C-2 floors. Keep this plan's checkboxes in lockstep with shipped code.
 - [ ] **Step 6: Commit + push:**
 
 ```bash

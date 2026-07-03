@@ -69,8 +69,8 @@ describe('HomeView (R1B 10-section homepage)', () => {
 
   it('merchant and creator CTAs land on their locked routes', () => {
     render(<HomeView {...base} />)
-    expect(screen.getByRole('link', { name: en.home.merchantCta }).getAttribute('href')).toBe('/en/merchants')
-    expect(screen.getByRole('link', { name: en.home.creatorCta }).getAttribute('href')).toBe('/en/sign-up')
+    expect(screen.getByRole('link', { name: en.home.merchantCta }).getAttribute('href')).toBe('/en/for-merchants')
+    expect(screen.getByRole('link', { name: en.home.creatorCta }).getAttribute('href')).toBe('/en/for-creators')
     expect(screen.getByRole('link', { name: new RegExp(en.home.agentCta) }).getAttribute('href')).toBe('/en/agent')
   })
 
