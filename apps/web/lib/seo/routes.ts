@@ -16,5 +16,5 @@ export const MARKETING_PATHS = [
 export const ROBOTS_DISALLOW = [
   '/*/studio', '/*/admin', '/*/ops',
   '/*/sign-in', '/*/sign-up', '/*/creator$',
-  '/*/merchants/post', '/*/merchants/missions', '/*/merchants/creators', '/*/merchants/insights',
+  '/*/merchants/dashboard', '/*/merchants/apply',
 ] as const

@@ -90,7 +90,7 @@ export type CreatePartnerLinkInput = LocaleOption & {
   originalUrl: string
 }
 
-const merchantMissionsPath = '/merchants/missions'
+const merchantMissionsPath = '/merchants/dashboard/missions'
 const studioMissionsPath = '/studio/missions'
 const opsSettlementsPath = '/ops/settlements'
 const defaultLocale = 'en'

@@ -27,7 +27,7 @@ describe('robots', () => {
     const disallow = (rule.disallow ?? []) as string[]
     expect(disallow).toContain('/*/studio')
     expect(disallow).toContain('/*/admin')
-    expect(disallow).toContain('/*/merchants/post')
+    expect(disallow).toContain('/*/merchants/dashboard')
     // onboarding is anchored so it does not catch the public /creators directory
     expect(disallow).toContain('/*/creator$')
     expect(disallow).not.toContain('/*/merchants') // the public landing stays crawlable

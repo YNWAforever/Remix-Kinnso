@@ -109,8 +109,8 @@ describe('MissionPostWizard', () => {
 
     fireEvent.click(screen.getByRole('button', { name: en.missions.publish }))
 
-    expect((await screen.findByRole('link', { name: en.missions.viewMission })).getAttribute('href')).toBe('/en/merchants/missions/m1')
-    expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/missions')
+    expect((await screen.findByRole('link', { name: en.missions.viewMission })).getAttribute('href')).toBe('/en/merchants/dashboard/missions/m1')
+    expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/dashboard/missions')
   })
 })
 

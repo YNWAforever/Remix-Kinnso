@@ -858,6 +858,60 @@ export type Database = {
         }
         Relationships: []
       }
+      experiences: {
+        Row: {
+          city: string
+          cover_url: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          merchant_profile_id: string
+          price_amount: number
+          published_at: string | null
+          slug: string
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          cover_url?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          merchant_profile_id: string
+          price_amount: number
+          published_at?: string | null
+          slug: string
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          cover_url?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          merchant_profile_id?: string
+          price_amount?: number
+          published_at?: string | null
+          slug?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guides: {
         Row: {
           city: string
@@ -1036,36 +1090,48 @@ export type Database = {
       }
       merchant_profiles: {
         Row: {
+          city: string | null
           company_name: string
           contact_email: string
           contact_name: string | null
           created_at: string
           id: string
+          logo_url: string | null
+          slug: string | null
           status: string
+          tagline: string | null
           tier: string
           updated_at: string
           user_id: string
           website_url: string | null
         }
         Insert: {
+          city?: string | null
           company_name: string
           contact_email: string
           contact_name?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
+          slug?: string | null
           status?: string
+          tagline?: string | null
           tier?: string
           updated_at?: string
           user_id: string
           website_url?: string | null
         }
         Update: {
+          city?: string | null
           company_name?: string
           contact_email?: string
           contact_name?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
+          slug?: string | null
           status?: string
+          tagline?: string | null
           tier?: string
           updated_at?: string
           user_id?: string
@@ -1753,7 +1819,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      merchant_public_profiles: {
+        Row: {
+          city: string | null
+          company_name: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          slug: string
+          tagline: string | null
+          website_url: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_mission_invite: {

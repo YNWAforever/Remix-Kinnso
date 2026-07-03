@@ -28,7 +28,7 @@ describe('Footer (R1A editorial IA)', () => {
   it('routes "How it works" to the merchant landing, not a pricing page', () => {
     render(<Footer locale="en" t={en.footer} />)
     expect(screen.getByRole('link', { name: en.footer.lPricing }).getAttribute('href')).toBe('/en/for-merchants')
-    expect(screen.getByRole('link', { name: en.footer.lPostMission }).getAttribute('href')).toBe('/en/merchants/post')
+    expect(screen.getByRole('link', { name: en.footer.lPostMission }).getAttribute('href')).toBe('/en/merchants/dashboard/post')
   })
 
   it('links the For Creators label to the creator landing', () => {

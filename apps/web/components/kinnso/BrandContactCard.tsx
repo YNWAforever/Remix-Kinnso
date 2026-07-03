@@ -18,7 +18,7 @@ export function BrandContactCard({ creator, role, locale, t }: Props) {
   const meta = tierMeta[creator.tier];
   const firstName = creator.name.split(" ")[0];
   const p = (path: string) => `/${locale}${path}`;
-  const creatorBriefHref = `${p("/merchants/post")}?creator=${encodeURIComponent(creator.handle)}`;
+  const creatorBriefHref = `${p("/merchants/dashboard/post")}?creator=${encodeURIComponent(creator.handle)}`;
 
   return (
     <TicketCard className="bg-kinnso-amber/40 p-6 md:flex md:items-center md:justify-between md:gap-8">
@@ -40,7 +40,7 @@ export function BrandContactCard({ creator, role, locale, t }: Props) {
         ) : role === "anon" ? (
           <span className="rounded-pill bg-white/70 px-4 py-2 text-sm font-semibold text-kinnso-ink">{t.brandSignInToContact}</span>
         ) : (
-          <Link href={p("/merchants/post")} className="k-btn-primary">{t.brandSendBrief}</Link>
+          <Link href={p("/merchants/dashboard/post")} className="k-btn-primary">{t.brandSendBrief}</Link>
         )}
       </div>
     </TicketCard>

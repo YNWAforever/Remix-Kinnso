@@ -154,7 +154,7 @@ export function MerchantApplyAlreadyMerchantView({ locale, t }: { locale: Locale
         <Eyebrow>{t.title}</Eyebrow>
         <h1 className="k2-display mt-4 text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.alreadyMerchantTitle}</h1>
         <p className="mt-4 max-w-xl leading-relaxed text-kinnso-ink/70">{t.alreadyMerchantBody}</p>
-        <Link href={p('/merchants')} className="k2-btn-primary mt-6 inline-flex">{t.alreadyMerchantCta}</Link>
+        <Link href={p('/merchants/dashboard')} className="k2-btn-primary mt-6 inline-flex">{t.alreadyMerchantCta}</Link>
       </SectionShell>
     </main>
   )

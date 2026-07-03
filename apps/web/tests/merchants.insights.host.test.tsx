@@ -26,7 +26,7 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 vi.mock('@/lib/insights/merchant', () => ({ getMerchantInsights: insightsMock }))
 
-import MerchantsInsightsPage from '@/app/[locale]/merchants/insights/page'
+import MerchantsInsightsPage from '@/app/[locale]/merchants/dashboard/insights/page'
 import en from '@/lib/i18n/messages/en'
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ beforeEach(() => {
   getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
 })
 
-describe('/[locale]/merchants/insights host', () => {
+describe('/[locale]/merchants/dashboard/insights host', () => {
   it('renders insights for a merchant', async () => {
     const ui = await MerchantsInsightsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)

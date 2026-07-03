@@ -72,6 +72,69 @@ export interface MerchantApplicationsOpsMessages {
   noWebsite: string
 }
 
+export interface MerchantDashboardMessages {
+  title: string
+  subtitle: string
+  open: string
+  cardPostTitle: string
+  cardPostBody: string
+  cardMissionsTitle: string
+  cardMissionsBody: string
+  cardCreatorsTitle: string
+  cardCreatorsBody: string
+  cardInsightsTitle: string
+  cardInsightsBody: string
+  cardExperiencesTitle: string
+  cardExperiencesBody: string
+  cardProfileTitle: string
+  cardProfileBody: string
+  profileTitle: string
+  profileSubtitle: string
+  slugLabel: string
+  slugNote: string
+  fieldCompanyName: string
+  fieldContactName: string
+  fieldContactEmail: string
+  fieldWebsite: string
+  fieldTagline: string
+  fieldCity: string
+  fieldLogoUrl: string
+  saveCta: string
+  savedNote: string
+  expTitle: string
+  expSubtitle: string
+  expNew: string
+  expEmpty: string
+  colTitle: string
+  colCity: string
+  colPrice: string
+  colStatus: string
+  statusDraft: string
+  statusPublished: string
+  statusPaused: string
+  actEdit: string
+  actPublish: string
+  actPause: string
+  formTitleNew: string
+  formTitleEdit: string
+  fieldTitle: string
+  fieldSummary: string
+  fieldDescription: string
+  fieldExpCity: string
+  fieldPrice: string
+  fieldCurrency: string
+  fieldDuration: string
+  fieldCoverUrl: string
+  saveDraftCta: string
+  publishCta: string
+  backToList: string
+  errorGeneric: string
+  errRequired: string
+  errTooLong: string
+  errInvalidUrl: string
+  errInvalidNumber: string
+}
+
 export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
@@ -783,6 +846,7 @@ export interface Messages {
   }
   merchantApply: MerchantApplyMessages
   merchantApplicationsOps: MerchantApplicationsOpsMessages
+  merchantDashboard: MerchantDashboardMessages
   merchantsOps: {
     title: string; subtitle: string
     tabOverview: string; tabDirectory: string; tabApplications: string
@@ -1853,6 +1917,68 @@ const messages: Messages = {
     reasonPlaceholder: 'Reason (required)',
     actionFailed: 'Action failed. Please try again.',
     pitchLabel: 'Pitch', noPitch: 'No pitch provided', noWebsite: 'No website provided',
+  },
+  merchantDashboard: {
+    title: 'Merchant dashboard',
+    subtitle: 'Run your missions, listings, and public profile from one place.',
+    open: 'Open',
+    cardPostTitle: 'Post a mission',
+    cardPostBody: 'Brief vetted creators and pay on published results.',
+    cardMissionsTitle: 'Your missions',
+    cardMissionsBody: 'Review applicants, submissions, and settlement status.',
+    cardCreatorsTitle: 'Find creators',
+    cardCreatorsBody: 'Search vetted creators and invite them to your briefs.',
+    cardInsightsTitle: 'Insights',
+    cardInsightsBody: 'See how your missions and creators are performing.',
+    cardExperiencesTitle: 'Experiences',
+    cardExperiencesBody: 'List the tours and activities travellers will soon book.',
+    cardProfileTitle: 'Public profile',
+    cardProfileBody: 'Control how your business appears across KINNSO.',
+    profileTitle: 'Public profile',
+    profileSubtitle: 'These details appear on your public merchant page.',
+    slugLabel: 'Profile URL',
+    slugNote: 'Your profile address is fixed for now — contact us to change it.',
+    fieldCompanyName: 'Company name',
+    fieldContactName: 'Contact name',
+    fieldContactEmail: 'Contact email',
+    fieldWebsite: 'Website',
+    fieldTagline: 'Tagline',
+    fieldCity: 'City',
+    fieldLogoUrl: 'Logo URL',
+    saveCta: 'Save profile',
+    savedNote: 'Profile saved.',
+    expTitle: 'Experiences',
+    expSubtitle: 'Bookable listings — booking opens in a later release.',
+    expNew: 'New experience',
+    expEmpty: 'No experiences yet. Create your first listing.',
+    colTitle: 'Title',
+    colCity: 'City',
+    colPrice: 'Price',
+    colStatus: 'Status',
+    statusDraft: 'Draft',
+    statusPublished: 'Published',
+    statusPaused: 'Paused',
+    actEdit: 'Edit',
+    actPublish: 'Publish',
+    actPause: 'Pause',
+    formTitleNew: 'New experience',
+    formTitleEdit: 'Edit experience',
+    fieldTitle: 'Title',
+    fieldSummary: 'Summary',
+    fieldDescription: 'Description',
+    fieldExpCity: 'City',
+    fieldPrice: 'Price',
+    fieldCurrency: 'Currency',
+    fieldDuration: 'Duration (minutes)',
+    fieldCoverUrl: 'Cover image URL',
+    saveDraftCta: 'Save draft',
+    publishCta: 'Save & publish',
+    backToList: 'Back to experiences',
+    errorGeneric: 'Could not save. Please try again.',
+    errRequired: 'This field is required',
+    errTooLong: 'Too long',
+    errInvalidUrl: 'Enter a valid http(s) URL',
+    errInvalidNumber: 'Enter a valid number',
   },
   merchantsOps: {
     title: 'Merchants',

@@ -213,7 +213,7 @@ describe('createMissionAction', () => {
     })
 
     expect(result).toEqual({ ok: true, missionId: 'mission-1' })
-    expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/merchants/missions')
+    expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/merchants/dashboard/missions')
     expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/studio/missions')
   })
 

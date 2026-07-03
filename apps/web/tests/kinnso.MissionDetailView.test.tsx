@@ -62,7 +62,7 @@ describe('MissionDetailView', () => {
 
   it('links back to the mission queue', () => {
     render(<MissionDetailView locale="en" t={en.missions} mission={mission} onReviewParticipant={vi.fn()} onReviewSubmission={vi.fn()} />)
-    expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/missions')
+    expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/dashboard/missions')
   })
 
   it('links a participant name to the public profile when a handle exists', () => {

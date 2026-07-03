@@ -43,16 +43,16 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
   // Merchant deep links: slim second row on desktop + tray entries on mobile —
   // never on the top row, which cannot fit nine anchors.
   const merchantAnchors = [
-    { to: "/merchants/missions", label: t.linkMissions },
-    { to: "/merchants/creators", label: t.linkFindCreators },
-    { to: "/merchants/insights", label: t.linkInsights },
+    { to: "/merchants/dashboard/missions", label: t.linkMissions },
+    { to: "/merchants/dashboard/creators", label: t.linkFindCreators },
+    { to: "/merchants/dashboard/insights", label: t.linkInsights },
   ];
   const trayAnchors = role === "merchant" ? [...baseAnchors, ...merchantAnchors] : baseAnchors;
 
   const cta = (() => {
     if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k2-btn-primary" };
     if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso-cream2 px-4 py-2 text-sm font-semibold text-kinnso-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange" };
-    if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/post", className: "k2-btn-primary" };
+    if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/dashboard/post", className: "k2-btn-primary" };
     return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
   })();
 

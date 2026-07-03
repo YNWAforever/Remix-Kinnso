@@ -8,7 +8,7 @@ const Footer = ({ locale, t }: { locale: Locale; t: Messages["footer"] }) => {
   const cols = [
     { title: t.colExplore,   links: [[t.lGuides, "/explore"], [t.lDestinations, "/destinations"], [t.lArticles, "/articles"], [t.lSessions, "/sessions"]] as const },
     { title: t.colCreators,  links: [[t.lForCreators, "/for-creators"], [t.lApply, "/sign-up"], [t.lStudio, "/studio"], [t.lMissions, "/studio/missions"], [t.lEarnings, "/studio/earnings"]] as const },
-    { title: t.colMerchants, links: [[t.lPostMission, "/merchants/post"], [t.lPricing, "/for-merchants"]] as const },
+    { title: t.colMerchants, links: [[t.lPostMission, "/merchants/dashboard/post"], [t.lPricing, "/for-merchants"]] as const },
     { title: t.colCompany,   links: [[t.lAbout, "/about"], [t.lAgent, "/agent"], [t.lContact, "/contact"], [t.lLegal, "/legal/creator-terms"]] as const },
   ];
   return (

@@ -43,7 +43,7 @@ vi.mock('@/lib/merchants/creator-search', () => ({
 vi.mock('@/lib/merchants/saved', () => ({ listSavedCreators: savedMock }))
 vi.mock('@/lib/merchants/invite', () => ({ listMerchantPublishedMissions: missionsMock }))
 
-import MerchantsCreatorsPage from '@/app/[locale]/merchants/creators/page'
+import MerchantsCreatorsPage from '@/app/[locale]/merchants/dashboard/creators/page'
 import en from '@/lib/i18n/messages/en'
 
 // A merchant_profiles row carrying id + tier; the merchant has no missions, so
@@ -71,7 +71,7 @@ beforeEach(() => {
   wireQueries()
 })
 
-describe('/[locale]/merchants/creators host', () => {
+describe('/[locale]/merchants/dashboard/creators host', () => {
   it('renders the search surface for a merchant viewer', async () => {
     const ui = await MerchantsCreatorsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)

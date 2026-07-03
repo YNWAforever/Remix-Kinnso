@@ -53,7 +53,7 @@ export function MissionDetailView({
 
   return (
     <main className="k-container py-10">
-      <Link href={`/${locale}/merchants/missions`} className="text-sm font-semibold text-kinnso-orange hover:underline">
+      <Link href={`/${locale}/merchants/dashboard/missions`} className="text-sm font-semibold text-kinnso-orange hover:underline">
         <span aria-hidden="true">←</span> {t.backToQueue}
       </Link>
       <h1 className="mt-3 text-3xl font-black text-kinnso-ink">{mission.title}</h1>
