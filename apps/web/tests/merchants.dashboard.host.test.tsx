@@ -1,0 +1,73 @@
+// @vitest-environment jsdom
+import { render, screen, cleanup } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+const { authMock, resolveViewerRoleMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  resolveViewerRoleMock: vi.fn(),
+}))
+
+vi.mock('next/navigation', () => ({
+  notFound: () => { throw new Error('notFound') },
+  redirect: (url: string) => { throw new Error(`redirect:${url}`) },
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}))
+vi.mock('@/lib/supabase/server', () => ({
+  createSupabaseServerClient: async () => ({
+    auth: { getUser: authMock },
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          maybeSingle: () => Promise.resolve({ data: { id: 'm1' }, error: null }),
+          order: () => Promise.resolve({ data: [], error: null }),
+        }),
+      }),
+    }),
+  }),
+}))
+vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: resolveViewerRoleMock }))
+vi.mock('@/lib/experiences/queries', () => ({
+  listMyExperiences: vi.fn(async () => ([{
+    id: 'e1', slug: 'sunset-tour-abc123', title: 'Sunset tour', city: 'Hong Kong',
+    priceAmount: 480, currency: 'HKD', status: 'draft', updatedAt: '2026-07-04T00:00:00Z',
+  }])),
+  getMyExperience: vi.fn(),
+}))
+
+import MerchantDashboardHomePage from '@/app/[locale]/merchants/dashboard/page'
+import en from '@/lib/i18n/messages/en'
+
+afterEach(cleanup)
+
+describe('MerchantDashboardHomePage', () => {
+  it('redirects anon to sign-in', async () => {
+    authMock.mockResolvedValue({ data: { user: null } })
+    await expect(MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) }))
+      .rejects.toThrow('redirect:/en/sign-in')
+  })
+
+  it('notFound for non-merchant viewers', async () => {
+    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    resolveViewerRoleMock.mockResolvedValue('creator')
+    await expect(MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) }))
+      .rejects.toThrow('notFound')
+  })
+
+  it('renders all six cards with dashboard-prefixed links for merchants', async () => {
+    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    resolveViewerRoleMock.mockResolvedValue('merchant')
+    const el = await MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) })
+    render(el)
+    for (const [label, href] of [
+      [en.merchantDashboard.cardPostTitle, '/en/merchants/dashboard/post'],
+      [en.merchantDashboard.cardMissionsTitle, '/en/merchants/dashboard/missions'],
+      [en.merchantDashboard.cardCreatorsTitle, '/en/merchants/dashboard/creators'],
+      [en.merchantDashboard.cardInsightsTitle, '/en/merchants/dashboard/insights'],
+      [en.merchantDashboard.cardExperiencesTitle, '/en/merchants/dashboard/experiences'],
+      [en.merchantDashboard.cardProfileTitle, '/en/merchants/dashboard/profile'],
+    ] as const) {
+      const link = screen.getByRole('link', { name: new RegExp(label, 'i') })
+      expect(link.getAttribute('href')).toBe(href)
+    }
+  })
+})
