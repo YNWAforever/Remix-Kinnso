@@ -53,10 +53,10 @@ vi.mock('@/lib/creators/queries', () => ({
   ),
 }))
 
-import MerchantMissionDetailPage from '@/app/[locale]/merchants/missions/[missionId]/page'
+import MerchantMissionDetailPage from '@/app/[locale]/merchants/dashboard/missions/[missionId]/page'
 import en from '@/lib/i18n/messages/en'
 
-describe('/[locale]/merchants/missions/[missionId] host', () => {
+describe('/[locale]/merchants/dashboard/missions/[missionId] host', () => {
   it('maps milestone submissions and social snapshots into the detail view', async () => {
     const ui = await MerchantMissionDetailPage({
       params: Promise.resolve({ locale: 'en', missionId: 'mission-1' }),

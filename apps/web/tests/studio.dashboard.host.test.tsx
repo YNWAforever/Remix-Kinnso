@@ -101,7 +101,7 @@ describe('/[locale]/studio dashboard host', () => {
 
   it('redirects merchants to their home', async () => {
     resolveViewerRoleMock.mockResolvedValue('merchant')
-    await expect(run()).rejects.toThrow('NEXT_REDIRECT:/en/merchants/post')
+    await expect(run()).rejects.toThrow('NEXT_REDIRECT:/en/merchants/dashboard/post')
   })
 
   it('redirects ops to their home', async () => {

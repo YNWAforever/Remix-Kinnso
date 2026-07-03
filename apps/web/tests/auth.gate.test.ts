@@ -33,17 +33,24 @@ describe('gateDecision', () => {
   })
 
   it('redirects unauthenticated users from merchant mission creation', () => {
-    expect(gateDecision('/en/merchants/post', false)).toEqual({
+    expect(gateDecision('/en/merchants/dashboard/post', false)).toEqual({
       type: 'redirect',
       location: '/en/sign-in',
     })
   })
 
   it('redirects unauthenticated users from merchant mission list', () => {
-    expect(gateDecision('/zh-hk/merchants/missions', false)).toEqual({
+    expect(gateDecision('/zh-hk/merchants/dashboard/missions', false)).toEqual({
       type: 'redirect',
       location: '/zh-hk/sign-in',
     })
+  })
+
+  it('allows the legacy merchant routes — their 308 stubs fire before any gate', () => {
+    // R2B: /merchants/post etc. are permanentRedirect stubs to /merchants/dashboard/*;
+    // gating the old path would sign-in-redirect anon users before they ever saw the 308.
+    expect(gateDecision('/en/merchants/post', false)).toEqual({ type: 'allow' })
+    expect(gateDecision('/zh-hk/merchants/missions', false)).toEqual({ type: 'allow' })
   })
 
   it('redirects unauthenticated users from creator missions', () => {

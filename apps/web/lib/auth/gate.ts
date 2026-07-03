@@ -30,9 +30,7 @@ export function gateDecision(pathname: string, hasSession: boolean): GateDecisio
   const gatedPrefixes = [
     'creator',
     'creator/',
-    'merchants/post',
-    'merchants/missions',
-    'merchants/missions/',
+    'merchants/dashboard',
     'studio/missions',
     'ops/settlements',
     'admin',

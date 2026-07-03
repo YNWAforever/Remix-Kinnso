@@ -126,11 +126,11 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
           <p className="mt-2 text-kinnso-muted">{t.postSuccessBody}</p>
           <div className="mt-6 flex flex-wrap gap-2">
             {missionId && (
-              <Link href={`/${locale}/merchants/missions/${missionId}`} className="k-btn-primary">
+              <Link href={`/${locale}/merchants/dashboard/missions/${missionId}`} className="k-btn-primary">
                 {t.viewMission}
               </Link>
             )}
-            <Link href={`/${locale}/merchants/missions`} className="k-btn-ghost">
+            <Link href={`/${locale}/merchants/dashboard/missions`} className="k-btn-ghost">
               {t.backToQueue}
             </Link>
           </div>

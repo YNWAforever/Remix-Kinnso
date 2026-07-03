@@ -12,9 +12,9 @@ import type { Messages } from '@/lib/i18n/messages/en'
 export function MerchantsLandingView({ locale, t }: { locale: Locale; t: Messages['merchantsLanding'] }) {
   const p = (path: string) => `/${locale}${path}`
   const cards = [
-    { title: t.cardPostTitle, body: t.cardPostBody, href: p('/merchants/post'), icon: <FileText aria-hidden="true" className="h-5 w-5" /> },
-    { title: t.cardCreatorsTitle, body: t.cardCreatorsBody, href: p('/merchants/creators'), icon: <Users aria-hidden="true" className="h-5 w-5" /> },
-    { title: t.cardMissionsTitle, body: t.cardMissionsBody, href: p('/merchants/missions'), icon: <LineChart aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardPostTitle, body: t.cardPostBody, href: p('/merchants/dashboard/post'), icon: <FileText aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardCreatorsTitle, body: t.cardCreatorsBody, href: p('/merchants/dashboard/creators'), icon: <Users aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardMissionsTitle, body: t.cardMissionsBody, href: p('/merchants/dashboard/missions'), icon: <LineChart aria-hidden="true" className="h-5 w-5" /> },
   ]
   return (
     <main className="bg-kinnso-cream font-sans">

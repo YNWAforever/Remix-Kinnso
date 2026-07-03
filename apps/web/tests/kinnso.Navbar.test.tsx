@@ -56,10 +56,10 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(screen.getByRole('link', { name: en.nav.ctaOpenStudio }).getAttribute('href')).toBe('/en/studio')
     cleanup()
     render(<Navbar locale="en" role="merchant" t={en.nav} />)
-    expect(screen.getAllByRole('link', { name: en.nav.linkMissions })[0].getAttribute('href')).toBe('/en/merchants/missions')
-    expect(screen.getByRole('link', { name: en.nav.ctaPostMission }).getAttribute('href')).toBe('/en/merchants/post')
-    expect(screen.getAllByRole('link', { name: en.nav.linkFindCreators })[0].getAttribute('href')).toBe('/en/merchants/creators')
-    expect(screen.getAllByRole('link', { name: en.nav.linkInsights })[0].getAttribute('href')).toBe('/en/merchants/insights')
+    expect(screen.getAllByRole('link', { name: en.nav.linkMissions })[0].getAttribute('href')).toBe('/en/merchants/dashboard/missions')
+    expect(screen.getByRole('link', { name: en.nav.ctaPostMission }).getAttribute('href')).toBe('/en/merchants/dashboard/post')
+    expect(screen.getAllByRole('link', { name: en.nav.linkFindCreators })[0].getAttribute('href')).toBe('/en/merchants/dashboard/creators')
+    expect(screen.getAllByRole('link', { name: en.nav.linkInsights })[0].getAttribute('href')).toBe('/en/merchants/dashboard/insights')
   })
 
   it('creator-pending renders the pending pill CTA → /en/creators/apply', () => {
@@ -108,8 +108,8 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(screen.getByRole('link', { name: en.nav.linkCreators }).getAttribute('aria-current')).toBe('page')
   })
 
-  it('merchant sub-row owns the active state on /merchants/creators; base Creators stays inactive', () => {
-    mockPathname = '/en/merchants/creators'
+  it('merchant sub-row owns the active state on /merchants/dashboard/creators; base Creators stays inactive', () => {
+    mockPathname = '/en/merchants/dashboard/creators'
     render(<Navbar locale="en" role="merchant" t={en.nav} />)
     expect(screen.getByRole('link', { name: en.nav.linkFindCreators }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('link', { name: en.nav.linkCreators }).getAttribute('aria-current')).toBeNull()

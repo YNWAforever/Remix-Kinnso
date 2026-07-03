@@ -47,7 +47,7 @@ describe('inviteCreatorAction', () => {
     expect(r.ok).toBe(true)
     expect(calls.fn).toBe('merchant_invite_creator')
     expect(calls.args).toEqual({ p_mission_id: 'mission-1', p_creator_id: 'creator-1' })
-    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/creators')
+    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/dashboard/creators')
   })
 
   it('maps invite_quota_exceeded to a friendly error', async () => {

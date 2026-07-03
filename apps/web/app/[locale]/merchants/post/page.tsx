@@ -1,23 +1,10 @@
-import { notFound } from 'next/navigation'
-import { MissionPostWizard } from '@/components/kinnso/pages/MissionPostWizard'
-import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
-import { createMissionAction } from '@/lib/missions/actions'
-import type { MissionDraftInput } from '@/lib/missions/types'
+import { notFound, permanentRedirect } from 'next/navigation'
+import { isLocale } from '@/lib/i18n/config'
 
-export function generateStaticParams() {
-  return LOCALES.map((locale) => ({ locale }))
-}
-
-export default async function MerchantPostPage({ params }: { params: Promise<{ locale: string }> }) {
+// R2B: the merchant app moved under /merchants/dashboard/* (design spec D-R2-5).
+// In-repo 308 stub — deterministic, testable, no seo_redirects DB dependency.
+export default async function LegacyMerchantPostPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
-  const messages = await getDictionary(locale as Locale)
-
-  async function submitMission(input: MissionDraftInput, opts: { publish: boolean }) {
-    'use server'
-    return createMissionAction(input, { publish: opts.publish, locale })
-  }
-
-  return <MissionPostWizard locale={locale} t={messages.missions} onSubmit={submitMission} />
+  permanentRedirect(`/${locale}/merchants/dashboard/post`)
 }

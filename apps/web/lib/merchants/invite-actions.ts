@@ -4,7 +4,7 @@ import { requireMerchantAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 import type { Locale } from '@/lib/i18n/config'
 
-const merchantCreatorsPath = (locale: Locale) => `/${locale}/merchants/creators`
+const merchantCreatorsPath = (locale: Locale) => `/${locale}/merchants/dashboard/creators`
 
 /** Maps the RPC's raised error codes to friendly, surfaceable messages. */
 const FRIENDLY: Record<string, string> = {

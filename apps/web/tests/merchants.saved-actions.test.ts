@@ -76,7 +76,7 @@ describe('saveCreatorAction', () => {
     expect(r.ok).toBe(true)
     expect(calls.table).toBe('merchant_saved_creators')
     expect(calls.upsert).toMatchObject({ merchant_id: 'm1', creator_id: 'c1' })
-    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/creators')
+    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/dashboard/creators')
   })
   it('returns a form error when the write fails', async () => {
     const { client } = makeClient({ error: { message: 'boom' } })
@@ -104,7 +104,7 @@ describe('unsaveCreatorAction', () => {
     expect(calls.deleted).toBe(true)
     expect(calls.eqs).toContainEqual({ merchant_id: 'm1' })
     expect(calls.eqs).toContainEqual({ creator_id: 'c1' })
-    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/creators')
+    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/dashboard/creators')
   })
 })
 
@@ -125,6 +125,6 @@ describe('setSavedNoteAction', () => {
     expect(calls.update).toMatchObject({ note: 'great fit' })
     expect(calls.eqs).toContainEqual({ merchant_id: 'm1' })
     expect(calls.eqs).toContainEqual({ creator_id: 'c1' })
-    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/creators')
+    expect(revalidateMock).toHaveBeenCalledWith('/en/merchants/dashboard/creators')
   })
 })
