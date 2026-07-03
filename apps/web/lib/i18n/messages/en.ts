@@ -21,6 +21,57 @@ export interface MissionsOpsMessages {
   reasonVerificationFailed: string
 }
 
+export interface MerchantApplyMessages {
+  title: string
+  subtitle: string
+  signedOutTitle: string
+  signedOutBody: string
+  signInCta: string
+  signUpCta: string
+  alreadyMerchantTitle: string
+  alreadyMerchantBody: string
+  alreadyMerchantCta: string
+  formCompanyName: string
+  formContactName: string
+  formContactEmail: string
+  formWebsite: string
+  formPitch: string
+  formPitchPlaceholder: string
+  submitCta: string
+  errorGeneric: string
+  pendingTitle: string
+  pendingBody: string
+  rejectedTitle: string
+  rejectedBody: string
+  reapplyCta: string
+  decisionReasonLabel: string
+}
+
+export interface MerchantApplicationsOpsMessages {
+  pendingHeading: string
+  pendingEmpty: string
+  decidedHeading: string
+  decidedEmpty: string
+  colApplicant: string
+  colEmail: string
+  colWebsite: string
+  colSubmitted: string
+  colStatus: string
+  colDecidedBy: string
+  statusPending: string
+  statusApproved: string
+  statusRejected: string
+  actApprove: string
+  actReject: string
+  actCancel: string
+  actConfirm: string
+  reasonPlaceholder: string
+  actionFailed: string
+  pitchLabel: string
+  noPitch: string
+  noWebsite: string
+}
+
 export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
@@ -730,9 +781,11 @@ export interface Messages {
     payoutsEmpty: string
     reasonRequired: string
   }
+  merchantApply: MerchantApplyMessages
+  merchantApplicationsOps: MerchantApplicationsOpsMessages
   merchantsOps: {
     title: string; subtitle: string
-    tabOverview: string; tabDirectory: string
+    tabOverview: string; tabDirectory: string; tabApplications: string
     kpiTotal: string; kpiActive: string; kpiPaused: string; kpiSuspended: string; kpiArchived: string
     kpiFree: string; kpiGrowth: string; kpiNew: string; kpiMissionsLive: string; kpiSettlementsPending: string
     trendSignups: string; trendMissions: string; trendEmpty: string
@@ -1763,10 +1816,48 @@ const messages: Messages = {
     payoutsEmpty: 'No settlements match this filter',
     reasonRequired: 'A reason is required.',
   },
+  merchantApply: {
+    title: 'Become a KINNSO merchant',
+    subtitle: 'Tell us about your business. Our team reviews every application within 48 hours.',
+    signedOutTitle: 'Sign in to apply',
+    signedOutBody: 'You need a KINNSO account before applying as a merchant.',
+    signInCta: 'Sign in',
+    signUpCta: 'Create an account',
+    alreadyMerchantTitle: "You're already a merchant",
+    alreadyMerchantBody: 'Head to your merchant hub to post a mission or manage your listings.',
+    alreadyMerchantCta: 'Go to merchant hub',
+    formCompanyName: 'Company name',
+    formContactName: 'Contact name',
+    formContactEmail: 'Contact email',
+    formWebsite: 'Website',
+    formPitch: 'Tell us about your business',
+    formPitchPlaceholder: 'What do you sell, and who are your travellers?',
+    submitCta: 'Submit application',
+    errorGeneric: 'Your application could not be submitted. Please try again.',
+    pendingTitle: 'Application under review',
+    pendingBody: "We've received your application and our team is reviewing it. This usually takes under 48 hours.",
+    rejectedTitle: 'Application not approved',
+    rejectedBody: "We couldn't approve your application this time.",
+    reapplyCta: 'Apply again',
+    decisionReasonLabel: 'Reviewer note',
+  },
+  merchantApplicationsOps: {
+    pendingHeading: 'Pending applications',
+    pendingEmpty: 'No pending applications',
+    decidedHeading: 'Recent decisions',
+    decidedEmpty: 'No decisions yet',
+    colApplicant: 'Company', colEmail: 'Email', colWebsite: 'Website', colSubmitted: 'Submitted',
+    colStatus: 'Status', colDecidedBy: 'Decided',
+    statusPending: 'Pending', statusApproved: 'Approved', statusRejected: 'Rejected',
+    actApprove: 'Approve', actReject: 'Reject', actCancel: 'Cancel', actConfirm: 'Confirm',
+    reasonPlaceholder: 'Reason (required)',
+    actionFailed: 'Action failed. Please try again.',
+    pitchLabel: 'Pitch', noPitch: 'No pitch provided', noWebsite: 'No website provided',
+  },
   merchantsOps: {
     title: 'Merchants',
     subtitle: 'Understand, moderate, and analyze your merchants.',
-    tabOverview: 'Overview', tabDirectory: 'Directory',
+    tabOverview: 'Overview', tabDirectory: 'Directory', tabApplications: 'Applications',
     kpiTotal: 'Total merchants', kpiActive: 'Active', kpiPaused: 'Paused', kpiSuspended: 'Suspended', kpiArchived: 'Archived',
     kpiFree: 'Free tier', kpiGrowth: 'Growth tier', kpiNew: 'New this period', kpiMissionsLive: 'Live missions', kpiSettlementsPending: 'Settlements pending',
     trendSignups: 'Merchant signups', trendMissions: 'Missions created', trendEmpty: 'No data in this period',
