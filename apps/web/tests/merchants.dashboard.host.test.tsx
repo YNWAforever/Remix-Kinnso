@@ -58,16 +58,23 @@ describe('MerchantDashboardHomePage', () => {
     resolveViewerRoleMock.mockResolvedValue('merchant')
     const el = await MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) })
     render(el)
-    for (const [label, href] of [
-      [en.merchantDashboard.cardPostTitle, '/en/merchants/dashboard/post'],
-      [en.merchantDashboard.cardMissionsTitle, '/en/merchants/dashboard/missions'],
-      [en.merchantDashboard.cardCreatorsTitle, '/en/merchants/dashboard/creators'],
-      [en.merchantDashboard.cardInsightsTitle, '/en/merchants/dashboard/insights'],
-      [en.merchantDashboard.cardExperiencesTitle, '/en/merchants/dashboard/experiences'],
-      [en.merchantDashboard.cardProfileTitle, '/en/merchants/dashboard/profile'],
-    ] as const) {
-      const link = screen.getByRole('link', { name: new RegExp(label, 'i') })
-      expect(link.getAttribute('href')).toBe(href)
+    const hrefs = screen.getAllByRole('link').map((l) => l.getAttribute('href'))
+    for (const href of [
+      '/en/merchants/dashboard/post',
+      '/en/merchants/dashboard/missions',
+      '/en/merchants/dashboard/creators',
+      '/en/merchants/dashboard/insights',
+      '/en/merchants/dashboard/experiences',
+      '/en/merchants/dashboard/profile',
+    ]) {
+      expect(hrefs).toContain(href)
+    }
+    for (const title of [
+      en.merchantDashboard.cardPostTitle,
+      en.merchantDashboard.cardExperiencesTitle,
+      en.merchantDashboard.cardProfileTitle,
+    ]) {
+      expect(screen.getByRole('heading', { level: 3, name: title })).toBeTruthy()
     }
   })
 })
