@@ -39,6 +39,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
     { to: "/sessions",     label: t.linkSessions },
     { to: "/agent",        label: t.linkAgent },
     { to: "/creators",     label: t.linkCreators },
+    { to: "/merchants",    label: t.linkMerchants },
   ];
   // Merchant deep links: slim second row on desktop + tray entries on mobile —
   // never on the top row, which cannot fit nine anchors.
