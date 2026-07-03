@@ -7,7 +7,7 @@ function fakeSupabase(rows: unknown[], error: unknown = null) {
     from: () => ({
       select: () => ({
         eq: () => ({ order: () => Promise.resolve({ data: rows, error }) }),
-        in: () => ({ order: () => Promise.resolve({ data: rows, error }) }),
+        in: () => ({ order: () => ({ limit: () => Promise.resolve({ data: rows, error }) }) }),
       }),
     }),
   } as never

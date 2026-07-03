@@ -52,7 +52,7 @@ export async function listPendingMerchantApplications(
   return (data ?? []).map((r) => toDomain(r as unknown as Row))
 }
 
-/** Ops-only read of decided applications, newest decision first. */
+/** Ops-only read of the last 50 decided applications, newest decision first. */
 export async function listDecidedMerchantApplications(
   supabase: SupabaseClient<Database>,
 ): Promise<AdminMerchantApplication[]> {
@@ -61,6 +61,7 @@ export async function listDecidedMerchantApplications(
     .select(COLUMNS)
     .in('status', ['approved', 'rejected'])
     .order('decided_at', { ascending: false })
+    .limit(50)
   if (error) throw error
   return (data ?? []).map((r) => toDomain(r as unknown as Row))
 }

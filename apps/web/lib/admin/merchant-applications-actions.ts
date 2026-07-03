@@ -10,6 +10,7 @@ const applicationsPath = (locale: Locale) => `/${locale}/admin/merchants/applica
 const FRIENDLY: Record<string, string> = {
   forbidden: 'Active ops access is required.',
   reason_required: 'A reason is required.',
+  reason_too_long: 'The reason is too long (max 500 characters).',
   not_found: 'That application no longer exists. Refresh and try again.',
   not_pending: 'This application was already decided. Refresh and try again.',
   already_merchant: 'This user already has a merchant profile.',

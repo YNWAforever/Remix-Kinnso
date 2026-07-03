@@ -56,4 +56,17 @@ describe('MerchantApplyPage', () => {
     render(el)
     expect(screen.getByText(/under review/i)).toBeTruthy()
   })
+
+  it('shows a rejected panel with the reviewer note and a re-apply CTA', async () => {
+    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    resolveViewerRoleMock.mockResolvedValue('creator')
+    getMyApplicationMock.mockResolvedValue({
+      id: 'app1', status: 'rejected', companyName: 'Acme', decisionReason: 'Not a fit right now', createdAt: '2026-07-03T00:00:00Z',
+    })
+    const el = await MerchantApplyPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(el)
+    expect(screen.getByText(/not approved/i)).toBeTruthy()
+    expect(screen.getByText(/Not a fit right now/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /apply again/i })).toBeTruthy()
+  })
 })

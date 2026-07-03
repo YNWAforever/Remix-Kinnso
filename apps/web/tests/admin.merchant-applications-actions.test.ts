@@ -49,6 +49,14 @@ describe('approveMerchantApplicationAction', () => {
     const res = await approveMerchantApplicationAction('en', 'app1', 'looks great')
     expect(res.ok).toBe(false)
   })
+
+  it('maps an already_merchant RPC error to a friendly message', async () => {
+    requireOpsActionMock.mockResolvedValue({ ok: true, user: { id: 'ops1' } })
+    rpcMock.mockResolvedValue({ data: null, error: { message: 'already_merchant' } })
+    const res = await approveMerchantApplicationAction('en', 'app1', 'looks great')
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.errors.form?.[0]).toBe('This user already has a merchant profile.')
+  })
 })
 
 describe('rejectMerchantApplicationAction', () => {
