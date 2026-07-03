@@ -35,6 +35,7 @@ vi.mock('@/lib/experiences/queries', () => ({
 }))
 
 import MerchantDashboardHomePage from '@/app/[locale]/merchants/dashboard/page'
+import MerchantExperiencesPage from '@/app/[locale]/merchants/dashboard/experiences/page'
 import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
@@ -76,5 +77,18 @@ describe('MerchantDashboardHomePage', () => {
     ]) {
       expect(screen.getByRole('heading', { level: 3, name: title })).toBeTruthy()
     }
+  })
+})
+
+describe('MerchantExperiencesPage', () => {
+  it('lists the merchant experiences with an edit link and publish action', async () => {
+    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    resolveViewerRoleMock.mockResolvedValue('merchant')
+    const el = await MerchantExperiencesPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(el)
+    expect(screen.getByText('Sunset tour')).toBeTruthy()
+    const edit = screen.getByRole('link', { name: en.merchantDashboard.actEdit })
+    expect(edit.getAttribute('href')).toBe('/en/merchants/dashboard/experiences/e1/edit')
+    expect(screen.getByRole('button', { name: en.merchantDashboard.actPublish })).toBeTruthy()
   })
 })
