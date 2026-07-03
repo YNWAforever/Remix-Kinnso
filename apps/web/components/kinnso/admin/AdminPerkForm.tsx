@@ -43,10 +43,15 @@ export function AdminPerkForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setPending(true)
-    const result = await onSave(form)
-    setPending(false)
-    if (!result.ok) setErrors(result.errors)
-    else onCancel()
+    try {
+      const result = await onSave(form)
+      if (!result.ok) setErrors(result.errors)
+      else onCancel()
+    } catch {
+      setErrors({ form: ['Perk could not be saved'] })
+    } finally {
+      setPending(false)
+    }
   }
 
   const tierLabel = (v: string) =>

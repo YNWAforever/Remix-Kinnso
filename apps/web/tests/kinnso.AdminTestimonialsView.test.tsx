@@ -106,6 +106,18 @@ describe('AdminTestimonialsView', () => {
     expect(refreshMock).not.toHaveBeenCalled()
   })
 
+  it('clears the busy state and shows a row error when onSetStatus rejects (not just resolves false)', async () => {
+    const onSetStatus = vi.fn(async () => { throw new Error('network blip') })
+    renderView({ onSetStatus })
+    const unpublishButton = screen.getByText(t.actUnpublish) as HTMLButtonElement
+    fireEvent.click(unpublishButton)
+    await waitFor(() => expect(onSetStatus).toHaveBeenCalled())
+    // Busy state must clear (button re-enabled) even though the action threw.
+    await waitFor(() => expect(unpublishButton.disabled).toBe(false))
+    await waitFor(() => expect(screen.getByText(t.colStatus)).toBeTruthy())
+    expect(refreshMock).not.toHaveBeenCalled()
+  })
+
   it('deletes a row through onDelete after the confirm dialog is accepted', async () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     const onDelete = vi.fn(mutateOk)

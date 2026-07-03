@@ -39,12 +39,17 @@ export function AdminTestimonialsView({
   async function mutate(id: string, run: () => Promise<MutateResult>, fallback: string) {
     setBusyId(id)
     setRowErrors((e) => ({ ...e, [id]: '' }))
-    const res = await run()
-    setBusyId(null)
-    if (res.ok) {
-      router.refresh() // reconcile with the revalidated server truth
-    } else {
-      setRowErrors((e) => ({ ...e, [id]: res.errors.form?.[0] ?? fallback }))
+    try {
+      const res = await run()
+      if (res.ok) {
+        router.refresh() // reconcile with the revalidated server truth
+      } else {
+        setRowErrors((e) => ({ ...e, [id]: res.errors.form?.[0] ?? fallback }))
+      }
+    } catch {
+      setRowErrors((e) => ({ ...e, [id]: fallback }))
+    } finally {
+      setBusyId(null)
     }
   }
 
@@ -138,23 +143,28 @@ function TestimonialForm({
   const [authorName, setAuthorName] = useState(testimonial?.author_name ?? '')
   const [authorRole, setAuthorRole] = useState<TestimonialRole>((testimonial?.author_role as TestimonialRole) ?? 'creator')
   const [locale, setLocale] = useState<string>(testimonial?.locale ?? '')
-  const [sortOrder, setSortOrder] = useState<number>(testimonial?.sort_order ?? 0)
+  const [sortOrder, setSortOrder] = useState<string>(String(testimonial?.sort_order ?? 0))
   const [errors, setErrors] = useState<Record<string, string[]>>({})
   const [saving, setSaving] = useState(false)
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
-    const res = await onSave({
-      quote,
-      authorName,
-      authorRole,
-      locale: locale !== '' && isLocale(locale) ? locale : null,
-      sortOrder,
-    })
-    setSaving(false)
-    if (res.ok) onDone()
-    else setErrors(res.errors)
+    try {
+      const res = await onSave({
+        quote,
+        authorName,
+        authorRole,
+        locale: locale !== '' && isLocale(locale) ? locale : null,
+        sortOrder: sortOrder.trim() === '' ? Number.NaN : Number(sortOrder),
+      })
+      if (res.ok) onDone()
+      else setErrors(res.errors)
+    } catch {
+      setErrors({ form: ['Testimonial could not be saved'] })
+    } finally {
+      setSaving(false)
+    }
   }
 
   const field = 'mt-1 w-full rounded-lg border border-kinnso-edge bg-white px-3 py-2 font-normal'
@@ -198,7 +208,7 @@ function TestimonialForm({
         <input
           type="number"
           value={sortOrder}
-          onChange={(e) => setSortOrder(Number(e.target.value))}
+          onChange={(e) => setSortOrder(e.target.value)}
           className={field}
         />
         {err('sortOrder')}

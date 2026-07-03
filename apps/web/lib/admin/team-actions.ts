@@ -43,7 +43,10 @@ export async function inviteMemberAction(
   if (!email || !email.trim()) return formError(FRIENDLY.email_required)
   if (!isOpsRole(role)) return formError(FRIENDLY.bad_role)
   const { data, error } = await supabase.rpc('admin_invite_ops_member', { p_email: email.trim(), p_role: role })
-  if (error || !data) return formError(mapError(error?.message ?? ''))
+  if (error || !data) {
+    if (error) console.error('[admin:team] inviteMember failed', error)
+    return formError(mapError(error?.message ?? ''))
+  }
   revalidatePath(teamPath(locale))
   return { ok: true, token: data as string }
 }
@@ -56,7 +59,10 @@ export async function revokeInviteAction(
   const gate = await requireOpsAction(supabase)
   if (!gate.ok) return gate
   const { error } = await supabase.rpc('admin_revoke_ops_invite', { p_invite_id: inviteId })
-  if (error) return formError(mapError(error.message))
+  if (error) {
+    console.error('[admin:team] revokeInvite failed', error)
+    return formError(mapError(error.message))
+  }
   revalidatePath(teamPath(locale))
   return { ok: true }
 }
@@ -72,7 +78,10 @@ export async function setMemberRoleAction(
   const rErr = validateReason(reason)
   if (rErr) return formError(FRIENDLY[rErr] ?? rErr)
   const { error } = await supabase.rpc('admin_set_ops_member_role', { p_member_id: memberId, p_role: role, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message))
+  if (error) {
+    console.error('[admin:team] setMemberRole failed', error)
+    return formError(mapError(error.message))
+  }
   revalidatePath(directoryPath(locale))
   return { ok: true }
 }
@@ -87,7 +96,10 @@ export async function suspendMemberAction(
   const rErr = validateReason(reason)
   if (rErr) return formError(FRIENDLY[rErr] ?? rErr)
   const { error } = await supabase.rpc('admin_suspend_ops_member', { p_member_id: memberId, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message))
+  if (error) {
+    console.error('[admin:team] suspendMember failed', error)
+    return formError(mapError(error.message))
+  }
   revalidatePath(directoryPath(locale))
   return { ok: true }
 }
@@ -102,7 +114,10 @@ export async function reactivateMemberAction(
   const rErr = validateReason(reason)
   if (rErr) return formError(FRIENDLY[rErr] ?? rErr)
   const { error } = await supabase.rpc('admin_reactivate_ops_member', { p_member_id: memberId, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message))
+  if (error) {
+    console.error('[admin:team] reactivateMember failed', error)
+    return formError(mapError(error.message))
+  }
   revalidatePath(directoryPath(locale))
   return { ok: true }
 }

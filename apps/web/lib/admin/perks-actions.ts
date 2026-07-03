@@ -41,7 +41,10 @@ export async function createPerkAction(
     .insert({ ...toRow(input), slug })
     .select('id')
     .single()
-  if (error || !data) return formError('Perk could not be created')
+  if (error || !data) {
+    if (error) console.error('[admin:perks] create failed', error)
+    return formError('Perk could not be created')
+  }
 
   revalidatePath(adminPerksPath(locale))
   return { ok: true, id: data.id as string }
@@ -65,7 +68,10 @@ export async function updatePerkAction(
     .eq('id', id)
     .select('id')
     .maybeSingle()
-  if (error || !data) return formError('Perk could not be updated')
+  if (error || !data) {
+    if (error) console.error('[admin:perks] update failed', error)
+    return formError('Perk could not be updated')
+  }
 
   revalidatePath(adminPerksPath(locale))
   return { ok: true, id }
@@ -87,7 +93,10 @@ export async function togglePerkActiveAction(
     .eq('id', id)
     .select('id')
     .maybeSingle()
-  if (error || !data) return formError('Perk status could not be changed')
+  if (error || !data) {
+    if (error) console.error('[admin:perks] toggleActive failed', error)
+    return formError('Perk status could not be changed')
+  }
 
   revalidatePath(adminPerksPath(locale))
   return { ok: true, id, active }
