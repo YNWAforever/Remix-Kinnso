@@ -986,6 +986,54 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_applications: {
+        Row: {
+          company_name: string
+          contact_email: string
+          contact_name: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by_ops_member_id: string | null
+          decision_reason: string | null
+          id: string
+          pitch: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          company_name: string
+          contact_email: string
+          contact_name?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by_ops_member_id?: string | null
+          decision_reason?: string | null
+          id?: string
+          pitch?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          company_name?: string
+          contact_email?: string
+          contact_name?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by_ops_member_id?: string | null
+          decision_reason?: string | null
+          id?: string
+          pitch?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       merchant_profiles: {
         Row: {
           company_name: string
@@ -1746,6 +1794,14 @@ export type Database = {
       }
       admin_add_creator_note: {
         Args: { p_id: string; p_note: string }
+        Returns: undefined
+      }
+      admin_approve_merchant_application: {
+        Args: { p_id: string; p_reason: string }
+        Returns: string
+      }
+      admin_reject_merchant_application: {
+        Args: { p_id: string; p_reason: string }
         Returns: undefined
       }
       admin_bulk_set_creator_status: {
