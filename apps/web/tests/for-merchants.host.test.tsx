@@ -1,8 +1,10 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 import { ForMerchantsView } from '@/components/kinnso/pages/ForMerchantsView'
+
+afterEach(cleanup)
 
 describe('ForMerchantsView', () => {
   it('renders hero, steps, and CTA → /merchants/post; hides empty testimonials strip', () => {
