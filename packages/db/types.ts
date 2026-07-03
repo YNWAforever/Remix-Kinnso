@@ -55,6 +55,27 @@ export type Database = {
           },
         ]
       }
+      agent_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          locale: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          locale?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          locale?: string | null
+        }
+        Relationships: []
+      }
       affiliate_network_events: {
         Row: {
           affiliate_network_program_id: string | null
@@ -1656,6 +1677,7 @@ export type Database = {
           quote: string
           sort_order: number
           status: string
+          updated_at: string
         }
         Insert: {
           author_name: string
@@ -1666,6 +1688,7 @@ export type Database = {
           quote: string
           sort_order?: number
           status?: string
+          updated_at?: string
         }
         Update: {
           author_name?: string
@@ -1676,6 +1699,7 @@ export type Database = {
           quote?: string
           sort_order?: number
           status?: string
+          updated_at?: string
         }
         Relationships: []
       }

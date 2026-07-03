@@ -5,7 +5,7 @@ import { Bookmark, MapPin } from 'lucide-react'
 import { isLocale, htmlLang, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
-import { RouteStamp, TicketCard } from '@/components/kinnso/MarketPassport'
+import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
@@ -64,7 +64,7 @@ export default async function GuidePage({
   ]
 
   return (
-    <article className="k-container py-8 md:py-12">
+    <article className="k2-container py-8 md:py-12">
       <JsonLd data={ld} />
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
         <div
@@ -80,12 +80,12 @@ export default async function GuidePage({
 
           {/* RouteStamp – city/category signal, positioned top-left */}
           <div className="absolute left-6 top-6 flex flex-wrap gap-2 sm:left-8">
-            <RouteStamp>{guide.city}</RouteStamp>
+            <Eyebrow className="rounded-[3px] bg-white/90 px-3 py-1">{guide.city}</Eyebrow>
           </div>
 
           {/* TicketCard overlay – title, author, city, saves */}
-          <TicketCard className="absolute inset-x-4 bottom-4 p-5 sm:inset-x-6 sm:bottom-6 sm:p-7 md:inset-x-8 md:bottom-8">
-            <h1 className="max-w-3xl text-2xl font-black leading-tight text-kinnso-ink md:text-4xl">{guide.title}</h1>
+          <div className="k2-card absolute inset-x-4 bottom-4 p-5 sm:inset-x-6 sm:bottom-6 sm:p-7 md:inset-x-8 md:bottom-8">
+            <h1 className="k2-display max-w-3xl text-2xl font-semibold leading-tight text-kinnso-ink md:text-4xl">{guide.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-kinnso-muted">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-4 w-4" aria-hidden="true" />
@@ -98,9 +98,9 @@ export default async function GuidePage({
             </div>
             <div className="mt-3">
               <div className="text-sm font-black text-kinnso-ink">{authorName}</div>
-              <div className="k-mono mt-0.5 text-sm text-kinnso-muted">@{guide.creatorHandle}</div>
+              <div className="mt-0.5 text-sm text-kinnso-muted">@{guide.creatorHandle}</div>
             </div>
-          </TicketCard>
+          </div>
         </div>
       </section>
 
@@ -108,18 +108,18 @@ export default async function GuidePage({
         <div className="rounded-lg bg-white p-6">
           <h2 className="text-base font-bold text-kinnso-ink">{messages.creatorProfile.destinationsCovered}</h2>
           <p className="mt-2 text-sm text-kinnso-muted">{guide.summary ?? guide.city}</p>
-          <Link href={`/${locale}/feed`} className="k-btn-ghost mt-5 inline-flex text-sm">
+          <Link href={`/${locale}/feed`} className="k2-btn-ghost mt-5 inline-flex text-sm">
             {messages.creatorProfile.viewAllGuides}
           </Link>
         </div>
 
-        <aside className="rounded-lg bg-kinnso-cream2 p-6">
+        <aside className="k2-card bg-kinnso-cream2 p-6">
           <p className="text-xs font-bold uppercase tracking-wider text-kinnso-muted">{messages.article.by}</p>
           <div className="mt-3">
             <div className="text-lg font-black text-kinnso-ink">{authorName}</div>
             <Link
               href={`/${locale}/c/${guide.creatorHandle}`}
-              className="k-mono mt-1 inline-flex text-sm text-kinnso-orange hover:text-kinnso-orangeDark"
+              className="mt-1 inline-flex text-sm text-kinnso-orangeDark hover:text-kinnso-ink"
             >
               @{guide.creatorHandle}
             </Link>

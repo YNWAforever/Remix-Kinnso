@@ -48,8 +48,8 @@ export default async function CategoryPage(
   if (page > 1 && items.length === 0) notFound()
 
   return (
-    <main className="k-container py-8">
-      <h1 className="k-display text-3xl font-black text-kinnso-ink mb-6">{dict.categories[category as UrlCategory]}</h1>
+    <main className="k2-container py-8">
+      <h1 className="k2-display text-3xl font-semibold text-kinnso-ink mb-6">{dict.categories[category as UrlCategory]}</h1>
       <p className="text-kinnso-muted mb-6">{total} {dict.listing.resultsCount}</p>
 
       {items.length === 0 ? (

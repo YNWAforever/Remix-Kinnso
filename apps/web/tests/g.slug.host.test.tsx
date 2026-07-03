@@ -32,7 +32,7 @@ describe('/[locale]/g/[slug] host', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Kyoto Tea Houses' })).toBeTruthy()
     expect(screen.getByRole('link', { name: '@teafan' }).getAttribute('href')).toBe('/en/c/teafan')
-    expect(document.querySelector('.k-route-stamp')).toBeTruthy()
+    expect(document.querySelector('.k2-eyebrow')?.textContent).toBe('Kyoto') // city Eyebrow, k-route-stamp retired in R1C de-ticketing
     // The Article JSON-LD threads the guide's published_at into datePublished/dateModified.
     const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
     expect(ld).toContain('"datePublished":"2026-06-02T00:00:00Z"')

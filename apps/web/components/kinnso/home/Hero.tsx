@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
-// The Guide TYPE still lives in creator-mock until the R1C sweep relocates it.
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -18,14 +17,14 @@ export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home'
   const covers = guides.filter((g) => g.cover).slice(0, 3)
   const showCollage = covers.length >= 3
   return (
-    <section className="border-b border-kinnso2-line bg-kinnso2-paper">
+    <section className="border-b border-kinnso-edge bg-kinnso-cream">
       <div className={`k2-container grid gap-12 py-16 md:py-24 ${showCollage ? 'lg:grid-cols-[1.1fr_0.9fr]' : ''}`}>
         <div className="flex flex-col justify-center">
           <Eyebrow>{t.heroEyebrow}</Eyebrow>
-          <h1 className="k2-display mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-kinnso2-ink md:text-6xl">
+          <h1 className="k2-display mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-kinnso-ink md:text-6xl">
             {t.heroTitle}
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-kinnso2-ink/70">{t.heroSubtitle}</p>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-kinnso-ink/70">{t.heroSubtitle}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             {/* → /explore until R4: the live agent then becomes the primary planning entry. */}
             <Link href={p('/explore')} className="k2-btn-primary">
@@ -36,7 +35,7 @@ export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home'
         </div>
         {showCollage ? (
           <div className="grid grid-cols-2 gap-3 self-center">
-            <div className="row-span-2 overflow-hidden rounded-[4px] border border-kinnso2-line bg-kinnso2-sand">
+            <div className="row-span-2 overflow-hidden rounded-[4px] border border-kinnso-edge bg-kinnso-cream2">
               <img
                 src={covers[0].cover}
                 alt={covers[0].title}
@@ -47,7 +46,7 @@ export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home'
               />
             </div>
             {covers.slice(1).map((g) => (
-              <div key={g.slug} className="aspect-[4/3] overflow-hidden rounded-[4px] border border-kinnso2-line bg-kinnso2-sand">
+              <div key={g.slug} className="aspect-[4/3] overflow-hidden rounded-[4px] border border-kinnso-edge bg-kinnso-cream2">
                 <img
                   src={g.cover}
                   alt={g.title}

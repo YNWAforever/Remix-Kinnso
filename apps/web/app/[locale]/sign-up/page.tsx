@@ -35,26 +35,26 @@ export default async function SignUpPage({
   if (user) redirect(`/${locale}/studio`)
 
   return (
-    <main className="k-page-band flex min-h-screen flex-col items-center justify-center gap-6 p-6">
-      <div className="k-auth-card k-ticket w-full max-w-sm p-8">
-      <h1 className="k-display text-2xl font-bold text-kinnso-ink">{dict.auth.signUpCreatorTitle}</h1>
-      {sent !== '1' && <p className="mt-2 text-sm text-ink/70">{dict.auth.signUpCreatorSubtitle}</p>}
+    <main className="bg-kinnso-cream font-sans flex min-h-screen flex-col items-center justify-center gap-6 p-6">
+      <div className="k-auth-card k2-card w-full max-w-sm p-8">
+      <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{dict.auth.signUpCreatorTitle}</h1>
+      {sent !== '1' && <p className="mt-2 text-sm text-kinnso-ink/70">{dict.auth.signUpCreatorSubtitle}</p>}
 
       {sent === '1' ? (
         <div className="mt-6 flex w-full flex-col items-center gap-4 text-center">
           <div>
-            <p className="font-medium text-ink">{dict.auth.emailSent}</p>
-            <p className="mt-1 text-sm text-ink/70">{dict.auth.emailSentDesc}</p>
-            <p className="mt-3 text-sm text-ink/70">{dict.auth.emailSentNext}</p>
+            <p className="font-medium text-kinnso-ink">{dict.auth.emailSent}</p>
+            <p className="mt-1 text-sm text-kinnso-ink/70">{dict.auth.emailSentDesc}</p>
+            <p className="mt-3 text-sm text-kinnso-ink/70">{dict.auth.emailSentNext}</p>
           </div>
           <div className="flex w-full flex-col gap-2">
             <Link
               href={`/${locale}/sign-in`}
-              className="rounded bg-ink px-4 py-2 text-sm font-medium text-cream transition-colors hover:bg-ink/90"
+              className="rounded bg-kinnso-ink px-4 py-2 text-sm font-medium text-kinnso-cream transition-colors hover:bg-kinnso-ink/90"
             >
               {dict.auth.emailSentSignIn}
             </Link>
-            <Link href={`/${locale}/sign-up`} className="text-sm text-ink/70 underline">
+            <Link href={`/${locale}/sign-up`} className="text-sm text-kinnso-ink/70 underline">
               {dict.auth.emailSentUseAnother}
             </Link>
           </div>
@@ -74,15 +74,15 @@ export default async function SignUpPage({
             errorGeneric={dict.auth.errorGeneric}
             serverError={serverError}
           />
-          <p className="text-sm text-ink/70">
+          <p className="text-sm text-kinnso-ink/70">
             {dict.auth.alreadyHaveAccount}{' '}
-            <Link href={`/${locale}/sign-in`} className="underline text-ink">
+            <Link href={`/${locale}/sign-in`} className="underline text-kinnso-ink">
               {dict.auth.signIn}
             </Link>
           </p>
-          <p className="mt-3 text-xs text-ink/60">
+          <p className="mt-3 text-xs text-kinnso-ink/60">
             {dict.auth.termsPrefix}{' '}
-            <Link href={`/${locale}/legal/creator-terms`} className="underline text-ink">
+            <Link href={`/${locale}/legal/creator-terms`} className="underline text-kinnso-ink">
               {dict.auth.termsLink}
             </Link>.
           </p>

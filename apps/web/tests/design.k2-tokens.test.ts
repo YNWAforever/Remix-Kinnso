@@ -1,44 +1,57 @@
-import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { describe, expect, it } from 'vitest'
 
-// R1A token contract: the kinnso2-* editorial system must exist ALONGSIDE the
-// legacy kinnso-* system (legacy is removed only in R1C's final task). String
-// assertions on globals.css keep this executable without a CSS pipeline.
-// NOTE: token declarations in globals.css use exactly one space after the colon
-// so these substring checks hold.
-const css = readFileSync(join(process.cwd(), 'app/globals.css'), 'utf8')
+// R1C token contract (user decision 2026-07-02): the ORIGINAL kinnso-* palette is
+// canonical again. kinnso2-* color tokens are gone; the k2-* editorial utilities
+// stay, recolored to kinnso-*; Fraunces/Inter own --font-display/--font-sans; the
+// legacy k-* ticket utilities stay DEFINED for studio/admin only.
+const css = readFileSync(join(__dirname, '../app/globals.css'), 'utf8')
+const layout = readFileSync(join(__dirname, '../app/layout.tsx'), 'utf8')
 
-describe('kinnso2 editorial design tokens (R1A)', () => {
-  it.each([
-    ['--color-kinnso2-paper', '#FAF6EF'],
-    ['--color-kinnso2-ink', '#26201A'],
-    ['--color-kinnso2-clay', '#B9482B'],
-    ['--color-kinnso2-clay-deep', '#93361F'],
-    ['--color-kinnso2-sand', '#E8DCC8'],
-    ['--color-kinnso2-moss', '#4A5D43'],
-    ['--color-kinnso2-sun', '#D99A2B'],
-    ['--color-kinnso2-line', '#D8CDBB'],
-  ])('defines %s: %s', (token, hex) => {
-    expect(css).toContain(`${token}: ${hex}`)
-  })
-
-  it('keeps the legacy kinnso-* tokens until the R1C sweep', () => {
+describe('R1C canonical design tokens', () => {
+  it('keeps the original kinnso-* palette as the only color system', () => {
     expect(css).toContain('--color-kinnso-orange: #F26A1F')
+    expect(css).toContain('--color-kinnso-orangeDark: #C24E0E')
     expect(css).toContain('--color-kinnso-cream: #F8F1E6')
+    expect(css).toContain('--color-kinnso-cream2: #EFE3D2')
+    expect(css).toContain('--color-kinnso-ink: #211B16')
+    expect(css).toContain('--color-kinnso-edge: #DED5C7')
+    expect(css).toContain('--color-kinnso-amber: #F4BD50')
   })
 
-  it('registers the k2 font tokens with CJK-safe fallback stacks', () => {
-    expect(css).toContain('--font-k2-display: var(--font-fraunces)')
-    expect(css).toContain("'Noto Serif TC'")
-    expect(css).toContain('--font-k2-sans: var(--font-inter)')
-    expect(css).toContain("'Noto Sans Thai'")
+  it('has no kinnso2 color tokens or k2 font aliases left', () => {
+    expect(css).not.toMatch(/--color-kinnso2-/)
+    expect(css).not.toMatch(/--font-k2-/)
   })
 
-  it.each(['k2-container', 'k2-display', 'k2-eyebrow', 'k2-card', 'k2-hairline', 'k2-btn-primary', 'k2-btn-ghost'])(
-    'registers the .%s utility class',
-    (cls) => {
-      expect(css).toContain(`.${cls}`)
-    },
-  )
+  it('wires Fraunces and Inter to the canonical font tokens (CJK-safe stacks)', () => {
+    expect(css).toMatch(/--font-display:\s*var\(--font-fraunces\)/)
+    expect(css).toMatch(/--font-sans:\s*var\(--font-inter\)/)
+    expect(css).toMatch(/--font-mono:\s*var\(--font-jetbrains-mono\)/)
+    expect(layout).not.toContain('Bricolage_Grotesque')
+    expect(layout).not.toContain('DM_Sans')
+    expect(layout).toContain('Fraunces')
+    expect(layout).toContain('Inter')
+  })
+
+  it('recolors the k2-* editorial utilities to the original palette', () => {
+    for (const cls of ['.k2-container', '.k2-display', '.k2-eyebrow', '.k2-card', '.k2-hairline', '.k2-btn-primary', '.k2-btn-ghost']) {
+      expect(css).toContain(cls)
+    }
+    expect(css).toMatch(/\.k2-btn-primary\s*\{[^}]*bg-kinnso-orange/)
+    expect(css).toMatch(/\.k2-btn-primary\s*\{[^}]*hover:bg-kinnso-orangeDark/)
+    expect(css).toMatch(/\.k2-eyebrow\s*\{[^}]*text-kinnso-orangeDark/)
+    expect(css).toMatch(/\.k2-card\s*\{[^}]*border-kinnso-edge/)
+  })
+
+  it('keeps the original global focus rule on kinnso-orange', () => {
+    expect(css).toMatch(/a:focus-visible,\s*button:focus-visible\s*\{\s*outline: 2px solid var\(--color-kinnso-orange\)/)
+  })
+
+  it('keeps the legacy k-* utilities for studio/admin (retired in a later phase)', () => {
+    for (const cls of ['.k-container', '.k-card', '.k-btn-primary', '.k-ticket', '.k-route-stamp']) {
+      expect(css).toContain(cls)
+    }
+  })
 })

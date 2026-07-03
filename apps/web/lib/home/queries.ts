@@ -51,16 +51,20 @@ export interface Testimonial {
  * (= all locales), ordered by sort_order then created_at, max 3. RLS already
  * hides drafts from the anon client; the eq() filter documents intent.
  */
-export async function getPublishedTestimonials(locale: Locale): Promise<Testimonial[]> {
+export async function getPublishedTestimonials(
+  locale: Locale,
+  role?: Testimonial['authorRole'],
+): Promise<Testimonial[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  let query = supabase
     .from('testimonials')
     .select('id, quote, author_name, author_role')
     .eq('status', 'published')
     .or(`locale.is.null,locale.eq.${locale}`)
     .order('sort_order', { ascending: true })
     .order('created_at', { ascending: true })
-    .limit(3)
+  if (role) query = query.eq('author_role', role)
+  const { data } = await query.limit(3)
   return (data ?? []).map((r) => ({
     id: r.id as string,
     quote: r.quote as string,

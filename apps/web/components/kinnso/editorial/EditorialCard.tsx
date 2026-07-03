@@ -30,14 +30,14 @@ export function EditorialCard({
   return (
     <article className={cn('k2-card flex flex-col', className)}>
       {media ? (
-        <div data-slot="media" className="aspect-[4/3] w-full overflow-hidden bg-kinnso2-sand">
+        <div data-slot="media" className="aspect-[4/3] w-full overflow-hidden bg-kinnso-cream2">
           {media}
         </div>
       ) : null}
       <div className="flex flex-1 flex-col gap-2 p-5">
         {kicker ? <Eyebrow>{kicker}</Eyebrow> : null}
-        <TitleTag className="k2-display text-xl font-semibold text-kinnso2-ink">{title}</TitleTag>
-        {children ? <div className="text-sm leading-relaxed text-kinnso2-ink/70">{children}</div> : null}
+        <TitleTag className="k2-display text-xl font-semibold text-kinnso-ink">{title}</TitleTag>
+        {children ? <div className="text-sm leading-relaxed text-kinnso-ink/70">{children}</div> : null}
         {footer ? <div className="mt-auto pt-3">{footer}</div> : null}
       </div>
     </article>

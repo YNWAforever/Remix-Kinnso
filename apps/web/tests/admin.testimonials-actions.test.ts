@@ -85,6 +85,16 @@ describe('createTestimonialAction', () => {
     expect(revalidateMock).toHaveBeenCalledWith('/en/admin/testimonials')
     expect(revalidateMock).toHaveBeenCalledWith('/zh-hk')
   })
+  it('logs the underlying DB error when the insert fails', async () => {
+    const dbError = { message: 'insert failed', code: '23505' }
+    const { client } = makeClient({ row: null, error: dbError })
+    serverClientMock.mockResolvedValue(client)
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const r = await createTestimonialAction('en', input)
+    expect(r.ok).toBe(false)
+    expect(consoleErrorSpy).toHaveBeenCalledWith('[admin:testimonials] create failed', dbError)
+    consoleErrorSpy.mockRestore()
+  })
 })
 
 describe('updateTestimonialAction', () => {
@@ -108,6 +118,16 @@ describe('updateTestimonialAction', () => {
     const r = await updateTestimonialAction('en', 't-stale', input)
     expect(r.ok).toBe(false)
     expect(revalidateMock).not.toHaveBeenCalled()
+  })
+  it('logs the underlying DB error when the update fails', async () => {
+    const dbError = { message: 'update failed', code: '23505' }
+    const { client } = makeClient({ row: null, error: dbError })
+    serverClientMock.mockResolvedValue(client)
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const r = await updateTestimonialAction('en', 't1', input)
+    expect(r.ok).toBe(false)
+    expect(consoleErrorSpy).toHaveBeenCalledWith('[admin:testimonials] update failed', dbError)
+    consoleErrorSpy.mockRestore()
   })
 })
 

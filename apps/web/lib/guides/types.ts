@@ -1,4 +1,12 @@
-import type { Guide } from '@/lib/creator-mock'
+/** Public guide-card shape (R1C: relocated from creator-mock — it was never mock data). */
+export interface Guide {
+  slug: string
+  title: string
+  cover: string
+  city: string
+  saves: number
+  creatorHandle: string
+}
 
 /** Raw form input from the GuideForm. */
 export interface GuideInput {

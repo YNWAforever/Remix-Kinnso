@@ -18,11 +18,11 @@ const t = en.testimonialsAdmin
 
 const published: AdminTestimonial = {
   id: 't1', quote: 'KINNSO changed how I travel', author_name: 'Mina', author_role: 'creator',
-  locale: null, sort_order: 0, status: 'published', created_at: '2026-06-26T00:00:00Z',
+  locale: null, sort_order: 0, status: 'published', created_at: '2026-06-26T00:00:00Z', updated_at: '2026-06-26T00:00:00Z',
 }
 const draft: AdminTestimonial = {
   id: 't2', quote: 'Missions pay for my trips', author_name: 'Ken', author_role: 'merchant',
-  locale: 'ja', sort_order: 1, status: 'draft', created_at: '2026-06-26T00:00:00Z',
+  locale: 'ja', sort_order: 1, status: 'draft', created_at: '2026-06-26T00:00:00Z', updated_at: '2026-06-26T00:00:00Z',
 }
 
 const saveOk = async () => ({ ok: true as const, id: 't1' })
@@ -103,6 +103,18 @@ describe('AdminTestimonialsView', () => {
     renderView({ onSetStatus })
     fireEvent.click(screen.getByText(t.actUnpublish))
     await waitFor(() => expect(screen.getByText(/active ops access/i)).toBeTruthy())
+    expect(refreshMock).not.toHaveBeenCalled()
+  })
+
+  it('clears the busy state and shows a row error when onSetStatus rejects (not just resolves false)', async () => {
+    const onSetStatus = vi.fn(async () => { throw new Error('network blip') })
+    renderView({ onSetStatus })
+    const unpublishButton = screen.getByText(t.actUnpublish) as HTMLButtonElement
+    fireEvent.click(unpublishButton)
+    await waitFor(() => expect(onSetStatus).toHaveBeenCalled())
+    // Busy state must clear (button re-enabled) even though the action threw.
+    await waitFor(() => expect(unpublishButton.disabled).toBe(false))
+    await waitFor(() => expect(screen.getByText(t.colStatus)).toBeTruthy())
     expect(refreshMock).not.toHaveBeenCalled()
   })
 

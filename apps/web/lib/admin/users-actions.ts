@@ -32,6 +32,7 @@ export async function setUserStatusAction(
 
   const { error } = await supabase.rpc('admin_set_user_status', { p_kind: kind, p_id: id, p_status: status })
   if (error) {
+    console.error('[admin:users] setUserStatus failed', error)
     const key = Object.keys(FRIENDLY).find((k) => error.message.includes(k))
     return formError(key ? FRIENDLY[key] : 'User status could not be changed')
   }

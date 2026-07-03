@@ -34,8 +34,8 @@ export default async function ArticlesHubPage({ params }: { params: Promise<{ lo
   )
 
   return (
-    <main className="k-container py-8">
-      <h1 className="k-display text-3xl font-black text-kinnso-ink mb-8">{dict.breadcrumb.articles}</h1>
+    <main className="k2-container py-8">
+      <h1 className="k2-display text-3xl font-semibold text-kinnso-ink mb-8">{dict.breadcrumb.articles}</h1>
       {sections.map((s) => (
         <section key={s.category} className="mb-10">
           <div className="flex items-baseline justify-between mb-4">

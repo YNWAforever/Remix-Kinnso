@@ -1,77 +1,47 @@
 import Link from 'next/link'
-import { ArrowRight, FileText, Send, Users } from 'lucide-react'
-import MissionCard from '@/components/kinnso/MissionCard'
-import { RouteStamp, TicketCard, TicketDivider } from '@/components/kinnso/MarketPassport'
-import { missions } from '@/lib/creator-mock'
+import { ArrowRight, FileText, LineChart, Users } from 'lucide-react'
+import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
+import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
+/** R1C: /merchants is the merchant HUB (mock sample-missions grid removed —
+ *  master spec §4.1; acquisition copy lives at /for-merchants to avoid
+ *  duplicate content). R2 turns this route into the public merchant directory. */
 export function MerchantsLandingView({ locale, t }: { locale: Locale; t: Messages['merchantsLanding'] }) {
   const p = (path: string) => `/${locale}${path}`
-  const steps = [
-    { n: 1, title: t.step1Title, desc: t.step1Desc, icon: <FileText aria-hidden="true" className="h-5 w-5" /> },
-    { n: 2, title: t.step2Title, desc: t.step2Desc, icon: <Users aria-hidden="true" className="h-5 w-5" /> },
-    { n: 3, title: t.step3Title, desc: t.step3Desc, icon: <Send aria-hidden="true" className="h-5 w-5" /> },
+  const cards = [
+    { title: t.cardPostTitle, body: t.cardPostBody, href: p('/merchants/post'), icon: <FileText aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardCreatorsTitle, body: t.cardCreatorsBody, href: p('/merchants/creators'), icon: <Users aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardMissionsTitle, body: t.cardMissionsBody, href: p('/merchants/missions'), icon: <LineChart aria-hidden="true" className="h-5 w-5" /> },
   ]
   return (
-    <main>
-      {/* HERO — paper/ink mission-ticket composition */}
-      <section className="k-page-band py-20 md:py-28">
-        <div className="k-container">
-          <RouteStamp>{t.heroPill}</RouteStamp>
-          <h1 className="k-display mt-4 max-w-3xl">{t.heroTitle}</h1>
-          <p className="mt-5 max-w-xl text-lg text-kinnso-muted">{t.heroSubtitle}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={p('/merchants/post')} className="k-btn-primary inline-flex">
-              {t.postCta} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" />
-            </Link>
-            <Link href={p('/merchants/creators')} className="k-btn-ghost inline-flex">
-              {t.browseCta}
-            </Link>
-          </div>
-        </div>
-      </section>
+    <main className="bg-kinnso-cream font-sans">
+      <SectionShell as="header">
+        <Eyebrow>{t.heroPill}</Eyebrow>
+        <h1 className="k2-display mt-4 max-w-3xl text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-5xl">{t.hubTitle}</h1>
+        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-kinnso-ink/70">{t.hubSub}</p>
+      </SectionShell>
 
-      {/* HOW IT WORKS */}
-      <section className="k-container py-16">
-        <h2 className="k-section-title text-center">{t.howHeading}</h2>
-        <p className="mt-2 text-center text-kinnso-muted">{t.howSub}</p>
-        <ol className="mt-10 grid gap-4 md:grid-cols-3" aria-label={t.howHeading}>
-          {steps.map((s) => (
-            <li key={s.n}>
-              <TicketCard className="h-full p-5">
-                <div className="flex items-center justify-between">
-                  <span className="k-mono text-3xl font-black text-kinnso-orange">0{s.n}</span>
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orange">{s.icon}</span>
-                </div>
-                <TicketDivider className="my-3" />
-                <h3 className="text-lg font-bold text-kinnso-ink">{s.title}</h3>
-                <p className="mt-1 text-sm text-kinnso-muted">{s.desc}</p>
-              </TicketCard>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* SAMPLE MISSIONS */}
-      <section className="k-container pb-8">
-        <h2 className="k-section-title">{t.samplesHeading}</h2>
-        <p className="mt-1 text-kinnso-muted">{t.samplesSub}</p>
-        <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {missions.map((m) => (
-            <MissionCard key={m.id} m={m} href={p(`/merchants/creators`)} />
+      <SectionShell className="k2-hairline">
+        <h2 className="sr-only">{t.cardsHeading}</h2>
+        <div className="grid gap-5 md:grid-cols-3">
+          {cards.map((c) => (
+            <Link key={c.href} href={c.href} className="group">
+              <EditorialCard title={c.title} footer={<span className="inline-flex items-center gap-1 text-sm font-semibold text-kinnso-orangeDark">{t.cardOpen} <ArrowRight aria-hidden="true" className="h-4 w-4" /></span>}>
+                <span className="mb-2 grid h-9 w-9 place-items-center rounded-full bg-kinnso-cream2 text-kinnso-orangeDark">{c.icon}</span>
+                {c.body}
+              </EditorialCard>
+            </Link>
           ))}
         </div>
-      </section>
+      </SectionShell>
 
-      {/* CTA */}
-      <section className="k-container pb-20">
-        <TicketCard className="p-8 text-center">
-          <h2 className="text-2xl font-black text-kinnso-ink">{t.ctaTitle}</h2>
-          <p className="mt-2 text-kinnso-muted">{t.ctaDesc}</p>
-          <Link href={p('/merchants/post')} className="k-btn-primary mt-5 inline-flex">{t.ctaButton} <ArrowRight aria-hidden="true" className="ml-2 h-4 w-4" /></Link>
-        </TicketCard>
-      </section>
+      <SectionShell className="k2-hairline">
+        <p className="max-w-2xl leading-relaxed text-kinnso-ink/70">{t.newHereNote}</p>
+        <Link href={p('/for-merchants')} className="k2-btn-ghost mt-6">{t.newHereCta}</Link>
+      </SectionShell>
     </main>
   )
 }

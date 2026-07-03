@@ -43,7 +43,10 @@ export async function createTestimonialAction(
   if (Object.keys(errors).length) return { ok: false, errors }
 
   const { data, error } = await supabase.from('testimonials').insert(toRow(input)).select('id').single()
-  if (error || !data) return formError('Testimonial could not be created')
+  if (error || !data) {
+    if (error) console.error('[admin:testimonials] create failed', error)
+    return formError('Testimonial could not be created')
+  }
 
   revalidateTestimonialSurfaces(locale)
   return { ok: true, id: data.id as string }
@@ -67,7 +70,10 @@ export async function updateTestimonialAction(
     .eq('id', id)
     .select('id')
     .maybeSingle()
-  if (error || !data) return formError('Testimonial could not be updated')
+  if (error || !data) {
+    if (error) console.error('[admin:testimonials] update failed', error)
+    return formError('Testimonial could not be updated')
+  }
 
   revalidateTestimonialSurfaces(locale)
   return { ok: true, id }
@@ -90,7 +96,10 @@ export async function setTestimonialStatusAction(
     .eq('id', id)
     .select('id')
     .maybeSingle()
-  if (error || !data) return formError('Testimonial status could not be changed')
+  if (error || !data) {
+    if (error) console.error('[admin:testimonials] setStatus failed', error)
+    return formError('Testimonial status could not be changed')
+  }
 
   revalidateTestimonialSurfaces(locale)
   return { ok: true, id, status }
@@ -111,7 +120,10 @@ export async function deleteTestimonialAction(
     .eq('id', id)
     .select('id')
     .maybeSingle()
-  if (error || !data) return formError('Testimonial could not be deleted')
+  if (error || !data) {
+    if (error) console.error('[admin:testimonials] delete failed', error)
+    return formError('Testimonial could not be deleted')
+  }
 
   revalidateTestimonialSurfaces(locale)
   return { ok: true, id }

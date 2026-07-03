@@ -27,7 +27,7 @@ export interface Creator {
   avatar: string
 }
 
-// ─── Mission / Offer / EarningTx / TickerItem (kinnso.ts) ──────
+// ─── Mission / Offer / EarningTx (kinnso.ts) ───────────────────
 export interface Mission {
   id: string
   merchant: string
@@ -61,13 +61,6 @@ export interface EarningTx {
   currency: 'HKD'
   status: 'pending' | 'cleared' | 'paid_out'
   date: string
-}
-
-export interface TickerItem {
-  handle: string
-  amount: number
-  label: string
-  ago: string
 }
 
 // ─── CreatorPost / CreatorLocation / CreatorPlaceTag (creatorProfile.ts) ──
@@ -121,6 +114,7 @@ export interface EngagementHistoryPoint {
 }
 
 // ─── ExtendedCreator (creatorProfile.ts) ──────────────────────
+// KEPT for studio-scan (out of scope this phase) — passed as `metrics` via getCreator() in app/[locale]/studio/scan/page.tsx, and used directly by BrandContactCard.tsx / ShareDnaDialog.tsx. Do not delete without checking that surface first.
 export interface ExtendedCreator extends Creator {
   bio: string
   banner: string
@@ -149,69 +143,6 @@ export interface ScoreBreakdown {
   diversity: number
   recency: number
   total: number
-}
-
-// ─── Merchant profile — EXTENDED with tier + quotas (this slice) ──
-// Base fields from creatorProfile.ts `merchantProfile`; the redesign typed it
-// inline. We name it + add the Growth-tier quota fields the spec calls for.
-export interface MerchantProfile {
-  id: string
-  name: string
-  city: string
-  country: string
-  category: string
-  // Narrowed to the keys that ExtendedCreator.audience actually tracks (hk/tw/sg).
-  // 'JP' / 'Other' removed: neither maps to a real audience key, so they would
-  // silently fall through to the c.audience.other default in computeMatch.
-  primaryAudience: 'HK' | 'TW' | 'SG'
-  budgetTier: Tier
-  // NEW (Slice 1, mock UI-only — §8/§10 of the design spec):
-  tier: 'free' | 'growth'
-  searchesLeft: number
-  searchLimit: number
-  invitesLeft: number
-  inviteLimit: number
-}
-
-// ─── Match scoring (matchScore.ts) ────────────────────────────
-export interface MatchReason {
-  key: 'city_overlap' | 'category_match' | 'tier_fit' | 'audience_fit'
-  label: string
-  icon: string
-  value: number
-}
-
-// Reasons-as-object form the spec mandates ({ city_overlap, category_match,
-// tier_fit, audience_fit }), alongside the ranked array the UI renders.
-export interface MatchReasonBreakdown {
-  city_overlap: number
-  category_match: number
-  tier_fit: number
-  audience_fit: number
-}
-
-export interface MatchResult {
-  score: number // 0–100
-  reasons: MatchReasonBreakdown
-  reasonList: MatchReason[]
-}
-
-// ─── Working-with shorthand (creatorProfile.ts) ───────────────
-export interface MerchantWorkingWith {
-  handle: string
-  missionTitle: string
-  status: 'in_progress' | 'delivered' | 'completed'
-}
-
-// ─── Guide (kinnso.ts — cross-phase reconciliation) ───────────
-// Consumed by Phase 2A GuideCard and Phase 4 CreatorProfileView.
-export interface Guide {
-  slug: string
-  title: string
-  cover: string
-  city: string
-  saves: number
-  creatorHandle: string
 }
 
 export interface FeedItem {

@@ -22,21 +22,21 @@ describe('AgentTeaser (section 5 — waitlist framing)', () => {
 })
 
 describe('MerchantValue (section 8)', () => {
-  it('renders the three benefit bullets and the CTA to /merchants', () => {
+  it('renders the three benefit bullets and the CTA to /for-merchants', () => {
     render(<MerchantValue locale="en" t={en.home} />)
     for (const b of [en.home.merchantBullet1, en.home.merchantBullet2, en.home.merchantBullet3]) {
       expect(screen.getByText(b)).toBeTruthy()
     }
-    expect(screen.getByRole('link', { name: en.home.merchantCta }).getAttribute('href')).toBe('/en/merchants')
+    expect(screen.getByRole('link', { name: en.home.merchantCta }).getAttribute('href')).toBe('/en/for-merchants')
   })
 })
 
 describe('CreatorCta (section 9)', () => {
-  it('renders the three bullets and the CTA to /sign-up', () => {
+  it('renders the three bullets and the CTA to /for-creators', () => {
     render(<CreatorCta locale="en" t={en.home} />)
     for (const b of [en.home.creatorBullet1, en.home.creatorBullet2, en.home.creatorBullet3]) {
       expect(screen.getByText(b)).toBeTruthy()
     }
-    expect(screen.getByRole('link', { name: en.home.creatorCta }).getAttribute('href')).toBe('/en/sign-up')
+    expect(screen.getByRole('link', { name: en.home.creatorCta }).getAttribute('href')).toBe('/en/for-creators')
   })
 })

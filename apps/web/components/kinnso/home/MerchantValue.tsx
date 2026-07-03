@@ -12,21 +12,20 @@ export function MerchantValue({ locale, t }: { locale: Locale; t: Messages['home
       <div className="grid gap-10 lg:grid-cols-2">
         <div>
           <Eyebrow>{t.merchantEyebrow}</Eyebrow>
-          <h2 className="k2-display mt-3 max-w-md text-3xl font-semibold text-kinnso2-ink md:text-4xl">
+          <h2 className="k2-display mt-3 max-w-md text-3xl font-semibold text-kinnso-ink md:text-4xl">
             {t.merchantHeading}
           </h2>
         </div>
         <div>
           <ul className="space-y-4">
             {bullets.map((b) => (
-              <li key={b} className="flex gap-3 leading-relaxed text-kinnso2-ink/80">
-                <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-kinnso2-clay" />
+              <li key={b} className="flex gap-3 leading-relaxed text-kinnso-ink/80">
+                <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-kinnso-orange" />
                 {b}
               </li>
             ))}
           </ul>
-          {/* → /merchants until R1C ships the /for-merchants landing; retarget there in the R1C sweep. */}
-          <Link href={`/${locale}/merchants`} className="k2-btn-ghost mt-8">{t.merchantCta}</Link>
+          <Link href={`/${locale}/for-merchants`} className="k2-btn-ghost mt-8">{t.merchantCta}</Link>
         </div>
       </div>
     </SectionShell>

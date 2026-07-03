@@ -35,9 +35,9 @@ export default async function SignInPage({
   if (user) redirect(`/${locale}/studio`)
 
   return (
-    <main className="k-page-band flex min-h-screen flex-col items-center justify-center p-6">
-      <div className="k-auth-card k-ticket w-full max-w-sm p-8">
-        <h1 className="k-display text-2xl font-bold text-kinnso-ink">{dict.auth.signIn}</h1>
+    <main className="bg-kinnso-cream font-sans flex min-h-screen flex-col items-center justify-center p-6">
+      <div className="k-auth-card k2-card w-full max-w-sm p-8">
+        <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{dict.auth.signIn}</h1>
 
         <div className="mt-6">
           <SignInForm

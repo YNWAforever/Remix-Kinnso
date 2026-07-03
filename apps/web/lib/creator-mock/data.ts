@@ -1,4 +1,5 @@
 import type { Dna } from '@kinnso/scan'
+import type { Guide } from '@/lib/guides/types'
 import type {
   Tier,
   TierMetaEntry,
@@ -9,10 +10,6 @@ import type {
   CreatorPlaceTag,
   EngagementHistoryPoint,
   Mission,
-  TickerItem,
-  MerchantProfile,
-  MerchantWorkingWith,
-  Guide,
   FeedItem,
 } from './types'
 
@@ -91,6 +88,7 @@ const FOLLOWERS: Record<string, [number, number, number]> = {
   voyagewithem: [9800, 2100, 0],
 }
 
+// KEPT for studio-scan (out of scope this phase) — getCreator() below finds() into this for app/[locale]/studio/scan/page.tsx's `metrics`. Do not delete without checking that surface first.
 export const extendedCreators: ExtendedCreator[] = creators.map((c) => {
   const [ig, th, yt] = FOLLOWERS[c.handle] ?? [10000, 2000, 0]
   const totalReach = ig + th + yt
@@ -248,44 +246,12 @@ export const creatorPosts: CreatorPost[] = extendedCreators.flatMap((c) => {
 })
 
 // ─── Missions (kinnso.ts, representative subset) ──────────────
+// KEPT for studio-scan (out of scope this phase) — StudioScanView.tsx:110 does `missions.slice(0, 3)` directly. Do not delete without checking that surface first.
 export const missions: Mission[] = [
   { id: 'm_001', merchant: 'Hoshino Resorts', category: 'Hotel', title: 'OMO5 Tokyo Otsuka — 2-night stay + Guide', brief: 'Stay 2 nights at OMO5 and publish a Tokyo neighborhood Guide featuring the property and 5 nearby stops.', cities: ['Tokyo'], tier: 'pro', payout: 1200, commission: 6, travelWindow: 'Jul 1–31, 2026', deadline: 'Aug 15, 2026', status: 'open' },
   { id: 'm_002', merchant: 'Klook', category: 'Activity', title: 'Bangkok Floating Market half-day tour', brief: 'Book the Damnoen Saduak tour, publish a Guide segment with photo/video and tracked affiliate link.', cities: ['Bangkok'], tier: 'rising', payout: 280, commission: 8, travelWindow: 'Jun 15–Jul 31', deadline: 'Aug 1, 2026', status: 'open' },
   { id: 'm_004', merchant: 'Mandarin Oriental', category: 'Hotel', title: 'MO Taipei — Wellness weekender Guide', brief: 'Comped 1-night spa stay + dinner. Publish a wellness-angled Guide for Taipei.', cities: ['Taipei'], tier: 'elite', payout: 2400, commission: 5, travelWindow: 'Aug 1–31, 2026', deadline: 'Sep 15, 2026', status: 'open' },
 ]
-
-// ─── Live ticker (kinnso.ts, verbatim) ────────────────────────
-export const tickerSeed: TickerItem[] = [
-  { handle: 'maywanders', amount: 680, label: 'Tokyo Shibuya mission', ago: '2h ago' },
-  { handle: 'nomadleo', amount: 1250, label: 'Bangkok hotel · sponsored', ago: '5h ago' },
-  { handle: 'aubreyeats', amount: 340, label: 'Taipei night-market · affiliate', ago: '8h ago' },
-  { handle: 'kenjishoots', amount: 920, label: 'Seoul photo Guide payout', ago: '11h ago' },
-  { handle: 'saraonfoot', amount: 410, label: 'HK tram tour · affiliate', ago: '14h ago' },
-  { handle: 'voyagewithem', amount: 560, label: 'Singapore family Guide', ago: '1d ago' },
-]
-
-// ─── Working-with (creatorProfile.ts, verbatim) ───────────────
-export const merchantWorkingWith: MerchantWorkingWith[] = [
-  { handle: 'maywanders', missionTitle: 'OMO5 Tokyo Otsuka · 2-night Guide', status: 'in_progress' },
-  { handle: 'kenjishoots', missionTitle: 'Seoul × Hoshino partner showcase', status: 'delivered' },
-]
-
-// ─── Merchant profile — base fields from creatorProfile.ts +
-//     NEW Growth-tier + quota fields (this slice, mock UI-only) ──
-export const merchantProfile: MerchantProfile = {
-  id: 'mer_demo',
-  name: 'Hoshino Resorts',
-  city: 'Tokyo',
-  country: 'JP',
-  category: 'Hotels',
-  primaryAudience: 'HK',
-  budgetTier: 'pro',
-  tier: 'growth',
-  searchesLeft: 18,
-  searchLimit: 25,
-  invitesLeft: 4,
-  inviteLimit: 5,
-}
 
 // Merchant logo wall for the homepage "Trusted by partners" strip (mock).
 export const merchantLogos: string[] = [

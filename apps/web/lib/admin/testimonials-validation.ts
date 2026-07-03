@@ -21,5 +21,8 @@ export function validateTestimonialInput(input: TestimonialInput): ValidationErr
   if (!TESTIMONIAL_ROLES.includes(input.authorRole)) errors.authorRole = ['Invalid author role']
   if (input.locale !== null && !isLocale(input.locale)) errors.locale = ['Invalid locale']
   if (!Number.isInteger(input.sortOrder)) errors.sortOrder = ['Sort order must be a whole number']
+  else if (input.sortOrder < -2147483648 || input.sortOrder > 2147483647) {
+    errors.sortOrder = ['Sort order is out of range']
+  }
   return errors
 }

@@ -7,6 +7,7 @@ import { isLocale, toDbCategory, toUrlCategory, type Locale } from '@/lib/i18n/c
 import { buildArticleMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { ArticleBlockRenderer } from '@/components/ArticleBlockRenderer'
+import { ArticleGuideLinks } from '@/components/kinnso/articles/ArticleGuideLinks'
 import { ArticleToc } from '@/components/ArticleToc'
 import { ArticleCard } from '@/components/ArticleCard'
 import { ViewPing } from '@/components/ViewPing'
@@ -66,7 +67,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
   if (a.faqs.length) ld.push(faqJsonLd(a.faqs))
 
   return (
-    <main className="k-container py-8">
+    <main className="k2-container py-8">
       <JsonLd data={ld} />
       <ViewPing url={url} />
 
@@ -79,9 +80,9 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
       </nav>
 
       <header className="mb-6">
-        <h1 className="k-display text-3xl md:text-4xl font-black text-kinnso-ink">{a.translation.title}</h1>
+        <h1 className="k2-display text-3xl md:text-4xl font-semibold text-kinnso-ink">{a.translation.title}</h1>
         {a.translation.locale !== loc && (
-          <p className="mt-2 rounded-lg bg-kinnso-cream2 px-3 py-2 text-sm text-kinnso-ink">
+          <p className="mt-2 rounded-[4px] border border-kinnso-edge bg-kinnso-cream2 px-3 py-2 text-sm text-kinnso-ink">
             {dict.article.fallbackNotice}
           </p>
         )}
@@ -92,13 +93,14 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
         <article>
           {a.thumbnails[0] && <img src={a.thumbnails[0]} alt={a.translation.title ?? ''} className="rounded-card w-full mb-6" />}
           <ArticleBlockRenderer blocks={a.translation.content} />
+          <ArticleGuideLinks locale={loc} regions={[...(a.regions ?? []), ...(a.tag_slugs ?? [])]} t={dict.article} />
 
           {a.faqs.length > 0 && (
             <section className="mt-10">
               <h2 className="text-2xl font-bold mb-4">{a.translation.faq_title || dict.article.faqTitle}</h2>
               <dl className="space-y-4">
                 {a.faqs.map((f, i) => (
-                  <div key={`${f.question}-${i}`} className="rounded-card border border-cream-2 p-4">
+                  <div key={`${f.question}-${i}`} className="rounded-card border border-kinnso-cream2 p-4">
                     <dt className="font-semibold">{f.question}</dt>
                     <dd className="text-muted mt-1">{f.answer}</dd>
                   </div>

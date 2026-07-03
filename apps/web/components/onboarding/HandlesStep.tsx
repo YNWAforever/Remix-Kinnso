@@ -132,7 +132,7 @@ export function HandlesStep({
   return (
     <section className="w-full max-w-md space-y-4">
       <h2 className="text-xl font-semibold">{t.heading}</h2>
-      <p className="text-sm text-ink/70">{t.intro}</p>
+      <p className="text-sm text-kinnso-ink/70">{t.intro}</p>
 
       <ul className="space-y-3">
         {resolved.map(({ row, result, duplicate }) => {
@@ -170,7 +170,7 @@ export function HandlesStep({
                 />
                 <button
                   type="button"
-                  className="text-sm underline text-ink/60"
+                  className="text-sm underline text-kinnso-ink/60"
                   onClick={() => removeRow(row.key)}
                   disabled={rows.length <= 1}
                 >
@@ -198,7 +198,7 @@ export function HandlesStep({
         </button>
         <button
           type="button"
-          className="rounded bg-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+          className="rounded bg-kinnso-ink px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
           onClick={run}
           disabled={!canRun}
         >
@@ -207,7 +207,7 @@ export function HandlesStep({
       </div>
 
       {!canRun && validRows.length === 0 ? (
-        <p className="text-xs text-ink/50">{t.needOne}</p>
+        <p className="text-xs text-kinnso-ink/50">{t.needOne}</p>
       ) : null}
       {saveError ? <p className="text-xs text-red-600">{saveError}</p> : null}
     </section>

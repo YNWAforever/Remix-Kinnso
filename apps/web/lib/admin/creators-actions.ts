@@ -39,7 +39,10 @@ export async function setCreatorStatus(
   if (rErr) return formError(FRIENDLY[rErr])
 
   const { error } = await supabase.rpc('admin_set_creator_status', { p_id: id, p_status: status, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message, 'Status could not be changed'))
+  if (error) {
+    console.error('[admin:creators] setCreatorStatus failed', error)
+    return formError(mapError(error.message, 'Status could not be changed'))
+  }
   revalidatePath(dirPath(locale))
   return { ok: true, id, status }
 }
@@ -55,7 +58,10 @@ export async function reinstateCreator(
   if (rErr) return formError(FRIENDLY[rErr])
 
   const { error } = await supabase.rpc('admin_reinstate_creator', { p_id: id, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message, 'Creator could not be reinstated'))
+  if (error) {
+    console.error('[admin:creators] reinstateCreator failed', error)
+    return formError(mapError(error.message, 'Creator could not be reinstated'))
+  }
   revalidatePath(dirPath(locale))
   return { ok: true, id, status: 'active' }
 }
@@ -71,7 +77,10 @@ export async function setCreatorVerified(
   if (rErr) return formError(FRIENDLY[rErr])
 
   const { error } = await supabase.rpc('admin_set_creator_verified', { p_id: id, p_verified: verified, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message, 'Verification could not be changed'))
+  if (error) {
+    console.error('[admin:creators] setCreatorVerified failed', error)
+    return formError(mapError(error.message, 'Verification could not be changed'))
+  }
   revalidatePath(dirPath(locale))
   return { ok: true, id, verified }
 }
@@ -87,7 +96,10 @@ export async function addCreatorNote(
   if (rErr) return formError(FRIENDLY[rErr])
 
   const { error } = await supabase.rpc('admin_add_creator_note', { p_id: id, p_note: note.trim() })
-  if (error) return formError(mapError(error.message, 'Note could not be saved'))
+  if (error) {
+    console.error('[admin:creators] addCreatorNote failed', error)
+    return formError(mapError(error.message, 'Note could not be saved'))
+  }
   revalidatePath(dirPath(locale))
   return { ok: true, id }
 }
@@ -106,7 +118,10 @@ export async function bulkSetCreatorStatus(
   if (rErr) return formError(FRIENDLY[rErr])
 
   const { data, error } = await supabase.rpc('admin_bulk_set_creator_status', { p_ids: ids, p_status: status, p_reason: reason.trim() })
-  if (error) return formError(mapError(error.message, 'Bulk update failed'))
+  if (error) {
+    console.error('[admin:creators] bulkSetCreatorStatus failed', error)
+    return formError(mapError(error.message, 'Bulk update failed'))
+  }
   return { ok: true, count: Number(data ?? 0) }
 }
 
@@ -146,7 +161,10 @@ export async function setSettlementStatus(
     p_allow_revert: input.allowRevert ?? false,
     p_reason: reason.trim(),
   })
-  if (error) return formError(mapError(error.message, 'Settlement status could not be changed'))
+  if (error) {
+    console.error('[admin:creators] setSettlementStatus failed', error)
+    return formError(mapError(error.message, 'Settlement status could not be changed'))
+  }
   revalidatePath(payoutsPath(locale))
   return { ok: true, id }
 }

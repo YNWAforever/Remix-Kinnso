@@ -8,7 +8,7 @@ export function TextBlock({
   return (
     <section id={id} className="scroll-mt-24 mb-8">
       {title && (
-        <h2 className="text-2xl font-bold text-ink mb-2 flex gap-2">
+        <h2 className="text-2xl font-bold text-kinnso-ink mb-2 flex gap-2">
           {number != null && (
             <span className="text-orange" aria-hidden>{number}</span>
           )}

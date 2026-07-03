@@ -25,7 +25,7 @@ export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
   breadcrumb: { home: string; articles: string }
-  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string }
+  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string }
   seo: {
     brandTitle: string
     brandDescription: string
@@ -37,6 +37,8 @@ export interface Messages {
     contact: { title: string; description: string }
     merchants: { title: string; description: string }
     terms: { title: string; description: string }
+    forCreators: { title: string; description: string }
+    forMerchants: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -432,25 +434,28 @@ export interface Messages {
     statusPaid: string
   }
   nav: {
-    linkCreators: string; linkMerchants: string; linkAgent: string; linkTravelers: string
-    linkGuides: string; linkArticles: string; linkFindCreators: string; linkMissions: string
+    linkCreators: string; linkAgent: string
+    linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
     linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
     ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
+    merchantMenuLabel: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
     colExplore: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
-    lPostMission: string; lPricing: string; lCaseStudies: string; lContact: string
-    lAbout: string; lAgent: string; lPress: string; lLegal: string; rights: string
+    lPostMission: string; lPricing: string; lContact: string
+    lAbout: string; lAgent: string; lLegal: string; rights: string
+    lForCreators: string
   }
   home: {
     heroEyebrow: string; heroTitle: string; heroSubtitle: string
     heroPrimaryCta: string; heroSecondaryCta: string
     statCreators: string; statGuides: string; statDestinations: string
     roleCreator: string; roleTraveller: string; roleMerchant: string
+    testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
     howTabTravellers: string; howTabCreators: string; howTabMerchants: string
     howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3Desc: string
@@ -483,14 +488,37 @@ export interface Messages {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
   agent: {
-    heroPill: string; heroTitle: string; heroSubtitle: string
-    heroCta: string; heroSecondaryCta: string
-    valuesHeading: string
-    value1Title: string; value1Desc: string
-    value2Title: string; value2Desc: string
-    value3Title: string; value3Desc: string
-    tiersHeading: string; tiersSub: string; comingNote: string
-    ctaTitle: string; ctaDesc: string; ctaButton: string
+    eyebrow: string; title: string; body: string
+    pointsHeading: string
+    point1Title: string; point1Body: string
+    point2Title: string; point2Body: string
+    point3Title: string; point3Body: string
+    formHeading: string; formBody: string
+    emailLabel: string; emailPlaceholder: string; submitCta: string
+    successNote: string; errorInvalid: string; errorGeneric: string
+    honestNote: string; exploreCta: string; articlesCta: string
+  }
+  forCreators: {
+    heroEyebrow: string; heroTitle: string; heroSub: string
+    heroCtaPrimary: string; heroCtaSecondary: string
+    howEyebrow: string; howHeading: string
+    step1Title: string; step1Body: string
+    step2Title: string; step2Body: string
+    step3Title: string; step3Body: string
+    whyHeading: string; why1: string; why2: string; why3: string
+    testimonialsHeading: string
+    ctaTitle: string; ctaBody: string; ctaButton: string
+  }
+  forMerchants: {
+    heroEyebrow: string; heroTitle: string; heroSub: string
+    heroCtaPrimary: string; heroCtaSecondary: string
+    howEyebrow: string; howHeading: string
+    step1Title: string; step1Body: string
+    step2Title: string; step2Body: string
+    step3Title: string; step3Body: string
+    whyHeading: string; why1: string; why2: string; why3: string
+    testimonialsHeading: string
+    ctaTitle: string; ctaBody: string; ctaButton: string
   }
   studioHome: {
     pill: string; heading: string; subtitle: string
@@ -565,6 +593,7 @@ export interface Messages {
   }
   explore: {
     pill: string; heading: string; subtitle: string
+    gridHeading: string
     savesLabel: string; emptyNote: string
   }
   feed: {
@@ -587,14 +616,14 @@ export interface Messages {
     guideCount: string
   }
   merchantsLanding: {
-    heroPill: string; heroTitle: string; heroSubtitle: string
-    postCta: string; browseCta: string
-    howHeading: string; howSub: string
-    step1Title: string; step1Desc: string
-    step2Title: string; step2Desc: string
-    step3Title: string; step3Desc: string
-    samplesHeading: string; samplesSub: string
-    ctaTitle: string; ctaDesc: string; ctaButton: string
+    heroPill: string
+    hubTitle: string; hubSub: string
+    cardsHeading: string
+    cardPostTitle: string; cardPostBody: string
+    cardCreatorsTitle: string; cardCreatorsBody: string
+    cardMissionsTitle: string; cardMissionsBody: string
+    cardOpen: string
+    newHereNote: string; newHereCta: string
   }
   studioOffers: {
     heading: string
@@ -874,7 +903,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
   breadcrumb: { home: 'Home', articles: 'Articles' },
-  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version." },
+  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination' },
   seo: {
     brandTitle: 'KINNSO — Travel creators, real missions',
     brandDescription:
@@ -893,8 +922,8 @@ const messages: Messages = {
       description: 'Find travel and lifestyle creators on KINNSO by niche, audience, and platform.',
     },
     agent: {
-      title: 'Creator Copilot — your AI growth assistant',
-      description: 'Meet the KINNSO Creator Copilot: AI agents that help you find content ideas, grow your audience, and earn more.',
+      title: 'KINNSO AI travel agent — join the waitlist',
+      description: 'An AI travel agent grounded in real creator guides. Join the waitlist to be first in when it opens.',
     },
     about: {
       title: 'About KINNSO',
@@ -911,6 +940,14 @@ const messages: Messages = {
     terms: {
       title: 'Creator Terms',
       description: 'The terms that govern creators using KINNSO.',
+    },
+    forCreators: {
+      title: 'Become a KINNSO travel creator',
+      description: 'Publish travel guides, run vetted brand missions, and earn from the places you genuinely recommend.',
+    },
+    forMerchants: {
+      title: 'Work with vetted travel creators — KINNSO for merchants',
+      description: 'Brief vetted travel creators, pay on published results, and reach travellers who trust them.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -1302,21 +1339,23 @@ const messages: Messages = {
     statusPaid: 'Paid',
   },
   nav: {
-    linkCreators: 'Creators', linkMerchants: 'Merchants', linkAgent: 'AI Agent', linkTravelers: 'Travelers',
-    linkGuides: 'Guides', linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
+    linkCreators: 'Creators', linkAgent: 'AI Agent',
+    linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
     linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
     ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
+    merchantMenuLabel: 'Merchant menu',
   },
   footer: {
     tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
     colExplore: 'Explore', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
-    lPostMission: 'Post a mission', lPricing: 'How it works', lCaseStudies: 'Case studies', lContact: 'Contact',
-    lAbout: 'About', lAgent: 'AI Agent', lPress: 'Press', lLegal: 'Legal',
+    lPostMission: 'Post a mission', lPricing: 'How it works', lContact: 'Contact',
+    lAbout: 'About', lAgent: 'AI Agent', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
+    lForCreators: 'For Creators',
   },
   home: {
     heroEyebrow: 'The travel creator marketplace',
@@ -1326,6 +1365,7 @@ const messages: Messages = {
     heroSecondaryCta: 'Browse Creators',
     statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered',
     roleCreator: 'Creator', roleTraveller: 'Traveller', roleMerchant: 'Merchant',
+    testimonialsHeading: 'What people say about KINNSO',
     howEyebrow: 'How it works',
     howHeading: 'One platform, three ways in.',
     howSub: 'Travel it, create it, or host it — KINNSO turns real local knowledge into real trips.',
@@ -1424,24 +1464,55 @@ const messages: Messages = {
     back: 'Back to home',
   },
   agent: {
-    heroPill: 'Creator Copilot',
-    heroTitle: 'Your AI copilot for growing as a creator',
-    heroSubtitle: 'KINNSO Copilot is a growing library of saved AI agents that help you grow your audience, find your next idea, and produce content that earns.',
-    heroCta: 'Join as a creator',
-    heroSecondaryCta: 'See how it works',
-    valuesHeading: 'What your copilot will do',
-    value1Title: 'Grow your audience',
-    value1Desc: 'Data-backed prompts on what to post, when, and where — tuned to your Creator DNA.',
-    value2Title: 'Never run out of ideas',
-    value2Desc: 'Surface fresh content angles and trending places that fit your niche and audience.',
-    value3Title: 'Produce better content',
-    value3Desc: 'Turn a rough idea into captions, shot lists, and guide drafts you can publish in minutes.',
-    tiersHeading: 'A better copilot as you climb',
-    tiersSub: 'Publish guides and complete missions to level up. Higher tiers unlock more agents, higher limits, better commissions, and exclusive missions.',
-    comingNote: 'The copilot ships inside Studio in a later release. Join now to be first in line.',
-    ctaTitle: 'Get your copilot',
-    ctaDesc: 'Sign up as a creator, scan your DNA, and be first to use the copilot when it lands.',
-    ctaButton: 'Join KINNSO',
+    eyebrow: 'KINNSO AI Agent',
+    title: 'A travel agent grounded in real creators’ guides',
+    body: 'Ask for a plan and get real places pulled from published creator guides and articles — not generic lists. The agent is in private preview while we wire it to live guides.',
+    pointsHeading: 'What the agent does',
+    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide or article — no invented spots.',
+    point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',
+    point3Title: 'Built for booking', point3Body: 'When direct booking ships, recommendations will link straight to bookable stays and experiences.',
+    formHeading: 'Be first in line', formBody: 'Leave your email and we’ll invite you when the agent opens.',
+    emailLabel: 'Email address', emailPlaceholder: 'you@example.com', submitCta: 'Join the waitlist',
+    successNote: 'You’re on the list — we’ll email you when the agent opens.',
+    errorInvalid: 'Enter a valid email address.', errorGeneric: 'Something went wrong — please try again.',
+    honestNote: 'The agent isn’t live yet — we only ship it when it’s genuinely useful. Until then, the same knowledge is all here:',
+    exploreCta: 'Explore guides', articlesCta: 'Read articles',
+  },
+  forCreators: {
+    heroEyebrow: 'For Creators',
+    heroTitle: 'Turn your travel taste into income',
+    heroSub: 'Publish the guides you already give friends, run real brand missions, and earn from the places you genuinely recommend.',
+    heroCtaPrimary: 'Apply as a creator', heroCtaSecondary: 'See creator guides',
+    howEyebrow: 'How it works', howHeading: 'Three steps to your first payout',
+    step1Title: 'Publish guides', step1Body: 'Turn your favourite city into a guide travellers actually use — your voice, your picks.',
+    step2Title: 'Run missions', step2Body: 'Take on briefs from vetted brands that fit your niche. No spray-and-pray sponsorships.',
+    step3Title: 'Earn and grow', step3Body: 'Get paid per mission, earn affiliate commissions, and level up to unlock better offers.',
+    whyHeading: 'Why creators choose KINNSO',
+    why1: 'You keep your voice — merchants brief you, they don’t script you.',
+    why2: 'Transparent payouts with a real ledger, not a black box.',
+    why3: 'Your guides keep earning after the trip ends — bookings are coming, and your recommendations power them.',
+    testimonialsHeading: 'Creators on KINNSO',
+    ctaTitle: 'Your next trip could pay for itself',
+    ctaBody: 'Apply in minutes. Publish your first guide this week.',
+    ctaButton: 'Apply as a creator',
+  },
+  forMerchants: {
+    heroEyebrow: 'For Merchants',
+    heroTitle: 'Reach travellers through creators they trust',
+    heroSub: 'Brief vetted travel creators, pay on published results, and turn their genuine recommendations into your next customers.',
+    heroCtaPrimary: 'Post a mission', heroCtaSecondary: 'Talk to us',
+    howEyebrow: 'How it works', howHeading: 'Launch a campaign in three steps',
+    step1Title: 'Post a brief', step1Body: 'Describe the mission, target cities and payout — it takes minutes.',
+    step2Title: 'Creators apply', step2Body: 'Vetted creators who fit your brand pick up the brief and produce real content.',
+    step3Title: 'Pay on results', step3Body: 'Approve published work and pay for outcomes — with attribution you can verify.',
+    whyHeading: 'Why merchants choose KINNSO',
+    why1: 'Creators are vetted with real audience data, not follower counts.',
+    why2: 'You approve work before you pay — no surprises.',
+    why3: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.',
+    testimonialsHeading: 'Merchants on KINNSO',
+    ctaTitle: 'Your next campaign starts with a brief',
+    ctaBody: 'Post your first mission today — our team reviews every brief within 48 hours.',
+    ctaButton: 'Post a mission',
   },
   studioHome: {
     pill: 'Creator Studio',
@@ -1535,13 +1606,14 @@ const messages: Messages = {
   explore: {
     pill: 'Explore',
     heading: 'Travel Guides from real creators',
-    subtitle: 'Discover hand-picked spots, saved by travelers like you.',
+    subtitle: 'Discover hand-picked spots, saved by travellers like you.',
+    gridHeading: 'All guides',
     savesLabel: 'saves',
     emptyNote: 'More guides are added every week.',
   },
   feed: {
     pill: 'Feed',
-    heading: 'What travelers are saving now',
+    heading: 'What travellers are saving now',
     subtitle: 'A live look at the guides and spots trending across KINNSO.',
     savesLabel: 'saves',
     empty: 'No guides yet. Check back soon for new travel guides.',
@@ -1566,15 +1638,15 @@ const messages: Messages = {
   },
   merchantsLanding: {
     heroPill: 'For Merchants',
-    heroTitle: 'Reach travelers through creators they trust.',
-    heroSubtitle: 'Post a mission and pay only when a real creator publishes and drives clicks.',
-    postCta: 'Post a Mission', browseCta: 'Browse creators',
-    howHeading: 'How it works', howSub: 'Launch a campaign in three steps.',
-    step1Title: 'Post a brief', step1Desc: 'Describe the mission, cities and payout.',
-    step2Title: 'Creators apply', step2Desc: 'Qualified creators join and submit work.',
-    step3Title: 'Pay on results', step3Desc: 'Approve submissions and pay on publish.',
-    samplesHeading: 'Open missions right now', samplesSub: 'A sample of live briefs from merchants.',
-    ctaTitle: 'Ready to launch?', ctaDesc: 'Post your first mission today.', ctaButton: 'Post a Mission',
+    hubTitle: 'Your missions, creators and results — one place',
+    hubSub: 'Everything you run on KINNSO starts here.',
+    cardsHeading: 'Your merchant tools',
+    cardPostTitle: 'Post a mission', cardPostBody: 'Write a brief and put it in front of vetted creators.',
+    cardCreatorsTitle: 'Find creators', cardCreatorsBody: 'Search vetted creators by niche, audience and platform.',
+    cardMissionsTitle: 'Track missions', cardMissionsBody: 'Review applications, approve work and follow results.',
+    cardOpen: 'Open',
+    newHereNote: 'New to KINNSO? See how missions work and what creators can do for your brand.',
+    newHereCta: 'Why KINNSO for merchants',
   },
   studioOffers: {
     heading: 'Affiliate offers',

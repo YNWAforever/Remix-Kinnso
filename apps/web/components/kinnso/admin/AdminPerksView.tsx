@@ -28,14 +28,19 @@ export function AdminPerksView({
   async function toggle(perk: AdminPerk) {
     setBusyId(perk.id)
     setErrors((e) => ({ ...e, [perk.id]: '' }))
-    const res = await onToggle(perk.id, !perk.active)
-    setBusyId(null)
-    if (res.ok) {
-      router.refresh() // reconcile the list with the revalidated server truth
-    } else {
-      // The action returns formError(...) on failure (expired ops session, no-op write, …);
-      // surface it so the button does not silently appear to do nothing.
-      setErrors((e) => ({ ...e, [perk.id]: res.errors.form?.[0] ?? 'Perk status could not be changed.' }))
+    try {
+      const res = await onToggle(perk.id, !perk.active)
+      if (res.ok) {
+        router.refresh() // reconcile the list with the revalidated server truth
+      } else {
+        // The action returns formError(...) on failure (expired ops session, no-op write, …);
+        // surface it so the button does not silently appear to do nothing.
+        setErrors((e) => ({ ...e, [perk.id]: res.errors.form?.[0] ?? 'Perk status could not be changed.' }))
+      }
+    } catch {
+      setErrors((e) => ({ ...e, [perk.id]: 'Perk status could not be changed.' }))
+    } finally {
+      setBusyId(null)
     }
   }
 

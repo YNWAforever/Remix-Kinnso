@@ -29,7 +29,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
   const loc = locale as Locale
   const [messages, guides, stats, testimonials, articleResult, sessions] = await Promise.all([
     getDictionary(loc),
-    getPublishedGuides(),
+    getPublishedGuides(6),
     getPlatformStats(),
     getPublishedTestimonials(loc),
     // Articles highlight degrades to hidden rather than crashing the homepage
@@ -41,7 +41,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
     <HomeView
       locale={loc}
       t={messages.home}
-      guides={guides.slice(0, 6)}
+      guides={guides}
       stats={stats}
       testimonials={testimonials}
       articles={articleResult.items}

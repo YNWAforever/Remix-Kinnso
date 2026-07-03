@@ -18,12 +18,12 @@ export function StatsBar({ locale, t, stats }: { locale: Locale; t: Messages['ho
   if (entries.length < MIN_VISIBLE_STATS) return null
   const fmt = new Intl.NumberFormat(locale)
   return (
-    <div className="border-b border-kinnso2-line bg-kinnso2-paper">
+    <div className="border-b border-kinnso-edge bg-kinnso-cream">
       <ul className="k2-container flex flex-wrap items-baseline gap-x-12 gap-y-4 py-8">
         {entries.map((s) => (
           <li key={s.key} className="flex items-baseline gap-2">
-            <span className="k2-display text-3xl font-semibold text-kinnso2-ink">{fmt.format(s.value)}</span>
-            <span className="text-sm text-kinnso2-ink/70">{s.label}</span>
+            <span className="k2-display text-3xl font-semibold text-kinnso-ink">{fmt.format(s.value)}</span>
+            <span className="text-sm text-kinnso-ink/70">{s.label}</span>
           </li>
         ))}
       </ul>

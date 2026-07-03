@@ -21,11 +21,11 @@ describe('editorial primitives (R1A)', () => {
 
   it('SectionShell can render as a div and merge classes', () => {
     render(
-      <SectionShell as="div" className="bg-kinnso2-paper">
+      <SectionShell as="div" className="bg-kinnso-cream">
         <p>INNER2</p>
       </SectionShell>,
     )
-    const band = screen.getByText('INNER2').closest('div.bg-kinnso2-paper')
+    const band = screen.getByText('INNER2').closest('div.bg-kinnso-cream')
     expect(band).toBeTruthy()
   })
 

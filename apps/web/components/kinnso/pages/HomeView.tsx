@@ -9,8 +9,7 @@ import { HowItWorks } from '@/components/kinnso/home/HowItWorks'
 import { MerchantValue } from '@/components/kinnso/home/MerchantValue'
 import { StatsBar } from '@/components/kinnso/home/StatsBar'
 import type { SearchResult } from '@/lib/articles/queries'
-// The Guide TYPE stays sourced from creator-mock until the R1C sweep relocates it.
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 import type { PlatformStats, Testimonial, UpcomingSession } from '@/lib/home/queries'
 import { toUrlCategory, type Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -40,24 +39,26 @@ export function HomeView({
   }
   const dateFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium' })
   const dateTimeFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' })
+  const linkableArticles = articles.filter((a) => toUrlCategory(a.category))
 
   return (
-    <div className="bg-kinnso2-paper font-k2-sans">
+    <div className="bg-kinnso-cream font-sans">
       {/* 1 — Hero (locked copy; real covers or typographic fallback) */}
       <Hero locale={locale} t={t} guides={guides} />
 
       {/* 2 — Social proof: threshold-gated counts + curated pull-quotes */}
       <StatsBar locale={locale} t={t} stats={stats} />
       {testimonials.length > 0 ? (
-        <SectionShell className="k2-hairline">
+        <SectionShell className="k2-hairline" aria-labelledby="home-testimonials-heading">
+          <h2 id="home-testimonials-heading" className="sr-only">{t.testimonialsHeading}</h2>
           <ul className="grid gap-10 md:grid-cols-3">
             {testimonials.map((q) => (
               <li key={q.id}>
                 <figure>
-                  <blockquote className="k2-display text-xl leading-snug text-kinnso2-ink">
+                  <blockquote className="k2-display text-xl leading-snug text-kinnso-ink">
                     &ldquo;{q.quote}&rdquo;
                   </blockquote>
-                  <figcaption className="mt-3 text-sm text-kinnso2-ink/70">
+                  <figcaption className="mt-3 text-sm text-kinnso-ink/70">
                     — {q.authorName} · {roleLabel[q.authorRole]}
                   </figcaption>
                 </figure>
@@ -75,18 +76,18 @@ export function HomeView({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <Eyebrow>{t.featuredEyebrow}</Eyebrow>
-            <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.featuredHeading}</h2>
-            <p className="mt-2 text-kinnso2-ink/70">{t.featuredSub}</p>
+            <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.featuredHeading}</h2>
+            <p className="mt-2 text-kinnso-ink/70">{t.featuredSub}</p>
           </div>
-          <Link href={p('/explore')} className="text-sm font-semibold text-kinnso2-clay transition hover:text-kinnso2-clay-deep">
+          <Link href={p('/explore')} className="text-sm font-semibold text-kinnso-orangeDark transition hover:text-kinnso-ink">
             {t.featuredSeeAll} →
           </Link>
         </div>
         {guides.length === 0 ? (
-          <p className="mt-8 text-kinnso2-ink/70">{t.featuredEmpty}</p>
+          <p className="mt-8 text-kinnso-ink/70">{t.featuredEmpty}</p>
         ) : (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {guides.slice(0, 6).map((g) => (
+            {guides.map((g) => (
               <Link key={g.slug} href={p(`/g/${g.slug}`)} className="group">
                 <EditorialCard
                   media={
@@ -115,20 +116,20 @@ export function HomeView({
       {/* 5 — AI Agent (waitlist framing until R4) */}
       <AgentTeaser locale={locale} t={t} />
 
-      {/* 6 — Articles highlight (3 latest; hidden when none) */}
-      {articles.length > 0 ? (
+      {/* 6 — Articles highlight (3 latest with a resolvable category; hidden when none) */}
+      {linkableArticles.length > 0 ? (
         <SectionShell>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <Eyebrow>{t.articlesEyebrow}</Eyebrow>
-              <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.articlesHeading}</h2>
+              <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.articlesHeading}</h2>
             </div>
-            <Link href={p('/articles')} className="text-sm font-semibold text-kinnso2-clay transition hover:text-kinnso2-clay-deep">
+            <Link href={p('/articles')} className="text-sm font-semibold text-kinnso-orangeDark transition hover:text-kinnso-ink">
               {t.articlesSeeAll} →
             </Link>
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {articles.slice(0, 3).map((a) => {
+            {linkableArticles.slice(0, 3).map((a) => {
               const cat = toUrlCategory(a.category)
               if (!cat) return null
               return (
@@ -164,14 +165,14 @@ export function HomeView({
       {sessions.length > 0 ? (
         <SectionShell className="k2-hairline">
           <Eyebrow>{t.sessionsEyebrow}</Eyebrow>
-          <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso2-ink md:text-4xl">{t.sessionsHeading}</h2>
-          <p className="mt-2 max-w-xl text-kinnso2-ink/70">{t.sessionsSub}</p>
+          <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.sessionsHeading}</h2>
+          <p className="mt-2 max-w-xl text-kinnso-ink/70">{t.sessionsSub}</p>
           <ul className="mt-8 grid gap-5 md:grid-cols-3">
             {sessions.map((s) => (
               <li key={s.id} className="k2-card p-5">
-                <p className="text-sm text-kinnso2-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
-                <h3 className="mt-2 text-lg font-semibold text-kinnso2-ink">{s.title}</h3>
-                <p className="mt-1 text-sm text-kinnso2-ink/70">@{s.hostHandle}</p>
+                <p className="text-sm text-kinnso-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
+                <h3 className="mt-2 text-lg font-semibold text-kinnso-ink">{s.title}</h3>
+                <p className="mt-1 text-sm text-kinnso-ink/70">@{s.hostHandle}</p>
               </li>
             ))}
           </ul>

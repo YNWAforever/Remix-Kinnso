@@ -30,4 +30,15 @@ describe('validateTestimonialInput', () => {
   it('rejects a fractional sort order', () => {
     expect(validateTestimonialInput({ ...valid, sortOrder: 1.5 }).sortOrder).toBeTruthy()
   })
+  it('rejects a sort order beyond the int4 range', () => {
+    expect(validateTestimonialInput({ ...valid, sortOrder: 2 ** 31 }).sortOrder).toBeTruthy()
+    expect(validateTestimonialInput({ ...valid, sortOrder: -(2 ** 31) - 1 }).sortOrder).toBeTruthy()
+  })
+  it('accepts the int4 boundary values', () => {
+    expect(validateTestimonialInput({ ...valid, sortOrder: 2147483647 }).sortOrder).toBeUndefined()
+    expect(validateTestimonialInput({ ...valid, sortOrder: -2147483648 }).sortOrder).toBeUndefined()
+  })
+  it('rejects NaN (an emptied sort order field)', () => {
+    expect(validateTestimonialInput({ ...valid, sortOrder: Number.NaN }).sortOrder).toBeTruthy()
+  })
 })

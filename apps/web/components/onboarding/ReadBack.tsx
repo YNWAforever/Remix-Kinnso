@@ -8,7 +8,7 @@ type DnaDict = Messages['dna']
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium text-ink/50">{label}</span>
+      <span className="text-xs font-medium text-kinnso-ink/50">{label}</span>
       <span className="text-sm">{value}</span>
     </div>
   )
@@ -30,7 +30,7 @@ export function ReadBack({
   return (
     <section className="w-full max-w-lg space-y-4">
       <h2 className="text-xl font-semibold">{t.readBackHeading}</h2>
-      <p className="text-sm text-ink/70">{t.readBackIntro}</p>
+      <p className="text-sm text-kinnso-ink/70">{t.readBackIntro}</p>
 
       <div className="space-y-3">
         <Row label={t.bio} value={dna.bio} />
@@ -49,11 +49,11 @@ export function ReadBack({
       <div className="flex flex-wrap items-center gap-4 pt-1">
         <a
           href={dashboardHref}
-          className="inline-flex items-center justify-center rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-ink/90"
+          className="inline-flex items-center justify-center rounded-md bg-kinnso-ink px-4 py-2 text-sm font-medium text-white hover:bg-kinnso-ink/90"
         >
           {t.enterStudio}
         </a>
-        <a href={signOutHref} className="text-sm underline text-ink/70 hover:text-ink">
+        <a href={signOutHref} className="text-sm underline text-kinnso-ink/70 hover:text-kinnso-ink">
           {signOutLabel}
         </a>
       </div>

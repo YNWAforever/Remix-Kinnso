@@ -1,5 +1,5 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
-import type { Guide } from '@/lib/creator-mock'
+import type { Guide } from '@/lib/guides/types'
 import type { GuideDetail } from '@/lib/guides/types'
 
 interface GuideRowLite {
@@ -22,13 +22,15 @@ export function mapRowToGuide(r: GuideRowLite): Guide {
   }
 }
 
-export async function getPublishedGuides(): Promise<Guide[]> {
+export async function getPublishedGuides(limit?: number): Promise<Guide[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  let query = supabase
     .from('guides')
     .select('slug, title, cover_url, city, saves_count, creator_handle')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
+  if (limit !== undefined) query = query.limit(limit)
+  const { data } = await query
   return (data ?? []).map(mapRowToGuide)
 }
 
@@ -44,6 +46,33 @@ export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: st
     slug: r.slug as string,
     lastmod: (r.published_at as string | null) ?? null,
   }))
+}
+
+/**
+ * R1C heuristic cross-link (master spec §5): guides whose city matches any of
+ * an article's region strings. PostgREST .or() treats commas/parens as syntax,
+ * so region strings are sanitized to [letters/numbers/spaces/hyphens] before
+ * interpolation; sub-2-char fragments are dropped as noise. Reads never crash
+ * the article page — failures degrade to [] (same stance as getPublishedGuides).
+ */
+export async function getGuidesForRegions(regions: string[], limit = 3): Promise<Guide[]> {
+  const clean = [...new Set(regions
+    .map((r) => r.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim())
+    .filter((r) => r.length >= 2))]
+  if (clean.length === 0) return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data } = await supabase
+      .from('guides')
+      .select('slug, title, cover_url, city, saves_count, creator_handle')
+      .eq('status', 'published')
+      .or(clean.map((r) => `city.ilike.%${r}%`).join(','))
+      .order('published_at', { ascending: false })
+      .limit(limit)
+    return (data ?? []).map(mapRowToGuide)
+  } catch {
+    return []
+  }
 }
 
 export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> {
