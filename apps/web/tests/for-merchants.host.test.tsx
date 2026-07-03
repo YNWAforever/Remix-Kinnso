@@ -7,11 +7,11 @@ import { ForMerchantsView } from '@/components/kinnso/pages/ForMerchantsView'
 afterEach(cleanup)
 
 describe('ForMerchantsView', () => {
-  it('renders hero, steps, and CTA → /merchants/post; hides empty testimonials strip', () => {
+  it('renders hero, steps, and CTAs → /merchants/apply; hides empty testimonials strip', () => {
     render(<ForMerchantsView locale="en" t={en.forMerchants} testimonials={[]} />)
     expect(screen.getByRole('heading', { level: 1, name: en.forMerchants.heroTitle })).toBeTruthy()
-    const postLinks = screen.getAllByRole('link', { name: en.forMerchants.heroCtaPrimary })
-    expect(postLinks[0].getAttribute('href')).toBe('/en/merchants/post')
+    const applyLinks = screen.getAllByRole('link', { name: en.forMerchants.heroCtaPrimary })
+    expect(applyLinks.every((l) => l.getAttribute('href') === '/en/merchants/apply')).toBe(true)
     const contactLink = screen.getByRole('link', { name: en.forMerchants.heroCtaSecondary })
     expect(contactLink.getAttribute('href')).toBe('/en/contact')
     expect(document.getElementById('for-merchants-testimonials')).toBeNull()
