@@ -9,6 +9,7 @@ export function MerchantsTabs({ t, locale }: { t: Messages['merchantsOps']; loca
   const tabs = [
     { href: `/${locale}/admin/merchants`, label: t.tabOverview },
     { href: `/${locale}/admin/merchants/directory`, label: t.tabDirectory },
+    { href: `/${locale}/admin/merchants/applications`, label: t.tabApplications },
   ]
   return (
     <nav className="mb-6 flex gap-2 border-b border-kinnso-line">

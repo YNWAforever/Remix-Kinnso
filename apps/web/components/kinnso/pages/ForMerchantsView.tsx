@@ -27,7 +27,7 @@ export function ForMerchantsView({ locale, t, testimonials }: {
         <h1 className="k2-display mt-4 max-w-3xl text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-6xl">{t.heroTitle}</h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-kinnso-ink/70">{t.heroSub}</p>
         <div className="mt-8 flex flex-wrap gap-4">
-          <Link href={p('/merchants/post')} className="k2-btn-primary">{t.heroCtaPrimary}</Link>
+          <Link href={p('/merchants/apply')} className="k2-btn-primary">{t.heroCtaPrimary}</Link>
           <Link href={p('/contact')} className="k2-btn-ghost">{t.heroCtaSecondary}</Link>
         </div>
       </SectionShell>
@@ -81,7 +81,7 @@ export function ForMerchantsView({ locale, t, testimonials }: {
         <div className="k2-container">
           <h2 className="k2-display max-w-2xl text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.ctaTitle}</h2>
           <p className="mt-4 max-w-2xl leading-relaxed text-kinnso-ink/85">{t.ctaBody}</p>
-          <Link href={p('/merchants/post')} className="mt-8 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso-ink px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{t.ctaButton}</Link>
+          <Link href={p('/merchants/apply')} className="mt-8 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso-ink px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{t.ctaButton}</Link>
         </div>
       </section>
     </main>

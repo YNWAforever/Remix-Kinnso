@@ -39,6 +39,7 @@ let affiliateProgramId = ''
 
 const missionTableNames = [
   'merchant_profiles',
+  'merchant_applications',
   'kinnso_ops_members',
   'affiliate_network_programs',
   'missions',
