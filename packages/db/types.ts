@@ -702,6 +702,24 @@ export type Database = {
           },
         ]
       }
+      checkout_rate_limits: {
+        Row: {
+          ip: string
+          window_start: string
+          request_count: number
+        }
+        Insert: {
+          ip: string
+          window_start?: string
+          request_count?: number
+        }
+        Update: {
+          ip?: string
+          window_start?: string
+          request_count?: number
+        }
+        Relationships: []
+      }
       copilot_messages: {
         Row: {
           archived: boolean
@@ -2023,6 +2041,26 @@ export type Database = {
       }
     }
     Functions: {
+      check_and_increment_checkout_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      confirm_booking_from_webhook: {
+        Args: { p_stripe_payment_intent_id: string; p_stripe_checkout_session_id: string }
+        Returns: undefined
+      }
+      get_booking_by_checkout_session: {
+        Args: { p_session_id: string }
+        Returns: {
+          booking_id: string
+          status: string
+          qty: number
+          total_amount: number
+          currency: string
+          experience_title: string
+          experience_slug: string
+        }[]
+      }
       accept_mission_invite: {
         Args: { p_mission_id: string }
         Returns: undefined
