@@ -55,6 +55,20 @@ describe('POST /api/stripe/webhook', () => {
     })
   })
 
+  it('confirms the booking when payment_intent is an expanded object, not a string', async () => {
+    constructEventMock.mockReturnValue({
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_123', payment_status: 'paid', payment_intent: { id: 'pi_456' } } },
+    })
+    rpcMock.mockResolvedValue({ data: null, error: null })
+    const res = await POST(makeRequest('{}', 'sig_good'))
+    expect(res.status).toBe(200)
+    expect(rpcMock).toHaveBeenCalledWith('confirm_booking_from_webhook', {
+      p_stripe_payment_intent_id: 'pi_456',
+      p_stripe_checkout_session_id: 'cs_123',
+    })
+  })
+
   it('ignores a checkout.session.completed event that is not yet paid', async () => {
     constructEventMock.mockReturnValue({
       type: 'checkout.session.completed',
