@@ -3,9 +3,10 @@ import { render, screen, cleanup } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 
-const { getExperienceBySlugMock, listPublicAvailabilityMock } = vi.hoisted(() => ({
+const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock } = vi.hoisted(() => ({
   getExperienceBySlugMock: vi.fn(),
   listPublicAvailabilityMock: vi.fn(async (): Promise<PublicAvailability[]> => []),
+  getUserMock: vi.fn(async () => ({ data: { user: null as { email: string } | null } })),
 }))
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('notFound') } }))
 vi.mock('@/lib/experiences/public-queries', () => ({
@@ -17,11 +18,12 @@ vi.mock('@/lib/experiences/public-availability-queries', () => ({
 }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
-    auth: { getUser: async () => ({ data: { user: null } }) },
+    auth: { getUser: getUserMock },
   }),
 }))
 
 import ExperiencePublicPage from '@/app/[locale]/experiences/[slug]/page'
+import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
 
@@ -50,6 +52,21 @@ describe('ExperiencePublicPage', () => {
     expect(merchantLinks.every((l) => l.getAttribute('href') === '/en/m/acme-travel')).toBe(true)
     expect(screen.queryByText(/Booking opens soon/i)).toBeNull()
     expect(screen.getByRole('button', { name: /book now/i })).toBeTruthy()
+  })
+
+  it('hides the guest-email field end-to-end when the viewer is signed in', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+    getUserMock.mockResolvedValueOnce({ data: { user: { email: 'traveler@example.com' } } })
+    const el = await ExperiencePublicPage({ params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }) })
+    render(el)
+    expect(screen.queryByLabelText(en.booking.guestEmailLabel)).toBeNull()
+    expect(screen.getByText(en.booking.submitCta)).toBeTruthy()
   })
 
   it('renders the no-availability state when there are no upcoming dates', async () => {

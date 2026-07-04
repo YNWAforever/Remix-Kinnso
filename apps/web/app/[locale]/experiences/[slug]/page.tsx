@@ -34,6 +34,9 @@ export default async function ExperiencePublicPage({ params }: { params: Promise
   if (!experience) notFound()
 
   const supabase = await createSupabaseServerClient()
+  // auth.getUser() here makes this page request-dynamic (it was previously
+  // static-generation-eligible via generateStaticParams()) — needed so the
+  // booking widget knows whether to show the guest-email field.
   const [availability, { data: { user } }] = await Promise.all([
     listPublicAvailability(experience.id),
     supabase.auth.getUser(),
