@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@kinnso/db'
 import type { MerchantBookingRow, OpsBookingSettlementRow, TravelerBookingRow } from './types'
 
 function maskGuestEmail(email: string): string {
@@ -27,7 +28,7 @@ function one<T>(value: T | T[] | null): T | null {
 }
 
 export async function listMerchantBookings(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   merchantProfileId: string,
 ): Promise<MerchantBookingRow[]> {
   const { data, error } = await supabase
@@ -38,9 +39,9 @@ export async function listMerchantBookings(
     .eq('experiences.merchant_profile_id', merchantProfileId)
     .order('created_at', { ascending: false })
 
-  if (error || !data) return []
+  if (error) throw error
 
-  return (data as unknown as MerchantBookingQueryRow[]).map((row) => {
+  return ((data ?? []) as unknown as MerchantBookingQueryRow[]).map((row) => {
     const experience = one(row.experiences)
     const creator = one(row.creators ?? null)
     return {
@@ -69,7 +70,7 @@ interface TravelerBookingQueryRow {
 }
 
 export async function listMyBookings(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   travelerUserId: string,
 ): Promise<TravelerBookingRow[]> {
   const { data, error } = await supabase
@@ -80,9 +81,9 @@ export async function listMyBookings(
     .eq('traveler_user_id', travelerUserId)
     .order('created_at', { ascending: false })
 
-  if (error || !data) return []
+  if (error) throw error
 
-  return (data as unknown as TravelerBookingQueryRow[]).map((row) => {
+  return ((data ?? []) as unknown as TravelerBookingQueryRow[]).map((row) => {
     const experience = one(row.experiences)
     const merchant = experience ? one(experience.merchant_profiles) : null
     const availability = one(row.experience_availability)
@@ -116,7 +117,7 @@ interface OpsSettlementQueryRow {
 }
 
 export async function listOpsBookingSettlements(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
 ): Promise<OpsBookingSettlementRow[]> {
   const { data, error } = await supabase
     .from('booking_settlements')
@@ -125,9 +126,9 @@ export async function listOpsBookingSettlements(
     )
     .order('created_at', { ascending: false })
 
-  if (error || !data) return []
+  if (error) throw error
 
-  return (data as unknown as OpsSettlementQueryRow[]).map((row) => {
+  return ((data ?? []) as unknown as OpsSettlementQueryRow[]).map((row) => {
     const booking = one(row.bookings)
     const experience = booking ? one(booking.experiences) : null
     return {
