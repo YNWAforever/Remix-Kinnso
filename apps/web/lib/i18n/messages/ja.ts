@@ -849,7 +849,7 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
@@ -897,6 +897,19 @@ const messages: Messages = {
     confirmMarkDisputed: 'この精算を異議ありとしてフラグしますか？',
     payoutsEmpty: 'このフィルターに一致する精算はありません',
     reasonRequired: '理由を入力してください。',
+  },
+  bookingsOps: {
+    title: '予約と精算',
+    empty: 'まだ予約はありません。',
+    colExperience: '体験',
+    colMerchantPayout: '加盟店への支払い',
+    colCreatorCommission: 'クリエイター手数料',
+    colKinnsoCommission: 'Kinnso 手数料',
+    colStatus: 'ステータス',
+    noCreatorLeg: 'クリエイターなし（直接予約）',
+    markPaidButton: 'すべて支払い済みにする',
+    reasonPlaceholder: '理由（必須）',
+    actionFailed: '操作に失敗しました。もう一度お試しください。',
   },
   merchantApply: {
     title: 'KINNSO 加盟店になる',

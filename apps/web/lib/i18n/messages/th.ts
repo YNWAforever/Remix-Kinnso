@@ -849,7 +849,7 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
@@ -897,6 +897,19 @@ const messages: Messages = {
     confirmMarkDisputed: 'ทำเครื่องหมายการชำระเงินนี้ว่ามีข้อพิพาทหรือไม่?',
     payoutsEmpty: 'ไม่มีการชำระเงินที่ตรงกับตัวกรองนี้',
     reasonRequired: 'ต้องระบุเหตุผล',
+  },
+  bookingsOps: {
+    title: 'การจองและการชำระเงิน',
+    empty: 'ยังไม่มีการจอง',
+    colExperience: 'ประสบการณ์',
+    colMerchantPayout: 'ยอดจ่ายให้ร้านค้า',
+    colCreatorCommission: 'ค่าคอมมิชชันครีเอเตอร์',
+    colKinnsoCommission: 'ค่าคอมมิชชัน Kinnso',
+    colStatus: 'สถานะ',
+    noCreatorLeg: 'ไม่มีครีเอเตอร์ (จองโดยตรง)',
+    markPaidButton: 'ทำเครื่องหมายว่าชำระเงินแล้วทั้งหมด',
+    reasonPlaceholder: 'เหตุผล (จำเป็น)',
+    actionFailed: 'การดำเนินการล้มเหลว โปรดลองอีกครั้ง',
   },
   merchantApply: {
     title: 'สมัครเป็นร้านค้า KINNSO',

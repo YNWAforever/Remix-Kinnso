@@ -849,7 +849,7 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션', navTestimonials: '추천사',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션', navTestimonials: '추천사', navBookings: '예약',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
@@ -897,6 +897,19 @@ const messages: Messages = {
     confirmMarkDisputed: '이 정산을 분쟁으로 표시할까요?',
     payoutsEmpty: '이 필터와 일치하는 정산이 없습니다',
     reasonRequired: '사유를 입력해 주세요.',
+  },
+  bookingsOps: {
+    title: '예약 및 정산',
+    empty: '아직 예약이 없습니다.',
+    colExperience: '체험',
+    colMerchantPayout: '머천트 정산금',
+    colCreatorCommission: '크리에이터 수수료',
+    colKinnsoCommission: 'Kinnso 수수료',
+    colStatus: '상태',
+    noCreatorLeg: '크리에이터 없음 (직접 예약)',
+    markPaidButton: '전체 지급 완료 처리',
+    reasonPlaceholder: '사유 (필수)',
+    actionFailed: '작업에 실패했습니다. 다시 시도해 주세요.',
   },
   merchantApply: {
     title: 'KINNSO 가맹점 신청',

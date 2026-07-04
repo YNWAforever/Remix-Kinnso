@@ -72,6 +72,20 @@ export interface MerchantApplicationsOpsMessages {
   noWebsite: string
 }
 
+export interface BookingsOpsMessages {
+  title: string
+  empty: string
+  colExperience: string
+  colMerchantPayout: string
+  colCreatorCommission: string
+  colKinnsoCommission: string
+  colStatus: string
+  noCreatorLeg: string
+  markPaidButton: string
+  reasonPlaceholder: string
+  actionFailed: string
+}
+
 export interface MerchantDashboardMessages {
   title: string
   subtitle: string
@@ -880,7 +894,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -926,6 +940,7 @@ export interface Messages {
     payoutsEmpty: string
     reasonRequired: string
   }
+  bookingsOps: BookingsOpsMessages
   merchantApply: MerchantApplyMessages
   merchantApplicationsOps: MerchantApplicationsOpsMessages
   merchantDashboard: MerchantDashboardMessages
@@ -1949,7 +1964,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -1997,6 +2012,19 @@ const messages: Messages = {
     confirmMarkDisputed: 'Flag this settlement as disputed?',
     payoutsEmpty: 'No settlements match this filter',
     reasonRequired: 'A reason is required.',
+  },
+  bookingsOps: {
+    title: 'Bookings & Settlements',
+    empty: 'No bookings yet.',
+    colExperience: 'Experience',
+    colMerchantPayout: 'Merchant payout',
+    colCreatorCommission: 'Creator commission',
+    colKinnsoCommission: 'Kinnso commission',
+    colStatus: 'Status',
+    noCreatorLeg: 'No creator (direct booking)',
+    markPaidButton: 'Mark all paid',
+    reasonPlaceholder: 'Reason (required)',
+    actionFailed: 'Action failed. Try again.',
   },
   merchantApply: {
     title: 'Become a KINNSO merchant',

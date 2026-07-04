@@ -849,7 +849,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶', navCreators: '創作者', navMerchants: '商戶', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶', navCreators: '創作者', navMerchants: '商戶', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、用戶同平台內容。',
     statCreators: '創作者', statMerchants: '商戶', statOps: '營運成員',
     statPerksActive: '啟用中福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
@@ -897,6 +897,19 @@ const messages: Messages = {
     confirmMarkDisputed: '將此結算標記為爭議？',
     payoutsEmpty: '沒有符合此篩選的結算',
     reasonRequired: '需要填寫原因。',
+  },
+  bookingsOps: {
+    title: '訂單同結算',
+    empty: '仲未有訂單。',
+    colExperience: '體驗',
+    colMerchantPayout: '商戶撥款',
+    colCreatorCommission: '創作者佣金',
+    colKinnsoCommission: 'Kinnso 佣金',
+    colStatus: '狀態',
+    noCreatorLeg: '冇創作者（直接訂購）',
+    markPaidButton: '標記全部已付款',
+    reasonPlaceholder: '原因（必填）',
+    actionFailed: '操作失敗，請再試一次。',
   },
   merchantApply: {
     title: '成為 KINNSO 商戶',

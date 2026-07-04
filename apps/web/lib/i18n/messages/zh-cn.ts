@@ -849,7 +849,7 @@ const messages: Messages = {
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
   admin: {
-    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队', navMissions: '任务', navTestimonials: '用户推荐',
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队', navMissions: '任务', navTestimonials: '用户推荐', navBookings: '订单',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
@@ -897,6 +897,19 @@ const messages: Messages = {
     confirmMarkDisputed: '将此结算标记为争议？',
     payoutsEmpty: '没有符合此筛选的结算',
     reasonRequired: '需要填写原因。',
+  },
+  bookingsOps: {
+    title: '订单与结算',
+    empty: '暂无订单。',
+    colExperience: '体验',
+    colMerchantPayout: '商家拨款',
+    colCreatorCommission: '创作者佣金',
+    colKinnsoCommission: 'Kinnso 佣金',
+    colStatus: '状态',
+    noCreatorLeg: '无创作者（直接预订）',
+    markPaidButton: '标记全部已付款',
+    reasonPlaceholder: '原因（必填）',
+    actionFailed: '操作失败，请重试。',
   },
   merchantApply: {
     title: '成为 KINNSO 商家',
