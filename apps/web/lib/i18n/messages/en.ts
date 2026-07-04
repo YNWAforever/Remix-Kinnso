@@ -191,6 +191,7 @@ export interface TravelerTripsMessages {
   empty: string
   colExperience: string
   colMerchant: string
+  colQty: string
   colStatus: string
   colAmount: string
   statusPendingPayment: string
@@ -198,6 +199,7 @@ export interface TravelerTripsMessages {
   statusCompleted: string
   statusCancelled: string
   statusRefunded: string
+  bookedOnLabel: string
   savesTabTitle: string
   savesTabComingSoon: string
 }
@@ -2184,6 +2186,7 @@ const messages: Messages = {
     empty: "No bookings yet — once you book an experience, it'll show up here.",
     colExperience: 'Experience',
     colMerchant: 'Merchant',
+    colQty: 'Qty',
     colStatus: 'Status',
     colAmount: 'Amount',
     statusPendingPayment: 'Awaiting payment',
@@ -2191,6 +2194,7 @@ const messages: Messages = {
     statusCompleted: 'Completed',
     statusCancelled: 'Cancelled',
     statusRefunded: 'Refunded',
+    bookedOnLabel: 'Booked on',
     savesTabTitle: 'Saved',
     savesTabComingSoon: 'Saved guides and experiences are coming soon.',
   },
