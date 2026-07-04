@@ -2769,3 +2769,13 @@ spec) · retroactive guest→account booking linking · booking-lookup-by-email 
 returning guests · a capacity-hold/expiry mechanism for abandoned checkouts (PD-1) ·
 `checkout.session.expired`/`async_payment_failed` webhook handling (PD-7) · Stripe
 Connect auto-splits.
+
+**Carry-forward from Task 7's code-quality review**: `stripe.checkout.sessions.create()`
+is called with no `idempotency_key`. This doesn't reopen PD-1's accepted tradeoff (two
+genuinely separate user double-clicks each creating their own session/booking is already
+handled by the confirmation RPC's `least()` clamp) — it's a narrower gap: a network retry
+or duplicate form-submission re-firing the *same* logical request could create two
+distinct Stripe sessions for what the user experienced as one action. A fast-follow, not
+a blocker: pass `{ idempotencyKey: ... }` as `sessions.create()`'s second argument, keyed
+on something stable per logical submission (e.g. `availabilityId` + a client-generated
+request id threaded through the form, or a short time-bucketed key).
