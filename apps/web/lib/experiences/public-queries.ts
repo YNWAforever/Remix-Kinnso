@@ -84,3 +84,27 @@ export async function getExperiencesForSitemap(): Promise<{ slug: string; lastmo
   if (error) throw error
   return (data ?? []).map((r) => ({ slug: r.slug as string, lastmod: (r.published_at as string | null) ?? null }))
 }
+
+/** Same shape as getExperienceBySlug, keyed by id — used by the checkout
+ * action, which only has the id (never re-derive price/currency from
+ * anything client-supplied). */
+export async function getExperienceById(id: string): Promise<PublicExperience | null> {
+  const supabase = createSupabasePublicClient()
+  const { data: exp, error: expError } = await supabase
+    .from('experiences')
+    .select(EXP_COLUMNS)
+    .eq('id', id)
+    .maybeSingle()
+  if (expError) throw expError
+  if (!exp) return null
+
+  const { data: merchant, error: merchantError } = await supabase
+    .from('merchant_public_profiles')
+    .select('slug, company_name')
+    .eq('id', (exp as unknown as ExpRow).merchant_profile_id)
+    .maybeSingle()
+  if (merchantError) throw merchantError
+  if (!merchant) return null
+
+  return toDomain(exp as unknown as ExpRow, { slug: merchant.slug as string, companyName: merchant.company_name as string })
+}
