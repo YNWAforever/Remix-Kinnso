@@ -12,7 +12,11 @@ export interface AdminBookingsViewProps {
   locale: Locale
   t: AdminBookingsMessages
   settlements: OpsBookingSettlementRow[]
-  onMarkPaid: (settlementId: string, reason: string) => Promise<ActionResult<{ id: string }>>
+  onMarkPaid: (
+    settlementId: string,
+    reason: string,
+    hasCreatorLeg: boolean,
+  ) => Promise<ActionResult<{ id: string }>>
 }
 
 // NOTE: `admin_cancel_and_refund_booking` (Task 6) needs `stripePaymentIntentId`
@@ -36,8 +40,13 @@ export function AdminBookingsView({ t, settlements, onMarkPaid }: AdminBookingsV
     if (!reason) return
     setBusyId(row.id)
     setRowError((m) => ({ ...m, [row.id]: '' }))
+    // Direct bookings (no creator_id) never get a creator_commission_status leg
+    // (it stays null from Task 1's confirm-time trigger) — only ask the RPC to
+    // touch that leg when one actually exists, otherwise
+    // admin_set_booking_settlement_status raises `no_creator_leg`.
+    const hasCreatorLeg = row.creatorCommissionStatus !== null
     startTransition(async () => {
-      const result = await onMarkPaid(row.id, reason)
+      const result = await onMarkPaid(row.id, reason, hasCreatorLeg)
       setBusyId(null)
       if (result.ok) {
         setRows((prev) =>
