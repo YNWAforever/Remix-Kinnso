@@ -1,6 +1,6 @@
 import type { createSupabaseServerClient } from '@/lib/supabase/server'
 
-export type ViewerRole = 'anon' | 'creator' | 'creator-pending' | 'merchant' | 'ops'
+export type ViewerRole = 'anon' | 'creator' | 'creator-pending' | 'merchant' | 'traveler' | 'ops'
 
 /**
  * Server: derive the viewer's role from the cookie session. Mirrors the client
@@ -31,5 +31,16 @@ export async function resolveViewerRole(
     .maybeSingle()
   if (merchant) return 'merchant'
 
-  return 'creator'
+  // Every sign-up gets a blank `creators` row (handle_new_user()), so row
+  // existence alone can't distinguish a real creator from a traveler who never
+  // touched onboarding. `status = 'active'` is the same bar /studio/page.tsx
+  // already uses as its own "real" creator gate.
+  const { data: creator } = await supabase
+    .from('creators')
+    .select('status')
+    .eq('id', user.id)
+    .maybeSingle()
+  if (creator?.status === 'active') return 'creator'
+
+  return 'traveler'
 }
