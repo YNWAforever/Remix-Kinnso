@@ -66,6 +66,19 @@ describe('BookingWidget', () => {
     expect(screen.getByText(new RegExp(en.booking.soldOutLabel))).toBeInTheDocument()
   })
 
+  it('disables the submit button when every date is sold out', () => {
+    render(
+      <BookingWidget
+        locale="en"
+        t={en.booking}
+        experience={experience}
+        availability={[{ id: 'a1', date: '2026-08-01', remaining: 0 }]}
+        viewerEmail="traveler@example.com"
+      />,
+    )
+    expect(screen.getByText(en.booking.submitCta).closest('button')).toBeDisabled()
+  })
+
   it('shows an inline error when the action returns a failure', async () => {
     createCheckoutSessionActionMock.mockResolvedValue({ ok: false, errors: { form: ['Not enough spots left for that date'] } })
     render(
