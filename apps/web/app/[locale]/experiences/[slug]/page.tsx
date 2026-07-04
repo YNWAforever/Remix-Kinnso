@@ -1,8 +1,11 @@
+// apps/web/app/[locale]/experiences/[slug]/page.tsx
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getExperienceBySlug } from '@/lib/experiences/public-queries'
+import { listPublicAvailability } from '@/lib/experiences/public-availability-queries'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { buildExperienceMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
@@ -29,9 +32,17 @@ export default async function ExperiencePublicPage({ params }: { params: Promise
   const messages = await getDictionary(locale as Locale)
   const experience = await getExperienceBySlug(slug)
   if (!experience) notFound()
+
+  const supabase = await createSupabaseServerClient()
+  const [availability, { data: { user } }] = await Promise.all([
+    listPublicAvailability(experience.id),
+    supabase.auth.getUser(),
+  ])
+
   const canonical = `${SITE_URL}/${locale}/experiences/${slug}`
-  // Breadcrumbs only — deliberately NO Product/Offer JSON-LD until booking is real
-  // (design spec §D-R2-6: never claim bookability before it exists).
+  // Breadcrumbs only — Product/Offer JSON-LD for real bookability is a
+  // separate SEO carry-forward (design spec groups it with R3C's loop-closure
+  // work, not this phase's Stripe/widget scope).
   const ld = [
     breadcrumbJsonLd([
       { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
@@ -42,7 +53,14 @@ export default async function ExperiencePublicPage({ params }: { params: Promise
   return (
     <>
       <JsonLd data={ld} />
-      <ExperiencePublicView locale={locale as Locale} t={messages.experiencePublic} experience={experience} />
+      <ExperiencePublicView
+        locale={locale as Locale}
+        t={messages.experiencePublic}
+        bookingT={messages.booking}
+        experience={experience}
+        availability={availability}
+        viewerEmail={user?.email ?? null}
+      />
     </>
   )
 }
