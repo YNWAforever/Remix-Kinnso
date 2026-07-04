@@ -65,3 +65,28 @@ export function CreatorCard({ name, handle, niches, guideCount }: { name: string
     </Frame>
   )
 }
+
+export function MerchantCard({ name, tagline, city }: { name: string; tagline: string | null; city: string | null }) {
+  return (
+    <Frame>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ fontSize: 64, fontWeight: 700 }}>{name}</div>
+        {tagline ? <div style={{ fontSize: 34, color: OG.muted }}>{tagline}</div> : null}
+        {city ? <div style={{ fontSize: 28, color: OG.muted }}>{city}</div> : null}
+      </div>
+    </Frame>
+  )
+}
+
+export function ExperienceCard({ title, city, merchantName, cover }: { title: string; city: string; merchantName: string; cover?: string }) {
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', fontFamily: 'Bricolage', background: OG.ink, color: OG.cream }}>
+      {cover ? <img src={cover} width={1200} height={360} style={{ objectFit: 'cover' }} /> : <div style={{ width: 1200, height: 360, background: OG.orange }} />}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 56, flex: 1, justifyContent: 'center' }}>
+        <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.05 }}>{title}</div>
+        <div style={{ fontSize: 30, color: '#D9D2C7' }}>{`${city} · ${merchantName}`}</div>
+        <div style={{ fontSize: 28, fontWeight: 700, color: OG.orange }}>KINNSO</div>
+      </div>
+    </div>
+  )
+}

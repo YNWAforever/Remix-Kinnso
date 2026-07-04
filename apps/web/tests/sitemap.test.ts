@@ -13,6 +13,23 @@ describe('sitemap', () => {
     expect(urls).toContain('https://www.kinnso.ai/en/articles')
     expect(urls).toContain('https://www.kinnso.ai/en/articles/dining')
   })
+
+  it('includes merchant and experience URLs for every locale when they exist', async () => {
+    const entries = await sitemap()
+    const urls = entries.map((e) => e.url)
+    const merchantUrls = urls.filter((u) => /\/[a-z-]+\/m\/[^/]+$/.test(u))
+    if (merchantUrls.length > 0) {
+      expect(merchantUrls.some((u) => u.startsWith('https://www.kinnso.ai/en/m/'))).toBe(true)
+      expect(merchantUrls.some((u) => u.startsWith('https://www.kinnso.ai/zh-hk/m/'))).toBe(true)
+      const merchantPriority = entries.find((e) => merchantUrls.includes(e.url))
+      expect(merchantPriority?.priority).toBe(0.6)
+    }
+    const experienceUrls = urls.filter((u) => /\/[a-z-]+\/experiences\/[^/]+$/.test(u))
+    if (experienceUrls.length > 0) {
+      const experiencePriority = entries.find((e) => experienceUrls.includes(e.url))
+      expect(experiencePriority?.priority).toBe(0.7)
+    }
+  })
 })
 
 describe('robots', () => {

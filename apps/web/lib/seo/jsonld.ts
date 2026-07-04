@@ -68,3 +68,17 @@ export function creatorProfileJsonLd(i: {
     mainEntity: person,
   }
 }
+
+export function merchantProfileJsonLd(i: {
+  name: string; url: string; tagline: string | null; city: string | null
+}): Record<string, unknown> {
+  const org: Record<string, unknown> = {
+    '@type': 'Organization', name: i.name, url: i.url,
+  }
+  if (i.tagline) org.description = i.tagline
+  if (i.city) org.address = { '@type': 'PostalAddress', addressLocality: i.city }
+  return {
+    '@context': 'https://schema.org', '@type': 'ProfilePage',
+    mainEntity: org,
+  }
+}

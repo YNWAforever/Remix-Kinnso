@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { articleJsonLd, faqJsonLd, breadcrumbJsonLd, organizationJsonLd, websiteJsonLd, creatorProfileJsonLd } from '@/lib/seo/jsonld'
+import { articleJsonLd, faqJsonLd, breadcrumbJsonLd, organizationJsonLd, websiteJsonLd, creatorProfileJsonLd, merchantProfileJsonLd } from '@/lib/seo/jsonld'
 
 describe('JSON-LD', () => {
   it('Article includes datePublished AND dateModified (the SEO fix)', () => {
@@ -82,5 +82,24 @@ describe('creatorProfileJsonLd', () => {
     const p = creatorProfileJsonLd({ name: 'Leo', handle: 'leo', url: 'u', bio: '', niches: [] }) as any
     expect(p.mainEntity.description).toBeUndefined()
     expect(p.mainEntity.knowsAbout).toBeUndefined()
+  })
+})
+
+describe('merchantProfileJsonLd', () => {
+  it('wraps an Organization in a ProfilePage', () => {
+    const p = merchantProfileJsonLd({
+      name: 'Acme Travel', url: 'https://www.kinnso.ai/en/m/acme-travel',
+      tagline: 'Boutique tours', city: 'Hong Kong',
+    }) as any
+    expect(p['@type']).toBe('ProfilePage')
+    expect(p.mainEntity['@type']).toBe('Organization')
+    expect(p.mainEntity.name).toBe('Acme Travel')
+    expect(p.mainEntity.description).toBe('Boutique tours')
+    expect(p.mainEntity.address).toEqual({ '@type': 'PostalAddress', addressLocality: 'Hong Kong' })
+  })
+  it('omits empty tagline and city', () => {
+    const p = merchantProfileJsonLd({ name: 'Acme', url: 'u', tagline: null, city: null }) as any
+    expect(p.mainEntity.description).toBeUndefined()
+    expect(p.mainEntity.address).toBeUndefined()
   })
 })

@@ -28,6 +28,7 @@ describe('Navbar (R1A editorial IA)', () => {
       [en.nav.linkSessions, '/en/sessions'],
       [en.nav.linkAgent, '/en/agent'],
       [en.nav.linkCreators, '/en/creators'],
+      [en.nav.linkMerchants, '/en/merchants'],
     ] as const
     for (const [name, href] of expected) {
       expect(screen.getByRole('link', { name }).getAttribute('href')).toBe(href)
