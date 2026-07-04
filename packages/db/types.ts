@@ -2305,6 +2305,18 @@ export type Database = {
           tier: string
         }[]
       }
+      admin_set_booking_settlement_status: {
+        Args: {
+          p_allow_revert?: boolean
+          p_creator_commission_status?: string
+          p_id: string
+          p_kinnso_commission_status?: string
+          p_merchant_payout_status?: string
+          p_reason?: string
+          p_status?: string
+        }
+        Returns: undefined
+      }
       admin_set_creator_status: {
         Args: { p_id: string; p_reason: string; p_status: string }
         Returns: undefined
@@ -2425,6 +2437,10 @@ export type Database = {
           summary: string
           title: string
         }[]
+      }
+      mark_booking_completed: {
+        Args: { p_booking_id: string }
+        Returns: undefined
       }
       merchant_insights: { Args: never; Returns: Json }
       merchant_invite_creator: {
@@ -2624,4 +2640,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
