@@ -1,10 +1,10 @@
 import type { CreateCheckoutSessionInput } from '@/lib/experiences/booking-types'
 
-export type ValidationErrors = Record<string, string[]>
+export type CheckoutValidationErrors = Record<string, string[]>
 export type ParsedCheckoutInput = { availabilityId: string; qty: number; guestEmail: string | null }
 export type CheckoutValidation =
   | { ok: true; parsed: ParsedCheckoutInput }
-  | { ok: false; errors: ValidationErrors }
+  | { ok: false; errors: CheckoutValidationErrors }
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 const MAX_QTY = 10
@@ -13,7 +13,7 @@ export function validateCheckoutInput(
   input: CreateCheckoutSessionInput,
   options: { requireGuestEmail: boolean },
 ): CheckoutValidation {
-  const errors: ValidationErrors = {}
+  const errors: CheckoutValidationErrors = {}
 
   if (!input.availabilityId) errors.availabilityId = ['required']
 

@@ -28,6 +28,13 @@ describe('validateCheckoutInput', () => {
     }
   })
 
+  it('accepts qty at the exact boundary values 1 and 10', () => {
+    for (const qty of ['1', '10']) {
+      const result = validateCheckoutInput({ availabilityId: 'a1', qty }, { requireGuestEmail: false })
+      expect(result.ok, `qty=${qty} should be accepted`).toBe(true)
+    }
+  })
+
   it('rejects a missing or malformed guest email when required', () => {
     const missing = validateCheckoutInput({ availabilityId: 'a1', qty: '1' }, { requireGuestEmail: true })
     expect(missing.ok).toBe(false)
