@@ -948,11 +948,11 @@ Expected: FAIL — module not found.
 // apps/web/lib/experiences/booking-validation.ts
 import type { CreateCheckoutSessionInput } from '@/lib/experiences/booking-types'
 
-export type ValidationErrors = Record&lt;string, string[]&gt;
+export type CheckoutValidationErrors = Record&lt;string, string[]&gt;
 export type ParsedCheckoutInput = { availabilityId: string; qty: number; guestEmail: string | null }
 export type CheckoutValidation =
   | { ok: true; parsed: ParsedCheckoutInput }
-  | { ok: false; errors: ValidationErrors }
+  | { ok: false; errors: CheckoutValidationErrors }
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 const MAX_QTY = 10
@@ -961,7 +961,7 @@ export function validateCheckoutInput(
   input: CreateCheckoutSessionInput,
   options: { requireGuestEmail: boolean },
 ): CheckoutValidation {
-  const errors: ValidationErrors = {}
+  const errors: CheckoutValidationErrors = {}
 
   if (!input.availabilityId) errors.availabilityId = ['required']
 
@@ -1266,13 +1266,13 @@ Expected: FAIL — module not found.
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getExperienceById } from '@/lib/experiences/public-queries'
-import { validateCheckoutInput, type ValidationErrors } from '@/lib/experiences/booking-validation'
+import { validateCheckoutInput, type CheckoutValidationErrors } from '@/lib/experiences/booking-validation'
 import type { CreateCheckoutSessionInput } from '@/lib/experiences/booking-types'
 import { getStripeClient, toStripeAmount } from '@/lib/stripe/client'
 import { getClientIp } from '@/lib/http/client-ip'
 import type { Locale } from '@/lib/i18n/config'
 
-type ActionFailure = { ok: false; errors: ValidationErrors }
+type ActionFailure = { ok: false; errors: CheckoutValidationErrors }
 type ActionResult&lt;T extends Record&lt;string, unknown&gt; = Record&lt;string, never&gt;&gt; =
   | ({ ok: true } &amp; T)
   | ActionFailure
