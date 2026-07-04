@@ -1,5 +1,6 @@
 // apps/web/app/[locale]/experiences/[slug]/booked/page.tsx
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getBookingByCheckoutSession } from '@/lib/experiences/booking-confirmation-queries'
@@ -17,7 +18,7 @@ export default async function BookingConfirmationPage({
 }) {
   const { locale, slug } = await params
   const { session_id: sessionId } = await searchParams
-  if (!isLocale(locale)) return null
+  if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
   const t = messages.booking
   const refreshHref = `/${locale}/experiences/${slug}/booked${sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : ''}`
