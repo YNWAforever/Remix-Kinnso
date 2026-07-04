@@ -62,6 +62,8 @@ export function MerchantExperiencesView({ locale, t, experiences }: {
                 <div className="flex shrink-0 items-center gap-3">
                   <Link href={p(`/merchants/dashboard/experiences/${exp.id}/edit`)}
                     className="text-sm font-semibold text-kinnso-orangeDark hover:underline">{t.actEdit}</Link>
+                  <Link href={p(`/merchants/dashboard/experiences/${exp.id}/availability`)}
+                    className="text-sm font-semibold text-kinnso-orangeDark hover:underline">{t.actAvailability}</Link>
                   {exp.status !== 'published' ? (
                     <button onClick={() => setStatus(exp.id, 'published')} disabled={busyId === exp.id}
                       className="k2-btn-ghost text-sm disabled:opacity-50">{t.actPublish}</button>
