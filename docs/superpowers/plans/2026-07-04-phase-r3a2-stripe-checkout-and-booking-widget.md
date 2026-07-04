@@ -2810,3 +2810,20 @@ yet. Whoever builds that R3B flow should also special-case this page's fallthrou
 branch (distinct copy for cancelled vs. refunded vs. actually-confirmed) at the same
 time, rather than this page silently mis-rendering a state R3B is about to make
 reachable for the first time.
+
+**Carry-forward from Task 15 — a third prerequisite for actually running the e2e spec,
+discovered live, not just the two already documented.** Ran `booking.spec.ts` against
+the real target: it navigated successfully, but the page rendered the OLD retired
+"Booking opens soon" / "We're finishing direct booking for this experience. Check back
+soon." copy (`bookingSoonBadge`/`bookingSoonNote`) — text that no longer exists anywhere
+in this branch's codebase (confirmed via grep: zero hits). This proves the run hit
+`apps/e2e/playwright.config.ts`'s **default** `baseURL` (`E2E_BASE_URL ?? 'https://remix-kinnso-web.vercel.app'`
+— i.e. live production), not this unmerged branch's own code, since production has none
+of R3A-1/R3A-2's changes yet. **So there are three things needed before this spec can
+pass, not two**: (1) Stripe test-mode keys reachable by whichever deployment is under
+test, (2) at least one experience with real `experience_availability` data, AND
+(3) `E2E_BASE_URL` explicitly pointed at a deployment or local dev server that's actually
+running this branch (a preview deployment of this PR, or `pnpm --filter web dev` locally
+with `E2E_BASE_URL=http://localhost:3000`) — the default is prod, which won't have this
+code until merge. None of these are fixable by code in this plan; all three are
+operational/deploy-sequencing steps for whoever actually runs this spec.
