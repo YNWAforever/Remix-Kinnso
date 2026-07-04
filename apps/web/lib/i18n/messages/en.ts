@@ -171,12 +171,36 @@ export interface MerchantProfileMessages {
 
 export interface ExperiencePublicMessages {
   hostedBy: string
-  bookingSoonBadge: string
-  bookingSoonNote: string
   priceLabel: string
   durationLabel: string
   minutesSuffix: string
   backToMerchant: string
+}
+
+export interface BookingMessages {
+  selectDateLabel: string
+  noAvailability: string
+  qtyLabel: string
+  spotsLeftLabel: string
+  soldOutLabel: string
+  guestEmailLabel: string
+  guestEmailPlaceholder: string
+  guestEmailHint: string
+  submitCta: string
+  submittingCta: string
+  invalidEmail: string
+  invalidQty: string
+  genericError: string
+  rateLimitedError: string
+  confirmedTitle: string
+  confirmedBody: string
+  pendingTitle: string
+  pendingBody: string
+  refreshCta: string
+  notFoundTitle: string
+  notFoundBody: string
+  summaryQtyLabel: string
+  summaryTotalLabel: string
 }
 
 export interface Messages {
@@ -776,6 +800,7 @@ export interface Messages {
   merchantsDirectory: MerchantsDirectoryMessages
   merchantProfile: MerchantProfileMessages
   experiencePublic: ExperiencePublicMessages
+  booking: BookingMessages
   studioOffers: {
     heading: string
     subtitle: string
@@ -1807,12 +1832,35 @@ const messages: Messages = {
   },
   experiencePublic: {
     hostedBy: 'Hosted by',
-    bookingSoonBadge: 'Booking opens soon',
-    bookingSoonNote: "We're finishing direct booking for this experience. Check back soon.",
     priceLabel: 'From',
     durationLabel: 'Duration',
     minutesSuffix: 'min',
     backToMerchant: 'Back to',
+  },
+  booking: {
+    selectDateLabel: 'Choose a date',
+    noAvailability: 'No upcoming dates yet — check back soon.',
+    qtyLabel: 'Travelers',
+    spotsLeftLabel: 'spots left',
+    soldOutLabel: 'Sold out',
+    guestEmailLabel: 'Email',
+    guestEmailPlaceholder: 'you@example.com',
+    guestEmailHint: "We'll send your booking confirmation here.",
+    submitCta: 'Book now',
+    submittingCta: 'Redirecting to secure checkout…',
+    invalidEmail: 'Enter a valid email address',
+    invalidQty: 'Choose how many travelers',
+    genericError: 'Something went wrong. Please try again.',
+    rateLimitedError: 'Too many attempts. Please try again in a few minutes.',
+    confirmedTitle: "You're booked!",
+    confirmedBody: "We've sent a confirmation to your email.",
+    pendingTitle: 'Confirming your payment…',
+    pendingBody: 'This can take a few seconds. Refresh to check again.',
+    refreshCta: 'Refresh',
+    notFoundTitle: "We couldn't find that booking",
+    notFoundBody: 'The link may be incomplete or out of date.',
+    summaryQtyLabel: 'Travelers',
+    summaryTotalLabel: 'Total paid',
   },
   studioOffers: {
     heading: 'Affiliate offers',
