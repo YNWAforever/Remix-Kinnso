@@ -186,6 +186,22 @@ export interface MerchantBookingsMessages {
   statusRefunded: string
 }
 
+export interface TravelerTripsMessages {
+  title: string
+  empty: string
+  colExperience: string
+  colMerchant: string
+  colStatus: string
+  colAmount: string
+  statusPendingPayment: string
+  statusConfirmed: string
+  statusCompleted: string
+  statusCancelled: string
+  statusRefunded: string
+  savesTabTitle: string
+  savesTabComingSoon: string
+}
+
 export interface MerchantsDirectoryMessages {
   heading: string
   subtitle: string
@@ -654,7 +670,7 @@ export interface Messages {
     linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
     linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
-    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
+    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string; ctaMyTrips: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
     merchantMenuLabel: string
   }
@@ -945,6 +961,7 @@ export interface Messages {
   merchantApplicationsOps: MerchantApplicationsOpsMessages
   merchantDashboard: MerchantDashboardMessages
   merchantBookings: MerchantBookingsMessages
+  trips: TravelerTripsMessages
   merchantsOps: {
     title: string; subtitle: string
     tabOverview: string; tabDirectory: string; tabApplications: string
@@ -1558,7 +1575,7 @@ const messages: Messages = {
     linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
     linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
-    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
+    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission', ctaMyTrips: 'My Trips',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
     merchantMenuLabel: 'Merchant menu',
   },
@@ -2161,6 +2178,21 @@ const messages: Messages = {
     statusCompleted: 'Completed',
     statusCancelled: 'Cancelled',
     statusRefunded: 'Refunded',
+  },
+  trips: {
+    title: 'Your trips',
+    empty: "No bookings yet — once you book an experience, it'll show up here.",
+    colExperience: 'Experience',
+    colMerchant: 'Merchant',
+    colStatus: 'Status',
+    colAmount: 'Amount',
+    statusPendingPayment: 'Awaiting payment',
+    statusConfirmed: 'Confirmed',
+    statusCompleted: 'Completed',
+    statusCancelled: 'Cancelled',
+    statusRefunded: 'Refunded',
+    savesTabTitle: 'Saved',
+    savesTabComingSoon: 'Saved guides and experiences are coming soon.',
   },
   merchantsOps: {
     title: 'Merchants',

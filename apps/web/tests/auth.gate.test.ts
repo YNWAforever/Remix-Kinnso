@@ -78,6 +78,24 @@ describe('gateDecision', () => {
     expect(gateDecision('/en/admin/users', true)).toEqual({ type: 'allow' })
   })
 
+  it('redirects unauthenticated users from the traveller trips area', () => {
+    expect(gateDecision('/en/trips', false)).toEqual({
+      type: 'redirect',
+      location: '/en/sign-in',
+    })
+  })
+
+  it('redirects unauthenticated users from a nested trips path', () => {
+    expect(gateDecision('/zh-hk/trips/whatever', false)).toEqual({
+      type: 'redirect',
+      location: '/zh-hk/sign-in',
+    })
+  })
+
+  it('allows an authenticated user to access /en/trips', () => {
+    expect(gateDecision('/en/trips', true)).toEqual({ type: 'allow' })
+  })
+
   // ---- non-creator paths — always allow regardless of auth ----
   it('allows any user on a public path', () => {
     expect(gateDecision('/en/articles', false)).toEqual({ type: 'allow' })

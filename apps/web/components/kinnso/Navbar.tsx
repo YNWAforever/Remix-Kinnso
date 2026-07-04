@@ -54,6 +54,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
     if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k2-btn-primary" };
     if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso-cream2 px-4 py-2 text-sm font-semibold text-kinnso-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange" };
     if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/dashboard/post", className: "k2-btn-primary" };
+    if (role === "traveler") return { label: t.ctaMyTrips, to: "/trips", className: "k2-btn-primary" };
     return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
   })();
 
