@@ -78,6 +78,7 @@ export function MerchantBookingsView({ t, bookings, onComplete }: MerchantBookin
                     type="button"
                     disabled={isPending && busyId === row.id}
                     onClick={() => handleComplete(row.id)}
+                    aria-label={`${t.markCompleteButton} ${row.experienceTitle}`}
                     className="k-btn-ghost text-sm disabled:opacity-50"
                   >
                     {t.markCompleteButton}
