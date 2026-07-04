@@ -2572,7 +2572,7 @@ describe('checkout_rate_limits', () =&gt; {
 - [ ] **Step 2: Run test to verify it passes**
 
 Run: `cd apps/web && npx vitest run db.r3a2-migration`
-Expected: PASS, 8 tests (this is a pure string-assertion test against the migration
+Expected: PASS, 10 tests (this is a pure string-assertion test against the migration
 file written in Task 2 — it should already pass; if it doesn't, the migration file and
 this test have drifted and one of them needs fixing before proceeding).
 
