@@ -19,4 +19,7 @@ export const FIXTURES = {
     '/ja/articles/dining/ramen-guide',
   ],
   presentLocales: ['en', 'zh-hk'] as const,
+  booking: {
+    experiencePath: '/en/experiences/tokyo-after-hours-izakaya-crawl',
+  },
 } as const
