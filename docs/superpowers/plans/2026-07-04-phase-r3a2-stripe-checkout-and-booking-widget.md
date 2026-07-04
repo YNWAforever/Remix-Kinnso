@@ -2779,3 +2779,16 @@ distinct Stripe sessions for what the user experienced as one action. A fast-fol
 a blocker: pass `{ idempotencyKey: ... }` as `sessions.create()`'s second argument, keyed
 on something stable per logical submission (e.g. `availabilityId` + a client-generated
 request id threaded through the form, or a short time-bucketed key).
+
+**Carry-forward from Task 13's spec-compliance review**: the booking confirmation page
+(`/experiences/[slug]/booked`) has exactly two states beyond not-found —
+`pending_payment` and a single "confirmed" fallthrough covering everything else
+(`confirmed`, `completed`, `cancelled`, `refunded`). A `cancelled`/`refunded` booking
+would currently show the same "You're booked! We've sent a confirmation to your email."
+success message, which would be actively misleading. **Not fixed here** because no code
+path in this program can currently produce a `cancelled`/`refunded` booking — that
+status transition is R3B's refund/cancellation ops-console action, which doesn't exist
+yet. Whoever builds that R3B flow should also special-case this page's fallthrough
+branch (distinct copy for cancelled vs. refunded vs. actually-confirmed) at the same
+time, rather than this page silently mis-rendering a state R3B is about to make
+reachable for the first time.
