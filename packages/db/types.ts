@@ -14,68 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      ops_audit_log: {
-        Row: {
-          action: string
-          actor_ops_member_id: string
-          created_at: string
-          entity_id: string
-          entity_type: string
-          id: string
-          metadata: Json
-          reason: string | null
-        }
-        Insert: {
-          action: string
-          actor_ops_member_id: string
-          created_at?: string
-          entity_id: string
-          entity_type: string
-          id?: string
-          metadata?: Json
-          reason?: string | null
-        }
-        Update: {
-          action?: string
-          actor_ops_member_id?: string
-          created_at?: string
-          entity_id?: string
-          entity_type?: string
-          id?: string
-          metadata?: Json
-          reason?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ops_audit_log_actor_ops_member_id_fkey"
-            columns: ["actor_ops_member_id"]
-            isOneToOne: false
-            referencedRelation: "kinnso_ops_members"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      agent_waitlist: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          locale: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          locale?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          locale?: string | null
-        }
-        Relationships: []
-      }
       affiliate_network_events: {
         Row: {
           affiliate_network_program_id: string | null
@@ -292,6 +230,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      agent_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          locale: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          locale?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          locale?: string | null
+        }
+        Relationships: []
       }
       article_authors: {
         Row: {
@@ -613,6 +572,72 @@ export type Database = {
           },
         ]
       }
+      booking_settlements: {
+        Row: {
+          booking_id: string
+          created_at: string
+          creator_commission_amount: number | null
+          creator_commission_status: string | null
+          currency: string
+          id: string
+          kinnso_commission_amount: number
+          kinnso_commission_status: string
+          merchant_payout_amount: number
+          merchant_payout_status: string
+          ops_note: string | null
+          status: string
+          updated_at: string
+          updated_by_ops_member_id: string | null
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          creator_commission_amount?: number | null
+          creator_commission_status?: string | null
+          currency: string
+          id?: string
+          kinnso_commission_amount: number
+          kinnso_commission_status?: string
+          merchant_payout_amount: number
+          merchant_payout_status?: string
+          ops_note?: string | null
+          status?: string
+          updated_at?: string
+          updated_by_ops_member_id?: string | null
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          creator_commission_amount?: number | null
+          creator_commission_status?: string | null
+          currency?: string
+          id?: string
+          kinnso_commission_amount?: number
+          kinnso_commission_status?: string
+          merchant_payout_amount?: number
+          merchant_payout_status?: string
+          ops_note?: string | null
+          status?: string
+          updated_at?: string
+          updated_by_ops_member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_settlements_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_settlements_updated_by_ops_member_id_fkey"
+            columns: ["updated_by_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           availability_id: string
@@ -705,18 +730,18 @@ export type Database = {
       checkout_rate_limits: {
         Row: {
           ip: string
-          window_start: string
           request_count: number
+          window_start: string
         }
         Insert: {
           ip: string
-          window_start?: string
           request_count?: number
+          window_start?: string
         }
         Update: {
           ip?: string
-          window_start?: string
           request_count?: number
+          window_start?: string
         }
         Relationships: []
       }
@@ -1090,7 +1115,22 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "experiences_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "experiences_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       guides: {
         Row: {
@@ -1151,6 +1191,53 @@ export type Database = {
           },
         ]
       }
+      kinnso_ops_invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_user_id: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: string
+          status: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role: string
+          status?: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: string
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kinnso_ops_invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kinnso_ops_members: {
         Row: {
           created_at: string
@@ -1178,45 +1265,6 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      kinnso_ops_invites: {
-        Row: {
-          id: string
-          email: string
-          role: string
-          token: string
-          status: string
-          invited_by: string
-          created_at: string
-          expires_at: string
-          accepted_at: string | null
-          accepted_user_id: string | null
-        }
-        Insert: {
-          id?: string
-          email: string
-          role: string
-          token?: string
-          status?: string
-          invited_by: string
-          created_at?: string
-          expires_at?: string
-          accepted_at?: string | null
-          accepted_user_id?: string | null
-        }
-        Update: {
-          id?: string
-          email?: string
-          role?: string
-          token?: string
-          status?: string
-          invited_by?: string
-          created_at?: string
-          expires_at?: string
-          accepted_at?: string | null
-          accepted_user_id?: string | null
         }
         Relationships: []
       }
@@ -1266,7 +1314,15 @@ export type Database = {
           user_id?: string
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "merchant_applications_decided_by_ops_member_id_fkey"
+            columns: ["decided_by_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       merchant_profiles: {
         Row: {
@@ -1351,6 +1407,13 @@ export type Database = {
             columns: ["merchant_id"]
             isOneToOne: false
             referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchant_saved_creators_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1851,6 +1914,54 @@ export type Database = {
             referencedRelation: "merchant_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "missions_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_audit_log: {
+        Row: {
+          action: string
+          actor_ops_member_id: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_ops_member_id: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_ops_member_id?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_audit_log_actor_ops_member_id_fkey"
+            columns: ["actor_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
         ]
       }
       partner_perks: {
@@ -2029,75 +2140,48 @@ export type Database = {
       merchant_public_profiles: {
         Row: {
           city: string | null
-          company_name: string
-          created_at: string
-          id: string
+          company_name: string | null
+          created_at: string | null
+          id: string | null
           logo_url: string | null
-          slug: string
+          slug: string | null
           tagline: string | null
           website_url: string | null
+        }
+        Insert: {
+          city?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          logo_url?: string | null
+          slug?: string | null
+          tagline?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          city?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          id?: string | null
+          logo_url?: string | null
+          slug?: string | null
+          tagline?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
     }
     Functions: {
-      check_and_increment_checkout_rate_limit: {
-        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
-        Returns: boolean
-      }
-      confirm_booking_from_webhook: {
-        Args: { p_stripe_payment_intent_id: string; p_stripe_checkout_session_id: string }
-        Returns: undefined
-      }
-      get_booking_by_checkout_session: {
-        Args: { p_session_id: string }
-        Returns: {
-          booking_id: string
-          status: string
-          qty: number
-          total_amount: number
-          currency: string
-          experience_title: string
-          experience_slug: string
-        }[]
-      }
       accept_mission_invite: {
         Args: { p_mission_id: string }
         Returns: undefined
       }
-      admin_merchant_analytics: {
-        Args: { p_days?: number }
-        Returns: Json
-      }
-      admin_merchant_detail: {
-        Args: { p_merchant_id: string }
-        Returns: Json
-      }
-      admin_mission_analytics: {
-        Args: { p_days?: number }
-        Returns: Json
-      }
-      admin_creator_analytics: {
-        Args: { p_days?: number }
-        Returns: Json
-      }
-      admin_creator_detail: {
-        Args: { p_creator_id: string }
-        Returns: Json
-      }
-      admin_set_creator_status: {
-        Args: { p_id: string; p_status: string; p_reason: string }
-        Returns: undefined
-      }
-      admin_reinstate_creator: {
-        Args: { p_id: string; p_reason: string }
-        Returns: undefined
-      }
-      admin_set_creator_verified: {
-        Args: { p_id: string; p_verified: boolean; p_reason: string }
-        Returns: undefined
-      }
+      admin_accept_ops_invite: { Args: { p_token: string }; Returns: undefined }
       admin_add_creator_note: {
+        Args: { p_id: string; p_note: string }
+        Returns: undefined
+      }
+      admin_add_merchant_note: {
         Args: { p_id: string; p_note: string }
         Returns: undefined
       }
@@ -2105,57 +2189,18 @@ export type Database = {
         Args: { p_id: string; p_reason: string }
         Returns: string
       }
-      admin_reject_merchant_application: {
-        Args: { p_id: string; p_reason: string }
-        Returns: undefined
-      }
       admin_bulk_set_creator_status: {
-        Args: { p_ids: string[]; p_status: string; p_reason: string }
+        Args: { p_ids: string[]; p_reason: string; p_status: string }
         Returns: number
       }
-      admin_set_settlement_status: {
-        Args: {
-          p_id: string
-          p_status?: string | null
-          p_creator_payout_status?: string | null
-          p_kinnso_commission_status?: string | null
-          p_affiliate_commission_status?: string | null
-          p_allow_revert?: boolean
-          p_reason?: string | null
-        }
-        Returns: undefined
+      admin_bulk_set_merchant_status: {
+        Args: { p_ids: string[]; p_reason: string; p_status: string }
+        Returns: number
       }
-      admin_search_creators: {
-        Args: {
-          p_search?: string | null
-          p_statuses?: string[] | null
-          p_tiers?: string[] | null
-          p_dna?: string | null
-          p_verified?: boolean | null
-          p_limit?: number | null
-          p_cursor_created_at?: string | null
-          p_cursor_id?: string | null
-        }
-        Returns: {
-          id: string
-          display_name: string
-          handle: string
-          status: string
-          verified: boolean
-          tier: string
-          dna_status: string
-          contribution_points: number
-          created_at: string
-        }[]
-      }
-      ops_audit_log_append: {
-        Args: {
-          p_entity_type: string
-          p_entity_id: string
-          p_action: string
-          p_reason?: string
-          p_metadata?: Json
-        }
+      admin_creator_analytics: { Args: { p_days?: number }; Returns: Json }
+      admin_creator_detail: { Args: { p_creator_id: string }; Returns: Json }
+      admin_invite_ops_member: {
+        Args: { p_email: string; p_role: string }
         Returns: string
       }
       admin_list_creators: {
@@ -2189,34 +2234,10 @@ export type Database = {
           user_id: string
         }[]
       }
-      admin_list_ops_members: {
-        Args: Record<string, never>
-        Returns: Json
-      }
-      admin_invite_ops_member: {
-        Args: { p_email: string; p_role: string }
-        Returns: string
-      }
-      admin_revoke_ops_invite: {
-        Args: { p_invite_id: string }
-        Returns: undefined
-      }
-      admin_accept_ops_invite: {
-        Args: { p_token: string }
-        Returns: undefined
-      }
-      admin_set_ops_member_role: {
-        Args: { p_member_id: string; p_role: string; p_reason: string }
-        Returns: undefined
-      }
-      admin_suspend_ops_member: {
-        Args: { p_member_id: string; p_reason: string }
-        Returns: undefined
-      }
-      admin_reactivate_ops_member: {
-        Args: { p_member_id: string; p_reason: string }
-        Returns: undefined
-      }
+      admin_list_ops_members: { Args: never; Returns: Json }
+      admin_merchant_analytics: { Args: { p_days?: number }; Returns: Json }
+      admin_merchant_detail: { Args: { p_merchant_id: string }; Returns: Json }
+      admin_mission_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_overview_counts: {
         Args: never
         Returns: {
@@ -2228,41 +2249,100 @@ export type Database = {
           redemptions: number
         }[]
       }
-      admin_set_merchant_status: {
-        Args: { p_id: string; p_status: string; p_reason: string }
+      admin_reactivate_ops_member: {
+        Args: { p_member_id: string; p_reason: string }
         Returns: undefined
       }
-      admin_set_merchant_tier: {
-        Args: { p_id: string; p_tier: string; p_reason: string }
+      admin_reinstate_creator: {
+        Args: { p_id: string; p_reason: string }
         Returns: undefined
       }
-      admin_add_merchant_note: {
-        Args: { p_id: string; p_note: string }
+      admin_reject_merchant_application: {
+        Args: { p_id: string; p_reason: string }
         Returns: undefined
       }
-      admin_bulk_set_merchant_status: {
-        Args: { p_ids: string[]; p_status: string; p_reason: string }
-        Returns: number
+      admin_revoke_ops_invite: {
+        Args: { p_invite_id: string }
+        Returns: undefined
+      }
+      admin_search_creators: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_dna?: string
+          p_limit?: number
+          p_search?: string
+          p_statuses?: string[]
+          p_tiers?: string[]
+          p_verified?: boolean
+        }
+        Returns: {
+          contribution_points: number
+          created_at: string
+          display_name: string
+          dna_status: string
+          handle: string
+          id: string
+          status: string
+          tier: string
+          verified: boolean
+        }[]
       }
       admin_search_merchants: {
         Args: {
-          p_search?: string | null
-          p_statuses?: string[] | null
-          p_tiers?: string[] | null
-          p_limit?: number | null
-          p_cursor_created_at?: string | null
-          p_cursor_id?: string | null
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_search?: string
+          p_statuses?: string[]
+          p_tiers?: string[]
         }
         Returns: {
-          id: string
           company_name: string
+          created_at: string
+          id: string
           status: string
           tier: string
-          created_at: string
         }[]
+      }
+      admin_set_creator_status: {
+        Args: { p_id: string; p_reason: string; p_status: string }
+        Returns: undefined
+      }
+      admin_set_creator_verified: {
+        Args: { p_id: string; p_reason: string; p_verified: boolean }
+        Returns: undefined
+      }
+      admin_set_merchant_status: {
+        Args: { p_id: string; p_reason: string; p_status: string }
+        Returns: undefined
+      }
+      admin_set_merchant_tier: {
+        Args: { p_id: string; p_reason: string; p_tier: string }
+        Returns: undefined
+      }
+      admin_set_ops_member_role: {
+        Args: { p_member_id: string; p_reason: string; p_role: string }
+        Returns: undefined
+      }
+      admin_set_settlement_status: {
+        Args: {
+          p_affiliate_commission_status?: string
+          p_allow_revert?: boolean
+          p_creator_payout_status?: string
+          p_id: string
+          p_kinnso_commission_status?: string
+          p_reason?: string
+          p_status?: string
+        }
+        Returns: undefined
       }
       admin_set_user_status: {
         Args: { p_id: string; p_kind: string; p_status: string }
+        Returns: undefined
+      }
+      admin_suspend_ops_member: {
+        Args: { p_member_id: string; p_reason: string }
         Returns: undefined
       }
       award_contribution_event: {
@@ -2271,6 +2351,17 @@ export type Database = {
           p_event_type: string
           p_points: number
           p_source_id: string
+        }
+        Returns: undefined
+      }
+      check_and_increment_checkout_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      confirm_booking_from_webhook: {
+        Args: {
+          p_stripe_checkout_session_id: string
+          p_stripe_payment_intent_id: string
         }
         Returns: undefined
       }
@@ -2295,6 +2386,18 @@ export type Database = {
       }
       creator_insights: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
+      get_booking_by_checkout_session: {
+        Args: { p_session_id: string }
+        Returns: {
+          booking_id: string
+          currency: string
+          experience_slug: string
+          experience_title: string
+          qty: number
+          status: string
+          total_amount: number
+        }[]
+      }
       get_you_may_like: {
         Args: { p_article_id: string; p_limit?: number; p_locale: string }
         Returns: {
@@ -2324,17 +2427,28 @@ export type Database = {
         }[]
       }
       merchant_insights: { Args: never; Returns: Json }
+      merchant_invite_creator: {
+        Args: { p_creator_id: string; p_mission_id: string }
+        Returns: string
+      }
+      merchant_slugify: { Args: { p_text: string }; Returns: string }
+      ops_audit_log_append: {
+        Args: {
+          p_action: string
+          p_entity_id: string
+          p_entity_type: string
+          p_metadata?: Json
+          p_reason?: string
+        }
+        Returns: string
+      }
       platform_stats: {
         Args: never
         Returns: {
           active_creators: number
-          published_guides: number
           destinations: number
+          published_guides: number
         }[]
-      }
-      merchant_invite_creator: {
-        Args: { p_creator_id: string; p_mission_id: string }
-        Returns: string
       }
       recompute_creator_contribution: {
         Args: { p_creator_id: string }
@@ -2510,3 +2624,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
