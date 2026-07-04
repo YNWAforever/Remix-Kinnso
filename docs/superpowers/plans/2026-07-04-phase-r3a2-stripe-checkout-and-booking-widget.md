@@ -2532,6 +2532,22 @@ describe('confirm_booking_from_webhook() RPC', () =&gt; {
     expect(sql).toContain('revoke all on function public.confirm_booking_from_webhook(text, text) from public')
     expect(sql).toContain('grant execute on function public.confirm_booking_from_webhook(text, text) to service_role')
   })
+  it('grants confirm_booking_from_webhook execute to service_role only — never anon or authenticated', () =&gt; {
+    // Added after a live incident during Task 2: this project's default ACL
+    // auto-grants EXECUTE on new functions to anon/authenticated, and
+    // `revoke all ... from public` alone does NOT undo that — only an
+    // explicit `revoke ... from anon, authenticated` by name does. This test
+    // must isolate the exact grant line for THIS function (not just grep the
+    // whole file for "anon", since the other two functions in this same
+    // migration correctly DO grant to anon/authenticated).
+    const grantLine = sql
+      .split('\n')
+      .find((line) =&gt; line.includes('grant execute on function public.confirm_booking_from_webhook'))
+    expect(grantLine).toBeTruthy()
+    expect(grantLine).not.toMatch(/\banon\b/)
+    expect(grantLine).not.toMatch(/\bauthenticated\b/)
+    expect(grantLine).toContain('service_role')
+  })
 })
 
 describe('get_booking_by_checkout_session() RPC', () =&gt; {
