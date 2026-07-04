@@ -92,8 +92,6 @@ begin
     raise exception 'booking_not_found';
   end if;
 
-  -- Idempotent: Stripe redelivers events; a booking already confirmed (or
-  -- past confirmed) is a no-op success, not an error.
   if v_status <> 'pending_payment' then
     return;
   end if;
@@ -123,10 +121,6 @@ begin
 end;
 $$;
 
--- Only the webhook route (service-role client) may call this — the
--- documented service-role exception (design spec §4.5). Never grant to
--- anon/authenticated: a client-callable path to flip a booking to confirmed
--- without a real Stripe event would be a payment-integrity hole.
 revoke all on function public.confirm_booking_from_webhook(text, text) from public;
 grant execute on function public.confirm_booking_from_webhook(text, text) to service_role;
 
@@ -152,8 +146,5 @@ as $$
   where b.stripe_checkout_session_id = p_session_id;
 $$;
 
--- Anon AND authenticated both need this (guest vs. signed-in traveler reading
--- back their own just-created booking) — safe because the sole lookup key is
--- an unguessable, Stripe-generated id, never an email or a list.
 revoke all on function public.get_booking_by_checkout_session(text) from public;
 grant execute on function public.get_booking_by_checkout_session(text) to anon, authenticated;
