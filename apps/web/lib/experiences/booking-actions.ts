@@ -44,7 +44,13 @@ export async function createCheckoutSessionAction(
   }
   if (!allowed) return formError('Too many attempts. Please try again in a few minutes.')
 
-  const experience = await getExperienceById(experienceId)
+  let experience: Awaited<ReturnType<typeof getExperienceById>>
+  try {
+    experience = await getExperienceById(experienceId)
+  } catch (err) {
+    console.error('[experiences:booking] experience lookup failed', err)
+    return formError('Something went wrong. Please try again.')
+  }
   if (!experience) return formError('Experience not found')
 
   const { data: availability } = await supabase
