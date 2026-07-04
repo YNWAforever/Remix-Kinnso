@@ -1,11 +1,19 @@
+// apps/web/components/kinnso/pages/ExperiencePublicView.tsx
 import Link from 'next/link'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { BookingWidget } from '@/components/kinnso/pages/BookingWidget'
 import type { PublicExperience } from '@/lib/experiences/public-queries'
+import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
-export function ExperiencePublicView({ locale, t, experience }: {
-  locale: Locale; t: Messages['experiencePublic']; experience: PublicExperience
+export function ExperiencePublicView({ locale, t, bookingT, experience, availability, viewerEmail }: {
+  locale: Locale
+  t: Messages['experiencePublic']
+  bookingT: Messages['booking']
+  experience: PublicExperience
+  availability: PublicAvailability[]
+  viewerEmail: string | null
 }) {
   const p = (path: string) => `/${locale}${path}`
   return (
@@ -42,10 +50,7 @@ export function ExperiencePublicView({ locale, t, experience }: {
           {experience.durationMinutes ? (
             <p className="mt-3 text-sm text-kinnso-ink/70">{t.durationLabel}: {experience.durationMinutes} {t.minutesSuffix}</p>
           ) : null}
-          <div className="mt-6 rounded-[3px] border border-kinnso-edge bg-white px-4 py-3">
-            <p className="text-sm font-semibold text-kinnso-ink">{t.bookingSoonBadge}</p>
-            <p className="mt-1 text-xs text-kinnso-muted">{t.bookingSoonNote}</p>
-          </div>
+          <BookingWidget locale={locale} t={bookingT} experience={experience} availability={availability} viewerEmail={viewerEmail} />
           <Link href={p(`/m/${experience.merchant.slug}`)} className="mt-4 inline-block text-sm font-semibold text-kinnso-orangeDark hover:underline">
             {t.backToMerchant} {experience.merchant.companyName}
           </Link>
