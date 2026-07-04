@@ -587,37 +587,56 @@ Expected: exactly one row, `grantee = 'authenticated'`, `privilege_type = 'EXECU
 `anon` or `PUBLIC` appear, the revoke didn't take — re-check the migration's grant block
 before proceeding.
 
-- [ ] **Step 4: Write the RPC test**
+- [ ] **Step 4: Write the RPC test — static SQL assertions, NOT live client calls**
+
+**Correction (discovered during Task 1's execution, applies to every remaining
+`db.r3b-*.test.ts` in this plan):** `SUPABASE_SERVICE_ROLE_KEY` is not configured in
+any `.env.test` in this project (confirmed project-wide). The established convention
+for these `db.*-migration.test.ts` files (`db.r1b-migration.test.ts`,
+`db.r3a2-fix-migration.test.ts`) is deterministic string assertions against the
+migration file's SQL text via `readFileSync`, not live `createClient(...).rpc(...)`
+calls. Use that pattern here, matching `db.r3a2-fix-migration.test.ts`'s exact
+grant/revoke assertion style for the grant-check part:
 
 ```typescript
 // apps/web/tests/db.r3b-settlement-status-rpc.test.ts
-import { describe, expect, it } from 'vitest'
-import { createClient } from '@supabase/supabase-js'
+import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
-const url = process.env.SUPABASE_URL!
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const anonKey = process.env.SUPABASE_ANON_KEY!
+const sql = readFileSync(
+  join(process.cwd(), '../../supabase/migrations/20260704150000_r3b_admin_settlement_status_rpc.sql'),
+  'utf8',
+)
 
-describe('admin_set_booking_settlement_status (integration)', () => {
-  it('rejects an anon caller with forbidden, not a grant error', async () => {
-    const anon = createClient(url, anonKey)
-    const { error } = await anon.rpc('admin_set_booking_settlement_status', {
-      p_id: '00000000-0000-0000-0000-000000000000',
-      p_status: 'paid',
-      p_reason: 'test',
-    })
-    expect(error).toBeTruthy()
-    expect(error?.message).not.toMatch(/permission denied for function/i)
+describe('admin_set_booking_settlement_status() RPC', () => {
+  it('is a SECURITY DEFINER function gated on admin rank', () => {
+    expect(sql).toContain('create or replace function public.admin_set_booking_settlement_status(')
+    expect(sql).toContain('security definer')
+    expect(sql).toContain("if not public.is_active_ops_role('admin') then")
   })
-
-  it('rejects a missing reason', async () => {
-    const service = createClient(url, serviceKey)
-    const { error } = await service.rpc('admin_set_booking_settlement_status', {
-      p_id: '00000000-0000-0000-0000-000000000000',
-      p_status: 'paid',
-      p_reason: '',
-    })
-    expect(error?.message).toMatch(/reason_required/)
+  it('requires a non-empty, length-capped reason', () => {
+    expect(sql).toContain("if coalesce(btrim(p_reason), '') = '' then raise exception 'reason_required'; end if")
+    expect(sql).toContain("if length(btrim(p_reason)) > 500 then raise exception 'reason_too_long'; end if")
+  })
+  it('rejects a leg-status change on a null (no-creator) leg', () => {
+    expect(sql).toContain("if v_cc is null then raise exception 'no_creator_leg'; end if")
+  })
+  it('enforces the rank-based transition matrix with a p_allow_revert escape hatch', () => {
+    expect(sql).toContain("v_rank_to < v_rank_from and not coalesce(p_allow_revert, false) then")
+    expect(sql).toContain("raise exception 'bad_transition'")
+  })
+  it('logs to ops_audit_log_append with entity_type booking_settlement', () => {
+    expect(sql).toContain("public.ops_audit_log_append('booking_settlement', p_id, 'booking_settlement.status', p_reason,")
+  })
+  it('explicitly revokes execute from anon and authenticated by name, then grants only to authenticated', () => {
+    // A bare `revoke all from public` does NOT undo this project's default-ACL
+    // auto-grant of EXECUTE to anon/authenticated on new functions (the same gotcha
+    // r3a2's confirm_booking_from_webhook hit) -- the explicit named revoke is required.
+    expect(sql).toContain(
+      'revoke all on function public.admin_set_booking_settlement_status from public, anon, authenticated',
+    )
+    expect(sql).toContain('grant execute on function public.admin_set_booking_settlement_status to authenticated')
   })
 })
 ```
@@ -625,7 +644,11 @@ describe('admin_set_booking_settlement_status (integration)', () => {
 - [ ] **Step 5: Run it**
 
 Run: `cd apps/web && npx vitest run tests/db.r3b-settlement-status-rpc.test.ts`
-Expected: PASS.
+Expected: PASS. This test is deterministic and needs no live credentials — it only
+reads the migration file from disk. The grant itself was already independently
+verified live in Step 3 above via a direct MCP `execute_sql` query; this test just
+pins that the migration file's text is what produced that result, so a future edit
+can't silently drop the revoke.
 
 - [ ] **Step 6: Commit**
 
@@ -707,37 +730,49 @@ grant execute on function public.mark_booking_completed to authenticated;
 
 Run: `pnpm --filter @kinnso/db gen`
 
-- [ ] **Step 5: Write the test**
+- [ ] **Step 5: Write the test — static SQL assertions (see Task 2 Step 4's correction:
+no `SUPABASE_SERVICE_ROLE_KEY` is configured anywhere in this project; use
+`readFileSync` + string assertions like `db.r1b-migration.test.ts`, not live calls)**
 
 ```typescript
 // apps/web/tests/db.r3b-merchant-booking-access.test.ts
-import { describe, expect, it } from 'vitest'
-import { createClient } from '@supabase/supabase-js'
+import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
-const url = process.env.SUPABASE_URL!
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const sql = readFileSync(
+  join(process.cwd(), '../../supabase/migrations/20260704160000_r3b_merchant_booking_access_and_completion.sql'),
+  'utf8',
+)
 
-describe('mark_booking_completed (integration)', () => {
-  it('rejects completing a booking that is not confirmed', async () => {
-    const service = createClient(url, serviceKey)
-    const { data: booking } = await service
-      .from('bookings')
-      .select('id')
-      .eq('status', 'pending_payment')
-      .limit(1)
-      .maybeSingle()
-    if (!booking) return // no pending_payment row in this environment; skip
-
-    const { error } = await service.rpc('mark_booking_completed', { p_booking_id: booking.id })
-    expect(error?.message).toMatch(/bad_transition/)
+describe('bookings_merchant_select policy', () => {
+  it('scopes to experiences owned by the caller’s own merchant_profiles row', () => {
+    expect(sql).toContain('create policy bookings_merchant_select on public.bookings')
+    expect(sql).toContain('for select')
+    expect(sql).toContain('mp.user_id = auth.uid()')
   })
+})
 
-  it('rejects a non-owner caller', async () => {
-    const service = createClient(url, serviceKey)
-    const { error } = await service.rpc('mark_booking_completed', {
-      p_booking_id: '00000000-0000-0000-0000-000000000000',
-    })
-    expect(error?.message).toMatch(/not_found|forbidden/)
+describe('mark_booking_completed() RPC', () => {
+  it('is a SECURITY DEFINER function gated on experience ownership, not kinnso_ops_members', () => {
+    expect(sql).toContain('create or replace function public.mark_booking_completed(p_booking_id uuid)')
+    expect(sql).toContain('security definer')
+    expect(sql).not.toContain('is_active_ops')
+  })
+  it('only allows the confirmed -> completed transition', () => {
+    expect(sql).toContain("if v_status <> 'confirmed' then raise exception 'bad_transition'; end if")
+  })
+  it('rejects a non-owner caller with forbidden', () => {
+    expect(sql).toContain("if not v_is_owner then raise exception 'forbidden' using errcode = '42501'; end if")
+  })
+  it('logs a merchant_completed booking_events row', () => {
+    expect(sql).toContain("'merchant_completed'")
+  })
+  it('explicitly revokes execute from anon and authenticated by name, then grants only to authenticated', () => {
+    expect(sql).toContain(
+      'revoke all on function public.mark_booking_completed from public, anon, authenticated',
+    )
+    expect(sql).toContain('grant execute on function public.mark_booking_completed to authenticated')
   })
 })
 ```
@@ -745,7 +780,9 @@ describe('mark_booking_completed (integration)', () => {
 - [ ] **Step 6: Run it**
 
 Run: `cd apps/web && npx vitest run tests/db.r3b-merchant-booking-access.test.ts`
-Expected: PASS.
+Expected: PASS — deterministic, no live credentials needed. The policy/grant/transition
+behavior was already independently verified live in Steps 2–3 above; this test pins
+that the migration file's text is what produced that verified behavior.
 
 - [ ] **Step 7: Add `bookings_merchant_select`'s existence to the shared RLS regression
 list** — this project's established convention after every phase's holistic review
@@ -840,43 +877,49 @@ correctly rejects both).
 - [ ] **Step 3: Verify the grant** (same pattern as Task 2 Step 3, routine name
 `admin_cancel_and_refund_booking`)
 
-- [ ] **Step 4: Write the test**
+- [ ] **Step 4: Write the test — static SQL assertions (same correction as Tasks 2 and 3:
+no live client calls, no `SUPABASE_SERVICE_ROLE_KEY` — use `readFileSync` +
+string assertions)**
 
 ```typescript
 // apps/web/tests/db.r3b-cancel-refund-rpc.test.ts
-import { describe, expect, it } from 'vitest'
-import { createClient } from '@supabase/supabase-js'
+import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
-const url = process.env.SUPABASE_URL!
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const sql = readFileSync(
+  join(process.cwd(), '../../supabase/migrations/20260704170000_r3b_admin_cancel_refund_booking.sql'),
+  'utf8',
+)
 
-describe('admin_cancel_and_refund_booking (integration)', () => {
-  it('rejects refunding a booking that was never confirmed', async () => {
-    const service = createClient(url, serviceKey)
-    const { data: booking } = await service
-      .from('bookings')
-      .select('id')
-      .eq('status', 'pending_payment')
-      .limit(1)
-      .maybeSingle()
-    if (!booking) return
-
-    const { error } = await service.rpc('admin_cancel_and_refund_booking', {
-      p_booking_id: booking.id,
-      p_stripe_refund_id: 're_test_123',
-      p_reason: 'test refund',
-    })
-    expect(error?.message).toMatch(/bad_transition/)
+describe('admin_cancel_and_refund_booking() RPC', () => {
+  it('is a SECURITY DEFINER function gated on admin rank, reason-required', () => {
+    expect(sql).toContain('create or replace function public.admin_cancel_and_refund_booking(')
+    expect(sql).toContain('security definer')
+    expect(sql).toContain("if not public.is_active_ops_role('admin') then")
+    expect(sql).toContain("if coalesce(btrim(p_reason), '') = '' then raise exception 'reason_required'; end if")
   })
-
-  it('rejects a missing refund id', async () => {
-    const service = createClient(url, serviceKey)
-    const { error } = await service.rpc('admin_cancel_and_refund_booking', {
-      p_booking_id: '00000000-0000-0000-0000-000000000000',
-      p_stripe_refund_id: '',
-      p_reason: 'test',
-    })
-    expect(error?.message).toMatch(/refund_id_required/)
+  it('requires a non-empty stripe refund id', () => {
+    expect(sql).toContain(
+      "if coalesce(btrim(p_stripe_refund_id), '') = '' then raise exception 'refund_id_required'; end if",
+    )
+  })
+  it('only allows refunding a confirmed or completed booking', () => {
+    expect(sql).toContain("if v_status not in ('confirmed', 'completed') then raise exception 'bad_transition'; end if")
+  })
+  it('flips the booking to refunded and the settlement to disputed', () => {
+    expect(sql).toContain("set status = 'refunded'")
+    expect(sql).toContain("set status = 'disputed'")
+  })
+  it('logs both a booking_events row and an ops_audit_log_append call', () => {
+    expect(sql).toContain("'ops_cancelled_refunded'")
+    expect(sql).toContain("public.ops_audit_log_append('booking', p_booking_id, 'booking.refund', p_reason,")
+  })
+  it('explicitly revokes execute from anon and authenticated by name, then grants only to authenticated', () => {
+    expect(sql).toContain(
+      'revoke all on function public.admin_cancel_and_refund_booking from public, anon, authenticated',
+    )
+    expect(sql).toContain('grant execute on function public.admin_cancel_and_refund_booking to authenticated')
   })
 })
 ```
@@ -884,7 +927,8 @@ describe('admin_cancel_and_refund_booking (integration)', () => {
 - [ ] **Step 5: Run it**
 
 Run: `cd apps/web && npx vitest run tests/db.r3b-cancel-refund-rpc.test.ts`
-Expected: PASS.
+Expected: PASS — deterministic, no live credentials needed. Live behavior (grant shape,
+transition rejection) was already independently verified in Steps 2–3 above.
 
 - [ ] **Step 6: Commit**
 
