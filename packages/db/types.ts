@@ -581,6 +581,127 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_events: {
+        Row: {
+          booking_id: string
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          availability_id: string
+          created_at: string
+          creator_id: string | null
+          currency: string
+          experience_id: string
+          guest_email: string | null
+          guide_id: string | null
+          id: string
+          qty: number
+          source_surface: string | null
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          total_amount: number
+          traveler_user_id: string | null
+          unit_amount: number
+          updated_at: string
+        }
+        Insert: {
+          availability_id: string
+          created_at?: string
+          creator_id?: string | null
+          currency: string
+          experience_id: string
+          guest_email?: string | null
+          guide_id?: string | null
+          id?: string
+          qty: number
+          source_surface?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          total_amount: number
+          traveler_user_id?: string | null
+          unit_amount: number
+          updated_at?: string
+        }
+        Update: {
+          availability_id?: string
+          created_at?: string
+          creator_id?: string | null
+          currency?: string
+          experience_id?: string
+          guest_email?: string | null
+          guide_id?: string | null
+          id?: string
+          qty?: number
+          source_surface?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          total_amount?: number
+          traveler_user_id?: string | null
+          unit_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_availability_id_fkey"
+            columns: ["availability_id"]
+            isOneToOne: false
+            referencedRelation: "experience_availability"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       copilot_messages: {
         Row: {
           archived: boolean
@@ -857,6 +978,47 @@ export type Database = {
           verified?: boolean
         }
         Relationships: []
+      }
+      experience_availability: {
+        Row: {
+          booked_count: number
+          capacity: number
+          created_at: string
+          date: string
+          experience_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booked_count?: number
+          capacity: number
+          created_at?: string
+          date: string
+          experience_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booked_count?: number
+          capacity?: number
+          created_at?: string
+          date?: string
+          experience_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_availability_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       experiences: {
         Row: {
@@ -1814,6 +1976,33 @@ export type Database = {
           sort_order?: number
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      traveler_profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          locale: string | null
+          marketing_opt_in: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          locale?: string | null
+          marketing_opt_in?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          locale?: string | null
+          marketing_opt_in?: boolean
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

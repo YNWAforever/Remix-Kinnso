@@ -133,6 +133,23 @@ export interface MerchantDashboardMessages {
   errTooLong: string
   errInvalidUrl: string
   errInvalidNumber: string
+  actAvailability: string
+  availTitle: string
+  availSubtitle: string
+  availBackToExperience: string
+  availAddHeading: string
+  fieldDate: string
+  fieldCapacity: string
+  addDateCta: string
+  availEmpty: string
+  colDate: string
+  colCapacity: string
+  colBooked: string
+  statusOpen: string
+  statusClosed: string
+  actClose: string
+  errInvalidDate: string
+  errDuplicateDate: string
 }
 
 export interface MerchantsDirectoryMessages {
@@ -2011,6 +2028,23 @@ const messages: Messages = {
     errTooLong: 'Too long',
     errInvalidUrl: 'Enter a valid http(s) URL',
     errInvalidNumber: 'Enter a valid number',
+    actAvailability: 'Availability',
+    availTitle: 'Manage availability',
+    availSubtitle: 'Add the dates travellers can book, with a capacity for each.',
+    availBackToExperience: 'Back to experiences',
+    availAddHeading: 'Add a date',
+    fieldDate: 'Date',
+    fieldCapacity: 'Capacity',
+    addDateCta: 'Add date',
+    availEmpty: 'No availability yet. Add your first bookable date.',
+    colDate: 'Date',
+    colCapacity: 'Capacity',
+    colBooked: 'Booked',
+    statusOpen: 'Open',
+    statusClosed: 'Closed',
+    actClose: 'Close',
+    errInvalidDate: 'Enter a valid date',
+    errDuplicateDate: 'This date already exists for this experience',
   },
   merchantsOps: {
     title: 'Merchants',
