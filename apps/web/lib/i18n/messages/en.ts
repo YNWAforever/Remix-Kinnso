@@ -86,6 +86,8 @@ export interface MerchantDashboardMessages {
   cardInsightsBody: string
   cardExperiencesTitle: string
   cardExperiencesBody: string
+  cardBookingsTitle: string
+  cardBookingsBody: string
   cardProfileTitle: string
   cardProfileBody: string
   profileTitle: string
@@ -150,6 +152,24 @@ export interface MerchantDashboardMessages {
   actClose: string
   errInvalidDate: string
   errDuplicateDate: string
+}
+
+export interface MerchantBookingsMessages {
+  title: string
+  empty: string
+  colExperience: string
+  colTraveler: string
+  colCreator: string
+  colQty: string
+  colAmount: string
+  colStatus: string
+  directLabel: string
+  markCompleteButton: string
+  statusPendingPayment: string
+  statusConfirmed: string
+  statusCompleted: string
+  statusCancelled: string
+  statusRefunded: string
 }
 
 export interface MerchantsDirectoryMessages {
@@ -909,6 +929,7 @@ export interface Messages {
   merchantApply: MerchantApplyMessages
   merchantApplicationsOps: MerchantApplicationsOpsMessages
   merchantDashboard: MerchantDashboardMessages
+  merchantBookings: MerchantBookingsMessages
   merchantsOps: {
     title: string; subtitle: string
     tabOverview: string; tabDirectory: string; tabApplications: string
@@ -2029,6 +2050,8 @@ const messages: Messages = {
     cardInsightsBody: 'See how your missions and creators are performing.',
     cardExperiencesTitle: 'Experiences',
     cardExperiencesBody: 'List the tours and activities travellers will soon book.',
+    cardBookingsTitle: 'Bookings',
+    cardBookingsBody: 'Track who booked your experiences and mark completed stays.',
     cardProfileTitle: 'Public profile',
     cardProfileBody: 'Control how your business appears across KINNSO.',
     profileTitle: 'Public profile',
@@ -2093,6 +2116,23 @@ const messages: Messages = {
     actClose: 'Close',
     errInvalidDate: 'Enter a valid date',
     errDuplicateDate: 'This date already exists for this experience',
+  },
+  merchantBookings: {
+    title: 'Bookings',
+    empty: "No bookings yet — once a traveller books one of your experiences, it'll show up here.",
+    colExperience: 'Experience',
+    colTraveler: 'Traveller',
+    colCreator: 'Booked via',
+    colQty: 'Qty',
+    colAmount: 'Amount',
+    colStatus: 'Status',
+    directLabel: 'Direct',
+    markCompleteButton: 'Mark completed',
+    statusPendingPayment: 'Awaiting payment',
+    statusConfirmed: 'Confirmed',
+    statusCompleted: 'Completed',
+    statusCancelled: 'Cancelled',
+    statusRefunded: 'Refunded',
   },
   merchantsOps: {
     title: 'Merchants',
