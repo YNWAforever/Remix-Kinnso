@@ -22,7 +22,7 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
     let latestResolution = 0
 
     const resolveSignedInRole = async (userId: string): Promise<ViewerRole> => {
-      const [{ data: ops }, { data: merchant }] = await Promise.all([
+      const [{ data: ops }, { data: merchant }, { data: creator }] = await Promise.all([
         supabase
           .from('kinnso_ops_members')
           .select('id')
@@ -34,8 +34,16 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
           .select('id')
           .eq('user_id', userId)
           .maybeSingle(),
+        supabase
+          .from('creators')
+          .select('status')
+          .eq('id', userId)
+          .maybeSingle(),
       ])
-      return ops ? 'ops' : merchant ? 'merchant' : 'creator'
+      if (ops) return 'ops'
+      if (merchant) return 'merchant'
+      if (creator?.status === 'active') return 'creator'
+      return 'traveler'
     }
 
     const initialResolution = ++latestResolution
