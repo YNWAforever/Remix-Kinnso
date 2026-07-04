@@ -246,6 +246,12 @@ export interface BookingMessages {
   rateLimitedError: string
   confirmedTitle: string
   confirmedBody: string
+  completedTitle: string
+  completedBody: string
+  cancelledTitle: string
+  cancelledBody: string
+  refundedTitle: string
+  refundedBody: string
   pendingTitle: string
   pendingBody: string
   refreshCta: string
@@ -1909,6 +1915,12 @@ const messages: Messages = {
     rateLimitedError: 'Too many attempts. Please try again in a few minutes.',
     confirmedTitle: "You're booked!",
     confirmedBody: "We've sent a confirmation to your email.",
+    completedTitle: 'Hope you had a great time!',
+    completedBody: 'You can book this experience again anytime.',
+    cancelledTitle: 'This booking was cancelled',
+    cancelledBody: 'No payment was taken for this booking.',
+    refundedTitle: 'This booking was refunded',
+    refundedBody: 'You should see the refund on your original payment method within 5–10 business days.',
     pendingTitle: 'Confirming your payment…',
     pendingBody: 'This can take a few seconds. Refresh to check again.',
     refreshCta: 'Refresh',
