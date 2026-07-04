@@ -2591,35 +2591,38 @@ git commit -m "test(db): pin the R3A-2 migration's RPC shapes (security mode, id
 - Modify: `apps/e2e/fixtures.ts`
 - Create: `apps/e2e/specs/booking.spec.ts`
 
-**Prerequisite (user action, not code):** this spec drives Stripe's own hosted Checkout
+**Prerequisite 1 (user action, not code):** this spec drives Stripe's own hosted Checkout
 page, which requires the target deployment to have **real Stripe test-mode keys**
 configured (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`-equivalent is not used
 server-side but the account must be in test mode, `STRIPE_WEBHOOK_SECRET`) and a webhook
 endpoint Stripe can reach (the deployed preview/prod URL, or `stripe listen --forward-to
 localhost:3000/api/stripe/webhook` for a local run). Per the design spec §8, this is the
-same "Stripe account status" item already flagged to the user — this plan's code works
-in test mode without further KYC, but this e2e spec cannot run at all until those test
-keys exist somewhere reachable. If they don't exist yet, everything through Task 14 is
-still fully functional and unit-tested; only this task's spec is blocked.
+same "Stripe account status" item already flagged to the user.
 
-- [ ] **Step 1: Find a real seeded experience with open availability to test against**
+**Prerequisite 2 (user/ops action, not code — discovered live during this task, worse
+than Prerequisite 1 alone implied):** live-queried `scryfkefedzuetfdtrvl` on 2026-07-04
+and found **zero rows in `experience_availability`** (`select count(*) from
+public.experience_availability` → 0), despite 5 published experiences existing
+(`bali-uluwatu-sunset-surf-lesson`, `bangkok-street-food-night-market-tour`,
+`chiang-mai-old-city-temple-cafe-walk`, `seoul-hongdae-street-food-karaoke-night`,
+`tokyo-after-hours-izakaya-crawl`). R3A-1 built the merchant-facing tooling to add
+availability dates, but no merchant has actually used it yet — this is the same
+long-standing "seed real supply" gap the R3 design spec's own §7/§8 already flagged for
+the whole program's public launch, now concretely blocking this specific e2e spec too.
+**This spec cannot run until at least one of the 5 experiences has an open, future,
+non-full `experience_availability` row** — via `/merchants/dashboard/experiences/
+[experienceId]/availability` as that merchant, or a direct seed insert. Neither Stripe
+keys nor availability data existing yet blocks writing/typechecking the spec itself
+(Steps 1-4 below) — only Step 5 (actually running it) is gated on both.
 
-Run via the Supabase MCP `execute_sql` tool against `scryfkefedzuetfdtrvl`:
+- [ ] **Step 1: Confirmed experience slug (live-queried 2026-07-04, no availability data yet)**
 
-```sql
-select e.slug, e.title, ea.date
-from public.experiences e
-join public.experience_availability ea on ea.experience_id = e.id
-where e.status = 'published' and ea.status = 'open' and ea.date &gt;= current_date
-  and ea.booked_count &lt; ea.capacity
-order by ea.date asc
-limit 1;
-```
-
-Use the returned `slug` as `FIXTURES.booking.experienceSlug` in Step 2 — do not guess a
-slug; this table was seeded per the design spec's ground truth (5 test experiences
-across Tokyo/Seoul/Bali/Bangkok/Chiang Mai) but this plan was not given the exact
-slugs, so this lookup is required before writing the fixture.
+`tokyo-after-hours-izakaya-crawl` (Tokyo After-Hours Izakaya Crawl) — a real, published
+experience, chosen because it matches the experience name already used consistently
+across this plan's own mock fixtures in Tasks 7/9/11. It currently has **no**
+`experience_availability` rows (see Prerequisite 2) — that's a live-data gap, not a
+reason to pick a different slug; any of the 5 published experiences has the identical
+gap today.
 
 - [ ] **Step 2: Add the booking fixture**
 
@@ -2628,13 +2631,9 @@ the existing entries, inside the same `as const` object):
 
 ```typescript
   booking: {
-    experiencePath: `/en/experiences/${'/* slug from Step 1 */'}`,
+    experiencePath: '/en/experiences/tokyo-after-hours-izakaya-crawl',
   },
 ```
-
-(Replace the placeholder with the actual slug found in Step 1 — this is a data lookup
-result, not a plan placeholder; the query above is the exact, actionable way to obtain
-it.)
 
 - [ ] **Step 3: Write the spec**
 
@@ -2694,11 +2693,14 @@ to re-capture the current selectors rather than guessing.
 Run: `cd apps/e2e && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 5: Run the spec (only if Stripe test-mode keys are available; otherwise skip and note it explicitly to the user)**
+- [ ] **Step 5: Run the spec (only if BOTH prerequisites are met; otherwise skip and note explicitly)**
 
 Run: `cd apps/e2e && npx playwright test booking.spec.ts`
-Expected: PASS. If Stripe test-mode keys are not yet configured anywhere reachable,
-this step cannot run — report that explicitly rather than marking it done.
+Expected: PASS — but only runnable once BOTH Prerequisite 1 (Stripe test-mode keys
+configured) AND Prerequisite 2 (at least one experience has an open, future, non-full
+`experience_availability` row — currently none do) are satisfied. If either is missing,
+this step cannot run — report that explicitly rather than marking it done or skipping
+silently.
 
 - [ ] **Step 6: Commit**
 
