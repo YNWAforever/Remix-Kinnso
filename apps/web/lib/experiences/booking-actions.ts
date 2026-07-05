@@ -4,7 +4,12 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getExperienceById } from '@/lib/experiences/public-queries'
 import { validateCheckoutInput, type CheckoutValidationErrors } from '@/lib/experiences/booking-validation'
-import type { CreateCheckoutSessionInput } from '@/lib/experiences/booking-types'
+import {
+  ALLOWED_SOURCE_SURFACES,
+  type BookingSourceSurface,
+  type CreateCheckoutSessionInput,
+} from '@/lib/experiences/booking-types'
+import { getGuideBySlug } from '@/lib/guides/queries'
 import { getStripeClient, toStripeAmount } from '@/lib/stripe/client'
 import { getClientIp } from '@/lib/http/client-ip'
 import type { Locale } from '@/lib/i18n/config'
@@ -16,13 +21,35 @@ type ActionResult<T extends Record<string, unknown> = Record<string, never>> =
 
 const formError = (message: string): ActionFailure => ({ ok: false, errors: { form: [message] } })
 
+/**
+ * Re-resolves attribution server-side from a real, published guide — never trusts
+ * a client-supplied creator/guide id directly (same house rule R3A-2 used for
+ * price/currency re-derivation). An unrecognized surface or unresolvable slug
+ * degrades to today's exact behavior rather than blocking the checkout (D-R3C-3).
+ */
+async function resolveAttribution(input: { sourceSurface?: string; guideSlug?: string }): Promise<{
+  sourceSurface: BookingSourceSurface
+  creatorId: string | null
+  guideId: string | null
+}> {
+  const sourceSurface = (ALLOWED_SOURCE_SURFACES as readonly string[]).includes(input.sourceSurface ?? '')
+    ? (input.sourceSurface as BookingSourceSurface)
+    : 'experience_page'
+  if (sourceSurface !== 'guide' || !input.guideSlug) {
+    return { sourceSurface, creatorId: null, guideId: null }
+  }
+  const guide = await getGuideBySlug(input.guideSlug)
+  if (!guide) return { sourceSurface: 'experience_page', creatorId: null, guideId: null }
+  return { sourceSurface, creatorId: guide.creatorId, guideId: guide.id }
+}
+
 const MAX_CHECKOUT_ATTEMPTS_PER_WINDOW = 5
 const CHECKOUT_RATE_LIMIT_WINDOW_SECONDS = 600
 
 export async function createCheckoutSessionAction(
   experienceId: string,
   rawInput: CreateCheckoutSessionInput,
-  options: { locale: Locale },
+  options: { locale: Locale; sourceSurface?: string; guideSlug?: string },
 ): Promise<ActionResult<{ checkoutUrl: string }>> {
   const supabase = await createSupabaseServerClient()
   const {
@@ -70,6 +97,11 @@ export async function createCheckoutSessionAction(
   const remaining = (availability.capacity as number) - (availability.booked_count as number)
   if (remaining < p.qty) return formError('Not enough spots left for that date')
 
+  const attribution = await resolveAttribution({
+    sourceSurface: options.sourceSurface,
+    guideSlug: options.guideSlug,
+  })
+
   const unitAmount = experience.priceAmount
   const totalAmount = unitAmount * p.qty
   const stripe = getStripeClient()
@@ -110,7 +142,9 @@ export async function createCheckoutSessionAction(
     currency: experience.currency,
     status: 'pending_payment',
     stripe_checkout_session_id: session.id,
-    source_surface: 'experience_page',
+    source_surface: attribution.sourceSurface,
+    creator_id: attribution.creatorId,
+    guide_id: attribution.guideId,
   })
   if (insertError) {
     console.error('[experiences:booking] booking row insert failed', insertError)
