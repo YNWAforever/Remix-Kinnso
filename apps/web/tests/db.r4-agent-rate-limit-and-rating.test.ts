@@ -20,8 +20,16 @@ describe('agent rate limit + rating migration', () => {
   it('rate_agent_message validates the rating value and checks ownership before updating', () => {
     expect(sql).toContain('create or replace function public.rate_agent_message')
     expect(sql).toContain("if p_rating not in ('up','down')")
-    expect(sql).toContain('v_traveler_user_id != auth.uid()')
-    expect(sql).toContain('v_anon_session_id != p_anon_session_id')
     expect(sql).toContain("and role = 'assistant'")
+  })
+  it('rate_agent_message uses NULL-safe ownership comparisons, not plain != (an anon caller must never bypass the check via a NULL auth.uid())', () => {
+    // The executable checks must use IS DISTINCT FROM, not !=: in Postgres, `!=`
+    // against a NULL operand evaluates to NULL, and plpgsql's `if` treats NULL as
+    // false (no exception raised) -- silently letting an anon caller (auth.uid() is
+    // NULL) rate a signed-in traveller's message. Assert on the real executable
+    // lines specifically (not just "the string appears somewhere", which a comment
+    // could satisfy without the code itself being fixed).
+    expect(sql).toContain('if v_traveler_user_id is distinct from auth.uid() then')
+    expect(sql).toContain('if p_anon_session_id is null or v_anon_session_id is distinct from p_anon_session_id then')
   })
 })

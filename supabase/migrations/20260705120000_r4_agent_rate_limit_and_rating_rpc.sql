@@ -96,7 +96,11 @@ begin
       raise exception 'forbidden';
     end if;
   else
-    if p_anon_session_id is null or v_anon_session_id != p_anon_session_id then
+    -- Same NULL-safety concern as the traveller branch above, hardened the same way
+    -- even though agent_messages_exactly_one_identity currently guarantees
+    -- v_anon_session_id is never null on this path: defense in depth against that
+    -- invariant ever weakening, not just reliance on an external constraint.
+    if p_anon_session_id is null or v_anon_session_id is distinct from p_anon_session_id then
       raise exception 'forbidden';
     end if;
   end if;
