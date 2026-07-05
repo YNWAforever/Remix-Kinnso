@@ -25,6 +25,16 @@ vi.mock('@/lib/guides/queries', () => ({
   })),
 }))
 
+// GuideExperienceLinks is an async Server Component — react-dom's client renderer
+// (used by this jsdom+@testing-library/react host test) cannot render a nested async
+// function component directly (that resolution only happens in Next's real RSC
+// pipeline, not in this test harness). It also has its own dedicated test
+// (kinnso.guide-experience-links.test.tsx) and would otherwise make a real
+// getExperiencesForCity()/Supabase call here. Stub it to a synchronous no-op.
+vi.mock('@/components/kinnso/GuideExperienceLinks', () => ({
+  GuideExperienceLinks: () => null,
+}))
+
 describe('/[locale]/g/[slug] host', () => {
   it('renders a known guide and links the author to /c/[handle]', async () => {
     const route = await import('@/app/[locale]/g/[slug]/page')
