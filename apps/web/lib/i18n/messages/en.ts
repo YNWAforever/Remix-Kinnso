@@ -737,6 +737,11 @@ export interface Messages {
     emailLabel: string; emailPlaceholder: string; submitCta: string
     successNote: string; errorInvalid: string; errorGeneric: string
     honestNote: string; exploreCta: string; articlesCta: string
+    // Live chat UI (AgentChatView, Task 10) — additive alongside the waitlist
+    // keys above until Task 11 retires AgentLandingView/AgentWaitlistForm.
+    inputPlaceholder: string; send: string; toolWorking: string
+    ratingUpLabel: string; ratingDownLabel: string
+    unconfiguredTitle: string; unconfiguredBody: string
   }
   forCreators: {
     heroEyebrow: string; heroTitle: string; heroSub: string
@@ -1717,6 +1722,13 @@ const messages: Messages = {
     errorInvalid: 'Enter a valid email address.', errorGeneric: 'Something went wrong — please try again.',
     honestNote: 'The agent isn’t live yet — we only ship it when it’s genuinely useful. Until then, the same knowledge is all here:',
     exploreCta: 'Explore guides', articlesCta: 'Read articles',
+    inputPlaceholder: 'Ask about a destination, dates, or style of trip...',
+    send: 'Send',
+    toolWorking: 'Searching...',
+    ratingUpLabel: 'This response was helpful',
+    ratingDownLabel: 'This response was not helpful',
+    unconfiguredTitle: 'Agent temporarily unavailable',
+    unconfiguredBody: 'The travel agent is temporarily offline — try again shortly, or explore guides and articles directly.',
   },
   forCreators: {
     heroEyebrow: 'For Creators',

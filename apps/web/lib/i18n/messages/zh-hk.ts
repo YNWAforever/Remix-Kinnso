@@ -577,6 +577,13 @@ const messages: Messages = {
     errorInvalid: '請輸入有效嘅電郵地址。', errorGeneric: '出咗啲問題——請再試一次。',
     honestNote: '助理仲未推出——我哋只會喺佢真係好用嘅時候先出街。而家不妨先睇睇：',
     exploreCta: '探索攻略', articlesCta: '閱讀文章',
+    inputPlaceholder: '講吓你想去邊、幾時去、鍾意點玩……',
+    send: '傳送',
+    toolWorking: '搜尋緊……',
+    ratingUpLabel: '呢個回應有幫助',
+    ratingDownLabel: '呢個回應冇幫助',
+    unconfiguredTitle: '助理暫時未能使用',
+    unconfiguredBody: '旅遊助理暫時離線，請稍後再試，或者直接睇攻略同文章。',
   },
   forCreators: {
     heroEyebrow: '創作者專區',

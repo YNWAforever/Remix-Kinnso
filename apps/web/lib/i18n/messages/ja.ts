@@ -577,6 +577,13 @@ const messages: Messages = {
     errorInvalid: '有効なメールアドレスを入力してください。', errorGeneric: 'エラーが発生しました。もう一度お試しください。',
     honestNote: 'エージェントはまだ公開前です。本当に役立つものになってからお届けします。それまでは、同じ知識をこちらでどうぞ：',
     exploreCta: 'ガイドを探す', articlesCta: '記事を読む',
+    inputPlaceholder: '行き先や日程、旅のスタイルを教えてください…',
+    send: '送信',
+    toolWorking: '検索中…',
+    ratingUpLabel: 'この回答は役に立った',
+    ratingDownLabel: 'この回答は役に立たなかった',
+    unconfiguredTitle: 'エージェントは一時的にご利用いただけません',
+    unconfiguredBody: '旅行エージェントは一時的に停止中です。しばらくしてから再度お試しいただくか、ガイドや記事を直接ご覧ください。',
   },
   forCreators: {
     heroEyebrow: 'クリエイター向け',

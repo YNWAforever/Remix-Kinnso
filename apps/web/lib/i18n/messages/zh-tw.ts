@@ -577,6 +577,13 @@ const messages: Messages = {
     errorInvalid: '請輸入有效的電子郵件。', errorGeneric: '發生錯誤——請再試一次。',
     honestNote: '助理尚未上線——我們只在它真正好用時推出。在那之前，同樣的知識都在這裡：',
     exploreCta: '探索攻略', articlesCta: '閱讀文章',
+    inputPlaceholder: '告訴我們你想去哪裡、什麼時候去、喜歡怎樣的旅行風格……',
+    send: '傳送',
+    toolWorking: '搜尋中……',
+    ratingUpLabel: '這個回覆有幫助',
+    ratingDownLabel: '這個回覆沒有幫助',
+    unconfiguredTitle: '助理暫時無法使用',
+    unconfiguredBody: '旅遊助理暫時離線，請稍後再試，或直接瀏覽攻略與文章。',
   },
   forCreators: {
     heroEyebrow: '創作者專區',
