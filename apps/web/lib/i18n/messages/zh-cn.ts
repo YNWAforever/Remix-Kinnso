@@ -463,7 +463,7 @@ const messages: Messages = {
     heroSubtitle: '发现值得信赖的旅行创作者攻略、用 AI 规划行程，一站完成预订。',
     heroPrimaryCta: '开始规划',
     heroSecondaryCta: '浏览创作者',
-    statCreators: '位活跃创作者', statGuides: '份已发布攻略', statDestinations: '个目的地',
+    statCreators: '位活跃创作者', statGuides: '份已发布攻略', statDestinations: '个目的地', statCompletedBookings: '完成预订',
     roleCreator: '创作者', roleTraveller: '旅行者', roleMerchant: '商家',
     testimonialsHeading: '大家怎么看 KINNSO',
     howEyebrow: '如何运作',

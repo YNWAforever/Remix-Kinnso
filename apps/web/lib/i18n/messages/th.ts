@@ -463,7 +463,7 @@ const messages: Messages = {
     heroSubtitle: 'ค้นพบไกด์จากทราเวลครีเอเตอร์ที่เชื่อถือได้ วางแผนด้วย AI และจองครบในที่เดียว',
     heroPrimaryCta: 'เริ่มวางแผนทริป',
     heroSecondaryCta: 'ดูครีเอเตอร์',
-    statCreators: 'ครีเอเตอร์ที่แอ็กทีฟ', statGuides: 'ไกด์ที่เผยแพร่แล้ว', statDestinations: 'จุดหมาย',
+    statCreators: 'ครีเอเตอร์ที่แอ็กทีฟ', statGuides: 'ไกด์ที่เผยแพร่แล้ว', statDestinations: 'จุดหมาย', statCompletedBookings: 'การจองที่เสร็จสมบูรณ์',
     roleCreator: 'ครีเอเตอร์', roleTraveller: 'นักเดินทาง', roleMerchant: 'ร้านค้า',
     testimonialsHeading: 'เสียงจากผู้ใช้ KINNSO',
     howEyebrow: 'วิธีใช้งาน',
