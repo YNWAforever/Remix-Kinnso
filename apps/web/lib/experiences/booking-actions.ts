@@ -38,9 +38,14 @@ async function resolveAttribution(input: { sourceSurface?: string; guideSlug?: s
   if (sourceSurface !== 'guide' || !input.guideSlug) {
     return { sourceSurface, creatorId: null, guideId: null }
   }
-  const guide = await getGuideBySlug(input.guideSlug)
-  if (!guide) return { sourceSurface: 'experience_page', creatorId: null, guideId: null }
-  return { sourceSurface, creatorId: guide.creatorId, guideId: guide.id }
+  try {
+    const guide = await getGuideBySlug(input.guideSlug)
+    if (!guide) return { sourceSurface: 'experience_page', creatorId: null, guideId: null }
+    return { sourceSurface, creatorId: guide.creatorId, guideId: guide.id }
+  } catch (err) {
+    console.error('[experiences:booking] guide attribution lookup failed', err)
+    return { sourceSurface: 'experience_page', creatorId: null, guideId: null }
+  }
 }
 
 const MAX_CHECKOUT_ATTEMPTS_PER_WINDOW = 5
