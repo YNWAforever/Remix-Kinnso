@@ -4,7 +4,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: '目的地', dining: '美食', shopping: '购物' },
   breadcrumb: { home: '首页', articles: '文章' },
-  article: { youMayLike: '你可能喜欢', faqTitle: '常见问题', tableOfContents: '本文目录', by: '作者', fallbackNotice: '本文尚未提供你所用语言的版本，现显示原始版本。', guidesNearbyEyebrow: '正计划去这里？', guidesNearbyHeading: '这个目的地的创作者攻略' },
+  article: { youMayLike: '你可能喜欢', faqTitle: '常见问题', tableOfContents: '本文目录', by: '作者', fallbackNotice: '本文尚未提供你所用语言的版本，现显示原始版本。', guidesNearbyEyebrow: '正计划去这里？', guidesNearbyHeading: '这个目的地的创作者攻略', experiencesNearbyEyebrow: '准备好预订了吗？', experiencesNearbyHeading: '这里的可预订体验' },
   seo: {
     brandTitle: 'KINNSO — 旅行创作者，真实任务',
     brandDescription:
@@ -463,7 +463,7 @@ const messages: Messages = {
     heroSubtitle: '发现值得信赖的旅行创作者攻略、用 AI 规划行程，一站完成预订。',
     heroPrimaryCta: '开始规划',
     heroSecondaryCta: '浏览创作者',
-    statCreators: '位活跃创作者', statGuides: '份已发布攻略', statDestinations: '个目的地',
+    statCreators: '位活跃创作者', statGuides: '份已发布攻略', statDestinations: '个目的地', statCompletedBookings: '完成预订',
     roleCreator: '创作者', roleTraveller: '旅行者', roleMerchant: '商家',
     testimonialsHeading: '大家怎么看 KINNSO',
     howEyebrow: '如何运作',

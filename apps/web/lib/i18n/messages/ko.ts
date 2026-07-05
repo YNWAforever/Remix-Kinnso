@@ -4,7 +4,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: '여행지', dining: '다이닝', shopping: '쇼핑' },
   breadcrumb: { home: '홈', articles: '아티클' },
-  article: { youMayLike: '추천 콘텐츠', faqTitle: '자주 묻는 질문', tableOfContents: '목차', by: '작성자', fallbackNotice: '이 글은 아직 사용 중인 언어로 제공되지 않아 원문 버전을 표시합니다.', guidesNearbyEyebrow: '이곳 여행을 계획 중이신가요?', guidesNearbyHeading: '이 여행지의 크리에이터 가이드' },
+  article: { youMayLike: '추천 콘텐츠', faqTitle: '자주 묻는 질문', tableOfContents: '목차', by: '작성자', fallbackNotice: '이 글은 아직 사용 중인 언어로 제공되지 않아 원문 버전을 표시합니다.', guidesNearbyEyebrow: '이곳 여행을 계획 중이신가요?', guidesNearbyHeading: '이 여행지의 크리에이터 가이드', experiencesNearbyEyebrow: '예약할 준비가 되셨나요?', experiencesNearbyHeading: '이 지역의 예약 가능한 체험' },
   seo: {
     brandTitle: 'KINNSO — 트래블 크리에이터, 리얼 미션',
     brandDescription:
@@ -463,7 +463,7 @@ const messages: Messages = {
     heroSubtitle: '믿을 수 있는 여행 크리에이터의 가이드를 만나고, AI로 계획하고, 한곳에서 예약까지.',
     heroPrimaryCta: '여행 계획 시작하기',
     heroSecondaryCta: '크리에이터 둘러보기',
-    statCreators: '명의 활동 중인 크리에이터', statGuides: '개의 공개 가이드', statDestinations: '곳의 여행지',
+    statCreators: '명의 활동 중인 크리에이터', statGuides: '개의 공개 가이드', statDestinations: '곳의 여행지', statCompletedBookings: '완료된 예약',
     roleCreator: '크리에이터', roleTraveller: '여행자', roleMerchant: '가맹점',
     testimonialsHeading: 'KINNSO 사용자들의 이야기',
     howEyebrow: '이용 방법',

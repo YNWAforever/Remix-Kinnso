@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 
-const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock } = vi.hoisted(() => ({
+const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock, createCheckoutSessionActionMock } = vi.hoisted(() => ({
   getExperienceBySlugMock: vi.fn(),
   listPublicAvailabilityMock: vi.fn(async (): Promise<PublicAvailability[]> => []),
   getUserMock: vi.fn(async () => ({ data: { user: null as { email: string } | null } })),
+  createCheckoutSessionActionMock: vi.fn(),
 }))
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('notFound') } }))
 vi.mock('@/lib/experiences/public-queries', () => ({
@@ -21,6 +22,9 @@ vi.mock('@/lib/supabase/server', () => ({
     auth: { getUser: getUserMock },
   }),
 }))
+vi.mock('@/lib/experiences/booking-actions', () => ({
+  createCheckoutSessionAction: createCheckoutSessionActionMock,
+}))
 
 import ExperiencePublicPage from '@/app/[locale]/experiences/[slug]/page'
 import en from '@/lib/i18n/messages/en'
@@ -29,12 +33,16 @@ afterEach(cleanup)
 
 describe('ExperiencePublicPage', () => {
   it('notFound for an invalid locale', async () => {
-    await expect(ExperiencePublicPage({ params: Promise.resolve({ locale: 'xx', slug: 'sunset-tour' }) })).rejects.toThrow('notFound')
+    await expect(
+      ExperiencePublicPage({ params: Promise.resolve({ locale: 'xx', slug: 'sunset-tour' }), searchParams: Promise.resolve({}) }),
+    ).rejects.toThrow('notFound')
   })
 
   it('notFound for an unknown slug', async () => {
     getExperienceBySlugMock.mockResolvedValue(null)
-    await expect(ExperiencePublicPage({ params: Promise.resolve({ locale: 'en', slug: 'nope' }) })).rejects.toThrow('notFound')
+    await expect(
+      ExperiencePublicPage({ params: Promise.resolve({ locale: 'en', slug: 'nope' }), searchParams: Promise.resolve({}) }),
+    ).rejects.toThrow('notFound')
   })
 
   it('renders the experience with merchant attribution, price, and the real booking widget', async () => {
@@ -45,7 +53,10 @@ describe('ExperiencePublicPage', () => {
       merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
     })
     listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
-    const el = await ExperiencePublicPage({ params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }) })
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
     render(el)
     expect(screen.getByRole('heading', { level: 1, name: 'Sunset junk boat tour' })).toBeTruthy()
     const merchantLinks = screen.getAllByRole('link', { name: /Acme Travel/i })
@@ -63,7 +74,10 @@ describe('ExperiencePublicPage', () => {
     })
     listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
     getUserMock.mockResolvedValueOnce({ data: { user: { email: 'traveler@example.com' } } })
-    const el = await ExperiencePublicPage({ params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }) })
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
     render(el)
     expect(screen.queryByLabelText(en.booking.guestEmailLabel)).toBeNull()
     expect(screen.getByText(en.booking.submitCta)).toBeTruthy()
@@ -77,9 +91,73 @@ describe('ExperiencePublicPage', () => {
       merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
     })
     listPublicAvailabilityMock.mockResolvedValue([])
-    const el = await ExperiencePublicPage({ params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }) })
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
     render(el)
     expect(screen.getByText(/No upcoming dates yet/i)).toBeTruthy()
     expect(screen.queryByRole('button', { name: /book now/i })).toBeNull()
+  })
+
+  it('includes Product/Offer JSON-LD when an open date exists', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).toContain('"@type":"Product"')
+  })
+
+  it('omits Product/Offer JSON-LD when there is no availability', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([])
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).not.toContain('"@type":"Product"')
+  })
+
+  it('threads src/guideSlug query params from searchParams down to the checkout action', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+    getUserMock.mockResolvedValueOnce({ data: { user: { email: 'traveler@example.com' } } })
+    createCheckoutSessionActionMock.mockResolvedValue({ ok: true, checkoutUrl: 'https://x' })
+
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ src: 'guide', guideSlug: 'kyoto-tea' }),
+    })
+    render(el)
+
+    fireEvent.click(screen.getByRole('button', { name: /book now/i }))
+    await vi.waitFor(() => {
+      expect(createCheckoutSessionActionMock).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.objectContaining({ sourceSurface: 'guide', guideSlug: 'kyoto-tea' }),
+      )
+    })
   })
 })

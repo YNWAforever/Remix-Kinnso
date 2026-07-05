@@ -7,13 +7,15 @@ import type { PublicAvailability } from '@/lib/experiences/public-availability-q
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
-export function ExperiencePublicView({ locale, t, bookingT, experience, availability, viewerEmail }: {
+export function ExperiencePublicView({ locale, t, bookingT, experience, availability, viewerEmail, sourceSurface, guideSlug }: {
   locale: Locale
   t: Messages['experiencePublic']
   bookingT: Messages['booking']
   experience: PublicExperience
   availability: PublicAvailability[]
   viewerEmail: string | null
+  sourceSurface?: string
+  guideSlug?: string
 }) {
   const p = (path: string) => `/${locale}${path}`
   return (
@@ -50,7 +52,7 @@ export function ExperiencePublicView({ locale, t, bookingT, experience, availabi
           {experience.durationMinutes ? (
             <p className="mt-3 text-sm text-kinnso-ink/70">{t.durationLabel}: {experience.durationMinutes} {t.minutesSuffix}</p>
           ) : null}
-          <BookingWidget locale={locale} t={bookingT} experience={experience} availability={availability} viewerEmail={viewerEmail} />
+          <BookingWidget locale={locale} t={bookingT} experience={experience} availability={availability} viewerEmail={viewerEmail} sourceSurface={sourceSurface} guideSlug={guideSlug} />
           <Link href={p(`/m/${experience.merchant.slug}`)} className="mt-4 inline-block text-sm font-semibold text-kinnso-orangeDark hover:underline">
             {t.backToMerchant} {experience.merchant.companyName}
           </Link>

@@ -189,3 +189,54 @@ export function normalizeTravelpayoutsAction(raw: Record<string, unknown>): Trav
     raw,
   }
 }
+
+const actionsEndpoint = 'https://api.travelpayouts.com/finance/v2/get_user_actions_affecting_balance'
+const maxActionsPerPage = 300
+const defaultMaxPages = 10 // safety cap: 3000 actions/run, bounds worst-case cron duration
+
+type RawTravelpayoutsActionsResponse = {
+  actions?: Array<Record<string, unknown>>
+}
+
+/**
+ * Fetches affiliate actions from the real Travelpayouts Finance v2 API
+ * (D-R3-9) — verified against the public Travelpayouts Help Center, not
+ * fabricated. Response has no per-action currency (it's a request-scoped
+ * param), which is exactly why normalizeTravelpayoutsAction() already
+ * defaults to 'usd' when raw.currency is absent.
+ */
+export async function fetchTravelpayoutsActions(opts: {
+  currency?: string
+  from?: string
+  until?: string
+  maxPages?: number
+} = {}): Promise<TravelpayoutsAction[]> {
+  const token = requireEnv('TRAVELPAYOUTS_API_TOKEN')
+  const currency = opts.currency ?? 'usd'
+  const maxPages = opts.maxPages ?? defaultMaxPages
+  const actions: TravelpayoutsAction[] = []
+
+  for (let page = 0; page < maxPages; page++) {
+    const url = new URL(actionsEndpoint)
+    url.searchParams.set('currency', currency)
+    url.searchParams.set('limit', String(maxActionsPerPage))
+    url.searchParams.set('offset', String(page * maxActionsPerPage))
+    if (opts.from) url.searchParams.set('from', opts.from)
+    if (opts.until) url.searchParams.set('until', opts.until)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: { 'X-Access-Token': token },
+    })
+    if (!response.ok) {
+      const body = await response.text().catch(() => '')
+      throw new Error(`Travelpayouts actions request failed: ${response.status} ${body}`.trim())
+    }
+    const json = (await response.json()) as RawTravelpayoutsActionsResponse
+    const pageActions = json.actions ?? []
+    for (const raw of pageActions) actions.push(normalizeTravelpayoutsAction(raw))
+    if (pageActions.length < maxActionsPerPage) break
+  }
+
+  return actions
+}

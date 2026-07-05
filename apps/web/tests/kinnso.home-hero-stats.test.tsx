@@ -43,21 +43,29 @@ describe('StatsBar (section 2 — threshold-gated honesty)', () => {
     expect(container.innerHTML).toBe('')
   })
   it('renders nothing when fewer than 2 stats pass their thresholds', () => {
-    const { container } = render(<StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 3, destinations: 2 }} />)
+    const { container } = render(
+      <StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 3, destinations: 2, completedBookings: 0 }} />,
+    )
     expect(container.innerHTML).toBe('')
   })
   it('renders only stats at/above threshold — never zeros', () => {
-    render(<StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 48, destinations: 0 }} />)
+    render(
+      <StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 48, destinations: 0, completedBookings: 0 }} />,
+    )
     expect(screen.getByText('12')).toBeTruthy()
     expect(screen.getByText('48')).toBeTruthy()
     expect(screen.getByText(t.statCreators)).toBeTruthy()
     expect(screen.queryByText(t.statDestinations)).toBeNull()
+    expect(screen.queryByText(t.statCompletedBookings)).toBeNull()
     expect(screen.queryByText('0')).toBeNull()
   })
-  it('renders all three when all pass (boundary values count as passing)', () => {
-    render(<StatsBar locale="en" t={t} stats={{ activeCreators: 5, publishedGuides: 10, destinations: 3 }} />)
+  it('renders all four when all pass (boundary values count as passing)', () => {
+    render(
+      <StatsBar locale="en" t={t} stats={{ activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3 }} />,
+    )
     expect(screen.getByText(t.statCreators)).toBeTruthy()
     expect(screen.getByText(t.statGuides)).toBeTruthy()
     expect(screen.getByText(t.statDestinations)).toBeTruthy()
+    expect(screen.getByText(t.statCompletedBookings)).toBeTruthy()
   })
 })

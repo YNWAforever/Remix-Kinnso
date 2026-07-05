@@ -93,4 +93,44 @@ describe('BookingWidget', () => {
     fireEvent.click(screen.getByText(en.booking.submitCta))
     expect(await screen.findByText('Not enough spots left for that date')).toBeInTheDocument()
   })
+
+  it('threads sourceSurface and guideSlug into the checkout action when given', async () => {
+    createCheckoutSessionActionMock.mockResolvedValue({ ok: true, checkoutUrl: 'https://x' })
+    render(
+      <BookingWidget
+        locale="en"
+        t={en.booking}
+        experience={experience}
+        availability={[{ id: 'a1', date: '2026-08-01', remaining: 4 }]}
+        viewerEmail="traveler@example.com"
+        sourceSurface="guide"
+        guideSlug="kyoto-tea"
+      />,
+    )
+    fireEvent.click(screen.getByText(en.booking.submitCta))
+    await vi.waitFor(() => {
+      expect(createCheckoutSessionActionMock).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        { locale: 'en', sourceSurface: 'guide', guideSlug: 'kyoto-tea' },
+      )
+    })
+  })
+
+  it('omits sourceSurface and guideSlug from the checkout action when neither prop is given', async () => {
+    createCheckoutSessionActionMock.mockResolvedValue({ ok: true, checkoutUrl: 'https://x' })
+    render(
+      <BookingWidget
+        locale="en"
+        t={en.booking}
+        experience={experience}
+        availability={[{ id: 'a1', date: '2026-08-01', remaining: 4 }]}
+        viewerEmail="traveler@example.com"
+      />,
+    )
+    fireEvent.click(screen.getByText(en.booking.submitCta))
+    await vi.waitFor(() => {
+      expect(createCheckoutSessionActionMock).toHaveBeenCalledWith(expect.any(String), expect.any(Object), { locale: 'en' })
+    })
+  })
 })

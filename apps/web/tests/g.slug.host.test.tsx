@@ -10,6 +10,7 @@ vi.mock('next/navigation', () => ({ notFound }))
 
 vi.mock('@/lib/guides/queries', () => ({
   getGuideBySlug: vi.fn(async () => ({
+    id: 'g1',
     slug: 'kyoto-tea',
     title: 'Kyoto Tea Houses',
     cover: 'https://example.com/kyoto.jpg',
@@ -17,10 +18,21 @@ vi.mock('@/lib/guides/queries', () => ({
     saves: 5,
     creatorHandle: 'teafan',
     creatorName: 'Tea Fan',
+    creatorId: 'c1',
     summary: 'Lovely tea houses.',
     publishedAt: '2026-06-02T00:00:00Z',
     source: 'db',
   })),
+}))
+
+// GuideExperienceLinks is an async Server Component — react-dom's client renderer
+// (used by this jsdom+@testing-library/react host test) cannot render a nested async
+// function component directly (that resolution only happens in Next's real RSC
+// pipeline, not in this test harness). It also has its own dedicated test
+// (kinnso.guide-experience-links.test.tsx) and would otherwise make a real
+// getExperiencesForCity()/Supabase call here. Stub it to a synchronous no-op.
+vi.mock('@/components/kinnso/GuideExperienceLinks', () => ({
+  GuideExperienceLinks: () => null,
 }))
 
 describe('/[locale]/g/[slug] host', () => {

@@ -5,6 +5,7 @@ vi.mock('server-only', () => ({}))
 import {
   buildSubId,
   createTravelpayoutsPartnerLinks,
+  fetchTravelpayoutsActions,
   normalizeTravelpayoutsAction,
 } from '@/lib/missions/travelpayouts'
 
@@ -196,6 +197,59 @@ describe('Travelpayouts adapter', () => {
     })).toMatchObject({
       eventState: 'cancelled',
     })
+  })
+})
+
+describe('fetchTravelpayoutsActions', () => {
+  it('calls the Finance v2 endpoint with X-Access-Token and pagination params, normalizing each action', async () => {
+    vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'tok')
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      actions: [{ action_id: 'a1', campaign_id: '101', action_state: 'paid', price: 100, profit: 10, booked_at: '2026-07-01', updated_at: '2026-07-02' }],
+    })))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const actions = await fetchTravelpayoutsActions({ from: '2026-06-28' })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const calledUrl = new URL(fetchMock.mock.calls[0][0] as string)
+    expect(calledUrl.origin + calledUrl.pathname).toBe('https://api.travelpayouts.com/finance/v2/get_user_actions_affecting_balance')
+    expect(calledUrl.searchParams.get('currency')).toBe('usd')
+    expect(calledUrl.searchParams.get('limit')).toBe('300')
+    expect(calledUrl.searchParams.get('offset')).toBe('0')
+    expect(calledUrl.searchParams.get('from')).toBe('2026-06-28')
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'GET', headers: { 'X-Access-Token': 'tok' } })
+    expect(actions).toEqual([expect.objectContaining({ externalActionId: 'a1', eventState: 'paid', priceAmount: 100, profitAmount: 10 })])
+  })
+
+  it('paginates until a short page, respecting a maxPages safety cap', async () => {
+    vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'tok')
+    const fullPage = Array.from({ length: 300 }, (_, i) => ({ action_id: `p1-${i}`, action_state: 'paid' }))
+    const shortPage = [{ action_id: 'p2-0', action_state: 'paid' }]
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ actions: fullPage })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ actions: shortPage })))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const actions = await fetchTravelpayoutsActions()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(actions).toHaveLength(301)
+  })
+
+  it('stops at maxPages even when every page is full (never loops unbounded)', async () => {
+    vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'tok')
+    const fullPage = () => Array.from({ length: 300 }, (_, i) => ({ action_id: `p-${i}`, action_state: 'paid' }))
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(JSON.stringify({ actions: fullPage() })))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const actions = await fetchTravelpayoutsActions({ maxPages: 2 })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(actions).toHaveLength(600)
+  })
+
+  it('throws with the response body on a non-ok response (never swallows a real API error)', async () => {
+    vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'tok')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('Unauthorized', { status: 401 })))
+    await expect(fetchTravelpayoutsActions()).rejects.toThrow(/401.*Unauthorized/)
   })
 })
 

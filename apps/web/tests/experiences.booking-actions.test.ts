@@ -2,7 +2,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-const { getUserMock, fromMock, rpcMock, getExperienceByIdMock, getClientIpMock, sessionsCreateMock, sessionsExpireMock } = vi.hoisted(() => ({
+const { getUserMock, fromMock, rpcMock, getExperienceByIdMock, getClientIpMock, sessionsCreateMock, sessionsExpireMock, getGuideBySlugMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(),
   fromMock: vi.fn(),
   rpcMock: vi.fn(),
@@ -10,6 +10,7 @@ const { getUserMock, fromMock, rpcMock, getExperienceByIdMock, getClientIpMock, 
   getClientIpMock: vi.fn(),
   sessionsCreateMock: vi.fn(),
   sessionsExpireMock: vi.fn(),
+  getGuideBySlugMock: vi.fn(),
 }))
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -27,6 +28,7 @@ vi.mock('@/lib/stripe/client', () => ({
   }),
   toStripeAmount: (amount: number) => Math.round(amount * 100),
 }))
+vi.mock('@/lib/guides/queries', () => ({ getGuideBySlug: getGuideBySlugMock }))
 
 import { createCheckoutSessionAction } from '@/lib/experiences/booking-actions'
 
@@ -45,6 +47,7 @@ beforeEach(() => {
   getClientIpMock.mockReset()
   sessionsCreateMock.mockReset()
   sessionsExpireMock.mockReset()
+  getGuideBySlugMock.mockReset()
   getClientIpMock.mockResolvedValue('1.2.3.4')
   rpcMock.mockResolvedValue({ data: true, error: null })
   getExperienceByIdMock.mockResolvedValue(experience)
@@ -103,7 +106,8 @@ describe('createCheckoutSessionAction (signed-in traveler)', () => {
   it('creates a Stripe session and a pending_payment booking, returning the checkout URL', async () => {
     mockAvailabilityLookup(openAvailability)
     sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
-    fromMock.mockReturnValueOnce({ insert: () => Promise.resolve({ error: null }) })
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
 
     const res = await createCheckoutSessionAction('exp1', { availabilityId: 'avail1', qty: '2' }, { locale: 'en' })
 
@@ -119,7 +123,109 @@ describe('createCheckoutSessionAction (signed-in traveler)', () => {
         ],
       }),
     )
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'experience_page', creator_id: null, guide_id: null }),
+    )
+    expect(getGuideBySlugMock).not.toHaveBeenCalled()
     expect(res).toEqual({ ok: true, checkoutUrl: 'https://checkout.stripe.com/cs_123' })
+  })
+
+  it('attributes source_surface: article with no creator/guide ids', async () => {
+    mockAvailabilityLookup(openAvailability)
+    sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
+
+    const res = await createCheckoutSessionAction(
+      'exp1',
+      { availabilityId: 'avail1', qty: '2' },
+      { locale: 'en', sourceSurface: 'article' },
+    )
+
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'article', creator_id: null, guide_id: null }),
+    )
+    expect(getGuideBySlugMock).not.toHaveBeenCalled()
+    expect(res.ok).toBe(true)
+  })
+
+  it('attributes source_surface: guide to the real creator/guide ids resolved from a published guide slug', async () => {
+    mockAvailabilityLookup(openAvailability)
+    sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+    getGuideBySlugMock.mockResolvedValue({ id: 'g1', creatorId: 'c1' })
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
+
+    const res = await createCheckoutSessionAction(
+      'exp1',
+      { availabilityId: 'avail1', qty: '2' },
+      { locale: 'en', sourceSurface: 'guide', guideSlug: 'kyoto-tea' },
+    )
+
+    expect(getGuideBySlugMock).toHaveBeenCalledWith('kyoto-tea')
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'guide', creator_id: 'c1', guide_id: 'g1' }),
+    )
+    expect(res.ok).toBe(true)
+  })
+
+  it('degrades to experience_page/null when the guide slug does not resolve to a real published guide', async () => {
+    mockAvailabilityLookup(openAvailability)
+    sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+    getGuideBySlugMock.mockResolvedValue(null)
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
+
+    const res = await createCheckoutSessionAction(
+      'exp1',
+      { availabilityId: 'avail1', qty: '2' },
+      { locale: 'en', sourceSurface: 'guide', guideSlug: 'nonexistent' },
+    )
+
+    expect(getGuideBySlugMock).toHaveBeenCalledWith('nonexistent')
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'experience_page', creator_id: null, guide_id: null }),
+    )
+    expect(res.ok).toBe(true)
+  })
+
+  it('degrades to experience_page/null rather than failing the checkout when the guide lookup itself throws', async () => {
+    mockAvailabilityLookup(openAvailability)
+    sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+    getGuideBySlugMock.mockRejectedValue(new Error('network blip'))
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
+
+    const res = await createCheckoutSessionAction(
+      'exp1',
+      { availabilityId: 'avail1', qty: '2' },
+      { locale: 'en', sourceSurface: 'guide', guideSlug: 'kyoto-tea' },
+    )
+
+    expect(getGuideBySlugMock).toHaveBeenCalledWith('kyoto-tea')
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'experience_page', creator_id: null, guide_id: null }),
+    )
+    expect(res.ok).toBe(true)
+  })
+
+  it('degrades to experience_page/null for an unrecognized sourceSurface value', async () => {
+    mockAvailabilityLookup(openAvailability)
+    sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
+
+    const res = await createCheckoutSessionAction(
+      'exp1',
+      { availabilityId: 'avail1', qty: '2' },
+      { locale: 'en', sourceSurface: 'not-a-real-value' },
+    )
+
+    expect(getGuideBySlugMock).not.toHaveBeenCalled()
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'experience_page', creator_id: null, guide_id: null }),
+    )
+    expect(res.ok).toBe(true)
   })
 
   it('expires the Stripe session and returns a failure if the booking insert fails', async () => {
@@ -159,7 +265,13 @@ describe('createCheckoutSessionAction (guest)', () => {
 
     expect(res.ok).toBe(true)
     expect(insertMock).toHaveBeenCalledWith(
-      expect.objectContaining({ traveler_user_id: null, guest_email: 'guest@example.com', source_surface: 'experience_page' }),
+      expect.objectContaining({
+        traveler_user_id: null,
+        guest_email: 'guest@example.com',
+        source_surface: 'experience_page',
+        creator_id: null,
+        guide_id: null,
+      }),
     )
   })
 })

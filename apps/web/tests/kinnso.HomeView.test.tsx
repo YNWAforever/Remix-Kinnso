@@ -12,7 +12,7 @@ const guides = [
   { slug: 'real-seoul', title: 'Real Seoul Guide', cover: '/b.jpg', city: 'Seoul', saves: 7, creatorHandle: 'jun' },
   { slug: 'real-tokyo', title: 'Real Tokyo Guide', cover: '/c.jpg', city: 'Tokyo', saves: 5, creatorHandle: 'aki' },
 ]
-const stats = { activeCreators: 12, publishedGuides: 48, destinations: 9 }
+const stats = { activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4 }
 const testimonials = [
   { id: 't1', quote: 'KINNSO paid me for what I already knew.', authorName: 'Mei', authorRole: 'creator' as const },
 ]

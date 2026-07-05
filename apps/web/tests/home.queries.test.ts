@@ -12,11 +12,16 @@ import {
 } from '@/lib/home/queries'
 
 describe('getPlatformStats', () => {
-  it('maps the RPC row to camelCase numbers', async () => {
+  it('maps the RPC row to camelCase numbers, including completed_bookings', async () => {
     publicClientMock.mockReturnValue({
-      rpc: vi.fn(async () => ({ data: [{ active_creators: 12, published_guides: 48, destinations: 9 }], error: null })),
+      rpc: vi.fn(async () => ({
+        data: [{ active_creators: 12, published_guides: 48, destinations: 9, completed_bookings: 4 }],
+        error: null,
+      })),
     })
-    expect(await getPlatformStats()).toEqual({ activeCreators: 12, publishedGuides: 48, destinations: 9 })
+    expect(await getPlatformStats()).toEqual({
+      activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4,
+    })
   })
   it('degrades to null on RPC failure (stats bar hides; homepage stays up)', async () => {
     publicClientMock.mockReturnValue({ rpc: vi.fn(async () => ({ data: null, error: { message: 'boom' } })) })
@@ -73,9 +78,11 @@ describe('getUpcomingSessions (R5 stub)', () => {
   })
 })
 
-describe('display thresholds (locked R1B decisions)', () => {
+describe('display thresholds (locked R1B decisions + R3C addition)', () => {
   it('exports the honesty thresholds as constants', () => {
-    expect(STAT_THRESHOLDS).toEqual({ activeCreators: 5, publishedGuides: 10, destinations: 3 })
+    expect(STAT_THRESHOLDS).toEqual({
+      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3,
+    })
     expect(MIN_VISIBLE_STATS).toBe(2)
   })
 })

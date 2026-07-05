@@ -4,7 +4,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: '旅行先', dining: 'グルメ', shopping: 'ショッピング' },
   breadcrumb: { home: 'ホーム', articles: '記事' },
-  article: { youMayLike: 'おすすめ記事', faqTitle: 'よくある質問', tableOfContents: '目次', by: '著者', fallbackNotice: 'この記事はまだお使いの言語ではご利用いただけないため、オリジナル版を表示しています。', guidesNearbyEyebrow: 'ここへ旅行を計画中？', guidesNearbyHeading: 'この目的地のクリエイターガイド' },
+  article: { youMayLike: 'おすすめ記事', faqTitle: 'よくある質問', tableOfContents: '目次', by: '著者', fallbackNotice: 'この記事はまだお使いの言語ではご利用いただけないため、オリジナル版を表示しています。', guidesNearbyEyebrow: 'ここへ旅行を計画中？', guidesNearbyHeading: 'この目的地のクリエイターガイド', experiencesNearbyEyebrow: '予約の準備はできましたか？', experiencesNearbyHeading: 'このエリアで予約できる体験' },
   seo: {
     brandTitle: 'KINNSO — トラベルクリエイター、リアルなミッション',
     brandDescription:
@@ -463,7 +463,7 @@ const messages: Messages = {
     heroSubtitle: '信頼できるトラベルクリエイターのガイドに出会い、AIで計画し、ひとつの場所で予約まで。',
     heroPrimaryCta: '旅の計画を始める',
     heroSecondaryCta: 'クリエイターを見る',
-    statCreators: '人のアクティブクリエイター', statGuides: '本の公開ガイド', statDestinations: 'の旅行先',
+    statCreators: '人のアクティブクリエイター', statGuides: '本の公開ガイド', statDestinations: 'の旅行先', statCompletedBookings: '予約完了数',
     roleCreator: 'クリエイター', roleTraveller: '旅行者', roleMerchant: '加盟店',
     testimonialsHeading: 'KINNSO利用者の声',
     howEyebrow: '使い方',

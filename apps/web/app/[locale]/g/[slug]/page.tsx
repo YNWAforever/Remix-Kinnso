@@ -6,6 +6,7 @@ import { isLocale, htmlLang, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { GuideExperienceLinks } from '@/components/kinnso/GuideExperienceLinks'
 import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
@@ -111,6 +112,7 @@ export default async function GuidePage({
           <Link href={`/${locale}/feed`} className="k2-btn-ghost mt-5 inline-flex text-sm">
             {messages.creatorProfile.viewAllGuides}
           </Link>
+          <GuideExperienceLinks locale={locale as Locale} city={guide.city} guideSlug={guide.slug} t={messages.article} />
         </div>
 
         <aside className="k2-card bg-kinnso-cream2 p-6">

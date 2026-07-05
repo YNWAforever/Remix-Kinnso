@@ -108,3 +108,29 @@ export async function getExperienceById(id: string): Promise<PublicExperience | 
 
   return toDomain(exp as unknown as ExpRow, { slug: merchant.slug as string, companyName: merchant.company_name as string })
 }
+
+/**
+ * Published experiences matching a city, for the embedded-CTA components on
+ * article/guide pages (D-R3-7). RLS on `experiences` already restricts anon
+ * reads to published + active-merchant rows (same as getExperiencesForSitemap)
+ * — no merchant join needed here, same no-second-query shape as
+ * listPublishedExperiencesForMerchant. Reads never crash the host page —
+ * failures degrade to [] (same stance as getGuidesForRegions).
+ */
+export async function getExperiencesForCity(city: string, limit = 3): Promise<PublicExperience[]> {
+  const clean = city.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim()
+  if (clean.length < 2) return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data } = await supabase
+      .from('experiences')
+      .select(EXP_COLUMNS)
+      .eq('status', 'published')
+      .ilike('city', `%${clean}%`)
+      .order('published_at', { ascending: false })
+      .limit(limit)
+    return (data ?? []).map((r) => toDomain(r as unknown as ExpRow, { slug: '', companyName: '' }))
+  } catch {
+    return []
+  }
+}

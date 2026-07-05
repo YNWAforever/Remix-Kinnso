@@ -82,3 +82,19 @@ export function merchantProfileJsonLd(i: {
     mainEntity: org,
   }
 }
+
+export function experienceOfferJsonLd(i: {
+  name: string; description: string; url: string; image: string | null
+  priceAmount: number; currency: string
+}): Record<string, unknown> {
+  const ld: Record<string, unknown> = {
+    '@context': 'https://schema.org', '@type': 'Product',
+    name: i.name, description: i.description,
+    offers: {
+      '@type': 'Offer', url: i.url, priceCurrency: i.currency, price: i.priceAmount,
+      availability: 'https://schema.org/InStock',
+    },
+  }
+  if (i.image) ld.image = i.image
+  return ld
+}
