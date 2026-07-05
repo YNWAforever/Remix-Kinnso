@@ -26,8 +26,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildExperienceMetadata({ slug, locale: locale as Locale, title: experience.title, description })
 }
 
-export default async function ExperiencePublicPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+export default async function ExperiencePublicPage({ params, searchParams }: {
+  params: Promise<{ locale: string; slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const { locale, slug } = await params
+  const sp = await searchParams
+  const firstOf = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
+  const sourceSurface = firstOf(sp.src)
+  const guideSlug = firstOf(sp.guideSlug)
   if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
   const experience = await getExperienceBySlug(slug)
@@ -63,6 +70,8 @@ export default async function ExperiencePublicPage({ params }: { params: Promise
         experience={experience}
         availability={availability}
         viewerEmail={user?.email ?? null}
+        sourceSurface={sourceSurface}
+        guideSlug={guideSlug}
       />
     </>
   )

@@ -8,12 +8,14 @@ import type { PublicExperience } from '@/lib/experiences/public-queries'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 import { createCheckoutSessionAction } from '@/lib/experiences/booking-actions'
 
-export function BookingWidget({ locale, t, experience, availability, viewerEmail }: {
+export function BookingWidget({ locale, t, experience, availability, viewerEmail, sourceSurface, guideSlug }: {
   locale: Locale
   t: Messages['booking']
   experience: PublicExperience
   availability: PublicAvailability[]
   viewerEmail: string | null
+  sourceSurface?: string
+  guideSlug?: string
 }) {
   const [selectedId, setSelectedId] = useState(availability.find((a) => a.remaining > 0)?.id ?? '')
   const [qty, setQty] = useState('1')
@@ -29,7 +31,7 @@ export function BookingWidget({ locale, t, experience, availability, viewerEmail
       const result = await createCheckoutSessionAction(
         experience.id,
         { availabilityId: selectedId, qty, guestEmail },
-        { locale },
+        { locale, ...(sourceSurface ? { sourceSurface } : {}), ...(guideSlug ? { guideSlug } : {}) },
       )
       if (!result.ok) {
         setError(
