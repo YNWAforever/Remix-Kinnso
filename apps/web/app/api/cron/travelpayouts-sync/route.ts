@@ -12,6 +12,14 @@ import { createSupabaseServiceClient } from '@/lib/supabase/service'
  * — same trust shape: no user session, shared-secret-gated, server-to-server,
  * narrow set of writes (two read-only lookups + one upsert).
  */
+
+// fetchTravelpayoutsActions' default maxPages=10 sequential fetches, plus this
+// route's 2 lookups + 1 upsert, could plausibly approach Vercel's default
+// timeout on a slow day. 60s comfortably fits Hobby tier's Fluid Compute limit
+// (300s, per vercel.com/docs/functions/configuring-functions/duration as of
+// 2026-06-19) with margin, matching the precedent set by app/api/copilot/route.ts.
+export const maxDuration = 60
+
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET
   const auth = req.headers.get('authorization')
@@ -88,5 +96,3 @@ export async function GET(req: Request) {
 
   return NextResponse.json({ ok: true, synced: rows.length })
 }
-
-export const maxDuration = 60

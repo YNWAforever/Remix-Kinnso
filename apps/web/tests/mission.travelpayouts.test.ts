@@ -235,6 +235,17 @@ describe('fetchTravelpayoutsActions', () => {
     expect(actions).toHaveLength(301)
   })
 
+  it('stops at maxPages even when every page is full (never loops unbounded)', async () => {
+    vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'tok')
+    const fullPage = () => Array.from({ length: 300 }, (_, i) => ({ action_id: `p-${i}`, action_state: 'paid' }))
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(JSON.stringify({ actions: fullPage() })))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const actions = await fetchTravelpayoutsActions({ maxPages: 2 })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(actions).toHaveLength(600)
+  })
+
   it('throws with the response body on a non-ok response (never swallows a real API error)', async () => {
     vi.stubEnv('TRAVELPAYOUTS_API_TOKEN', 'tok')
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('Unauthorized', { status: 401 })))
