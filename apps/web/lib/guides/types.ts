@@ -28,6 +28,8 @@ export interface GuideListItem {
 
 /** Detail-page shape: the public Guide plus detail-only fields. */
 export interface GuideDetail extends Guide {
+  id: string
+  creatorId: string | null
   summary: string | null
   creatorName: string | null
   publishedAt: string | null

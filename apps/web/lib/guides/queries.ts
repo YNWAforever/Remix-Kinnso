@@ -79,7 +79,7 @@ export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> 
   const supabase = createSupabasePublicClient()
   const { data } = await supabase
     .from('guides')
-    .select('slug, title, cover_url, city, saves_count, creator_handle, creator_name, summary, published_at')
+    .select('id, slug, title, cover_url, city, saves_count, creator_handle, creator_name, creator_id, summary, published_at')
     .eq('slug', slug)
     .eq('status', 'published')
     .maybeSingle()
@@ -87,6 +87,8 @@ export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> 
   if (!data) return null
   return {
     ...mapRowToGuide(data),
+    id: data.id as string,
+    creatorId: (data.creator_id as string | null) ?? null,
     summary: data.summary,
     creatorName: data.creator_name,
     publishedAt: (data.published_at as string | null) ?? null,

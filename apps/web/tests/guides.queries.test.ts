@@ -83,16 +83,24 @@ describe('getPublishedGuides', () => {
 })
 
 describe('getGuideBySlug', () => {
-  it('returns the db guide (source: db) when a row exists, threading published_at', async () => {
-    state.single = { ...row, creator_name: 'Tea Fan', summary: 'Lovely tea houses.', published_at: '2026-06-02T00:00:00Z' }
+  it('returns the db guide (source: db) when a row exists, threading published_at, id, and creatorId', async () => {
+    state.single = { ...row, id: 'g1', creator_id: 'c1', creator_name: 'Tea Fan', summary: 'Lovely tea houses.', published_at: '2026-06-02T00:00:00Z' }
     const guide = await getGuideBySlug('kyoto-tea')
     expect(guide?.slug).toBe('kyoto-tea')
+    expect(guide?.id).toBe('g1')
+    expect(guide?.creatorId).toBe('c1')
     expect(guide?.source).toBe('db')
     expect(guide?.publishedAt).toBe('2026-06-02T00:00:00Z')
   })
 
+  it('defaults creatorId to null when the row has no creator_id', async () => {
+    state.single = { ...row, id: 'g1', creator_id: null, creator_name: 'Tea Fan', summary: null }
+    const guide = await getGuideBySlug('kyoto-tea')
+    expect(guide?.creatorId).toBeNull()
+  })
+
   it('defaults publishedAt to null when the row has no published_at', async () => {
-    state.single = { ...row, creator_name: 'Tea Fan', summary: null }
+    state.single = { ...row, id: 'g1', creator_id: null, creator_name: 'Tea Fan', summary: null }
     const guide = await getGuideBySlug('kyoto-tea')
     expect(guide?.publishedAt).toBeNull()
   })
