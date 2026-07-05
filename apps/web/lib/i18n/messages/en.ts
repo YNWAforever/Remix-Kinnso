@@ -733,12 +733,8 @@ export interface Messages {
     point1Title: string; point1Body: string
     point2Title: string; point2Body: string
     point3Title: string; point3Body: string
-    formHeading: string; formBody: string
-    emailLabel: string; emailPlaceholder: string; submitCta: string
-    successNote: string; errorInvalid: string; errorGeneric: string
     honestNote: string; exploreCta: string; articlesCta: string
-    // Live chat UI (AgentChatView, Task 10) — additive alongside the waitlist
-    // keys above until Task 11 retires AgentLandingView/AgentWaitlistForm.
+    errorGeneric: string
     inputPlaceholder: string; send: string; toolWorking: string
     ratingUpLabel: string; ratingDownLabel: string
     unconfiguredTitle: string; unconfiguredBody: string
@@ -1640,9 +1636,9 @@ const messages: Messages = {
     featuredEmpty: 'No published guides yet — the first ones are on their way.',
     agentEyebrow: 'KINNSO AI Agent',
     agentTitle: 'An agent that plans like a local.',
-    agentBody: 'Tell it where you are going and how you like to travel — the KINNSO agent draws on real creator guides, not generic lists, to shape your trip. It is in private preview while we teach it the streets.',
-    agentCta: 'Join the agent waitlist',
-    agentNote: 'In private preview — live trip chat is coming soon.',
+    agentBody: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
+    agentCta: 'Try the AI Agent',
+    agentNote: 'Live now — ask it to plan your next trip.',
     articlesEyebrow: 'From the journal',
     articlesHeading: 'Stories from the ground.',
     articlesSeeAll: 'Read all articles',
@@ -1710,18 +1706,15 @@ const messages: Messages = {
   },
   agent: {
     eyebrow: 'KINNSO AI Agent',
-    title: 'A travel agent grounded in real creators’ guides',
-    body: 'Ask for a plan and get real places pulled from published creator guides and articles — not generic lists. The agent is in private preview while we wire it to live guides.',
+    title: 'Your travel agent, grounded in real creator guides',
+    body: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and bookable experiences to help you plan.',
     pointsHeading: 'What the agent does',
-    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide or article — no invented spots.',
+    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or bookable experience — no invented spots.',
     point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',
-    point3Title: 'Built for booking', point3Body: 'When direct booking ships, recommendations will link straight to bookable stays and experiences.',
-    formHeading: 'Be first in line', formBody: 'Leave your email and we’ll invite you when the agent opens.',
-    emailLabel: 'Email address', emailPlaceholder: 'you@example.com', submitCta: 'Join the waitlist',
-    successNote: 'You’re on the list — we’ll email you when the agent opens.',
-    errorInvalid: 'Enter a valid email address.', errorGeneric: 'Something went wrong — please try again.',
+    point3Title: 'Built for booking', point3Body: 'When it surfaces a bookable experience, you can book it right from the conversation.',
     honestNote: 'The agent isn’t live yet — we only ship it when it’s genuinely useful. Until then, the same knowledge is all here:',
     exploreCta: 'Explore guides', articlesCta: 'Read articles',
+    errorGeneric: 'Something went wrong — please try again.',
     inputPlaceholder: 'Ask about a destination, dates, or style of trip...',
     send: 'Send',
     toolWorking: 'Searching...',
