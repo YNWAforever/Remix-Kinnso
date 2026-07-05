@@ -2197,6 +2197,14 @@ export type Database = {
         Args: { p_ids: string[]; p_reason: string; p_status: string }
         Returns: number
       }
+      admin_cancel_and_refund_booking: {
+        Args: {
+          p_booking_id: string
+          p_reason: string
+          p_stripe_refund_id: string
+        }
+        Returns: undefined
+      }
       admin_creator_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_creator_detail: { Args: { p_creator_id: string }; Returns: Json }
       admin_invite_ops_member: {
@@ -2462,6 +2470,7 @@ export type Database = {
         Args: never
         Returns: {
           active_creators: number
+          completed_bookings: number
           destinations: number
           published_guides: number
         }[]
