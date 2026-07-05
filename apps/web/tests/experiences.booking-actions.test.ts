@@ -149,6 +149,25 @@ describe('createCheckoutSessionAction (signed-in traveler)', () => {
     expect(res.ok).toBe(true)
   })
 
+  it('accepts sourceSurface "agent" and passes it straight through with no attribution lookup', async () => {
+    mockAvailabilityLookup(openAvailability)
+    sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+    const insertMock = vi.fn(() => Promise.resolve({ error: null }))
+    fromMock.mockReturnValueOnce({ insert: insertMock })
+
+    const res = await createCheckoutSessionAction(
+      'exp1',
+      { availabilityId: 'avail1', qty: '2' },
+      { locale: 'en', sourceSurface: 'agent' },
+    )
+
+    expect(getGuideBySlugMock).not.toHaveBeenCalled()
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({ source_surface: 'agent', creator_id: null, guide_id: null }),
+    )
+    expect(res.ok).toBe(true)
+  })
+
   it('attributes source_surface: guide to the real creator/guide ids resolved from a published guide slug', async () => {
     mockAvailabilityLookup(openAvailability)
     sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
