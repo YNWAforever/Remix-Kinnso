@@ -733,7 +733,6 @@ export interface Messages {
     point1Title: string; point1Body: string
     point2Title: string; point2Body: string
     point3Title: string; point3Body: string
-    honestNote: string; exploreCta: string; articlesCta: string
     errorGeneric: string
     inputPlaceholder: string; send: string; toolWorking: string
     ratingUpLabel: string; ratingDownLabel: string
@@ -1712,8 +1711,6 @@ const messages: Messages = {
     point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or bookable experience — no invented spots.',
     point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',
     point3Title: 'Built for booking', point3Body: 'When it surfaces a bookable experience, you can book it right from the conversation.',
-    honestNote: 'The agent isn’t live yet — we only ship it when it’s genuinely useful. Until then, the same knowledge is all here:',
-    exploreCta: 'Explore guides', articlesCta: 'Read articles',
     errorGeneric: 'Something went wrong — please try again.',
     inputPlaceholder: 'Ask about a destination, dates, or style of trip...',
     send: 'Send',

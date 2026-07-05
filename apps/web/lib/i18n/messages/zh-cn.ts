@@ -571,8 +571,6 @@ const messages: Messages = {
     point1Title: '基于真实攻略', point1Body: '每个建议都能追溯到已发布的创作者攻略、文章或可预订体验，没有凭空编造的景点。',
     point2Title: '按你的节奏规划', point2Body: '告诉它目的地、日期和节奏，它会拟出一份真正走得完的行程大纲。',
     point3Title: '为预订而生', point3Body: '当它找到可预订的体验，你可以直接在对话中完成预订。',
-    honestNote: '助理尚未上线——我们只在它真正好用时发布。在此之前，同样的知识都在这里：',
-    exploreCta: '探索攻略', articlesCta: '阅读文章',
     errorGeneric: '出了点问题——请重试。',
     inputPlaceholder: '告诉我们你想去哪里、什么时候去、喜欢怎样的旅行风格……',
     send: '发送',
