@@ -217,6 +217,13 @@ type SearchRow = {
 export async function listCreatorsDirectory(supabase: Client, params: ListDirectoryParams): Promise<CreatorsDirectory> {
   const limit = params.limit ?? 25
   const { data, error } = await supabase.rpc('admin_search_creators', {
+    // Explicit `null` (not `undefined`) for every optional filter, matching this
+    // RPC's own `default null` params and this file's existing test assertions.
+    // The generated Args type below is imprecise here (typed `string | undefined`,
+    // not `string | null | undefined`, for a SQL param whose default IS null) --
+    // cast rather than drop the explicit nulls, since PostgREST treats an omitted
+    // key and an explicit null identically over the wire, but tests here assert
+    // the exact literal value passed to the client.
     p_search: params.search ?? null,
     p_statuses: params.statuses ?? null,
     p_tiers: params.tiers ?? null,
@@ -225,7 +232,7 @@ export async function listCreatorsDirectory(supabase: Client, params: ListDirect
     p_limit: limit,
     p_cursor_created_at: params.cursor?.createdAt ?? null,
     p_cursor_id: params.cursor?.id ?? null,
-  })
+  } as Database['public']['Functions']['admin_search_creators']['Args'])
   if (error) throw error
   const raw = (data ?? []) as SearchRow[]
   const rows: DirectoryRow[] = raw.map((r) => ({

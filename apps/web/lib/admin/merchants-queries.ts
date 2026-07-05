@@ -30,13 +30,20 @@ type SearchRow = { id: string; company_name: string; status: string; tier: strin
 export async function listMerchantsDirectory(supabase: Client, params: ListMerchantsParams): Promise<MerchantsDirectory> {
   const limit = Math.min(Math.max(params.limit ?? 25, 1), 100)
   const { data, error } = await supabase.rpc('admin_search_merchants', {
+    // Explicit `null` (not `undefined`) for every optional filter, matching this
+    // RPC's own `default null` params and this file's existing test assertions.
+    // The generated Args type below is imprecise here (typed `string | undefined`,
+    // not `string | null | undefined`, for a SQL param whose default IS null) --
+    // cast rather than drop the explicit nulls, since PostgREST treats an omitted
+    // key and an explicit null identically over the wire, but tests here assert
+    // the exact literal value passed to the client.
     p_search: params.search ?? null,
     p_statuses: params.statuses ?? null,
     p_tiers: params.tiers ?? null,
     p_limit: limit + 1,
     p_cursor_created_at: params.cursor?.createdAt ?? null,
     p_cursor_id: params.cursor?.id ?? null,
-  })
+  } as Database['public']['Functions']['admin_search_merchants']['Args'])
   if (error) throw error
   const all = ((data ?? []) as unknown as SearchRow[]).map((r) => ({
     id: r.id, companyName: r.company_name, status: r.status, tier: r.tier, createdAt: r.created_at,
