@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FileText, LineChart, MapPin, Store, Users, Briefcase } from 'lucide-react'
+import { CalendarCheck, FileText, LineChart, MapPin, Store, Users, Briefcase } from 'lucide-react'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
@@ -14,6 +14,7 @@ export function MerchantDashboardHomeView({ locale, t }: { locale: Locale; t: Me
     { title: t.cardCreatorsTitle, body: t.cardCreatorsBody, href: p('/merchants/dashboard/creators'), icon: <Users aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardInsightsTitle, body: t.cardInsightsBody, href: p('/merchants/dashboard/insights'), icon: <LineChart aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardExperiencesTitle, body: t.cardExperiencesBody, href: p('/merchants/dashboard/experiences'), icon: <MapPin aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardBookingsTitle, body: t.cardBookingsBody, href: p('/merchants/dashboard/bookings'), icon: <CalendarCheck aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardProfileTitle, body: t.cardProfileBody, href: p('/merchants/dashboard/profile'), icon: <Store aria-hidden="true" className="h-5 w-5" /> },
   ]
   return (

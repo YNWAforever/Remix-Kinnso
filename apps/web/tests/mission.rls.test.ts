@@ -50,6 +50,8 @@ const missionTableNames = [
   'affiliate_partner_links',
   'affiliate_network_events',
   'mission_settlements',
+  'bookings',
+  'booking_settlements',
 ]
 
 function sqlString(value: string) {

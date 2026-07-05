@@ -68,6 +68,11 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(screen.getByRole('link', { name: en.nav.ctaPending }).getAttribute('href')).toBe('/en/creators/apply')
   })
 
+  it('traveler shows My Trips CTA → /en/trips', () => {
+    render(<Navbar locale="en" role="traveler" t={en.nav} />)
+    expect(screen.getByRole('link', { name: en.nav.ctaMyTrips }).getAttribute('href')).toBe('/en/trips')
+  })
+
   it('does not render a Travelers/feed anchor (consolidated into /explore)', () => {
     render(<Navbar locale="en" role="anon" t={en.nav} />)
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))

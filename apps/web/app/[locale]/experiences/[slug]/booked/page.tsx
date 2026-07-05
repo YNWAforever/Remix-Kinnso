@@ -49,15 +49,51 @@ export default async function BookingConfirmationPage({
     )
   }
 
+  if (booking.status === 'confirmed') {
+    return (
+      <div className="k2-container py-16 text-center">
+        <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.confirmedTitle}</h1>
+        <p className="mt-2 text-kinnso-muted">{t.confirmedBody}</p>
+        <div className="k2-card mx-auto mt-6 max-w-sm bg-kinnso-cream2 p-6 text-left">
+          <p className="text-sm font-semibold text-kinnso-ink">{booking.experienceTitle}</p>
+          <p className="mt-2 text-sm text-kinnso-ink/70">{t.summaryQtyLabel}: {booking.qty}</p>
+          <p className="mt-1 text-sm text-kinnso-ink/70">{t.summaryTotalLabel}: {booking.currency} {booking.totalAmount.toLocaleString()}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (booking.status === 'completed') {
+    return (
+      <div className="k2-container py-16 text-center">
+        <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.completedTitle}</h1>
+        <p className="mt-2 text-kinnso-muted">{t.completedBody}</p>
+        <div className="k2-card mx-auto mt-6 max-w-sm bg-kinnso-cream2 p-6 text-left">
+          <p className="text-sm font-semibold text-kinnso-ink">{booking.experienceTitle}</p>
+          <p className="mt-2 text-sm text-kinnso-ink/70">{t.summaryQtyLabel}: {booking.qty}</p>
+          <p className="mt-1 text-sm text-kinnso-ink/70">{t.summaryTotalLabel}: {booking.currency} {booking.totalAmount.toLocaleString()}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (booking.status === 'refunded') {
+    return (
+      <div className="k2-container py-16 text-center">
+        <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.refundedTitle}</h1>
+        <p className="mt-2 text-kinnso-muted">{t.refundedBody}</p>
+      </div>
+    )
+  }
+
+  // booking.status === 'cancelled' — the check constraint still permits this
+  // value even though no code path in this phase produces it (only
+  // 'refunded' is produced by admin_cancel_and_refund_booking); handled
+  // defensively as the final, explicit branch.
   return (
     <div className="k2-container py-16 text-center">
-      <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.confirmedTitle}</h1>
-      <p className="mt-2 text-kinnso-muted">{t.confirmedBody}</p>
-      <div className="k2-card mx-auto mt-6 max-w-sm bg-kinnso-cream2 p-6 text-left">
-        <p className="text-sm font-semibold text-kinnso-ink">{booking.experienceTitle}</p>
-        <p className="mt-2 text-sm text-kinnso-ink/70">{t.summaryQtyLabel}: {booking.qty}</p>
-        <p className="mt-1 text-sm text-kinnso-ink/70">{t.summaryTotalLabel}: {booking.currency} {booking.totalAmount.toLocaleString()}</p>
-      </div>
+      <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.cancelledTitle}</h1>
+      <p className="mt-2 text-kinnso-muted">{t.cancelledBody}</p>
     </div>
   )
 }

@@ -79,4 +79,60 @@ describe('BookingConfirmationPage', () => {
     expect(screen.getByText(`${en.booking.summaryQtyLabel}: 3`)).toBeTruthy()
     expect(screen.getByText(`${en.booking.summaryTotalLabel}: HKD 1,440`)).toBeTruthy()
   })
+
+  it('renders the completed state with experience title, qty, and formatted total', async () => {
+    getBookingByCheckoutSessionMock.mockResolvedValue({
+      bookingId: 'b1', status: 'completed', qty: 2, totalAmount: 960, currency: 'HKD',
+      experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+    })
+    const el = await BookingConfirmationPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ session_id: 'cs_test_123' }),
+    })
+    render(el)
+    expect(screen.getByText(en.booking.completedTitle)).toBeTruthy()
+    expect(screen.getByText(en.booking.completedBody)).toBeTruthy()
+    expect(screen.getByText('Sunset junk boat tour')).toBeTruthy()
+    expect(screen.getByText(`${en.booking.summaryQtyLabel}: 2`)).toBeTruthy()
+    expect(screen.getByText(`${en.booking.summaryTotalLabel}: HKD 960`)).toBeTruthy()
+    expect(screen.queryByText(en.booking.confirmedTitle)).toBeNull()
+  })
+
+  it('renders the cancelled state without a booking summary and without the confirmed copy', async () => {
+    getBookingByCheckoutSessionMock.mockResolvedValue({
+      bookingId: 'b1', status: 'cancelled', qty: 2, totalAmount: 960, currency: 'HKD',
+      experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+    })
+    const el = await BookingConfirmationPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ session_id: 'cs_test_123' }),
+    })
+    render(el)
+    expect(screen.getByText(en.booking.cancelledTitle)).toBeTruthy()
+    expect(screen.getByText(en.booking.cancelledBody)).toBeTruthy()
+    // Regression test for the fallthrough bug: a cancelled booking must never
+    // show the "confirmedTitle"/"confirmedBody" success copy.
+    expect(screen.queryByText(en.booking.confirmedTitle)).toBeNull()
+    expect(screen.queryByText(en.booking.confirmedBody)).toBeNull()
+    expect(screen.queryByText('Sunset junk boat tour')).toBeNull()
+  })
+
+  it('renders the refunded state without a booking summary and without the confirmed copy', async () => {
+    getBookingByCheckoutSessionMock.mockResolvedValue({
+      bookingId: 'b1', status: 'refunded', qty: 2, totalAmount: 960, currency: 'HKD',
+      experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+    })
+    const el = await BookingConfirmationPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ session_id: 'cs_test_123' }),
+    })
+    render(el)
+    expect(screen.getByText(en.booking.refundedTitle)).toBeTruthy()
+    expect(screen.getByText(en.booking.refundedBody)).toBeTruthy()
+    // Regression test for the fallthrough bug: a refunded booking must never
+    // show the "confirmedTitle"/"confirmedBody" success copy.
+    expect(screen.queryByText(en.booking.confirmedTitle)).toBeNull()
+    expect(screen.queryByText(en.booking.confirmedBody)).toBeNull()
+    expect(screen.queryByText('Sunset junk boat tour')).toBeNull()
+  })
 })
