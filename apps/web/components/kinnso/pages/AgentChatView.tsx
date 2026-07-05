@@ -14,15 +14,17 @@ function textOf(m: UIMsg): string {
   return (m.parts ?? []).filter((p) => p.type === 'text').map((p) => p.text ?? '').join('')
 }
 
-export function AgentChatView({ locale, t, configured, anonSessionId, viewerSignedIn }: {
+export function AgentChatView({ locale, t, configured, anonSessionId, viewerSignedIn, initialMessages = [] }: {
   locale: Locale
   t: Messages['agent']
   configured: boolean
   anonSessionId: string
   viewerSignedIn: boolean
+  initialMessages?: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
 }) {
   const { messages, sendMessage, status, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/agent' }),
+    messages: initialMessages.map((m) => ({ id: m.id, role: m.role, parts: [{ type: 'text', text: m.content }] })),
   } as never) as unknown as {
     messages: UIMsg[]
     sendMessage: (m: { text: string }, o?: unknown) => void
