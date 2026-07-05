@@ -577,6 +577,13 @@ const messages: Messages = {
     errorInvalid: '유효한 이메일 주소를 입력하세요.', errorGeneric: '문제가 발생했습니다. 다시 시도해 주세요.',
     honestNote: '에이전트는 아직 공개 전입니다. 정말 쓸모 있을 때 선보이겠습니다. 그때까지 같은 지식을 여기에서 만나보세요:',
     exploreCta: '가이드 둘러보기', articlesCta: '아티클 읽기',
+    inputPlaceholder: '목적지, 날짜, 원하는 여행 스타일을 알려주세요…',
+    send: '보내기',
+    toolWorking: '검색 중…',
+    ratingUpLabel: '이 답변이 도움이 되었어요',
+    ratingDownLabel: '이 답변이 도움이 되지 않았어요',
+    unconfiguredTitle: '에이전트를 일시적으로 이용할 수 없습니다',
+    unconfiguredBody: '여행 에이전트가 일시적으로 오프라인 상태입니다. 잠시 후 다시 시도하거나 가이드와 아티클을 직접 둘러보세요.',
   },
   forCreators: {
     heroEyebrow: '크리에이터를 위한',

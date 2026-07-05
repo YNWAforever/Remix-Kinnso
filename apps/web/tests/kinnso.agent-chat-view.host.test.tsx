@@ -27,9 +27,11 @@ import en from '@/lib/i18n/messages/en'
 import { AgentChatView } from '@/components/kinnso/pages/AgentChatView'
 
 describe('AgentChatView', () => {
-  it('renders the value-prop cards as an empty state when there are no messages', () => {
+  it('renders the value-prop cards as an empty state when there are no messages', async () => {
+    vi.resetModules()
     vi.doMock('@ai-sdk/react', () => ({ useChat: () => ({ messages: [], sendMessage: sendMessageMock, status: 'ready', clearError: vi.fn() }) }))
-    render(<AgentChatView locale="en" t={en.agent} configured={true} anonSessionId="sess-1" viewerSignedIn={false} />)
+    const { AgentChatView: AgentChatViewWithEmptyMessages } = await import('@/components/kinnso/pages/AgentChatView')
+    render(<AgentChatViewWithEmptyMessages locale="en" t={en.agent} configured={true} anonSessionId="sess-1" viewerSignedIn={false} />)
     expect(screen.getByText(en.agent.point1Title)).toBeTruthy()
   })
 
