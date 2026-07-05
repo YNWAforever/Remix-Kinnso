@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 afterEach(cleanup)
 
 const { getUserMock } = vi.hoisted(() => ({
-  getUserMock: vi.fn(async () => ({ data: { user: null } })),
+  getUserMock: vi.fn(async () => ({ data: { user: null as { id: string } | null } })),
 }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }),
