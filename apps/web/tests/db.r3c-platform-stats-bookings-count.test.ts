@@ -21,6 +21,9 @@ describe('app_private.count_completed_bookings()', () => {
 })
 
 describe('platform_stats() — R3C addition', () => {
+  it('drops the existing function first, since Postgres cannot change RETURNS TABLE shape via CREATE OR REPLACE', () => {
+    expect(sql).toContain('drop function if exists public.platform_stats()')
+  })
   it('stays SECURITY INVOKER and gains a fourth completed_bookings column via the new helper', () => {
     expect(sql).toContain('create or replace function public.platform_stats()')
     expect(sql).toContain('security invoker')

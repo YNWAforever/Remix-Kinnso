@@ -15,6 +15,10 @@ $$;
 revoke all on function app_private.count_completed_bookings() from public;
 grant execute on function app_private.count_completed_bookings() to anon, authenticated;
 
+-- Postgres can't change RETURNS TABLE's column list via CREATE OR REPLACE, so the
+-- live 3-column platform_stats() must be dropped before it can be redefined with 4.
+drop function if exists public.platform_stats();
+
 create or replace function public.platform_stats()
 returns table (active_creators bigint, published_guides bigint, destinations bigint, completed_bookings bigint)
 language sql stable security invoker set search_path = public as $$
