@@ -571,8 +571,6 @@ const messages: Messages = {
     point1Title: '建基於真實攻略', point1Body: '每個建議都可以追溯到已發佈嘅創作者攻略、文章或可預訂體驗，冇作出嚟嘅景點。',
     point2Title: '跟你嘅節奏計劃', point2Body: '話低目的地、日期同步伐，助理會草擬一個真係行得通嘅行程大綱。',
     point3Title: '為預訂而生', point3Body: '當佢搵到可預訂嘅體驗，你可以直接喺對話入面完成預訂。',
-    honestNote: '助理仲未推出——我哋只會喺佢真係好用嘅時候先出街。而家不妨先睇睇：',
-    exploreCta: '探索攻略', articlesCta: '閱讀文章',
     errorGeneric: '出咗啲問題——請再試一次。',
     inputPlaceholder: '講吓你想去邊、幾時去、鍾意點玩……',
     send: '傳送',

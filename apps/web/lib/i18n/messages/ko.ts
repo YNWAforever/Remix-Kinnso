@@ -571,8 +571,6 @@ const messages: Messages = {
     point1Title: '진짜 가이드 기반', point1Body: '모든 제안은 공개된 크리에이터 가이드, 아티클, 예약 가능한 체험으로 거슬러 올라갑니다. 지어낸 장소는 없습니다.',
     point2Title: '나에게 맞춘 계획', point2Body: '목적지, 날짜, 여행 속도를 알려주면 실제로 소화할 수 있는 일정 초안을 만들어 줍니다.',
     point3Title: '예약까지 이어지는 설계', point3Body: '예약 가능한 체험을 찾아내면, 대화 중에 바로 예약할 수 있습니다.',
-    honestNote: '에이전트는 아직 공개 전입니다. 정말 쓸모 있을 때 선보이겠습니다. 그때까지 같은 지식을 여기에서 만나보세요:',
-    exploreCta: '가이드 둘러보기', articlesCta: '아티클 읽기',
     errorGeneric: '문제가 발생했습니다. 다시 시도해 주세요.',
     inputPlaceholder: '목적지, 날짜, 원하는 여행 스타일을 알려주세요…',
     send: '보내기',

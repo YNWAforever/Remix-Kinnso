@@ -571,8 +571,6 @@ const messages: Messages = {
     point1Title: '根植於真實攻略', point1Body: '每個建議都能追溯到已發布的創作者攻略、文章或可預訂體驗，沒有憑空捏造的景點。',
     point2Title: '照你的步調規劃', point2Body: '告訴它目的地、日期與節奏，它會擬出一份真的走得完的行程大綱。',
     point3Title: '為預訂而生', point3Body: '當它找到可預訂的體驗，你可以直接在對話中完成預訂。',
-    honestNote: '助理尚未上線——我們只在它真正好用時推出。在那之前，同樣的知識都在這裡：',
-    exploreCta: '探索攻略', articlesCta: '閱讀文章',
     errorGeneric: '發生錯誤——請再試一次。',
     inputPlaceholder: '告訴我們你想去哪裡、什麼時候去、喜歡怎樣的旅行風格……',
     send: '傳送',
