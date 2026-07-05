@@ -7,7 +7,7 @@ import { getExperienceBySlug } from '@/lib/experiences/public-queries'
 import { listPublicAvailability } from '@/lib/experiences/public-availability-queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { buildExperienceMetadata, SITE_URL } from '@/lib/seo/metadata'
-import { breadcrumbJsonLd } from '@/lib/seo/jsonld'
+import { breadcrumbJsonLd, experienceOfferJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
 
@@ -50,15 +50,23 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
   ])
 
   const canonical = `${SITE_URL}/${locale}/experiences/${slug}`
-  // Breadcrumbs only — Product/Offer JSON-LD for real bookability is a
-  // separate SEO carry-forward (design spec groups it with R3C's loop-closure
-  // work, not this phase's Stripe/widget scope).
+  const hasOpenAvailability = availability.some((a) => a.remaining > 0)
   const ld = [
     breadcrumbJsonLd([
       { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
       { name: messages.seo.merchants.title, url: `${SITE_URL}/${locale}/merchants` },
       { name: experience.title, url: canonical },
     ]),
+    ...(hasOpenAvailability
+      ? [experienceOfferJsonLd({
+          name: experience.title,
+          description: experience.summary ?? experience.description ?? `${experience.city} experience`,
+          url: canonical,
+          image: experience.coverUrl,
+          priceAmount: experience.priceAmount,
+          currency: experience.currency,
+        })]
+      : []),
   ]
   return (
     <>

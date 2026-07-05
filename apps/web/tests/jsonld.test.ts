@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { articleJsonLd, faqJsonLd, breadcrumbJsonLd, organizationJsonLd, websiteJsonLd, creatorProfileJsonLd, merchantProfileJsonLd } from '@/lib/seo/jsonld'
+import { articleJsonLd, faqJsonLd, breadcrumbJsonLd, organizationJsonLd, websiteJsonLd, creatorProfileJsonLd, merchantProfileJsonLd, experienceOfferJsonLd } from '@/lib/seo/jsonld'
 
 describe('JSON-LD', () => {
   it('Article includes datePublished AND dateModified (the SEO fix)', () => {
@@ -101,5 +101,19 @@ describe('merchantProfileJsonLd', () => {
     const p = merchantProfileJsonLd({ name: 'Acme', url: 'u', tagline: null, city: null }) as any
     expect(p.mainEntity.description).toBeUndefined()
     expect(p.mainEntity.address).toBeUndefined()
+  })
+})
+
+describe('experienceOfferJsonLd', () => {
+  it('builds a Product/Offer schema from an experience', () => {
+    const ld = experienceOfferJsonLd({
+      name: 'Sunset tour', description: 'Two hours on the harbour.', url: 'https://x/experiences/sunset-tour',
+      image: 'https://x/cover.jpg', priceAmount: 480, currency: 'HKD',
+    })
+    expect(ld).toEqual({
+      '@context': 'https://schema.org', '@type': 'Product',
+      name: 'Sunset tour', description: 'Two hours on the harbour.', image: 'https://x/cover.jpg',
+      offers: { '@type': 'Offer', url: 'https://x/experiences/sunset-tour', priceCurrency: 'HKD', price: 480, availability: 'https://schema.org/InStock' },
+    })
   })
 })

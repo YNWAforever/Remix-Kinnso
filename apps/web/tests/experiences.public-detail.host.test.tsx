@@ -100,6 +100,40 @@ describe('ExperiencePublicPage', () => {
     expect(screen.queryByRole('button', { name: /book now/i })).toBeNull()
   })
 
+  it('includes Product/Offer JSON-LD when an open date exists', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).toContain('"@type":"Product"')
+  })
+
+  it('omits Product/Offer JSON-LD when there is no availability', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([])
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).not.toContain('"@type":"Product"')
+  })
+
   it('threads src/guideSlug query params from searchParams down to the checkout action', async () => {
     getExperienceBySlugMock.mockResolvedValue({
       id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
