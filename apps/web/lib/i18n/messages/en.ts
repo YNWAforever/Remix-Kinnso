@@ -72,6 +72,20 @@ export interface MerchantApplicationsOpsMessages {
   noWebsite: string
 }
 
+export interface BookingsOpsMessages {
+  title: string
+  empty: string
+  colExperience: string
+  colMerchantPayout: string
+  colCreatorCommission: string
+  colKinnsoCommission: string
+  colStatus: string
+  noCreatorLeg: string
+  markPaidButton: string
+  reasonPlaceholder: string
+  actionFailed: string
+}
+
 export interface MerchantDashboardMessages {
   title: string
   subtitle: string
@@ -86,6 +100,8 @@ export interface MerchantDashboardMessages {
   cardInsightsBody: string
   cardExperiencesTitle: string
   cardExperiencesBody: string
+  cardBookingsTitle: string
+  cardBookingsBody: string
   cardProfileTitle: string
   cardProfileBody: string
   profileTitle: string
@@ -152,6 +168,42 @@ export interface MerchantDashboardMessages {
   errDuplicateDate: string
 }
 
+export interface MerchantBookingsMessages {
+  title: string
+  empty: string
+  colExperience: string
+  colTraveler: string
+  colCreator: string
+  colQty: string
+  colAmount: string
+  colStatus: string
+  directLabel: string
+  markCompleteButton: string
+  statusPendingPayment: string
+  statusConfirmed: string
+  statusCompleted: string
+  statusCancelled: string
+  statusRefunded: string
+}
+
+export interface TravelerTripsMessages {
+  title: string
+  empty: string
+  colExperience: string
+  colMerchant: string
+  colQty: string
+  colStatus: string
+  colAmount: string
+  statusPendingPayment: string
+  statusConfirmed: string
+  statusCompleted: string
+  statusCancelled: string
+  statusRefunded: string
+  bookedOnLabel: string
+  savesTabTitle: string
+  savesTabComingSoon: string
+}
+
 export interface MerchantsDirectoryMessages {
   heading: string
   subtitle: string
@@ -171,12 +223,42 @@ export interface MerchantProfileMessages {
 
 export interface ExperiencePublicMessages {
   hostedBy: string
-  bookingSoonBadge: string
-  bookingSoonNote: string
   priceLabel: string
   durationLabel: string
   minutesSuffix: string
   backToMerchant: string
+}
+
+export interface BookingMessages {
+  selectDateLabel: string
+  noAvailability: string
+  qtyLabel: string
+  spotsLeftLabel: string
+  soldOutLabel: string
+  guestEmailLabel: string
+  guestEmailPlaceholder: string
+  guestEmailHint: string
+  submitCta: string
+  submittingCta: string
+  invalidEmail: string
+  invalidQty: string
+  genericError: string
+  rateLimitedError: string
+  confirmedTitle: string
+  confirmedBody: string
+  completedTitle: string
+  completedBody: string
+  cancelledTitle: string
+  cancelledBody: string
+  refundedTitle: string
+  refundedBody: string
+  pendingTitle: string
+  pendingBody: string
+  refreshCta: string
+  notFoundTitle: string
+  notFoundBody: string
+  summaryQtyLabel: string
+  summaryTotalLabel: string
 }
 
 export interface Messages {
@@ -596,7 +678,7 @@ export interface Messages {
     linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
     linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
-    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string
+    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string; ctaMyTrips: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
     merchantMenuLabel: string
   }
@@ -776,6 +858,7 @@ export interface Messages {
   merchantsDirectory: MerchantsDirectoryMessages
   merchantProfile: MerchantProfileMessages
   experiencePublic: ExperiencePublicMessages
+  booking: BookingMessages
   studioOffers: {
     heading: string
     subtitle: string
@@ -835,7 +918,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -881,9 +964,12 @@ export interface Messages {
     payoutsEmpty: string
     reasonRequired: string
   }
+  bookingsOps: BookingsOpsMessages
   merchantApply: MerchantApplyMessages
   merchantApplicationsOps: MerchantApplicationsOpsMessages
   merchantDashboard: MerchantDashboardMessages
+  merchantBookings: MerchantBookingsMessages
+  trips: TravelerTripsMessages
   merchantsOps: {
     title: string; subtitle: string
     tabOverview: string; tabDirectory: string; tabApplications: string
@@ -1497,7 +1583,7 @@ const messages: Messages = {
     linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
     linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
-    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission',
+    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission', ctaMyTrips: 'My Trips',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
     merchantMenuLabel: 'Merchant menu',
   },
@@ -1807,12 +1893,41 @@ const messages: Messages = {
   },
   experiencePublic: {
     hostedBy: 'Hosted by',
-    bookingSoonBadge: 'Booking opens soon',
-    bookingSoonNote: "We're finishing direct booking for this experience. Check back soon.",
     priceLabel: 'From',
     durationLabel: 'Duration',
     minutesSuffix: 'min',
     backToMerchant: 'Back to',
+  },
+  booking: {
+    selectDateLabel: 'Choose a date',
+    noAvailability: 'No upcoming dates yet — check back soon.',
+    qtyLabel: 'Travelers',
+    spotsLeftLabel: 'spots left',
+    soldOutLabel: 'Sold out',
+    guestEmailLabel: 'Email',
+    guestEmailPlaceholder: 'you@example.com',
+    guestEmailHint: "We'll send your booking confirmation here.",
+    submitCta: 'Book now',
+    submittingCta: 'Redirecting to secure checkout…',
+    invalidEmail: 'Enter a valid email address',
+    invalidQty: 'Choose how many travelers',
+    genericError: 'Something went wrong. Please try again.',
+    rateLimitedError: 'Too many attempts. Please try again in a few minutes.',
+    confirmedTitle: "You're booked!",
+    confirmedBody: "We've sent a confirmation to your email.",
+    completedTitle: 'Hope you had a great time!',
+    completedBody: 'You can book this experience again anytime.',
+    cancelledTitle: 'This booking was cancelled',
+    cancelledBody: 'No payment was taken for this booking.',
+    refundedTitle: 'This booking was refunded',
+    refundedBody: 'You should see the refund on your original payment method within 5–10 business days.',
+    pendingTitle: 'Confirming your payment…',
+    pendingBody: 'This can take a few seconds. Refresh to check again.',
+    refreshCta: 'Refresh',
+    notFoundTitle: "We couldn't find that booking",
+    notFoundBody: 'The link may be incomplete or out of date.',
+    summaryQtyLabel: 'Travelers',
+    summaryTotalLabel: 'Total paid',
   },
   studioOffers: {
     heading: 'Affiliate offers',
@@ -1880,7 +1995,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -1928,6 +2043,19 @@ const messages: Messages = {
     confirmMarkDisputed: 'Flag this settlement as disputed?',
     payoutsEmpty: 'No settlements match this filter',
     reasonRequired: 'A reason is required.',
+  },
+  bookingsOps: {
+    title: 'Bookings & Settlements',
+    empty: 'No bookings yet.',
+    colExperience: 'Experience',
+    colMerchantPayout: 'Merchant payout',
+    colCreatorCommission: 'Creator commission',
+    colKinnsoCommission: 'Kinnso commission',
+    colStatus: 'Status',
+    noCreatorLeg: 'No creator (direct booking)',
+    markPaidButton: 'Mark all paid',
+    reasonPlaceholder: 'Reason (required)',
+    actionFailed: 'Action failed. Try again.',
   },
   merchantApply: {
     title: 'Become a KINNSO merchant',
@@ -1981,6 +2109,8 @@ const messages: Messages = {
     cardInsightsBody: 'See how your missions and creators are performing.',
     cardExperiencesTitle: 'Experiences',
     cardExperiencesBody: 'List the tours and activities travellers will soon book.',
+    cardBookingsTitle: 'Bookings',
+    cardBookingsBody: 'Track who booked your experiences and mark completed stays.',
     cardProfileTitle: 'Public profile',
     cardProfileBody: 'Control how your business appears across KINNSO.',
     profileTitle: 'Public profile',
@@ -2045,6 +2175,40 @@ const messages: Messages = {
     actClose: 'Close',
     errInvalidDate: 'Enter a valid date',
     errDuplicateDate: 'This date already exists for this experience',
+  },
+  merchantBookings: {
+    title: 'Bookings',
+    empty: "No bookings yet — once a traveller books one of your experiences, it'll show up here.",
+    colExperience: 'Experience',
+    colTraveler: 'Traveller',
+    colCreator: 'Booked via',
+    colQty: 'Qty',
+    colAmount: 'Amount',
+    colStatus: 'Status',
+    directLabel: 'Direct',
+    markCompleteButton: 'Mark completed',
+    statusPendingPayment: 'Awaiting payment',
+    statusConfirmed: 'Confirmed',
+    statusCompleted: 'Completed',
+    statusCancelled: 'Cancelled',
+    statusRefunded: 'Refunded',
+  },
+  trips: {
+    title: 'Your trips',
+    empty: "No bookings yet — once you book an experience, it'll show up here.",
+    colExperience: 'Experience',
+    colMerchant: 'Merchant',
+    colQty: 'Qty',
+    colStatus: 'Status',
+    colAmount: 'Amount',
+    statusPendingPayment: 'Awaiting payment',
+    statusConfirmed: 'Confirmed',
+    statusCompleted: 'Completed',
+    statusCancelled: 'Cancelled',
+    statusRefunded: 'Refunded',
+    bookedOnLabel: 'Booked on',
+    savesTabTitle: 'Saved',
+    savesTabComingSoon: 'Saved guides and experiences are coming soon.',
   },
   merchantsOps: {
     title: 'Merchants',

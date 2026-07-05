@@ -17,4 +17,5 @@ export const ROBOTS_DISALLOW = [
   '/*/studio', '/*/admin', '/*/ops',
   '/*/sign-in', '/*/sign-up', '/*/creator$',
   '/*/merchants/dashboard', '/*/merchants/apply',
+  '/*/trips',
 ] as const

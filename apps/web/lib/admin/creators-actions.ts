@@ -1,4 +1,5 @@
 import { revalidatePath } from 'next/cache'
+import type { Database } from '@kinnso/db'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireOpsAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
@@ -153,6 +154,13 @@ export async function setSettlementStatus(
   if (rErr) return formError(FRIENDLY[rErr])
 
   const { error } = await supabase.rpc('admin_set_settlement_status', {
+    // Explicit `null` (not `undefined`) for every unchanged leg, matching this
+    // RPC's own `default null` params and this file's existing test assertions.
+    // The generated Args type below is imprecise here (typed `string | undefined`,
+    // not `string | null | undefined`, for a SQL param whose default IS null) --
+    // cast rather than drop the explicit nulls, since PostgREST treats an omitted
+    // key and an explicit null identically over the wire, but tests here assert
+    // the exact literal value passed to the client.
     p_id: id,
     p_status: input.status ?? null,
     p_creator_payout_status: input.creatorPayoutStatus ?? null,
@@ -160,7 +168,7 @@ export async function setSettlementStatus(
     p_affiliate_commission_status: input.affiliateCommissionStatus ?? null,
     p_allow_revert: input.allowRevert ?? false,
     p_reason: reason.trim(),
-  })
+  } as Database['public']['Functions']['admin_set_settlement_status']['Args'])
   if (error) {
     console.error('[admin:creators] setSettlementStatus failed', error)
     return formError(mapError(error.message, 'Settlement status could not be changed'))
