@@ -265,7 +265,7 @@ export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
   breadcrumb: { home: string; articles: string }
-  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string }
+  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string; experiencesNearbyEyebrow: string; experiencesNearbyHeading: string }
   seo: {
     brandTitle: string
     brandDescription: string
@@ -1143,7 +1143,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
   breadcrumb: { home: 'Home', articles: 'Articles' },
-  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination' },
+  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination', experiencesNearbyEyebrow: 'Ready to book?', experiencesNearbyHeading: 'Bookable experiences here' },
   seo: {
     brandTitle: 'KINNSO — Travel creators, real missions',
     brandDescription:
