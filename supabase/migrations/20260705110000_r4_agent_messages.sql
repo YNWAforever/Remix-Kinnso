@@ -10,6 +10,11 @@
 
 create table public.agent_messages (
   id uuid primary key default gen_random_uuid(),
+  -- Deliberately CASCADEs (unlike bookings.traveler_user_id, which has no on-delete
+  -- clause and blocks account deletion instead): this is a chat log, not a financial/
+  -- legal record, so it follows copilot_messages' precedent (full teardown of a
+  -- person's own conversational data on account deletion) rather than bookings'
+  -- "never silently disappear" stance.
   traveler_user_id uuid references auth.users(id) on delete cascade,
   anon_session_id uuid,
   role text not null check (role in ('user','assistant')),
