@@ -6,7 +6,7 @@ vi.mock('@/lib/supabase/public', () => ({
   createSupabasePublicClient: () => ({ from: fromMock }),
 }))
 
-import { getExperienceBySlug, getExperiencesForSitemap, listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
+import { getExperienceBySlug, getExperiencesForCity, getExperiencesForSitemap, listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
 
 beforeEach(() => { fromMock.mockReset() })
 
@@ -74,5 +74,35 @@ describe('getExperiencesForSitemap', () => {
     const order = vi.fn(() => Promise.resolve({ data: [{ slug: 'sunset-tour', published_at: '2026-07-01T00:00:00Z' }], error: null }))
     fromMock.mockReturnValue({ select: vi.fn(() => ({ eq: vi.fn(() => ({ order })) })) })
     expect(await getExperiencesForSitemap()).toEqual([{ slug: 'sunset-tour', lastmod: '2026-07-01T00:00:00Z' }])
+  })
+})
+
+describe('getExperiencesForCity', () => {
+  it('returns [] for a too-short/noise-only city string without querying', async () => {
+    expect(await getExperiencesForCity('!')).toEqual([])
+    expect(fromMock).not.toHaveBeenCalled()
+  })
+
+  it('queries published experiences by case-insensitive city match, ordered, capped at 3', async () => {
+    const limit = vi.fn(() => Promise.resolve({
+      data: [{ id: 'e1', slug: 'sunset-tour', title: 'Sunset tour', summary: null, description: null, city: 'Tokyo', price_amount: 12000, currency: 'JPY', duration_minutes: null, cover_url: null, merchant_profile_id: 'm1', published_at: '2026-07-01T00:00:00Z' }],
+      error: null,
+    }))
+    const order = vi.fn(() => ({ limit }))
+    const ilike = vi.fn(() => ({ order }))
+    const eq = vi.fn(() => ({ ilike }))
+    fromMock.mockReturnValue({ select: vi.fn(() => ({ eq })) })
+
+    const rows = await getExperiencesForCity('Tokyo')
+    expect(fromMock).toHaveBeenCalledWith('experiences')
+    expect(eq).toHaveBeenCalledWith('status', 'published')
+    expect(ilike).toHaveBeenCalledWith('city', '%Tokyo%')
+    expect(limit).toHaveBeenCalledWith(3)
+    expect(rows[0].title).toBe('Sunset tour')
+  })
+
+  it('never throws — degrades to [] on query failure', async () => {
+    fromMock.mockImplementation(() => { throw new Error('boom') })
+    expect(await getExperiencesForCity('Tokyo')).toEqual([])
   })
 })
