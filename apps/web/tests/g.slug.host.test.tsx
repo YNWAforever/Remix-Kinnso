@@ -10,6 +10,7 @@ vi.mock('next/navigation', () => ({ notFound }))
 
 vi.mock('@/lib/guides/queries', () => ({
   getGuideBySlug: vi.fn(async () => ({
+    id: 'g1',
     slug: 'kyoto-tea',
     title: 'Kyoto Tea Houses',
     cover: 'https://example.com/kyoto.jpg',
@@ -17,6 +18,7 @@ vi.mock('@/lib/guides/queries', () => ({
     saves: 5,
     creatorHandle: 'teafan',
     creatorName: 'Tea Fan',
+    creatorId: 'c1',
     summary: 'Lovely tea houses.',
     publishedAt: '2026-06-02T00:00:00Z',
     source: 'db',
