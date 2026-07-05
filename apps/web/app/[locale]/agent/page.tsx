@@ -5,6 +5,7 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { isAgentConfigured } from '@/lib/agent/config'
+import { getAgentMessages } from '@/lib/agent/queries'
 import { AgentChatView } from '@/components/kinnso/pages/AgentChatView'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -30,6 +31,12 @@ export default async function AgentPage({ params }: { params: Promise<{ locale: 
   // equivalent comment from R3A-2).
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Sign-in unlocks reading a traveller's saved conversation back (D-R4-4 / plan
+  // Ground Truth note). Anon sessions have no read policy at all, so there is
+  // nothing to fetch for an anon visitor — same asymmetry as appendAgentMessage's
+  // insert-only anon path.
+  const initialMessages = user ? await getAgentMessages(supabase, user.id) : []
+
   return (
     <AgentChatView
       locale={locale as Locale}
@@ -37,6 +44,7 @@ export default async function AgentPage({ params }: { params: Promise<{ locale: 
       configured={isAgentConfigured()}
       viewerSignedIn={Boolean(user)}
       anonSessionId={randomUUID()}
+      initialMessages={initialMessages.map((m) => ({ id: m.id, role: m.role, content: m.content }))}
     />
   )
 }
