@@ -2,5 +2,8 @@
   "framework": "nextjs",
   "regions": ["hkg1"],
   "buildCommand": "cd ../.. && pnpm --filter web build",
-  "installCommand": "cd ../.. && pnpm install"
+  "installCommand": "cd ../.. && pnpm install",
+  "crons": [
+    { "path": "/api/cron/travelpayouts-sync", "schedule": "0 3 * * *" }
+  ]
 }
