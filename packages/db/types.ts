@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       affiliate_network_events: {
@@ -230,6 +255,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      agent_messages: {
+        Row: {
+          anon_session_id: string | null
+          content: string
+          created_at: string
+          id: string
+          rating: string | null
+          role: string
+          tool_calls: Json | null
+          traveler_user_id: string | null
+        }
+        Insert: {
+          anon_session_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          rating?: string | null
+          role: string
+          tool_calls?: Json | null
+          traveler_user_id?: string | null
+        }
+        Update: {
+          anon_session_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          rating?: string | null
+          role?: string
+          tool_calls?: Json | null
+          traveler_user_id?: string | null
+        }
+        Relationships: []
+      }
+      agent_rate_limits: {
+        Row: {
+          ip: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          ip: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          ip?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
       }
       agent_waitlist: {
         Row: {
@@ -1079,6 +1155,7 @@ export type Database = {
           status: string
           summary: string | null
           title: string
+          tsv: unknown
           updated_at: string
         }
         Insert: {
@@ -1096,6 +1173,7 @@ export type Database = {
           status?: string
           summary?: string | null
           title: string
+          tsv?: unknown
           updated_at?: string
         }
         Update: {
@@ -1113,6 +1191,7 @@ export type Database = {
           status?: string
           summary?: string | null
           title?: string
+          tsv?: unknown
           updated_at?: string
         }
         Relationships: [
@@ -1147,6 +1226,7 @@ export type Database = {
           status: string
           summary: string
           title: string
+          tsv: unknown
           updated_at: string
         }
         Insert: {
@@ -1163,6 +1243,7 @@ export type Database = {
           status?: string
           summary: string
           title: string
+          tsv?: unknown
           updated_at?: string
         }
         Update: {
@@ -1179,6 +1260,7 @@ export type Database = {
           status?: string
           summary?: string
           title?: string
+          tsv?: unknown
           updated_at?: string
         }
         Relationships: [
@@ -2374,6 +2456,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      check_and_increment_agent_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
       check_and_increment_checkout_rate_limit: {
         Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
         Returns: boolean
@@ -2475,6 +2561,14 @@ export type Database = {
           published_guides: number
         }[]
       }
+      rate_agent_message: {
+        Args: {
+          p_anon_session_id?: string
+          p_message_id: string
+          p_rating: string
+        }
+        Returns: undefined
+      }
       recompute_creator_contribution: {
         Args: { p_creator_id: string }
         Returns: undefined
@@ -2514,6 +2608,45 @@ export type Database = {
           title: string
           total_count: number
           url: string
+        }[]
+      }
+      search_experiences: {
+        Args: {
+          p_city?: string
+          p_limit?: number
+          p_offset?: number
+          p_q?: string
+        }
+        Returns: {
+          city: string
+          cover_url: string
+          currency: string
+          merchant_profile_id: string
+          price_amount: number
+          published_at: string
+          slug: string
+          summary: string
+          title: string
+          total_count: number
+        }[]
+      }
+      search_guides: {
+        Args: {
+          p_city?: string
+          p_limit?: number
+          p_offset?: number
+          p_q?: string
+        }
+        Returns: {
+          city: string
+          cover_url: string
+          creator_handle: string
+          published_at: string
+          saves_count: number
+          slug: string
+          summary: string
+          title: string
+          total_count: number
         }[]
       }
       slugify: { Args: { input: string }; Returns: string }
@@ -2645,6 +2778,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

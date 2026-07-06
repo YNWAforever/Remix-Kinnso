@@ -74,6 +74,13 @@ describe('HomeView (R1B 10-section homepage)', () => {
     expect(screen.getByRole('link', { name: new RegExp(en.home.agentCta) }).getAttribute('href')).toBe('/en/agent')
   })
 
+  it('AgentTeaser links straight to /agent with live-chat copy, not waitlist copy', () => {
+    render(<HomeView {...base} />)
+    expect(screen.getByText(en.home.agentCta)).toBeTruthy()
+    const link = screen.getByText(en.home.agentCta).closest('a')
+    expect(link?.getAttribute('href')).toBe('/en/agent')
+  })
+
   it('data-gates every proof section: nothing fake when the data is empty', () => {
     const { container } = render(
       <HomeView {...base} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[]} />,

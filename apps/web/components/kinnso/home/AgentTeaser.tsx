@@ -4,11 +4,8 @@ import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 /**
- * Section 5 — AI Agent block, WAITLIST framing (master spec rule: never
- * feature a non-live agent). Value copy + CTA to /{locale}/agent only —
- * deliberately NO email capture in R1B. R4 flips this band to "Try the AI
- * Agent" with live chat. Ochre eyebrow is allowed here: it sits on dark ink.
- * Hand-rolled eyebrow (not <Eyebrow>) because that component is clay-on-paper.
+ * Section 5 — AI Agent block. Links straight to the live chat at /agent
+ * (R4 — no more waitlist framing; the agent is live).
  */
 export function AgentTeaser({ locale, t }: { locale: Locale; t: Messages['home'] }) {
   return (
