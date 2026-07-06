@@ -153,9 +153,11 @@
   .k2-hairline    { @apply border-t border-kinnso-edge; }
   .k2-btn-primary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso-orange px-6 py-2.5 text-sm font-bold tracking-wide text-white transition hover:bg-kinnso-orangeDark; }
   .k2-btn-ghost   { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] border border-kinnso-ink/25 px-6 py-2.5 text-sm font-semibold tracking-wide text-kinnso-ink transition hover:border-kinnso-ink hover:bg-kinnso-cream2/40; }
+  .k2-input       { @apply w-full min-h-[44px] rounded-[3px] border border-kinnso-edge bg-white px-4 py-2.5 text-sm outline-none transition focus:border-kinnso-orange; }
 
   .k2-btn-primary:focus-visible,
-  .k2-btn-ghost:focus-visible {
+  .k2-btn-ghost:focus-visible,
+  .k2-input:focus-visible {
     outline: 2px solid var(--color-kinnso-orange);
     outline-offset: 2px;
   }
