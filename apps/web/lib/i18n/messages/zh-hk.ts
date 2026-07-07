@@ -467,7 +467,7 @@ const messages: Messages = {
     heroSubtitle: '睇信得過嘅旅遊創作者攻略、用 AI 計劃行程，一個地方搞掂晒。',
     heroPrimaryCta: '開始計劃行程',
     heroSecondaryCta: '睇下創作者',
-    statCreators: '位活躍創作者', statGuides: '份已發佈攻略', statDestinations: '個目的地', statCompletedBookings: '完成預訂',
+    statCreators: '位活躍創作者', statGuides: '份已發佈攻略', statDestinations: '個目的地', statCompletedBookings: '完成預訂', statUpcomingSessions: '場即將舉行嘅活動',
     roleCreator: '創作者', roleTraveller: '旅人', roleMerchant: '商家',
     testimonialsHeading: '大家點睇 KINNSO',
     howEyebrow: '點樣運作',
