@@ -2,9 +2,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const { getUserMock, rpcMock, insertMock, getClientIpMock } = vi.hoisted(() => ({
-  getUserMock: vi.fn(async () => ({ data: { user: null } })),
-  rpcMock: vi.fn(async () => ({ data: true, error: null })),
-  insertMock: vi.fn(async () => ({ error: null })),
+  getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({ data: { user: null } })),
+  rpcMock: vi.fn(async (): Promise<{ data: boolean | null; error: { message: string } | null }> => ({ data: true, error: null })),
+  insertMock: vi.fn(async (): Promise<{ error: { code: string; message: string } | null }> => ({ error: null })),
   getClientIpMock: vi.fn(async () => '203.0.113.5'),
 }))
 vi.mock('@/lib/supabase/server', () => ({

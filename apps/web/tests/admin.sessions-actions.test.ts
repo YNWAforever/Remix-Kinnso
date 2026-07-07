@@ -3,7 +3,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { SessionInput } from '@/lib/sessions/types'
 
 const { requireOpsActionMock, fromMock } = vi.hoisted(() => ({
-  requireOpsActionMock: vi.fn(async () => ({ ok: true, user: { id: 'ops1' } })),
+  requireOpsActionMock: vi.fn(async (): Promise<{ ok: true; user: { id: string } } | { ok: false; errors: Record<string, string[]> }> => ({
+    ok: true, user: { id: 'ops1' },
+  })),
   fromMock: vi.fn(),
 }))
 vi.mock('@/lib/admin/guard', () => ({ requireOpsAction: requireOpsActionMock }))

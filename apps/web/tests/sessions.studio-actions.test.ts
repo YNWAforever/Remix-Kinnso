@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { SessionInput } from '@/lib/sessions/types'
 
 const { requireCreatorActionMock, fromMock, revalidatePathMock } = vi.hoisted(() => ({
-  requireCreatorActionMock: vi.fn(async () => ({ ok: true, user: { id: 'creator-1' } })),
+  requireCreatorActionMock: vi.fn(async (): Promise<{ ok: true; user: { id: string } } | { ok: false; errors: Record<string, string[]> }> => ({
+    ok: true, user: { id: 'creator-1' },
+  })),
   fromMock: vi.fn(),
   revalidatePathMock: vi.fn(),
 }))

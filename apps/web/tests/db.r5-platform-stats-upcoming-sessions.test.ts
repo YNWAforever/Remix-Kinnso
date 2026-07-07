@@ -18,7 +18,7 @@ describe('R5 platform_stats() upcoming_sessions migration', () => {
   })
 
   it('counts scheduled+live community_sessions rows, not a security-definer helper', () => {
-    expect(sql).toMatch(/upcoming_sessions.*select count\(\*\) from public\.community_sessions\s+where status in \('scheduled','live'\)/s)
+    expect(sql).toMatch(/upcoming_sessions[\s\S]*select count\(\*\) from public\.community_sessions\s+where status in \('scheduled','live'\)/)
     expect(sql).not.toContain('app_private.count_upcoming_sessions')
   })
 
