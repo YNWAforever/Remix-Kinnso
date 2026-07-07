@@ -15,12 +15,12 @@ describe('getPlatformStats', () => {
   it('maps the RPC row to camelCase numbers, including completed_bookings', async () => {
     publicClientMock.mockReturnValue({
       rpc: vi.fn(async () => ({
-        data: [{ active_creators: 12, published_guides: 48, destinations: 9, completed_bookings: 4 }],
+        data: [{ active_creators: 12, published_guides: 48, destinations: 9, completed_bookings: 4, upcoming_sessions: 6 }],
         error: null,
       })),
     })
     expect(await getPlatformStats()).toEqual({
-      activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4,
+      activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4, upcomingSessions: 6,
     })
   })
   it('degrades to null on RPC failure (stats bar hides; homepage stays up)', async () => {
@@ -30,6 +30,17 @@ describe('getPlatformStats', () => {
   it('returns null when the RPC yields no row', async () => {
     publicClientMock.mockReturnValue({ rpc: vi.fn(async () => ({ data: [], error: null })) })
     expect(await getPlatformStats()).toBeNull()
+  })
+  it('maps upcoming_sessions alongside the existing stats', async () => {
+    publicClientMock.mockReturnValue({
+      rpc: vi.fn(async () => ({
+        data: [{ active_creators: 12, published_guides: 48, destinations: 9, completed_bookings: 4, upcoming_sessions: 6 }],
+        error: null,
+      })),
+    })
+    expect(await getPlatformStats()).toEqual({
+      activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4, upcomingSessions: 6,
+    })
   })
 })
 
@@ -119,7 +130,7 @@ describe('getUpcomingSessions (R5)', () => {
 describe('display thresholds (locked R1B decisions + R3C addition)', () => {
   it('exports the honesty thresholds as constants', () => {
     expect(STAT_THRESHOLDS).toEqual({
-      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3,
+      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3, upcomingSessions: 1,
     })
     expect(MIN_VISIBLE_STATS).toBe(2)
   })

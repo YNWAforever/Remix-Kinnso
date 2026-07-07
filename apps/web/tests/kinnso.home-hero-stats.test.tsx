@@ -44,13 +44,13 @@ describe('StatsBar (section 2 — threshold-gated honesty)', () => {
   })
   it('renders nothing when fewer than 2 stats pass their thresholds', () => {
     const { container } = render(
-      <StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 3, destinations: 2, completedBookings: 0 }} />,
+      <StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 3, destinations: 2, completedBookings: 0, upcomingSessions: 0 }} />,
     )
     expect(container.innerHTML).toBe('')
   })
   it('renders only stats at/above threshold — never zeros', () => {
     render(
-      <StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 48, destinations: 0, completedBookings: 0 }} />,
+      <StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 48, destinations: 0, completedBookings: 0, upcomingSessions: 0 }} />,
     )
     expect(screen.getByText('12')).toBeTruthy()
     expect(screen.getByText('48')).toBeTruthy()
@@ -61,11 +61,15 @@ describe('StatsBar (section 2 — threshold-gated honesty)', () => {
   })
   it('renders all four when all pass (boundary values count as passing)', () => {
     render(
-      <StatsBar locale="en" t={t} stats={{ activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3 }} />,
+      <StatsBar locale="en" t={t} stats={{ activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3, upcomingSessions: 0 }} />,
     )
     expect(screen.getByText(t.statCreators)).toBeTruthy()
     expect(screen.getByText(t.statGuides)).toBeTruthy()
     expect(screen.getByText(t.statDestinations)).toBeTruthy()
     expect(screen.getByText(t.statCompletedBookings)).toBeTruthy()
+  })
+  it('shows the upcoming-sessions stat once it meets its threshold (1)', () => {
+    render(<StatsBar locale="en" t={t} stats={{ activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4, upcomingSessions: 1 }} />)
+    expect(screen.getByText(en.home.statUpcomingSessions)).toBeTruthy()
   })
 })

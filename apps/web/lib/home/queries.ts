@@ -7,6 +7,7 @@ export interface PlatformStats {
   publishedGuides: number
   destinations: number
   completedBookings: number
+  upcomingSessions: number
 }
 
 /**
@@ -18,6 +19,7 @@ export const STAT_THRESHOLDS = {
   publishedGuides: 10,
   destinations: 3,
   completedBookings: 3, // coldest-start metric — matches the current lowest threshold (D-R3C-4)
+  upcomingSessions: 1, // any real upcoming session is honest content worth surfacing
 } as const
 
 /** Fewer than this many passing stats → the whole social-proof bar renders null. */
@@ -39,6 +41,7 @@ export async function getPlatformStats(): Promise<PlatformStats | null> {
     publishedGuides: Number(row.published_guides),
     destinations: Number(row.destinations),
     completedBookings: Number(row.completed_bookings),
+    upcomingSessions: Number(row.upcoming_sessions),
   }
 }
 

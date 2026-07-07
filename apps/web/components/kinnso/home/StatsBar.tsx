@@ -15,6 +15,7 @@ export function StatsBar({ locale, t, stats }: { locale: Locale; t: Messages['ho
     { key: 'guides', value: stats.publishedGuides, min: STAT_THRESHOLDS.publishedGuides, label: t.statGuides },
     { key: 'destinations', value: stats.destinations, min: STAT_THRESHOLDS.destinations, label: t.statDestinations },
     { key: 'bookings', value: stats.completedBookings, min: STAT_THRESHOLDS.completedBookings, label: t.statCompletedBookings },
+    { key: 'sessions', value: stats.upcomingSessions, min: STAT_THRESHOLDS.upcomingSessions, label: t.statUpcomingSessions },
   ].filter((s) => s.value >= s.min)
   if (entries.length < MIN_VISIBLE_STATS) return null
   const fmt = new Intl.NumberFormat(locale)
