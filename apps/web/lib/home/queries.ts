@@ -76,20 +76,51 @@ export async function getPublishedTestimonials(
   }))
 }
 
-/** The shape R5's community_sessions rows will map into. */
 export interface UpcomingSession {
   id: string
+  slug: string
   title: string
   hostHandle: string
   startsAt: string // ISO timestamp
 }
 
 /**
- * DATA-GATED stub until R5 ships `community_sessions`: returns [] so the
- * homepage Sessions section renders null — no fake content, no empty
- * carousels. R5 replaces this body with a real query; the return type is
- * already the R5 contract, so HomeView will not change shape.
+ * Upcoming (scheduled or live) sessions for the homepage band, oldest-first, capped
+ * to 3. Degrades to [] on any failure (same reads-never-crash stance as
+ * getPublishedGuides) — a query error hides the band, it never crashes the
+ * homepage. Host attribution is a second query against `creators` (same no-embed
+ * two-query shape as lib/sessions/public-queries.ts); a session whose host isn't
+ * publicly readable yet is simply dropped from this list rather than shown with a
+ * broken handle.
  */
 export async function getUpcomingSessions(): Promise<UpcomingSession[]> {
-  return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data, error } = await supabase
+      .from('community_sessions')
+      .select('id, slug, title, starts_at, host_creator_id')
+      .in('status', ['scheduled', 'live'])
+      .order('starts_at', { ascending: true })
+      .limit(3)
+    if (error) throw error
+    const rows = data ?? []
+    if (rows.length === 0) return []
+
+    const ids = [...new Set(rows.map((r) => r.host_creator_id as string))]
+    const { data: creators, error: creatorsError } = await supabase.from('creators').select('id, handle').in('id', ids)
+    if (creatorsError) throw creatorsError
+    const handleById = new Map((creators ?? []).map((c) => [c.id as string, c.handle as string]))
+
+    return rows
+      .filter((r) => handleById.has(r.host_creator_id as string))
+      .map((r) => ({
+        id: r.id as string,
+        slug: r.slug as string,
+        title: r.title as string,
+        hostHandle: handleById.get(r.host_creator_id as string) as string,
+        startsAt: r.starts_at as string,
+      }))
+  } catch {
+    return []
+  }
 }

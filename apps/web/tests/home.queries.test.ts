@@ -72,8 +72,46 @@ describe('getPublishedTestimonials', () => {
   })
 })
 
-describe('getUpcomingSessions (R5 stub)', () => {
-  it('returns an empty list so the homepage Sessions section data-gates off', async () => {
+describe('getUpcomingSessions (R5)', () => {
+  it('queries community_sessions for scheduled+live rows, joins host handle, and returns the UpcomingSession contract including slug', async () => {
+    const sessionRow = { id: 's1', slug: 'tokyo-ramen-ama', title: 'Tokyo ramen AMA', starts_at: '2027-01-15T18:00:00.000Z', host_creator_id: 'creator-1' }
+    const limit = vi.fn(async () => ({ data: [sessionRow], error: null }))
+    const order = vi.fn(() => ({ limit }))
+    const inStatus = vi.fn(() => ({ order }))
+    const selectSessions = vi.fn(() => ({ in: inStatus }))
+
+    const inIds = vi.fn(async () => ({ data: [{ id: 'creator-1', handle: 'sora' }], error: null }))
+    const selectCreators = vi.fn(() => ({ in: inIds }))
+
+    publicClientMock.mockReturnValue({
+      from: vi.fn((table: string) => (table === 'community_sessions' ? { select: selectSessions } : { select: selectCreators })),
+    })
+
+    const result = await getUpcomingSessions()
+    expect(inStatus).toHaveBeenCalledWith('status', ['scheduled', 'live'])
+    expect(order).toHaveBeenCalledWith('starts_at', { ascending: true })
+    expect(limit).toHaveBeenCalledWith(3)
+    expect(inIds).toHaveBeenCalledWith('id', ['creator-1'])
+    expect(result).toEqual([{ id: 's1', slug: 'tokyo-ramen-ama', title: 'Tokyo ramen AMA', hostHandle: 'sora', startsAt: '2027-01-15T18:00:00.000Z' }])
+  })
+
+  it('drops a session whose host is not yet publicly readable rather than showing a broken handle', async () => {
+    const sessionRow = { id: 's1', slug: 'x', title: 'X', starts_at: '2027-01-01T00:00:00.000Z', host_creator_id: 'creator-1' }
+    const limit = vi.fn(async () => ({ data: [sessionRow], error: null }))
+    publicClientMock.mockReturnValue({
+      from: vi.fn((table: string) =>
+        table === 'community_sessions'
+          ? { select: () => ({ in: () => ({ order: () => ({ limit }) }) }) }
+          : { select: () => ({ in: async () => ({ data: [], error: null }) }) },
+      ),
+    })
+    expect(await getUpcomingSessions()).toEqual([])
+  })
+
+  it('degrades to [] on any query error, same reads-never-crash stance as getPublishedGuides', async () => {
+    publicClientMock.mockReturnValue({
+      from: vi.fn(() => ({ select: () => ({ in: () => ({ order: () => ({ limit: async () => ({ data: null, error: { message: 'boom' } }) }) }) }) })),
+    })
     expect(await getUpcomingSessions()).toEqual([])
   })
 })

@@ -169,10 +169,12 @@ export function HomeView({
           <p className="mt-2 max-w-xl text-kinnso-ink/70">{t.sessionsSub}</p>
           <ul className="mt-8 grid gap-5 md:grid-cols-3">
             {sessions.map((s) => (
-              <li key={s.id} className="k2-card p-5">
-                <p className="text-sm text-kinnso-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
-                <h3 className="mt-2 text-lg font-semibold text-kinnso-ink">{s.title}</h3>
-                <p className="mt-1 text-sm text-kinnso-ink/70">@{s.hostHandle}</p>
+              <li key={s.id}>
+                <Link href={p(`/sessions/${s.slug}`)} className="k2-card block p-5 transition hover:border-kinnso-orangeDark">
+                  <p className="text-sm text-kinnso-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
+                  <h3 className="mt-2 text-lg font-semibold text-kinnso-ink">{s.title}</h3>
+                  <p className="mt-1 text-sm text-kinnso-ink/70">@{s.hostHandle}</p>
+                </Link>
               </li>
             ))}
           </ul>

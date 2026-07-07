@@ -24,7 +24,7 @@ const articles = [
 ]
 // hostHandle intentionally distinct from any guides[].creatorHandle above ('aki' collided
 // with the real-tokyo guide's `@aki` card text, making the assertion below ambiguous).
-const sessions = [{ id: 's1', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
+const sessions = [{ id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
 
 const base = { locale: 'en' as const, t: en.home, guides, stats, testimonials, articles, sessions }
 
@@ -65,6 +65,13 @@ describe('HomeView (R1B 10-section homepage)', () => {
     expect(screen.getByText(en.home.sessionsHeading)).toBeTruthy()
     expect(screen.getByText('Tokyo briefing')).toBeTruthy()
     expect(screen.getByText('@sora')).toBeTruthy()
+  })
+
+  it('links each Sessions band card to its detail page', () => {
+    render(<HomeView locale="en" t={en.home} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[
+      { id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' },
+    ]} />)
+    expect(screen.getByRole('link', { name: /Tokyo briefing/ }).getAttribute('href')).toBe('/en/sessions/tokyo-briefing')
   })
 
   it('merchant and creator CTAs land on their locked routes', () => {
