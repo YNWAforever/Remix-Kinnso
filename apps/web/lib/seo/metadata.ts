@@ -159,3 +159,18 @@ export function buildExperienceMetadata(i: { slug: string; locale: Locale; title
     robots: { index: true, follow: true, 'max-image-preview': 'large' },
   }
 }
+
+export function buildSessionMetadata(i: { slug: string; locale: Locale; title: string; description: string }): Metadata {
+  const { canonical, languages } = hreflangFor((l) => abs(l, `/sessions/${i.slug}`), i.locale, LOCALES)
+  return {
+    title: i.title,
+    description: i.description,
+    alternates: { canonical, languages },
+    openGraph: {
+      type: 'website', url: canonical, title: i.title, description: i.description,
+      siteName: 'KINNSO', locale: OG_LOCALE[i.locale],
+    },
+    twitter: { card: 'summary_large_image', title: i.title, description: i.description },
+    robots: { index: true, follow: true, 'max-image-preview': 'large' },
+  }
+}
