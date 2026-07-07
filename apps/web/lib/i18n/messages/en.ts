@@ -778,6 +778,8 @@ export interface Messages {
     perksDesc: string
     insightsTitle: string
     insightsDesc: string
+    sessionsTitle: string
+    sessionsDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -831,6 +833,21 @@ export interface Messages {
     backToGuides: string
     errorTitleRequired: string; errorSummaryRequired: string; errorCityRequired: string
     errorCoverRequired: string; errorCoverInvalid: string; errorGeneric: string
+  }
+  studioSessions: {
+    listPill: string; listHeading: string; listSubtitle: string
+    newButton: string; emptyTitle: string; emptyBody: string
+    statusScheduled: string; statusLive: string; statusEnded: string; statusCancelled: string
+    edit: string
+    formNewHeading: string; formEditHeading: string
+    titleLabel: string; descriptionLabel: string; typeLabel: string
+    startsAtLabel: string; durationLabel: string
+    embedUrlLabel: string; embedUrlPlaceholder: string
+    replayUrlLabel: string; replayUrlPlaceholder: string
+    destinationTagsLabel: string; destinationTagsPlaceholder: string
+    saveButton: string
+    typeDestinationBriefing: string; typeAskACreator: string
+    typeMerchantSpotlight: string; typeNewCreatorIntro: string
   }
   explore: {
     pill: string; heading: string; subtitle: string
@@ -1784,6 +1801,7 @@ const messages: Messages = {
     copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
     perksTitle: 'Perks', perksDesc: 'Partner deals unlocked by your tier.',
     insightsTitle: 'Insights', insightsDesc: 'Your real activity — points, guides, and missions.',
+    sessionsTitle: 'Sessions', sessionsDesc: 'Schedule and host live community sessions.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1856,6 +1874,37 @@ const messages: Messages = {
     errorCoverRequired: 'Add a cover image URL.',
     errorCoverInvalid: 'Enter a valid image URL (http or https).',
     errorGeneric: 'Something went wrong. Please try again.',
+  },
+  studioSessions: {
+    listPill: 'Studio',
+    listHeading: 'My sessions',
+    listSubtitle: 'Schedule, host, and manage the live community sessions you run on KINNSO.',
+    newButton: 'New session',
+    emptyTitle: 'No sessions yet',
+    emptyBody: 'Schedule your first session and it will appear here.',
+    statusScheduled: 'Scheduled',
+    statusLive: 'Live',
+    statusEnded: 'Ended',
+    statusCancelled: 'Cancelled',
+    edit: 'Edit',
+    formNewHeading: 'New session',
+    formEditHeading: 'Edit session',
+    titleLabel: 'Title',
+    descriptionLabel: 'Description',
+    typeLabel: 'Type',
+    startsAtLabel: 'Starts at',
+    durationLabel: 'Duration (minutes)',
+    embedUrlLabel: 'Live embed URL',
+    embedUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    replayUrlLabel: 'Replay URL',
+    replayUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    destinationTagsLabel: 'Destination tags',
+    destinationTagsPlaceholder: 'e.g. Tokyo, Osaka',
+    saveButton: 'Save',
+    typeDestinationBriefing: 'Destination briefing',
+    typeAskACreator: 'Ask a creator',
+    typeMerchantSpotlight: 'Merchant spotlight',
+    typeNewCreatorIntro: 'New creator intro',
   },
   explore: {
     pill: 'Explore',

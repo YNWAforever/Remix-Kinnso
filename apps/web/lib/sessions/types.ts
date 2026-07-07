@@ -16,3 +16,8 @@ export type SessionInput = {
   replayUrl: string // '' = not set yet
   destinationTags: string // comma-separated form-string; parsed downstream
 }
+
+export type SessionListItem = {
+  id: string; slug: string; title: string; type: SessionType
+  startsAt: string; status: SessionStatus; embedUrl: string | null
+}
