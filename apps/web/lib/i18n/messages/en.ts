@@ -279,6 +279,7 @@ export interface Messages {
     terms: { title: string; description: string }
     forCreators: { title: string; description: string }
     forMerchants: { title: string; description: string }
+    sessions: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -1137,6 +1138,10 @@ export interface Messages {
     merchantEmpty: string
     notApplicable: string
   }
+  sessions: {
+    eyebrow: string; title: string; body: string
+    upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
+  }
 }
 
 const messages: Messages = {
@@ -1188,6 +1193,10 @@ const messages: Messages = {
     forMerchants: {
       title: 'Work with vetted travel creators — KINNSO for merchants',
       description: 'Brief vetted travel creators, pay on published results, and reach travellers who trust them.',
+    },
+    sessions: {
+      title: 'Community Sessions — KINNSO',
+      description: 'Live briefings, Q&As, and replays from the creators behind our guides.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -2421,6 +2430,14 @@ const messages: Messages = {
     colDelivered: 'Delivered',
     merchantEmpty: 'Post a mission to start seeing campaign activity.',
     notApplicable: '—',
+  },
+  sessions: {
+    eyebrow: 'Community Sessions',
+    title: 'Live briefings from creators on the ground.',
+    body: 'Ask questions, get real answers, and watch replays from the creators behind our guides.',
+    upcomingHeading: 'Upcoming',
+    emptyUpcoming: 'No sessions scheduled right now — check back soon.',
+    replaysHeading: 'Replays',
   },
 }
 export default messages

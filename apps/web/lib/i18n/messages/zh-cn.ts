@@ -49,6 +49,10 @@ const messages: Messages = {
       title: '与经过审核的旅行创作者合作 — KINNSO 商家专区',
       description: '向经过审核的旅行创作者发布 brief，按已发布成效付款，触达真正信任他们的旅行者。',
     },
+    sessions: {
+      title: '社区活动 — KINNSO',
+      description: '由撰写攻略的创作者亲自主持的实时简报、问答与回放。',
+    },
   },
   listing: { searchPlaceholder: '搜索文章', filterRegion: '地区', filterTag: '标签', noResults: '找不到文章。', resultsCount: '篇文章' },
   pagination: { prev: '上一页', next: '下一页', page: '第' },
@@ -1269,6 +1273,14 @@ const messages: Messages = {
     colDelivered: '已交付',
     merchantEmpty: '发布任务后即可查看活动数据。',
     notApplicable: '—',
+  },
+  sessions: {
+    eyebrow: '社区活动',
+    title: '来自一线创作者的实时分享。',
+    body: '提问、获得真实解答，还能回看撰写攻略的创作者主持的活动回放。',
+    upcomingHeading: '即将开始',
+    emptyUpcoming: '暂时没有安排的活动——请稍后再来看看。',
+    replaysHeading: '活动回放',
   },
 }
 export default messages

@@ -49,6 +49,10 @@ const messages: Messages = {
       title: '검증된 여행 크리에이터와 함께하기 — KINNSO 판매자를 위해',
       description: '검증된 여행 크리에이터에게 브리프를 전달하고, 게시된 성과에 따라 비용을 지불하며, 그들을 신뢰하는 여행자에게 도달하세요.',
     },
+    sessions: {
+      title: '커뮤니티 세션 — KINNSO',
+      description: '가이드를 쓴 크리에이터가 직접 진행하는 라이브 브리핑, Q&A, 다시보기.',
+    },
   },
   listing: { searchPlaceholder: '아티클 검색', filterRegion: '지역', filterTag: '태그', noResults: '검색 결과가 없습니다.', resultsCount: '개' },
   pagination: { prev: '이전', next: '다음', page: '페이지' },
@@ -1269,6 +1273,14 @@ const messages: Messages = {
     colDelivered: '납품됨',
     merchantEmpty: '미션을 게시하여 캠페인 활동을 확인하세요.',
     notApplicable: '—',
+  },
+  sessions: {
+    eyebrow: '커뮤니티 세션',
+    title: '현지 크리에이터의 라이브 브리핑.',
+    body: '질문하고 진짜 답을 들어보세요. 가이드를 쓴 크리에이터의 다시보기 영상도 볼 수 있어요.',
+    upcomingHeading: '예정된 세션',
+    emptyUpcoming: '지금은 예정된 세션이 없어요 — 곧 다시 확인해 주세요.',
+    replaysHeading: '다시보기',
   },
 }
 export default messages

@@ -49,6 +49,10 @@ const messages: Messages = {
       title: '審査済みのトラベルクリエイターと組む — KINNSO加盟店向け',
       description: '審査済みのトラベルクリエイターにブリーフを送り、公開された成果に応じて支払い、彼らを信頼する旅行者にリーチしましょう。',
     },
+    sessions: {
+      title: 'コミュニティセッション — KINNSO',
+      description: 'ガイドを書いたクリエイター本人による、ライブブリーフィング、Q&A、アーカイブ映像。',
+    },
   },
   listing: { searchPlaceholder: '記事を検索', filterRegion: '地域', filterTag: 'タグ', noResults: '記事が見つかりません。', resultsCount: '件' },
   pagination: { prev: '前へ', next: '次へ', page: 'ページ' },
@@ -1269,6 +1273,14 @@ const messages: Messages = {
     colDelivered: '納品済み',
     merchantEmpty: 'ミッションを投稿してキャンペーンアクティビティを確認しましょう。',
     notApplicable: '—',
+  },
+  sessions: {
+    eyebrow: 'コミュニティセッション',
+    title: '現地クリエイターによるライブブリーフィング。',
+    body: '質問して、本音の答えをもらおう。ガイドを書いたクリエイターによるアーカイブ映像も見られます。',
+    upcomingHeading: '開催予定',
+    emptyUpcoming: '現在予定されているセッションはありません。近日中にまたチェックしてください。',
+    replaysHeading: 'アーカイブ',
   },
 }
 export default messages
