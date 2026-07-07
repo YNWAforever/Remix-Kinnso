@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
 }))
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
 
-import { requireOpsPage, requireOpsAction } from '@/lib/admin/guard'
+import { requireOpsPage, requireOpsAction, requireCreatorAction } from '@/lib/admin/guard'
 const sb = () => ({ auth: { getUser: getUserMock } }) as never
 
 beforeEach(() => { roleMock.mockResolvedValue('ops'); getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } }) })
@@ -38,5 +38,27 @@ describe('requireOpsAction', () => {
   it('ok+user for ops', async () => {
     const r = await requireOpsAction(sb())
     expect(r).toEqual({ ok: true, user: { id: 'u1' } })
+  })
+})
+
+describe('requireCreatorAction', () => {
+  it('fails for an anon caller', async () => {
+    const supabase = { auth: { getUser: async () => ({ data: { user: null } }) } }
+    const result = await requireCreatorAction(supabase as never)
+    expect(result.ok).toBe(false)
+  })
+
+  it('fails for a signed-in non-creator (e.g. a traveller)', async () => {
+    roleMock.mockResolvedValueOnce('traveler')
+    const supabase = { auth: { getUser: async () => ({ data: { user: { id: 'u1' } } }) } }
+    const result = await requireCreatorAction(supabase as never)
+    expect(result.ok).toBe(false)
+  })
+
+  it('succeeds for a signed-in creator, returning the user (id doubles as creators.id)', async () => {
+    roleMock.mockResolvedValueOnce('creator')
+    const supabase = { auth: { getUser: async () => ({ data: { user: { id: 'creator-1' } } }) } }
+    const result = await requireCreatorAction(supabase as never)
+    expect(result).toEqual({ ok: true, user: { id: 'creator-1' } })
   })
 })
