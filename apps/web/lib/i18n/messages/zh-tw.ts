@@ -1281,6 +1281,14 @@ const messages: Messages = {
     upcomingHeading: '即將舉行',
     emptyUpcoming: '目前尚無排定的活動——請稍後再來看看。',
     replaysHeading: '活動重播',
+    rsvpEmailLabel: '電子郵件地址',
+    rsvpSubmit: '立即報名',
+    rsvpConfirmed: '報名成功，詳細資訊將以電子郵件寄送給你。',
+    rsvpError: '發生錯誤，請確認電子郵件地址後再試一次。',
+    typeDestinationBriefing: '目的地情報分享',
+    typeAskACreator: '創作者問答',
+    typeMerchantSpotlight: '商家焦點',
+    typeNewCreatorIntro: '新銳創作者介紹',
   },
 }
 export default messages

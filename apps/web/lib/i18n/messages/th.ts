@@ -1281,6 +1281,14 @@ const messages: Messages = {
     upcomingHeading: 'เซสชันที่กำลังจะมาถึง',
     emptyUpcoming: 'ตอนนี้ยังไม่มีเซสชันที่กำหนดไว้ — กลับมาดูใหม่เร็ว ๆ นี้',
     replaysHeading: 'วิดีโอย้อนหลัง',
+    rsvpEmailLabel: 'ที่อยู่อีเมล',
+    rsvpSubmit: 'ลงทะเบียนเข้าร่วม',
+    rsvpConfirmed: 'ลงทะเบียนสำเร็จแล้ว เราจะส่งรายละเอียดไปทางอีเมลให้คุณ',
+    rsvpError: 'เกิดข้อผิดพลาด กรุณาตรวจสอบอีเมลของคุณแล้วลองใหม่อีกครั้ง',
+    typeDestinationBriefing: 'บรีฟจุดหมายปลายทาง',
+    typeAskACreator: 'ถามครีเอเตอร์',
+    typeMerchantSpotlight: 'สปอตไลท์ร้านค้า',
+    typeNewCreatorIntro: 'แนะนำครีเอเตอร์ใหม่',
   },
 }
 export default messages

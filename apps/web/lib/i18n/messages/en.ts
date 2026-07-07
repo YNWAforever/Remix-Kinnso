@@ -1141,6 +1141,9 @@ export interface Messages {
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
+    rsvpEmailLabel: string; rsvpSubmit: string; rsvpConfirmed: string; rsvpError: string
+    typeDestinationBriefing: string; typeAskACreator: string
+    typeMerchantSpotlight: string; typeNewCreatorIntro: string
   }
 }
 
@@ -2438,6 +2441,14 @@ const messages: Messages = {
     upcomingHeading: 'Upcoming',
     emptyUpcoming: 'No sessions scheduled right now — check back soon.',
     replaysHeading: 'Replays',
+    rsvpEmailLabel: 'Your email',
+    rsvpSubmit: 'RSVP',
+    rsvpConfirmed: "You're on the list — we'll be in touch.",
+    rsvpError: 'RSVP could not be saved — please try again.',
+    typeDestinationBriefing: 'Destination briefing',
+    typeAskACreator: 'Ask a creator',
+    typeMerchantSpotlight: 'Merchant spotlight',
+    typeNewCreatorIntro: 'New creator intro',
   },
 }
 export default messages

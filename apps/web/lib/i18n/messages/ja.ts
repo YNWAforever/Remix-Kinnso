@@ -1281,6 +1281,14 @@ const messages: Messages = {
     upcomingHeading: '開催予定',
     emptyUpcoming: '現在予定されているセッションはありません。近日中にまたチェックしてください。',
     replaysHeading: 'アーカイブ',
+    rsvpEmailLabel: 'メールアドレス',
+    rsvpSubmit: '参加登録',
+    rsvpConfirmed: '登録が完了しました。詳細はメールでお送りします。',
+    rsvpError: '問題が発生しました。メールアドレスをご確認のうえ、もう一度お試しください。',
+    typeDestinationBriefing: '目的地ブリーフィング',
+    typeAskACreator: 'クリエイターに質問',
+    typeMerchantSpotlight: '店舗スポットライト',
+    typeNewCreatorIntro: '新人クリエイター紹介',
   },
 }
 export default messages

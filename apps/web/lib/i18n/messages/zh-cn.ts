@@ -1281,6 +1281,14 @@ const messages: Messages = {
     upcomingHeading: '即将开始',
     emptyUpcoming: '暂时没有安排的活动——请稍后再来看看。',
     replaysHeading: '活动回放',
+    rsvpEmailLabel: '电子邮箱',
+    rsvpSubmit: '立即报名',
+    rsvpConfirmed: '报名成功，详情稍后会发送到你的邮箱。',
+    rsvpError: '出了点问题，请检查邮箱地址后重试。',
+    typeDestinationBriefing: '目的地情报分享',
+    typeAskACreator: '创作者问答',
+    typeMerchantSpotlight: '商家焦点',
+    typeNewCreatorIntro: '新晋创作者介绍',
   },
 }
 export default messages

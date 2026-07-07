@@ -1281,6 +1281,14 @@ const messages: Messages = {
     upcomingHeading: '即將舉行',
     emptyUpcoming: '暫時未有活動——遲啲再嚟睇睇啦。',
     replaysHeading: '活動重溫',
+    rsvpEmailLabel: '電郵地址',
+    rsvpSubmit: '立即報名',
+    rsvpConfirmed: '報名成功喇，詳情會用電郵發畀你。',
+    rsvpError: '出咗啲問題，請檢查你嘅電郵地址再試多次。',
+    typeDestinationBriefing: '目的地情報分享',
+    typeAskACreator: '問創作者',
+    typeMerchantSpotlight: '商戶焦點',
+    typeNewCreatorIntro: '新晉創作者介紹',
   },
 }
 export default messages
