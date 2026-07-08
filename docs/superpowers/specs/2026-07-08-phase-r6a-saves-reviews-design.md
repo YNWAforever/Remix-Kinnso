@@ -98,25 +98,45 @@ hidden per decision `D-R3-5` — goes live.
 | `id` | uuid PK | `default gen_random_uuid()` |
 | `booking_id` | uuid | `references bookings(id) on delete cascade`, **unique** |
 | `traveler_user_id` | uuid | `references auth.users(id) on delete cascade`, NOT NULL |
+| `experience_id` | uuid | `references experiences(id) on delete cascade`, NOT NULL — denormalized from `bookings.experience_id` at insert time |
+| `guide_id` | uuid | `references guides(id) on delete cascade`, nullable — denormalized from `bookings.guide_id` (R3C's attribution column) at insert time; null when the booking had no guide attribution |
 | `rating` | smallint | `check (rating between 1 and 5)`, NOT NULL |
 | `body` | text | nullable |
 | `status` | text | `check (status in ('published','hidden'))`, default `'published'` |
 | `created_at` | timestamptz | default `now()` |
 
+`experience_id`/`guide_id` are denormalized rather than looked up via a join at read
+time for a load-bearing reason: `bookings` RLS restricts SELECT to a booking's own
+traveller (or ops) — an arbitrary visitor reading a guide/experience detail page has no
+RLS grant to read *any* row of `bookings`, including someone else's, so a public read
+query that joined `reviews` to `bookings` to find "which experience/guide is this review
+for" would silently return zero rows for every visitor except the reviewer themselves.
+Copying the two id columns onto `reviews` itself at write time means every public read
+is scoped entirely by `reviews`' own RLS and never touches `bookings` at all.
+
 RLS: INSERT gated to `authenticated` `with check` clauses enforcing (a)
-`traveler_user_id = auth.uid()`, (b) the referenced booking's own `traveler_user_id`
-matches the caller and its `status = 'completed'` (an `exists(...)` subquery against
-`bookings`, the real enforcement boundary — mirrors R5's cancelled-session RLS fix
-pattern), and (c) uniqueness on `booking_id` (one review per booking). Public SELECT of
-`status = 'published'` rows for anon + authenticated. Ops-only UPDATE (the `status`
-toggle), no public UPDATE/DELETE.
+`traveler_user_id = auth.uid()`, (b) an `exists(...)` subquery against `bookings`
+confirming the referenced booking's own `traveler_user_id` matches the caller, its
+`status = 'completed'`, and — critically — that the row's own `experience_id`/`guide_id`
+match that same booking's columns exactly (`b.experience_id = reviews.experience_id`,
+`b.guide_id is not distinct from reviews.guide_id`, NULL-safe per this project's
+established `IS DISTINCT FROM` convention), so a client can never insert a review that
+misattributes itself to an experience or guide the booking wasn't actually for. Public
+SELECT of `status = 'published'` rows for anon + authenticated. Ops-only UPDATE (the
+`status` toggle), no public UPDATE/DELETE.
 
 **Aggregate query** (used by both guide and experience detail pages, and by the new
 JSON-LD fields): a plain query, not an RPC — following this codebase's established
 `lib/<domain>/queries.ts` convention (e.g. `lib/guides/queries.ts`, `lib/experiences/
-queries.ts`) — computing `avg(rating), count(*) from reviews where status = 'published'`,
-joined through `reviews.booking_id → bookings.{guide_id|experience_id}` (whichever the
-`bookings` table already keys on) to scope to the relevant guide/experience row.
+queries.ts`) — `select rating from reviews where status = 'published' and experience_id =
+:id` (or `and guide_id = :id`), with the average and count computed in application code
+rather than in SQL (review volume is tiny — D-R6A-7 already accepts a live query over a
+trigger-maintained column for this reason — so there's no need for Postgres-side
+aggregation, and it keeps the read path a single flat `reviews`-only query per the point
+above). A guide's rating reflects bookings whose `source_surface`/`guide_id` attribution
+(R3C's existing query-param mechanism, reused unchanged) traces back to that guide — i.e.
+"travellers this guide sent on a trip, rating how it went" — not a separate, unrelated
+review of the guide's writing.
 
 ## Routes & components
 
