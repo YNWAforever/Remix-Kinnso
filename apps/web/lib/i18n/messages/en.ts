@@ -724,7 +724,6 @@ export interface Messages {
   }
   comingSoon: { heading: string; body: string; back: string }
   destinationsSoon: { eyebrow: string; title: string; body: string; cta: string }
-  sessionsSoon: { eyebrow: string; title: string; body: string; cta: string }
   creatorTerms: {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
@@ -1736,12 +1735,6 @@ const messages: Messages = {
     title: 'Every city, told by the people who know it.',
     body: 'We are stitching KINNSO guides and stories into a browsable atlas of destinations — the food streets, the side alleys, the day trips locals actually take. While we finish it, our destination stories are the best place to start.',
     cta: 'Read destination stories',
-  },
-  sessionsSoon: {
-    eyebrow: 'Community Sessions',
-    title: 'Live briefings from creators on the ground.',
-    body: 'Community Sessions are small live conversations — destination briefings, ask-a-creator hours, and merchant spotlights, hosted by the creators behind our guides. We are lining up the first hosts now.',
-    cta: 'Meet the creators',
   },
   creatorTerms: {
     eyebrow: 'Creator terms',
