@@ -39,6 +39,7 @@ export function SessionDetailView({
 
   const showLiveEmbed = (session.status === 'scheduled' || session.status === 'live') && session.embedUrl
   const showReplay = session.status === 'ended' && session.replayUrl
+  const canRsvp = session.status !== 'cancelled'
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -65,7 +66,9 @@ export function SessionDetailView({
         {showReplay ? <div className="mt-8"><EmbedFrame url={session.replayUrl as string} title={session.title} /></div> : null}
 
         <div className="mt-10 max-w-md">
-          {status === 'done' ? (
+          {!canRsvp ? (
+            <p className="font-semibold text-kinnso-ink">{t.rsvpCancelledNotice}</p>
+          ) : status === 'done' ? (
             <p className="font-semibold text-kinnso-ink">{t.rsvpConfirmed}</p>
           ) : (
             <form onSubmit={onSubmit} className="grid gap-3">

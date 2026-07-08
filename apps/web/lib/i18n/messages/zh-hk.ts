@@ -1314,6 +1314,7 @@ const messages: Messages = {
     rsvpSubmit: '立即報名',
     rsvpConfirmed: '報名成功喇，詳情會用電郵發畀你。',
     rsvpError: '出咗啲問題，請檢查你嘅電郵地址再試多次。',
+    rsvpCancelledNotice: '呢個環節已經取消咗。',
     typeDestinationBriefing: '目的地情報分享',
     typeAskACreator: '問創作者',
     typeMerchantSpotlight: '商戶焦點',

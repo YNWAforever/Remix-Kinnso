@@ -1159,6 +1159,7 @@ export interface Messages {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
     rsvpEmailLabel: string; rsvpSubmit: string; rsvpConfirmed: string; rsvpError: string
+    rsvpCancelledNotice: string
     typeDestinationBriefing: string; typeAskACreator: string
     typeMerchantSpotlight: string; typeNewCreatorIntro: string
   }
@@ -2508,6 +2509,7 @@ const messages: Messages = {
     rsvpSubmit: 'RSVP',
     rsvpConfirmed: "You're on the list — we'll be in touch.",
     rsvpError: 'RSVP could not be saved — please try again.',
+    rsvpCancelledNotice: 'This session has been cancelled.',
     typeDestinationBriefing: 'Destination briefing',
     typeAskACreator: 'Ask a creator',
     typeMerchantSpotlight: 'Merchant spotlight',

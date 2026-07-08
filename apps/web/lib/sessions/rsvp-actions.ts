@@ -7,7 +7,7 @@ import { getClientIp } from '@/lib/http/client-ip'
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 const RSVP_RATE_LIMIT = { maxRequests: 10, windowSeconds: 3600 } as const
 
-export type RsvpResult = { ok: true } | { ok: false; error: 'invalid' | 'rate_limited' | 'failed' }
+export type RsvpResult = { ok: true } | { ok: false; error: 'invalid' | 'rate_limited' | 'cancelled' | 'failed' }
 
 /**
  * Anon-or-authenticated RSVP insert (session_rsvps_insert RLS, D-R5-5). `hp` is the
@@ -16,6 +16,13 @@ export type RsvpResult = { ok: true } | { ok: false; error: 'invalid' | 'rate_li
  * success, not failure — re-RSVPing is a no-op and this doubles as an
  * email-enumeration shield. Uses the SSR-aware server client (not the public
  * client) specifically so a signed-in visitor's user_id is attached.
+ *
+ * Also verifies the target session is not cancelled (and exists) before inserting.
+ * This is a defense-in-depth app-layer check that mirrors the RLS policy's own
+ * `exists (... cs.status <> 'cancelled')` clause — the RLS policy is the real
+ * enforcement boundary, but checking here first gives a clean, specific error
+ * instead of a raw RLS-insert failure. A missing session is treated the same as
+ * cancelled: neither is available to RSVP to.
  */
 export async function rsvpToSessionAction(sessionId: string, email: string, hp?: string): Promise<RsvpResult> {
   if (hp) return { ok: true }
@@ -34,6 +41,17 @@ export async function rsvpToSessionAction(sessionId: string, email: string, hp?:
     return { ok: false, error: 'failed' }
   }
   if (!allowed) return { ok: false, error: 'rate_limited' }
+
+  const { data: sessionRow, error: sessionError } = await supabase
+    .from('community_sessions')
+    .select('status')
+    .eq('id', sessionId)
+    .maybeSingle()
+  if (sessionError) {
+    console.error('[sessions:rsvp] session status lookup failed', sessionError)
+    return { ok: false, error: 'failed' }
+  }
+  if (!sessionRow || sessionRow.status === 'cancelled') return { ok: false, error: 'cancelled' }
 
   const { data: { user } } = await supabase.auth.getUser()
   const { error } = await supabase.from('session_rsvps').insert({

@@ -1314,6 +1314,7 @@ const messages: Messages = {
     rsvpSubmit: 'ลงทะเบียนเข้าร่วม',
     rsvpConfirmed: 'ลงทะเบียนสำเร็จแล้ว เราจะส่งรายละเอียดไปทางอีเมลให้คุณ',
     rsvpError: 'เกิดข้อผิดพลาด กรุณาตรวจสอบอีเมลของคุณแล้วลองใหม่อีกครั้ง',
+    rsvpCancelledNotice: 'เซสชันนี้ถูกยกเลิกแล้ว',
     typeDestinationBriefing: 'บรีฟจุดหมายปลายทาง',
     typeAskACreator: 'ถามครีเอเตอร์',
     typeMerchantSpotlight: 'สปอตไลท์ร้านค้า',

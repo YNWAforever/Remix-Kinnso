@@ -1,17 +1,24 @@
 // apps/web/tests/sessions.rsvp-actions.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { getUserMock, rpcMock, insertMock, getClientIpMock } = vi.hoisted(() => ({
+const { getUserMock, rpcMock, insertMock, selectSessionMock, getClientIpMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({ data: { user: null } })),
   rpcMock: vi.fn(async (): Promise<{ data: boolean | null; error: { message: string } | null }> => ({ data: true, error: null })),
   insertMock: vi.fn(async (): Promise<{ error: { code: string; message: string } | null }> => ({ error: null })),
+  selectSessionMock: vi.fn(async (): Promise<{ data: { status: string } | null; error: { message: string } | null }> => ({
+    data: { status: 'scheduled' }, error: null,
+  })),
   getClientIpMock: vi.fn(async () => '203.0.113.5'),
 }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
     auth: { getUser: getUserMock },
     rpc: rpcMock,
-    from: () => ({ insert: insertMock }),
+    from: (table: string) => (
+      table === 'community_sessions'
+        ? { select: () => ({ eq: () => ({ maybeSingle: selectSessionMock }) }) }
+        : { insert: insertMock }
+    ),
   }),
 }))
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
@@ -25,6 +32,8 @@ beforeEach(() => {
   rpcMock.mockResolvedValue({ data: true, error: null })
   insertMock.mockReset()
   insertMock.mockResolvedValue({ error: null })
+  selectSessionMock.mockReset()
+  selectSessionMock.mockResolvedValue({ data: { status: 'scheduled' }, error: null })
   getClientIpMock.mockClear()
 })
 
@@ -76,5 +85,32 @@ describe('rsvpToSessionAction', () => {
     insertMock.mockResolvedValueOnce({ error: { code: '23503', message: 'fk violation' } })
     const result = await rsvpToSessionAction('sess-1', 'traveller@example.com')
     expect(result).toEqual({ ok: false, error: 'failed' })
+  })
+
+  it('rejects and does not insert when the target session has been cancelled', async () => {
+    selectSessionMock.mockResolvedValueOnce({ data: { status: 'cancelled' }, error: null })
+    const result = await rsvpToSessionAction('sess-1', 'traveller@example.com')
+    expect(result).toEqual({ ok: false, error: 'cancelled' })
+    expect(insertMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects when the target session does not exist', async () => {
+    selectSessionMock.mockResolvedValueOnce({ data: null, error: null })
+    const result = await rsvpToSessionAction('sess-1', 'traveller@example.com')
+    expect(result).toEqual({ ok: false, error: 'cancelled' })
+    expect(insertMock).not.toHaveBeenCalled()
+  })
+
+  it('checks the session status before inserting for a scheduled/live/ended session', async () => {
+    await rsvpToSessionAction('sess-1', 'traveller@example.com')
+    expect(selectSessionMock).toHaveBeenCalled()
+    expect(insertMock).toHaveBeenCalled()
+  })
+
+  it('returns failed and does not insert when the session status lookup itself errors', async () => {
+    selectSessionMock.mockResolvedValueOnce({ data: null, error: { message: 'boom' } })
+    const result = await rsvpToSessionAction('sess-1', 'traveller@example.com')
+    expect(result).toEqual({ ok: false, error: 'failed' })
+    expect(insertMock).not.toHaveBeenCalled()
   })
 })

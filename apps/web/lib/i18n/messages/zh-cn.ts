@@ -1314,6 +1314,7 @@ const messages: Messages = {
     rsvpSubmit: '立即报名',
     rsvpConfirmed: '报名成功，详情稍后会发送到你的邮箱。',
     rsvpError: '出了点问题，请检查邮箱地址后重试。',
+    rsvpCancelledNotice: '该场次已取消。',
     typeDestinationBriefing: '目的地情报分享',
     typeAskACreator: '创作者问答',
     typeMerchantSpotlight: '商家焦点',

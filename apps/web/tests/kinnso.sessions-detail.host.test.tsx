@@ -66,4 +66,12 @@ describe('/[locale]/sessions/[slug] detail host', () => {
     await screen.findByText(en.sessions.rsvpConfirmed)
     expect(rsvpMock).toHaveBeenCalledWith('s1', 'me@example.com', '')
   })
+
+  it('does not render the RSVP form for a cancelled session, showing a cancelled notice instead', async () => {
+    getSessionBySlugMock.mockResolvedValueOnce({ ...liveSession, status: 'cancelled' })
+    const ui = await SessionDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo-ramen-ama' }) })
+    render(ui)
+    expect(screen.getByText(en.sessions.rsvpCancelledNotice)).toBeTruthy()
+    expect(screen.queryByLabelText(en.sessions.rsvpEmailLabel)).toBeNull()
+  })
 })
