@@ -12,7 +12,7 @@ vi.mock('@/lib/admin/guard', () => ({ requireCreatorAction: requireCreatorAction
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ from: fromMock }) }))
 vi.mock('next/cache', () => ({ revalidatePath: revalidatePathMock }))
 
-import { createSessionAction, updateSessionAction, setSessionStatusAction } from '@/lib/sessions/studio-actions'
+import { createSessionAction, setSessionStatusAction } from '@/lib/sessions/studio-actions'
 
 const validInput: SessionInput = {
   title: 'Tokyo ramen AMA', description: 'Ask away.', type: 'ask_a_creator',
