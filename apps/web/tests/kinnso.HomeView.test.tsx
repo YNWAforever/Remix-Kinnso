@@ -12,7 +12,7 @@ const guides = [
   { slug: 'real-seoul', title: 'Real Seoul Guide', cover: '/b.jpg', city: 'Seoul', saves: 7, creatorHandle: 'jun' },
   { slug: 'real-tokyo', title: 'Real Tokyo Guide', cover: '/c.jpg', city: 'Tokyo', saves: 5, creatorHandle: 'aki' },
 ]
-const stats = { activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4 }
+const stats = { activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4, upcomingSessions: 6 }
 const testimonials = [
   { id: 't1', quote: 'KINNSO paid me for what I already knew.', authorName: 'Mei', authorRole: 'creator' as const },
 ]
@@ -24,7 +24,7 @@ const articles = [
 ]
 // hostHandle intentionally distinct from any guides[].creatorHandle above ('aki' collided
 // with the real-tokyo guide's `@aki` card text, making the assertion below ambiguous).
-const sessions = [{ id: 's1', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
+const sessions = [{ id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
 
 const base = { locale: 'en' as const, t: en.home, guides, stats, testimonials, articles, sessions }
 
@@ -65,6 +65,13 @@ describe('HomeView (R1B 10-section homepage)', () => {
     expect(screen.getByText(en.home.sessionsHeading)).toBeTruthy()
     expect(screen.getByText('Tokyo briefing')).toBeTruthy()
     expect(screen.getByText('@sora')).toBeTruthy()
+  })
+
+  it('links each Sessions band card to its detail page', () => {
+    render(<HomeView locale="en" t={en.home} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[
+      { id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' },
+    ]} />)
+    expect(screen.getByRole('link', { name: /Tokyo briefing/ }).getAttribute('href')).toBe('/en/sessions/tokyo-briefing')
   })
 
   it('merchant and creator CTAs land on their locked routes', () => {

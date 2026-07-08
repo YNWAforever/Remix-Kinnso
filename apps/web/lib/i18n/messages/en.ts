@@ -279,6 +279,7 @@ export interface Messages {
     terms: { title: string; description: string }
     forCreators: { title: string; description: string }
     forMerchants: { title: string; description: string }
+    sessions: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -693,7 +694,7 @@ export interface Messages {
   home: {
     heroEyebrow: string; heroTitle: string; heroSubtitle: string
     heroPrimaryCta: string; heroSecondaryCta: string
-    statCreators: string; statGuides: string; statDestinations: string; statCompletedBookings: string
+    statCreators: string; statGuides: string; statDestinations: string; statCompletedBookings: string; statUpcomingSessions: string
     roleCreator: string; roleTraveller: string; roleMerchant: string
     testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
@@ -723,7 +724,6 @@ export interface Messages {
   }
   comingSoon: { heading: string; body: string; back: string }
   destinationsSoon: { eyebrow: string; title: string; body: string; cta: string }
-  sessionsSoon: { eyebrow: string; title: string; body: string; cta: string }
   creatorTerms: {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
@@ -777,6 +777,8 @@ export interface Messages {
     perksDesc: string
     insightsTitle: string
     insightsDesc: string
+    sessionsTitle: string
+    sessionsDesc: string
   }
   studioDashboard: {
     greeting: string
@@ -830,6 +832,22 @@ export interface Messages {
     backToGuides: string
     errorTitleRequired: string; errorSummaryRequired: string; errorCityRequired: string
     errorCoverRequired: string; errorCoverInvalid: string; errorGeneric: string
+  }
+  studioSessions: {
+    listPill: string; listHeading: string; listSubtitle: string
+    newButton: string; emptyTitle: string; emptyBody: string
+    statusScheduled: string; statusLive: string; statusEnded: string; statusCancelled: string
+    edit: string
+    formNewHeading: string; formEditHeading: string
+    titleLabel: string; descriptionLabel: string; typeLabel: string
+    startsAtLabel: string; durationLabel: string
+    embedUrlLabel: string; embedUrlPlaceholder: string
+    replayUrlLabel: string; replayUrlPlaceholder: string
+    destinationTagsLabel: string; destinationTagsPlaceholder: string
+    saveButton: string
+    typeDestinationBriefing: string; typeAskACreator: string
+    typeMerchantSpotlight: string; typeNewCreatorIntro: string
+    hostPickerLabel: string; hostPickerPlaceholder: string; hostRequiredError: string
   }
   explore: {
     pill: string; heading: string; subtitle: string
@@ -918,7 +936,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -1137,6 +1155,31 @@ export interface Messages {
     merchantEmpty: string
     notApplicable: string
   }
+  sessions: {
+    eyebrow: string; title: string; body: string
+    upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
+    rsvpEmailLabel: string; rsvpSubmit: string; rsvpConfirmed: string; rsvpError: string
+    rsvpCancelledNotice: string
+    typeDestinationBriefing: string; typeAskACreator: string
+    typeMerchantSpotlight: string; typeNewCreatorIntro: string
+  }
+  sessionsAdmin: {
+    title: string; subtitle: string; newCta: string; empty: string
+    statusScheduled: string; statusLive: string; statusEnded: string; statusCancelled: string
+    typeDestinationBriefing: string; typeAskACreator: string
+    typeMerchantSpotlight: string; typeNewCreatorIntro: string
+    actEdit: string; actGoLive: string; actEnd: string; actCancel: string
+    actViewRsvps: string; actDelete: string; deleteConfirm: string
+    rsvpsEmpty: string
+    formNewTitle: string; formEditTitle: string; formCancel: string
+    titleLabel: string; descriptionLabel: string; typeLabel: string
+    startsAtLabel: string; durationLabel: string
+    embedUrlLabel: string; embedUrlPlaceholder: string
+    replayUrlLabel: string; replayUrlPlaceholder: string
+    destinationTagsLabel: string; destinationTagsPlaceholder: string
+    saveButton: string
+    hostPickerLabel: string; hostPickerPlaceholder: string; hostRequiredError: string
+  }
 }
 
 const messages: Messages = {
@@ -1188,6 +1231,10 @@ const messages: Messages = {
     forMerchants: {
       title: 'Work with vetted travel creators — KINNSO for merchants',
       description: 'Brief vetted travel creators, pay on published results, and reach travellers who trust them.',
+    },
+    sessions: {
+      title: 'Community Sessions — KINNSO',
+      description: 'Live briefings, Q&As, and replays from the creators behind our guides.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -1603,7 +1650,7 @@ const messages: Messages = {
     heroSubtitle: 'Discover guides from trusted travel creators. Plan with AI. Book in one place.',
     heroPrimaryCta: 'Start Planning',
     heroSecondaryCta: 'Browse Creators',
-    statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered', statCompletedBookings: 'completed bookings',
+    statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered', statCompletedBookings: 'completed bookings', statUpcomingSessions: 'live sessions coming up',
     roleCreator: 'Creator', roleTraveller: 'Traveller', roleMerchant: 'Merchant',
     testimonialsHeading: 'What people say about KINNSO',
     howEyebrow: 'How it works',
@@ -1690,12 +1737,6 @@ const messages: Messages = {
     body: 'We are stitching KINNSO guides and stories into a browsable atlas of destinations — the food streets, the side alleys, the day trips locals actually take. While we finish it, our destination stories are the best place to start.',
     cta: 'Read destination stories',
   },
-  sessionsSoon: {
-    eyebrow: 'Community Sessions',
-    title: 'Live briefings from creators on the ground.',
-    body: 'Community Sessions are small live conversations — destination briefings, ask-a-creator hours, and merchant spotlights, hosted by the creators behind our guides. We are lining up the first hosts now.',
-    cta: 'Meet the creators',
-  },
   creatorTerms: {
     eyebrow: 'Creator terms',
     title: 'Creator Terms (MVP draft)',
@@ -1772,6 +1813,7 @@ const messages: Messages = {
     copilotDesc: 'Chat with your AI copilot for ideas, captions, and content.',
     perksTitle: 'Perks', perksDesc: 'Partner deals unlocked by your tier.',
     insightsTitle: 'Insights', insightsDesc: 'Your real activity — points, guides, and missions.',
+    sessionsTitle: 'Sessions', sessionsDesc: 'Schedule and host live community sessions.',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',
@@ -1844,6 +1886,40 @@ const messages: Messages = {
     errorCoverRequired: 'Add a cover image URL.',
     errorCoverInvalid: 'Enter a valid image URL (http or https).',
     errorGeneric: 'Something went wrong. Please try again.',
+  },
+  studioSessions: {
+    listPill: 'Sessions',
+    listHeading: 'Your sessions',
+    listSubtitle: 'Schedule and manage your community sessions.',
+    newButton: 'New session',
+    emptyTitle: 'No sessions yet',
+    emptyBody: 'Schedule your first session to start meeting your community live.',
+    statusScheduled: 'Scheduled',
+    statusLive: 'Live',
+    statusEnded: 'Ended',
+    statusCancelled: 'Cancelled',
+    edit: 'Edit',
+    formNewHeading: 'New session',
+    formEditHeading: 'Edit session',
+    titleLabel: 'Title',
+    descriptionLabel: 'Description',
+    typeLabel: 'Type',
+    startsAtLabel: 'Starts at',
+    durationLabel: 'Duration (minutes)',
+    embedUrlLabel: 'Live embed URL (YouTube)',
+    embedUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    replayUrlLabel: 'Replay URL (YouTube)',
+    replayUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    destinationTagsLabel: 'Destinations (comma-separated)',
+    destinationTagsPlaceholder: 'Tokyo, Japan',
+    saveButton: 'Save',
+    typeDestinationBriefing: 'Destination briefing',
+    typeAskACreator: 'Ask a creator',
+    typeMerchantSpotlight: 'Merchant spotlight',
+    typeNewCreatorIntro: 'New creator intro',
+    hostPickerLabel: 'Host',
+    hostPickerPlaceholder: 'Select a host…',
+    hostRequiredError: 'Select a host before creating this session',
   },
   explore: {
     pill: 'Explore',
@@ -1997,7 +2073,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -2421,6 +2497,63 @@ const messages: Messages = {
     colDelivered: 'Delivered',
     merchantEmpty: 'Post a mission to start seeing campaign activity.',
     notApplicable: '—',
+  },
+  sessions: {
+    eyebrow: 'Community Sessions',
+    title: 'Live briefings from creators on the ground.',
+    body: 'Ask questions, get real answers, and watch replays from the creators behind our guides.',
+    upcomingHeading: 'Upcoming',
+    emptyUpcoming: 'No sessions scheduled right now — check back soon.',
+    replaysHeading: 'Replays',
+    rsvpEmailLabel: 'Your email',
+    rsvpSubmit: 'RSVP',
+    rsvpConfirmed: "You're on the list — we'll be in touch.",
+    rsvpError: 'RSVP could not be saved — please try again.',
+    rsvpCancelledNotice: 'This session has been cancelled.',
+    typeDestinationBriefing: 'Destination briefing',
+    typeAskACreator: 'Ask a creator',
+    typeMerchantSpotlight: 'Merchant spotlight',
+    typeNewCreatorIntro: 'New creator intro',
+  },
+  sessionsAdmin: {
+    title: 'Community Sessions',
+    subtitle: 'Create, manage, and moderate sessions across all creators.',
+    newCta: 'New session',
+    empty: 'No sessions yet.',
+    statusScheduled: 'Scheduled',
+    statusLive: 'Live',
+    statusEnded: 'Ended',
+    statusCancelled: 'Cancelled',
+    typeDestinationBriefing: 'Destination briefing',
+    typeAskACreator: 'Ask a creator',
+    typeMerchantSpotlight: 'Merchant spotlight',
+    typeNewCreatorIntro: 'New creator intro',
+    actEdit: 'Edit',
+    actGoLive: 'Go live',
+    actEnd: 'End',
+    actCancel: 'Cancel',
+    actViewRsvps: 'View RSVPs',
+    actDelete: 'Delete',
+    deleteConfirm: 'Delete this session? This cannot be undone.',
+    rsvpsEmpty: 'No RSVPs yet.',
+    formNewTitle: 'New session',
+    formEditTitle: 'Edit session',
+    formCancel: 'Cancel',
+    titleLabel: 'Title',
+    descriptionLabel: 'Description',
+    typeLabel: 'Type',
+    startsAtLabel: 'Starts at',
+    durationLabel: 'Duration (minutes)',
+    embedUrlLabel: 'Live embed URL (YouTube)',
+    embedUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    replayUrlLabel: 'Replay URL (YouTube)',
+    replayUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    destinationTagsLabel: 'Destinations (comma-separated)',
+    destinationTagsPlaceholder: 'Tokyo, Japan',
+    saveButton: 'Save',
+    hostPickerLabel: 'Host creator',
+    hostPickerPlaceholder: 'Select a creator',
+    hostRequiredError: 'Select a host before creating this session',
   },
 }
 export default messages
