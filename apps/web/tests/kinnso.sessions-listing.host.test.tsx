@@ -4,10 +4,11 @@ import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
+vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
 
 const { getUpcomingSessionsListMock, getReplaySessionsMock } = vi.hoisted(() => ({
-  getUpcomingSessionsListMock: vi.fn(async () => []),
-  getReplaySessionsMock: vi.fn(async () => []),
+  getUpcomingSessionsListMock: vi.fn(async (): Promise<import('@/lib/sessions/public-queries').PublicSession[]> => []),
+  getReplaySessionsMock: vi.fn(async (): Promise<import('@/lib/sessions/public-queries').PublicSession[]> => []),
 }))
 vi.mock('@/lib/sessions/public-queries', () => ({
   getUpcomingSessionsList: getUpcomingSessionsListMock,
@@ -55,7 +56,6 @@ describe('/[locale]/sessions listing host', () => {
   })
 
   it('404s unknown locales', async () => {
-    vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
     await expect(SessionsPage({ params: Promise.resolve({ locale: 'xx' }) })).rejects.toThrow('NEXT_NOT_FOUND')
   })
 })

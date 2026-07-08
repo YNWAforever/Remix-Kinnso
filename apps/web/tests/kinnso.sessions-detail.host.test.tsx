@@ -7,8 +7,8 @@ afterEach(cleanup)
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
 
 const { getSessionBySlugMock, getUserMock, rsvpMock } = vi.hoisted(() => ({
-  getSessionBySlugMock: vi.fn(async () => null),
-  getUserMock: vi.fn(async () => ({ data: { user: null } })),
+  getSessionBySlugMock: vi.fn(async (): Promise<import('@/lib/sessions/public-queries').PublicSession | null> => null),
+  getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string; email?: string } | null } }> => ({ data: { user: null } })),
   rsvpMock: vi.fn(async () => ({ ok: true })),
 }))
 vi.mock('@/lib/sessions/public-queries', () => ({ getSessionBySlug: getSessionBySlugMock }))

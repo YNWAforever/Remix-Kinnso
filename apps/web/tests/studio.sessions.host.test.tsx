@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 const { getUserMock, fromMock } = vi.hoisted(() => ({
-  getUserMock: vi.fn(async () => ({ data: { user: null } })),
+  getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({ data: { user: null } })),
   fromMock: vi.fn(() => ({ select: () => ({ eq: () => ({ order: async () => ({ data: [], error: null }) }) }) })),
 }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock }, from: fromMock }) }))
