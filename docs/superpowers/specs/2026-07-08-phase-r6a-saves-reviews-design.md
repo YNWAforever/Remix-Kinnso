@@ -46,9 +46,11 @@ hidden per decision `D-R3-5` — goes live.
   just guides — despite the master spec's data-model table literally naming the feature
   `guide_saves` and only guides having an existing `saves_count` column today. Two parallel
   tables (`guide_saves`, `experience_saves`), not one polymorphic table, matching this
-  codebase's established "each feature/content-type gets its own table" convention (seen
-  repeatedly: `agent_rate_limits`/`checkout_rate_limits`/`rsvp_rate_limits` are three
-  separate tables with identical shapes, not one shared table with a discriminator column).
+  codebase's established "each feature/content-type gets its own table" convention (seen in
+  `agent_rate_limits` and `checkout_rate_limits` — two separate, byte-for-byte-identical
+  tables rather than one shared table with a discriminator column, both confirmed merged to
+  `main`; R5's in-flight `rsvp_rate_limits`, PR #79, follows the same convention but had not
+  merged to `main` as of this writing, so it is not cited here as a merged precedent).
 - **D-R6A-6 (saves require sign-in, no anon path)**: consistent with the one existing
   save/bookmark precedent in this codebase, `merchant_saved_creators` (owner-scoped RLS,
   no anon grant at all). An anon visitor sees the save button; clicking it routes to
