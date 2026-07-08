@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireCreatorAction } from '@/lib/admin/guard'
 import { makeSlug } from '@/lib/guides/slug'
-import { validateSessionInput, canGoLive, type ValidationErrors } from '@/lib/sessions/validation'
+import { validateSessionInput, canGoLive, type ValidationErrors, type ParsedSession } from '@/lib/sessions/validation'
 import type { SessionInput } from '@/lib/sessions/types'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -17,7 +17,7 @@ type ActionResult<T extends Record<string, unknown> = Record<string, never>> =
 const formError = (message: string): ActionFailure => ({ ok: false, errors: { form: [message] } })
 const listPath = (locale: Locale) => `/${locale}/studio/sessions`
 
-function toRow(p: ReturnType<typeof validateSessionInput> extends { ok: true; parsed: infer P } ? P : never) {
+function toRow(p: ParsedSession) {
   return {
     title: p.title,
     description: p.description,

@@ -3,7 +3,7 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { MySessionsView } from '@/components/kinnso/pages/MySessionsView'
-import type { SessionListItem } from '@/lib/sessions/types'
+import type { SessionListItem, SessionType } from '@/lib/sessions/types'
 
 export default async function StudioSessionsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -21,8 +21,8 @@ export default async function StudioSessionsPage({ params }: { params: Promise<{
     .order('starts_at', { ascending: false })
 
   const sessions: SessionListItem[] = (data ?? []).map((s) => ({
-    id: s.id, slug: s.slug, title: s.title, type: s.type,
-    startsAt: s.starts_at, status: s.status, embedUrl: s.embed_url,
+    id: s.id, slug: s.slug, title: s.title, type: s.type as SessionType,
+    startsAt: s.starts_at, status: s.status as SessionListItem['status'], embedUrl: s.embed_url,
   }))
 
   return <MySessionsView locale={locale as Locale} t={messages.studioSessions} sessions={sessions} />

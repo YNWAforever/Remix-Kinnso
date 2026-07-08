@@ -72,7 +72,7 @@ export function AdminSessionsView({
             t={t}
             typeLabel={typeLabel}
             initial={current ? {
-              title: current.title, description: current.description, type: current.type,
+              title: current.title, description: current.description, type: current.type as SessionType,
               startsAt: current.starts_at, durationMinutes: String(current.duration_minutes),
               embedUrl: current.embed_url ?? '', replayUrl: current.replay_url ?? '',
               destinationTags: (current.destination_tags ?? []).join(', '),

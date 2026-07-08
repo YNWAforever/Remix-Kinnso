@@ -307,27 +307,6 @@ export type Database = {
         }
         Relationships: []
       }
-      agent_waitlist: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          locale: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          locale?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          locale?: string | null
-        }
-        Relationships: []
-      }
       article_authors: {
         Row: {
           avatar: string | null
@@ -820,6 +799,65 @@ export type Database = {
           window_start?: string
         }
         Relationships: []
+      }
+      community_sessions: {
+        Row: {
+          created_at: string
+          description: string
+          destination_tags: string[]
+          duration_minutes: number
+          embed_url: string | null
+          host_creator_id: string
+          id: string
+          replay_url: string | null
+          slug: string
+          starts_at: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          destination_tags?: string[]
+          duration_minutes: number
+          embed_url?: string | null
+          host_creator_id: string
+          id?: string
+          replay_url?: string | null
+          slug: string
+          starts_at: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          destination_tags?: string[]
+          duration_minutes?: number
+          embed_url?: string | null
+          host_creator_id?: string
+          id?: string
+          replay_url?: string | null
+          slug?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_sessions_host_creator_id_fkey"
+            columns: ["host_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       copilot_messages: {
         Row: {
@@ -2133,6 +2171,24 @@ export type Database = {
           },
         ]
       }
+      rsvp_rate_limits: {
+        Row: {
+          ip: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          ip: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          ip?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       seo_redirects: {
         Row: {
           from_path: string
@@ -2153,6 +2209,38 @@ export type Database = {
           to_path?: string
         }
         Relationships: []
+      }
+      session_rsvps: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_rsvps_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "community_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       testimonials: {
         Row: {
@@ -2464,6 +2552,10 @@ export type Database = {
         Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
         Returns: boolean
       }
+      check_and_increment_rsvp_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
       confirm_booking_from_webhook: {
         Args: {
           p_stripe_checkout_session_id: string
@@ -2559,6 +2651,7 @@ export type Database = {
           completed_bookings: number
           destinations: number
           published_guides: number
+          upcoming_sessions: number
         }[]
       }
       rate_agent_message: {

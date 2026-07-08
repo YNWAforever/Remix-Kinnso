@@ -3,6 +3,7 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { updateSessionAction } from '@/lib/sessions/studio-actions'
+import type { SessionType } from '@/lib/sessions/types'
 import { SessionForm } from '@/components/kinnso/pages/SessionForm'
 
 export default async function EditStudioSessionPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -34,7 +35,7 @@ export default async function EditStudioSessionPage({ params }: { params: Promis
           t={t}
           typeLabel={typeLabel}
           initial={{
-            title: session.title, description: session.description, type: session.type,
+            title: session.title, description: session.description, type: session.type as SessionType,
             startsAt: session.starts_at, durationMinutes: String(session.duration_minutes),
             embedUrl: session.embed_url ?? '', replayUrl: session.replay_url ?? '',
             destinationTags: (session.destination_tags ?? []).join(', '),
