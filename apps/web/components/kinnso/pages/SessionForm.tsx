@@ -11,12 +11,18 @@ type SaveResult = { ok: true; id: string; slug?: string } | { ok: false; errors:
  *  which server action to call and where to navigate on success. */
 export function SessionForm({
   t, typeLabel, initial, onSave, onDoneHref,
+  hostPicker,
 }: {
   t: Messages['studioSessions']
   typeLabel: Record<SessionType, string>
   initial: Partial<SessionInput> | null
   onSave: (input: SessionInput) => Promise<SaveResult>
   onDoneHref: string
+  hostPicker?: {
+    creators: { id: string; handle: string | null; displayName: string | null }[]
+    value: string
+    onChange: (id: string) => void
+  }
 }) {
   const router = useRouter()
   const [title, setTitle] = useState(initial?.title ?? '')
@@ -52,6 +58,18 @@ export function SessionForm({
         <input value={title} onChange={(e) => setTitle(e.target.value)} className={field} />
         {err('title')}
       </label>
+      {hostPicker ? (
+        <label className="block text-sm font-bold text-kinnso-ink">
+          {t.hostPickerLabel}
+          <select value={hostPicker.value} onChange={(e) => hostPicker.onChange(e.target.value)} className={field}>
+            <option value="">{t.hostPickerPlaceholder}</option>
+            {hostPicker.creators.map((c) => (
+              <option key={c.id} value={c.id}>{c.displayName ?? c.handle ?? c.id}</option>
+            ))}
+          </select>
+          {err('host')}
+        </label>
+      ) : null}
       <label className="block text-sm font-bold text-kinnso-ink">
         {t.descriptionLabel}
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} className={field} />

@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { requireOpsAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
+import { listSessionRsvps } from '@/lib/admin/sessions-queries'
 import { validateSessionInput, canGoLive } from '@/lib/sessions/validation'
 import type { SessionInput } from '@/lib/sessions/types'
 import { makeSlug } from '@/lib/guides/slug'
@@ -135,4 +136,12 @@ export async function adminDeleteSessionAction(
 
   revalidateSessionSurfaces(options.locale)
   return { ok: true, id: data.id as string }
+}
+
+export async function listSessionRsvpsForAdminAction(sessionId: string) {
+  const supabase = await createSupabaseServerClient()
+  const gate = await requireOpsAction(supabase)
+  if (!gate.ok) return { ok: false as const, rsvps: [] }
+  const rsvps = await listSessionRsvps(supabase, sessionId)
+  return { ok: true as const, rsvps }
 }
