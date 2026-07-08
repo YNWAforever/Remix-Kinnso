@@ -18,7 +18,7 @@ import type { Messages } from '@/lib/i18n/messages/en'
  * R1B homepage — the 10 sections of master spec §4.1, in order:
  *  1 Hero · 2 Social proof (stats bar + pull-quotes) · 3 How it works ·
  *  4 Featured guides · 5 AI Agent (waitlist) · 6 Articles highlight ·
- *  7 Community Sessions (data-gated until R5) · 8 Merchant value ·
+ *  7 Community Sessions (real data since R5) · 8 Merchant value ·
  *  9 Creator CTA · 10 Footer (rendered by SiteChrome — no work here).
  * Every proof section is data-gated: empty data renders nothing, never filler.
  */
