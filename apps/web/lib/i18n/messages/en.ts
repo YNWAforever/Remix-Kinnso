@@ -848,6 +848,7 @@ export interface Messages {
     saveButton: string
     typeDestinationBriefing: string; typeAskACreator: string
     typeMerchantSpotlight: string; typeNewCreatorIntro: string
+    hostPickerLabel: string; hostPickerPlaceholder: string; hostRequiredError: string
   }
   explore: {
     pill: string; heading: string; subtitle: string
@@ -936,7 +937,7 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
@@ -1161,6 +1162,23 @@ export interface Messages {
     rsvpEmailLabel: string; rsvpSubmit: string; rsvpConfirmed: string; rsvpError: string
     typeDestinationBriefing: string; typeAskACreator: string
     typeMerchantSpotlight: string; typeNewCreatorIntro: string
+  }
+  sessionsAdmin: {
+    title: string; subtitle: string; newCta: string; empty: string
+    statusScheduled: string; statusLive: string; statusEnded: string; statusCancelled: string
+    typeDestinationBriefing: string; typeAskACreator: string
+    typeMerchantSpotlight: string; typeNewCreatorIntro: string
+    actEdit: string; actGoLive: string; actEnd: string; actCancel: string
+    actViewRsvps: string; actDelete: string; deleteConfirm: string
+    rsvpsEmpty: string
+    formNewTitle: string; formEditTitle: string; formCancel: string
+    titleLabel: string; descriptionLabel: string; typeLabel: string
+    startsAtLabel: string; durationLabel: string
+    embedUrlLabel: string; embedUrlPlaceholder: string
+    replayUrlLabel: string; replayUrlPlaceholder: string
+    destinationTagsLabel: string; destinationTagsPlaceholder: string
+    saveButton: string
+    hostPickerLabel: string; hostPickerPlaceholder: string; hostRequiredError: string
   }
 }
 
@@ -1905,6 +1923,9 @@ const messages: Messages = {
     typeAskACreator: 'Ask a creator',
     typeMerchantSpotlight: 'Merchant spotlight',
     typeNewCreatorIntro: 'New creator intro',
+    hostPickerLabel: 'Host',
+    hostPickerPlaceholder: 'Select a host…',
+    hostRequiredError: 'Select a host before creating this session',
   },
   explore: {
     pill: 'Explore',
@@ -2058,7 +2079,7 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
@@ -2498,6 +2519,46 @@ const messages: Messages = {
     typeAskACreator: 'Ask a creator',
     typeMerchantSpotlight: 'Merchant spotlight',
     typeNewCreatorIntro: 'New creator intro',
+  },
+  sessionsAdmin: {
+    title: 'Sessions',
+    subtitle: 'Schedule, host, and moderate live community sessions across all creators.',
+    newCta: 'New session',
+    empty: 'No sessions yet.',
+    statusScheduled: 'Scheduled',
+    statusLive: 'Live',
+    statusEnded: 'Ended',
+    statusCancelled: 'Cancelled',
+    typeDestinationBriefing: 'Destination briefing',
+    typeAskACreator: 'Ask a creator',
+    typeMerchantSpotlight: 'Merchant spotlight',
+    typeNewCreatorIntro: 'New creator intro',
+    actEdit: 'Edit',
+    actGoLive: 'Go live',
+    actEnd: 'End',
+    actCancel: 'Cancel',
+    actViewRsvps: 'View RSVPs',
+    actDelete: 'Delete',
+    deleteConfirm: 'Delete this session? This cannot be undone.',
+    rsvpsEmpty: 'No RSVPs yet.',
+    formNewTitle: 'New session',
+    formEditTitle: 'Edit session',
+    formCancel: 'Cancel',
+    titleLabel: 'Title',
+    descriptionLabel: 'Description',
+    typeLabel: 'Type',
+    startsAtLabel: 'Starts at',
+    durationLabel: 'Duration (minutes)',
+    embedUrlLabel: 'Live embed URL',
+    embedUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    replayUrlLabel: 'Replay URL',
+    replayUrlPlaceholder: 'https://youtube.com/watch?v=…',
+    destinationTagsLabel: 'Destination tags',
+    destinationTagsPlaceholder: 'e.g. Tokyo, Osaka',
+    saveButton: 'Save',
+    hostPickerLabel: 'Host',
+    hostPickerPlaceholder: 'Select a host…',
+    hostRequiredError: 'Select a host before creating this session',
   },
 }
 export default messages

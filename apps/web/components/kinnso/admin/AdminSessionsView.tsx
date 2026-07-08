@@ -5,7 +5,7 @@ import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { SessionForm } from '@/components/kinnso/pages/SessionForm'
 import type { ActionResult } from '@/lib/admin/result'
 import type { AdminSession, SessionRsvp } from '@/lib/admin/sessions-queries'
-import { SESSION_TYPES, type SessionInput, type SessionType } from '@/lib/sessions/types'
+import type { SessionInput, SessionType } from '@/lib/sessions/types'
 import { canGoLive } from '@/lib/sessions/validation'
 import type { Messages } from '@/lib/i18n/messages/en'
 

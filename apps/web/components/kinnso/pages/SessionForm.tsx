@@ -7,13 +7,29 @@ import type { Messages } from '@/lib/i18n/messages/en'
 
 type SaveResult = { ok: true; id: string; slug?: string } | { ok: false; errors: ValidationErrors }
 
+/** Field labels the form itself renders. Both `studioSessions` and `sessionsAdmin`
+ *  message groups satisfy this — they don't share a common parent type, so this
+ *  is the narrow shape SessionForm actually depends on rather than the full
+ *  Messages['studioSessions'] (which the ops caller's `sessionsAdmin` messages
+ *  aren't structurally assignable to). */
+export type SessionFormMessages = Pick<
+  Messages['studioSessions'],
+  | 'titleLabel' | 'descriptionLabel' | 'typeLabel'
+  | 'startsAtLabel' | 'durationLabel'
+  | 'embedUrlLabel' | 'embedUrlPlaceholder'
+  | 'replayUrlLabel' | 'replayUrlPlaceholder'
+  | 'destinationTagsLabel' | 'destinationTagsPlaceholder'
+  | 'saveButton'
+  | 'hostPickerLabel' | 'hostPickerPlaceholder' | 'hostRequiredError'
+>
+
 /** Shared by the Studio (creator) and ops create/edit pages — the caller supplies
  *  which server action to call and where to navigate on success. */
 export function SessionForm({
   t, typeLabel, initial, onSave, onDoneHref,
   hostPicker,
 }: {
-  t: Messages['studioSessions']
+  t: SessionFormMessages
   typeLabel: Record<SessionType, string>
   initial: Partial<SessionInput> | null
   onSave: (input: SessionInput) => Promise<SaveResult>
@@ -38,6 +54,10 @@ export function SessionForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
+    if (hostPicker && !hostPicker.value) {
+      setErrors({ host: [t.hostRequiredError] })
+      return
+    }
     setSaving(true)
     try {
       const result = await onSave({ title, description, type, startsAt, durationMinutes, embedUrl, replayUrl, destinationTags })

@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireOpsPage } from '@/lib/admin/guard'
 import { listAllSessions, listCreatorsForHostPicker } from '@/lib/admin/sessions-queries'
 import {
   adminCreateSessionAction, adminUpdateSessionAction, adminSetSessionStatusAction,
@@ -16,13 +16,11 @@ export default async function AdminSessionsPage({ params }: { params: Promise<{ 
   const messages = await getDictionary(locale as Locale)
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${locale}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'ops') notFound()
+  const loc = locale as Locale
+  await requireOpsPage(supabase, loc)
 
   const [sessions, creators] = await Promise.all([listAllSessions(supabase), listCreatorsForHostPicker(supabase)])
 
-  const loc = locale as Locale
   return (
     <AdminSessionsView
       t={messages.sessionsAdmin}
