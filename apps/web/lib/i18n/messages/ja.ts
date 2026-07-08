@@ -1312,7 +1312,7 @@ const messages: Messages = {
     replaysHeading: 'アーカイブ',
     rsvpEmailLabel: 'メールアドレス',
     rsvpSubmit: '参加登録',
-    rsvpConfirmed: '登録が完了しました。詳細はメールでお送りします。',
+    rsvpConfirmed: '登録が完了しました。追ってご連絡します。',
     rsvpError: '問題が発生しました。メールアドレスをご確認のうえ、もう一度お試しください。',
     rsvpCancelledNotice: 'このセッションは中止になりました。',
     typeDestinationBriefing: '目的地ブリーフィング',

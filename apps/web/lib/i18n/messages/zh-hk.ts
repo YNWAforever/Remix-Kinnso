@@ -1312,7 +1312,7 @@ const messages: Messages = {
     replaysHeading: '活動重溫',
     rsvpEmailLabel: '電郵地址',
     rsvpSubmit: '立即報名',
-    rsvpConfirmed: '報名成功喇，詳情會用電郵發畀你。',
+    rsvpConfirmed: '報名成功喇，我哋會再同你聯絡。',
     rsvpError: '出咗啲問題，請檢查你嘅電郵地址再試多次。',
     rsvpCancelledNotice: '呢個環節已經取消咗。',
     typeDestinationBriefing: '目的地情報分享',

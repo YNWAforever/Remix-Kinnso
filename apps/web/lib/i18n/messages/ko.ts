@@ -1312,7 +1312,7 @@ const messages: Messages = {
     replaysHeading: '다시보기',
     rsvpEmailLabel: '이메일 주소',
     rsvpSubmit: '참가 신청',
-    rsvpConfirmed: '신청이 완료됐어요. 자세한 내용을 이메일로 보내드릴게요.',
+    rsvpConfirmed: '신청이 완료됐어요. 곧 다시 연락드릴게요.',
     rsvpError: '문제가 발생했어요. 이메일 주소를 확인하고 다시 시도해 주세요.',
     rsvpCancelledNotice: '이 세션은 취소되었어요.',
     typeDestinationBriefing: '여행지 브리핑',

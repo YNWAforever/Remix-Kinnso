@@ -1312,7 +1312,7 @@ const messages: Messages = {
     replaysHeading: '活動重播',
     rsvpEmailLabel: '電子郵件地址',
     rsvpSubmit: '立即報名',
-    rsvpConfirmed: '報名成功，詳細資訊將以電子郵件寄送給你。',
+    rsvpConfirmed: '報名成功，我們會再與你聯絡。',
     rsvpError: '發生錯誤，請確認電子郵件地址後再試一次。',
     rsvpCancelledNotice: '此場次已取消。',
     typeDestinationBriefing: '目的地情報分享',

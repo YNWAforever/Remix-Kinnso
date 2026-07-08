@@ -1312,7 +1312,7 @@ const messages: Messages = {
     replaysHeading: 'วิดีโอย้อนหลัง',
     rsvpEmailLabel: 'ที่อยู่อีเมล',
     rsvpSubmit: 'ลงทะเบียนเข้าร่วม',
-    rsvpConfirmed: 'ลงทะเบียนสำเร็จแล้ว เราจะส่งรายละเอียดไปทางอีเมลให้คุณ',
+    rsvpConfirmed: 'ลงทะเบียนสำเร็จแล้ว เราจะติดต่อกลับไปหาคุณ',
     rsvpError: 'เกิดข้อผิดพลาด กรุณาตรวจสอบอีเมลของคุณแล้วลองใหม่อีกครั้ง',
     rsvpCancelledNotice: 'เซสชันนี้ถูกยกเลิกแล้ว',
     typeDestinationBriefing: 'บรีฟจุดหมายปลายทาง',
