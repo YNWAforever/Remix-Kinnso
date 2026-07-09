@@ -6,10 +6,13 @@ import type { PublicAvailability } from '@/lib/experiences/public-availability-q
 const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock, createCheckoutSessionActionMock } = vi.hoisted(() => ({
   getExperienceBySlugMock: vi.fn(),
   listPublicAvailabilityMock: vi.fn(async (): Promise<PublicAvailability[]> => []),
-  getUserMock: vi.fn(async () => ({ data: { user: null as { email: string } | null } })),
+  getUserMock: vi.fn(async () => ({ data: { user: null as { email: string; id?: string } | null } })),
   createCheckoutSessionActionMock: vi.fn(),
 }))
-vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('notFound') } }))
+vi.mock('next/navigation', () => ({
+  notFound: () => { throw new Error('notFound') },
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}))
 vi.mock('@/lib/experiences/public-queries', () => ({
   getExperienceBySlug: getExperienceBySlugMock,
   listPublishedExperiencesForMerchant: vi.fn(),
@@ -24,6 +27,18 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 vi.mock('@/lib/experiences/booking-actions', () => ({
   createCheckoutSessionAction: createCheckoutSessionActionMock,
+}))
+
+const { isExperienceSavedMock } = vi.hoisted(() => ({ isExperienceSavedMock: vi.fn(async () => false) }))
+vi.mock('@/lib/saves/experience-queries', () => ({ isExperienceSaved: isExperienceSavedMock }))
+
+const { getExperienceRatingAggregateMock, listPublishedReviewsForExperienceMock } = vi.hoisted(() => ({
+  getExperienceRatingAggregateMock: vi.fn(async (): Promise<{ average: number; count: number } | null> => null),
+  listPublishedReviewsForExperienceMock: vi.fn(async (): Promise<Array<{ id: string; rating: number; body: string | null; createdAt: string }>> => []),
+}))
+vi.mock('@/lib/reviews/queries', () => ({
+  getExperienceRatingAggregate: getExperienceRatingAggregateMock,
+  listPublishedReviewsForExperience: listPublishedReviewsForExperienceMock,
 }))
 
 import ExperiencePublicPage from '@/app/[locale]/experiences/[slug]/page'
@@ -159,5 +174,48 @@ describe('ExperiencePublicPage', () => {
         expect.objectContaining({ sourceSurface: 'guide', guideSlug: 'kyoto-tea' }),
       )
     })
+  })
+
+  it('shows the save button (anon: "Sign in to save") and omits aggregateRating when there are no reviews', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    expect(screen.getByRole('button', { name: 'Sign in to save' })).toBeTruthy()
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).not.toContain('aggregateRating')
+  })
+
+  it('shows the real save state and rating for a signed-in viewer with published reviews', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z',
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+    getUserMock.mockResolvedValueOnce({ data: { user: { email: 'traveler@example.com', id: 'u1' } } })
+    isExperienceSavedMock.mockResolvedValueOnce(true)
+    getExperienceRatingAggregateMock.mockResolvedValueOnce({ average: 5, count: 1 })
+    listPublishedReviewsForExperienceMock.mockResolvedValueOnce([
+      { id: 'r1', rating: 5, body: 'Amazing sunset', createdAt: '2026-07-01T00:00:00Z' },
+    ])
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    expect(screen.getByRole('button', { name: 'Saved' })).toBeTruthy()
+    expect(screen.getByText('Amazing sunset')).toBeTruthy()
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).toContain('"aggregateRating"')
   })
 })
