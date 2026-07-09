@@ -47,3 +47,40 @@ describe('R6A guide_saves + experience_saves migration', () => {
     expect(sql).toContain('create index experience_saves_traveler_idx on public.experience_saves(traveler_user_id, created_at desc)')
   })
 })
+
+describe('R6A reviews table + get_booking_by_checkout_session extension', () => {
+  it('creates reviews with denormalized experience_id/guide_id and a unique booking_id', () => {
+    expect(sql).toContain('create table public.reviews')
+    expect(sql).toContain('booking_id uuid not null unique references public.bookings(id) on delete cascade')
+    expect(sql).toContain('experience_id uuid not null references public.experiences(id) on delete cascade')
+    expect(sql).toContain('guide_id uuid references public.guides(id) on delete cascade')
+    expect(sql).toContain("check (rating between 1 and 5)")
+    expect(sql).toContain("check (status in ('published', 'hidden'))")
+  })
+
+  it('reviews_insert validates the booking is the caller\'s own, completed, and its id columns match exactly', () => {
+    expect(sql).toContain('create policy reviews_insert on public.reviews')
+    expect(sql).toContain('traveler_user_id = auth.uid()')
+    expect(sql).toContain("b.status = 'completed'")
+    expect(sql).toContain('b.experience_id = reviews.experience_id')
+    expect(sql).toContain('b.guide_id is not distinct from reviews.guide_id')
+  })
+
+  it('reviews has both an owner-select and a public-published-only select policy', () => {
+    expect(sql).toContain('create policy reviews_owner_select on public.reviews')
+    expect(sql).toContain('using (traveler_user_id = auth.uid())')
+    expect(sql).toContain('create policy reviews_public_select on public.reviews')
+    expect(sql).toContain("using (status = 'published')")
+  })
+
+  it('reviews_ops_update is the only UPDATE policy, gated on is_active_ops()', () => {
+    expect(sql).toContain('create policy reviews_ops_update on public.reviews')
+    expect(sql).toContain('public.is_active_ops()')
+  })
+
+  it('extends get_booking_by_checkout_session with traveler_user_id, experience_id, and guide_id', () => {
+    expect(sql).toMatch(/create or replace function public\.get_booking_by_checkout_session/)
+    expect(sql).toContain('traveler_user_id uuid, experience_id uuid, guide_id uuid')
+    expect(sql).toContain('b.traveler_user_id, b.experience_id, b.guide_id')
+  })
+})
