@@ -1,3 +1,5 @@
+Using workdir /Users/willylai/Documents/Claude/Projects/Remix Kinnso/kinnso-v3/.worktrees/feat-revision-r6a
+Initialising login role...
 export type Json =
   | string
   | number
@@ -304,27 +306,6 @@ export type Database = {
           ip?: string
           request_count?: number
           window_start?: string
-        }
-        Relationships: []
-      }
-      agent_waitlist: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          locale: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          locale?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          locale?: string | null
         }
         Relationships: []
       }
@@ -821,6 +802,65 @@ export type Database = {
         }
         Relationships: []
       }
+      community_sessions: {
+        Row: {
+          created_at: string
+          description: string
+          destination_tags: string[]
+          duration_minutes: number
+          embed_url: string | null
+          host_creator_id: string
+          id: string
+          replay_url: string | null
+          slug: string
+          starts_at: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          destination_tags?: string[]
+          duration_minutes: number
+          embed_url?: string | null
+          host_creator_id: string
+          id?: string
+          replay_url?: string | null
+          slug: string
+          starts_at: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          destination_tags?: string[]
+          duration_minutes?: number
+          embed_url?: string | null
+          host_creator_id?: string
+          id?: string
+          replay_url?: string | null
+          slug?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_sessions_host_creator_id_fkey"
+            columns: ["host_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       copilot_messages: {
         Row: {
           archived: boolean
@@ -1139,6 +1179,35 @@ export type Database = {
           },
         ]
       }
+      experience_saves: {
+        Row: {
+          created_at: string
+          experience_id: string
+          id: string
+          traveler_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          experience_id: string
+          id?: string
+          traveler_user_id: string
+        }
+        Update: {
+          created_at?: string
+          experience_id?: string
+          id?: string
+          traveler_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_saves_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       experiences: {
         Row: {
           city: string
@@ -1151,6 +1220,7 @@ export type Database = {
           merchant_profile_id: string
           price_amount: number
           published_at: string | null
+          saves_count: number
           slug: string
           status: string
           summary: string | null
@@ -1169,6 +1239,7 @@ export type Database = {
           merchant_profile_id: string
           price_amount: number
           published_at?: string | null
+          saves_count?: number
           slug: string
           status?: string
           summary?: string | null
@@ -1187,6 +1258,7 @@ export type Database = {
           merchant_profile_id?: string
           price_amount?: number
           published_at?: string | null
+          saves_count?: number
           slug?: string
           status?: string
           summary?: string | null
@@ -1207,6 +1279,35 @@ export type Database = {
             columns: ["merchant_profile_id"]
             isOneToOne: false
             referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_saves: {
+        Row: {
+          created_at: string
+          guide_id: string
+          id: string
+          traveler_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          guide_id: string
+          id?: string
+          traveler_user_id: string
+        }
+        Update: {
+          created_at?: string
+          guide_id?: string
+          id?: string
+          traveler_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_saves_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
             referencedColumns: ["id"]
           },
         ]
@@ -2133,6 +2234,82 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          body: string | null
+          booking_id: string
+          created_at: string
+          experience_id: string
+          guide_id: string | null
+          id: string
+          rating: number
+          status: string
+          traveler_user_id: string
+        }
+        Insert: {
+          body?: string | null
+          booking_id: string
+          created_at?: string
+          experience_id: string
+          guide_id?: string | null
+          id?: string
+          rating: number
+          status?: string
+          traveler_user_id: string
+        }
+        Update: {
+          body?: string | null
+          booking_id?: string
+          created_at?: string
+          experience_id?: string
+          guide_id?: string | null
+          id?: string
+          rating?: number
+          status?: string
+          traveler_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rsvp_rate_limits: {
+        Row: {
+          ip: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          ip: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          ip?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       seo_redirects: {
         Row: {
           from_path: string
@@ -2153,6 +2330,38 @@ export type Database = {
           to_path?: string
         }
         Relationships: []
+      }
+      session_rsvps: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_rsvps_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "community_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       testimonials: {
         Row: {
@@ -2464,6 +2673,10 @@ export type Database = {
         Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
         Returns: boolean
       }
+      check_and_increment_rsvp_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
       confirm_booking_from_webhook: {
         Args: {
           p_stripe_checkout_session_id: string
@@ -2497,11 +2710,14 @@ export type Database = {
         Returns: {
           booking_id: string
           currency: string
+          experience_id: string
           experience_slug: string
           experience_title: string
+          guide_id: string
           qty: number
           status: string
           total_amount: number
+          traveler_user_id: string
         }[]
       }
       get_you_may_like: {
@@ -2559,6 +2775,7 @@ export type Database = {
           completed_bookings: number
           destinations: number
           published_guides: number
+          upcoming_sessions: number
         }[]
       }
       rate_agent_message: {
@@ -2785,3 +3002,5 @@ export const Constants = {
     Enums: {},
   },
 } as const
+A new version of Supabase CLI is available: v2.109.1 (currently installed v2.102.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
