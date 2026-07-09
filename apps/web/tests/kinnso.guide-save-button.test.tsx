@@ -28,6 +28,16 @@ describe('GuideSaveButton', () => {
     expect(saveGuideActionMock).not.toHaveBeenCalled()
   })
 
+  it('shows "Sign in to save" (not "Save") for an anon viewer, and conveys toggle state via aria-pressed', () => {
+    render(<GuideSaveButton locale="en" guideId="g1" initialSaved={false} signedIn={false} t={en.guideSave} />)
+    expect(screen.getByRole('button', { name: en.guideSave.signInToSave })).toBeInTheDocument()
+  })
+
+  it('sets aria-pressed to reflect the saved state for a signed-in traveller', () => {
+    render(<GuideSaveButton locale="en" guideId="g1" initialSaved={true} signedIn={true} t={en.guideSave} />)
+    expect(screen.getByRole('button', { name: en.guideSave.saved })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('calls saveGuideAction and flips to the saved label for a signed-in traveller', async () => {
     render(<GuideSaveButton locale="en" guideId="g1" initialSaved={false} signedIn={true} t={en.guideSave} />)
     fireEvent.click(screen.getByRole('button', { name: en.guideSave.save }))

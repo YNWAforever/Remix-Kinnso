@@ -40,13 +40,15 @@ export function GuideSaveButton({ locale, guideId, initialSaved, signedIn, t }: 
       type="button"
       onClick={toggle}
       disabled={pending}
+      aria-pressed={saved}
       className={cn(
-        'inline-flex items-center gap-1 rounded-[3px] bg-white/90 px-3 py-1 text-sm font-semibold text-kinnso-ink disabled:opacity-50',
+        'inline-flex min-h-[44px] items-center gap-1 rounded-[3px] bg-white/90 px-3 py-1 text-sm font-semibold text-kinnso-ink disabled:opacity-50',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange',
         saved && 'bg-kinnso-amber/90',
       )}
     >
       <Bookmark className={cn('h-4 w-4', saved && 'fill-current')} aria-hidden="true" />
-      {saved ? t.saved : t.save}
+      {signedIn ? (saved ? t.saved : t.save) : t.signInToSave}
     </button>
   )
 }
