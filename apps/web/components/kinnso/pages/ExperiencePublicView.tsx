@@ -1,5 +1,6 @@
 // apps/web/components/kinnso/pages/ExperiencePublicView.tsx
 import Link from 'next/link'
+import { Bookmark } from 'lucide-react'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { BookingWidget } from '@/components/kinnso/pages/BookingWidget'
 import { ExperienceSaveButton } from '@/components/kinnso/ExperienceSaveButton'
@@ -45,6 +46,12 @@ export function ExperiencePublicView({
         </div>
         <div className="p-6 md:p-8">
           <h1 className="k2-display max-w-3xl text-2xl font-semibold leading-tight text-kinnso-ink md:text-4xl">{experience.title}</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-kinnso-muted">
+            <span className="inline-flex items-center gap-1 tabular-nums">
+              <Bookmark className="h-4 w-4" aria-hidden="true" />
+              {experience.savesCount.toLocaleString()}
+            </span>
+          </div>
           <p className="mt-2 text-sm text-kinnso-muted">
             {t.hostedBy}{' '}
             <Link href={p(`/m/${experience.merchant.slug}`)} className="font-semibold text-kinnso-orangeDark hover:underline">

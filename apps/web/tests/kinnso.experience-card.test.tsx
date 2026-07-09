@@ -21,7 +21,7 @@ import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
 
-const experience = { slug: 'sunset-tour', title: 'Sunset junk boat tour', city: 'Hong Kong', priceAmount: 480, currency: 'HKD', coverUrl: null }
+const experience = { slug: 'sunset-tour', title: 'Sunset junk boat tour', city: 'Hong Kong', priceAmount: 480, currency: 'HKD', coverUrl: null, savesCount: 12 }
 
 describe('ExperienceCard', () => {
   it('links to the experience detail page and shows no save button when onSaveToggle is omitted', () => {
@@ -35,6 +35,14 @@ describe('ExperienceCard', () => {
     render(<ExperienceCard experience={experience} locale="en" isSaved={false} onSaveToggle={onSaveToggle} />)
     fireEvent.click(screen.getByRole('button'))
     expect(onSaveToggle).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders the saves count, with and without a save toggle', () => {
+    const { unmount } = render(<ExperienceCard experience={experience} locale="en" />)
+    expect(screen.getByText('12')).toBeInTheDocument()
+    unmount()
+    render(<ExperienceCard experience={experience} locale="en" isSaved={false} onSaveToggle={() => {}} />)
+    expect(screen.getByRole('button').textContent).toContain('12')
   })
 })
 

@@ -10,11 +10,13 @@ export interface ExperienceCardData {
   priceAmount: number
   currency: string
   coverUrl: string | null
+  savesCount: number
 }
 
-export function ExperienceCard({ experience, locale, isSaved, onSaveToggle }: {
+export function ExperienceCard({ experience, locale, savesLabel = 'Saves', isSaved, onSaveToggle }: {
   experience: ExperienceCardData
   locale: Locale
+  savesLabel?: string
   isSaved?: boolean
   onSaveToggle?: () => void
 }) {
@@ -40,11 +42,19 @@ export function ExperienceCard({ experience, locale, isSaved, onSaveToggle }: {
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSaveToggle(); }}
-          className="shrink-0 rounded-[3px] p-2 text-kinnso-muted hover:text-kinnso-orangeDark"
+          className="flex shrink-0 items-center gap-1 rounded-[3px] p-2 text-xs text-kinnso-muted hover:text-kinnso-orangeDark"
         >
           <Bookmark className={cn('h-4 w-4', isSaved && 'fill-current text-kinnso-orangeDark')} aria-hidden="true" />
+          <span className="sr-only">{savesLabel} </span>
+          {experience.savesCount.toLocaleString()}
         </button>
-      ) : null}
+      ) : (
+        <span className="flex shrink-0 items-center gap-1 p-2 text-xs text-kinnso-muted">
+          <Bookmark className="h-4 w-4" aria-hidden="true" />
+          <span className="sr-only">{savesLabel} </span>
+          {experience.savesCount.toLocaleString()}
+        </span>
+      )}
     </Link>
   )
 }

@@ -12,15 +12,17 @@ export type PublicExperience = {
   durationMinutes: number | null
   coverUrl: string | null
   publishedAt: string | null
+  savesCount: number
   merchant: { slug: string; companyName: string }
 }
 
-const EXP_COLUMNS = 'id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, merchant_profile_id, published_at'
+const EXP_COLUMNS = 'id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, merchant_profile_id, published_at, saves_count'
 
 type ExpRow = {
   id: string; slug: string; title: string; summary: string | null; description: string | null
   city: string; price_amount: number; currency: string; duration_minutes: number | null
   cover_url: string | null; merchant_profile_id: string; published_at: string | null
+  saves_count: number
 }
 
 function toDomain(r: ExpRow, merchant: { slug: string; companyName: string }): PublicExperience {
@@ -28,6 +30,7 @@ function toDomain(r: ExpRow, merchant: { slug: string; companyName: string }): P
     id: r.id, slug: r.slug, title: r.title, summary: r.summary, description: r.description,
     city: r.city, priceAmount: Number(r.price_amount), currency: r.currency,
     durationMinutes: r.duration_minutes, coverUrl: r.cover_url, publishedAt: r.published_at,
+    savesCount: r.saves_count,
     merchant,
   }
 }
