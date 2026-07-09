@@ -43,3 +43,16 @@ export async function requireMerchantAction(
   if (!profile) return formError('Merchant access is required')
   return { ok: true, user, merchantId: profile.id as string }
 }
+
+/**
+ * Action gate: typed failure for anon; ok+user for any signed-in traveller. No
+ * role or profile-table lookup -- any authenticated user may save/review as a
+ * traveller (D-R6A-4/D-R6A-6), unlike requireMerchantAction's ownership check.
+ */
+export async function requireTravelerAction(
+  supabase: Supabase,
+): Promise<{ ok: true; user: { id: string } } | ActionFailure> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return formError('Sign in is required')
+  return { ok: true, user }
+}
