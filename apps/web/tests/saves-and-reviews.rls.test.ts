@@ -26,11 +26,14 @@ const travelerEmail = `r6a-rls-traveler-${runId}@example.test`
 const otherTravelerEmail = `r6a-rls-other-traveler-${runId}@example.test`
 const merchantEmail = `r6a-rls-merchant-${runId}@example.test`
 const creatorEmail = `r6a-rls-creator-${runId}@example.test`
+const opsEmail = `r6a-rls-ops-${runId}@example.test`
 
 let travelerId = ''
 let otherTravelerId = ''
 let merchantUserId = ''
 let creatorUserId = ''
+let opsUserId = ''
+let opsMemberId = ''
 let merchantProfileId = ''
 let experienceId = ''
 let otherExperienceId = ''
@@ -68,6 +71,18 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
     const creatorUser = await svc.auth.admin.createUser({ email: creatorEmail, password, email_confirm: true })
     expect(creatorUser.error, `createUser failed: ${creatorUser.error?.message}`).toBeNull()
     creatorUserId = creatorUser.data.user!.id
+
+    const opsUser = await svc.auth.admin.createUser({ email: opsEmail, password, email_confirm: true })
+    expect(opsUser.error, `createUser failed: ${opsUser.error?.message}`).toBeNull()
+    opsUserId = opsUser.data.user!.id
+
+    const opsMember = await svc
+      .from('kinnso_ops_members')
+      .insert({ user_id: opsUserId, display_name: 'R6A RLS Ops', status: 'active' })
+      .select('id')
+      .single()
+    expect(opsMember.error).toBeNull()
+    opsMemberId = opsMember.data!.id
 
     const merchant = await svc
       .from('merchant_profiles')
@@ -175,7 +190,8 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
     const guideIds = [guideId, otherGuideId].filter(Boolean)
     if (guideIds.length > 0) await svc.from('guides').delete().in('id', guideIds)
     if (merchantProfileId) await svc.from('merchant_profiles').delete().eq('id', merchantProfileId)
-    const userIds = [travelerId, otherTravelerId, merchantUserId, creatorUserId].filter(Boolean)
+    if (opsMemberId) await svc.from('kinnso_ops_members').delete().eq('id', opsMemberId)
+    const userIds = [travelerId, otherTravelerId, merchantUserId, creatorUserId, opsUserId].filter(Boolean)
     for (const id of userIds) await svc.auth.admin.deleteUser(id)
   }, hookTimeout)
 
@@ -236,6 +252,82 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
       expect(error).toBeNull()
       expect(data!.id).toBeTruthy()
       insertedReviewIds.push(data!.id)
+    }, testTimeout)
+  })
+
+  // reviews_ops_update is the only thing standing between `grant update on
+  // public.reviews to authenticated` and any signed-in traveller rewriting
+  // someone else's published review. db.r6a-saves-and-reviews.test.ts only
+  // string-matches its `using`/`with check` clauses; this exercises the real
+  // policy with a positive control (an ops user can hide a review) and two
+  // negative controls (neither the review's own author nor an unrelated
+  // non-ops traveller can).
+  describe('reviews_ops_update', () => {
+    let opsUpdateBookingId = ''
+    let opsUpdateReviewId = ''
+
+    beforeAll(async () => {
+      const booking = await svc
+        .from('bookings')
+        .insert({
+          experience_id: experienceId, availability_id: availabilityId, guide_id: guideId,
+          traveler_user_id: travelerId, qty: 1, unit_amount: 100, total_amount: 100, currency: 'HKD',
+          status: 'completed',
+        })
+        .select('id')
+        .single()
+      expect(booking.error).toBeNull()
+      opsUpdateBookingId = booking.data!.id
+
+      const review = await svc
+        .from('reviews')
+        .insert({
+          booking_id: opsUpdateBookingId, traveler_user_id: travelerId, experience_id: experienceId, guide_id: guideId,
+          rating: 3, body: 'Seeded for reviews_ops_update RLS coverage.',
+        })
+        .select('id')
+        .single()
+      expect(review.error).toBeNull()
+      opsUpdateReviewId = review.data!.id
+    }, hookTimeout)
+
+    afterAll(async () => {
+      if (opsUpdateReviewId) await svc.from('reviews').delete().eq('id', opsUpdateReviewId)
+      if (opsUpdateBookingId) await svc.from('bookings').delete().eq('id', opsUpdateBookingId)
+    }, hookTimeout)
+
+    it("rejects an UPDATE from the review's own author (negative control: is_active_ops() is false for them)", async () => {
+      const traveler = await authedClient(travelerEmail)
+      const denied = await traveler.from('reviews').update({ status: 'hidden' }).eq('id', opsUpdateReviewId).select('id')
+      // RLS's `using` clause filters the row out of the update's candidate set
+      // rather than raising -- a denied update surfaces as zero affected rows,
+      // not necessarily a thrown error (mirrors mission.rls.test.ts's pattern).
+      expect(denied.error === null ? denied.data : []).toEqual([])
+
+      const stillPublished = await svc.from('reviews').select('status').eq('id', opsUpdateReviewId).single()
+      expect(stillPublished.error).toBeNull()
+      expect(stillPublished.data!.status).toBe('published')
+    }, testTimeout)
+
+    it('rejects an UPDATE from an unrelated non-ops authenticated traveller', async () => {
+      const other = await authedClient(otherTravelerEmail)
+      const denied = await other.from('reviews').update({ status: 'hidden' }).eq('id', opsUpdateReviewId).select('id')
+      expect(denied.error === null ? denied.data : []).toEqual([])
+
+      const stillPublished = await svc.from('reviews').select('status').eq('id', opsUpdateReviewId).single()
+      expect(stillPublished.error).toBeNull()
+      expect(stillPublished.data!.status).toBe('published')
+    }, testTimeout)
+
+    it('allows an active ops member to hide the review (positive control)', async () => {
+      const ops = await authedClient(opsEmail)
+      const allowed = await ops.from('reviews').update({ status: 'hidden' }).eq('id', opsUpdateReviewId).select('id')
+      expect(allowed.error).toBeNull()
+      expect(allowed.data).toEqual([{ id: opsUpdateReviewId }])
+
+      const updated = await svc.from('reviews').select('status').eq('id', opsUpdateReviewId).single()
+      expect(updated.error).toBeNull()
+      expect(updated.data!.status).toBe('hidden')
     }, testTimeout)
   })
 
