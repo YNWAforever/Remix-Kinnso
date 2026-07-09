@@ -83,4 +83,10 @@ describe('R6A reviews table + get_booking_by_checkout_session extension', () => 
     expect(sql).toContain('traveler_user_id uuid, experience_id uuid, guide_id uuid')
     expect(sql).toContain('b.traveler_user_id, b.experience_id, b.guide_id')
   })
+
+  it('drops get_booking_by_checkout_session before redefining it, since Postgres cannot change RETURNS TABLE shape via CREATE OR REPLACE', () => {
+    expect(sql).toContain('drop function if exists public.get_booking_by_checkout_session(text)')
+    expect(sql.indexOf('drop function if exists public.get_booking_by_checkout_session(text)'))
+      .toBeLessThan(sql.indexOf('create or replace function public.get_booking_by_checkout_session(p_session_id text)'))
+  })
 })

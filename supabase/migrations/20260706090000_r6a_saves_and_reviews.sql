@@ -161,6 +161,13 @@ grant update on public.reviews to authenticated;
 -- (a) tell whether the signed-in viewer is the real traveler on the booking, never a
 -- guest (D-R6A-4), and (b) submit a review whose experience_id/guide_id will actually
 -- pass reviews_insert's check above. None of these are PII; safe for this anon-callable RPC.
+--
+-- Postgres can't change RETURNS TABLE's column list via CREATE OR REPLACE, so the
+-- live 7-column get_booking_by_checkout_session() must be dropped before it can be
+-- redefined with 10 (see 20260705090000_r3c_platform_stats_bookings_count.sql for the
+-- same gotcha with platform_stats()).
+drop function if exists public.get_booking_by_checkout_session(text);
+
 create or replace function public.get_booking_by_checkout_session(p_session_id text)
 returns table (
   booking_id uuid, status text, qty integer, total_amount numeric,
