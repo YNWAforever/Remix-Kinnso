@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { getUserMock, upsertMock, deleteEqMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({ data: { user: null } })),
@@ -23,6 +23,8 @@ vi.mock('@/lib/supabase/server', () => ({
 
 import { saveExperienceAction, unsaveExperienceAction } from '@/lib/saves/experience-actions'
 
+beforeEach(() => { vi.clearAllMocks() })
+
 describe('saveExperienceAction', () => {
   it('requires sign-in', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: null } })
@@ -40,6 +42,30 @@ describe('saveExperienceAction', () => {
     )
     expect(revalidatePathMock).toHaveBeenCalledWith('/en/trips')
   })
+
+  it('returns a form error and never revalidates when the upsert itself fails (e.g. a permission/grant error)', async () => {
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    upsertMock.mockResolvedValueOnce({ error: { message: 'permission denied for table experience_saves' } })
+    const result = await saveExperienceAction('en', 'e1')
+    expect(result).toEqual({ ok: false, errors: { form: ['Experience could not be saved'] } })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+
+  it('is idempotent: a repeat save for the same experience/traveller pair upserts again rather than erroring', async () => {
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    const first = await saveExperienceAction('en', 'e1')
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    const second = await saveExperienceAction('en', 'e1')
+    expect(first).toEqual({ ok: true, experienceId: 'e1' })
+    expect(second).toEqual({ ok: true, experienceId: 'e1' })
+    expect(upsertMock).toHaveBeenCalledTimes(2)
+    for (const call of upsertMock.mock.calls) {
+      expect(call).toEqual([
+        { experience_id: 'e1', traveler_user_id: 'u1' },
+        { onConflict: 'experience_id,traveler_user_id' },
+      ])
+    }
+  })
 })
 
 describe('unsaveExperienceAction', () => {
@@ -53,5 +79,13 @@ describe('unsaveExperienceAction', () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     const result = await unsaveExperienceAction('en', 'e1')
     expect(result).toEqual({ ok: true, experienceId: 'e1' })
+  })
+
+  it('returns a form error and never revalidates when the delete itself fails', async () => {
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    deleteEqMock.mockResolvedValueOnce({ error: { message: 'permission denied for table experience_saves' } })
+    const result = await unsaveExperienceAction('en', 'e1')
+    expect(result).toEqual({ ok: false, errors: { form: ['Experience could not be removed'] } })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 })
