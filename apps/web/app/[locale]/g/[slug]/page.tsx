@@ -5,8 +5,12 @@ import { Bookmark, MapPin } from 'lucide-react'
 import { isLocale, htmlLang, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
+import { isGuideSaved } from '@/lib/saves/guide-queries'
+import { getGuideRatingAggregate, listPublishedReviewsForGuide } from '@/lib/reviews/queries'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { GuideExperienceLinks } from '@/components/kinnso/GuideExperienceLinks'
+import { GuideSaveButton } from '@/components/kinnso/GuideSaveButton'
 import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
@@ -48,6 +52,14 @@ export default async function GuidePage({
   const messages = await getDictionary(locale as Locale)
   const authorName = guide.creatorName ?? guide.creatorHandle
 
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const [isSaved, rating, reviews] = await Promise.all([
+    user ? isGuideSaved(supabase, guide.id, user.id) : Promise.resolve(false),
+    getGuideRatingAggregate(supabase, guide.id),
+    listPublishedReviewsForGuide(supabase, guide.id),
+  ])
+
   const canonical = `${SITE_URL}/${locale}/g/${slug}`
   const ld = [
     articleJsonLd({
@@ -56,6 +68,7 @@ export default async function GuidePage({
       url: canonical, images: guide.cover ? [guide.cover] : [],
       publishedAt: guide.publishedAt, modifiedAt: null,
       authorName, locale: htmlLang(locale as Locale),
+      rating: rating ?? undefined,
     }),
     breadcrumbJsonLd([
       { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
@@ -82,6 +95,11 @@ export default async function GuidePage({
           {/* RouteStamp – city/category signal, positioned top-left */}
           <div className="absolute left-6 top-6 flex flex-wrap gap-2 sm:left-8">
             <Eyebrow className="rounded-[3px] bg-white/90 px-3 py-1">{guide.city}</Eyebrow>
+          </div>
+
+          {/* Save toggle, top-right */}
+          <div className="absolute right-6 top-6 sm:right-8">
+            <GuideSaveButton locale={locale as Locale} guideId={guide.id} initialSaved={isSaved} signedIn={!!user} t={messages.guideSave} />
           </div>
 
           {/* TicketCard overlay – title, author, city, saves */}
@@ -127,6 +145,24 @@ export default async function GuidePage({
             </Link>
           </div>
         </aside>
+      </section>
+
+      <section className="mt-6 rounded-lg bg-white p-6">
+        <h2 className="text-base font-bold text-kinnso-ink">
+          {rating
+            ? `${messages.reviews.ratingAverageLabel.replace('{average}', rating.average.toFixed(1))} · ${messages.reviews.countLabel.replace('{count}', String(rating.count))}`
+            : messages.reviews.emptyState}
+        </h2>
+        {reviews.length === 0 ? null : (
+          <ul className="mt-4 space-y-4">
+            {reviews.map((r) => (
+              <li key={r.id} className="border-t border-kinnso-cream2 pt-4 first:border-t-0 first:pt-0">
+                <p className="text-sm font-semibold text-kinnso-ink">{messages.reviews.anonymousReviewer} · {r.rating}/5</p>
+                {r.body ? <p className="mt-1 text-sm text-kinnso-muted">{r.body}</p> : null}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </article>
   )
