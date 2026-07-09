@@ -14,6 +14,8 @@ create table public.guide_saves (
   unique (guide_id, traveler_user_id)
 );
 
+create index guide_saves_traveler_idx on public.guide_saves(traveler_user_id, created_at desc);
+
 alter table public.guide_saves enable row level security;
 
 create policy guide_saves_owner_all on public.guide_saves
@@ -56,6 +58,8 @@ create table public.experience_saves (
   created_at timestamptz not null default now(),
   unique (experience_id, traveler_user_id)
 );
+
+create index experience_saves_traveler_idx on public.experience_saves(traveler_user_id, created_at desc);
 
 alter table public.experience_saves enable row level security;
 

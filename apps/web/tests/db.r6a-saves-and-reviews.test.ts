@@ -41,4 +41,9 @@ describe('R6A guide_saves + experience_saves migration', () => {
     expect(sql).toMatch(/revoke all on function public\.guide_saves_sync_count\(\) from public, anon, authenticated, service_role/)
     expect(sql).toMatch(/revoke all on function public\.experience_saves_sync_count\(\) from public, anon, authenticated, service_role/)
   })
+
+  it('both save tables index traveler_user_id for the /trips saved-list queries, matching this codebase\'s per-FK-index convention', () => {
+    expect(sql).toContain('create index guide_saves_traveler_idx on public.guide_saves(traveler_user_id, created_at desc)')
+    expect(sql).toContain('create index experience_saves_traveler_idx on public.experience_saves(traveler_user_id, created_at desc)')
+  })
 })
