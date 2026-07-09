@@ -1270,5 +1270,15 @@ const messages: Messages = {
     merchantEmpty: '發布任務後即可查看活動數據。',
     notApplicable: '—',
   },
+  guideSave: {
+    save: '儲存',
+    saved: '已儲存',
+    signInToSave: '登入以儲存',
+  },
+  experienceSave: {
+    save: '儲存',
+    saved: '已儲存',
+    signInToSave: '登入以儲存',
+  },
 }
 export default messages

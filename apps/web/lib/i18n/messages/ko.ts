@@ -1270,5 +1270,15 @@ const messages: Messages = {
     merchantEmpty: '미션을 게시하여 캠페인 활동을 확인하세요.',
     notApplicable: '—',
   },
+  guideSave: {
+    save: '저장',
+    saved: '저장됨',
+    signInToSave: '저장하려면 로그인하세요',
+  },
+  experienceSave: {
+    save: '저장',
+    saved: '저장됨',
+    signInToSave: '저장하려면 로그인하세요',
+  },
 }
 export default messages

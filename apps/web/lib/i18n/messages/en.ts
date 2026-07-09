@@ -1137,6 +1137,16 @@ export interface Messages {
     merchantEmpty: string
     notApplicable: string
   }
+  guideSave: {
+    save: string
+    saved: string
+    signInToSave: string
+  }
+  experienceSave: {
+    save: string
+    saved: string
+    signInToSave: string
+  }
 }
 
 const messages: Messages = {
@@ -2421,6 +2431,16 @@ const messages: Messages = {
     colDelivered: 'Delivered',
     merchantEmpty: 'Post a mission to start seeing campaign activity.',
     notApplicable: '—',
+  },
+  guideSave: {
+    save: 'Save',
+    saved: 'Saved',
+    signInToSave: 'Sign in to save',
+  },
+  experienceSave: {
+    save: 'Save',
+    saved: 'Saved',
+    signInToSave: 'Sign in to save',
   },
 }
 export default messages

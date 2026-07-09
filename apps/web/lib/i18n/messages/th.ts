@@ -1270,5 +1270,15 @@ const messages: Messages = {
     merchantEmpty: 'โพสต์มิชชันเพื่อเริ่มดูกิจกรรมแคมเปญ',
     notApplicable: '—',
   },
+  guideSave: {
+    save: 'บันทึก',
+    saved: 'บันทึกแล้ว',
+    signInToSave: 'เข้าสู่ระบบเพื่อบันทึก',
+  },
+  experienceSave: {
+    save: 'บันทึก',
+    saved: 'บันทึกแล้ว',
+    signInToSave: 'เข้าสู่ระบบเพื่อบันทึก',
+  },
 }
 export default messages
