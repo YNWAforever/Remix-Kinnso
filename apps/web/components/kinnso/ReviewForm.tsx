@@ -29,7 +29,18 @@ export function ReviewForm({ locale, bookingId, experienceId, guideId, t, onSubm
       setSubmitted(true)
       onSubmitted?.()
     } else {
-      setError(result.errors.form?.[0] ?? result.errors.rating?.[0] ?? t.genericError)
+      // submitReviewAction returns ALREADY_REVIEWED/NOT_ELIGIBLE as translation
+      // keys (never literal text) so this stays in the caller's own locale --
+      // any other `errors.form` value (e.g. the shared "Sign in is required"
+      // guard message) passes through as-is, matching every other form here.
+      const formCode = result.errors.form?.[0]
+      const message =
+        formCode === 'ALREADY_REVIEWED'
+          ? t.alreadyReviewed
+          : formCode === 'NOT_ELIGIBLE'
+            ? t.genericError
+            : (formCode ?? result.errors.rating?.[0] ?? t.genericError)
+      setError(message)
     }
   }
 

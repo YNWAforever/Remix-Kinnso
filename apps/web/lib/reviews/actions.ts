@@ -9,6 +9,15 @@ import type { Locale } from '@/lib/i18n/config'
 
 const UNIQUE_VIOLATION = '23505'
 
+// These two are translation-lookup KEYS, not user-facing text: ReviewForm maps
+// them to the caller's own `t.alreadyReviewed` / `t.genericError` (both
+// translated in all 7 locales). Returning literal English here -- as this
+// action used to -- would reach non-English travellers verbatim, since
+// ReviewForm's error handler prefers `errors.form` over any translated
+// fallback.
+const ALREADY_REVIEWED = 'ALREADY_REVIEWED'
+const NOT_ELIGIBLE = 'NOT_ELIGIBLE'
+
 /**
  * Submits a review for a completed booking. reviews_insert RLS is the real
  * enforcement boundary -- it re-checks ownership, completed status, and that
@@ -38,8 +47,8 @@ export async function submitReviewAction(
     body: parsed.parsed.body,
   })
   if (error) {
-    if (error.code === UNIQUE_VIOLATION) return formError('You already reviewed this booking')
-    return formError('This booking is not eligible for a review yet')
+    if (error.code === UNIQUE_VIOLATION) return formError(ALREADY_REVIEWED)
+    return formError(NOT_ELIGIBLE)
   }
 
   revalidatePath(`/${locale}/trips`)

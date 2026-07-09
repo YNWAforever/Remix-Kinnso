@@ -43,17 +43,17 @@ describe('submitReviewAction', () => {
     expect(revalidatePathMock).toHaveBeenCalledWith('/en/trips')
   })
 
-  it('translates a unique-violation into a friendly "already reviewed" message', async () => {
+  it('translates a unique-violation into the ALREADY_REVIEWED key (ReviewForm maps this to t.alreadyReviewed, never literal English)', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     insertMock.mockResolvedValueOnce({ error: { code: '23505', message: 'duplicate key' } })
     const result = await submitReviewAction('en', 'b1', 'e1', null, { rating: 4, body: '' })
-    expect(result).toEqual({ ok: false, errors: { form: ['You already reviewed this booking'] } })
+    expect(result).toEqual({ ok: false, errors: { form: ['ALREADY_REVIEWED'] } })
   })
 
-  it('translates any other DB rejection (e.g. RLS check failing) into an eligibility message', async () => {
+  it('translates any other DB rejection (e.g. RLS check failing) into the NOT_ELIGIBLE key (ReviewForm maps this to t.genericError)', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     insertMock.mockResolvedValueOnce({ error: { code: '42501', message: 'new row violates row-level security policy' } })
     const result = await submitReviewAction('en', 'b1', 'e1', null, { rating: 4, body: '' })
-    expect(result).toEqual({ ok: false, errors: { form: ['This booking is not eligible for a review yet'] } })
+    expect(result).toEqual({ ok: false, errors: { form: ['NOT_ELIGIBLE'] } })
   })
 })
