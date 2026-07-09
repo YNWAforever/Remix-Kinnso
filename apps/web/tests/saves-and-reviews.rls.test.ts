@@ -36,6 +36,7 @@ let experienceId = ''
 let otherExperienceId = ''
 let availabilityId = ''
 let guideId = ''
+let otherGuideId = ''
 let completedBookingId = ''
 let confirmedBookingId = ''
 let guestBookingId = ''
@@ -119,6 +120,19 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
     expect(guide.error).toBeNull()
     guideId = guide.data!.id
 
+    const otherGuide = await svc
+      .from('guides')
+      .insert({
+        creator_id: creatorUserId, creator_handle: 'r6arlscreatorother', creator_name: 'R6A RLS Other Creator',
+        slug: `r6a-rls-other-guide-${runId}`, title: 'R6A RLS Other Guide', summary: 'A second guide used only for RLS verification.',
+        cover_url: 'https://example.com/r6a-rls-cover.jpg', city: 'Hong Kong', status: 'published',
+        published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(otherGuide.error).toBeNull()
+    otherGuideId = otherGuide.data!.id
+
     const bookingBase = {
       experience_id: experienceId, availability_id: availabilityId, guide_id: guideId,
       qty: 1, unit_amount: 100, total_amount: 100, currency: 'HKD',
@@ -158,7 +172,8 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
     if (availabilityId) await svc.from('experience_availability').delete().eq('id', availabilityId)
     const experienceIds = [experienceId, otherExperienceId].filter(Boolean)
     if (experienceIds.length > 0) await svc.from('experiences').delete().in('id', experienceIds)
-    if (guideId) await svc.from('guides').delete().eq('id', guideId)
+    const guideIds = [guideId, otherGuideId].filter(Boolean)
+    if (guideIds.length > 0) await svc.from('guides').delete().in('id', guideIds)
     if (merchantProfileId) await svc.from('merchant_profiles').delete().eq('id', merchantProfileId)
     const userIds = [travelerId, otherTravelerId, merchantUserId, creatorUserId].filter(Boolean)
     for (const id of userIds) await svc.auth.admin.deleteUser(id)
@@ -225,11 +240,11 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
   })
 
   describe('save idempotency against the real unique constraints', () => {
-    it('guide_saves: two real upserts with the app\'s onConflict shape never raise a duplicate-key error, and leave exactly one row', async () => {
+    it('guide_saves: two real upserts with the app\'s onConflict+ignoreDuplicates shape never raise a duplicate-key error, and leave exactly one row', async () => {
       const traveler = await authedClient(travelerEmail)
-      const first = await traveler.from('guide_saves').upsert({ guide_id: guideId, traveler_user_id: travelerId }, { onConflict: 'guide_id,traveler_user_id' })
+      const first = await traveler.from('guide_saves').upsert({ guide_id: guideId, traveler_user_id: travelerId }, { onConflict: 'guide_id,traveler_user_id', ignoreDuplicates: true })
       expect(first.error).toBeNull()
-      const second = await traveler.from('guide_saves').upsert({ guide_id: guideId, traveler_user_id: travelerId }, { onConflict: 'guide_id,traveler_user_id' })
+      const second = await traveler.from('guide_saves').upsert({ guide_id: guideId, traveler_user_id: travelerId }, { onConflict: 'guide_id,traveler_user_id', ignoreDuplicates: true })
       expect(second.error).toBeNull()
 
       const rows = await svc.from('guide_saves').select('id').eq('guide_id', guideId).eq('traveler_user_id', travelerId)
@@ -239,11 +254,11 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
       await svc.from('guide_saves').delete().eq('guide_id', guideId).eq('traveler_user_id', travelerId)
     }, testTimeout)
 
-    it('experience_saves: two real upserts with the app\'s onConflict shape never raise a duplicate-key error, and leave exactly one row', async () => {
+    it('experience_saves: two real upserts with the app\'s onConflict+ignoreDuplicates shape never raise a duplicate-key error, and leave exactly one row', async () => {
       const traveler = await authedClient(travelerEmail)
-      const first = await traveler.from('experience_saves').upsert({ experience_id: experienceId, traveler_user_id: travelerId }, { onConflict: 'experience_id,traveler_user_id' })
+      const first = await traveler.from('experience_saves').upsert({ experience_id: experienceId, traveler_user_id: travelerId }, { onConflict: 'experience_id,traveler_user_id', ignoreDuplicates: true })
       expect(first.error).toBeNull()
-      const second = await traveler.from('experience_saves').upsert({ experience_id: experienceId, traveler_user_id: travelerId }, { onConflict: 'experience_id,traveler_user_id' })
+      const second = await traveler.from('experience_saves').upsert({ experience_id: experienceId, traveler_user_id: travelerId }, { onConflict: 'experience_id,traveler_user_id', ignoreDuplicates: true })
       expect(second.error).toBeNull()
 
       const rows = await svc.from('experience_saves').select('id').eq('experience_id', experienceId).eq('traveler_user_id', travelerId)
@@ -262,6 +277,28 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
       expect(duplicate.error!.code).toBe('23505')
 
       await svc.from('guide_saves').delete().eq('guide_id', guideId).eq('traveler_user_id', travelerId)
+    }, testTimeout)
+
+    it('rejects a direct REST-API UPDATE of an existing save row (no UPDATE grant, and the count triggers are INSERT/DELETE-only, so this closes the saves_count inflation path)', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const inserted = await traveler.from('guide_saves').insert({ guide_id: guideId, traveler_user_id: travelerId }).select('id').single()
+      expect(inserted.error).toBeNull()
+
+      const reassigned = await traveler.from('guide_saves').update({ guide_id: otherGuideId }).eq('id', inserted.data!.id)
+      expect(reassigned.error).not.toBeNull()
+
+      await svc.from('guide_saves').delete().eq('guide_id', guideId).eq('traveler_user_id', travelerId)
+    }, testTimeout)
+
+    it('rejects a direct REST-API UPDATE of an existing experience_saves row for the same reason', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const inserted = await traveler.from('experience_saves').insert({ experience_id: experienceId, traveler_user_id: travelerId }).select('id').single()
+      expect(inserted.error).toBeNull()
+
+      const reassigned = await traveler.from('experience_saves').update({ experience_id: otherExperienceId }).eq('id', inserted.data!.id)
+      expect(reassigned.error).not.toBeNull()
+
+      await svc.from('experience_saves').delete().eq('experience_id', experienceId).eq('traveler_user_id', travelerId)
     }, testTimeout)
   })
 })

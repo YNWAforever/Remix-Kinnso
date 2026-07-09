@@ -17,11 +17,16 @@ export async function saveExperienceAction(
   const gate = await requireTravelerAction(supabase)
   if (!gate.ok) return gate
 
+  // ignoreDuplicates compiles to INSERT ... ON CONFLICT DO NOTHING, never
+  // ON CONFLICT DO UPDATE -- so no UPDATE grant on experience_saves is needed,
+  // and a traveller can never reassign an existing save row's experience_id via
+  // this call (which would desync experiences.saves_count from the AFTER INSERT
+  // OR DELETE-only trigger). See 20260706094500_r6a_revoke_saves_update_grant.sql.
   const { error } = await supabase
     .from('experience_saves')
     .upsert(
       { experience_id: experienceId, traveler_user_id: gate.user.id },
-      { onConflict: 'experience_id,traveler_user_id' },
+      { onConflict: 'experience_id,traveler_user_id', ignoreDuplicates: true },
     )
   if (error) return formError('Experience could not be saved')
 

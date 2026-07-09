@@ -40,7 +40,7 @@ describe('saveGuideAction', () => {
     expect(result).toEqual({ ok: true, guideId: 'g1' })
     expect(upsertMock).toHaveBeenCalledWith(
       { guide_id: 'g1', traveler_user_id: 'u1' },
-      { onConflict: 'guide_id,traveler_user_id' },
+      { onConflict: 'guide_id,traveler_user_id', ignoreDuplicates: true },
     )
     expect(revalidatePathMock).toHaveBeenCalledWith('/en/trips')
   })
@@ -64,7 +64,7 @@ describe('saveGuideAction', () => {
     for (const call of upsertMock.mock.calls) {
       expect(call).toEqual([
         { guide_id: 'g1', traveler_user_id: 'u1' },
-        { onConflict: 'guide_id,traveler_user_id' },
+        { onConflict: 'guide_id,traveler_user_id', ignoreDuplicates: true },
       ])
     }
   })

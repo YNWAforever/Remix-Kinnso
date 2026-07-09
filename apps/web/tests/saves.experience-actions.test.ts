@@ -38,7 +38,7 @@ describe('saveExperienceAction', () => {
     expect(result).toEqual({ ok: true, experienceId: 'e1' })
     expect(upsertMock).toHaveBeenCalledWith(
       { experience_id: 'e1', traveler_user_id: 'u1' },
-      { onConflict: 'experience_id,traveler_user_id' },
+      { onConflict: 'experience_id,traveler_user_id', ignoreDuplicates: true },
     )
     expect(revalidatePathMock).toHaveBeenCalledWith('/en/trips')
   })
@@ -62,7 +62,7 @@ describe('saveExperienceAction', () => {
     for (const call of upsertMock.mock.calls) {
       expect(call).toEqual([
         { experience_id: 'e1', traveler_user_id: 'u1' },
-        { onConflict: 'experience_id,traveler_user_id' },
+        { onConflict: 'experience_id,traveler_user_id', ignoreDuplicates: true },
       ])
     }
   })
