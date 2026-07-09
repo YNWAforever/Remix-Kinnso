@@ -1,0 +1,267 @@
+// apps/web/tests/saves-and-reviews.rls.test.ts
+//
+// db.r6a-saves-and-reviews.test.ts only string-matches the migration file's SQL text.
+// That catches a missing clause but not a subtly wrong one (e.g. an operator-precedence
+// bug, or `is not distinct from` silently replaced by a plain `=` that still contains the
+// same substring elsewhere in the file). This file runs the real reviews_insert RLS
+// policy against a live Postgres instance, mirroring the sign-in-as-a-real-user pattern
+// established by creator-rls.test.ts / mission.rls.test.ts, and also verifies the
+// guide_saves/experience_saves idempotent-upsert claim (D-R6A) against the tables' actual
+// unique constraints rather than a mocked-call parameter-shape check.
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { createClient } from '@supabase/supabase-js'
+
+const svcKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const url = process.env.SUPABASE_URL ?? 'http://127.0.0.1:54321'
+const anonKey = process.env.SUPABASE_ANON_KEY ?? 'missing'
+const d = svcKey && process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY ? describe : describe.skip
+const hookTimeout = 60000
+const testTimeout = 15000
+
+const svc = createClient(url, svcKey ?? 'missing')
+const runId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+const password = 'Test1234!rls'
+
+const travelerEmail = `r6a-rls-traveler-${runId}@example.test`
+const otherTravelerEmail = `r6a-rls-other-traveler-${runId}@example.test`
+const merchantEmail = `r6a-rls-merchant-${runId}@example.test`
+const creatorEmail = `r6a-rls-creator-${runId}@example.test`
+
+let travelerId = ''
+let otherTravelerId = ''
+let merchantUserId = ''
+let creatorUserId = ''
+let merchantProfileId = ''
+let experienceId = ''
+let otherExperienceId = ''
+let availabilityId = ''
+let guideId = ''
+let completedBookingId = ''
+let confirmedBookingId = ''
+let guestBookingId = ''
+const insertedReviewIds: string[] = []
+
+async function authedClient(email: string) {
+  const anon = createClient(url, anonKey)
+  const { data, error } = await anon.auth.signInWithPassword({ email, password })
+  expect(error, `sign-in failed for ${email}: ${error?.message}`).toBeNull()
+  return createClient(url, anonKey, {
+    global: { headers: { Authorization: `Bearer ${data.session!.access_token}` } },
+  })
+}
+
+d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
+  beforeAll(async () => {
+    const traveler = await svc.auth.admin.createUser({ email: travelerEmail, password, email_confirm: true })
+    expect(traveler.error, `createUser failed: ${traveler.error?.message}`).toBeNull()
+    travelerId = traveler.data.user!.id
+
+    const otherTraveler = await svc.auth.admin.createUser({ email: otherTravelerEmail, password, email_confirm: true })
+    expect(otherTraveler.error, `createUser failed: ${otherTraveler.error?.message}`).toBeNull()
+    otherTravelerId = otherTraveler.data.user!.id
+
+    const merchantUser = await svc.auth.admin.createUser({ email: merchantEmail, password, email_confirm: true })
+    expect(merchantUser.error, `createUser failed: ${merchantUser.error?.message}`).toBeNull()
+    merchantUserId = merchantUser.data.user!.id
+
+    const creatorUser = await svc.auth.admin.createUser({ email: creatorEmail, password, email_confirm: true })
+    expect(creatorUser.error, `createUser failed: ${creatorUser.error?.message}`).toBeNull()
+    creatorUserId = creatorUser.data.user!.id
+
+    const merchant = await svc
+      .from('merchant_profiles')
+      .insert({ user_id: merchantUserId, company_name: 'R6A RLS Merchant', contact_email: merchantEmail })
+      .select('id')
+      .single()
+    expect(merchant.error).toBeNull()
+    merchantProfileId = merchant.data!.id
+
+    const experience = await svc
+      .from('experiences')
+      .insert({
+        merchant_profile_id: merchantProfileId, slug: `r6a-rls-experience-${runId}`, title: 'R6A RLS Experience',
+        city: 'Hong Kong', price_amount: 100, currency: 'HKD', status: 'published', published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(experience.error).toBeNull()
+    experienceId = experience.data!.id
+
+    const otherExperience = await svc
+      .from('experiences')
+      .insert({
+        merchant_profile_id: merchantProfileId, slug: `r6a-rls-other-experience-${runId}`, title: 'R6A RLS Other Experience',
+        city: 'Hong Kong', price_amount: 100, currency: 'HKD', status: 'published', published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(otherExperience.error).toBeNull()
+    otherExperienceId = otherExperience.data!.id
+
+    const availability = await svc
+      .from('experience_availability')
+      .insert({ experience_id: experienceId, date: '2026-08-01', capacity: 10 })
+      .select('id')
+      .single()
+    expect(availability.error).toBeNull()
+    availabilityId = availability.data!.id
+
+    const guide = await svc
+      .from('guides')
+      .insert({
+        creator_id: creatorUserId, creator_handle: 'r6arlscreator', creator_name: 'R6A RLS Creator',
+        slug: `r6a-rls-guide-${runId}`, title: 'R6A RLS Guide', summary: 'A guide used only for RLS verification.',
+        cover_url: 'https://example.com/r6a-rls-cover.jpg', city: 'Hong Kong', status: 'published',
+        published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(guide.error).toBeNull()
+    guideId = guide.data!.id
+
+    const bookingBase = {
+      experience_id: experienceId, availability_id: availabilityId, guide_id: guideId,
+      qty: 1, unit_amount: 100, total_amount: 100, currency: 'HKD',
+    }
+
+    const completedBooking = await svc
+      .from('bookings')
+      .insert({ ...bookingBase, traveler_user_id: travelerId, status: 'completed' })
+      .select('id')
+      .single()
+    expect(completedBooking.error).toBeNull()
+    completedBookingId = completedBooking.data!.id
+
+    const confirmedBooking = await svc
+      .from('bookings')
+      .insert({ ...bookingBase, traveler_user_id: travelerId, status: 'confirmed' })
+      .select('id')
+      .single()
+    expect(confirmedBooking.error).toBeNull()
+    confirmedBookingId = confirmedBooking.data!.id
+
+    const guestBooking = await svc
+      .from('bookings')
+      .insert({ ...bookingBase, traveler_user_id: null, guest_email: `r6a-rls-guest-${runId}@example.test`, status: 'completed' })
+      .select('id')
+      .single()
+    expect(guestBooking.error).toBeNull()
+    guestBookingId = guestBooking.data!.id
+  }, hookTimeout)
+
+  afterAll(async () => {
+    if (insertedReviewIds.length > 0) {
+      await svc.from('reviews').delete().in('id', insertedReviewIds)
+    }
+    const bookingIds = [completedBookingId, confirmedBookingId, guestBookingId].filter(Boolean)
+    if (bookingIds.length > 0) await svc.from('bookings').delete().in('id', bookingIds)
+    if (availabilityId) await svc.from('experience_availability').delete().eq('id', availabilityId)
+    const experienceIds = [experienceId, otherExperienceId].filter(Boolean)
+    if (experienceIds.length > 0) await svc.from('experiences').delete().in('id', experienceIds)
+    if (guideId) await svc.from('guides').delete().eq('id', guideId)
+    if (merchantProfileId) await svc.from('merchant_profiles').delete().eq('id', merchantProfileId)
+    const userIds = [travelerId, otherTravelerId, merchantUserId, creatorUserId].filter(Boolean)
+    for (const id of userIds) await svc.auth.admin.deleteUser(id)
+  }, hookTimeout)
+
+  describe('reviews_insert', () => {
+    it('rejects a review on a confirmed (not yet completed) booking (D-R6A-1)', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const { error } = await traveler
+        .from('reviews')
+        .insert({ booking_id: confirmedBookingId, traveler_user_id: travelerId, experience_id: experienceId, guide_id: guideId, rating: 5 })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it("rejects a review submitted by a user who isn't the booking's own traveler", async () => {
+      const other = await authedClient(otherTravelerEmail)
+      // otherTraveler references travelerA's completed booking. traveler_user_id = auth.uid()
+      // is satisfied (it's their own id), but the exists-subquery's b.traveler_user_id =
+      // auth.uid() fails because the real booking belongs to travelerA, not otherTraveler.
+      const { error } = await other
+        .from('reviews')
+        .insert({ booking_id: completedBookingId, traveler_user_id: otherTravelerId, experience_id: experienceId, guide_id: guideId, rating: 5 })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it("rejects a review whose experience_id has been tampered to not match the booking's own experience_id", async () => {
+      const traveler = await authedClient(travelerEmail)
+      const { error } = await traveler
+        .from('reviews')
+        .insert({ booking_id: completedBookingId, traveler_user_id: travelerId, experience_id: otherExperienceId, guide_id: guideId, rating: 5 })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it("rejects a review whose guide_id has been tampered to not match the booking's own guide_id", async () => {
+      const traveler = await authedClient(travelerEmail)
+      const { error } = await traveler
+        .from('reviews')
+        .insert({ booking_id: completedBookingId, traveler_user_id: travelerId, experience_id: experienceId, guide_id: null, rating: 5 })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it('rejects a review on a guest-checkout booking (traveler_user_id is null) for any authenticated caller (D-R6A-4)', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const { error } = await traveler
+        .from('reviews')
+        .insert({ booking_id: guestBookingId, traveler_user_id: travelerId, experience_id: experienceId, guide_id: guideId, rating: 5 })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it('allows the real traveler to review their own completed booking once every id matches (positive control)', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const { data, error } = await traveler
+        .from('reviews')
+        .insert({
+          booking_id: completedBookingId, traveler_user_id: travelerId, experience_id: experienceId, guide_id: guideId,
+          rating: 5, body: 'Verified by live RLS test.',
+        })
+        .select('id')
+        .single()
+      expect(error).toBeNull()
+      expect(data!.id).toBeTruthy()
+      insertedReviewIds.push(data!.id)
+    }, testTimeout)
+  })
+
+  describe('save idempotency against the real unique constraints', () => {
+    it('guide_saves: two real upserts with the app\'s onConflict shape never raise a duplicate-key error, and leave exactly one row', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const first = await traveler.from('guide_saves').upsert({ guide_id: guideId, traveler_user_id: travelerId }, { onConflict: 'guide_id,traveler_user_id' })
+      expect(first.error).toBeNull()
+      const second = await traveler.from('guide_saves').upsert({ guide_id: guideId, traveler_user_id: travelerId }, { onConflict: 'guide_id,traveler_user_id' })
+      expect(second.error).toBeNull()
+
+      const rows = await svc.from('guide_saves').select('id').eq('guide_id', guideId).eq('traveler_user_id', travelerId)
+      expect(rows.error).toBeNull()
+      expect((rows.data ?? []).length).toBe(1)
+
+      await svc.from('guide_saves').delete().eq('guide_id', guideId).eq('traveler_user_id', travelerId)
+    }, testTimeout)
+
+    it('experience_saves: two real upserts with the app\'s onConflict shape never raise a duplicate-key error, and leave exactly one row', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const first = await traveler.from('experience_saves').upsert({ experience_id: experienceId, traveler_user_id: travelerId }, { onConflict: 'experience_id,traveler_user_id' })
+      expect(first.error).toBeNull()
+      const second = await traveler.from('experience_saves').upsert({ experience_id: experienceId, traveler_user_id: travelerId }, { onConflict: 'experience_id,traveler_user_id' })
+      expect(second.error).toBeNull()
+
+      const rows = await svc.from('experience_saves').select('id').eq('experience_id', experienceId).eq('traveler_user_id', travelerId)
+      expect(rows.error).toBeNull()
+      expect((rows.data ?? []).length).toBe(1)
+
+      await svc.from('experience_saves').delete().eq('experience_id', experienceId).eq('traveler_user_id', travelerId)
+    }, testTimeout)
+
+    it('confirms the underlying constraint is real: a raw duplicate INSERT without onConflict is rejected 23505', async () => {
+      const traveler = await authedClient(travelerEmail)
+      const first = await traveler.from('guide_saves').insert({ guide_id: guideId, traveler_user_id: travelerId })
+      expect(first.error).toBeNull()
+      const duplicate = await traveler.from('guide_saves').insert({ guide_id: guideId, traveler_user_id: travelerId })
+      expect(duplicate.error).not.toBeNull()
+      expect(duplicate.error!.code).toBe('23505')
+
+      await svc.from('guide_saves').delete().eq('guide_id', guideId).eq('traveler_user_id', travelerId)
+    }, testTimeout)
+  })
+})
