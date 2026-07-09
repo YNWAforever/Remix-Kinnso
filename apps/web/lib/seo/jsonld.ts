@@ -1,6 +1,7 @@
 export interface ArticleLdInput {
   headline: string; description: string; url: string; images: string[]
   publishedAt: string | null; modifiedAt: string | null; authorName: string | null; locale: string
+  rating?: { average: number; count: number }
 }
 
 export function articleJsonLd(i: ArticleLdInput): Record<string, unknown> {
@@ -14,6 +15,7 @@ export function articleJsonLd(i: ArticleLdInput): Record<string, unknown> {
     publisher: { '@type': 'Organization', name: 'KINNSO' },
   }
   if (i.authorName) ld.author = { '@type': 'Person', name: i.authorName }
+  if (i.rating) ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: i.rating.average, reviewCount: i.rating.count }
   return ld
 }
 
@@ -86,6 +88,7 @@ export function merchantProfileJsonLd(i: {
 export function experienceOfferJsonLd(i: {
   name: string; description: string; url: string; image: string | null
   priceAmount: number; currency: string
+  rating?: { average: number; count: number }
 }): Record<string, unknown> {
   const ld: Record<string, unknown> = {
     '@context': 'https://schema.org', '@type': 'Product',
@@ -96,5 +99,6 @@ export function experienceOfferJsonLd(i: {
     },
   }
   if (i.image) ld.image = i.image
+  if (i.rating) ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: i.rating.average, reviewCount: i.rating.count }
   return ld
 }
