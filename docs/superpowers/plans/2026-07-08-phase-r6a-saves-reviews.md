@@ -2688,6 +2688,16 @@ describe('ExperienceSaveButton', () => {
     await screen.findByRole('button', { name: en.experienceSave.saved })
     expect(refreshMock).toHaveBeenCalled()
   })
+
+  it('shows "Sign in to save" (not "Save") for an anon viewer, and conveys toggle state via aria-pressed', () => {
+    render(<ExperienceSaveButton locale="en" experienceId="e1" initialSaved={false} signedIn={false} t={en.experienceSave} />)
+    expect(screen.getByRole('button', { name: en.experienceSave.signInToSave })).toBeInTheDocument()
+  })
+
+  it('sets aria-pressed to reflect the saved state for a signed-in traveller', () => {
+    render(<ExperienceSaveButton locale="en" experienceId="e1" initialSaved={true} signedIn={true} t={en.experienceSave} />)
+    expect(screen.getByRole('button', { name: en.experienceSave.saved })).toHaveAttribute('aria-pressed', 'true')
+  })
 })
 ```
 
@@ -2798,13 +2808,15 @@ export function ExperienceSaveButton({ locale, experienceId, initialSaved, signe
       type="button"
       onClick={toggle}
       disabled={pending}
+      aria-pressed={saved}
       className={cn(
-        'inline-flex items-center gap-1 rounded-[3px] bg-white/90 px-3 py-1 text-sm font-semibold text-kinnso-ink disabled:opacity-50',
+        'inline-flex min-h-[44px] items-center gap-1 rounded-[3px] bg-white/90 px-3 py-1 text-sm font-semibold text-kinnso-ink disabled:opacity-50',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange',
         saved && 'bg-kinnso-amber/90',
       )}
     >
       <Bookmark className={cn('h-4 w-4', saved && 'fill-current')} aria-hidden="true" />
-      {saved ? t.saved : t.save}
+      {signedIn ? (saved ? t.saved : t.save) : t.signInToSave}
     </button>
   )
 }
@@ -2815,7 +2827,7 @@ export default ExperienceSaveButton
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `cd apps/web && npx vitest run kinnso.experience-card`
-Expected: PASS (4 tests)
+Expected: PASS (6 tests)
 
 - [ ] **Step 5: Commit**
 
