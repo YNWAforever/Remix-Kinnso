@@ -151,6 +151,63 @@ describe('listMyBookings', () => {
 
     await expect(listMyBookings(supabaseMock as never, 'traveler-1')).rejects.toThrow('boom')
   })
+
+  it('maps experience_id, guide_id, and a joined review id onto the row', async () => {
+    supabaseMock.from.mockReturnValue(
+      chainable({
+        data: [
+          {
+            id: 't3',
+            status: 'completed',
+            qty: 1,
+            total_amount: 480,
+            currency: 'HKD',
+            created_at: '2026-06-01T00:00:00Z',
+            experience_id: 'e1',
+            guide_id: 'g1',
+            experiences: { title: 'Sunset Tour', slug: 'sunset-tour', merchant_profiles: { company_name: 'Acme Travel' } },
+            experience_availability: null,
+            reviews: { id: 'r1' },
+          },
+        ],
+        error: null,
+      }),
+    )
+
+    const rows = await listMyBookings(supabaseMock as never, 'traveler-1')
+
+    expect(rows[0].experienceId).toBe('e1')
+    expect(rows[0].guideId).toBe('g1')
+    expect(rows[0].reviewId).toBe('r1')
+  })
+
+  it('maps a missing review embed to reviewId: null', async () => {
+    supabaseMock.from.mockReturnValue(
+      chainable({
+        data: [
+          {
+            id: 't4',
+            status: 'confirmed',
+            qty: 1,
+            total_amount: 300,
+            currency: 'HKD',
+            created_at: '2026-06-02T00:00:00Z',
+            experience_id: 'e2',
+            guide_id: null,
+            experiences: { title: 'City Walk', slug: 'city-walk', merchant_profiles: { company_name: 'Kowloon Eats Co' } },
+            experience_availability: null,
+            reviews: null,
+          },
+        ],
+        error: null,
+      }),
+    )
+
+    const rows = await listMyBookings(supabaseMock as never, 'traveler-1')
+
+    expect(rows[0].guideId).toBeNull()
+    expect(rows[0].reviewId).toBeNull()
+  })
 })
 
 describe('listOpsBookingSettlements', () => {
