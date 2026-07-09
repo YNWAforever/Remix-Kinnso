@@ -1280,5 +1280,20 @@ const messages: Messages = {
     saved: '저장됨',
     signInToSave: '저장하려면 로그인하세요',
   },
+  reviews: {
+    formHeading: '리뷰 작성',
+    ratingLabel: '평점',
+    bodyLabel: '리뷰 (선택 사항)',
+    bodyPlaceholder: '다른 여행자에게 경험을 알려주세요…',
+    submitCta: '리뷰 제출',
+    submittingCta: '제출 중…',
+    submitted: '리뷰 감사합니다!',
+    alreadyReviewed: '이미 이 예약에 대한 리뷰를 작성했습니다.',
+    genericError: '문제가 발생했습니다. 다시 시도해 주세요.',
+    ratingAverageLabel: '5점 만점에 {average}점',
+    countLabel: '리뷰 {count}개',
+    emptyState: '아직 리뷰가 없습니다.',
+    anonymousReviewer: 'KINNSO 여행자',
+  },
 }
 export default messages

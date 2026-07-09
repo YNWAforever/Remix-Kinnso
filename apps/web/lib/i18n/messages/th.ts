@@ -1280,5 +1280,20 @@ const messages: Messages = {
     saved: 'บันทึกแล้ว',
     signInToSave: 'เข้าสู่ระบบเพื่อบันทึก',
   },
+  reviews: {
+    formHeading: 'เขียนรีวิว',
+    ratingLabel: 'คะแนน',
+    bodyLabel: 'รีวิวของคุณ (ไม่บังคับ)',
+    bodyPlaceholder: 'บอกเล่าประสบการณ์ของคุณให้นักเดินทางคนอื่นฟัง…',
+    submitCta: 'ส่งรีวิว',
+    submittingCta: 'กำลังส่ง…',
+    submitted: 'ขอบคุณสำหรับรีวิว!',
+    alreadyReviewed: 'คุณรีวิวการจองนี้ไปแล้ว',
+    genericError: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง',
+    ratingAverageLabel: '{average} จาก 5 คะแนน',
+    countLabel: '{count} รีวิว',
+    emptyState: 'ยังไม่มีรีวิว',
+    anonymousReviewer: 'นักเดินทาง KINNSO',
+  },
 }
 export default messages

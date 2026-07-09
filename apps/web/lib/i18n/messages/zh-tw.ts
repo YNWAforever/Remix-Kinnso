@@ -1280,5 +1280,20 @@ const messages: Messages = {
     saved: '已儲存',
     signInToSave: '登入以儲存',
   },
+  reviews: {
+    formHeading: '撰寫評價',
+    ratingLabel: '評分',
+    bodyLabel: '你的評價（選填）',
+    bodyPlaceholder: '和其他旅客分享你的體驗…',
+    submitCta: '提交評價',
+    submittingCta: '提交中…',
+    submitted: '謝謝你的評價！',
+    alreadyReviewed: '你已經評價過這筆訂單。',
+    genericError: '發生錯誤，請再試一次。',
+    ratingAverageLabel: '{average} 分（滿分 5 分）',
+    countLabel: '{count} 則評價',
+    emptyState: '目前尚無評價。',
+    anonymousReviewer: 'KINNSO 旅客',
+  },
 }
 export default messages

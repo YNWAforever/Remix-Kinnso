@@ -1280,5 +1280,20 @@ const messages: Messages = {
     saved: '已保存',
     signInToSave: '登录以保存',
   },
+  reviews: {
+    formHeading: '撰写评价',
+    ratingLabel: '评分',
+    bodyLabel: '你的评价（选填）',
+    bodyPlaceholder: '和其他旅客分享你的体验…',
+    submitCta: '提交评价',
+    submittingCta: '提交中…',
+    submitted: '谢谢你的评价！',
+    alreadyReviewed: '你已经评价过这笔订单。',
+    genericError: '出现错误，请重试。',
+    ratingAverageLabel: '{average} 分（满分 5 分）',
+    countLabel: '{count} 条评价',
+    emptyState: '暂无评价。',
+    anonymousReviewer: 'KINNSO 旅客',
+  },
 }
 export default messages

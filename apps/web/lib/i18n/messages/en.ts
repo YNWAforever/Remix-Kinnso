@@ -1147,6 +1147,21 @@ export interface Messages {
     saved: string
     signInToSave: string
   }
+  reviews: {
+    formHeading: string
+    ratingLabel: string
+    bodyLabel: string
+    bodyPlaceholder: string
+    submitCta: string
+    submittingCta: string
+    submitted: string
+    alreadyReviewed: string
+    genericError: string
+    ratingAverageLabel: string
+    countLabel: string
+    emptyState: string
+    anonymousReviewer: string
+  }
 }
 
 const messages: Messages = {
@@ -2441,6 +2456,21 @@ const messages: Messages = {
     save: 'Save',
     saved: 'Saved',
     signInToSave: 'Sign in to save',
+  },
+  reviews: {
+    formHeading: 'Leave a review',
+    ratingLabel: 'Rating',
+    bodyLabel: 'Your review (optional)',
+    bodyPlaceholder: 'Tell other travellers about your experience…',
+    submitCta: 'Submit review',
+    submittingCta: 'Submitting…',
+    submitted: 'Thanks for your review!',
+    alreadyReviewed: 'You already reviewed this booking.',
+    genericError: 'Something went wrong. Please try again.',
+    ratingAverageLabel: '{average} out of 5',
+    countLabel: '{count} reviews',
+    emptyState: 'No reviews yet.',
+    anonymousReviewer: 'A KINNSO traveller',
   },
 }
 export default messages
