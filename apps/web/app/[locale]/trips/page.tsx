@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { TravelerTripsView } from '@/components/kinnso/pages/TravelerTripsView'
 import { listMyBookings } from '@/lib/bookings/queries'
+import { listSavedGuides } from '@/lib/saves/guide-queries'
+import { listSavedExperiences } from '@/lib/saves/experience-queries'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { noindexMetadata } from '@/lib/seo/metadata'
@@ -32,7 +34,20 @@ export default async function TripsPage({ params }: { params: Params }) {
   // is resolveViewerRole's fallback). A merchant/creator/ops user who also
   // personally booked something as a traveller can still see their own
   // bookings here — this is intentional, not a gap.
-  const bookings = await listMyBookings(supabase, user.id)
+  const [bookings, savedGuides, savedExperiences] = await Promise.all([
+    listMyBookings(supabase, user.id),
+    listSavedGuides(supabase, user.id),
+    listSavedExperiences(supabase, user.id),
+  ])
 
-  return <TravelerTripsView locale={loc} t={messages.trips} bookings={bookings} />
+  return (
+    <TravelerTripsView
+      locale={loc}
+      t={messages.trips}
+      reviewsT={messages.reviews}
+      bookings={bookings}
+      savedGuides={savedGuides}
+      savedExperiences={savedExperiences}
+    />
+  )
 }
