@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { requireTravelerAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 import { validateReviewInput } from '@/lib/reviews/validation'
 import type { Locale } from '@/lib/i18n/config'
@@ -25,12 +26,12 @@ export async function submitReviewAction(
   if (!parsed.ok) return { ok: false, errors: parsed.errors }
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return formError('Sign in is required')
+  const gate = await requireTravelerAction(supabase)
+  if (!gate.ok) return gate
 
   const { error } = await supabase.from('reviews').insert({
     booking_id: bookingId,
-    traveler_user_id: user.id,
+    traveler_user_id: gate.user.id,
     experience_id: experienceId,
     guide_id: guideId,
     rating: parsed.parsed.rating,
