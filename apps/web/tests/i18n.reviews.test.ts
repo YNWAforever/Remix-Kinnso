@@ -18,3 +18,20 @@ describe('reviews i18n', () => {
     })
   }
 })
+
+describe('TravelerTripsMessages Saved-section keys', () => {
+  for (const locale of LOCALES) {
+    it(`${locale} trips group drops savesTabTitle/savesTabComingSoon and defines the real Saved-section keys`, async () => {
+      const dict = await getDictionary(locale)
+      const trips = dict.trips as unknown as Record<string, unknown>
+      expect(trips.savesTabTitle).toBeUndefined()
+      expect(trips.savesTabComingSoon).toBeUndefined()
+      expect(trips.savedGuidesTitle).toBeTruthy()
+      expect(trips.savedGuidesEmpty).toBeTruthy()
+      expect(trips.savedExperiencesTitle).toBeTruthy()
+      expect(trips.savedExperiencesEmpty).toBeTruthy()
+      expect(trips.reviewCta).toBeTruthy()
+      expect(trips.reviewedLabel).toBeTruthy()
+    })
+  }
+})

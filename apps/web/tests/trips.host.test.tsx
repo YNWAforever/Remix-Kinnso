@@ -19,8 +19,12 @@ const messages = {
   statusCancelled: 'Cancelled',
   statusRefunded: 'Refunded',
   bookedOnLabel: 'Booked on',
-  savesTabTitle: 'Saved',
-  savesTabComingSoon: 'Coming soon.',
+  savedGuidesTitle: 'Saved guides',
+  savedGuidesEmpty: "You haven't saved any guides yet.",
+  savedExperiencesTitle: 'Saved experiences',
+  savedExperiencesEmpty: "You haven't saved any experiences yet.",
+  reviewCta: 'Leave a review',
+  reviewedLabel: 'Reviewed',
 }
 
 describe('TravelerTripsView', () => {
@@ -106,10 +110,5 @@ describe('TravelerTripsView', () => {
     )
     expect(screen.getByText('Now-Unlisted Tour')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Now-Unlisted Tour' })).toBeNull()
-  })
-
-  it('shows the saves tab as empty/coming-soon, not faked (D-R3-5)', () => {
-    render(<TravelerTripsView locale="en" t={messages} bookings={[]} />)
-    expect(screen.getByText('Coming soon.')).toBeInTheDocument()
   })
 })

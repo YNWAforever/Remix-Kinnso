@@ -200,8 +200,12 @@ export interface TravelerTripsMessages {
   statusCancelled: string
   statusRefunded: string
   bookedOnLabel: string
-  savesTabTitle: string
-  savesTabComingSoon: string
+  savedGuidesTitle: string
+  savedGuidesEmpty: string
+  savedExperiencesTitle: string
+  savedExperiencesEmpty: string
+  reviewCta: string
+  reviewedLabel: string
 }
 
 export interface MerchantsDirectoryMessages {
@@ -2234,8 +2238,12 @@ const messages: Messages = {
     statusCancelled: 'Cancelled',
     statusRefunded: 'Refunded',
     bookedOnLabel: 'Booked on',
-    savesTabTitle: 'Saved',
-    savesTabComingSoon: 'Saved guides and experiences are coming soon.',
+    savedGuidesTitle: 'Saved guides',
+    savedGuidesEmpty: "You haven't saved any guides yet.",
+    savedExperiencesTitle: 'Saved experiences',
+    savedExperiencesEmpty: "You haven't saved any experiences yet.",
+    reviewCta: 'Leave a review',
+    reviewedLabel: 'Reviewed',
   },
   merchantsOps: {
     title: 'Merchants',
