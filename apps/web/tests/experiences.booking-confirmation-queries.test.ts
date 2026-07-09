@@ -13,15 +13,17 @@ beforeEach(() => rpcMock.mockReset())
 const row = {
   booking_id: 'b1', status: 'confirmed', qty: 2, total_amount: '2400.00', currency: 'HKD',
   experience_title: 'Tokyo After-Hours Izakaya Crawl', experience_slug: 'tokyo-crawl',
+  traveler_user_id: 'u1', experience_id: 'e1', guide_id: 'g1',
 }
 
 describe('getBookingByCheckoutSession', () => {
-  it('maps a found booking to camelCase', async () => {
+  it('maps a found booking to camelCase, including travelerUserId/experienceId/guideId', async () => {
     rpcMock.mockReturnValue({ maybeSingle: () => Promise.resolve({ data: row, error: null }) })
     const result = await getBookingByCheckoutSession('cs_123')
     expect(result).toEqual({
       bookingId: 'b1', status: 'confirmed', qty: 2, totalAmount: 2400, currency: 'HKD',
       experienceTitle: 'Tokyo After-Hours Izakaya Crawl', experienceSlug: 'tokyo-crawl',
+      travelerUserId: 'u1', experienceId: 'e1', guideId: 'g1',
     })
   })
 
