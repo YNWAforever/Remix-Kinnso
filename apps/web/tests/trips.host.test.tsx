@@ -69,12 +69,12 @@ const baseBooking = {
 
 describe('TravelerTripsView', () => {
   it('renders the empty state', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText(/No bookings yet/)).toBeInTheDocument()
   })
 
   it('renders a booking row', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[baseBooking]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[baseBooking]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText('Hidden Waterfall Hike')).toBeInTheDocument()
     expect(screen.getByText('Sunrise Stays HK')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
@@ -83,39 +83,39 @@ describe('TravelerTripsView', () => {
   })
 
   it('renders a booking row with a null bookingDate: falls back to "Booked on <createdAt>"', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[{ ...baseBooking, id: 'b2', status: 'pending_payment', bookingDate: null }]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[{ ...baseBooking, id: 'b2', status: 'pending_payment', bookingDate: null }]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText('Hidden Waterfall Hike')).toBeInTheDocument()
     expect(screen.getByText('Awaiting payment')).toBeInTheDocument()
     expect(screen.getByText(/Booked on/)).toBeInTheDocument()
   })
 
   it('renders plain text (not a link) when experienceSlug is empty', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[{ ...baseBooking, id: 'b3', experienceSlug: '', experienceTitle: 'Now-Unlisted Tour' }]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[{ ...baseBooking, id: 'b3', experienceSlug: '', experienceTitle: 'Now-Unlisted Tour' }]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText('Now-Unlisted Tour')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Now-Unlisted Tour' })).toBeNull()
   })
 
   it('shows a "Leave a review" CTA for a completed booking with no review, and opens the form on click', async () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[{ ...baseBooking, id: 'b4', status: 'completed', reviewId: null }]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[{ ...baseBooking, id: 'b4', status: 'completed', reviewId: null }]} savedGuides={[]} savedExperiences={[]} />)
     const cta = screen.getByRole('button', { name: 'Leave a review' })
     fireEvent.click(cta)
     expect(screen.getByRole('button', { name: reviewsT.submitCta })).toBeInTheDocument()
   })
 
   it('shows "Reviewed" (no CTA) for a completed booking that already has a reviewId', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[{ ...baseBooking, id: 'b5', status: 'completed', reviewId: 'r1' }]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[{ ...baseBooking, id: 'b5', status: 'completed', reviewId: 'r1' }]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText('Reviewed')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Leave a review' })).toBeNull()
   })
 
   it('shows neither a CTA nor "Reviewed" for a non-completed booking', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[baseBooking]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[baseBooking]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.queryByRole('button', { name: 'Leave a review' })).toBeNull()
     expect(screen.queryByText('Reviewed')).toBeNull()
   })
 
   it('shows the empty state for both Saved sections when nothing is saved', () => {
-    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} bookings={[]} savedGuides={[]} savedExperiences={[]} />)
+    render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText("You haven't saved any guides yet.")).toBeInTheDocument()
     expect(screen.getByText("You haven't saved any experiences yet.")).toBeInTheDocument()
   })
@@ -123,7 +123,7 @@ describe('TravelerTripsView', () => {
   it('renders a saved guide as a real GuideCard and removes it from the list on unsave', async () => {
     render(
       <TravelerTripsView
-        locale="en" t={t} reviewsT={reviewsT} bookings={[]}
+        locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[]}
         savedGuides={[{ guideId: 'g1', guide: { slug: 'kyoto-tea', title: 'Kyoto Tea Houses', cover: 'https://x/kyoto.jpg', city: 'Kyoto', saves: 5, creatorHandle: 'teafan' } }]}
         savedExperiences={[]}
       />,
@@ -137,7 +137,7 @@ describe('TravelerTripsView', () => {
   it('renders a saved experience as a real ExperienceCard and removes it from the list on unsave', async () => {
     render(
       <TravelerTripsView
-        locale="en" t={t} reviewsT={reviewsT} bookings={[]} savedGuides={[]}
+        locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[]} savedGuides={[]}
         savedExperiences={[{ experienceId: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', city: 'Hong Kong', priceAmount: 480, currency: 'HKD', coverUrl: null, savesCount: 3 }]}
       />,
     )

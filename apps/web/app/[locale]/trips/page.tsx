@@ -45,6 +45,7 @@ export default async function TripsPage({ params }: { params: Params }) {
       locale={loc}
       t={messages.trips}
       reviewsT={messages.reviews}
+      savesLabel={messages.explore.savesLabel}
       bookings={bookings}
       savedGuides={savedGuides}
       savedExperiences={savedExperiences}

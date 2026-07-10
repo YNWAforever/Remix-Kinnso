@@ -25,13 +25,14 @@ type TravelerTripsViewProps = {
   locale: Locale
   t: TravelerTripsMessages
   reviewsT: Messages['reviews']
+  savesLabel: string
   bookings: TravelerBookingRow[]
   savedGuides: SavedGuideEntry[]
   savedExperiences: SavedExperienceEntry[]
 }
 
 export function TravelerTripsView({
-  locale, t, reviewsT, bookings,
+  locale, t, reviewsT, savesLabel, bookings,
   savedGuides: initialSavedGuides, savedExperiences: initialSavedExperiences,
 }: TravelerTripsViewProps) {
   const [savedGuides, setSavedGuides] = useState(initialSavedGuides)
@@ -144,6 +145,7 @@ export function TravelerTripsView({
                 key={entry.guideId}
                 g={entry.guide}
                 locale={locale}
+                savesLabel={savesLabel}
                 isSaved={true}
                 onSaveToggle={() => handleUnsaveGuide(entry.guideId)}
               />

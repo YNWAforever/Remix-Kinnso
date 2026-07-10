@@ -393,4 +393,117 @@ d('R6A reviews_insert RLS + saves idempotency (live Postgres)', () => {
       await svc.from('experience_saves').delete().eq('experience_id', experienceId).eq('traveler_user_id', travelerId)
     }, testTimeout)
   })
+
+  // The final review flagged that saves_count's count-sync triggers -- R6A's own
+  // headline deliverable -- were only verified by string-matching the migration text.
+  // This exercises the real triggers against a live Postgres instance.
+  describe('saves_count triggers actually fire (not just present in the migration text)', () => {
+    it('guide_saves: an insert increments guides.saves_count by 1, and a delete decrements it back', async () => {
+      const before = await svc.from('guides').select('saves_count').eq('id', guideId).single()
+      expect(before.error).toBeNull()
+      const baseline = before.data!.saves_count as number
+
+      const traveler = await authedClient(travelerEmail)
+      const inserted = await traveler.from('guide_saves').insert({ guide_id: guideId, traveler_user_id: travelerId }).select('id').single()
+      expect(inserted.error).toBeNull()
+
+      const afterInsert = await svc.from('guides').select('saves_count').eq('id', guideId).single()
+      expect(afterInsert.error).toBeNull()
+      expect(afterInsert.data!.saves_count).toBe(baseline + 1)
+
+      await svc.from('guide_saves').delete().eq('id', inserted.data!.id)
+
+      const afterDelete = await svc.from('guides').select('saves_count').eq('id', guideId).single()
+      expect(afterDelete.error).toBeNull()
+      expect(afterDelete.data!.saves_count).toBe(baseline)
+    }, testTimeout)
+
+    it('experience_saves: an insert increments experiences.saves_count by 1, and a delete decrements it back', async () => {
+      const before = await svc.from('experiences').select('saves_count').eq('id', experienceId).single()
+      expect(before.error).toBeNull()
+      const baseline = before.data!.saves_count as number
+
+      const traveler = await authedClient(travelerEmail)
+      const inserted = await traveler.from('experience_saves').insert({ experience_id: experienceId, traveler_user_id: travelerId }).select('id').single()
+      expect(inserted.error).toBeNull()
+
+      const afterInsert = await svc.from('experiences').select('saves_count').eq('id', experienceId).single()
+      expect(afterInsert.error).toBeNull()
+      expect(afterInsert.data!.saves_count).toBe(baseline + 1)
+
+      await svc.from('experience_saves').delete().eq('id', inserted.data!.id)
+
+      const afterDelete = await svc.from('experiences').select('saves_count').eq('id', experienceId).single()
+      expect(afterDelete.error).toBeNull()
+      expect(afterDelete.data!.saves_count).toBe(baseline)
+    }, testTimeout)
+  })
+
+  // D-R6A-6: saves require sign-in, no anon path. revoke all ... from anon means anon
+  // has zero grant at the table level (rejected before RLS even evaluates); confirm
+  // this holds live rather than trusting only the migration text.
+  describe('guide_saves/experience_saves reject anon access entirely (D-R6A-6)', () => {
+    const anon = createClient(url, anonKey)
+
+    it('anon cannot select guide_saves', async () => {
+      const { error } = await anon.from('guide_saves').select('id').limit(1)
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it('anon cannot insert into guide_saves', async () => {
+      const { error } = await anon.from('guide_saves').insert({ guide_id: guideId, traveler_user_id: travelerId })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it('anon cannot select experience_saves', async () => {
+      const { error } = await anon.from('experience_saves').select('id').limit(1)
+      expect(error).not.toBeNull()
+    }, testTimeout)
+
+    it('anon cannot insert into experience_saves', async () => {
+      const { error } = await anon.from('experience_saves').insert({ experience_id: experienceId, traveler_user_id: travelerId })
+      expect(error).not.toBeNull()
+    }, testTimeout)
+  })
+
+  // guide_saves_owner_all / experience_saves_owner_all pin traveler_user_id =
+  // auth.uid() -- confirm the real policy actually isolates two real travellers from
+  // each other, not just that the policy text exists.
+  describe('guide_saves/experience_saves isolate savers from each other', () => {
+    it("otherTraveler cannot see or delete travelerA's guide_saves row", async () => {
+      const traveler = await authedClient(travelerEmail)
+      const inserted = await traveler.from('guide_saves').insert({ guide_id: guideId, traveler_user_id: travelerId }).select('id').single()
+      expect(inserted.error).toBeNull()
+
+      const other = await authedClient(otherTravelerEmail)
+      const seen = await other.from('guide_saves').select('id').eq('id', inserted.data!.id)
+      expect(seen.error === null ? seen.data : []).toEqual([])
+
+      const deleted = await other.from('guide_saves').delete().eq('id', inserted.data!.id).select('id')
+      expect(deleted.error === null ? deleted.data : []).toEqual([])
+
+      const stillThere = await svc.from('guide_saves').select('id').eq('id', inserted.data!.id).single()
+      expect(stillThere.error).toBeNull()
+
+      await svc.from('guide_saves').delete().eq('id', inserted.data!.id)
+    }, testTimeout)
+
+    it("otherTraveler cannot see or delete travelerA's experience_saves row", async () => {
+      const traveler = await authedClient(travelerEmail)
+      const inserted = await traveler.from('experience_saves').insert({ experience_id: experienceId, traveler_user_id: travelerId }).select('id').single()
+      expect(inserted.error).toBeNull()
+
+      const other = await authedClient(otherTravelerEmail)
+      const seen = await other.from('experience_saves').select('id').eq('id', inserted.data!.id)
+      expect(seen.error === null ? seen.data : []).toEqual([])
+
+      const deleted = await other.from('experience_saves').delete().eq('id', inserted.data!.id).select('id')
+      expect(deleted.error === null ? deleted.data : []).toEqual([])
+
+      const stillThere = await svc.from('experience_saves').select('id').eq('id', inserted.data!.id).single()
+      expect(stillThere.error).toBeNull()
+
+      await svc.from('experience_saves').delete().eq('id', inserted.data!.id)
+    }, testTimeout)
+  })
 })
