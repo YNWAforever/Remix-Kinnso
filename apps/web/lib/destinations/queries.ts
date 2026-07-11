@@ -31,32 +31,37 @@ function mapRowToDestination(r: DestinationRow): Destination {
 
 export async function getPublishedDestinations(): Promise<Destination[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('destinations')
     .select(DESTINATION_COLUMNS)
     .eq('status', 'published')
     .order('sort_order', { ascending: true })
+    .order('slug', { ascending: true }) // stable tie-break — sort_order isn't unique
+  if (error) throw error
   return (data ?? []).map(mapRowToDestination)
 }
 
 export async function getDestinationBySlug(slug: string): Promise<Destination | null> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('destinations')
     .select(DESTINATION_COLUMNS)
     .eq('slug', slug)
     .eq('status', 'published')
     .maybeSingle()
+  if (error) throw error
   return data ? mapRowToDestination(data) : null
 }
 
 export async function getDestinationsForSitemap(): Promise<{ slug: string; lastmod: string | null }[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('destinations')
     .select('slug, published_at')
     .eq('status', 'published')
     .order('sort_order', { ascending: true })
+    .order('slug', { ascending: true }) // stable tie-break so sitemap sharding partitions a deterministic order
+  if (error) throw error
   return (data ?? []).map((r) => ({
     slug: r.slug as string,
     lastmod: (r.published_at as string | null) ?? null,
