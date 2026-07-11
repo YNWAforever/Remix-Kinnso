@@ -5,6 +5,7 @@ import { getCreatorsForSitemap } from '@/lib/creators/queries'
 import { getMerchantsForSitemap } from '@/lib/merchants/public-queries'
 import { getExperiencesForSitemap } from '@/lib/experiences/public-queries'
 import { getSessionsForSitemap } from '@/lib/sessions/public-queries'
+import { getDestinationsForSitemap } from '@/lib/destinations/queries'
 import { LOCALES, URL_CATEGORIES, toUrlCategory } from '@/lib/i18n/config'
 import { SITE_URL } from '@/lib/seo/metadata'
 import { MARKETING_PATHS } from '@/lib/seo/routes'
@@ -21,9 +22,9 @@ const SITEMAP_CHUNK = 40000
  *  and each sitemap({id}) call must partition the SAME sequence or shards would overlap
  *  or drop URLs. */
 async function buildAllSitemapEntries(): Promise<MetadataRoute.Sitemap> {
-  const [articles, guides, creators, merchants, experiences, sessions] = await Promise.all([
+  const [articles, guides, creators, merchants, experiences, sessions, destinations] = await Promise.all([
     getPublishedForSitemap(), getGuidesForSitemap(), getCreatorsForSitemap(),
-    getMerchantsForSitemap(), getExperiencesForSitemap(), getSessionsForSitemap(),
+    getMerchantsForSitemap(), getExperiencesForSitemap(), getSessionsForSitemap(), getDestinationsForSitemap(),
   ])
   const out: MetadataRoute.Sitemap = []
 
@@ -77,6 +78,12 @@ async function buildAllSitemapEntries(): Promise<MetadataRoute.Sitemap> {
     const lastModified = s.lastmod ? new Date(s.lastmod) : undefined
     for (const l of LOCALES) {
       out.push({ url: `${SITE_URL}/${l}/sessions/${s.slug}`, lastModified, changeFrequency: 'weekly', priority: 0.6 })
+    }
+  }
+  for (const d of destinations) {
+    const lastModified = d.lastmod ? new Date(d.lastmod) : undefined
+    for (const l of LOCALES) {
+      out.push({ url: `${SITE_URL}/${l}/destinations/${d.slug}`, lastModified, changeFrequency: 'weekly', priority: 0.6 })
     }
   }
   return out
