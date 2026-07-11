@@ -76,11 +76,15 @@ export async function getUpcomingSessionsList(limit = 20): Promise<PublicSession
  * degrade to [], same stance as getGuidesForRegions/getExperiencesForCity.
  *
  * `.overlaps()` is a case-sensitive exact-string array comparison in Postgres, but
- * destination_tags is free-text typed by creators while matchTerms comes from the
- * separately ops-curated destinations.match_terms — the two casings aren't guaranteed
- * to agree. destination_tags is lowercased at write time (see parseTags in
- * lib/sessions/validation.ts), so lowercasing matchTerms here canonicalizes both
- * sides onto the same case for the comparison.
+ * destination_tags is free-text typed by creators (original casing preserved — see
+ * parseTags in lib/sessions/validation.ts) while matchTerms comes from the separately
+ * ops-curated destinations.match_terms — the two casings aren't guaranteed to agree.
+ * Rather than lowercase destination_tags itself (which would silently rewrite what
+ * creators typed, and round-trip into the Studio/admin edit-form pre-fill), the
+ * comparison runs against `destination_tags_ci`, a generated STORED column that
+ * mirrors destination_tags in lowercase and is kept in sync by Postgres for every
+ * row — existing and future — with no app-layer write path to keep correct. See
+ * migration 20260711120000_r6b_fix_session_destination_tags_ci_backfill.sql.
  */
 export async function getSessionsForDestination(matchTerms: string[], limit = 6): Promise<PublicSession[]> {
   if (matchTerms.length === 0) return []
@@ -90,7 +94,7 @@ export async function getSessionsForDestination(matchTerms: string[], limit = 6)
       .from('community_sessions')
       .select(SESSION_COLUMNS)
       .in('status', ['scheduled', 'live'])
-      .overlaps('destination_tags', matchTerms.map((t) => t.toLowerCase()))
+      .overlaps('destination_tags_ci', matchTerms.map((t) => t.toLowerCase()))
       .order('starts_at', { ascending: true })
       .limit(limit)
     return attachHost(supabase, (data ?? []) as unknown as SessionRow[])

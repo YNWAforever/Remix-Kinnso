@@ -1,4 +1,5 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
+import { sanitizeMatchTerm, sanitizeMatchTerms } from '@/lib/search/sanitize-match-terms'
 
 export type PublicExperience = {
   id: string
@@ -118,7 +119,7 @@ export async function getExperienceById(id: string): Promise<PublicExperience | 
  * failures degrade to [] (same stance as getGuidesForRegions).
  */
 export async function getExperiencesForCity(city: string, limit = 3): Promise<PublicExperience[]> {
-  const clean = city.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim()
+  const clean = sanitizeMatchTerm(city)
   if (clean.length < 2) return []
   try {
     const supabase = createSupabasePublicClient()
@@ -143,9 +144,7 @@ export async function getExperiencesForCity(city: string, limit = 3): Promise<Pu
  * [], same stance as getExperiencesForCity.
  */
 export async function getExperiencesForCities(cities: string[], limit = 6): Promise<PublicExperience[]> {
-  const clean = [...new Set(cities
-    .map((c) => c.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim())
-    .filter((c) => c.length >= 2))]
+  const clean = sanitizeMatchTerms(cities)
   if (clean.length === 0) return []
   try {
     const supabase = createSupabasePublicClient()

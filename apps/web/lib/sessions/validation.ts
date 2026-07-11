@@ -18,12 +18,15 @@ export type SessionValidation =
   | { ok: false; errors: ValidationErrors }
 
 /**
- * Lowercased so destination_tags can be matched via case-insensitive-equivalent
- * array overlap against destinations.match_terms (which ops curates independently
- * and cannot be relied on to share a creator's casing) — see getSessionsForDestination.
+ * Preserves the creator's original casing — it round-trips into the Studio/admin
+ * edit-form pre-fill, so it must not be silently rewritten here. Case-insensitive
+ * matching against destinations.match_terms (which ops curates independently and
+ * cannot be relied on to share a creator's casing) is handled entirely on the read
+ * side via the generated `destination_tags_ci` column — see getSessionsForDestination
+ * and migration 20260711120000_r6b_fix_session_destination_tags_ci_backfill.sql.
  */
 function parseTags(raw: string): string[] {
-  return raw.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)
+  return raw.split(',').map((t) => t.trim()).filter(Boolean)
 }
 
 export function validateSessionInput(input: SessionInput): SessionValidation {

@@ -98,20 +98,20 @@ describe('getSessionsForDestination', () => {
 
     const result = await getSessionsForDestination(['Tokyo'])
     expect(sessionsChain.in).toHaveBeenCalledWith('status', ['scheduled', 'live'])
-    // destination_tags is lowercased at write time (validation.ts's parseTags) — matchTerms
-    // (ops-curated, casing not guaranteed to agree) must be lowercased to the same canonical
-    // case before .overlaps(), or a differently-cased tag/term silently never matches.
-    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags', ['tokyo'])
+    // destination_tags keeps the creator's original casing — the comparison runs against
+    // destination_tags_ci (a generated, always-lowercase column kept in sync by Postgres for
+    // every row, existing and future), so matchTerms only need lowercasing on this side.
+    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags_ci', ['tokyo'])
     expect(result[0].host).toEqual({ handle: 'sora', displayName: 'Sora' })
   })
 
-  it('lowercases mixed-case match terms before overlapping', async () => {
+  it('lowercases mixed-case match terms before overlapping against destination_tags_ci', async () => {
     const sessionsChain = chain({ data: [sessionRow], error: null })
     const creatorsChain = chain({ data: [creatorRow], error: null })
     fromMock.mockImplementation((table: string) => (table === 'community_sessions' ? sessionsChain : creatorsChain))
 
     await getSessionsForDestination(['Tokyo, Japan', 'KYOTO'])
-    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags', ['tokyo, japan', 'kyoto'])
+    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags_ci', ['tokyo, japan', 'kyoto'])
   })
 
   it('never throws — degrades to [] on query failure', async () => {

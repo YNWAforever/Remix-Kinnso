@@ -1,6 +1,7 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import type { Guide } from '@/lib/guides/types'
 import type { GuideDetail } from '@/lib/guides/types'
+import { sanitizeMatchTerms } from '@/lib/search/sanitize-match-terms'
 
 interface GuideRowLite {
   slug: string
@@ -56,9 +57,7 @@ export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: st
  * the article page — failures degrade to [] (same stance as getPublishedGuides).
  */
 export async function getGuidesForRegions(regions: string[], limit = 3): Promise<Guide[]> {
-  const clean = [...new Set(regions
-    .map((r) => r.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim())
-    .filter((r) => r.length >= 2))]
+  const clean = sanitizeMatchTerms(regions)
   if (clean.length === 0) return []
   try {
     const supabase = createSupabasePublicClient()

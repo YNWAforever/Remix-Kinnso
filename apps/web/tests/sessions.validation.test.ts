@@ -19,7 +19,7 @@ describe('validateSessionInput', () => {
     const result = validateSessionInput(validInput)
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.parsed.destinationTags).toEqual(['tokyo', 'japan'])
+      expect(result.parsed.destinationTags).toEqual(['Tokyo', 'Japan'])
       expect(result.parsed.durationMinutes).toBe(45)
       expect(result.parsed.startsAt).toBe('2027-01-15T18:00:00.000Z')
       expect(result.parsed.embedUrl).toBeNull()
@@ -72,13 +72,13 @@ describe('validateSessionInput', () => {
   it('parses an empty destinationTags string to an empty array, and trims/drops blanks', () => {
     const result = validateSessionInput({ ...validInput, destinationTags: ' Tokyo ,, Japan ,' })
     expect(result.ok).toBe(true)
-    if (result.ok) expect(result.parsed.destinationTags).toEqual(['tokyo', 'japan'])
+    if (result.ok) expect(result.parsed.destinationTags).toEqual(['Tokyo', 'Japan'])
   })
 
-  it('lowercases destinationTags so they can match ops-curated destinations.match_terms case-insensitively', () => {
+  it('preserves destinationTags casing as typed — case-insensitive matching against ops-curated destinations.match_terms happens on the read side (destination_tags_ci), not here', () => {
     const result = validateSessionInput({ ...validInput, destinationTags: 'Tokyo, JAPAN' })
     expect(result.ok).toBe(true)
-    if (result.ok) expect(result.parsed.destinationTags).toEqual(['tokyo', 'japan'])
+    if (result.ok) expect(result.parsed.destinationTags).toEqual(['Tokyo', 'JAPAN'])
   })
 })
 

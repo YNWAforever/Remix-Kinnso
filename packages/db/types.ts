@@ -805,6 +805,7 @@ export type Database = {
           created_at: string
           description: string
           destination_tags: string[]
+          destination_tags_ci: string[] | null
           duration_minutes: number
           embed_url: string | null
           host_creator_id: string
@@ -821,6 +822,7 @@ export type Database = {
           created_at?: string
           description: string
           destination_tags?: string[]
+          destination_tags_ci?: string[] | null
           duration_minutes: number
           embed_url?: string | null
           host_creator_id: string
@@ -837,6 +839,7 @@ export type Database = {
           created_at?: string
           description?: string
           destination_tags?: string[]
+          destination_tags_ci?: string[] | null
           duration_minutes?: number
           embed_url?: string | null
           host_creator_id?: string
