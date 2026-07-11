@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const sql = readFileSync(
-  join(process.cwd(), '../../supabase/migrations/20260711120000_r6b_fix_session_destination_tags_ci_backfill.sql'),
+  join(process.cwd(), '../../supabase/migrations/20260711062712_r6b_fix_session_destination_tags_ci_backfill.sql'),
   'utf8',
 )
 
