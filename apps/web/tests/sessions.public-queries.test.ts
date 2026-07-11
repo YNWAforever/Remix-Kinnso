@@ -98,8 +98,20 @@ describe('getSessionsForDestination', () => {
 
     const result = await getSessionsForDestination(['Tokyo'])
     expect(sessionsChain.in).toHaveBeenCalledWith('status', ['scheduled', 'live'])
-    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags', ['Tokyo'])
+    // destination_tags is lowercased at write time (validation.ts's parseTags) — matchTerms
+    // (ops-curated, casing not guaranteed to agree) must be lowercased to the same canonical
+    // case before .overlaps(), or a differently-cased tag/term silently never matches.
+    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags', ['tokyo'])
     expect(result[0].host).toEqual({ handle: 'sora', displayName: 'Sora' })
+  })
+
+  it('lowercases mixed-case match terms before overlapping', async () => {
+    const sessionsChain = chain({ data: [sessionRow], error: null })
+    const creatorsChain = chain({ data: [creatorRow], error: null })
+    fromMock.mockImplementation((table: string) => (table === 'community_sessions' ? sessionsChain : creatorsChain))
+
+    await getSessionsForDestination(['Tokyo, Japan', 'KYOTO'])
+    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags', ['tokyo, japan', 'kyoto'])
   })
 
   it('never throws — degrades to [] on query failure', async () => {

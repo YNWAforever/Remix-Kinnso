@@ -74,19 +74,25 @@ export async function getUpcomingSessionsList(limit = 20): Promise<PublicSession
  * research that no existing call site uses this operator, so there is no in-repo example
  * to mirror the exact shape from. Reads never crash the destination page — failures
  * degrade to [], same stance as getGuidesForRegions/getExperiencesForCity.
+ *
+ * `.overlaps()` is a case-sensitive exact-string array comparison in Postgres, but
+ * destination_tags is free-text typed by creators while matchTerms comes from the
+ * separately ops-curated destinations.match_terms — the two casings aren't guaranteed
+ * to agree. destination_tags is lowercased at write time (see parseTags in
+ * lib/sessions/validation.ts), so lowercasing matchTerms here canonicalizes both
+ * sides onto the same case for the comparison.
  */
 export async function getSessionsForDestination(matchTerms: string[], limit = 6): Promise<PublicSession[]> {
   if (matchTerms.length === 0) return []
   try {
     const supabase = createSupabasePublicClient()
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('community_sessions')
       .select(SESSION_COLUMNS)
       .in('status', ['scheduled', 'live'])
-      .overlaps('destination_tags', matchTerms)
+      .overlaps('destination_tags', matchTerms.map((t) => t.toLowerCase()))
       .order('starts_at', { ascending: true })
       .limit(limit)
-    if (error) throw error
     return attachHost(supabase, (data ?? []) as unknown as SessionRow[])
   } catch {
     return []

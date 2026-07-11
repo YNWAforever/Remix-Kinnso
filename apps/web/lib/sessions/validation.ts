@@ -17,8 +17,13 @@ export type SessionValidation =
   | { ok: true; parsed: ParsedSession }
   | { ok: false; errors: ValidationErrors }
 
+/**
+ * Lowercased so destination_tags can be matched via case-insensitive-equivalent
+ * array overlap against destinations.match_terms (which ops curates independently
+ * and cannot be relied on to share a creator's casing) — see getSessionsForDestination.
+ */
 function parseTags(raw: string): string[] {
-  return raw.split(',').map((t) => t.trim()).filter(Boolean)
+  return raw.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)
 }
 
 export function validateSessionInput(input: SessionInput): SessionValidation {
