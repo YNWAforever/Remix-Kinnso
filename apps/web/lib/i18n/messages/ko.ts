@@ -548,12 +548,6 @@ const messages: Messages = {
     body: 'KINNSO의 이 부분은 준비 중입니다. 잠시 후 다시 확인해 주세요.',
     back: '홈으로',
   },
-  destinationsSoon: {
-    eyebrow: '여행지',
-    title: '그 도시를 가장 잘 아는 사람이 들려주는 이야기.',
-    body: 'KINNSO 크리에이터의 가이드와 스토리를 여행지별로 천천히 둘러볼 수 있는 지도로 엮고 있어요. 현지인이 진짜 가는 먹자골목과 당일치기 코스까지. 완성될 때까지는 여행지 아티클부터 먼저 만나보세요.',
-    cta: '여행지 아티클 읽기',
-  },
   creatorTerms: {
     eyebrow: '크리에이터 약관',
     title: '크리에이터 약관 (MVP 초안)',

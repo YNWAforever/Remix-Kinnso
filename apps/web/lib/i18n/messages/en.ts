@@ -723,7 +723,6 @@ export interface Messages {
     emailLabel: string; emailCta: string; responseNote: string
   }
   comingSoon: { heading: string; body: string; back: string }
-  destinationsSoon: { eyebrow: string; title: string; body: string; cta: string }
   creatorTerms: {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
@@ -1736,12 +1735,6 @@ const messages: Messages = {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
     back: 'Back to home',
-  },
-  destinationsSoon: {
-    eyebrow: 'Destinations',
-    title: 'Every city, told by the people who know it.',
-    body: 'We are stitching KINNSO guides and stories into a browsable atlas of destinations — the food streets, the side alleys, the day trips locals actually take. While we finish it, our destination stories are the best place to start.',
-    cta: 'Read destination stories',
   },
   creatorTerms: {
     eyebrow: 'Creator terms',

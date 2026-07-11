@@ -17,16 +17,18 @@ describe('sitemap', () => {
 
   // Regression guard for a class of bug: a MARKETING_PATHS entry whose page is still
   // noindexed would get submitted via the sitemap anyway ("Submitted URL marked
-  // noindex" in Search Console). /destinations is the concrete case — R1A shipped it
-  // noindexed pending Task 7's real page swap — but this checks the general invariant
-  // by cross-referencing the page's own generateMetadata robots value against the
-  // actual sitemap output, not just MARKETING_PATHS membership in isolation.
+  // noindex" in Search Console). /destinations was the concrete case pre-Task-7 (R1A
+  // shipped it noindexed, deliberately held out of MARKETING_PATHS until the real page
+  // landed) — now that Task 7 has shipped the real, indexable page and joined
+  // MARKETING_PATHS in the same commit, this checks the general invariant holds the
+  // other way: a MARKETING_PATHS entry's own generateMetadata robots value must agree
+  // with its presence in the sitemap output, not just MARKETING_PATHS membership in isolation.
   it('never lists a noindexed page in the emitted sitemap entries', async () => {
     const meta = await generateDestinationsMetadata({ params: Promise.resolve({ locale: 'en' }) })
-    expect((meta.robots as { index: boolean }).index).toBe(false)
+    expect((meta.robots as { index: boolean }).index).toBe(true)
     const entries = await sitemap()
     const urls = entries.map((e) => e.url)
-    expect(urls).not.toContain('https://www.kinnso.ai/en/destinations')
+    expect(urls).toContain('https://www.kinnso.ai/en/destinations')
   })
 
   it('includes merchant and experience URLs for every locale when they exist', async () => {

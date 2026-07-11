@@ -548,12 +548,6 @@ const messages: Messages = {
     body: 'KINNSO 的這個部分即將上線，請稍後再回來看看。',
     back: '返回首頁',
   },
-  destinationsSoon: {
-    eyebrow: '目的地',
-    title: '每個城市，由最熟路嘅人講畀你聽。',
-    body: '我哋而家將 KINNSO 創作者嘅攻略同故事，整合成一個可以慢慢逛嘅目的地地圖——地道食街、橫街窄巷、本地人真係會去嘅一日遊。整理期間，不妨先由目的地文章開始睇起。',
-    cta: '睇目的地文章',
-  },
   creatorTerms: {
     eyebrow: '創作者條款',
     title: '創作者條款（MVP 草案）',

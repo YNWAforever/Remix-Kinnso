@@ -548,12 +548,6 @@ const messages: Messages = {
     body: 'KINNSO 的这个部分即将上线，请稍后再回来看看。',
     back: '返回首页',
   },
-  destinationsSoon: {
-    eyebrow: '目的地',
-    title: '每座城市，都由最懂它的人来讲述。',
-    body: '我们正在把 KINNSO 创作者的攻略和故事，整理成一份可以慢慢浏览的目的地地图——地道美食街、小巷店铺、本地人真正会去的一日游。在完成之前，先从目的地文章开始探索吧。',
-    cta: '阅读目的地文章',
-  },
   creatorTerms: {
     eyebrow: '创作者条款',
     title: '创作者条款（MVP 草案）',
