@@ -1,22 +1,14 @@
-import Link from 'next/link'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
-import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
+import SessionCard from '@/components/kinnso/SessionCard'
 import type { PublicSession } from '@/lib/sessions/public-queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 function SessionGrid({ locale, sessions }: { locale: Locale; sessions: PublicSession[] }) {
-  const dateTimeFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' })
   return (
     <div className="mt-8 grid gap-5 md:grid-cols-3">
-      {sessions.map((s) => (
-        <Link key={s.id} href={`/${locale}/sessions/${s.slug}`} className="group">
-          <EditorialCard kicker={dateTimeFmt.format(new Date(s.startsAt))} title={s.title}>
-            {s.host ? `@${s.host.handle}` : null}
-          </EditorialCard>
-        </Link>
-      ))}
+      {sessions.map((s) => <SessionCard key={s.id} session={s} locale={locale} />)}
     </div>
   )
 }

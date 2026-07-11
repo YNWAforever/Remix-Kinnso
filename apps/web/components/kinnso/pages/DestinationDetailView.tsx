@@ -1,25 +1,13 @@
 // apps/web/components/kinnso/pages/DestinationDetailView.tsx
-import Link from 'next/link'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
-import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import GuideCard from '@/components/kinnso/GuideCard'
+import SessionCard from '@/components/kinnso/SessionCard'
 import type { Destination } from '@/lib/destinations/queries'
 import type { Guide } from '@/lib/guides/types'
 import type { PublicSession } from '@/lib/sessions/public-queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
-
-function SessionCard({ locale, session }: { locale: Locale; session: PublicSession }) {
-  const dateTimeFmt = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' })
-  return (
-    <Link href={`/${locale}/sessions/${session.slug}`} className="group">
-      <EditorialCard kicker={dateTimeFmt.format(new Date(session.startsAt))} title={session.title}>
-        {session.host ? `@${session.host.handle}` : null}
-      </EditorialCard>
-    </Link>
-  )
-}
 
 export function DestinationDetailView({
   locale, t, destination, guides, sessions, savesLabel,
