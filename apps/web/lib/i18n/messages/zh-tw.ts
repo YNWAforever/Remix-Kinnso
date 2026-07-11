@@ -1320,6 +1320,18 @@ const messages: Messages = {
     typeMerchantSpotlight: '商家焦點',
     typeNewCreatorIntro: '新銳創作者介紹',
   },
+  destinations: {
+    eyebrow: '目的地',
+    title: '每座城市，由最懂它的人來說。',
+    body: '瀏覽精選目的地——查看我們的創作者目前為每個地方整理的攻略、可預約體驗與直播活動。',
+    empty: '更多目的地即將上線，敬請期待。',
+    guidesHeading: '攻略',
+    emptyGuides: '這個目的地目前還沒有攻略。',
+    experiencesHeading: '體驗',
+    emptyExperiences: '這裡目前還沒有可預約的體驗。',
+    sessionsHeading: '即將舉行的活動',
+    emptySessions: '這個目的地目前還沒有安排活動。',
+  },
   sessionsAdmin: {
     title: '社群場次',
     subtitle: '建立、管理並審核所有創作者的場次。',

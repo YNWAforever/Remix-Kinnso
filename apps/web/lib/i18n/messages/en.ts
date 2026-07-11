@@ -1163,6 +1163,12 @@ export interface Messages {
     typeDestinationBriefing: string; typeAskACreator: string
     typeMerchantSpotlight: string; typeNewCreatorIntro: string
   }
+  destinations: {
+    eyebrow: string; title: string; body: string; empty: string
+    guidesHeading: string; emptyGuides: string
+    experiencesHeading: string; emptyExperiences: string
+    sessionsHeading: string; emptySessions: string
+  }
   sessionsAdmin: {
     title: string; subtitle: string; newCta: string; empty: string
     statusScheduled: string; statusLive: string; statusEnded: string; statusCancelled: string
@@ -2514,6 +2520,18 @@ const messages: Messages = {
     typeAskACreator: 'Ask a creator',
     typeMerchantSpotlight: 'Merchant spotlight',
     typeNewCreatorIntro: 'New creator intro',
+  },
+  destinations: {
+    eyebrow: 'Destinations',
+    title: 'Every city, told by the people who know it.',
+    body: 'Browse curated destinations — the guides, bookable experiences, and live sessions our creators have covered so far.',
+    empty: 'New destinations are on the way — check back soon.',
+    guidesHeading: 'Guides',
+    emptyGuides: 'No guides for this destination yet.',
+    experiencesHeading: 'Experiences',
+    emptyExperiences: 'No bookable experiences here yet.',
+    sessionsHeading: 'Upcoming sessions',
+    emptySessions: 'No sessions scheduled for this destination right now.',
   },
   sessionsAdmin: {
     title: 'Community Sessions',

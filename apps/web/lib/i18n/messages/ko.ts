@@ -1320,6 +1320,18 @@ const messages: Messages = {
     typeMerchantSpotlight: '매장 스포트라이트',
     typeNewCreatorIntro: '신규 크리에이터 소개',
   },
+  destinations: {
+    eyebrow: '여행지',
+    title: '그 도시를 가장 잘 아는 사람이 들려주는 이야기.',
+    body: '엄선된 여행지를 둘러보세요 — 크리에이터들이 지금까지 정리한 가이드, 예약 가능한 체험, 라이브 세션을 확인할 수 있어요.',
+    empty: '새로운 여행지를 준비 중이에요. 곧 다시 확인해 주세요.',
+    guidesHeading: '가이드',
+    emptyGuides: '이 여행지의 가이드가 아직 없어요.',
+    experiencesHeading: '체험',
+    emptyExperiences: '이 여행지에서 예약 가능한 체험이 아직 없어요.',
+    sessionsHeading: '예정된 세션',
+    emptySessions: '이 여행지에서 예정된 세션이 현재 없어요.',
+  },
   sessionsAdmin: {
     title: '커뮤니티 세션',
     subtitle: '모든 크리에이터의 세션을 생성, 관리, 검토하세요.',

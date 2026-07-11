@@ -1320,6 +1320,18 @@ const messages: Messages = {
     typeMerchantSpotlight: '商家焦点',
     typeNewCreatorIntro: '新晋创作者介绍',
   },
+  destinations: {
+    eyebrow: '目的地',
+    title: '每座城市，都由最懂它的人来讲述。',
+    body: '浏览精选目的地——查看我们的创作者目前为每个地方整理的攻略、可预订体验和直播活动。',
+    empty: '更多目的地即将上线，敬请期待。',
+    guidesHeading: '攻略',
+    emptyGuides: '这个目的地暂时还没有攻略。',
+    experiencesHeading: '体验',
+    emptyExperiences: '这里暂时还没有可预订的体验。',
+    sessionsHeading: '即将举行的活动',
+    emptySessions: '这个目的地暂时还没有安排活动。',
+  },
   sessionsAdmin: {
     title: '社区专场',
     subtitle: '创建、管理并审核所有创作者的专场。',

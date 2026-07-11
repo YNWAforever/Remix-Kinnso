@@ -1320,6 +1320,18 @@ const messages: Messages = {
     typeMerchantSpotlight: '店舗スポットライト',
     typeNewCreatorIntro: '新人クリエイター紹介',
   },
+  destinations: {
+    eyebrow: '旅行先',
+    title: 'その街を一番知る人が、その街を語る。',
+    body: '厳選された旅行先を見てみましょう——クリエイターがこれまでにまとめたガイド、予約できる体験、ライブセッションをご覧いただけます。',
+    empty: '新しい旅行先を準備中です。近日公開をお楽しみに。',
+    guidesHeading: 'ガイド',
+    emptyGuides: 'この旅行先のガイドはまだありません。',
+    experiencesHeading: '体験',
+    emptyExperiences: 'この旅行先で予約できる体験はまだありません。',
+    sessionsHeading: '開催予定のセッション',
+    emptySessions: 'この旅行先で予定されているセッションは現在ありません。',
+  },
   sessionsAdmin: {
     title: 'コミュニティセッション',
     subtitle: 'すべてのクリエイターのセッションを作成・管理・モデレートします。',
