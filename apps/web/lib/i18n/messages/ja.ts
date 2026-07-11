@@ -53,6 +53,10 @@ const messages: Messages = {
       title: 'コミュニティセッション — KINNSO',
       description: 'ガイドを書いたクリエイター本人による、ライブブリーフィング、Q&A、アーカイブ映像。',
     },
+    destinations: {
+      title: '旅行先 — KINNSO',
+      description: '厳選された旅行先をブラウズし、クリエイターがこれまでにまとめたガイド、予約できる体験、ライブセッションをチェックしましょう。',
+    },
   },
   listing: { searchPlaceholder: '記事を検索', filterRegion: '地域', filterTag: 'タグ', noResults: '記事が見つかりません。', resultsCount: '件' },
   pagination: { prev: '前へ', next: '次へ', page: 'ページ' },

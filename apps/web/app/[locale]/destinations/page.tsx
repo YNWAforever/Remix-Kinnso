@@ -6,6 +6,8 @@ import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getPublishedDestinations } from '@/lib/destinations/queries'
 import { DestinationsIndexView } from '@/components/kinnso/pages/DestinationsIndexView'
 
+export const revalidate = 300
+
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
 }
@@ -13,8 +15,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
   if (!isLocale(locale)) return {}
-  const t = (await getDictionary(locale as Locale)).destinations
-  return buildPageMetadata({ path: '/destinations', locale: locale as Locale, title: t.title, description: t.body })
+  const seo = (await getDictionary(locale as Locale)).seo.destinations
+  return buildPageMetadata({ path: '/destinations', locale: locale as Locale, title: seo.title, description: seo.description })
 }
 
 export default async function DestinationsPage({ params }: { params: Promise<{ locale: string }> }) {

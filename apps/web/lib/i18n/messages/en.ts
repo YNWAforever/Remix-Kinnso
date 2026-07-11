@@ -280,6 +280,7 @@ export interface Messages {
     forCreators: { title: string; description: string }
     forMerchants: { title: string; description: string }
     sessions: { title: string; description: string }
+    destinations: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -1240,6 +1241,10 @@ const messages: Messages = {
     sessions: {
       title: 'Community Sessions — KINNSO',
       description: 'Live briefings, Q&As, and replays from the creators behind our guides.',
+    },
+    destinations: {
+      title: 'Destinations — KINNSO',
+      description: 'Browse curated destinations and see the guides, bookable experiences, and live sessions our creators have covered so far.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },

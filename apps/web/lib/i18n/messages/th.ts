@@ -53,6 +53,10 @@ const messages: Messages = {
       title: 'คอมมูนิตี้เซสชัน — KINNSO',
       description: 'ไลฟ์บรีฟ ถามตอบ และวิดีโอย้อนหลัง จากครีเอเตอร์เจ้าของไกด์ตัวจริง',
     },
+    destinations: {
+      title: 'จุดหมายปลายทาง — KINNSO',
+      description: 'สำรวจจุดหมายปลายทางที่คัดสรรมาแล้ว พร้อมดูไกด์ ประสบการณ์ที่จองได้ และเซสชันสดที่ครีเอเตอร์ของเรารวบรวมไว้จนถึงตอนนี้',
+    },
   },
   listing: { searchPlaceholder: 'ค้นหาบทความ', filterRegion: 'ภูมิภาค', filterTag: 'แท็ก', noResults: 'ไม่พบบทความ', resultsCount: 'บทความ' },
   pagination: { prev: 'ก่อนหน้า', next: 'ถัดไป', page: 'หน้า' },

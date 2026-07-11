@@ -53,6 +53,10 @@ const messages: Messages = {
       title: '커뮤니티 세션 — KINNSO',
       description: '가이드를 쓴 크리에이터가 직접 진행하는 라이브 브리핑, Q&A, 다시보기.',
     },
+    destinations: {
+      title: '여행지 — KINNSO',
+      description: '엄선된 여행지를 둘러보고, 크리에이터들이 지금까지 정리한 가이드, 예약 가능한 체험, 라이브 세션을 확인해보세요.',
+    },
   },
   listing: { searchPlaceholder: '아티클 검색', filterRegion: '지역', filterTag: '태그', noResults: '검색 결과가 없습니다.', resultsCount: '개' },
   pagination: { prev: '이전', next: '다음', page: '페이지' },

@@ -53,6 +53,10 @@ const messages: Messages = {
       title: '社群活動 — KINNSO',
       description: '由寫攻略嘅創作者親自主持嘅現場簡報、問答同重溫。',
     },
+    destinations: {
+      title: '目的地 — KINNSO',
+      description: '瀏覽精選目的地，睇吓我哋創作者目前為各個地方整理咗嘅攻略、可預約體驗同直播活動。',
+    },
   },
   listing: { searchPlaceholder: '搜尋文章', filterRegion: '地區', filterTag: '標籤', noResults: '找不到文章。', resultsCount: '篇文章' },
   pagination: { prev: '上一頁', next: '下一頁', page: '第' },

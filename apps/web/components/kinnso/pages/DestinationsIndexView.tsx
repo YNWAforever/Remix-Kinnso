@@ -24,6 +24,7 @@ export function DestinationsIndexView({
       </SectionShell>
 
       <SectionShell className="k2-hairline">
+        <h2 className="sr-only">{t.eyebrow}</h2>
         {destinations.length === 0 ? (
           <p className="text-kinnso-ink/70">{t.empty}</p>
         ) : (
