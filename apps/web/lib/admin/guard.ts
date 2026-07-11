@@ -25,6 +25,22 @@ export async function requireOpsAction(
 }
 
 /**
+ * Action gate: typed failure for anon/non-creator; ok+user for a creator.
+ * Unlike requireMerchantAction, no extra lookup is needed — creators.id IS
+ * auth.uid() directly (creators is a one-row-per-auth-user table), so
+ * user.id can be used as host_creator_id / community_sessions ownership
+ * directly by the caller.
+ */
+export async function requireCreatorAction(
+  supabase: Supabase,
+): Promise<{ ok: true; user: { id: string } } | ActionFailure> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return formError('Sign in is required')
+  if ((await resolveViewerRole(supabase)) !== 'creator') return formError('Creator access is required')
+  return { ok: true, user }
+}
+
+/**
  * Action gate: typed failure for anon/non-merchant; ok+user+merchantId for a
  * merchant. Resolves the caller's own `merchant_profiles.id` so callers can
  * scope writes to the owning merchant (RLS still enforces ownership).

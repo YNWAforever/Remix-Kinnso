@@ -18,7 +18,7 @@ import type { Messages } from '@/lib/i18n/messages/en'
  * R1B homepage — the 10 sections of master spec §4.1, in order:
  *  1 Hero · 2 Social proof (stats bar + pull-quotes) · 3 How it works ·
  *  4 Featured guides · 5 AI Agent (waitlist) · 6 Articles highlight ·
- *  7 Community Sessions (data-gated until R5) · 8 Merchant value ·
+ *  7 Community Sessions (real data since R5) · 8 Merchant value ·
  *  9 Creator CTA · 10 Footer (rendered by SiteChrome — no work here).
  * Every proof section is data-gated: empty data renders nothing, never filler.
  */
@@ -169,10 +169,12 @@ export function HomeView({
           <p className="mt-2 max-w-xl text-kinnso-ink/70">{t.sessionsSub}</p>
           <ul className="mt-8 grid gap-5 md:grid-cols-3">
             {sessions.map((s) => (
-              <li key={s.id} className="k2-card p-5">
-                <p className="text-sm text-kinnso-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
-                <h3 className="mt-2 text-lg font-semibold text-kinnso-ink">{s.title}</h3>
-                <p className="mt-1 text-sm text-kinnso-ink/70">@{s.hostHandle}</p>
+              <li key={s.id}>
+                <Link href={p(`/sessions/${s.slug}`)} className="k2-card block p-5 transition hover:border-kinnso-orangeDark">
+                  <p className="text-sm text-kinnso-ink/70">{dateTimeFmt.format(new Date(s.startsAt))}</p>
+                  <h3 className="mt-2 text-lg font-semibold text-kinnso-ink">{s.title}</h3>
+                  <p className="mt-1 text-sm text-kinnso-ink/70">@{s.hostHandle}</p>
+                </Link>
               </li>
             ))}
           </ul>

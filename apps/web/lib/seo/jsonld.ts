@@ -102,3 +102,26 @@ export function experienceOfferJsonLd(i: {
   if (i.rating) ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: i.rating.average, reviewCount: i.rating.count }
   return ld
 }
+
+export function sessionEventJsonLd(i: {
+  name: string; description: string; url: string
+  startDate: string
+  status: 'scheduled' | 'live' | 'ended' | 'cancelled'
+  embedUrl: string | null
+  hostName: string | null
+}): Record<string, unknown> {
+  // schema.org has no "ended"/"live" EventStatus value — a session that happened as
+  // scheduled (live or ended) is still EventScheduled; only an explicit cancellation
+  // gets its own value.
+  const eventStatus = i.status === 'cancelled' ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled'
+  const ld: Record<string, unknown> = {
+    '@context': 'https://schema.org', '@type': 'Event',
+    name: i.name, description: i.description, url: i.url,
+    startDate: i.startDate,
+    eventStatus,
+    eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+    location: { '@type': 'VirtualLocation', url: i.embedUrl ?? i.url },
+  }
+  if (i.hostName) ld.performer = { '@type': 'Person', name: i.hostName }
+  return ld
+}

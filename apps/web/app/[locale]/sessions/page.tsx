@@ -1,14 +1,13 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { isLocale, LOCALES, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { noindexMetadata } from '@/lib/seo/metadata'
-import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
-import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { getUpcomingSessionsList, getReplaySessions } from '@/lib/sessions/public-queries'
+import { buildPageMetadata } from '@/lib/seo/metadata'
+import { SessionsListingView } from '@/components/kinnso/pages/SessionsListingView'
 
-// R1A designed placeholder. Noindexed and deliberately NOT in MARKETING_PATHS —
-// Community Sessions P1 (listing, RSVP, replays) ships in R5 and replaces this page.
+export const revalidate = 300
+
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
 }
@@ -17,25 +16,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params
   if (!isLocale(locale)) return {}
   const dict = await getDictionary(locale as Locale)
-  return noindexMetadata(dict.sessionsSoon.title)
+  return buildPageMetadata({ path: '/sessions', locale: locale as Locale, title: dict.seo.sessions.title, description: dict.seo.sessions.description })
 }
 
 export default async function SessionsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
-  const t = (await getDictionary(locale as Locale)).sessionsSoon
-  return (
-    <div className="bg-kinnso-cream font-sans">
-      <SectionShell className="flex min-h-[60vh] items-center">
-        <div className="max-w-2xl">
-          <Eyebrow>{t.eyebrow}</Eyebrow>
-          <h1 className="k2-display mt-4 text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-6xl">{t.title}</h1>
-          <p className="mt-5 text-lg leading-relaxed text-kinnso-ink/70">{t.body}</p>
-          <div className="mt-8 flex items-center gap-4">
-            <Link href={`/${locale}/creators`} className="k2-btn-primary">{t.cta}</Link>
-          </div>
-        </div>
-      </SectionShell>
-    </div>
-  )
+  const messages = await getDictionary(locale as Locale)
+  const [upcoming, replays] = await Promise.all([getUpcomingSessionsList(), getReplaySessions()])
+  return <SessionsListingView locale={locale as Locale} t={messages.sessions} upcoming={upcoming} replays={replays} />
 }

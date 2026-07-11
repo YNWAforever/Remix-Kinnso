@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       affiliate_network_events: {
@@ -805,6 +780,7 @@ export type Database = {
           created_at: string
           description: string
           destination_tags: string[]
+          destination_tags_ci: string[] | null
           duration_minutes: number
           embed_url: string | null
           host_creator_id: string
@@ -821,6 +797,7 @@ export type Database = {
           created_at?: string
           description: string
           destination_tags?: string[]
+          destination_tags_ci?: string[] | null
           duration_minutes: number
           embed_url?: string | null
           host_creator_id: string
@@ -837,6 +814,7 @@ export type Database = {
           created_at?: string
           description?: string
           destination_tags?: string[]
+          destination_tags_ci?: string[] | null
           duration_minutes?: number
           embed_url?: string | null
           host_creator_id?: string
@@ -1133,6 +1111,48 @@ export type Database = {
           status?: string
           updated_at?: string
           verified?: boolean
+        }
+        Relationships: []
+      }
+      destinations: {
+        Row: {
+          created_at: string
+          description: string | null
+          hero_image_url: string | null
+          id: string
+          match_terms: string[]
+          name: string
+          published_at: string | null
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          id?: string
+          match_terms?: string[]
+          name: string
+          published_at?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          id?: string
+          match_terms?: string[]
+          name?: string
+          published_at?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2746,6 +2766,7 @@ export type Database = {
           title: string
         }[]
       }
+      lowercase_text_array: { Args: { arr: string[] }; Returns: string[] }
       mark_booking_completed: {
         Args: { p_booking_id: string }
         Returns: undefined
@@ -2993,9 +3014,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
