@@ -42,6 +42,33 @@ describe('/[locale]/destinations/[slug] detail host', () => {
     expect(screen.getByRole('link', { name: /Kyoto Tea Houses/ }).getAttribute('href')).toBe('/en/g/kyoto-tea')
   })
 
+  it('renders the hero image when the destination has one', async () => {
+    getDestinationBySlugMock.mockResolvedValueOnce({ ...destination, heroImageUrl: 'https://x/tokyo-hero.jpg' })
+    const ui = await DestinationDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo' }) })
+    render(ui)
+    expect(screen.getByRole('img', { name: 'Tokyo' }).getAttribute('src')).toBe('https://x/tokyo-hero.jpg')
+  })
+
+  it('renders no hero image when the destination has none', async () => {
+    getDestinationBySlugMock.mockResolvedValueOnce(destination)
+    const ui = await DestinationDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo' }) })
+    render(ui)
+    expect(screen.queryByRole('img', { name: 'Tokyo' })).toBeNull()
+  })
+
+  it('renders upcoming sessions linking to their detail page', async () => {
+    getDestinationBySlugMock.mockResolvedValueOnce(destination)
+    getSessionsForDestinationMock.mockResolvedValueOnce([{
+      id: 's1', slug: 'tokyo-ramen-ama', title: 'Tokyo ramen AMA', description: 'Ask away.',
+      type: 'ask_a_creator', startsAt: '2027-01-15T18:00:00.000Z', durationMinutes: 45,
+      embedUrl: null, replayUrl: null, destinationTags: ['Tokyo'], status: 'scheduled',
+      host: { handle: 'sora', displayName: 'Sora' },
+    }])
+    const ui = await DestinationDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo' }) })
+    render(ui)
+    expect(screen.getByRole('link', { name: /Tokyo ramen AMA/ }).getAttribute('href')).toBe('/en/sessions/tokyo-ramen-ama')
+  })
+
   it('shows the empty-guides and empty-sessions copy when both are empty', async () => {
     getDestinationBySlugMock.mockResolvedValueOnce(destination)
     const ui = await DestinationDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo' }) })

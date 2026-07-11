@@ -34,7 +34,16 @@ export function DestinationDetailView({
   return (
     <div className="bg-kinnso-cream font-sans">
       <SectionShell className="flex min-h-[40vh] items-center">
-        <div>
+        <div className="w-full">
+          {destination.heroImageUrl ? (
+            <img
+              src={destination.heroImageUrl}
+              alt={destination.name}
+              width={1200}
+              height={500}
+              className="mb-8 aspect-[21/9] w-full rounded-[4px] object-cover"
+            />
+          ) : null}
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="k2-display mt-4 text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-6xl">{destination.name}</h1>
           {destination.description ? (
