@@ -1,3 +1,4 @@
+// apps/web/components/kinnso/pages/DestinationDetailView.tsx
 import Link from 'next/link'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
