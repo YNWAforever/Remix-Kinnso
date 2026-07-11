@@ -68,6 +68,31 @@ export async function getUpcomingSessionsList(limit = 20): Promise<PublicSession
   return attachHost(supabase, (data ?? []) as unknown as SessionRow[])
 }
 
+/**
+ * Upcoming sessions tagged for a destination (array-overlap on destination_tags). First
+ * .overlaps() query in this codebase — confirmed via repo-wide grep during R6B design
+ * research that no existing call site uses this operator, so there is no in-repo example
+ * to mirror the exact shape from. Reads never crash the destination page — failures
+ * degrade to [], same stance as getGuidesForRegions/getExperiencesForCity.
+ */
+export async function getSessionsForDestination(matchTerms: string[], limit = 6): Promise<PublicSession[]> {
+  if (matchTerms.length === 0) return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data, error } = await supabase
+      .from('community_sessions')
+      .select(SESSION_COLUMNS)
+      .in('status', ['scheduled', 'live'])
+      .overlaps('destination_tags', matchTerms)
+      .order('starts_at', { ascending: true })
+      .limit(limit)
+    if (error) throw error
+    return attachHost(supabase, (data ?? []) as unknown as SessionRow[])
+  } catch {
+    return []
+  }
+}
+
 export async function getReplaySessions(limit = 20): Promise<PublicSession[]> {
   const supabase = createSupabasePublicClient()
   const { data, error } = await supabase

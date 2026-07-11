@@ -6,7 +6,7 @@ vi.mock('@/lib/supabase/public', () => ({
   createSupabasePublicClient: () => ({ from: fromMock }),
 }))
 
-import { getExperienceBySlug, getExperiencesForCity, getExperiencesForSitemap, listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
+import { getExperienceBySlug, getExperiencesForCity, getExperiencesForCities, getExperiencesForSitemap, listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
 
 beforeEach(() => { fromMock.mockReset() })
 
@@ -104,5 +104,30 @@ describe('getExperiencesForCity', () => {
   it('never throws — degrades to [] on query failure', async () => {
     fromMock.mockImplementation(() => { throw new Error('boom') })
     expect(await getExperiencesForCity('Tokyo')).toEqual([])
+  })
+})
+
+describe('getExperiencesForCities', () => {
+  it('returns [] for an empty or noise-only term list without querying', async () => {
+    expect(await getExperiencesForCities([])).toEqual([])
+    expect(await getExperiencesForCities(['', ' ', 'x'])).toEqual([])
+    expect(fromMock).not.toHaveBeenCalled()
+  })
+
+  it('builds a sanitized ilike-or filter across all given terms', async () => {
+    const limit = vi.fn(() => Promise.resolve({ data: [], error: null }))
+    const order = vi.fn(() => ({ limit }))
+    const or = vi.fn(() => ({ order }))
+    const eq = vi.fn(() => ({ or }))
+    fromMock.mockReturnValue({ select: vi.fn(() => ({ eq })) })
+
+    await getExperiencesForCities(['Tokyo', 'Shibuya, (Ward)'])
+    expect(or).toHaveBeenCalledWith('city.ilike.%Tokyo%,city.ilike.%Shibuya Ward%')
+    expect(limit).toHaveBeenCalledWith(6)
+  })
+
+  it('never throws — degrades to [] on query failure', async () => {
+    fromMock.mockImplementation(() => { throw new Error('boom') })
+    expect(await getExperiencesForCities(['Tokyo'])).toEqual([])
   })
 })

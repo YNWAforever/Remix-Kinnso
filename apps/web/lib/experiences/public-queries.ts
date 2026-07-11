@@ -134,3 +134,30 @@ export async function getExperiencesForCity(city: string, limit = 3): Promise<Pu
     return []
   }
 }
+
+/**
+ * Same as getExperiencesForCity but matches ANY of several sanitized terms via .or() —
+ * mirrors getGuidesForRegions's array-of-terms shape (apps/web/lib/guides/queries.ts) for
+ * destination pages whose match_terms can include neighborhood aliases alongside the
+ * destination's own name. Reads never crash the destination page — failures degrade to
+ * [], same stance as getExperiencesForCity.
+ */
+export async function getExperiencesForCities(cities: string[], limit = 6): Promise<PublicExperience[]> {
+  const clean = [...new Set(cities
+    .map((c) => c.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim())
+    .filter((c) => c.length >= 2))]
+  if (clean.length === 0) return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data } = await supabase
+      .from('experiences')
+      .select(EXP_COLUMNS)
+      .eq('status', 'published')
+      .or(clean.map((c) => `city.ilike.%${c}%`).join(','))
+      .order('published_at', { ascending: false })
+      .limit(limit)
+    return (data ?? []).map((r) => toDomain(r as unknown as ExpRow, { slug: '', companyName: '' }))
+  } catch {
+    return []
+  }
+}
