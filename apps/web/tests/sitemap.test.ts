@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import sitemap from '@/app/sitemap'
 import robots from '@/app/robots'
+import { generateMetadata as generateDestinationsMetadata } from '@/app/[locale]/destinations/page'
 
 describe('sitemap', () => {
   it('includes published articles for present locales and excludes drafts', async () => {
@@ -12,6 +13,20 @@ describe('sitemap', () => {
     // hub + category present
     expect(urls).toContain('https://www.kinnso.ai/en/articles')
     expect(urls).toContain('https://www.kinnso.ai/en/articles/dining')
+  })
+
+  // Regression guard for a class of bug: a MARKETING_PATHS entry whose page is still
+  // noindexed would get submitted via the sitemap anyway ("Submitted URL marked
+  // noindex" in Search Console). /destinations is the concrete case — R1A shipped it
+  // noindexed pending Task 7's real page swap — but this checks the general invariant
+  // by cross-referencing the page's own generateMetadata robots value against the
+  // actual sitemap output, not just MARKETING_PATHS membership in isolation.
+  it('never lists a noindexed page in the emitted sitemap entries', async () => {
+    const meta = await generateDestinationsMetadata({ params: Promise.resolve({ locale: 'en' }) })
+    expect((meta.robots as { index: boolean }).index).toBe(false)
+    const entries = await sitemap()
+    const urls = entries.map((e) => e.url)
+    expect(urls).not.toContain('https://www.kinnso.ai/en/destinations')
   })
 
   it('includes merchant and experience URLs for every locale when they exist', async () => {

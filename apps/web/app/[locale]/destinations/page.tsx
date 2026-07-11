@@ -8,7 +8,8 @@ import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 
 // R1A designed placeholder. Noindexed and deliberately NOT in MARKETING_PATHS —
-// the real destination-browse surface ships in R6 and flips this to indexable.
+// the real destination-browse surface ships in Task 7 and flips this to indexable,
+// joining MARKETING_PATHS in that same commit (see the /sessions precedent).
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
 }

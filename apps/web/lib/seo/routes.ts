@@ -5,8 +5,14 @@
 
 // Public marketing pages: indexable and listed in the sitemap. Paths are locale-relative
 // — '' is the locale home, the rest start with '/'.
+// NOTE: '/destinations' intentionally does NOT join this list yet. The current
+// /[locale]/destinations page (apps/web/app/[locale]/destinations/page.tsx) is still
+// the R1A noindexed placeholder — joining MARKETING_PATHS ahead of the real indexable
+// page (Task 7) would make app/sitemap.ts submit a URL that the page itself tells
+// crawlers not to index ("Submitted URL marked noindex"). Follow the /sessions
+// precedent: join MARKETING_PATHS in the SAME commit that ships the real, indexable page.
 export const MARKETING_PATHS = [
-  '', '/explore', '/creators', '/agent', '/about', '/contact', '/merchants', '/legal/creator-terms', '/for-creators', '/for-merchants', '/sessions', '/destinations',
+  '', '/explore', '/creators', '/agent', '/about', '/contact', '/merchants', '/legal/creator-terms', '/for-creators', '/for-merchants', '/sessions',
 ] as const
 
 // Private/app route trees that must never be crawled. These are robots.txt path globs

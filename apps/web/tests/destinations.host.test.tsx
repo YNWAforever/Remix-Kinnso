@@ -20,14 +20,14 @@ describe('/[locale]/destinations host', () => {
     expect(screen.queryByText(en.comingSoon.heading)).toBeNull()
   })
 
-  // The R1A placeholder page above is still noindexed pending its Task 7 swap to the
-  // real, indexable /destinations index — but /destinations already joined
-  // MARKETING_PATHS in the "SEO plumbing" commit that added buildDestinationMetadata,
-  // ahead of that swap, so the sitemap can start listing it the moment Task 7 lands.
-  it('is noindexed for now, but already listed in MARKETING_PATHS ahead of the Task 7 page swap', async () => {
+  // The R1A placeholder page above is noindexed pending its Task 7 swap to the real,
+  // indexable /destinations index. It must stay OUT of MARKETING_PATHS until that swap
+  // lands in the same commit (the /sessions precedent) — joining ahead of time would
+  // make app/sitemap.ts submit a URL this very page tells crawlers not to index.
+  it('is noindexed and stays out of MARKETING_PATHS until the Task 7 page swap', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) })
     expect(meta.robots).toEqual({ index: false, follow: false })
-    expect(MARKETING_PATHS).toContain('/destinations')
+    expect(MARKETING_PATHS).not.toContain('/destinations')
   })
 
   it('404s unknown locales', async () => {
