@@ -818,3 +818,25 @@ Expected: PASS (per the vitest-scoping-gotcha memory — do not run this via
 Report the final task/commit list to the user and proceed to the
 `finishing-a-development-branch` skill (verify tests → present the 4 standard options →
 execute the chosen option).
+
+---
+
+### Final sweep — live verification log (2026-07-12)
+
+- **Step 4 grant check, performed live** (not a static read of the migration file):
+  `supabase db query --linked` against the linked `Remix-Kinnso` project
+  (`scryfkefedzuetfdtrvl`) for
+  `select table_name from information_schema.tables where table_schema='public' and
+  table_name in ('article_guide_overrides','article_experience_overrides')` returned zero
+  rows, and `supabase migration list --linked` shows `20260712100000` present only in the
+  Local column, not Remote. This branch's migration has not been deployed/applied to the
+  live database yet, so the two tables do not exist there — there is nothing to spot-check
+  grants on live right now. This is the accurate current live state, not a substitute for
+  it. Whoever applies this migration to the live project should re-run the grant query
+  above afterward to confirm `select`-only for `anon`/`authenticated` before treating this
+  item as closed.
+- **Step 5 hand-off**: the `finishing-a-development-branch` skill was invoked. Its Step 1
+  (verify tests) re-ran `cd apps/web && npx vitest run` — 296 passed / 4 skipped files,
+  1534 passed / 31 skipped tests, no failures. Its Step 3 (present the 4 standard options)
+  was reached and the options were presented to the user for a decision; execution of the
+  chosen option is pending that reply and is intentionally not performed automatically.
