@@ -134,3 +134,28 @@ export async function getExperiencesForCity(city: string, limit = 3): Promise<Pu
     return []
   }
 }
+
+/**
+ * Editorial override (D-R6C-1, force-add only): experiences ops has explicitly pinned to
+ * this article, shown ahead of and merged with the heuristic getExperiencesForCity
+ * matches. No merchant join (same no-second-query placeholder shape as
+ * getExperiencesForCity) -- a pinned experience no longer found is silently dropped.
+ */
+export async function getExperienceOverridesForArticle(articleId: string): Promise<PublicExperience[]> {
+  const supabase = createSupabasePublicClient()
+  const { data: overrides } = await supabase
+    .from('article_experience_overrides')
+    .select('experience_id')
+    .eq('article_id', articleId)
+    .order('sort_order', { ascending: true })
+  const experienceIds = (overrides ?? []).map((o) => o.experience_id as string)
+  if (experienceIds.length === 0) return []
+
+  const { data: rows } = await supabase
+    .from('experiences')
+    .select(EXP_COLUMNS)
+    .in('id', experienceIds)
+    .eq('status', 'published')
+  const byId = new Map((rows ?? []).map((r) => [(r as unknown as ExpRow).id, toDomain(r as unknown as ExpRow, { slug: '', companyName: '' })]))
+  return experienceIds.map((id) => byId.get(id)).filter((e): e is PublicExperience => e !== undefined)
+}
