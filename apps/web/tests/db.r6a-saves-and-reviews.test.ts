@@ -7,6 +7,11 @@ const sql = readFileSync(
   'utf8',
 )
 
+const fixSql = readFileSync(
+  join(process.cwd(), '../../supabase/migrations/20260712090000_r6a_fix_reviews_ops_select.sql'),
+  'utf8',
+)
+
 describe('R6A guide_saves + experience_saves migration', () => {
   it('creates guide_saves with a uuid PK, FK columns, and a uniqueness constraint', () => {
     expect(sql).toContain('create table public.guide_saves')
@@ -76,6 +81,12 @@ describe('R6A reviews table + get_booking_by_checkout_session extension', () => 
   it('reviews_ops_update is the only UPDATE policy, gated on is_active_ops()', () => {
     expect(sql).toContain('create policy reviews_ops_update on public.reviews')
     expect(sql).toContain('public.is_active_ops()')
+  })
+
+  it('reviews_ops_select lets ops see reviews of any status (fix: RETURNING under RLS needs SELECT visibility)', () => {
+    expect(fixSql).toContain('create policy reviews_ops_select on public.reviews')
+    expect(fixSql).toContain('for select to authenticated')
+    expect(fixSql).toContain('using (public.is_active_ops())')
   })
 
   it('extends get_booking_by_checkout_session with traveler_user_id, experience_id, and guide_id', () => {
