@@ -65,8 +65,11 @@ interface TravelerBookingQueryRow {
   total_amount: number
   currency: string
   created_at: string
+  experience_id: string
+  guide_id: string | null
   experiences: { title: string; slug: string; merchant_profiles: { company_name: string } | { company_name: string }[] | null } | Array<{ title: string; slug: string; merchant_profiles: { company_name: string } | { company_name: string }[] | null }> | null
   experience_availability: { date: string } | { date: string }[] | null
+  reviews: { id: string } | { id: string }[] | null
 }
 
 export async function listMyBookings(
@@ -76,7 +79,7 @@ export async function listMyBookings(
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      'id, status, qty, total_amount, currency, created_at, experiences(title, slug, merchant_profiles(company_name)), experience_availability(date)',
+      'id, status, qty, total_amount, currency, created_at, experience_id, guide_id, experiences(title, slug, merchant_profiles(company_name)), experience_availability(date), reviews(id)',
     )
     .eq('traveler_user_id', travelerUserId)
     .order('created_at', { ascending: false })
@@ -87,6 +90,7 @@ export async function listMyBookings(
     const experience = one(row.experiences)
     const merchant = experience ? one(experience.merchant_profiles) : null
     const availability = one(row.experience_availability)
+    const review = one(row.reviews)
     return {
       id: row.id,
       experienceTitle: experience?.title ?? 'Untitled experience',
@@ -98,6 +102,9 @@ export async function listMyBookings(
       currency: row.currency,
       bookingDate: availability?.date ?? null,
       createdAt: row.created_at,
+      experienceId: row.experience_id,
+      guideId: row.guide_id,
+      reviewId: review?.id ?? null,
     }
   })
 }

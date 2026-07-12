@@ -200,8 +200,12 @@ export interface TravelerTripsMessages {
   statusCancelled: string
   statusRefunded: string
   bookedOnLabel: string
-  savesTabTitle: string
-  savesTabComingSoon: string
+  savedGuidesTitle: string
+  savedGuidesEmpty: string
+  savedExperiencesTitle: string
+  savedExperiencesEmpty: string
+  reviewCta: string
+  reviewedLabel: string
 }
 
 export interface MerchantsDirectoryMessages {
@@ -1154,6 +1158,31 @@ export interface Messages {
     colDelivered: string
     merchantEmpty: string
     notApplicable: string
+  }
+  guideSave: {
+    save: string
+    saved: string
+    signInToSave: string
+  }
+  experienceSave: {
+    save: string
+    saved: string
+    signInToSave: string
+  }
+  reviews: {
+    formHeading: string
+    ratingLabel: string
+    bodyLabel: string
+    bodyPlaceholder: string
+    submitCta: string
+    submittingCta: string
+    submitted: string
+    alreadyReviewed: string
+    genericError: string
+    ratingAverageLabel: string
+    countLabel: string
+    emptyState: string
+    anonymousReviewer: string
   }
   sessions: {
     eyebrow: string; title: string; body: string
@@ -2285,8 +2314,12 @@ const messages: Messages = {
     statusCancelled: 'Cancelled',
     statusRefunded: 'Refunded',
     bookedOnLabel: 'Booked on',
-    savesTabTitle: 'Saved',
-    savesTabComingSoon: 'Saved guides and experiences are coming soon.',
+    savedGuidesTitle: 'Saved guides',
+    savedGuidesEmpty: "You haven't saved any guides yet.",
+    savedExperiencesTitle: 'Saved experiences',
+    savedExperiencesEmpty: "You haven't saved any experiences yet.",
+    reviewCta: 'Leave a review',
+    reviewedLabel: 'Reviewed',
   },
   merchantsOps: {
     title: 'Merchants',
@@ -2497,6 +2530,31 @@ const messages: Messages = {
     colDelivered: 'Delivered',
     merchantEmpty: 'Post a mission to start seeing campaign activity.',
     notApplicable: '—',
+  },
+  guideSave: {
+    save: 'Save',
+    saved: 'Saved',
+    signInToSave: 'Sign in to save',
+  },
+  experienceSave: {
+    save: 'Save',
+    saved: 'Saved',
+    signInToSave: 'Sign in to save',
+  },
+  reviews: {
+    formHeading: 'Leave a review',
+    ratingLabel: 'Rating',
+    bodyLabel: 'Your review (optional)',
+    bodyPlaceholder: 'Tell other travellers about your experience…',
+    submitCta: 'Submit review',
+    submittingCta: 'Submitting…',
+    submitted: 'Thanks for your review!',
+    alreadyReviewed: 'You already reviewed this booking.',
+    genericError: 'Something went wrong. Please try again.',
+    ratingAverageLabel: '{average} out of 5',
+    countLabel: '{count} reviews',
+    emptyState: 'No reviews yet.',
+    anonymousReviewer: 'A KINNSO traveller',
   },
   sessions: {
     eyebrow: 'Community Sessions',

@@ -40,6 +40,22 @@ describe('JSON-LD', () => {
       '@type': 'ListItem', position: 2, name: 'Dining', item: 'https://x/en/articles/dining',
     })
   })
+
+  it('Article includes aggregateRating when a rating is supplied', () => {
+    const ld = articleJsonLd({
+      headline: 'x', description: 'y', url: 'u', images: [], publishedAt: null,
+      modifiedAt: null, authorName: null, locale: 'en', rating: { average: 4.5, count: 12 },
+    })
+    expect(ld.aggregateRating).toEqual({ '@type': 'AggregateRating', ratingValue: 4.5, reviewCount: 12 })
+  })
+
+  it('Article omits aggregateRating entirely when no rating is supplied (never a fake ratingCount: 0)', () => {
+    const ld = articleJsonLd({
+      headline: 'x', description: 'y', url: 'u', images: [], publishedAt: null,
+      modifiedAt: null, authorName: null, locale: 'en',
+    })
+    expect(ld.aggregateRating).toBeUndefined()
+  })
 })
 
 describe('organizationJsonLd', () => {
@@ -115,5 +131,21 @@ describe('experienceOfferJsonLd', () => {
       name: 'Sunset tour', description: 'Two hours on the harbour.', image: 'https://x/cover.jpg',
       offers: { '@type': 'Offer', url: 'https://x/experiences/sunset-tour', priceCurrency: 'HKD', price: 480, availability: 'https://schema.org/InStock' },
     })
+  })
+
+  it('includes aggregateRating when a rating is supplied', () => {
+    const ld = experienceOfferJsonLd({
+      name: 'Sunset tour', description: 'Two hours on the harbour.', url: 'https://x/experiences/sunset-tour',
+      image: null, priceAmount: 480, currency: 'HKD', rating: { average: 5, count: 1 },
+    })
+    expect(ld.aggregateRating).toEqual({ '@type': 'AggregateRating', ratingValue: 5, reviewCount: 1 })
+  })
+
+  it('omits aggregateRating entirely when no rating is supplied', () => {
+    const ld = experienceOfferJsonLd({
+      name: 'Sunset tour', description: 'Two hours on the harbour.', url: 'https://x/experiences/sunset-tour',
+      image: null, priceAmount: 480, currency: 'HKD',
+    })
+    expect(ld.aggregateRating).toBeUndefined()
   })
 })

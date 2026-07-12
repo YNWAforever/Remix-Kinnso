@@ -5,6 +5,8 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getExperienceBySlug } from '@/lib/experiences/public-queries'
 import { listPublicAvailability } from '@/lib/experiences/public-availability-queries'
+import { isExperienceSaved } from '@/lib/saves/experience-queries'
+import { getExperienceRatingAggregate, listPublishedReviewsForExperience } from '@/lib/reviews/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { buildExperienceMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { breadcrumbJsonLd, experienceOfferJsonLd } from '@/lib/seo/jsonld'
@@ -12,8 +14,6 @@ import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
 
 export function generateStaticParams() {
-  // Experiences are DB-only; resolve on demand (dynamicParams defaults to true) —
-  // same choice as /g/[slug].
   return []
 }
 
@@ -41,12 +41,14 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
   if (!experience) notFound()
 
   const supabase = await createSupabaseServerClient()
-  // auth.getUser() here makes this page request-dynamic (it was previously
-  // static-generation-eligible via generateStaticParams()) — needed so the
-  // booking widget knows whether to show the guest-email field.
   const [availability, { data: { user } }] = await Promise.all([
     listPublicAvailability(experience.id),
     supabase.auth.getUser(),
+  ])
+  const [isSaved, rating, reviews] = await Promise.all([
+    user ? isExperienceSaved(supabase, experience.id, user.id) : Promise.resolve(false),
+    getExperienceRatingAggregate(supabase, experience.id),
+    listPublishedReviewsForExperience(supabase, experience.id),
   ])
 
   const canonical = `${SITE_URL}/${locale}/experiences/${slug}`
@@ -65,6 +67,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
           image: experience.coverUrl,
           priceAmount: experience.priceAmount,
           currency: experience.currency,
+          rating: rating ?? undefined,
         })]
       : []),
   ]
@@ -75,9 +78,15 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
         locale={locale as Locale}
         t={messages.experiencePublic}
         bookingT={messages.booking}
+        reviewsT={messages.reviews}
+        experienceSaveT={messages.experienceSave}
         experience={experience}
         availability={availability}
         viewerEmail={user?.email ?? null}
+        viewerId={user?.id ?? null}
+        isSaved={isSaved}
+        rating={rating}
+        reviews={reviews}
         sourceSurface={sourceSurface}
         guideSlug={guideSlug}
       />

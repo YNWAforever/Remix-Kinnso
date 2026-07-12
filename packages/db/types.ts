@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       affiliate_network_events: {
@@ -805,6 +780,7 @@ export type Database = {
           created_at: string
           description: string
           destination_tags: string[]
+          destination_tags_ci: string[] | null
           duration_minutes: number
           embed_url: string | null
           host_creator_id: string
@@ -821,6 +797,7 @@ export type Database = {
           created_at?: string
           description: string
           destination_tags?: string[]
+          destination_tags_ci?: string[] | null
           duration_minutes: number
           embed_url?: string | null
           host_creator_id: string
@@ -837,6 +814,7 @@ export type Database = {
           created_at?: string
           description?: string
           destination_tags?: string[]
+          destination_tags_ci?: string[] | null
           duration_minutes?: number
           embed_url?: string | null
           host_creator_id?: string
@@ -1136,6 +1114,48 @@ export type Database = {
         }
         Relationships: []
       }
+      destinations: {
+        Row: {
+          created_at: string
+          description: string | null
+          hero_image_url: string | null
+          id: string
+          match_terms: string[]
+          name: string
+          published_at: string | null
+          slug: string
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          id?: string
+          match_terms?: string[]
+          name: string
+          published_at?: string | null
+          slug: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          id?: string
+          match_terms?: string[]
+          name?: string
+          published_at?: string | null
+          slug?: string
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       experience_availability: {
         Row: {
           booked_count: number
@@ -1177,6 +1197,35 @@ export type Database = {
           },
         ]
       }
+      experience_saves: {
+        Row: {
+          created_at: string
+          experience_id: string
+          id: string
+          traveler_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          experience_id: string
+          id?: string
+          traveler_user_id: string
+        }
+        Update: {
+          created_at?: string
+          experience_id?: string
+          id?: string
+          traveler_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_saves_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       experiences: {
         Row: {
           city: string
@@ -1189,6 +1238,7 @@ export type Database = {
           merchant_profile_id: string
           price_amount: number
           published_at: string | null
+          saves_count: number
           slug: string
           status: string
           summary: string | null
@@ -1207,6 +1257,7 @@ export type Database = {
           merchant_profile_id: string
           price_amount: number
           published_at?: string | null
+          saves_count?: number
           slug: string
           status?: string
           summary?: string | null
@@ -1225,6 +1276,7 @@ export type Database = {
           merchant_profile_id?: string
           price_amount?: number
           published_at?: string | null
+          saves_count?: number
           slug?: string
           status?: string
           summary?: string | null
@@ -1245,6 +1297,35 @@ export type Database = {
             columns: ["merchant_profile_id"]
             isOneToOne: false
             referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_saves: {
+        Row: {
+          created_at: string
+          guide_id: string
+          id: string
+          traveler_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          guide_id: string
+          id?: string
+          traveler_user_id: string
+        }
+        Update: {
+          created_at?: string
+          guide_id?: string
+          id?: string
+          traveler_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_saves_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
             referencedColumns: ["id"]
           },
         ]
@@ -2171,6 +2252,64 @@ export type Database = {
           },
         ]
       }
+      reviews: {
+        Row: {
+          body: string | null
+          booking_id: string
+          created_at: string
+          experience_id: string
+          guide_id: string | null
+          id: string
+          rating: number
+          status: string
+          traveler_user_id: string
+        }
+        Insert: {
+          body?: string | null
+          booking_id: string
+          created_at?: string
+          experience_id: string
+          guide_id?: string | null
+          id?: string
+          rating: number
+          status?: string
+          traveler_user_id: string
+        }
+        Update: {
+          body?: string | null
+          booking_id?: string
+          created_at?: string
+          experience_id?: string
+          guide_id?: string | null
+          id?: string
+          rating?: number
+          status?: string
+          traveler_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rsvp_rate_limits: {
         Row: {
           ip: string
@@ -2589,11 +2728,14 @@ export type Database = {
         Returns: {
           booking_id: string
           currency: string
+          experience_id: string
           experience_slug: string
           experience_title: string
+          guide_id: string
           qty: number
           status: string
           total_amount: number
+          traveler_user_id: string
         }[]
       }
       get_you_may_like: {
@@ -2624,6 +2766,7 @@ export type Database = {
           title: string
         }[]
       }
+      lowercase_text_array: { Args: { arr: string[] }; Returns: string[] }
       mark_booking_completed: {
         Args: { p_booking_id: string }
         Returns: undefined
@@ -2871,9 +3014,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

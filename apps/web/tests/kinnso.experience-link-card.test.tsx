@@ -10,7 +10,7 @@ import type { PublicExperience } from '@/lib/experiences/public-queries'
 const experience: PublicExperience = {
   id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: null, description: null,
   city: 'Hong Kong', priceAmount: 480, currency: 'HKD', durationMinutes: null, coverUrl: null,
-  publishedAt: null, merchant: { slug: 'acme', companyName: 'Acme Travel' },
+  publishedAt: null, savesCount: 0, merchant: { slug: 'acme', companyName: 'Acme Travel' },
 }
 
 describe('ExperienceLinkCard', () => {

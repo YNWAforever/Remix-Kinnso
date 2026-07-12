@@ -28,6 +28,9 @@ export interface TravelerBookingRow {
   currency: string
   bookingDate: string | null // experience_availability.date, if joinable
   createdAt: string
+  experienceId: string
+  guideId: string | null
+  reviewId: string | null
 }
 
 export interface OpsBookingSettlementRow {

@@ -17,7 +17,7 @@ afterEach(cleanup)
 const experience = {
   id: 'exp1', slug: 'tokyo-crawl', title: 'Tokyo After-Hours Izakaya Crawl', summary: null,
   description: null, city: 'Tokyo', priceAmount: 1200, currency: 'HKD', durationMinutes: 180,
-  coverUrl: null, publishedAt: null, merchant: { slug: 'sunrise-stays', companyName: 'Sunrise Stays HK' },
+  coverUrl: null, publishedAt: null, savesCount: 0, merchant: { slug: 'sunrise-stays', companyName: 'Sunrise Stays HK' },
 }
 
 describe('BookingWidget', () => {
