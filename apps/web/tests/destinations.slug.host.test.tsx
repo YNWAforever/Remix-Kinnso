@@ -6,14 +6,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 afterEach(cleanup)
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
 
-const { getDestinationBySlugMock, getGuidesForRegionsMock, getSessionsForDestinationMock } = vi.hoisted(() => ({
+const { getDestinationBySlugMock, getGuidesForRegionsMock, getSessionsForDestinationMock, getExperiencesForCitiesMock } = vi.hoisted(() => ({
   getDestinationBySlugMock: vi.fn(async (): Promise<import('@/lib/destinations/queries').Destination | null> => null),
   getGuidesForRegionsMock: vi.fn(async (): Promise<import('@/lib/guides/types').Guide[]> => []),
   getSessionsForDestinationMock: vi.fn(async (): Promise<import('@/lib/sessions/public-queries').PublicSession[]> => []),
+  getExperiencesForCitiesMock: vi.fn(async (): Promise<import('@/lib/experiences/public-queries').PublicExperience[]> => []),
 }))
 vi.mock('@/lib/destinations/queries', () => ({ getDestinationBySlug: getDestinationBySlugMock }))
 vi.mock('@/lib/guides/queries', () => ({ getGuidesForRegions: getGuidesForRegionsMock }))
 vi.mock('@/lib/sessions/public-queries', () => ({ getSessionsForDestination: getSessionsForDestinationMock }))
+vi.mock('@/lib/experiences/public-queries', () => ({ getExperiencesForCities: getExperiencesForCitiesMock }))
 
 import DestinationDetailPage from '@/app/[locale]/destinations/[slug]/page'
 import en from '@/lib/i18n/messages/en'
@@ -75,5 +77,26 @@ describe('/[locale]/destinations/[slug] detail host', () => {
     render(ui)
     expect(screen.getByText(en.destinations.emptyGuides)).toBeTruthy()
     expect(screen.getByText(en.destinations.emptySessions)).toBeTruthy()
+  })
+
+  it('renders the destination experiences section', async () => {
+    getDestinationBySlugMock.mockResolvedValueOnce(destination)
+    getExperiencesForCitiesMock.mockResolvedValueOnce([
+      {
+        id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: null, description: null,
+        city: 'Tokyo', priceAmount: 12000, currency: 'JPY', durationMinutes: null, coverUrl: null,
+        publishedAt: '2026-07-01T00:00:00Z', savesCount: 5, merchant: { slug: '', companyName: '' },
+      },
+    ])
+    const ui = await DestinationDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo' }) })
+    render(ui)
+    expect(screen.getByRole('link', { name: /Sunset junk boat tour/ }).getAttribute('href')).toBe('/en/experiences/sunset-tour')
+  })
+
+  it('shows the empty-experiences copy when there are none', async () => {
+    getDestinationBySlugMock.mockResolvedValueOnce(destination)
+    const ui = await DestinationDetailPage({ params: Promise.resolve({ locale: 'en', slug: 'tokyo' }) })
+    render(ui)
+    expect(screen.getByText(en.destinations.emptyExperiences)).toBeTruthy()
   })
 })
