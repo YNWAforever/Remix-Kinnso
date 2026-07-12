@@ -3,6 +3,7 @@ import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import GuideCard from '@/components/kinnso/GuideCard'
 import SessionCard from '@/components/kinnso/SessionCard'
+import ExperienceCard, { type ExperienceCardData } from '@/components/kinnso/ExperienceCard'
 import type { Destination } from '@/lib/destinations/queries'
 import type { Guide } from '@/lib/guides/types'
 import type { PublicSession } from '@/lib/sessions/public-queries'
@@ -10,12 +11,13 @@ import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export function DestinationDetailView({
-  locale, t, destination, guides, sessions, savesLabel,
+  locale, t, destination, guides, experiences, sessions, savesLabel,
 }: {
   locale: Locale
   t: Messages['destinations']
   destination: Destination
   guides: Guide[]
+  experiences: ExperienceCardData[]
   sessions: PublicSession[]
   savesLabel: string
 }) {
@@ -47,6 +49,19 @@ export function DestinationDetailView({
         ) : (
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {guides.map((g) => <GuideCard key={g.slug} g={g} locale={locale} savesLabel={savesLabel} />)}
+          </div>
+        )}
+      </SectionShell>
+
+      <SectionShell className="k2-hairline">
+        <h2 className="k2-display text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.experiencesHeading}</h2>
+        {experiences.length === 0 ? (
+          <p className="mt-6 text-kinnso-ink/70">{t.emptyExperiences}</p>
+        ) : (
+          <div className="mt-8 grid gap-4">
+            {experiences.map((e) => (
+              <ExperienceCard key={e.slug} experience={e} locale={locale} savesLabel={savesLabel} />
+            ))}
           </div>
         )}
       </SectionShell>
