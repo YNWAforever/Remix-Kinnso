@@ -74,6 +74,12 @@ describe('validateSessionInput', () => {
     expect(result.ok).toBe(true)
     if (result.ok) expect(result.parsed.destinationTags).toEqual(['Tokyo', 'Japan'])
   })
+
+  it('preserves destinationTags casing as typed — case-insensitive matching against ops-curated destinations.match_terms happens on the read side (destination_tags_ci), not here', () => {
+    const result = validateSessionInput({ ...validInput, destinationTags: 'Tokyo, JAPAN' })
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.parsed.destinationTags).toEqual(['Tokyo', 'JAPAN'])
+  })
 })
 
 describe('canGoLive', () => {

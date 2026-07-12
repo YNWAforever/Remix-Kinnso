@@ -53,6 +53,10 @@ const messages: Messages = {
       title: 'コミュニティセッション — KINNSO',
       description: 'ガイドを書いたクリエイター本人による、ライブブリーフィング、Q&A、アーカイブ映像。',
     },
+    destinations: {
+      title: '旅行先 — KINNSO',
+      description: '厳選された旅行先をブラウズし、クリエイターがこれまでにまとめたガイド、予約できる体験、ライブセッションをチェックしましょう。',
+    },
   },
   listing: { searchPlaceholder: '記事を検索', filterRegion: '地域', filterTag: 'タグ', noResults: '記事が見つかりません。', resultsCount: '件' },
   pagination: { prev: '前へ', next: '次へ', page: 'ページ' },
@@ -547,12 +551,6 @@ const messages: Messages = {
     heading: '近日公開',
     body: 'KINNSOのこの部分は準備中です。しばらくしてからもう一度ご確認ください。',
     back: 'ホームに戻る',
-  },
-  destinationsSoon: {
-    eyebrow: '旅行先',
-    title: 'その街を一番知る人が、その街を語る。',
-    body: 'KINNSOのクリエイターが書いたガイドやストーリーを、旅行先ごとにゆっくり眺められる地図に編集しています。地元の人が本当に通う食の路地や日帰りコースまで。完成までの間は、旅行先の記事からぜひご覧ください。',
-    cta: '旅行先の記事を読む',
   },
   creatorTerms: {
     eyebrow: 'クリエイター規約',
@@ -1348,6 +1346,18 @@ const messages: Messages = {
     typeAskACreator: 'クリエイターに質問',
     typeMerchantSpotlight: '店舗スポットライト',
     typeNewCreatorIntro: '新人クリエイター紹介',
+  },
+  destinations: {
+    eyebrow: '旅行先',
+    title: 'その街を一番知る人が、その街を語る。',
+    body: '厳選された旅行先を見てみましょう——クリエイターがこれまでにまとめたガイド、予約できる体験、ライブセッションをご覧いただけます。',
+    empty: '新しい旅行先を準備中です。近日公開をお楽しみに。',
+    guidesHeading: 'ガイド',
+    emptyGuides: 'この旅行先のガイドはまだありません。',
+    experiencesHeading: '体験',
+    emptyExperiences: 'この旅行先で予約できる体験はまだありません。',
+    sessionsHeading: '開催予定のセッション',
+    emptySessions: 'この旅行先で予定されているセッションは現在ありません。',
   },
   sessionsAdmin: {
     title: 'コミュニティセッション',

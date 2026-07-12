@@ -53,6 +53,10 @@ const messages: Messages = {
       title: '커뮤니티 세션 — KINNSO',
       description: '가이드를 쓴 크리에이터가 직접 진행하는 라이브 브리핑, Q&A, 다시보기.',
     },
+    destinations: {
+      title: '여행지 — KINNSO',
+      description: '엄선된 여행지를 둘러보고, 크리에이터들이 지금까지 정리한 가이드, 예약 가능한 체험, 라이브 세션을 확인해보세요.',
+    },
   },
   listing: { searchPlaceholder: '아티클 검색', filterRegion: '지역', filterTag: '태그', noResults: '검색 결과가 없습니다.', resultsCount: '개' },
   pagination: { prev: '이전', next: '다음', page: '페이지' },
@@ -547,12 +551,6 @@ const messages: Messages = {
     heading: '곧 출시',
     body: 'KINNSO의 이 부분은 준비 중입니다. 잠시 후 다시 확인해 주세요.',
     back: '홈으로',
-  },
-  destinationsSoon: {
-    eyebrow: '여행지',
-    title: '그 도시를 가장 잘 아는 사람이 들려주는 이야기.',
-    body: 'KINNSO 크리에이터의 가이드와 스토리를 여행지별로 천천히 둘러볼 수 있는 지도로 엮고 있어요. 현지인이 진짜 가는 먹자골목과 당일치기 코스까지. 완성될 때까지는 여행지 아티클부터 먼저 만나보세요.',
-    cta: '여행지 아티클 읽기',
   },
   creatorTerms: {
     eyebrow: '크리에이터 약관',
@@ -1348,6 +1346,18 @@ const messages: Messages = {
     typeAskACreator: '크리에이터에게 질문하기',
     typeMerchantSpotlight: '매장 스포트라이트',
     typeNewCreatorIntro: '신규 크리에이터 소개',
+  },
+  destinations: {
+    eyebrow: '여행지',
+    title: '그 도시를 가장 잘 아는 사람이 들려주는 이야기.',
+    body: '엄선된 여행지를 둘러보세요 — 크리에이터들이 지금까지 정리한 가이드, 예약 가능한 체험, 라이브 세션을 확인할 수 있어요.',
+    empty: '새로운 여행지를 준비 중이에요. 곧 다시 확인해 주세요.',
+    guidesHeading: '가이드',
+    emptyGuides: '이 여행지의 가이드가 아직 없어요.',
+    experiencesHeading: '체험',
+    emptyExperiences: '이 여행지에서 예약 가능한 체험이 아직 없어요.',
+    sessionsHeading: '예정된 세션',
+    emptySessions: '이 여행지에서 예정된 세션이 현재 없어요.',
   },
   sessionsAdmin: {
     title: '커뮤니티 세션',

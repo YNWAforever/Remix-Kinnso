@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   buildArticleMetadata, buildListingMetadata,
   buildPageMetadata, buildGuideMetadata, buildCreatorMetadata, noindexMetadata,
+  buildDestinationMetadata,
   SITE_URL,
 } from '@/lib/seo/metadata'
 import { LOCALES } from '@/lib/i18n/config'
@@ -96,6 +97,18 @@ describe('buildGuideMetadata', () => {
     const langs = m.alternates!.languages as Record<string, string>
     expect(Object.keys(langs).sort()).toEqual([...LOCALES, 'x-default'].sort())
     expect((m.openGraph as any).type).toBe('article')
+    expect((m.robots as any).index).toBe(true)
+  })
+})
+
+describe('buildDestinationMetadata', () => {
+  it('og:type=website, self-canonical, 7 hreflang under /destinations/<slug>', () => {
+    const m = buildDestinationMetadata({ slug: 'tokyo', locale: 'en', title: 'Tokyo', description: 'Neon nights.' })
+    expect(m.title).toBe('Tokyo')
+    expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/destinations/tokyo`)
+    const langs = m.alternates!.languages as Record<string, string>
+    expect(Object.keys(langs).sort()).toEqual([...LOCALES, 'x-default'].sort())
+    expect((m.openGraph as any).type).toBe('website')
     expect((m.robots as any).index).toBe(true)
   })
 })

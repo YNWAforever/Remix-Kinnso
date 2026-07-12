@@ -6,7 +6,7 @@
 // Public marketing pages: indexable and listed in the sitemap. Paths are locale-relative
 // — '' is the locale home, the rest start with '/'.
 export const MARKETING_PATHS = [
-  '', '/explore', '/creators', '/agent', '/about', '/contact', '/merchants', '/legal/creator-terms', '/for-creators', '/for-merchants', '/sessions',
+  '', '/explore', '/creators', '/agent', '/about', '/contact', '/merchants', '/legal/creator-terms', '/for-creators', '/for-merchants', '/sessions', '/destinations',
 ] as const
 
 // Private/app route trees that must never be crawled. These are robots.txt path globs

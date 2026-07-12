@@ -53,6 +53,10 @@ const messages: Messages = {
       title: '社群活動 — KINNSO',
       description: '由撰寫攻略的創作者親自主持的現場簡報、問答與重播。',
     },
+    destinations: {
+      title: '目的地 — KINNSO',
+      description: '瀏覽精選目的地，查看我們的創作者目前為每個地方整理的攻略、可預約體驗與直播活動。',
+    },
   },
   listing: { searchPlaceholder: '搜尋文章', filterRegion: '地區', filterTag: '標籤', noResults: '找不到文章。', resultsCount: '篇文章' },
   pagination: { prev: '上一頁', next: '下一頁', page: '第' },
@@ -547,12 +551,6 @@ const messages: Messages = {
     heading: '即將推出',
     body: 'KINNSO 的這個部分即將上線，請稍後再回來看看。',
     back: '返回首頁',
-  },
-  destinationsSoon: {
-    eyebrow: '目的地',
-    title: '每座城市，由最懂它的人來說。',
-    body: '我們正在把 KINNSO 創作者的攻略與故事，整理成一份可以慢慢瀏覽的目的地地圖——道地美食街、巷弄小店、在地人真正會去的一日遊。在完成之前，先從目的地文章開始探索吧。',
-    cta: '閱讀目的地文章',
   },
   creatorTerms: {
     eyebrow: '創作者條款',
@@ -1348,6 +1346,18 @@ const messages: Messages = {
     typeAskACreator: '創作者問答',
     typeMerchantSpotlight: '商家焦點',
     typeNewCreatorIntro: '新銳創作者介紹',
+  },
+  destinations: {
+    eyebrow: '目的地',
+    title: '每座城市，由最懂它的人來說。',
+    body: '瀏覽精選目的地——查看我們的創作者目前為每個地方整理的攻略、可預約體驗與直播活動。',
+    empty: '更多目的地即將上線，敬請期待。',
+    guidesHeading: '攻略',
+    emptyGuides: '這個目的地目前還沒有攻略。',
+    experiencesHeading: '體驗',
+    emptyExperiences: '這裡目前還沒有可預約的體驗。',
+    sessionsHeading: '即將舉行的活動',
+    emptySessions: '這個目的地目前還沒有安排活動。',
   },
   sessionsAdmin: {
     title: '社群場次',

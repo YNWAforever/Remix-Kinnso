@@ -11,6 +11,9 @@ vi.mock('@/lib/guides/queries', () => ({
 vi.mock('@/lib/creators/queries', () => ({
   getCreatorsForSitemap: async () => [{ handle: 'maya', lastmod: '2026-06-03T00:00:00Z' }],
 }))
+vi.mock('@/lib/destinations/queries', () => ({
+  getDestinationsForSitemap: async () => [{ slug: 'tokyo', lastmod: '2026-07-01T00:00:00Z' }],
+}))
 
 import sitemap, { generateSitemaps } from '@/app/sitemap'
 import { LOCALES } from '@/lib/i18n/config'
@@ -35,6 +38,15 @@ describe('sitemap — guides, creators, marketing', () => {
     const urls = (await sitemap()).map((e) => e.url)
     expect(urls).toContain(`${SITE}/en/articles`)
     expect(urls).toContain(`${SITE}/en/articles/dining/ramen`)
+  })
+})
+
+describe('sitemap — destinations', () => {
+  it('emits each destination for all 7 locales', async () => {
+    const urls = (await sitemap()).map((e) => e.url)
+    for (const l of LOCALES) {
+      expect(urls).toContain(`${SITE}/${l}/destinations/tokyo`)
+    }
   })
 })
 

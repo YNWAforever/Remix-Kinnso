@@ -68,6 +68,41 @@ export async function getUpcomingSessionsList(limit = 20): Promise<PublicSession
   return attachHost(supabase, (data ?? []) as unknown as SessionRow[])
 }
 
+/**
+ * Upcoming sessions tagged for a destination (array-overlap on destination_tags). First
+ * .overlaps() query in this codebase — confirmed via repo-wide grep during R6B design
+ * research that no existing call site uses this operator, so there is no in-repo example
+ * to mirror the exact shape from. Reads never crash the destination page — failures
+ * degrade to [], same stance as getGuidesForRegions/getExperiencesForCity.
+ *
+ * `.overlaps()` is a case-sensitive exact-string array comparison in Postgres, but
+ * destination_tags is free-text typed by creators (original casing preserved — see
+ * parseTags in lib/sessions/validation.ts) while matchTerms comes from the separately
+ * ops-curated destinations.match_terms — the two casings aren't guaranteed to agree.
+ * Rather than lowercase destination_tags itself (which would silently rewrite what
+ * creators typed, and round-trip into the Studio/admin edit-form pre-fill), the
+ * comparison runs against `destination_tags_ci`, a generated STORED column that
+ * mirrors destination_tags in lowercase and is kept in sync by Postgres for every
+ * row — existing and future — with no app-layer write path to keep correct. See
+ * migration 20260711120000_r6b_fix_session_destination_tags_ci_backfill.sql.
+ */
+export async function getSessionsForDestination(matchTerms: string[], limit = 6): Promise<PublicSession[]> {
+  if (matchTerms.length === 0) return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data } = await supabase
+      .from('community_sessions')
+      .select(SESSION_COLUMNS)
+      .in('status', ['scheduled', 'live'])
+      .overlaps('destination_tags_ci', matchTerms.map((t) => t.toLowerCase()))
+      .order('starts_at', { ascending: true })
+      .limit(limit)
+    return attachHost(supabase, (data ?? []) as unknown as SessionRow[])
+  } catch {
+    return []
+  }
+}
+
 export async function getReplaySessions(limit = 20): Promise<PublicSession[]> {
   const supabase = createSupabasePublicClient()
   const { data, error } = await supabase
