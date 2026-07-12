@@ -3,27 +3,21 @@ import { getExperiencesForCity, getExperienceOverridesForArticle } from '@/lib/e
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
-/** "Ready to book?" — sibling to ArticleGuideLinks, same regions heuristic (D-R3-7)
- *  + D-R6C-1 editorial overrides. Editorial overrides (pinned by experiences ops for
- *  this article) are shown first, then remaining slots are filled by the first
- *  region with any heuristic match (one-shot-then-stop, no merge across regions),
- *  with any heuristic match already covered by a pinned experience deduped out.
- *  Renders nothing without a match on either tier. */
+/** "Ready to book?" — sibling to ArticleGuideLinks, same regions heuristic (D-R3-7).
+ *  Editorial overrides (D-R6C-1) are shown first, heuristic matches (first region with
+ *  any match wins, no merge across regions) fill any remaining slots, deduped against the
+ *  pinned set. Renders nothing without a match. */
 export async function ArticleExperienceLinks({ locale, regions, articleId, t }: {
   locale: Locale; regions: string[]; articleId: string; t: Messages['article']
 }) {
-  const [overrides, heuristic] = await Promise.all([
-    getExperienceOverridesForArticle(articleId),
-    (async () => {
-      for (const region of regions) {
-        const matches = await getExperiencesForCity(region)
-        if (matches.length > 0) return matches
-      }
-      return [] as Awaited<ReturnType<typeof getExperiencesForCity>>
-    })(),
-  ])
-  const pinnedSlugs = new Set(overrides.map((e) => e.slug))
-  const experiences = [...overrides, ...heuristic.filter((e) => !pinnedSlugs.has(e.slug))].slice(0, 3)
+  let heuristic: Awaited<ReturnType<typeof getExperiencesForCity>> = []
+  for (const region of regions) {
+    heuristic = await getExperiencesForCity(region)
+    if (heuristic.length > 0) break
+  }
+  const pinned = await getExperienceOverridesForArticle(articleId)
+  const pinnedIds = new Set(pinned.map((e) => e.id))
+  const experiences = [...pinned, ...heuristic.filter((e) => !pinnedIds.has(e.id))].slice(0, 3)
   if (experiences.length === 0) return null
   return (
     <aside aria-labelledby="article-experience-links" className="k2-hairline mt-10 pt-8">
