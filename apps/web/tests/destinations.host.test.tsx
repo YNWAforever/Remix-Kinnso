@@ -5,25 +5,37 @@ import { render, screen, cleanup } from '@testing-library/react'
 afterEach(cleanup)
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
 
+const { getPublishedDestinationsMock } = vi.hoisted(() => ({
+  getPublishedDestinationsMock: vi.fn(async (): Promise<import('@/lib/destinations/queries').Destination[]> => []),
+}))
+vi.mock('@/lib/destinations/queries', () => ({ getPublishedDestinations: getPublishedDestinationsMock }))
+
 import DestinationsPage, { generateMetadata } from '@/app/[locale]/destinations/page'
 import { MARKETING_PATHS } from '@/lib/seo/routes'
 import en from '@/lib/i18n/messages/en'
 
 describe('/[locale]/destinations host', () => {
-  it('renders the designed editorial placeholder (not the bare ComingSoonPage)', async () => {
+  it('renders published destinations as cards linking to their detail page', async () => {
+    getPublishedDestinationsMock.mockResolvedValueOnce([
+      { slug: 'tokyo', name: 'Tokyo', heroImageUrl: 'https://x/tokyo.jpg', description: 'Neon nights.', matchTerms: ['Tokyo'] },
+    ])
     const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
-    expect(screen.getByRole('heading', { level: 1, name: en.destinationsSoon.title })).toBeTruthy()
-    expect(screen.getByText(en.destinationsSoon.eyebrow)).toBeTruthy()
-    expect(screen.getByText(en.destinationsSoon.body)).toBeTruthy()
-    expect(screen.getByRole('link', { name: en.destinationsSoon.cta }).getAttribute('href')).toBe('/en/articles/destinations')
-    expect(screen.queryByText(en.comingSoon.heading)).toBeNull()
+    expect(screen.getByRole('heading', { level: 1, name: en.destinations.title })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Tokyo/ }).getAttribute('href')).toBe('/en/destinations/tokyo')
   })
 
-  it('is noindexed and stays out of MARKETING_PATHS', async () => {
+  it('shows the empty state when there are no published destinations', async () => {
+    getPublishedDestinationsMock.mockResolvedValueOnce([])
+    const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.getByText(en.destinations.empty)).toBeTruthy()
+  })
+
+  it('is indexable and listed in MARKETING_PATHS', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) })
-    expect(meta.robots).toEqual({ index: false, follow: false })
-    expect(MARKETING_PATHS).not.toContain('/destinations')
+    expect(meta.robots).toEqual({ index: true, follow: true, 'max-image-preview': 'large' })
+    expect(MARKETING_PATHS).toContain('/destinations')
   })
 
   it('404s unknown locales', async () => {

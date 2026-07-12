@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getBookingByCheckoutSession } from '@/lib/experiences/booking-confirmation-queries'
+import { hasReviewForBooking } from '@/lib/reviews/queries'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { ReviewForm } from '@/components/kinnso/ReviewForm'
 
 export async function generateMetadata(): Promise<Metadata> {
   return { robots: { index: false, follow: false } }
@@ -64,6 +67,13 @@ export default async function BookingConfirmationPage({
   }
 
   if (booking.status === 'completed') {
+    // D-R6A-4: only the real, signed-in traveler on the booking may review it --
+    // never a guest checkout, even if someone else happens to be signed in while
+    // viewing this anon-readable confirmation page.
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const canReview = !!user && booking.travelerUserId === user.id
+    const alreadyReviewed = canReview ? await hasReviewForBooking(supabase, booking.bookingId) : false
     return (
       <div className="k2-container py-16 text-center">
         <h1 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.completedTitle}</h1>
@@ -73,6 +83,14 @@ export default async function BookingConfirmationPage({
           <p className="mt-2 text-sm text-kinnso-ink/70">{t.summaryQtyLabel}: {booking.qty}</p>
           <p className="mt-1 text-sm text-kinnso-ink/70">{t.summaryTotalLabel}: {booking.currency} {booking.totalAmount.toLocaleString()}</p>
         </div>
+        {canReview && !alreadyReviewed ? (
+          <div className="mx-auto mt-6 max-w-sm">
+            <ReviewForm locale={locale as Locale} bookingId={booking.bookingId} experienceId={booking.experienceId} guideId={booking.guideId} t={messages.reviews} />
+          </div>
+        ) : null}
+        {canReview && alreadyReviewed ? (
+          <p className="mt-4 text-sm text-kinnso-muted">{messages.reviews.alreadyReviewed}</p>
+        ) : null}
       </div>
     )
   }

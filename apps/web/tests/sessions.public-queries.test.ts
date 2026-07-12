@@ -5,7 +5,7 @@ const { fromMock } = vi.hoisted(() => ({ fromMock: vi.fn() }))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: () => ({ from: fromMock }) }))
 
 import {
-  getUpcomingSessionsList, getReplaySessions, getSessionBySlug, getSessionsForSitemap,
+  getUpcomingSessionsList, getReplaySessions, getSessionBySlug, getSessionsForSitemap, getSessionsForDestination,
 } from '@/lib/sessions/public-queries'
 
 const sessionRow = {
@@ -18,7 +18,7 @@ const creatorRow = { id: 'creator-1', handle: 'sora', display_name: 'Sora' }
 
 function chain(finalValue: unknown) {
   const builder: Record<string, unknown> = {}
-  const methods = ['select', 'in', 'eq', 'not', 'order', 'limit', 'maybeSingle']
+  const methods = ['select', 'in', 'eq', 'not', 'order', 'limit', 'maybeSingle', 'overlaps']
   for (const m of methods) builder[m] = vi.fn(() => builder)
   builder.maybeSingle = vi.fn(async () => finalValue)
   builder.then = (resolve: (v: unknown) => unknown) => Promise.resolve(finalValue).then(resolve)
@@ -82,5 +82,40 @@ describe('getSessionsForSitemap', () => {
       { slug: 'a', lastmod: '2027-01-01T00:00:00.000Z' },
       { slug: 'b', lastmod: '2026-06-01T00:00:00.000Z' },
     ])
+  })
+})
+
+describe('getSessionsForDestination', () => {
+  it('returns [] without querying when matchTerms is empty', async () => {
+    expect(await getSessionsForDestination([])).toEqual([])
+    expect(fromMock).not.toHaveBeenCalled()
+  })
+
+  it('queries scheduled+live sessions overlapping the given match terms, then attaches host', async () => {
+    const sessionsChain = chain({ data: [sessionRow], error: null })
+    const creatorsChain = chain({ data: [creatorRow], error: null })
+    fromMock.mockImplementation((table: string) => (table === 'community_sessions' ? sessionsChain : creatorsChain))
+
+    const result = await getSessionsForDestination(['Tokyo'])
+    expect(sessionsChain.in).toHaveBeenCalledWith('status', ['scheduled', 'live'])
+    // destination_tags keeps the creator's original casing — the comparison runs against
+    // destination_tags_ci (a generated, always-lowercase column kept in sync by Postgres for
+    // every row, existing and future), so matchTerms only need lowercasing on this side.
+    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags_ci', ['tokyo'])
+    expect(result[0].host).toEqual({ handle: 'sora', displayName: 'Sora' })
+  })
+
+  it('lowercases mixed-case match terms before overlapping against destination_tags_ci', async () => {
+    const sessionsChain = chain({ data: [sessionRow], error: null })
+    const creatorsChain = chain({ data: [creatorRow], error: null })
+    fromMock.mockImplementation((table: string) => (table === 'community_sessions' ? sessionsChain : creatorsChain))
+
+    await getSessionsForDestination(['Tokyo, Japan', 'KYOTO'])
+    expect(sessionsChain.overlaps).toHaveBeenCalledWith('destination_tags_ci', ['tokyo, japan', 'kyoto'])
+  })
+
+  it('never throws — degrades to [] on query failure', async () => {
+    fromMock.mockImplementation(() => { throw new Error('boom') })
+    expect(await getSessionsForDestination(['Tokyo'])).toEqual([])
   })
 })

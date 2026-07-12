@@ -1,4 +1,5 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
+import { sanitizeMatchTerm, sanitizeMatchTerms } from '@/lib/search/sanitize-match-terms'
 
 export type PublicExperience = {
   id: string
@@ -12,15 +13,17 @@ export type PublicExperience = {
   durationMinutes: number | null
   coverUrl: string | null
   publishedAt: string | null
+  savesCount: number
   merchant: { slug: string; companyName: string }
 }
 
-const EXP_COLUMNS = 'id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, merchant_profile_id, published_at'
+const EXP_COLUMNS = 'id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, merchant_profile_id, published_at, saves_count'
 
 type ExpRow = {
   id: string; slug: string; title: string; summary: string | null; description: string | null
   city: string; price_amount: number; currency: string; duration_minutes: number | null
   cover_url: string | null; merchant_profile_id: string; published_at: string | null
+  saves_count: number
 }
 
 function toDomain(r: ExpRow, merchant: { slug: string; companyName: string }): PublicExperience {
@@ -28,6 +31,7 @@ function toDomain(r: ExpRow, merchant: { slug: string; companyName: string }): P
     id: r.id, slug: r.slug, title: r.title, summary: r.summary, description: r.description,
     city: r.city, priceAmount: Number(r.price_amount), currency: r.currency,
     durationMinutes: r.duration_minutes, coverUrl: r.cover_url, publishedAt: r.published_at,
+    savesCount: r.saves_count,
     merchant,
   }
 }
@@ -118,7 +122,7 @@ export async function getExperienceById(id: string): Promise<PublicExperience | 
  * failures degrade to [] (same stance as getGuidesForRegions).
  */
 export async function getExperiencesForCity(city: string, limit = 3): Promise<PublicExperience[]> {
-  const clean = city.normalize('NFC').replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s+/g, ' ').trim()
+  const clean = sanitizeMatchTerm(city)
   if (clean.length < 2) return []
   try {
     const supabase = createSupabasePublicClient()
@@ -127,6 +131,31 @@ export async function getExperiencesForCity(city: string, limit = 3): Promise<Pu
       .select(EXP_COLUMNS)
       .eq('status', 'published')
       .ilike('city', `%${clean}%`)
+      .order('published_at', { ascending: false })
+      .limit(limit)
+    return (data ?? []).map((r) => toDomain(r as unknown as ExpRow, { slug: '', companyName: '' }))
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Same as getExperiencesForCity but matches ANY of several sanitized terms via .or() —
+ * mirrors getGuidesForRegions's array-of-terms shape (apps/web/lib/guides/queries.ts) for
+ * destination pages whose match_terms can include neighborhood aliases alongside the
+ * destination's own name. Reads never crash the destination page — failures degrade to
+ * [], same stance as getExperiencesForCity.
+ */
+export async function getExperiencesForCities(cities: string[], limit = 6): Promise<PublicExperience[]> {
+  const clean = sanitizeMatchTerms(cities)
+  if (clean.length === 0) return []
+  try {
+    const supabase = createSupabasePublicClient()
+    const { data } = await supabase
+      .from('experiences')
+      .select(EXP_COLUMNS)
+      .eq('status', 'published')
+      .or(clean.map((c) => `city.ilike.%${c}%`).join(','))
       .order('published_at', { ascending: false })
       .limit(limit)
     return (data ?? []).map((r) => toDomain(r as unknown as ExpRow, { slug: '', companyName: '' }))

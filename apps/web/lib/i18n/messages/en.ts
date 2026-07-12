@@ -200,8 +200,12 @@ export interface TravelerTripsMessages {
   statusCancelled: string
   statusRefunded: string
   bookedOnLabel: string
-  savesTabTitle: string
-  savesTabComingSoon: string
+  savedGuidesTitle: string
+  savedGuidesEmpty: string
+  savedExperiencesTitle: string
+  savedExperiencesEmpty: string
+  reviewCta: string
+  reviewedLabel: string
 }
 
 export interface MerchantsDirectoryMessages {
@@ -280,6 +284,7 @@ export interface Messages {
     forCreators: { title: string; description: string }
     forMerchants: { title: string; description: string }
     sessions: { title: string; description: string }
+    destinations: { title: string; description: string }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -723,7 +728,6 @@ export interface Messages {
     emailLabel: string; emailCta: string; responseNote: string
   }
   comingSoon: { heading: string; body: string; back: string }
-  destinationsSoon: { eyebrow: string; title: string; body: string; cta: string }
   creatorTerms: {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
@@ -1155,6 +1159,31 @@ export interface Messages {
     merchantEmpty: string
     notApplicable: string
   }
+  guideSave: {
+    save: string
+    saved: string
+    signInToSave: string
+  }
+  experienceSave: {
+    save: string
+    saved: string
+    signInToSave: string
+  }
+  reviews: {
+    formHeading: string
+    ratingLabel: string
+    bodyLabel: string
+    bodyPlaceholder: string
+    submitCta: string
+    submittingCta: string
+    submitted: string
+    alreadyReviewed: string
+    genericError: string
+    ratingAverageLabel: string
+    countLabel: string
+    emptyState: string
+    anonymousReviewer: string
+  }
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
@@ -1162,6 +1191,12 @@ export interface Messages {
     rsvpCancelledNotice: string
     typeDestinationBriefing: string; typeAskACreator: string
     typeMerchantSpotlight: string; typeNewCreatorIntro: string
+  }
+  destinations: {
+    eyebrow: string; title: string; body: string; empty: string
+    guidesHeading: string; emptyGuides: string
+    experiencesHeading: string; emptyExperiences: string
+    sessionsHeading: string; emptySessions: string
   }
   sessionsAdmin: {
     title: string; subtitle: string; newCta: string; empty: string
@@ -1235,6 +1270,10 @@ const messages: Messages = {
     sessions: {
       title: 'Community Sessions — KINNSO',
       description: 'Live briefings, Q&As, and replays from the creators behind our guides.',
+    },
+    destinations: {
+      title: 'Destinations — KINNSO',
+      description: 'Browse curated destinations and see the guides, bookable experiences, and live sessions our creators have covered so far.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -1730,12 +1769,6 @@ const messages: Messages = {
     heading: 'Coming soon',
     body: 'This part of KINNSO is on the way. Check back shortly.',
     back: 'Back to home',
-  },
-  destinationsSoon: {
-    eyebrow: 'Destinations',
-    title: 'Every city, told by the people who know it.',
-    body: 'We are stitching KINNSO guides and stories into a browsable atlas of destinations — the food streets, the side alleys, the day trips locals actually take. While we finish it, our destination stories are the best place to start.',
-    cta: 'Read destination stories',
   },
   creatorTerms: {
     eyebrow: 'Creator terms',
@@ -2285,8 +2318,12 @@ const messages: Messages = {
     statusCancelled: 'Cancelled',
     statusRefunded: 'Refunded',
     bookedOnLabel: 'Booked on',
-    savesTabTitle: 'Saved',
-    savesTabComingSoon: 'Saved guides and experiences are coming soon.',
+    savedGuidesTitle: 'Saved guides',
+    savedGuidesEmpty: "You haven't saved any guides yet.",
+    savedExperiencesTitle: 'Saved experiences',
+    savedExperiencesEmpty: "You haven't saved any experiences yet.",
+    reviewCta: 'Leave a review',
+    reviewedLabel: 'Reviewed',
   },
   merchantsOps: {
     title: 'Merchants',
@@ -2498,6 +2535,31 @@ const messages: Messages = {
     merchantEmpty: 'Post a mission to start seeing campaign activity.',
     notApplicable: '—',
   },
+  guideSave: {
+    save: 'Save',
+    saved: 'Saved',
+    signInToSave: 'Sign in to save',
+  },
+  experienceSave: {
+    save: 'Save',
+    saved: 'Saved',
+    signInToSave: 'Sign in to save',
+  },
+  reviews: {
+    formHeading: 'Leave a review',
+    ratingLabel: 'Rating',
+    bodyLabel: 'Your review (optional)',
+    bodyPlaceholder: 'Tell other travellers about your experience…',
+    submitCta: 'Submit review',
+    submittingCta: 'Submitting…',
+    submitted: 'Thanks for your review!',
+    alreadyReviewed: 'You already reviewed this booking.',
+    genericError: 'Something went wrong. Please try again.',
+    ratingAverageLabel: '{average} out of 5',
+    countLabel: '{count} reviews',
+    emptyState: 'No reviews yet.',
+    anonymousReviewer: 'A KINNSO traveller',
+  },
   sessions: {
     eyebrow: 'Community Sessions',
     title: 'Live briefings from creators on the ground.',
@@ -2514,6 +2576,18 @@ const messages: Messages = {
     typeAskACreator: 'Ask a creator',
     typeMerchantSpotlight: 'Merchant spotlight',
     typeNewCreatorIntro: 'New creator intro',
+  },
+  destinations: {
+    eyebrow: 'Destinations',
+    title: 'Every city, told by the people who know it.',
+    body: 'Browse curated destinations — the guides, bookable experiences, and live sessions our creators have covered so far.',
+    empty: 'New destinations are on the way — check back soon.',
+    guidesHeading: 'Guides',
+    emptyGuides: 'No guides for this destination yet.',
+    experiencesHeading: 'Experiences',
+    emptyExperiences: 'No bookable experiences here yet.',
+    sessionsHeading: 'Upcoming sessions',
+    emptySessions: 'No sessions scheduled for this destination right now.',
   },
   sessionsAdmin: {
     title: 'Community Sessions',

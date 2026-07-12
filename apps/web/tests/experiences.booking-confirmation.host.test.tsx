@@ -12,6 +12,14 @@ vi.mock('@/lib/experiences/booking-confirmation-queries', () => ({
   getBookingByCheckoutSession: getBookingByCheckoutSessionMock,
 }))
 
+const { getUserMock } = vi.hoisted(() => ({
+  getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({ data: { user: null } })),
+}))
+vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
+
+const { hasReviewForBookingMock } = vi.hoisted(() => ({ hasReviewForBookingMock: vi.fn(async () => false) }))
+vi.mock('@/lib/reviews/queries', () => ({ hasReviewForBooking: hasReviewForBookingMock }))
+
 import BookingConfirmationPage from '@/app/[locale]/experiences/[slug]/booked/page'
 import en from '@/lib/i18n/messages/en'
 
@@ -51,6 +59,7 @@ describe('BookingConfirmationPage', () => {
     getBookingByCheckoutSessionMock.mockResolvedValue({
       bookingId: 'b1', status: 'pending_payment', qty: 2, totalAmount: 960, currency: 'HKD',
       experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: null, experienceId: 'e1', guideId: null,
     })
     const el = await BookingConfirmationPage({
       params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
@@ -68,6 +77,7 @@ describe('BookingConfirmationPage', () => {
     getBookingByCheckoutSessionMock.mockResolvedValue({
       bookingId: 'b1', status: 'confirmed', qty: 3, totalAmount: 1440, currency: 'HKD',
       experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: null, experienceId: 'e1', guideId: null,
     })
     const el = await BookingConfirmationPage({
       params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
@@ -84,6 +94,7 @@ describe('BookingConfirmationPage', () => {
     getBookingByCheckoutSessionMock.mockResolvedValue({
       bookingId: 'b1', status: 'completed', qty: 2, totalAmount: 960, currency: 'HKD',
       experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: null, experienceId: 'e1', guideId: null,
     })
     const el = await BookingConfirmationPage({
       params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
@@ -98,10 +109,58 @@ describe('BookingConfirmationPage', () => {
     expect(screen.queryByText(en.booking.confirmedTitle)).toBeNull()
   })
 
+  it('shows the review form on the completed branch for the real signed-in traveler on the booking', async () => {
+    getBookingByCheckoutSessionMock.mockResolvedValue({
+      bookingId: 'b1', status: 'completed', qty: 2, totalAmount: 960, currency: 'HKD',
+      experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: 'u1', experienceId: 'e1', guideId: null,
+    })
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    const el = await BookingConfirmationPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ session_id: 'cs_test_123' }),
+    })
+    render(el)
+    expect(screen.getByRole('button', { name: en.reviews.submitCta })).toBeTruthy()
+  })
+
+  it('hides the review form for a guest booking (no travelerUserId) even if someone is signed in', async () => {
+    getBookingByCheckoutSessionMock.mockResolvedValue({
+      bookingId: 'b1', status: 'completed', qty: 2, totalAmount: 960, currency: 'HKD',
+      experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: null, experienceId: 'e1', guideId: null,
+    })
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    const el = await BookingConfirmationPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ session_id: 'cs_test_123' }),
+    })
+    render(el)
+    expect(screen.queryByRole('button', { name: en.reviews.submitCta })).toBeNull()
+  })
+
+  it('shows "already reviewed" instead of the form when hasReviewForBooking is true', async () => {
+    getBookingByCheckoutSessionMock.mockResolvedValue({
+      bookingId: 'b1', status: 'completed', qty: 2, totalAmount: 960, currency: 'HKD',
+      experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: 'u1', experienceId: 'e1', guideId: null,
+    })
+    getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
+    hasReviewForBookingMock.mockResolvedValueOnce(true)
+    const el = await BookingConfirmationPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ session_id: 'cs_test_123' }),
+    })
+    render(el)
+    expect(screen.getByText(en.reviews.alreadyReviewed)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: en.reviews.submitCta })).toBeNull()
+  })
+
   it('renders the cancelled state without a booking summary and without the confirmed copy', async () => {
     getBookingByCheckoutSessionMock.mockResolvedValue({
       bookingId: 'b1', status: 'cancelled', qty: 2, totalAmount: 960, currency: 'HKD',
       experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: null, experienceId: 'e1', guideId: null,
     })
     const el = await BookingConfirmationPage({
       params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
@@ -121,6 +180,7 @@ describe('BookingConfirmationPage', () => {
     getBookingByCheckoutSessionMock.mockResolvedValue({
       bookingId: 'b1', status: 'refunded', qty: 2, totalAmount: 960, currency: 'HKD',
       experienceTitle: 'Sunset junk boat tour', experienceSlug: 'sunset-tour',
+      travelerUserId: null, experienceId: 'e1', guideId: null,
     })
     const el = await BookingConfirmationPage({
       params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
