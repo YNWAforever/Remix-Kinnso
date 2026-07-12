@@ -4,8 +4,8 @@ const { publicClientMock } = vi.hoisted(() => ({ publicClientMock: vi.fn() }))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: publicClientMock }))
 
 import {
-  getPlatformStats,
-  getPublishedTestimonials, getUpcomingSessions, STAT_THRESHOLDS, MIN_VISIBLE_STATS, shuffle
+  getPlatformStats, getPublishedTestimonials, getUpcomingSessions,
+  STAT_THRESHOLDS, MIN_VISIBLE_STATS, shuffle,
 } from '@/lib/home/queries'
 
 describe('getPlatformStats', () => {

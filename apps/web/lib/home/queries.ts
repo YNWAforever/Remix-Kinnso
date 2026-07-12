@@ -65,9 +65,18 @@ export function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
 /**
  * Published testimonials for a locale: rows whose locale matches OR is null (= all
  * locales), filtered by author_role if given, then shuffled and capped at 3 (D-R6C-5) so
- * every visitor doesn't see the identical three quotes forever. RLS already hides drafts
- * from the anon client; the eq() filter documents intent. sort_order stays on the table
- * as an ops-organizational field but no longer drives display order.
+ * the fixed ops-picked trio doesn't stay identical forever. RLS already hides drafts from
+ * the anon client; the eq() filter documents intent. sort_order stays on the table as an
+ * ops-organizational field but no longer drives display order.
+ *
+ * Rotation granularity: this function itself reshuffles on every invocation, but its three
+ * callers (`/[locale]`, `/[locale]/for-creators`, `/[locale]/for-merchants`) are ISR pages
+ * with `export const revalidate = 300` and `generateStaticParams()` — no cookies/headers/
+ * searchParams make them dynamic. Next.js therefore re-runs this function once per ~5-minute
+ * regeneration per locale, not once per HTTP request: every visitor hitting the cached HTML
+ * within a given window sees the same three quotes in the same order. The real guarantee is
+ * "rotates every revalidation window, shared across concurrent visitors in that window" —
+ * not literal per-request randomness.
  */
 export async function getPublishedTestimonials(
   locale: Locale,
