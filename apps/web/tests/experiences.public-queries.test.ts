@@ -6,7 +6,7 @@ vi.mock('@/lib/supabase/public', () => ({
   createSupabasePublicClient: () => ({ from: fromMock }),
 }))
 
-import { getExperienceBySlug, getExperiencesForCity, getExperiencesForCities, getExperiencesForSitemap, listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
+import { getExperienceBySlug, getExperienceOverridesForArticle, getExperiencesForCity, getExperiencesForCities, getExperiencesForSitemap, listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
 
 beforeEach(() => { fromMock.mockReset() })
 
@@ -129,5 +129,40 @@ describe('getExperiencesForCities', () => {
   it('never throws — degrades to [] on query failure', async () => {
     fromMock.mockImplementation(() => { throw new Error('boom') })
     expect(await getExperiencesForCities(['Tokyo'])).toEqual([])
+  })
+})
+
+describe('getExperienceOverridesForArticle', () => {
+  it('returns [] without querying experiences when no overrides exist', async () => {
+    const order = vi.fn(() => Promise.resolve({ data: [], error: null }))
+    const eq = vi.fn(() => ({ order }))
+    const select = vi.fn(() => ({ eq }))
+    fromMock.mockReturnValue({ select })
+
+    expect(await getExperienceOverridesForArticle('article-1')).toEqual([])
+    expect(fromMock).toHaveBeenCalledWith('article_experience_overrides')
+  })
+
+  it('preserves override sort_order and drops any pinned experience no longer found', async () => {
+    const overridesResult = { data: [{ experience_id: 'e2' }, { experience_id: 'e1' }], error: null }
+    const expRow = {
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: null, description: null,
+      city: 'Hong Kong', price_amount: 480, currency: 'HKD', duration_minutes: 120,
+      cover_url: null, merchant_profile_id: 'm1', published_at: '2026-07-01T00:00:00Z',
+    }
+    const order = vi.fn(() => Promise.resolve(overridesResult))
+    const eqOverrides = vi.fn(() => ({ order }))
+    const selectOverrides = vi.fn(() => ({ eq: eqOverrides }))
+    const eqExp = vi.fn(() => Promise.resolve({ data: [expRow], error: null }))
+    const inExp = vi.fn(() => ({ eq: eqExp }))
+    const selectExp = vi.fn(() => ({ in: inExp }))
+    fromMock.mockImplementation((table: string) => (table === 'article_experience_overrides' ? { select: selectOverrides } : { select: selectExp }))
+
+    const result = await getExperienceOverridesForArticle('article-1')
+    expect(result).toEqual([{
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: null, description: null,
+      city: 'Hong Kong', priceAmount: 480, currency: 'HKD', durationMinutes: 120,
+      coverUrl: null, publishedAt: '2026-07-01T00:00:00Z', merchant: { slug: '', companyName: '' },
+    }])
   })
 })

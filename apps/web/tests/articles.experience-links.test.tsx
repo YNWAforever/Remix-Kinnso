@@ -4,8 +4,14 @@ import { render, screen, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
 
-const { getExperiencesForCityMock } = vi.hoisted(() => ({ getExperiencesForCityMock: vi.fn() }))
-vi.mock('@/lib/experiences/public-queries', () => ({ getExperiencesForCity: getExperiencesForCityMock }))
+const { getExperiencesForCityMock, getExperienceOverridesForArticleMock } = vi.hoisted(() => ({
+  getExperiencesForCityMock: vi.fn(),
+  getExperienceOverridesForArticleMock: vi.fn(),
+}))
+vi.mock('@/lib/experiences/public-queries', () => ({
+  getExperiencesForCity: getExperiencesForCityMock,
+  getExperienceOverridesForArticle: getExperienceOverridesForArticleMock,
+}))
 
 import { ArticleExperienceLinks } from '@/components/kinnso/articles/ArticleExperienceLinks'
 import en from '@/lib/i18n/messages/en'
@@ -18,18 +24,39 @@ const experience = (slug: string) => ({
 
 describe('ArticleExperienceLinks', () => {
   it('renders nothing when no experiences match any region', async () => {
+    getExperienceOverridesForArticleMock.mockResolvedValueOnce([])
     getExperiencesForCityMock.mockResolvedValue([])
-    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Osaka'], t: en.article })
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Osaka'], articleId: 'a1', t: en.article })
     const { container } = render(jsx)
     expect(container.innerHTML).toBe('')
   })
 
   it('renders up to 3 experience cards from the first region with matches, linking with ?src=article', async () => {
+    getExperienceOverridesForArticleMock.mockResolvedValueOnce([])
     getExperiencesForCityMock.mockResolvedValueOnce([experience('a'), experience('b')])
-    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], t: en.article })
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article })
     render(jsx)
     expect(screen.getByText(en.article.experiencesNearbyHeading)).toBeTruthy()
     const link = screen.getByRole('link', { name: /Experience a/ })
     expect(link.getAttribute('href')).toBe('/en/experiences/a?src=article')
+  })
+
+  it('shows pinned overrides first, then fills remaining slots with heuristic matches, deduped', async () => {
+    getExperienceOverridesForArticleMock.mockResolvedValueOnce([experience('pinned')])
+    getExperiencesForCityMock.mockResolvedValueOnce([experience('pinned'), experience('heuristic')])
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article })
+    render(jsx)
+    const links = screen.getAllByRole('link')
+    expect(links).toHaveLength(2)
+    expect(links[0].getAttribute('href')).toBe('/en/experiences/pinned?src=article')
+    expect(links[1].getAttribute('href')).toBe('/en/experiences/heuristic?src=article')
+  })
+
+  it('renders heuristic-only when there are no overrides', async () => {
+    getExperienceOverridesForArticleMock.mockResolvedValueOnce([])
+    getExperiencesForCityMock.mockResolvedValueOnce([experience('a')])
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article })
+    render(jsx)
+    expect(screen.getAllByRole('link')).toHaveLength(1)
   })
 })

@@ -4,11 +4,8 @@ const { publicClientMock } = vi.hoisted(() => ({ publicClientMock: vi.fn() }))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: publicClientMock }))
 
 import {
-  getPlatformStats,
-  getPublishedTestimonials,
-  getUpcomingSessions,
-  STAT_THRESHOLDS,
-  MIN_VISIBLE_STATS,
+  getPlatformStats, getPublishedTestimonials, getUpcomingSessions,
+  STAT_THRESHOLDS, MIN_VISIBLE_STATS, shuffle,
 } from '@/lib/home/queries'
 
 describe('getPlatformStats', () => {
@@ -45,14 +42,11 @@ describe('getPlatformStats', () => {
 })
 
 describe('getPublishedTestimonials', () => {
-  it('reads published rows for the locale OR all-locale rows, ordered, capped at 3', async () => {
-    const limit = vi.fn(async () => ({
+  it('reads published rows for the locale OR all-locale rows (no DB-side ordering/limit)', async () => {
+    const or = vi.fn(() => Promise.resolve({
       data: [{ id: 't1', quote: 'q', author_name: 'Mei', author_role: 'creator' }],
       error: null,
     }))
-    const order2 = vi.fn(() => ({ limit }))
-    const order1 = vi.fn(() => ({ order: order2 }))
-    const or = vi.fn(() => ({ order: order1 }))
     const eq = vi.fn(() => ({ or }))
     const select = vi.fn(() => ({ eq }))
     publicClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) })
@@ -60,26 +54,75 @@ describe('getPublishedTestimonials', () => {
     const rows = await getPublishedTestimonials('zh-hk')
     expect(eq).toHaveBeenCalledWith('status', 'published')
     expect(or).toHaveBeenCalledWith('locale.is.null,locale.eq.zh-hk')
-    expect(order1).toHaveBeenCalledWith('sort_order', { ascending: true })
-    expect(limit).toHaveBeenCalledWith(3)
     expect(rows).toEqual([{ id: 't1', quote: 'q', authorName: 'Mei', authorRole: 'creator' }])
   })
 
   it('filters by author_role when given', async () => {
-    const limit = vi.fn(async () => ({
+    const eqRole = vi.fn(() => Promise.resolve({
       data: [{ id: 't2', quote: 'q2', author_name: 'Sam', author_role: 'creator' }],
       error: null,
     }))
-    const eqRole = vi.fn(() => ({ limit }))
-    const order2 = vi.fn(() => ({ limit, eq: eqRole }))
-    const order1 = vi.fn(() => ({ order: order2 }))
-    const or = vi.fn(() => ({ order: order1 }))
+    const or = vi.fn(() => ({ eq: eqRole }))
     const eq = vi.fn(() => ({ or }))
     const select = vi.fn(() => ({ eq }))
     publicClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) })
 
     await getPublishedTestimonials('en', 'creator')
     expect(eqRole).toHaveBeenCalledWith('author_role', 'creator')
+  })
+
+  it('shuffles the pool and caps the result at 3, never inventing or duplicating rows', async () => {
+    const or = vi.fn(() => Promise.resolve({
+      data: [
+        { id: 't1', quote: 'q1', author_name: 'A', author_role: 'creator' },
+        { id: 't2', quote: 'q2', author_name: 'B', author_role: 'creator' },
+        { id: 't3', quote: 'q3', author_name: 'C', author_role: 'creator' },
+        { id: 't4', quote: 'q4', author_name: 'D', author_role: 'creator' },
+        { id: 't5', quote: 'q5', author_name: 'E', author_role: 'creator' },
+      ],
+      error: null,
+    }))
+    const eq = vi.fn(() => ({ or }))
+    const select = vi.fn(() => ({ eq }))
+    publicClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) })
+
+    const rows = await getPublishedTestimonials('en')
+    expect(rows).toHaveLength(3)
+    const allIds = ['t1', 't2', 't3', 't4', 't5']
+    for (const r of rows) expect(allIds).toContain(r.id)
+    expect(new Set(rows.map((r) => r.id)).size).toBe(3)
+  })
+
+  it('returns fewer than 3 when the filtered pool itself has fewer than 3 rows', async () => {
+    const or = vi.fn(() => Promise.resolve({
+      data: [{ id: 't1', quote: 'q1', author_name: 'A', author_role: 'creator' }],
+      error: null,
+    }))
+    const eq = vi.fn(() => ({ or }))
+    const select = vi.fn(() => ({ eq }))
+    publicClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) })
+
+    expect(await getPublishedTestimonials('en')).toHaveLength(1)
+  })
+})
+
+describe('shuffle', () => {
+  it('is a pure permutation of the input (same elements, same length)', () => {
+    const input = [1, 2, 3, 4, 5]
+    const result = shuffle(input, () => 0.5)
+    expect(result).toHaveLength(5)
+    expect([...result].sort()).toEqual([1, 2, 3, 4, 5])
+  })
+
+  it('does not mutate the input array', () => {
+    const input = [1, 2, 3]
+    shuffle(input, () => 0.5)
+    expect(input).toEqual([1, 2, 3])
+  })
+
+  it('produces the expected order for a fixed rand source (rand always 0 -> always swap with index 0)', () => {
+    const result = shuffle([1, 2, 3, 4], () => 0)
+    expect(result).toEqual([2, 3, 4, 1])
   })
 })
 

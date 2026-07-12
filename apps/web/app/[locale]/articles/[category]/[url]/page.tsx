@@ -94,8 +94,8 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
         <article>
           {a.thumbnails[0] && <img src={a.thumbnails[0]} alt={a.translation.title ?? ''} className="rounded-card w-full mb-6" />}
           <ArticleBlockRenderer blocks={a.translation.content} />
-          <ArticleGuideLinks locale={loc} regions={[...(a.regions ?? []), ...(a.tag_slugs ?? [])]} t={dict.article} />
-          <ArticleExperienceLinks locale={loc} regions={[...(a.regions ?? []), ...(a.tag_slugs ?? [])]} t={dict.article} />
+          <ArticleGuideLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} />
+          <ArticleExperienceLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} />
 
           {a.faqs.length > 0 && (
             <section className="mt-10">

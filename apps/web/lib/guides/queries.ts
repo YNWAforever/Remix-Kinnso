@@ -74,6 +74,34 @@ export async function getGuidesForRegions(regions: string[], limit = 3): Promise
   }
 }
 
+/**
+ * Editorial override (D-R6C-1, force-add only): guides ops has explicitly pinned to this
+ * article, shown ahead of and merged with the heuristic getGuidesForRegions matches. A
+ * pinned guide that's no longer published (or was deleted) is silently dropped rather
+ * than shown broken. This is a structured id lookup, not a regex/ILIKE heuristic match,
+ * so no try/catch is needed here — same convention as getGuideBySlug: supabase-js resolves
+ * {data, error} rather than throwing, and try/catch in this file is reserved for the
+ * string-manipulating matchers (getGuidesForRegions) that interpolate into `.or()`/`.ilike()`.
+ */
+export async function getGuideOverridesForArticle(articleId: string): Promise<Guide[]> {
+  const supabase = createSupabasePublicClient()
+  const { data: overrides } = await supabase
+    .from('article_guide_overrides')
+    .select('guide_id')
+    .eq('article_id', articleId)
+    .order('sort_order', { ascending: true })
+  const guideIds = (overrides ?? []).map((o) => o.guide_id as string)
+  if (guideIds.length === 0) return []
+
+  const { data: rows } = await supabase
+    .from('guides')
+    .select('id, slug, title, cover_url, city, saves_count, creator_handle')
+    .in('id', guideIds)
+    .eq('status', 'published')
+  const byId = new Map((rows ?? []).map((r) => [r.id as string, mapRowToGuide(r)]))
+  return guideIds.map((id) => byId.get(id)).filter((g): g is Guide => g !== undefined)
+}
+
 export async function getGuideBySlug(slug: string): Promise<GuideDetail | null> {
   const supabase = createSupabasePublicClient()
   const { data } = await supabase

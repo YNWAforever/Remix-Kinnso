@@ -52,10 +52,31 @@ export interface Testimonial {
   authorRole: 'creator' | 'traveller' | 'merchant'
 }
 
+/** Fisher-Yates shuffle. `rand` is injectable for deterministic tests; defaults to Math.random. */
+export function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
+  const out = [...arr]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
 /**
- * Published testimonials for a locale: rows whose locale matches OR is null
- * (= all locales), ordered by sort_order then created_at, max 3. RLS already
- * hides drafts from the anon client; the eq() filter documents intent.
+ * Published testimonials for a locale: rows whose locale matches OR is null (= all
+ * locales), filtered by author_role if given, then shuffled and capped at 3 (D-R6C-5) so
+ * the fixed ops-picked trio doesn't stay identical forever. RLS already hides drafts from
+ * the anon client; the eq() filter documents intent. sort_order stays on the table as an
+ * ops-organizational field but no longer drives display order.
+ *
+ * Rotation granularity: this function itself reshuffles on every invocation, but its three
+ * callers (`/[locale]`, `/[locale]/for-creators`, `/[locale]/for-merchants`) are ISR pages
+ * with `export const revalidate = 300` and `generateStaticParams()` — no cookies/headers/
+ * searchParams make them dynamic. Next.js therefore re-runs this function once per ~5-minute
+ * regeneration per locale, not once per HTTP request: every visitor hitting the cached HTML
+ * within a given window sees the same three quotes in the same order. The real guarantee is
+ * "rotates every revalidation window, shared across concurrent visitors in that window" —
+ * not literal per-request randomness.
  */
 export async function getPublishedTestimonials(
   locale: Locale,
@@ -67,16 +88,15 @@ export async function getPublishedTestimonials(
     .select('id, quote, author_name, author_role')
     .eq('status', 'published')
     .or(`locale.is.null,locale.eq.${locale}`)
-    .order('sort_order', { ascending: true })
-    .order('created_at', { ascending: true })
   if (role) query = query.eq('author_role', role)
-  const { data } = await query.limit(3)
-  return (data ?? []).map((r) => ({
+  const { data } = await query
+  const rows = (data ?? []).map((r) => ({
     id: r.id as string,
     quote: r.quote as string,
     authorName: r.author_name as string,
     authorRole: r.author_role as Testimonial['authorRole'],
   }))
+  return shuffle(rows).slice(0, 3)
 }
 
 export interface UpcomingSession {
