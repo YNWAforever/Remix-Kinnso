@@ -79,7 +79,10 @@ export async function getGuidesForRegions(regions: string[], limit = 3): Promise
  * Editorial override (D-R6C-1, force-add only): guides ops has explicitly pinned to this
  * article, shown ahead of and merged with the heuristic getGuidesForRegions matches. A
  * pinned guide that's no longer published (or was deleted) is silently dropped rather
- * than shown broken — same reads-never-crash stance as getGuidesForRegions.
+ * than shown broken. This is a structured id lookup, not a regex/ILIKE heuristic match,
+ * so no try/catch is needed here — same convention as getGuideBySlug: supabase-js resolves
+ * {data, error} rather than throwing, and try/catch in this file is reserved for the
+ * string-manipulating matchers (getGuidesForRegions) that interpolate into `.or()`/`.ilike()`.
  */
 export async function getGuideOverridesForArticle(articleId: string): Promise<Guide[]> {
   const supabase = createSupabasePublicClient()

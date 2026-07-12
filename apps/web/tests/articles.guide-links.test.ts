@@ -8,12 +8,17 @@ Object.assign(chain, {
   or: orSpy.mockImplementation(() => chain),
   order: vi.fn(() => chain), limit: limitSpy,
 })
-const fromMock = vi.fn(() => chain)
-vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: vi.fn(() => ({ from: fromMock })) }))
+const fromMock = vi.fn<(table: string) => Record<string, unknown>>(() => chain)
+vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: () => ({ from: fromMock }) }))
 
-import { getGuidesForRegions } from '@/lib/guides/queries'
+import { getGuideOverridesForArticle, getGuidesForRegions } from '@/lib/guides/queries'
 
-beforeEach(() => { fromMock.mockClear(); orSpy.mockClear(); limitSpy.mockClear().mockResolvedValue({ data: [] }) })
+beforeEach(() => {
+  fromMock.mockClear()
+  fromMock.mockImplementation(() => chain) // restore base behavior in case a test below overrides it
+  orSpy.mockClear()
+  limitSpy.mockClear().mockResolvedValue({ data: [] })
+})
 
 describe('getGuidesForRegions', () => {
   it('returns [] without querying when no usable region strings', async () => {
@@ -33,14 +38,11 @@ describe('getGuidesForRegions', () => {
 
 describe('getGuideOverridesForArticle', () => {
   it('returns [] without querying guides when no overrides exist', async () => {
-    const overridesLimit = vi.fn(() => Promise.resolve({ data: [], error: null }))
-    const order = vi.fn(() => overridesLimit())
+    const order = vi.fn(() => Promise.resolve({ data: [], error: null }))
     const eq = vi.fn(() => ({ order }))
     const select = vi.fn(() => ({ eq }))
-    const fromMock = vi.fn(() => ({ select }))
-    vi.mocked(await import('@/lib/supabase/public')).createSupabasePublicClient.mockReturnValue({ from: fromMock } as any)
+    fromMock.mockImplementation(() => ({ select }))
 
-    const { getGuideOverridesForArticle } = await import('@/lib/guides/queries')
     expect(await getGuideOverridesForArticle('article-1')).toEqual([])
     expect(fromMock).toHaveBeenCalledWith('article_guide_overrides')
     expect(fromMock).not.toHaveBeenCalledWith('guides')
@@ -60,10 +62,8 @@ describe('getGuideOverridesForArticle', () => {
     const eqGuides = vi.fn(() => Promise.resolve(guidesResult))
     const inGuides = vi.fn(() => ({ eq: eqGuides }))
     const selectGuides = vi.fn(() => ({ in: inGuides }))
-    const fromMock = vi.fn((table: string) => (table === 'article_guide_overrides' ? { select: selectOverrides } : { select: selectGuides }))
-    vi.mocked(await import('@/lib/supabase/public')).createSupabasePublicClient.mockReturnValue({ from: fromMock } as any)
+    fromMock.mockImplementation((table: string) => (table === 'article_guide_overrides' ? { select: selectOverrides } : { select: selectGuides }))
 
-    const { getGuideOverridesForArticle } = await import('@/lib/guides/queries')
     const result = await getGuideOverridesForArticle('article-1')
     // g2 was pinned first but isn't published/found -> dropped; g1 (pinned second) survives
     expect(result).toEqual([{ slug: 'kyoto-tea', title: 'Kyoto Tea Houses', cover: 'https://x/kyoto.jpg', city: 'Kyoto', saves: 3, creatorHandle: 'teafan' }])
