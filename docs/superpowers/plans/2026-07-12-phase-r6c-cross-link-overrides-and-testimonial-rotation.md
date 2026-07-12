@@ -343,6 +343,7 @@ export async function getExperienceOverridesForArticle(articleId: string): Promi
     .from('experiences')
     .select(EXP_COLUMNS)
     .in('id', experienceIds)
+    .eq('status', 'published')
   const byId = new Map((rows ?? []).map((r) => [(r as unknown as ExpRow).id, toDomain(r as unknown as ExpRow, { slug: '', companyName: '' })]))
   return experienceIds.map((id) => byId.get(id)).filter((e): e is PublicExperience => e !== undefined)
 }
