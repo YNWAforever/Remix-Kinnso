@@ -343,6 +343,45 @@ export type Database = {
         }
         Relationships: []
       }
+      article_experience_overrides: {
+        Row: {
+          article_id: string
+          created_at: string
+          experience_id: string
+          id: string
+          sort_order: number
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          experience_id: string
+          id?: string
+          sort_order?: number
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          experience_id?: string
+          id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_experience_overrides_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_experience_overrides_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       article_faqs: {
         Row: {
           answer: string
@@ -377,6 +416,45 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      article_guide_overrides: {
+        Row: {
+          article_id: string
+          created_at: string
+          guide_id: string
+          id: string
+          sort_order: number
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          guide_id: string
+          id?: string
+          sort_order?: number
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          guide_id?: string
+          id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_guide_overrides_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "article_guide_overrides_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
             referencedColumns: ["id"]
           },
         ]
