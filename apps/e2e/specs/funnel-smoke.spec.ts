@@ -3,7 +3,8 @@ import { test, expect } from '@playwright/test'
 const bookingLive = process.env.BOOKING_LIVE === 'true'
 
 test('home to a published guide to its linked experience', async ({ page }) => {
-  await page.goto('/en')
+  const homeResponse = await page.goto('/en')
+  expect(homeResponse?.status(), 'home should return HTTP 200').toBe(200)
   await expect(page.locator('body')).toContainText(/featured/i)
 
   const guideLinks = await page.locator('a[href^="/en/g/"]').evaluateAll((links) =>
@@ -18,7 +19,8 @@ test('home to a published guide to its linked experience', async ({ page }) => {
 
   let experienceHref: string | null = null
   for (const guideHref of guideLinks) {
-    await page.goto(guideHref)
+    const guideResponse = await page.goto(guideHref)
+    expect(guideResponse?.status(), `${guideHref} should return HTTP 200`).toBe(200)
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.locator('a[href^="/en/c/"]').first()).toBeVisible()
     experienceHref = await page
@@ -29,7 +31,8 @@ test('home to a published guide to its linked experience', async ({ page }) => {
   }
 
   expect(experienceHref, 'a featured guide should link to a nearby experience attributed to the guide').toBeTruthy()
-  await page.goto(experienceHref as string)
+  const experienceResponse = await page.goto(experienceHref as string)
+  expect(experienceResponse?.status(), `${experienceHref} should return HTTP 200`).toBe(200)
   await expect(page.locator('h1')).toBeVisible()
   await expect(page.locator('body')).toContainText(/(?:HKD|USD|SGD|JPY|KRW|THB|TWD|CNY)\s*[\d,]+/)
 

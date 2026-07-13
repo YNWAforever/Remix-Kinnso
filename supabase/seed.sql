@@ -76,11 +76,12 @@ insert into public.seo_redirects (from_path, to_path) values
 
 -- Phase R7.1 deterministic local funnel fixtures (never used by hosted environments).
 insert into auth.users (
-  id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+  instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at
 )
 values
-  ('00000000-0000-0000-0000-000000000701', 'r7-smoke-creator@example.test', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000702', 'r7-smoke-merchant@example.test', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now())
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000701', 'authenticated', 'authenticated', 'r7-smoke-creator@example.test', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, false, now(), now()),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000702', 'authenticated', 'authenticated', 'r7-smoke-merchant@example.test', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, false, now(), now())
 on conflict (id) do nothing;
 
 update public.creators
