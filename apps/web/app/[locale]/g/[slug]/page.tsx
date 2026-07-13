@@ -8,6 +8,8 @@ import { getGuideBySlug } from '@/lib/guides/queries'
 import { isGuideSaved } from '@/lib/saves/guide-queries'
 import { getGuideRatingAggregate, listPublishedReviewsForGuide } from '@/lib/reviews/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabasePublicClient } from '@/lib/supabase/public'
+import { optionalQuery, optionalValue } from '@/lib/resilience/optional'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { GuideExperienceLinks } from '@/components/kinnso/GuideExperienceLinks'
 import { GuideSaveButton } from '@/components/kinnso/GuideSaveButton'
@@ -16,10 +18,7 @@ import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 import { cssUrl } from '@/lib/utils'
 
-export function generateStaticParams() {
-  // Guides are DB-only; resolve on demand (dynamicParams defaults to true).
-  return []
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
   params,
@@ -52,22 +51,31 @@ export default async function GuidePage({
   const messages = await getDictionary(locale as Locale)
   const authorName = guide.creatorName ?? guide.creatorHandle
 
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const [isSaved, rating, reviews] = await Promise.all([
-    user ? isGuideSaved(supabase, guide.id, user.id) : Promise.resolve(false),
-    getGuideRatingAggregate(supabase, guide.id),
-    listPublishedReviewsForGuide(supabase, guide.id),
+  const viewer = await optionalQuery('guide-viewer', async () => {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const isSaved = user
+      ? await optionalQuery('guide-save-state', () => isGuideSaved(supabase, guide.id, user.id), false)
+      : false
+    return { user, isSaved }
+  }, { user: null, isSaved: false })
+
+  const [rating, reviews] = await Promise.all([
+    optionalQuery('guide-rating', () => getGuideRatingAggregate(createSupabasePublicClient(), guide.id), null),
+    optionalQuery('guide-reviews', () => listPublishedReviewsForGuide(createSupabasePublicClient(), guide.id), []),
   ])
 
   const canonical = `${SITE_URL}/${locale}/g/${slug}`
-  const ld = [
+  const ld = optionalValue('guide-jsonld', () => [
     articleJsonLd({
       headline: guide.title,
       description: guide.summary ?? `${guide.city} guide by ${authorName}`,
-      url: canonical, images: guide.cover ? [guide.cover] : [],
-      publishedAt: guide.publishedAt, modifiedAt: null,
-      authorName, locale: htmlLang(locale as Locale),
+      url: canonical,
+      images: guide.cover ? [guide.cover] : [],
+      publishedAt: guide.publishedAt,
+      modifiedAt: null,
+      authorName,
+      locale: htmlLang(locale as Locale),
       rating: rating ?? undefined,
     }),
     breadcrumbJsonLd([
@@ -75,8 +83,7 @@ export default async function GuidePage({
       { name: messages.seo.explore.title, url: `${SITE_URL}/${locale}/explore` },
       { name: guide.title, url: canonical },
     ]),
-  ]
-
+  ], [])
   return (
     <article className="k2-container py-8 md:py-12">
       <JsonLd data={ld} />
@@ -99,7 +106,7 @@ export default async function GuidePage({
 
           {/* Save toggle, top-right */}
           <div className="absolute right-6 top-6 sm:right-8">
-            <GuideSaveButton locale={locale as Locale} guideId={guide.id} initialSaved={isSaved} signedIn={!!user} t={messages.guideSave} />
+            <GuideSaveButton locale={locale as Locale} guideId={guide.id} initialSaved={viewer.isSaved} signedIn={!!viewer.user} t={messages.guideSave} />
           </div>
 
           {/* TicketCard overlay – title, author, city, saves */}

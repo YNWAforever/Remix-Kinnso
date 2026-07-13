@@ -5,6 +5,7 @@ const messages: Messages = {
   categories: { destinations: '旅行先', dining: 'グルメ', shopping: 'ショッピング' },
   breadcrumb: { home: 'ホーム', articles: '記事' },
   article: { youMayLike: 'おすすめ記事', faqTitle: 'よくある質問', tableOfContents: '目次', by: '著者', fallbackNotice: 'この記事はまだお使いの言語ではご利用いただけないため、オリジナル版を表示しています。', guidesNearbyEyebrow: 'ここへ旅行を計画中？', guidesNearbyHeading: 'この目的地のクリエイターガイド', experiencesNearbyEyebrow: '予約の準備はできましたか？', experiencesNearbyHeading: 'このエリアで予約できる体験' },
+  detailError: { title: 'このページを読み込めませんでした', body: '一時的な問題が発生しました。もう一度試すか、探索を続けてください。', retry: 'もう一度試す', explore: '探索に戻る' },
   seo: {
     brandTitle: 'KINNSO — トラベルクリエイター、リアルなミッション',
     brandDescription:

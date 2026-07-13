@@ -8,14 +8,14 @@ import { listPublicAvailability } from '@/lib/experiences/public-availability-qu
 import { isExperienceSaved } from '@/lib/saves/experience-queries'
 import { getExperienceRatingAggregate, listPublishedReviewsForExperience } from '@/lib/reviews/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabasePublicClient } from '@/lib/supabase/public'
+import { optionalQuery, optionalValue } from '@/lib/resilience/optional'
 import { buildExperienceMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { breadcrumbJsonLd, experienceOfferJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
 
-export function generateStaticParams() {
-  return []
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params
@@ -40,20 +40,27 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
   const experience = await getExperienceBySlug(slug)
   if (!experience) notFound()
 
-  const supabase = await createSupabaseServerClient()
-  const [availability, { data: { user } }] = await Promise.all([
-    listPublicAvailability(experience.id),
-    supabase.auth.getUser(),
-  ])
-  const [isSaved, rating, reviews] = await Promise.all([
-    user ? isExperienceSaved(supabase, experience.id, user.id) : Promise.resolve(false),
-    getExperienceRatingAggregate(supabase, experience.id),
-    listPublishedReviewsForExperience(supabase, experience.id),
+  const availability = await optionalQuery(
+    'experience-availability',
+    () => listPublicAvailability(experience.id),
+    [],
+  )
+  const viewer = await optionalQuery('experience-viewer', async () => {
+    const supabase = await createSupabaseServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const isSaved = user
+      ? await optionalQuery('experience-save-state', () => isExperienceSaved(supabase, experience.id, user.id), false)
+      : false
+    return { user, isSaved }
+  }, { user: null, isSaved: false })
+  const [rating, reviews] = await Promise.all([
+    optionalQuery('experience-rating', () => getExperienceRatingAggregate(createSupabasePublicClient(), experience.id), null),
+    optionalQuery('experience-reviews', () => listPublishedReviewsForExperience(createSupabasePublicClient(), experience.id), []),
   ])
 
   const canonical = `${SITE_URL}/${locale}/experiences/${slug}`
   const hasOpenAvailability = availability.some((a) => a.remaining > 0)
-  const ld = [
+  const ld = optionalValue('experience-jsonld', () => [
     breadcrumbJsonLd([
       { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
       { name: messages.seo.merchants.title, url: `${SITE_URL}/${locale}/merchants` },
@@ -70,7 +77,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
           rating: rating ?? undefined,
         })]
       : []),
-  ]
+  ], [])
   return (
     <>
       <JsonLd data={ld} />
@@ -82,9 +89,9 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
         experienceSaveT={messages.experienceSave}
         experience={experience}
         availability={availability}
-        viewerEmail={user?.email ?? null}
-        viewerId={user?.id ?? null}
-        isSaved={isSaved}
+        viewerEmail={viewer.user?.email ?? null}
+        viewerId={viewer.user?.id ?? null}
+        isSaved={viewer.isSaved}
         rating={rating}
         reviews={reviews}
         sourceSurface={sourceSurface}

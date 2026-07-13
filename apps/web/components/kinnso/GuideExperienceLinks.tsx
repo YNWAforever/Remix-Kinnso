@@ -1,5 +1,6 @@
 import { ExperienceLinkCard } from '@/components/kinnso/ExperienceLinkCard'
 import { getExperiencesForCity } from '@/lib/experiences/public-queries'
+import { optionalQuery } from '@/lib/resilience/optional'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -18,7 +19,7 @@ import type { Messages } from '@/lib/i18n/messages/en'
 export async function GuideExperienceLinks({ locale, city, guideSlug, t }: {
   locale: Locale; city: string; guideSlug: string; t: Messages['article']
 }) {
-  const experiences = await getExperiencesForCity(city)
+  const experiences = await optionalQuery('guide-experience-links', () => getExperiencesForCity(city), [])
   if (experiences.length === 0) return null
   const hrefQuery = `src=guide&guideSlug=${encodeURIComponent(guideSlug)}`
   return (
