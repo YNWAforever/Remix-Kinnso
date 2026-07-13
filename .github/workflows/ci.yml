@@ -29,6 +29,33 @@ jobs:
           version: 2.106.0
       - run: pnpm supabase start
 
+      - name: Remove e2e-only fixtures from quality database
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          db_container="$(
+            docker ps \
+              --filter 'label=com.supabase.cli.project=kinnso-v3' \
+              --format '{{.ID}}\t{{.Names}}' \
+              | awk '$2 ~ /^supabase_db_/ { print $1; exit }'
+          )"
+
+          if [[ -z "$db_container" ]]; then
+            echo 'Unable to locate the local Supabase database container.' >&2
+            docker ps --format 'table {{.ID}}\t{{.Names}}\t{{.Labels}}'
+            exit 1
+          fi
+
+          docker exec -i "$db_container" \
+            psql -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          delete from auth.users
+          where id in (
+            '00000000-0000-0000-0000-000000000701'::uuid,
+            '00000000-0000-0000-0000-000000000702'::uuid
+          );
+          SQL
+
       - name: Export local Supabase env for tests
         # tee writes the same creds to web (anon-backed render tests),
         # packages/sync (service_role sync integration test), and
