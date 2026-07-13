@@ -57,10 +57,18 @@ function resolveUrl(value: string, parentUrl: string): string {
   }
 }
 
+function hasExplicitSitemapPath(baseUrl: string): boolean {
+  return /\/sitemap(?:\/\d+)?\.xml(?:[?#].*)?$/i.test(baseUrl.trim())
+}
+
 function sitemapUrlFor(baseUrl: string): string {
   const normalized = baseUrl.trim()
-  if (/\/sitemap(?:\/\d+)?\.xml(?:[?#].*)?$/i.test(normalized)) return normalized
+  if (hasExplicitSitemapPath(normalized)) return normalized
   return new URL('/sitemap.xml', normalized).href
+}
+
+function sitemapShardUrlFor(baseUrl: string, shardId: number): string {
+  return new URL(`/sitemap/${shardId}.xml`, baseUrl.trim()).href
 }
 
 function networkFailure(url: string): CrawlFailure {
@@ -91,8 +99,14 @@ export async function crawlSitemap({
   const pageUrls = new Set<string>()
   const rootSitemap = sitemapUrlFor(baseUrl)
 
-  const visitSitemap = async (url: string): Promise<void> => {
-    if (visitedSitemaps.has(url)) return
+  type SitemapVisitResult = 'ok' | 'missing' | 'failed'
+  type SitemapVisitOptions = { recordNotFound?: boolean }
+
+  const visitSitemap = async (
+    url: string,
+    { recordNotFound = true }: SitemapVisitOptions = {},
+  ): Promise<SitemapVisitResult> => {
+    if (visitedSitemaps.has(url)) return 'ok'
     visitedSitemaps.add(url)
 
     let response: Response
@@ -100,12 +114,17 @@ export async function crawlSitemap({
       response = await fetchImpl(url, { redirect: 'follow' })
     } catch {
       failures.push(networkFailure(url))
-      return
+      return 'failed'
+    }
+
+    if (response.status === 404) {
+      if (recordNotFound) failures.push({ url, status: response.status })
+      return 'missing'
     }
 
     if (response.status >= 400) {
       failures.push({ url, status: response.status })
-      return
+      return 'failed'
     }
 
     let xml: string
@@ -113,7 +132,7 @@ export async function crawlSitemap({
       xml = await response.text()
     } catch {
       failures.push(networkFailure(url))
-      return
+      return 'failed'
     }
 
     const locs = extractLocs(xml)
@@ -122,12 +141,12 @@ export async function crawlSitemap({
 
     if (isSitemapIndex) {
       await Promise.all(locs.map((loc) => visitSitemap(resolveUrl(loc, url))))
-      return
+      return 'ok'
     }
 
     if (isUrlset) {
       for (const loc of locs) pageUrls.add(resolveUrl(loc, url))
-      return
+      return 'ok'
     }
 
     // Be tolerant of valid XML with no namespace/root marker while preserving
@@ -139,10 +158,25 @@ export async function crawlSitemap({
       else pageUrls.add(resolved)
     }
     await Promise.all(nestedSitemaps.map((nested) => visitSitemap(nested)))
+    return 'ok'
   }
 
-  await visitSitemap(rootSitemap)
-
+  if (hasExplicitSitemapPath(baseUrl)) {
+    await visitSitemap(rootSitemap)
+  } else {
+    // Next's generateSitemaps output serves numbered shards without a
+    // /sitemap.xml index. Treat a missing default index as a discovery signal,
+    // but report a missing shard 0 so a genuinely absent sitemap is visible.
+    const rootOutcome = await visitSitemap(rootSitemap, { recordNotFound: false })
+    if (rootOutcome === 'missing') {
+      for (let shardId = 0; ; shardId += 1) {
+        const shardOutcome = await visitSitemap(sitemapShardUrlFor(baseUrl, shardId), {
+          recordNotFound: shardId === 0,
+        })
+        if (shardOutcome !== 'ok') break
+      }
+    }
+  }
   const pages = [...pageUrls]
   const requestedConcurrency = Number.isFinite(concurrency) ? Math.floor(concurrency) : 8
   const workerCount = Math.min(Math.max(1, requestedConcurrency), pages.length || 1)
