@@ -62,6 +62,47 @@ describe('crawlSitemap', () => {
     expect(seen).toContain(pageUrl)
   })
 
+  it('falls back to sequential generated shards when the default sitemap index is missing', async () => {
+    const shardZero = 'https://example.test/sitemap/0.xml'
+    const shardOne = 'https://example.test/sitemap/1.xml'
+    const shardTwo = 'https://example.test/sitemap/2.xml'
+    const pageUrls = [
+      'https://example.test/en/g/shard-zero-guide',
+      'https://example.test/en/experiences/shard-one-experience',
+    ]
+    const seen: string[] = []
+    const result = await crawlSitemap({
+      baseUrl: 'https://example.test',
+      fetchImpl: async (input) => {
+        const url = String(input)
+        seen.push(url)
+        if (url === sitemapUrl) return xmlResponse('<not-found />', 404)
+        if (url === shardZero) return xmlResponse(`<urlset><url><loc>${pageUrls[0]}</loc></url></urlset>`)
+        if (url === shardOne) return xmlResponse(`<urlset><url><loc>${pageUrls[1]}</loc></url></urlset>`)
+        if (url === shardTwo) return xmlResponse('', 404)
+        return pageResponse()
+      },
+    })
+
+    expect(result).toEqual({ checked: 2, failures: [] })
+    expect(seen.slice(0, 4)).toEqual([sitemapUrl, shardZero, shardOne, shardTwo])
+    expect(seen).toEqual(expect.arrayContaining(pageUrls))
+  })
+
+  it('reports a missing first generated shard instead of hiding a missing sitemap', async () => {
+    const shardZero = 'https://example.test/sitemap/0.xml'
+    const result = await crawlSitemap({
+      baseUrl: 'https://example.test',
+      fetchImpl: async (input) => {
+        const url = String(input)
+        if (url === sitemapUrl || url === shardZero) return xmlResponse('', 404)
+        return pageResponse()
+      },
+    })
+
+    expect(result.checked).toBe(0)
+    expect(result.failures).toContainEqual({ url: shardZero, status: 404 })
+  })
   it('de-duplicates sitemap shards and page URLs', async () => {
     const shardUrl = 'https://example.test/sitemap/0.xml'
     const pageUrl = 'https://example.test/en/g/repeated-guide'

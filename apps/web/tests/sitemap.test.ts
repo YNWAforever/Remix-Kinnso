@@ -52,7 +52,7 @@ describe('sitemap', () => {
 describe('robots', () => {
   it('points at the sitemap and allows crawling', () => {
     const r = robots()
-    expect(r.sitemap).toBe('https://www.kinnso.ai/sitemap.xml')
+    expect(r.sitemap).toBe('https://www.kinnso.ai/sitemap/0.xml')
     expect(Array.isArray(r.rules) ? r.rules[0].allow : r.rules.allow).toBeTruthy()
   })
   it('disallows the private trees but allows the public surface', () => {
