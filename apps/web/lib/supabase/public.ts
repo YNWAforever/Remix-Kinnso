@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
+import { getSupabasePublicEnv } from '@/lib/env'
 
 /**
  * Cookie-less anon Supabase client for PUBLIC reads (published guides etc.).
@@ -8,9 +9,8 @@ import type { Database } from '@kinnso/db'
  * dynamic rendering).
  */
 export function createSupabasePublicClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY
-  return createClient<Database>(url!, anonKey!, {
+  const { url, anonKey } = getSupabasePublicEnv()
+  return createClient<Database>(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 }
