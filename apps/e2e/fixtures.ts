@@ -16,7 +16,7 @@ export const FIXTURES = {
   notFound: [
     '/en/articles/shopping/draft-article',
     '/en/articles/destinations/expired-article',
-    '/ja/articles/dining/ramen-guide',
+    '/ja/articles/dining/r7-missing-article',
     '/en/g/r7-missing-guide',
     '/en/experiences/r7-missing-experience',
   ],
