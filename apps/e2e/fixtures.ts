@@ -17,6 +17,8 @@ export const FIXTURES = {
     '/en/articles/shopping/draft-article',
     '/en/articles/destinations/expired-article',
     '/ja/articles/dining/ramen-guide',
+    '/en/g/r7-missing-guide',
+    '/en/experiences/r7-missing-experience',
   ],
   presentLocales: ['en', 'zh-hk'] as const,
   booking: {

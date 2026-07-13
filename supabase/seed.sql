@@ -73,3 +73,54 @@ insert into public.article_tag_map (article_id, tag_id) values
 
 insert into public.seo_redirects (from_path, to_path) values
   ('/post/old-ramen', '/articles/dining/ramen-guide');
+
+-- Phase R7.1 deterministic local funnel fixtures (never used by hosted environments).
+insert into auth.users (
+  id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+)
+values
+  ('00000000-0000-0000-0000-000000000701', 'r7-smoke-creator@example.test', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000702', 'r7-smoke-merchant@example.test', '', now(), '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb, now(), now())
+on conflict (id) do nothing;
+
+update public.creators
+set display_name = 'R7 Smoke Creator',
+    handle = 'r7-smoke-creator',
+    bio = 'Local smoke-funnel creator fixture.',
+    public_profile = '{"niches":["travel"],"languages":["en"]}'::jsonb,
+    status = 'active',
+    updated_at = now()
+where id = '00000000-0000-0000-0000-000000000701';
+
+insert into public.merchant_profiles
+  (id, user_id, company_name, contact_name, contact_email, slug, tagline, city, status)
+values
+  ('00000000-0000-0000-0000-000000000705', '00000000-0000-0000-0000-000000000702', 'R7 Smoke Tokyo Host', 'R7 Smoke Merchant', 'r7-smoke-merchant@example.test', 'r7-smoke-tokyo-host', 'Local smoke-funnel host', 'Tokyo', 'active')
+on conflict (id) do update set
+  user_id = excluded.user_id, company_name = excluded.company_name, contact_name = excluded.contact_name,
+  contact_email = excluded.contact_email, slug = excluded.slug, tagline = excluded.tagline, city = excluded.city, status = excluded.status;
+
+insert into public.guides
+  (id, creator_id, creator_handle, creator_name, slug, title, summary, cover_url, city, status, saves_count, published_at)
+values
+  ('00000000-0000-0000-0000-000000000703', '00000000-0000-0000-0000-000000000701', 'r7-smoke-creator', 'R7 Smoke Creator', 'r7-smoke-tokyo-guide', 'R7 Smoke Tokyo Guide', 'A deterministic local guide for the R7 funnel smoke journey.', 'https://cdn.kinnso.ai/r7-smoke-tokyo-guide.jpg', 'Tokyo', 'published', 0, now())
+on conflict (id) do update set
+  creator_id = excluded.creator_id, creator_handle = excluded.creator_handle, creator_name = excluded.creator_name,
+  slug = excluded.slug, title = excluded.title, summary = excluded.summary, cover_url = excluded.cover_url, city = excluded.city,
+  status = excluded.status, published_at = excluded.published_at;
+
+insert into public.experiences
+  (id, merchant_profile_id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, status, published_at)
+values
+  ('00000000-0000-0000-0000-000000000704', '00000000-0000-0000-0000-000000000705', 'r7-smoke-tokyo-experience', 'R7 Smoke Tokyo Experience', 'A deterministic local experience for the R7 funnel smoke journey.', 'Explore Tokyo with the R7 smoke-funnel host.', 'Tokyo', 12000, 'JPY', 120, 'https://cdn.kinnso.ai/r7-smoke-tokyo-experience.jpg', 'published', now())
+on conflict (id) do update set
+  merchant_profile_id = excluded.merchant_profile_id, slug = excluded.slug, title = excluded.title, summary = excluded.summary, description = excluded.description,
+  city = excluded.city, price_amount = excluded.price_amount, currency = excluded.currency, duration_minutes = excluded.duration_minutes,
+  cover_url = excluded.cover_url, status = excluded.status, published_at = excluded.published_at;
+
+insert into public.experience_availability
+  (id, experience_id, date, capacity, booked_count, status)
+values
+  ('00000000-0000-0000-0000-000000000706', '00000000-0000-0000-0000-000000000704', current_date + 30, 8, 0, 'open')
+on conflict (id) do update set
+  experience_id = excluded.experience_id, date = excluded.date, capacity = excluded.capacity, booked_count = excluded.booked_count, status = excluded.status;
