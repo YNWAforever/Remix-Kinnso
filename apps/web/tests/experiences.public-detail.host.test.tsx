@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup, fireEvent } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 
-const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock, createCheckoutSessionActionMock } = vi.hoisted(() => ({
+const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock, createSupabaseServerClientMock, createCheckoutSessionActionMock } = vi.hoisted(() => ({
   getExperienceBySlugMock: vi.fn(),
   listPublicAvailabilityMock: vi.fn(async (): Promise<PublicAvailability[]> => []),
   getUserMock: vi.fn(async () => ({ data: { user: null as { email: string; id?: string } | null } })),
+  createSupabaseServerClientMock: vi.fn(),
   createCheckoutSessionActionMock: vi.fn(),
 }))
 vi.mock('next/navigation', () => ({
@@ -21,10 +22,9 @@ vi.mock('@/lib/experiences/public-availability-queries', () => ({
   listPublicAvailability: listPublicAvailabilityMock,
 }))
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: { getUser: getUserMock },
-  }),
+  createSupabaseServerClient: createSupabaseServerClientMock,
 }))
+vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: vi.fn(() => ({})) }))
 vi.mock('@/lib/experiences/booking-actions', () => ({
   createCheckoutSessionAction: createCheckoutSessionActionMock,
 }))
@@ -46,7 +46,51 @@ import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
 
+beforeEach(() => {
+  getExperienceBySlugMock.mockReset()
+  listPublicAvailabilityMock.mockReset()
+  listPublicAvailabilityMock.mockResolvedValue([])
+  getUserMock.mockReset()
+  getUserMock.mockResolvedValue({ data: { user: null } })
+  createSupabaseServerClientMock.mockReset()
+  createSupabaseServerClientMock.mockResolvedValue({ auth: { getUser: getUserMock } })
+  createCheckoutSessionActionMock.mockReset()
+  isExperienceSavedMock.mockReset()
+  isExperienceSavedMock.mockResolvedValue(false)
+  getExperienceRatingAggregateMock.mockReset()
+  getExperienceRatingAggregateMock.mockResolvedValue(null)
+  listPublishedReviewsForExperienceMock.mockReset()
+  listPublishedReviewsForExperienceMock.mockResolvedValue([])
+})
+
 describe('ExperiencePublicPage', () => {
+  it('exports request rendering and no static param generator', async () => {
+    const route = await import('@/app/[locale]/experiences/[slug]/page')
+    expect(route.dynamic).toBe('force-dynamic')
+    expect((route as Record<string, unknown>).generateStaticParams).toBeUndefined()
+  })
+
+  it('still renders primary experience content when all secondary queries fail', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z', savesCount: 42,
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    listPublicAvailabilityMock.mockRejectedValueOnce(new Error('availability unavailable'))
+    createSupabaseServerClientMock.mockRejectedValueOnce(new Error('auth unavailable'))
+    getExperienceRatingAggregateMock.mockRejectedValueOnce(new Error('rating unavailable'))
+    listPublishedReviewsForExperienceMock.mockRejectedValueOnce(new Error('reviews unavailable'))
+    const route = await import('@/app/[locale]/experiences/[slug]/page')
+    const el = await route.default({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    render(el)
+    expect(screen.getByRole('heading', { level: 1, name: 'Sunset junk boat tour' })).toBeTruthy()
+    expect(screen.getByText(en.booking.noAvailability)).toBeTruthy()
+  })
   it('notFound for an invalid locale', async () => {
     await expect(
       ExperiencePublicPage({ params: Promise.resolve({ locale: 'xx', slug: 'sunset-tour' }), searchParams: Promise.resolve({}) }),

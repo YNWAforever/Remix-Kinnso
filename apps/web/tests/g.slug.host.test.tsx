@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { beforeEach, describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
@@ -8,8 +8,8 @@ const { notFound } = vi.hoisted(() => ({
 }))
 vi.mock('next/navigation', () => ({ notFound, useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }))
 
-vi.mock('@/lib/guides/queries', () => ({
-  getGuideBySlug: vi.fn(async () => ({
+const { defaultGuide, getGuideBySlugMock } = vi.hoisted(() => {
+  const defaultGuide = {
     id: 'g1',
     slug: 'kyoto-tea',
     title: 'Kyoto Tea Houses',
@@ -22,13 +22,17 @@ vi.mock('@/lib/guides/queries', () => ({
     summary: 'Lovely tea houses.',
     publishedAt: '2026-06-02T00:00:00Z',
     source: 'db',
-  })),
-}))
+  }
+  return { defaultGuide, getGuideBySlugMock: vi.fn(async (): Promise<typeof defaultGuide | null> => defaultGuide) }
+})
+vi.mock('@/lib/guides/queries', () => ({ getGuideBySlug: getGuideBySlugMock }))
 
-const { getUserMock } = vi.hoisted(() => ({
+const { getUserMock, createSupabaseServerClientMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({ data: { user: null } })),
+  createSupabaseServerClientMock: vi.fn(),
 }))
-vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
+vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: createSupabaseServerClientMock }))
+vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: vi.fn(() => ({})) }))
 
 const { isGuideSavedMock } = vi.hoisted(() => ({ isGuideSavedMock: vi.fn(async () => false) }))
 vi.mock('@/lib/saves/guide-queries', () => ({ isGuideSaved: isGuideSavedMock }))
@@ -50,6 +54,44 @@ vi.mock('@/components/kinnso/GuideExperienceLinks', () => ({
 }))
 
 describe('/[locale]/g/[slug] host', () => {
+  beforeEach(() => {
+    getGuideBySlugMock.mockReset()
+    getGuideBySlugMock.mockResolvedValue(defaultGuide)
+    getUserMock.mockReset()
+    getUserMock.mockResolvedValue({ data: { user: null } })
+    createSupabaseServerClientMock.mockReset()
+    createSupabaseServerClientMock.mockResolvedValue({ auth: { getUser: getUserMock } })
+    isGuideSavedMock.mockReset()
+    isGuideSavedMock.mockResolvedValue(false)
+    getGuideRatingAggregateMock.mockReset()
+    getGuideRatingAggregateMock.mockResolvedValue(null)
+    listPublishedReviewsForGuideMock.mockReset()
+    listPublishedReviewsForGuideMock.mockResolvedValue([])
+  })
+
+  it('exports request rendering and no static param generator', async () => {
+    const route = await import('@/app/[locale]/g/[slug]/page')
+    expect(route.dynamic).toBe('force-dynamic')
+    expect((route as Record<string, unknown>).generateStaticParams).toBeUndefined()
+  })
+
+  it('notFounds an unknown guide slug', async () => {
+    getGuideBySlugMock.mockResolvedValueOnce(null)
+    const route = await import('@/app/[locale]/g/[slug]/page')
+    await expect(route.default({ params: Promise.resolve({ locale: 'en', slug: 'missing' }) }))
+      .rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('still renders primary guide content when all secondary queries fail', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    createSupabaseServerClientMock.mockRejectedValueOnce(new Error('auth unavailable'))
+    getGuideRatingAggregateMock.mockRejectedValueOnce(new Error('rating unavailable'))
+    listPublishedReviewsForGuideMock.mockRejectedValueOnce(new Error('reviews unavailable'))
+    const route = await import('@/app/[locale]/g/[slug]/page')
+    render(await route.default({ params: Promise.resolve({ locale: 'en', slug: 'kyoto-tea' }) }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Kyoto Tea Houses' })).toBeTruthy()
+    expect(screen.getByText('No reviews yet.')).toBeTruthy()
+  })
   it('renders a known guide and links the author to /c/[handle]', async () => {
     const route = await import('@/app/[locale]/g/[slug]/page')
     const ui = await route.default({ params: Promise.resolve({ locale: 'en', slug: 'kyoto-tea' }) })

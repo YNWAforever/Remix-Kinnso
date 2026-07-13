@@ -31,4 +31,12 @@ describe('GuideExperienceLinks', () => {
     const link = screen.getByRole('link', { name: /Experience a/ })
     expect(link.getAttribute('href')).toBe('/en/experiences/a?src=guide&guideSlug=kyoto-tea')
   })
+
+  it('renders nothing when the cross-link query rejects', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    getExperiencesForCityMock.mockRejectedValueOnce(new Error('cross-link unavailable'))
+    const jsx = await GuideExperienceLinks({ locale: 'en', city: 'Kyoto', guideSlug: 'kyoto-tea', t: en.article })
+    const { container } = render(jsx)
+    expect(container.innerHTML).toBe('')
+  })
 })
