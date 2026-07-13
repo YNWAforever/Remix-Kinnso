@@ -5,6 +5,7 @@ const messages: Messages = {
   categories: { destinations: '目的地', dining: '美食', shopping: '購物' },
   breadcrumb: { home: '主頁', articles: '文章' },
   article: { youMayLike: '你可能喜歡', faqTitle: '常見問題', tableOfContents: '本文目錄', by: '作者', fallbackNotice: '本文尚未提供你所用語言的版本，現顯示原始版本。', guidesNearbyEyebrow: '諗緊去呢度玩？', guidesNearbyHeading: '呢個目的地嘅創作者攻略', experiencesNearbyEyebrow: '準備好預訂了嗎？', experiencesNearbyHeading: '呢度嘅可預訂體驗' },
+  detailError: { title: '暫時未能載入此頁面', body: '載入時遇到暫時問題。請再試一次，或繼續探索。', retry: '再試一次', explore: '返回探索' },
   seo: {
     brandTitle: 'KINNSO — 旅遊創作者，真實任務',
     brandDescription:

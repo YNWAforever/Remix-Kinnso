@@ -5,6 +5,7 @@ const messages: Messages = {
   categories: { destinations: '여행지', dining: '다이닝', shopping: '쇼핑' },
   breadcrumb: { home: '홈', articles: '아티클' },
   article: { youMayLike: '추천 콘텐츠', faqTitle: '자주 묻는 질문', tableOfContents: '목차', by: '작성자', fallbackNotice: '이 글은 아직 사용 중인 언어로 제공되지 않아 원문 버전을 표시합니다.', guidesNearbyEyebrow: '이곳 여행을 계획 중이신가요?', guidesNearbyHeading: '이 여행지의 크리에이터 가이드', experiencesNearbyEyebrow: '예약할 준비가 되셨나요?', experiencesNearbyHeading: '이 지역의 예약 가능한 체험' },
+  detailError: { title: '페이지를 불러올 수 없습니다', body: '일시적인 문제가 발생했습니다. 다시 시도하거나 계속 둘러보세요.', retry: '다시 시도', explore: '탐색으로 돌아가기' },
   seo: {
     brandTitle: 'KINNSO — 트래블 크리에이터, 리얼 미션',
     brandDescription:

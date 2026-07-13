@@ -5,6 +5,7 @@ const messages: Messages = {
   categories: { destinations: '目的地', dining: '美食', shopping: '购物' },
   breadcrumb: { home: '首页', articles: '文章' },
   article: { youMayLike: '你可能喜欢', faqTitle: '常见问题', tableOfContents: '本文目录', by: '作者', fallbackNotice: '本文尚未提供你所用语言的版本，现显示原始版本。', guidesNearbyEyebrow: '正计划去这里？', guidesNearbyHeading: '这个目的地的创作者攻略', experiencesNearbyEyebrow: '准备好预订了吗？', experiencesNearbyHeading: '这里的可预订体验' },
+  detailError: { title: '暂时无法加载此页面', body: '加载时遇到临时问题。请重试，或继续探索。', retry: '重试', explore: '返回探索' },
   seo: {
     brandTitle: 'KINNSO — 旅行创作者，真实任务',
     brandDescription:
