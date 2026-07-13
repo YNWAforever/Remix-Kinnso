@@ -1,0 +1,35 @@
+name: Nightly funnel synthetic
+on:
+  schedule:
+    - cron: '15 21 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  production-funnel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @kinnso/e2e exec playwright install --with-deps chromium
+      - name: Production guide-to-experience smoke
+        env:
+          E2E_BASE_URL: https://remix-kinnso-web.vercel.app
+          BOOKING_LIVE: 'false'
+        run: pnpm --filter @kinnso/e2e e2e funnel-smoke notfound
+      - name: Crawl every sitemap URL
+        env:
+          BASE_URL: https://remix-kinnso-web.vercel.app
+        run: node scripts/crawl-sitemap.ts
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: nightly-funnel-artifacts
+          path: |
+            apps/e2e/test-results/
+            apps/e2e/playwright-report/
