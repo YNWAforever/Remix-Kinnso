@@ -424,6 +424,71 @@ d('mission schema RLS', () => {
     expect(trackedLink.data!.sub_id).toMatch(/^pending:/)
     expect(trackedLink.data!.sub_id).not.toBe('partner-good-link')
 
+    const expectedSubId = `kinnso_m_${travelpayoutsMissionId.replaceAll('-', '')}_p_${travelpayoutsParticipant.data!.id.replaceAll('-', '')}_c_${partnerCreatorId.replaceAll('-', '')}`
+    const originalUrl = 'https://example.com/travel-rpc'
+    const validPartnerUrl = `https://brand.tp.st/link?sub_id=${expectedSubId}`
+    const rpcArgs = {
+      p_affiliate_network_program_id: affiliateProgramId,
+      p_mission_id: travelpayoutsMissionId,
+      p_mission_participant_id: travelpayoutsParticipant.data!.id,
+      p_original_url: originalUrl,
+      p_partner_url: validPartnerUrl,
+      p_sub_id: expectedSubId,
+    }
+
+    const anonAttempt = await anon.rpc('create_travelpayouts_partner_link', rpcArgs)
+    expect(anonAttempt.error).not.toBeNull()
+
+    const wrongOwner = await authed(otherCreatorEmail)
+    const wrongOwnerAttempt = await wrongOwner.rpc('create_travelpayouts_partner_link', rpcArgs)
+    expect(wrongOwnerAttempt.error).not.toBeNull()
+
+    const mismatchedMission = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_mission_id: missionId,
+    })
+    expect(mismatchedMission.error).not.toBeNull()
+
+    const wrongSubId = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_partner_url: 'https://brand.tp.st/link?sub_id=wrong',
+      p_sub_id: 'wrong',
+    })
+    expect(wrongSubId.error).not.toBeNull()
+
+    const offDomain = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_partner_url: `https://example.net/link?sub_id=${expectedSubId}`,
+    })
+    expect(offDomain.error).not.toBeNull()
+
+    const missingQuerySubId = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_partner_url: 'https://brand.tp.st/link',
+    })
+    expect(missingQuerySubId.error).not.toBeNull()
+
+    const validRpc = await creator.rpc('create_travelpayouts_partner_link', rpcArgs)
+    expect(validRpc.error).toBeNull()
+    expect(validRpc.data).toHaveLength(1)
+    expect(validRpc.data![0].partner_url).toBe(validPartnerUrl)
+
+    const duplicateRpc = await creator.rpc('create_travelpayouts_partner_link', rpcArgs)
+    expect(duplicateRpc.error).toBeNull()
+    expect(duplicateRpc.data).toEqual(validRpc.data)
+
+    const storedRpcLink = await creator
+      .from('affiliate_partner_links')
+      .select('id, external_status, partner_url, sub_id')
+      .eq('id', validRpc.data![0].id)
+      .single()
+    expect(storedRpcLink.error).toBeNull()
+    expect(storedRpcLink.data).toMatchObject({
+      external_status: 'success',
+      partner_url: validPartnerUrl,
+      sub_id: expectedSubId,
+    })
+
     const merchantParticipant = await creator
       .from('mission_participants')
       .insert({
