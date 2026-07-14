@@ -5,6 +5,7 @@ import { getStripeSecretKey, getSupabasePublicEnv, validateBuildEnv } from '@/li
 const core = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://project.supabase.co',
   NEXT_PUBLIC_SUPABASE_ANON_KEY: 'anon-test',
+  AGENT_LIVE: 'false',
 }
 
 describe('R7 environment validation', () => {
@@ -36,6 +37,22 @@ describe('R7 environment validation', () => {
       .toThrow('agent: missing AI_GATEWAY_API_KEY or VERCEL=1')
     expect(() => validateBuildEnv({ ...core, AGENT_LIVE: 'true', VERCEL: '1' })).not.toThrow()
     expect(() => validateBuildEnv({ ...core, AGENT_LIVE: 'true', AI_GATEWAY_API_KEY: 'ai-key' })).not.toThrow()
+  })
+
+  it('requires AI or Vercel configuration when the Agent flag is absent', () => {
+    expect(() => validateBuildEnv({ ...core, AGENT_LIVE: undefined }))
+      .toThrow('agent: missing AI_GATEWAY_API_KEY or VERCEL=1')
+  })
+
+  it('does not require AI or Vercel configuration when Agent is explicitly disabled', () => {
+    expect(() => validateBuildEnv(core)).not.toThrow()
+  })
+
+  it('rejects invalid configured values before provider validation', () => {
+    expect(() => validateBuildEnv({ ...core, AGENT_LIVE: 'yes' }))
+      .toThrow('AGENT_LIVE must be true or false')
+    expect(() => validateBuildEnv({ ...core, BOOKING_LIVE: 'yes' }))
+      .toThrow('BOOKING_LIVE must be true or false')
   })
 
   it('returns a named Stripe runtime failure', () => {
