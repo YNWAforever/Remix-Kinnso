@@ -660,7 +660,11 @@ export async function createPartnerLinkAction(
   if (existingLinkError) return formError('Partner link could not be loaded')
   if (existingLink) return { ok: true, link: existingLink }
 
-  const { buildSubId, createTravelpayoutsPartnerLinks } = await import('@/lib/missions/travelpayouts')
+  const {
+    buildSubId,
+    canonicalizeTravelpayoutsPartnerUrl,
+    createTravelpayoutsPartnerLinks,
+  } = await import('@/lib/missions/travelpayouts')
   const subId = buildSubId({
     missionId: mission.id,
     participantId: participant.id,
@@ -674,8 +678,11 @@ export async function createPartnerLinkAction(
       shorten: true,
       links: [{ url: input.originalUrl, subId }],
     })
-    if (link?.status === 'success' && link.partnerUrl) partnerUrl = link.partnerUrl
-    else if (link?.message) failureReason = link.message
+    if (link?.status === 'success' && link.partnerUrl) {
+      partnerUrl = canonicalizeTravelpayoutsPartnerUrl(link.partnerUrl, subId)
+    } else if (link?.message) {
+      failureReason = link.message
+    }
   } catch (err) {
     failureReason = err instanceof Error ? err.message : String(err)
   }
