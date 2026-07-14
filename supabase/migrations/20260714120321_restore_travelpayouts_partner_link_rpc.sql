@@ -48,6 +48,10 @@ declare
   v_expected_sub_id text;
   v_original_url text := btrim(p_original_url);
   v_partner_url text := btrim(p_partner_url);
+  v_previous_bypass_setting text := coalesce(
+    current_setting('app.bypass_partner_link_prepare', true),
+    ''
+  );
 begin
   if v_actor_id is null then
     raise exception 'Authentication is required' using errcode = '28000';
@@ -72,8 +76,10 @@ begin
     raise exception 'Original URL is invalid' using errcode = '22023';
   end if;
 
-  if v_partner_url !~* '^https://([a-z0-9-]+\.)?tp\.st/[^[:space:]]*$'
-    or v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|#|$)') then
+  if v_partner_url !~* '^https://([a-z0-9-]+\.)?tp\.st/[^[:space:]#]*$'
+    or position('#' in v_partner_url) > 0
+    or regexp_count(v_partner_url, '[?&]sub_id=') <> 1
+    or v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|$)') then
     raise exception 'Partner URL is invalid' using errcode = '22023';
   end if;
 
@@ -110,6 +116,7 @@ begin
   order by link.generated_at desc
   limit 1;
   if found then
+    perform set_config('app.bypass_partner_link_prepare', v_previous_bypass_setting, true);
     return;
   end if;
 
@@ -140,6 +147,9 @@ begin
   )
   on conflict (network, sub_id, original_url) do nothing
   returning affiliate_partner_links.id, affiliate_partner_links.partner_url;
+
+  perform set_config('app.bypass_partner_link_prepare', v_previous_bypass_setting, true);
+
   if found then
     return;
   end if;
@@ -156,6 +166,9 @@ begin
   if not found then
     raise exception 'Partner link could not be persisted';
   end if;
+
+  perform set_config('app.bypass_partner_link_prepare', v_previous_bypass_setting, true);
+  return;
 end;
 $$;
 

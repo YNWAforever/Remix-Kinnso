@@ -40,12 +40,17 @@ describe('Travelpayouts partner-link persistence migration', () => {
     expect(compact).toContain('if btrim(p_sub_id) <> v_expected_sub_id then')
   })
 
-  it('accepts only HTTPS Travelpayouts links carrying the exact SubID', () => {
+  it('accepts one exact query SubID and rejects all fragments', () => {
     expect(compact).toContain("v_original_url !~* '^https://[^[:space:]]+$'")
     expect(compact).toContain(
-      "v_partner_url !~* '^https://([a-z0-9-]+\\.)?tp\\.st/[^[:space:]]*$'",
+      "v_partner_url !~* '^https://([a-z0-9-]+\\.)?tp\\.st/[^[:space:]#]*$'",
     )
+    expect(compact).toContain("position('#' in v_partner_url) > 0")
+    expect(compact).toContain("regexp_count(v_partner_url, '[?&]sub_id=') <> 1")
     expect(compact).toContain(
+      "v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|$)')",
+    )
+    expect(compact).not.toContain(
       "v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|#|$)')",
     )
   })
@@ -59,13 +64,27 @@ describe('Travelpayouts partner-link persistence migration', () => {
     expect(compact).toContain("program.status = 'active'")
   })
 
-  it('opens the bypass only after validation and persists idempotently', () => {
+  it('scopes the bypass to the audited insert and restores the prior setting', () => {
+    expect(compact).toContain(
+      "v_previous_bypass_setting text := coalesce( current_setting('app.bypass_partner_link_prepare', true), '' )",
+    )
+
     const validationIndex = compact.indexOf("raise exception 'partner link is not allowed'")
     const bypassIndex = compact.indexOf(
       "set_config('app.bypass_partner_link_prepare', 'on', true)",
     )
+    const insertIndex = compact.indexOf('return query insert into public.affiliate_partner_links', bypassIndex)
+    const restoreSql =
+      "set_config('app.bypass_partner_link_prepare', v_previous_bypass_setting, true)"
+    const restoreAfterInsertIndex = compact.indexOf(restoreSql, insertIndex)
+    const successfulInsertReturnIndex = compact.indexOf('if found then return; end if;', insertIndex)
+
     expect(validationIndex).toBeGreaterThan(-1)
     expect(bypassIndex).toBeGreaterThan(validationIndex)
+    expect(insertIndex).toBeGreaterThan(bypassIndex)
+    expect(restoreAfterInsertIndex).toBeGreaterThan(insertIndex)
+    expect(successfulInsertReturnIndex).toBeGreaterThan(restoreAfterInsertIndex)
+    expect(compact.split(restoreSql)).toHaveLength(4)
     expect(compact).toContain('on conflict (network, sub_id, original_url) do nothing')
     expect(compact).toContain("link.external_status = 'success'")
   })
