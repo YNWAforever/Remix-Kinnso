@@ -74,30 +74,39 @@ describe('Travelpayouts partner-link persistence migration', () => {
       "set_config('app.bypass_partner_link_prepare', 'on', true)",
     )
     const insertIndex = compact.indexOf('return query insert into public.affiliate_partner_links', bypassIndex)
+    const insertResultCaptureIndex = compact.indexOf('v_inserted := found;', insertIndex)
     const restoreSql =
       "set_config('app.bypass_partner_link_prepare', v_previous_bypass_setting, true)"
     const restoreAfterInsertIndex = compact.indexOf(restoreSql, insertIndex)
-    const successfulInsertReturnIndex = compact.indexOf('if found then return; end if;', insertIndex)
+    const successfulInsertReturnIndex = compact.indexOf(
+      'if v_inserted then return; end if;',
+      insertIndex,
+    )
 
     expect(validationIndex).toBeGreaterThan(-1)
     expect(bypassIndex).toBeGreaterThan(validationIndex)
     expect(insertIndex).toBeGreaterThan(bypassIndex)
-    expect(restoreAfterInsertIndex).toBeGreaterThan(insertIndex)
+    expect(compact).toContain('v_inserted boolean')
+    expect(insertResultCaptureIndex).toBeGreaterThan(insertIndex)
+    expect(restoreAfterInsertIndex).toBeGreaterThan(insertResultCaptureIndex)
     expect(successfulInsertReturnIndex).toBeGreaterThan(restoreAfterInsertIndex)
     expect(compact.split(restoreSql)).toHaveLength(4)
     expect(compact).toContain('on conflict (network, sub_id, original_url) do nothing')
     expect(compact).toContain("link.external_status = 'success'")
   })
 
-  it('revokes public and anon execution and grants only authenticated execution', () => {
+  it('revokes public, anon, and service-role execution and grants only authenticated execution', () => {
     expect(compact).toContain(
-      'revoke all on function public.create_travelpayouts_partner_link( uuid, uuid, uuid, text, text, text ) from public, anon, authenticated',
+      'revoke all on function public.create_travelpayouts_partner_link( uuid, uuid, uuid, text, text, text ) from public, anon, authenticated, service_role',
     )
     expect(compact).toContain(
       'grant execute on function public.create_travelpayouts_partner_link( uuid, uuid, uuid, text, text, text ) to authenticated',
     )
     expect(compact).not.toContain(
       'grant execute on function public.create_travelpayouts_partner_link( uuid, uuid, uuid, text, text, text ) to anon',
+    )
+    expect(compact).not.toContain(
+      'grant execute on function public.create_travelpayouts_partner_link( uuid, uuid, uuid, text, text, text ) to service_role',
     )
   })
 })

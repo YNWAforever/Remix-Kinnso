@@ -46,6 +46,7 @@ as $$
 declare
   v_actor_id uuid := auth.uid();
   v_expected_sub_id text;
+  v_inserted boolean;
   v_original_url text := btrim(p_original_url);
   v_partner_url text := btrim(p_partner_url);
   v_previous_bypass_setting text := coalesce(
@@ -148,9 +149,10 @@ begin
   on conflict (network, sub_id, original_url) do nothing
   returning affiliate_partner_links.id, affiliate_partner_links.partner_url;
 
+  v_inserted := found;
   perform set_config('app.bypass_partner_link_prepare', v_previous_bypass_setting, true);
 
-  if found then
+  if v_inserted then
     return;
   end if;
 
@@ -179,7 +181,7 @@ revoke all on function public.create_travelpayouts_partner_link(
   text,
   text,
   text
-) from public, anon, authenticated;
+) from public, anon, authenticated, service_role;
 
 grant execute on function public.create_travelpayouts_partner_link(
   uuid,

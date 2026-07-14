@@ -659,19 +659,21 @@ d('mission schema RLS', () => {
     expect(duplicateRpc.error).toBeNull()
     expect(duplicateRpc.data).toEqual(validRpc.data)
 
-    const concurrentArgs = {
-      ...rpcArgs,
-      p_original_url: 'https://example.com/travel-rpc-concurrent',
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const concurrentArgs = {
+        ...rpcArgs,
+        p_original_url: `https://example.com/travel-rpc-concurrent-${attempt}`,
+      }
+      const [concurrentRpcA, concurrentRpcB] = await Promise.all([
+        creator.rpc('create_travelpayouts_partner_link', concurrentArgs),
+        creator.rpc('create_travelpayouts_partner_link', concurrentArgs),
+      ])
+      expect(concurrentRpcA.error).toBeNull()
+      expect(concurrentRpcB.error).toBeNull()
+      expect(concurrentRpcA.data).toHaveLength(1)
+      expect(concurrentRpcB.data).toHaveLength(1)
+      expect(concurrentRpcB.data).toEqual(concurrentRpcA.data)
     }
-    const [concurrentRpcA, concurrentRpcB] = await Promise.all([
-      creator.rpc('create_travelpayouts_partner_link', concurrentArgs),
-      creator.rpc('create_travelpayouts_partner_link', concurrentArgs),
-    ])
-    expect(concurrentRpcA.error).toBeNull()
-    expect(concurrentRpcB.error).toBeNull()
-    expect(concurrentRpcA.data).toHaveLength(1)
-    expect(concurrentRpcB.data).toEqual(concurrentRpcA.data)
-
     const storedRpcLink = await creator
       .from('affiliate_partner_links')
       .select('id, external_status, partner_url, sub_id')
@@ -710,6 +712,30 @@ d('mission schema RLS', () => {
       })
       .select('id')
     expect(blockedMerchantMissionLink.error === null ? blockedMerchantMissionLink.data : []).toEqual([])
+  }, testTimeout)
+
+  it('partner-link RPC execute ACL allows authenticated but not service-role callers', async () => {
+    await runPsql(`
+      do $test$
+      begin
+        if has_function_privilege(
+          'service_role',
+          'public.create_travelpayouts_partner_link(uuid,uuid,uuid,text,text,text)',
+          'EXECUTE'
+        ) then
+          raise exception 'service_role can execute create_travelpayouts_partner_link';
+        end if;
+
+        if not has_function_privilege(
+          'authenticated',
+          'public.create_travelpayouts_partner_link(uuid,uuid,uuid,text,text,text)',
+          'EXECUTE'
+        ) then
+          raise exception 'authenticated cannot execute create_travelpayouts_partner_link';
+        end if;
+      end
+      $test$;
+    `)
   }, testTimeout)
 
   it('creator milestone submissions cannot forge review state or cross missions', async () => {
