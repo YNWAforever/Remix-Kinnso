@@ -43,7 +43,7 @@ describe('Travelpayouts partner-link persistence migration', () => {
   it('accepts one exact query SubID and rejects all fragments', () => {
     expect(compact).toContain("v_original_url !~* '^https://[^[:space:]]+$'")
     expect(compact).toContain(
-      "v_partner_url !~* '^https://([a-z0-9-]+\\.)?tp\\.st/[^[:space:]#]*$'",
+      "v_partner_url !~* '^https://([a-z0-9-]+\\.)*tp\\.st/[^[:space:]#]*$'",
     )
     expect(compact).toContain("position('#' in v_partner_url) > 0")
     expect(compact).toContain("regexp_count(v_partner_url, '[?&]sub_id=') <> 1")

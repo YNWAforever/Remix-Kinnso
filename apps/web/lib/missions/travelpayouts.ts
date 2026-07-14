@@ -79,6 +79,7 @@ export function canonicalizeTravelpayoutsPartnerUrl(partnerUrl: string, subId: s
   if (
     url.protocol !== 'https:'
     || !trustedHost
+    || url.port !== ''
     || url.username !== ''
     || url.password !== ''
   ) {

@@ -650,6 +650,40 @@ d('mission schema RLS', () => {
     expect(wrongProgramCleanup.error).toBeNull()
     expect(wrongProgramAttempt.error).not.toBeNull()
 
+    const nonDefaultPortAttempt = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_original_url: 'https://example.com/travel-rpc-non-default-port',
+      p_partner_url: `https://tp.st:8443/link?sub_id=${expectedSubId}`,
+    })
+    expect(nonDefaultPortAttempt.error).not.toBeNull()
+
+    const nestedOriginalUrl = 'https://example.com/travel-rpc-nested-host'
+    const nestedPartnerUrl = `https://a.b.tp.st/link?sub_id=${expectedSubId}`
+    const nestedRpc = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_original_url: nestedOriginalUrl,
+      p_partner_url: nestedPartnerUrl,
+    })
+    expect(nestedRpc.error).toBeNull()
+    expect(nestedRpc.data).toHaveLength(1)
+    expect(nestedRpc.data![0].partner_url).toBe(nestedPartnerUrl)
+
+    const storedNestedLink = await svc
+      .from('affiliate_partner_links')
+      .select('id, original_url, partner_url')
+      .eq('id', nestedRpc.data![0].id)
+      .single()
+    expect(storedNestedLink.error).toBeNull()
+    expect(storedNestedLink.data).toMatchObject({
+      original_url: nestedOriginalUrl,
+      partner_url: nestedPartnerUrl,
+    })
+
+    const nestedCleanup = await svc
+      .from('affiliate_partner_links')
+      .delete()
+      .eq('id', nestedRpc.data![0].id)
+    expect(nestedCleanup.error).toBeNull()
     const validRpc = await creator.rpc('create_travelpayouts_partner_link', rpcArgs)
     expect(validRpc.error).toBeNull()
     expect(validRpc.data).toHaveLength(1)

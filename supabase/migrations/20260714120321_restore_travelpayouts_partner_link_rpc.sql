@@ -77,7 +77,7 @@ begin
     raise exception 'Original URL is invalid' using errcode = '22023';
   end if;
 
-  if v_partner_url !~* '^https://([a-z0-9-]+\.)?tp\.st/[^[:space:]#]*$'
+  if v_partner_url !~* '^https://([a-z0-9-]+\.)*tp\.st/[^[:space:]#]*$'
     or position('#' in v_partner_url) > 0
     or regexp_count(v_partner_url, '[?&]sub_id=') <> 1
     or v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|$)') then
