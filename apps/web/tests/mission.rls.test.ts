@@ -657,8 +657,39 @@ d('mission schema RLS', () => {
     })
     expect(nonDefaultPortAttempt.error).not.toBeNull()
 
+    for (const malformedHost of [
+      '.tp.st',
+      'a..tp.st',
+      'foo_bar.tp.st',
+      '-edge.tp.st',
+      'edge-.tp.st',
+    ]) {
+      const malformedHostAttempt = await creator.rpc('create_travelpayouts_partner_link', {
+        ...rpcArgs,
+        p_original_url: `https://example.com/travel-rpc-malformed-${malformedHost}`,
+        p_partner_url: `https://${malformedHost}/link?sub_id=${expectedSubId}`,
+      })
+      expect(malformedHostAttempt.error).not.toBeNull()
+    }
+
+    const otherNetworkInsert = await svc
+      .from('affiliate_partner_links')
+      .insert({
+        affiliate_network_program_id: affiliateProgramId,
+        mission_id: travelpayoutsMissionId,
+        mission_participant_id: travelpayoutsParticipantId,
+        creator_id: partnerCreatorId,
+        network: 'other-network',
+        original_url: 'https://example.com/travel-rpc-other-network',
+        partner_url: `https://brand.tp.st/link?sub_id=${expectedSubId}`,
+        sub_id: expectedSubId,
+        external_status: 'success',
+      })
+      .select('id')
+    expect(otherNetworkInsert.error).not.toBeNull()
+    expect(otherNetworkInsert.error?.code).toBe('23514')
     const nestedOriginalUrl = 'https://example.com/travel-rpc-nested-host'
-    const nestedPartnerUrl = `https://a.b.tp.st/link?sub_id=${expectedSubId}`
+    const nestedPartnerUrl = `https://valid-label.deep-host.tp.st/link?sub_id=${expectedSubId}`
     const nestedRpc = await creator.rpc('create_travelpayouts_partner_link', {
       ...rpcArgs,
       p_original_url: nestedOriginalUrl,

@@ -61,6 +61,25 @@ describe('Travelpayouts adapter', () => {
     expect(canonical.hostname).toBe('a.b.tp.st')
     expect(canonical.searchParams.getAll('sub_id')).toEqual([subId])
   })
+
+  it.each([
+    'https://a.b.tp.st/path',
+    'https://valid-label.deep-host.tp.st/path',
+  ])('accepts a valid Travelpayouts hostname: %s', (partnerUrl) => {
+    expect(canonicalizeTravelpayoutsPartnerUrl(partnerUrl, 'creator_sub'))
+      .toBe(`${partnerUrl}?sub_id=creator_sub`)
+  })
+
+  it.each([
+    'https://.tp.st/path',
+    'https://a..tp.st/path',
+    'https://foo_bar.tp.st/path',
+    'https://-edge.tp.st/path',
+    'https://edge-.tp.st/path',
+  ])('rejects a malformed Travelpayouts hostname: %s', (partnerUrl) => {
+    expect(() => canonicalizeTravelpayoutsPartnerUrl(partnerUrl, 'creator_sub'))
+      .toThrow('Travelpayouts returned an invalid partner URL')
+  })
   it('collapses duplicate SubIDs, preserves unrelated parameters, and clears fragments', () => {
     expect(
       canonicalizeTravelpayoutsPartnerUrl(

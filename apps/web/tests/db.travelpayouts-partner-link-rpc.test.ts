@@ -43,7 +43,7 @@ describe('Travelpayouts partner-link persistence migration', () => {
   it('accepts one exact query SubID and rejects all fragments', () => {
     expect(compact).toContain("v_original_url !~* '^https://[^[:space:]]+$'")
     expect(compact).toContain(
-      "v_partner_url !~* '^https://([a-z0-9-]+\\.)*tp\\.st/[^[:space:]#]*$'",
+      "v_partner_url !~* '^https://(([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)\\.)*tp\\.st/[^[:space:]#]*$'",
     )
     expect(compact).toContain("position('#' in v_partner_url) > 0")
     expect(compact).toContain("regexp_count(v_partner_url, '[?&]sub_id=') <> 1")
@@ -55,6 +55,15 @@ describe('Travelpayouts partner-link persistence migration', () => {
     )
   })
 
+  it('scopes conflict fallback to the complete Travelpayouts mission identity', () => {
+    const fallbackIndex = compact.indexOf('if v_inserted then return; end if;')
+    const fallback = compact.slice(fallbackIndex)
+
+    expect(fallback).toContain("link.network = 'travelpayouts'")
+    expect(fallback).toContain('link.affiliate_network_program_id = p_affiliate_network_program_id')
+    expect(fallback).toContain('link.mission_id = p_mission_id')
+    expect(fallback).toContain('link.mission_participant_id = p_mission_participant_id')
+  })
   it('revalidates ownership and active Travelpayouts mission state', () => {
     expect(compact).toContain('participant.creator_id = v_actor_id')
     expect(compact).toContain("participant.status = 'active'")

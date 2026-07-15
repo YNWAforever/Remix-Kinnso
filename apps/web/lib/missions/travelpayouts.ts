@@ -75,7 +75,13 @@ export function canonicalizeTravelpayoutsPartnerUrl(partnerUrl: string, subId: s
     throw new Error('Travelpayouts returned an invalid partner URL')
   }
 
-  const trustedHost = url.hostname === 'tp.st' || url.hostname.endsWith('.tp.st')
+  const hostname = url.hostname.toLowerCase()
+  const subdomain = hostname.endsWith('.tp.st')
+    ? hostname.slice(0, -'.tp.st'.length)
+    : ''
+  const validHostnameLabel = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/
+  const trustedHost = hostname === 'tp.st'
+    || (subdomain !== '' && subdomain.split('.').every(label => validHostnameLabel.test(label)))
   if (
     url.protocol !== 'https:'
     || !trustedHost

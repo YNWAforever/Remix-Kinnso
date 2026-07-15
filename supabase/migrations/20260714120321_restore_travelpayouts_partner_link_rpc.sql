@@ -77,7 +77,7 @@ begin
     raise exception 'Original URL is invalid' using errcode = '22023';
   end if;
 
-  if v_partner_url !~* '^https://([a-z0-9-]+\.)*tp\.st/[^[:space:]#]*$'
+  if v_partner_url !~* '^https://(([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)\.)*tp\.st/[^[:space:]#]*$'
     or position('#' in v_partner_url) > 0
     or regexp_count(v_partner_url, '[?&]sub_id=') <> 1
     or v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|$)') then
@@ -160,6 +160,9 @@ begin
   select link.id, link.partner_url
   from public.affiliate_partner_links link
   where link.network = 'travelpayouts'
+    and link.affiliate_network_program_id = p_affiliate_network_program_id
+    and link.mission_id = p_mission_id
+    and link.mission_participant_id = p_mission_participant_id
     and link.sub_id = v_expected_sub_id
     and link.original_url = v_original_url
     and link.creator_id = v_actor_id
