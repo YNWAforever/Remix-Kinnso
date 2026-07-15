@@ -26,7 +26,8 @@ const articles = [
 // with the real-tokyo guide's `@aki` card text, making the assertion below ambiguous).
 const sessions = [{ id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
 
-const base = { locale: 'en' as const, t: en.home, guides, stats, testimonials, articles, sessions }
+const productState = { agentLive: true, bookingLive: false, sessionsLive: true }
+const base = { locale: 'en' as const, t: en.home, guides, stats, testimonials, articles, sessions, productState }
 
 describe('HomeView (R1B 10-section homepage)', () => {
   it('renders the locked hero with both CTAs and a real-cover collage', () => {
@@ -67,8 +68,14 @@ describe('HomeView (R1B 10-section homepage)', () => {
     expect(screen.getByText('@sora')).toBeTruthy()
   })
 
+  it('hides sessions when the product gate is off even if rows exist', () => {
+    render(<HomeView {...base} productState={{ ...productState, sessionsLive: false }} />)
+    expect(screen.queryByText(en.home.sessionsHeading)).toBeNull()
+    expect(screen.queryByText('Tokyo briefing')).toBeNull()
+  })
+
   it('links each Sessions band card to its detail page', () => {
-    render(<HomeView locale="en" t={en.home} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[
+    render(<HomeView locale="en" t={en.home} productState={productState} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[
       { id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' },
     ]} />)
     expect(screen.getByRole('link', { name: /Tokyo briefing/ }).getAttribute('href')).toBe('/en/sessions/tokyo-briefing')

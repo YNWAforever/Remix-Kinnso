@@ -13,6 +13,7 @@ import type { Guide } from '@/lib/guides/types'
 import type { PlatformStats, Testimonial, UpcomingSession } from '@/lib/home/queries'
 import { toUrlCategory, type Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
+import type { ProductState } from '@/lib/product-state'
 
 /**
  * R1B homepage — the 10 sections of master spec §4.1, in order:
@@ -23,7 +24,7 @@ import type { Messages } from '@/lib/i18n/messages/en'
  * Every proof section is data-gated: empty data renders nothing, never filler.
  */
 export function HomeView({
-  locale, t, guides, stats, testimonials, articles, sessions,
+  locale, t, guides, stats, testimonials, articles, sessions, productState,
 }: {
   locale: Locale
   t: Messages['home']
@@ -32,6 +33,7 @@ export function HomeView({
   testimonials: Testimonial[]
   articles: SearchResult['items']
   sessions: UpcomingSession[]
+  productState: ProductState
 }) {
   const p = (path: string) => `/${locale}${path}`
   const roleLabel: Record<Testimonial['authorRole'], string> = {
@@ -69,7 +71,7 @@ export function HomeView({
       ) : null}
 
       {/* 3 — How it works (traveller default; client tabs, no URL state) */}
-      <HowItWorks t={t} />
+      <HowItWorks t={t} bookingLive={productState.bookingLive} />
 
       {/* 4 — Featured guides (up to 6, real DB) */}
       <SectionShell className="k2-hairline">
@@ -162,7 +164,7 @@ export function HomeView({
       {/* 7 — Community Sessions: DATA-GATED. getUpcomingSessions() returns []
           until R5 ships community_sessions, so this renders null today — no
           fake content, no empty carousel. */}
-      {sessions.length > 0 ? (
+      {productState.sessionsLive && sessions.length > 0 ? (
         <SectionShell className="k2-hairline">
           <Eyebrow>{t.sessionsEyebrow}</Eyebrow>
           <h2 className="k2-display mt-3 text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.sessionsHeading}</h2>

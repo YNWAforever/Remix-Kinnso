@@ -1,5 +1,6 @@
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import type { Locale } from '@/lib/i18n/config'
+import { getReplaySessions, getUpcomingSessionsList } from '@/lib/sessions/public-queries'
 
 /** Aggregate counts from the `platform_stats()` SECURITY INVOKER RPC. */
 export interface PlatformStats {
@@ -144,6 +145,25 @@ export async function getUpcomingSessions(): Promise<UpcomingSession[]> {
         startsAt: r.starts_at as string,
       }))
   } catch {
+    return []
+  }
+}
+/** Homepage sessions prefer scheduled/live rows, then fall back to ended replays. */
+export async function getHomeSessions(limit = 3): Promise<UpcomingSession[]> {
+  try {
+    const upcoming = await getUpcomingSessionsList(limit)
+    const rows = upcoming.length > 0 ? upcoming : await getReplaySessions(limit)
+    return rows
+      .filter((session) => session.host !== null)
+      .map((session) => ({
+        id: session.id,
+        slug: session.slug,
+        title: session.title,
+        hostHandle: session.host!.handle,
+        startsAt: session.startsAt,
+      }))
+  } catch {
+    console.warn('home-sessions-query-failed')
     return []
   }
 }

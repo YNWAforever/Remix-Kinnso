@@ -3,10 +3,11 @@ import { notFound } from 'next/navigation'
 import { HomeView } from '@/components/kinnso/pages/HomeView'
 import { searchArticles } from '@/lib/articles/queries'
 import { getPublishedGuides } from '@/lib/guides/queries'
-import { getPlatformStats, getPublishedTestimonials, getUpcomingSessions } from '@/lib/home/queries'
+import { getPlatformStats, getPublishedTestimonials, getHomeSessions } from '@/lib/home/queries'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { getProductState } from '@/lib/product-state'
 
 /** ISR: honest stats + fresh guides at most 5 minutes stale. */
 export const revalidate = 300
@@ -27,7 +28,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const loc = locale as Locale
-  const [messages, guides, stats, testimonials, articleResult, sessions] = await Promise.all([
+  const [messages, guides, stats, testimonials, articleResult, sessions, productState] = await Promise.all([
     getDictionary(loc),
     getPublishedGuides(6),
     getPlatformStats(),
@@ -35,7 +36,8 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
     // Articles highlight degrades to hidden rather than crashing the homepage
     // (searchArticles rethrows after its internal retry).
     searchArticles({ locale: loc, page: 1, perPage: 3 }).catch(() => ({ items: [], total: 0, page: 1, perPage: 3 })),
-    getUpcomingSessions(),
+    getHomeSessions(),
+    getProductState(),
   ])
   return (
     <HomeView
@@ -46,6 +48,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
       testimonials={testimonials}
       articles={articleResult.items}
       sessions={sessions}
+      productState={productState}
     />
   )
 }

@@ -705,7 +705,7 @@ export interface Messages {
     testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
     howTabTravellers: string; howTabCreators: string; howTabMerchants: string
-    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3Desc: string
+    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3DescLive: string; howT3DescWaitlist: string
     howC1Title: string; howC1Desc: string; howC2Title: string; howC2Desc: string; howC3Title: string; howC3Desc: string
     howM1Title: string; howM1Desc: string; howM2Title: string; howM2Desc: string; howM3Title: string; howM3Desc: string
     featuredEyebrow: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
@@ -1713,7 +1713,8 @@ const messages: Messages = {
     howT2Title: 'Save the real spots',
     howT2Desc: 'Every guide is a route of real cafés, streets, and stays — not top-ten filler.',
     howT3Title: 'Plan and book in one place',
-    howT3Desc: 'Shape the trip with AI help, then book your picks without leaving KINNSO.',
+    howT3DescLive: 'Shape the trip with AI help, then book your picks without leaving KINNSO.',
+    howT3DescWaitlist: 'Booking is not live yet. Join the waitlist and we’ll notify you when it opens.',
     howC1Title: 'Scan your profile',
     howC1Desc: 'Connect your socials and KINNSO maps the cities you genuinely know.',
     howC2Title: 'Publish your guides',
