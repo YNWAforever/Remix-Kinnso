@@ -1,5 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { getStripeSecretKey, getSupabasePublicEnv, validateBuildEnv } from '@/lib/env'
 
 const core = {
@@ -9,6 +11,13 @@ const core = {
 }
 
 describe('R7 environment validation', () => {
+  it('uses a relative product-state import that the Next config loader can resolve', () => {
+    const source = readFileSync(join(process.cwd(), 'lib/env.ts'), 'utf8')
+
+    expect(source).toContain("from './product-state-config'")
+    expect(source).not.toContain("from '@/lib/product-state-config'")
+  })
+
   it('names a missing core variable without echoing values', () => {
     expect(() => validateBuildEnv({ NEXT_PUBLIC_SUPABASE_URL: 'secret-url-value' }))
       .toThrow('core web: missing NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_ANON_KEY')

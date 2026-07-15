@@ -1,4 +1,4 @@
-import { resolveConfiguredProductState } from '@/lib/product-state-config'
+import { resolveConfiguredProductState } from './product-state-config'
 
 type Env = Partial<NodeJS.ProcessEnv>
 
