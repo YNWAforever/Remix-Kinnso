@@ -152,7 +152,8 @@ export async function getUpcomingSessions(): Promise<UpcomingSession[]> {
 export async function getHomeSessions(limit = 3): Promise<UpcomingSession[]> {
   try {
     const upcoming = await getUpcomingSessionsList(limit)
-    const rows = upcoming.length > 0 ? upcoming : await getReplaySessions(limit)
+    const accessibleUpcoming = upcoming.filter((session) => session.host !== null)
+    const rows = accessibleUpcoming.length > 0 ? accessibleUpcoming : await getReplaySessions(limit)
     return rows
       .filter((session) => session.host !== null)
       .map((session) => ({

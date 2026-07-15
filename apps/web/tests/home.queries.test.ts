@@ -185,6 +185,11 @@ describe('getHomeSessions', () => {
     upcomingMock.mockResolvedValue([]); replayMock.mockResolvedValue([replay, { ...replay, id: 'hidden', host: null }])
     await expect(getHomeSessions()).resolves.toEqual([{ id: 's2', slug: 'replay', title: 'Replay', hostHandle: 'mei', startsAt: '2026-01-01T00:00:00Z' }]); expect(replayMock).toHaveBeenCalledWith(3)
   })
+  it('falls back to replays when all upcoming rows lack an accessible host', async () => {
+    upcomingMock.mockResolvedValue([{ ...upcoming, host: null }]); replayMock.mockResolvedValue([replay])
+    await expect(getHomeSessions()).resolves.toEqual([{ id: 's2', slug: 'replay', title: 'Replay', hostHandle: 'mei', startsAt: '2026-01-01T00:00:00Z' }])
+    expect(replayMock).toHaveBeenCalledWith(3)
+  })
   it('returns an empty list when neither source has rows', async () => {
     upcomingMock.mockResolvedValue([]); replayMock.mockResolvedValue([]); await expect(getHomeSessions()).resolves.toEqual([])
   })
