@@ -38,7 +38,7 @@
 - `getSessionsLive(client?): Promise<boolean>`
 - `getProductState(): Promise<ProductState>` wrapped with React server `cache()`
 
-- [ ] **Step 1: Write RED tests for strict configured state**
+- [x] **Step 1: Write RED tests for strict configured state**
 
 Create `apps/web/tests/product-state.test.ts`. Assert:
 
@@ -57,11 +57,11 @@ Use a chainable mocked public client to cover:
 - neither query returns a row → false;
 - either query errors → false and a safe `product-state-sessions-query-failed` warning that excludes the raw error message.
 
-- [ ] **Step 2: Update env tests for the locked default**
+- [x] **Step 2: Update env tests for the locked default**
 
 In `apps/web/tests/env.test.ts`, make the shared `core` fixture explicitly disable Agent so unrelated validation tests remain isolated. Add tests proving an absent Agent flag now requires AI/Vercel configuration, explicit `AGENT_LIVE=false` does not, and invalid configured values fail before provider validation.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 ```powershell
 pnpm --filter web test -- product-state env
@@ -69,7 +69,7 @@ pnpm --filter web test -- product-state env
 
 Expected: FAIL because `product-state.ts` does not exist and current env parsing does not use the locked defaults.
 
-- [ ] **Step 4: Implement the server-only state module**
+- [x] **Step 4: Implement the server-only state module**
 
 Create pure `apps/web/lib/product-state-config.ts` with the configured-state type and parser. It trims and lowercases only `true`/`false`, uses Agent=true and Booking=false when absent, and names invalid variables without printing their values.
 
@@ -94,11 +94,11 @@ const replay = await client
 
 Return false on a safe caught failure. Export `getProductState` as a cached async composition of configured state plus `getSessionsLive()`.
 
-- [ ] **Step 5: Make env validation consume the same resolver**
+- [x] **Step 5: Make env validation consume the same resolver**
 
 Replace the local permissive flag helper in `apps/web/lib/env.ts`. Import the resolver from `product-state-config.ts`, call it once, then gate existing Agent and Booking provider requirements from the resolved booleans.
 
-- [ ] **Step 6: Verify GREEN and commit**
+- [x] **Step 6: Verify GREEN and commit**
 
 ```powershell
 pnpm --filter web test -- product-state env
@@ -118,7 +118,7 @@ git commit -m "feat(web): centralize product state"
 
 **Schema:** `feature_interest_signups(id, feature, email, locale, created_at)`, unique `(feature, email)`, RLS enabled, ops-only select, no direct public writes, RPC-only insert.
 
-- [ ] **Step 1: Generate the migration path using the CLI**
+- [x] **Step 1: Generate the migration path using the CLI**
 
 ```powershell
 pnpm exec supabase migration new r7_2_feature_interest_signups
@@ -126,7 +126,7 @@ pnpm exec supabase migration new r7_2_feature_interest_signups
 
 Record the exact path printed by the CLI and use it in every later command. Do not rename or hand-create a timestamp and do not edit any earlier migration.
 
-- [ ] **Step 2: Write the SQL contract test before SQL implementation**
+- [x] **Step 2: Write the SQL contract test before SQL implementation**
 
 Create `apps/web/tests/db.r7-2-feature-interest-signups.test.ts` reading the generated exact path. Assert the SQL contains:
 
@@ -140,7 +140,7 @@ Create `apps/web/tests/db.r7-2-feature-interest-signups.test.ts` reading the gen
 - function revoke from `public` and execute grants only to `anon, authenticated`;
 - no direct INSERT/UPDATE/DELETE table grant to `anon` or `authenticated`.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 ```powershell
 pnpm --filter web test -- db.r7-2-feature-interest-signups
@@ -148,7 +148,7 @@ pnpm --filter web test -- db.r7-2-feature-interest-signups
 
 Expected: FAIL because the CLI-created migration is empty.
 
-- [ ] **Step 4: Implement the audited migration**
+- [x] **Step 4: Implement the audited migration**
 
 In the generated migration, create the table and constraints. Add:
 
@@ -169,13 +169,13 @@ revoke all on function public.join_feature_interest(text, text, text) from publi
 grant execute on function public.join_feature_interest(text, text, text) to anon, authenticated;
 ```
 
-- [ ] **Step 5: Verify SQL contract locally**
+- [x] **Step 5: Verify SQL contract locally**
 
 ```powershell
 pnpm --filter web test -- db.r7-2-feature-interest-signups
 ```
 
-- [ ] **Step 6: Apply all migrations only to the local Supabase stack and regenerate types**
+- [x] **Step 6: Apply all migrations only to the local Supabase stack and regenerate types**
 
 ```powershell
 pnpm exec supabase start
@@ -187,7 +187,7 @@ Verify the generated type contains `feature_interest_signups` and `join_feature_
 
 If the local Docker/Supabase stack cannot run, stop this task and report the blocker; do not hand-edit generated types or apply the migration to production.
 
-- [ ] **Step 7: Verify and commit**
+- [x] **Step 7: Verify and commit**
 
 ```powershell
 pnpm --filter web test -- db.r7-2-feature-interest-signups
@@ -213,7 +213,7 @@ git commit -m "feat(db): add feature interest signups"
 - `joinFeatureInterestAction(input): Promise<{ ok: true } | { ok: false; code: 'invalid-email' | 'retry' }>`
 - `FeatureInterestForm({ feature, locale, t })`
 
-- [ ] **Step 1: Write Server Action RED tests**
+- [x] **Step 1: Write Server Action RED tests**
 
 Mock `createSupabasePublicClient().rpc`. Test valid normalized input, invalid email, invalid feature/locale defense, honeypot success without RPC, duplicate-safe success, and sanitized RPC failure. The action must call:
 
@@ -225,11 +225,11 @@ rpc('join_feature_interest', {
 })
 ```
 
-- [ ] **Step 2: Write form RED tests**
+- [x] **Step 2: Write form RED tests**
 
 Test an explicit email label, email input, hidden honeypot, feature-specific submit label, pending disablement, `role="status"` success, localized invalid-email feedback, and retryable generic feedback.
 
-- [ ] **Step 3: Add the seven-locale form group**
+- [x] **Step 3: Add the seven-locale form group**
 
 Add the same `featureInterest` shape to `en`, `zh-hk`, `zh-tw`, `ja`, `ko`, `th`, and `zh-cn`:
 
@@ -248,17 +248,17 @@ featureInterest: {
 
 The English Booking label is exactly `Get notified when booking opens`. Translate every other locale in its existing register; do not leave English fallback copy.
 
-- [ ] **Step 4: Run RED**
+- [x] **Step 4: Run RED**
 
 ```powershell
 pnpm --filter web test -- feature-interest i18n.locale-parity
 ```
 
-- [ ] **Step 5: Implement action and form**
+- [x] **Step 5: Implement action and form**
 
 The action is server-only, validates before RPC, and returns stable codes rather than database messages. The client form uses `useTransition`, clears stale errors before submit, prevents duplicate pending submission, and maps action codes to dictionary strings. Honeypot input is visually hidden, removed from keyboard order, and named innocuously.
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 ```powershell
 pnpm --filter web test -- feature-interest i18n.locale-parity
@@ -288,7 +288,7 @@ git commit -m "feat(web): capture feature interest"
 - Modify: `apps/web/tests/kinnso.HomeView.test.tsx`
 - Modify: all seven locale dictionaries
 
-- [ ] **Step 1: Add RED state-propagation tests**
+- [x] **Step 1: Add RED state-propagation tests**
 
 Add required `sessionsLive` props to `SiteChrome` and `Navbar` tests. Assert Sessions is absent in desktop and mobile navigation when false, and present when true.
 
@@ -298,17 +298,17 @@ Extend `home.queries.test.ts` before implementation: the home-session loader ret
 
 In `kinnso.home-how-it-works.test.tsx`, assert traveller step 3 selects separate Booking OFF and ON dictionary values from a required `bookingLive` prop.
 
-- [ ] **Step 2: Add locale variants**
+- [x] **Step 2: Add locale variants**
 
 Replace `home.howT3Desc` with `home.howT3DescLive` and `home.howT3DescWaitlist` across all seven dictionaries. Keep the existing live promise in the Live key and write notification-oriented OFF copy.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 ```powershell
 pnpm --filter web test -- kinnso.Navbar kinnso.SiteChrome layout.siteChrome home.host home.queries kinnso.HomeView kinnso.home-how-it-works i18n.locale-parity
 ```
 
-- [ ] **Step 4: Thread state through server boundaries**
+- [x] **Step 4: Thread state through server boundaries**
 
 Add `export const revalidate = 300` to locale layout if absent. Resolve `getProductState()` and pass `sessionsLive` to `SiteChrome` → `Navbar`.
 
@@ -318,7 +318,7 @@ In the home page, add `getProductState()` to the existing `Promise.all`, replace
 
 Filter the Navbar base-anchor definition before both desktop and mobile render paths so the Sessions link cannot leak through either representation.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 ```powershell
 pnpm --filter web test -- kinnso.Navbar kinnso.SiteChrome layout.siteChrome home.host home.queries kinnso.HomeView kinnso.home-how-it-works i18n.locale-parity
@@ -344,7 +344,7 @@ git commit -m "feat(web): gate sessions discovery"
 - Modify: `apps/web/tests/api.agent.route.test.ts`
 - Modify: all seven locale dictionaries
 
-- [ ] **Step 1: Write Agent two-state RED tests**
+- [x] **Step 1: Write Agent two-state RED tests**
 
 Homepage tests render `AgentTeaser` with both `agentLive` values. ON keeps the current `/agent` link and live copy. OFF renders Agent waitlist copy plus `FeatureInterestForm` and no live CTA.
 
@@ -354,7 +354,7 @@ API tests assert Agent OFF returns a stable 503 response before model, tool, or 
 
 Metadata tests call `generateMetadata()` in both states and compare its title/description to the corresponding visible-page dictionary branch.
 
-- [ ] **Step 2: Add explicit Agent locale branches**
+- [x] **Step 2: Add explicit Agent locale branches**
 
 Across all seven dictionaries:
 
@@ -364,13 +364,13 @@ Across all seven dictionaries:
 
 Keep current chat/live copy as the ON branch. Remove `Live now` from component source; locale dictionary content is allowed.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 ```powershell
 pnpm --filter web test -- kinnso.home-bands kinnso.agent-page.host agent.metadata-state api.agent.route i18n.locale-parity
 ```
 
-- [ ] **Step 4: Implement one-state selection**
+- [x] **Step 4: Implement one-state selection**
 
 `AgentTeaser` requires `agentLive` and `Messages['featureInterest']`, then chooses the dictionary branch. Thread `messages.featureInterest` through the homepage route and `HomeView`. `AgentWaitlistView` renders localized heading/body and the shared Agent form.
 
@@ -378,7 +378,7 @@ In both `generateMetadata()` and `AgentPage()`, call `resolveConfiguredProductSt
 
 At the start of traveller Agent `POST`, resolve the same state. Return a sanitized 503 when OFF before reading or persisting chat input; never modify creator copilot.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 ```powershell
 pnpm --filter web test -- kinnso.home-bands kinnso.agent-page.host agent.metadata-state api.agent.route i18n.locale-parity
@@ -400,7 +400,7 @@ git commit -m "feat(web): align agent claims with state"
 - Modify: `apps/web/tests/experiences.booking-actions.test.ts`
 - Modify: all seven locale dictionaries as required by the OFF wrapper copy
 
-- [ ] **Step 1: Write Booking two-state RED tests**
+- [x] **Step 1: Write Booking two-state RED tests**
 
 Host tests mock configured state and assert the experience page passes `bookingLive` into `ExperiencePublicView`.
 
@@ -414,13 +414,13 @@ Extend booking-action tests: Booking OFF returns a stable failure before auth, a
 
 Keep `BookingWidget` as the live-only client component; update its direct tests only for any required prop/type changes.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 ```powershell
 pnpm --filter web test -- experiences.public-detail.host experiences.booking-widget.host experiences.booking-actions feature-interest.form
 ```
 
-- [ ] **Step 3: Implement the server-side branch**
+- [x] **Step 3: Implement the server-side branch**
 
 Resolve configured state in the experience route without adding another request-bound API. Pass `bookingLive` and `messages.featureInterest` into `ExperiencePublicView`.
 
@@ -428,7 +428,7 @@ In `ExperiencePublicView`, render `BookingWidget` only when ON. Render `FeatureI
 
 Add the same `bookingLive` guard at the start of `createCheckoutSessionAction()` so a stale or manually invoked Server Action cannot create Checkout while OFF.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ```powershell
 pnpm --filter web test -- experiences.public-detail.host experiences.booking-widget.host experiences.booking-actions feature-interest.form
@@ -453,7 +453,7 @@ git commit -m "feat(web): gate booking checkout"
 - Modify: `apps/web/tests/articles.experience-links.test.tsx`
 - Modify: all seven locale dictionaries
 
-- [ ] **Step 1: Write all three two-state RED tests**
+- [x] **Step 1: Write all three two-state RED tests**
 
 Require `bookingLive` in each view. Assert:
 
@@ -461,7 +461,7 @@ Require `bookingLive` in each view. Assert:
 - creator earnings bullet selects its OFF/ON equivalents;
 - article experience module header selects discovery/notification copy OFF and ready-to-book copy ON while preserving the same experience cards and `?src=article` links.
 
-- [ ] **Step 2: Add locale variants**
+- [x] **Step 2: Add locale variants**
 
 Across all seven locale files, replace each ambiguous single claim with explicit pairs:
 
@@ -476,17 +476,17 @@ article: {
 }
 ```
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 ```powershell
 pnpm --filter web test -- for-merchants for-creators articles.experience-links i18n.locale-parity
 ```
 
-- [ ] **Step 4: Thread configured state and select copy**
+- [x] **Step 4: Thread configured state and select copy**
 
 Each server page calls `resolveConfiguredProductState()` and passes `bookingLive`. Components select only dictionary keys; they contain no hard-coded availability claims.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 ```powershell
 pnpm --filter web test -- for-merchants for-creators articles.experience-links i18n.locale-parity
@@ -504,7 +504,7 @@ git commit -m "feat(web): gate booking claims"
 - Modify: any touched test fixture that still omits a required state prop
 - Modify: `docs/superpowers/plans/2026-07-14-phase-r7-2-feature-state.md` checkboxes during execution
 
-- [ ] **Step 1: Write the copy guard**
+- [x] **Step 1: Write the copy guard**
 
 Recursively scan `.tsx` component source under `apps/web/components` and `apps/web/app`, excluding tests and locale dictionaries. Fail on exact literals:
 
@@ -514,7 +514,7 @@ const forbidden = ['Coming Soon', 'Live now', 'coming soon']
 
 The failure lists every file and phrase. Dictionary files, tests, migrations, and documentation are outside the scan.
 
-- [ ] **Step 2: Run focused R7.2 verification**
+- [x] **Step 2: Run focused R7.2 verification**
 
 ```powershell
 pnpm --filter web test -- product-state feature-interest db.r7-2 kinnso.Navbar home agent booking for-merchants for-creators articles.experience-links i18n.locale-parity
@@ -534,7 +534,9 @@ pnpm --filter @kinnso/e2e e2e -- --project=chromium
 
 Run E2E only against a local/Preview environment configured with Agent ON and Booking OFF. Do not submit the interest form against production.
 
-- [ ] **Step 4: Verify the production build in default state**
+Verification note (2026-07-16): the full serial web run completed with 333 files passing and only the two documented local-seed failures in `creator-rls.test.ts`; the separately enabled mission RLS file passed 12/13 with only the documented `missions_tp_program_uniq` rollback-fixture failure. E2E typecheck passed. The complete local Chromium set compatible with Booking OFF passed 19 tests with one designed creator-onboarding skip when the external scan path was unavailable. `booking.spec.ts` was intentionally excluded because it asserts live checkout and therefore contradicts the locked Booking OFF test state. This step remains unchecked because the command printed in the plan describes the complete E2E suite without that exclusion.
+
+- [x] **Step 4: Verify the production build in default state**
 
 Set non-secret local test values through the approved environment mechanism, with `AGENT_LIVE=false` if no AI/Vercel identity is available, then run:
 
@@ -544,7 +546,7 @@ pnpm --filter web build
 
 Expected: build succeeds; marketing routes remain static/ISR except already-dynamic personalized detail routes.
 
-- [ ] **Step 5: Browser-check the default visible contract**
+- [x] **Step 5: Browser-check the default visible contract**
 
 Start the local app with the locked visible defaults (`AGENT_LIVE=true`, `BOOKING_LIVE=false`, and `VERCEL=1` only as local build identity when no AI key is available). Do not send an Agent API request. Verify:
 
@@ -557,6 +559,8 @@ Start the local app with the locked visible defaults (`AGENT_LIVE=true`, `BOOKIN
 
 Do not submit to production. A local migrated stack or mocked Preview endpoint is the only permitted persistence target.
 
+Verified locally on 2026-07-16 against the production build with `AGENT_LIVE=true`, `BOOKING_LIVE=false`, and `VERCEL=1`. A unique `@example.com` Booking-interest address was submitted only to the local Supabase stack; the explicit label, hidden honeypot, keyboard order, delayed pending state, disabled button, and localized status announcement all passed. Home/Agent live state, Sessions nav hiding, Booking interest capture, and merchant/creator/article OFF claims also passed without browser errors.
+
 - [ ] **Step 6: Review migration/deployment gate**
 
 Confirm the PR clearly states:
@@ -567,7 +571,9 @@ Confirm the PR clearly states:
 - merge/production deployment is blocked until an authorized operator applies the migration, because Booking defaults OFF and renders the form;
 - rollback is a configuration redeploy for Agent/Booking and automatic ISR expiry for Sessions.
 
-- [ ] **Step 7: Commit verification artifacts**
+Deployment-gate note (2026-07-16): this step remains unchecked because the PR does not exist yet. Its handoff must name `supabase/migrations/20260714072649_r7_2_feature_interest_signups.sql`, record the successful local reset, state that production remains unapplied under read-only access, block merge/deployment until an authorized operator applies the migration, and retain the rollback statement above.
+
+- [x] **Step 7: Commit verification artifacts**
 
 ```powershell
 git add apps/web/tests/product-state.copy-guard.test.ts docs/superpowers/plans/2026-07-14-phase-r7-2-feature-state.md
