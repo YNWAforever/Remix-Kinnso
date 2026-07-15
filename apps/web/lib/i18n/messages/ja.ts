@@ -1331,6 +1331,16 @@ const messages: Messages = {
     emptyState: 'まだレビューはありません。',
     anonymousReviewer: 'KINNSOの旅行者',
   },
+  featureInterest: {
+    emailLabel: 'メールアドレス',
+    emailPlaceholder: 'you@example.com',
+    submitAgent: 'AIエージェントのウェイトリストに登録',
+    submitBooking: '予約開始時に通知を受け取る',
+    pending: '送信中…',
+    success: '登録が完了しました。最新情報をお知らせします。',
+    invalidEmail: '有効なメールアドレスを入力してください。',
+    retry: '登録できませんでした。もう一度お試しください。',
+  },
   sessions: {
     eyebrow: 'コミュニティセッション',
     title: '現地クリエイターによるライブブリーフィング。',

@@ -1331,6 +1331,16 @@ const messages: Messages = {
     emptyState: '아직 리뷰가 없습니다.',
     anonymousReviewer: 'KINNSO 여행자',
   },
+  featureInterest: {
+    emailLabel: '이메일 주소',
+    emailPlaceholder: 'you@example.com',
+    submitAgent: 'AI 에이전트 대기 명단 등록',
+    submitBooking: '예약이 열리면 알림 받기',
+    pending: '제출 중…',
+    success: '대기 명단에 등록되었습니다. 소식을 알려드릴게요.',
+    invalidEmail: '올바른 이메일 주소를 입력해 주세요.',
+    retry: '등록하지 못했습니다. 다시 시도해 주세요.',
+  },
   sessions: {
     eyebrow: '커뮤니티 세션',
     title: '현지 크리에이터의 라이브 브리핑.',

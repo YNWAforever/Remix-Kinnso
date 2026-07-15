@@ -1331,6 +1331,16 @@ const messages: Messages = {
     emptyState: 'ยังไม่มีรีวิว',
     anonymousReviewer: 'นักเดินทาง KINNSO',
   },
+  featureInterest: {
+    emailLabel: 'อีเมล',
+    emailPlaceholder: 'you@example.com',
+    submitAgent: 'เข้าร่วมรายชื่อรอ AI Agent',
+    submitBooking: 'แจ้งฉันเมื่อเปิดให้จอง',
+    pending: 'กำลังส่ง…',
+    success: 'คุณอยู่ในรายชื่อแล้ว เราจะแจ้งข่าวให้ทราบ',
+    invalidEmail: 'กรุณากรอกอีเมลที่ถูกต้อง',
+    retry: 'ยังบันทึกไม่ได้ โปรดลองอีกครั้ง',
+  },
   sessions: {
     eyebrow: 'คอมมูนิตี้เซสชัน',
     title: 'ไลฟ์สดจากครีเอเตอร์ตัวจริงในพื้นที่',

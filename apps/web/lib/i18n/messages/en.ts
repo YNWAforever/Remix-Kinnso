@@ -1185,6 +1185,16 @@ export interface Messages {
     emptyState: string
     anonymousReviewer: string
   }
+  featureInterest: {
+    emailLabel: string
+    emailPlaceholder: string
+    submitAgent: string
+    submitBooking: string
+    pending: string
+    success: string
+    invalidEmail: string
+    retry: string
+  }
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
@@ -2561,6 +2571,16 @@ const messages: Messages = {
     countLabel: '{count} reviews',
     emptyState: 'No reviews yet.',
     anonymousReviewer: 'A KINNSO traveller',
+  },
+  featureInterest: {
+    emailLabel: 'Email address',
+    emailPlaceholder: 'you@example.com',
+    submitAgent: 'Join the AI Agent waitlist',
+    submitBooking: 'Get notified when booking opens',
+    pending: 'Submitting…',
+    success: "You're on the list — we'll keep you posted.",
+    invalidEmail: 'Enter a valid email address.',
+    retry: 'Could not save your interest. Please try again.',
   },
   sessions: {
     eyebrow: 'Community Sessions',

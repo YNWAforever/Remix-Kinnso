@@ -1331,6 +1331,16 @@ const messages: Messages = {
     emptyState: '暂无评价。',
     anonymousReviewer: 'KINNSO 旅客',
   },
+  featureInterest: {
+    emailLabel: '电子邮箱地址',
+    emailPlaceholder: 'you@example.com',
+    submitAgent: '加入 AI 旅行助手候补名单',
+    submitBooking: '预订开放时通知我',
+    pending: '提交中…',
+    success: '你已加入名单，我们会通知你。',
+    invalidEmail: '请输入有效的电子邮箱地址。',
+    retry: '暂时无法保存，请重试。',
+  },
   sessions: {
     eyebrow: '社区活动',
     title: '来自一线创作者的实时分享。',
