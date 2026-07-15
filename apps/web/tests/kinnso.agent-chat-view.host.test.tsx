@@ -31,32 +31,46 @@ describe('AgentChatView', () => {
     vi.resetModules()
     vi.doMock('@ai-sdk/react', () => ({ useChat: () => ({ messages: [], sendMessage: sendMessageMock, status: 'ready', clearError: vi.fn() }) }))
     const { AgentChatView: AgentChatViewWithEmptyMessages } = await import('@/components/kinnso/pages/AgentChatView')
-    render(<AgentChatViewWithEmptyMessages locale="en" t={en.agent} configured={true} anonSessionId="sess-1" viewerSignedIn={false} />)
+    render(<AgentChatViewWithEmptyMessages locale="en" t={en.agent} configured={true} bookingLive={false} anonSessionId="sess-1" viewerSignedIn={false} />)
     expect(screen.getByText(en.agent.point1Title)).toBeTruthy()
+    expect(screen.getByText(en.agent.point1Body)).toBeTruthy()
+    expect(screen.queryByText(/bookable experience/i)).toBeNull()
+    expect(screen.getByText(en.agent.bodyBookingWaitlist)).toBeTruthy()
+    expect(screen.getByText(en.agent.point3TitleBookingWaitlist)).toBeTruthy()
+    expect(screen.getByText(en.agent.point3BodyBookingWaitlist)).toBeTruthy()
   })
 
+  it('renders booking-aware body and third value prop when Booking is ON', async () => {
+    vi.resetModules()
+    vi.doMock('@ai-sdk/react', () => ({ useChat: () => ({ messages: [], sendMessage: sendMessageMock, status: 'ready', clearError: vi.fn() }) }))
+    const { AgentChatView: AgentChatViewWithEmptyMessages } = await import('@/components/kinnso/pages/AgentChatView')
+    render(<AgentChatViewWithEmptyMessages locale="en" t={en.agent} configured={true} bookingLive anonSessionId="sess-1" viewerSignedIn={false} />)
+    expect(screen.getByText(en.agent.bodyBookingLive)).toBeTruthy()
+    expect(screen.getByText(en.agent.point3TitleBookingLive)).toBeTruthy()
+    expect(screen.getByText(en.agent.point3BodyBookingLive)).toBeTruthy()
+  })
   it('renders messages and a thumbs up/down control under each assistant message', () => {
-    render(<AgentChatView locale="en" t={en.agent} configured={true} anonSessionId="sess-1" viewerSignedIn={false} />)
+    render(<AgentChatView locale="en" t={en.agent} configured={true} bookingLive={false} anonSessionId="sess-1" viewerSignedIn={false} />)
     expect(screen.getByText('Here is a guide...')).toBeTruthy()
     expect(screen.getByLabelText(en.agent.ratingUpLabel)).toBeTruthy()
     expect(screen.getByLabelText(en.agent.ratingDownLabel)).toBeTruthy()
   })
 
   it('clicking thumbs-up calls rateAgentMessageAction with the message id and anonSessionId', async () => {
-    render(<AgentChatView locale="en" t={en.agent} configured={true} anonSessionId="sess-1" viewerSignedIn={false} />)
+    render(<AgentChatView locale="en" t={en.agent} configured={true} bookingLive={false} anonSessionId="sess-1" viewerSignedIn={false} />)
     fireEvent.click(screen.getByLabelText(en.agent.ratingUpLabel))
     expect(rateActionMock).toHaveBeenCalledWith('m2', 'up', 'sess-1')
   })
 
   it('sends the anonSessionId in the request body when not signed in', () => {
-    render(<AgentChatView locale="en" t={en.agent} configured={true} anonSessionId="sess-1" viewerSignedIn={false} />)
+    render(<AgentChatView locale="en" t={en.agent} configured={true} bookingLive={false} anonSessionId="sess-1" viewerSignedIn={false} />)
     fireEvent.change(screen.getByPlaceholderText(en.agent.inputPlaceholder), { target: { value: 'hello' } })
     fireEvent.click(screen.getByText(en.agent.send))
     expect(sendMessageMock).toHaveBeenCalledWith({ text: 'hello' }, { body: { locale: 'en', anonSessionId: 'sess-1' } })
   })
 
   it('renders an unconfigured state when configured=false', () => {
-    render(<AgentChatView locale="en" t={en.agent} configured={false} anonSessionId="sess-1" viewerSignedIn={false} />)
+    render(<AgentChatView locale="en" t={en.agent} configured={false} bookingLive={false} anonSessionId="sess-1" viewerSignedIn={false} />)
     expect(screen.getByText(en.agent.unconfiguredTitle)).toBeTruthy()
   })
 })

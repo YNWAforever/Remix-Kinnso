@@ -706,11 +706,11 @@ export interface Messages {
     testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
     howTabTravellers: string; howTabCreators: string; howTabMerchants: string
-    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3DescLive: string; howT3DescWaitlist: string
+    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3TitleLive: string; howT3TitleWaitlist: string; howT3DescLive: string; howT3DescWaitlist: string
     howC1Title: string; howC1Desc: string; howC2Title: string; howC2Desc: string; howC3Title: string; howC3Desc: string
     howM1Title: string; howM1Desc: string; howM2Title: string; howM2Desc: string; howM3Title: string; howM3Desc: string
     featuredEyebrow: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
-    agentLiveEyebrow: string; agentLiveTitle: string; agentLiveBody: string; agentLiveCta: string; agentLiveNote: string
+    agentLiveEyebrow: string; agentLiveTitle: string; agentLiveBodyBookingLive: string; agentLiveBodyBookingWaitlist: string; agentLiveCta: string; agentLiveNote: string
     agentWaitlistEyebrow: string; agentWaitlistTitle: string; agentWaitlistBody: string; agentWaitlistNote: string
     articlesEyebrow: string; articlesHeading: string; articlesSeeAll: string
     sessionsEyebrow: string; sessionsHeading: string; sessionsSub: string
@@ -735,12 +735,13 @@ export interface Messages {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
   agent: {
-    eyebrow: string; title: string; body: string
+    eyebrow: string; title: string; bodyBookingLive: string; bodyBookingWaitlist: string
     waitlistTitle: string; waitlistBody: string
     pointsHeading: string
     point1Title: string; point1Body: string
     point2Title: string; point2Body: string
-    point3Title: string; point3Body: string
+    point3TitleBookingLive: string; point3BodyBookingLive: string
+    point3TitleBookingWaitlist: string; point3BodyBookingWaitlist: string
     errorGeneric: string
     inputPlaceholder: string; send: string; toolWorking: string
     ratingUpLabel: string; ratingDownLabel: string
@@ -1719,7 +1720,8 @@ const messages: Messages = {
     howT1Desc: 'Browse guides by creators who actually live and travel the places you want to go.',
     howT2Title: 'Save the real spots',
     howT2Desc: 'Every guide is a route of real cafés, streets, and stays — not top-ten filler.',
-    howT3Title: 'Plan and book in one place',
+    howT3TitleLive: 'Plan and book in one place',
+    howT3TitleWaitlist: 'Plan now, book when it opens',
     howT3DescLive: 'Shape the trip with AI help, then book your picks without leaving KINNSO.',
     howT3DescWaitlist: 'Booking is not live yet. Join the waitlist and we’ll notify you when it opens.',
     howC1Title: 'Scan your profile',
@@ -1741,7 +1743,8 @@ const messages: Messages = {
     featuredEmpty: 'No published guides yet — the first ones are on their way.',
     agentLiveEyebrow: 'KINNSO AI Agent',
     agentLiveTitle: 'An agent that plans like a local.',
-    agentLiveBody: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
+    agentLiveBodyBookingLive: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
+    agentLiveBodyBookingWaitlist: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and experiences to shape a plan you can save while booking opens soon.',
     agentLiveCta: 'Try the AI Agent',
     agentLiveNote: 'Live now — ask it to plan your next trip.',
     agentWaitlistEyebrow: 'KINNSO AI Agent',
@@ -1804,13 +1807,15 @@ const messages: Messages = {
   agent: {
     eyebrow: 'KINNSO AI Agent',
     title: 'Your travel agent, grounded in real creator guides',
-    body: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and bookable experiences to help you plan.',
+    bodyBookingLive: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and bookable experiences to help you plan and book.',
+    bodyBookingWaitlist: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and experiences to help you plan and save recommendations while booking opens soon.',
     waitlistTitle: 'AI travel planning is opening soon',
     waitlistBody: 'Join the list and we will let you know when the KINNSO Agent is ready to plan with real creator guides and articles.',
     pointsHeading: 'What the agent does',
-    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or bookable experience — no invented spots.',
+    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or published experience — no invented spots.',
     point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',
-    point3Title: 'Built for booking', point3Body: 'When it surfaces a bookable experience, you can book it right from the conversation.',
+    point3TitleBookingLive: 'Built for booking', point3BodyBookingLive: 'When it surfaces a bookable experience, you can book it right from the conversation.',
+    point3TitleBookingWaitlist: 'Save now, book later', point3BodyBookingWaitlist: 'Save recommended experiences from the conversation; direct booking opens soon.',
     errorGeneric: 'Something went wrong — please try again.',
     inputPlaceholder: 'Ask about a destination, dates, or style of trip...',
     send: 'Send',

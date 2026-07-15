@@ -14,10 +14,11 @@ function textOf(m: UIMsg): string {
   return (m.parts ?? []).filter((p) => p.type === 'text').map((p) => p.text ?? '').join('')
 }
 
-export function AgentChatView({ locale, t, configured, anonSessionId, viewerSignedIn, initialMessages = [] }: {
+export function AgentChatView({ locale, t, configured, bookingLive, anonSessionId, viewerSignedIn, initialMessages = [] }: {
   locale: Locale
   t: Messages['agent']
   configured: boolean
+  bookingLive: boolean
   anonSessionId: string
   viewerSignedIn: boolean
   initialMessages?: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
@@ -66,14 +67,18 @@ export function AgentChatView({ locale, t, configured, anonSessionId, viewerSign
   const points = [
     { title: t.point1Title, body: t.point1Body, icon: <MapPinned aria-hidden="true" className="h-5 w-5" /> },
     { title: t.point2Title, body: t.point2Body, icon: <CalendarRange aria-hidden="true" className="h-5 w-5" /> },
-    { title: t.point3Title, body: t.point3Body, icon: <Compass aria-hidden="true" className="h-5 w-5" /> },
+    {
+      title: bookingLive ? t.point3TitleBookingLive : t.point3TitleBookingWaitlist,
+      body: bookingLive ? t.point3BodyBookingLive : t.point3BodyBookingWaitlist,
+      icon: <Compass aria-hidden="true" className="h-5 w-5" />,
+    },
   ]
 
   return (
     <main className="k2-container py-10">
       <header className="mb-6">
         <h1 className="k2-display flex items-center gap-2 text-3xl font-semibold"><Bot aria-hidden="true" className="h-7 w-7" /> {t.title}</h1>
-        <p className="mt-2 text-kinnso-ink/70">{t.body}</p>
+        <p className="mt-2 text-kinnso-ink/70">{bookingLive ? t.bodyBookingLive : t.bodyBookingWaitlist}</p>
       </header>
 
       {messages.length === 0 ? (

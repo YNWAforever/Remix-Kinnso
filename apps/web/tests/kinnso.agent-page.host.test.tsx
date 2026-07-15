@@ -18,10 +18,11 @@ vi.mock('@/lib/product-state', () => ({ resolveConfiguredProductState: configure
 vi.mock('@/lib/agent/config', () => ({ isAgentConfigured: () => true }))
 vi.mock('@/lib/agent/queries', () => ({ getAgentMessages: getAgentMessagesMock }))
 vi.mock('@/components/kinnso/pages/AgentChatView', () => ({
-  AgentChatView: (p: { configured: boolean; viewerSignedIn: boolean; anonSessionId: string; initialMessages: Array<{ id: string }> }) => (
+  AgentChatView: (p: { configured: boolean; bookingLive: boolean; viewerSignedIn: boolean; anonSessionId: string; initialMessages: Array<{ id: string }> }) => (
     <div
       data-testid="chat-view"
       data-configured={String(p.configured)}
+      data-booking-live={String(p.bookingLive)}
       data-signed-in={String(p.viewerSignedIn)}
       data-anon-session={p.anonSessionId}
       data-initial-count={p.initialMessages.length}
@@ -61,6 +62,18 @@ describe('/[locale]/agent host', () => {
     expect(view.getAttribute('data-anon-session')).toMatch(/^[0-9a-f-]{36}$/)
   })
 
+  it('passes Booking OFF through to the live Agent chat', async () => {
+    const ui = await AgentPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.getByTestId('chat-view').getAttribute('data-booking-live')).toBe('false')
+  })
+
+  it('passes Booking ON through to the live Agent chat', async () => {
+    configuredStateMock.mockReturnValueOnce({ agentLive: true, bookingLive: true })
+    const ui = await AgentPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.getByTestId('chat-view').getAttribute('data-booking-live')).toBe('true')
+  })
   it('renders AgentChatView with viewerSignedIn=true for a signed-in traveller', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'traveler-1' } } })
     const ui = await AgentPage({ params: Promise.resolve({ locale: 'en' }) })

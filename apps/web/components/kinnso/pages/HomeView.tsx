@@ -117,7 +117,7 @@ export function HomeView({
       </SectionShell>
 
       {/* 5 — AI Agent (waitlist framing until R4) */}
-      <AgentTeaser locale={locale} t={t} featureInterest={featureInterest} agentLive={productState.agentLive} />
+      <AgentTeaser locale={locale} t={t} featureInterest={featureInterest} agentLive={productState.agentLive} bookingLive={productState.bookingLive} />
 
       {/* 6 — Articles highlight (3 latest with a resolvable category; hidden when none) */}
       {linkableArticles.length > 0 ? (

@@ -33,6 +33,7 @@ function req(body: unknown) {
 
 beforeEach(() => {
   streamTextMock.mockClear()
+  configuredStateMock.mockClear()
   getUserMock.mockResolvedValue({ data: { user: null } })
   rpcMock.mockResolvedValue({ data: true, error: null })
   configuredMock.mockReturnValue(true)
@@ -78,8 +79,22 @@ describe('POST /api/agent', () => {
     expect(res.status).toBe(200)
     expect(rpcMock).toHaveBeenCalledWith('check_and_increment_agent_rate_limit', { p_ip: '1.2.3.4', p_max_requests: 20, p_window_seconds: 3600 })
     expect(streamTextMock).toHaveBeenCalledTimes(1)
-    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { model: string }
+    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { model: string; system: string }
     expect(arg.model).toBe('anthropic/claude-haiku-4.5')
+    expect(arg.system).toContain('Do not claim that an experience can be booked directly on KINNSO')
+    expect(arg.system).toContain('save recommendations')
+    expect(arg.system).toContain('booking opens soon')
+    expect(configuredStateMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('allows direct-booking language in the system prompt when Booking is ON', async () => {
+    configuredStateMock.mockReturnValueOnce({ agentLive: true, bookingLive: true })
+    const res = await POST(req({ messages: [{ role: 'user', parts: [{ type: 'text', text: 'find a Tokyo experience' }] }], locale: 'en', anonSessionId: 'sess-1' }))
+    expect(res.status).toBe(200)
+    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { system: string }
+    expect(arg.system).toContain('can be booked directly on KINNSO')
+    expect(arg.system).not.toContain('Do not claim that an experience can be booked directly on KINNSO')
+    expect(configuredStateMock).toHaveBeenCalledTimes(1)
   })
 
   it('streams for a signed-in traveller without requiring anonSessionId', async () => {

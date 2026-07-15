@@ -4,15 +4,18 @@ import { FeatureInterestForm } from '@/components/kinnso/FeatureInterestForm'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
-export function AgentTeaser({ locale, t, featureInterest, agentLive }: {
+export function AgentTeaser({ locale, t, featureInterest, agentLive, bookingLive }: {
   locale: Locale
   t: Messages['home']
   featureInterest: Messages['featureInterest']
   agentLive: boolean
+  bookingLive: boolean
 }) {
   const eyebrow = agentLive ? t.agentLiveEyebrow : t.agentWaitlistEyebrow
   const title = agentLive ? t.agentLiveTitle : t.agentWaitlistTitle
-  const body = agentLive ? t.agentLiveBody : t.agentWaitlistBody
+  const body = agentLive
+    ? (bookingLive ? t.agentLiveBodyBookingLive : t.agentLiveBodyBookingWaitlist)
+    : t.agentWaitlistBody
   const note = agentLive ? t.agentLiveNote : t.agentWaitlistNote
 
   return (

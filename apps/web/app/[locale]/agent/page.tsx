@@ -30,7 +30,7 @@ export default async function AgentPage({ params }: { params: Promise<{ locale: 
   if (!isLocale(locale)) notFound()
   const loc = locale as Locale
   const messages = await getDictionary(loc)
-  const { agentLive } = resolveConfiguredProductState()
+  const { agentLive, bookingLive } = resolveConfiguredProductState()
 
   if (!agentLive) {
     return <AgentWaitlistView locale={loc} t={messages.agent} featureInterest={messages.featureInterest} />
@@ -50,6 +50,7 @@ export default async function AgentPage({ params }: { params: Promise<{ locale: 
       locale={loc}
       t={messages.agent}
       configured={isAgentConfigured()}
+      bookingLive={bookingLive}
       viewerSignedIn={Boolean(user)}
       anonSessionId={randomUUID()}
       initialMessages={initialMessages.map((m) => ({ id: m.id, role: m.role, content: m.content }))}

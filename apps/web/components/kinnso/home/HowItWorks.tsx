@@ -27,7 +27,7 @@ export function HowItWorks({ t, bookingLive }: { t: Messages['home']; bookingLiv
     traveller: [
       { title: t.howT1Title, desc: t.howT1Desc },
       { title: t.howT2Title, desc: t.howT2Desc },
-      { title: t.howT3Title, desc: bookingLive ? t.howT3DescLive : t.howT3DescWaitlist },
+      { title: bookingLive ? t.howT3TitleLive : t.howT3TitleWaitlist, desc: bookingLive ? t.howT3DescLive : t.howT3DescWaitlist },
     ],
     creator: [
       { title: t.howC1Title, desc: t.howC1Desc },
