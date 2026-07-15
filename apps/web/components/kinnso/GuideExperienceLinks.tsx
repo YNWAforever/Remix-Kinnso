@@ -24,8 +24,8 @@ export async function GuideExperienceLinks({ locale, city, guideSlug, t }: {
   const hrefQuery = `src=guide&guideSlug=${encodeURIComponent(guideSlug)}`
   return (
     <div className="mt-6 rounded-lg bg-white p-6">
-      <p className="k2-eyebrow">{t.experiencesNearbyEyebrow}</p>
-      <h2 className="k2-display mt-3 text-lg font-semibold text-kinnso-ink">{t.experiencesNearbyHeading}</h2>
+      <p className="k2-eyebrow">{t.experiencesNearbyEyebrowWaitlist}</p>
+      <h2 className="k2-display mt-3 text-lg font-semibold text-kinnso-ink">{t.experiencesNearbyHeadingWaitlist}</h2>
       <div className="mt-5 grid gap-4">
         {experiences.map((exp) => (
           <ExperienceLinkCard key={exp.id} locale={locale} experience={exp} hrefQuery={hrefQuery} />

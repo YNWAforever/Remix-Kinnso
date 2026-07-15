@@ -269,7 +269,7 @@ export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
   breadcrumb: { home: string; articles: string }
-  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string; experiencesNearbyEyebrow: string; experiencesNearbyHeading: string }
+  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string; experiencesNearbyEyebrowWaitlist: string; experiencesNearbyHeadingWaitlist: string; experiencesNearbyEyebrowLive: string; experiencesNearbyHeadingLive: string }
   detailError: { title: string; body: string; retry: string; explore: string }
   seo: {
     brandTitle: string
@@ -753,7 +753,7 @@ export interface Messages {
     step1Title: string; step1Body: string
     step2Title: string; step2Body: string
     step3Title: string; step3Body: string
-    whyHeading: string; why1: string; why2: string; why3: string
+    whyHeading: string; why1: string; why2: string; why3Waitlist: string; why3Live: string
     testimonialsHeading: string
     ctaTitle: string; ctaBody: string; ctaButton: string
   }
@@ -764,7 +764,7 @@ export interface Messages {
     step1Title: string; step1Body: string
     step2Title: string; step2Body: string
     step3Title: string; step3Body: string
-    whyHeading: string; why1: string; why2: string; why3: string
+    whyHeading: string; why1: string; why2: string; why3Waitlist: string; why3Live: string
     testimonialsHeading: string
     ctaTitle: string; ctaBody: string; ctaButton: string
   }
@@ -1235,7 +1235,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
   breadcrumb: { home: 'Home', articles: 'Articles' },
-  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination', experiencesNearbyEyebrow: 'Ready to book?', experiencesNearbyHeading: 'Bookable experiences here' },
+  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination', experiencesNearbyEyebrowWaitlist: 'Experiences nearby', experiencesNearbyHeadingWaitlist: 'Save for your trip', experiencesNearbyEyebrowLive: 'Bookable experiences', experiencesNearbyHeadingLive: 'Ready to book?' },
   detailError: { title: "We couldn't load this page", body: 'A temporary problem interrupted loading. Try again, or keep exploring.', retry: 'Try again', explore: 'Back to Explore' },
   seo: {
     brandTitle: 'KINNSO — Travel creators, real missions',
@@ -1832,7 +1832,7 @@ const messages: Messages = {
     whyHeading: 'Why creators choose KINNSO',
     why1: 'You keep your voice — merchants brief you, they don’t script you.',
     why2: 'Transparent payouts with a real ledger, not a black box.',
-    why3: 'Your guides keep earning after the trip ends — bookings are coming, and your recommendations power them.',
+    why3Waitlist: 'Your guides keep earning after the trip ends — bookings are coming, and your recommendations power them.', why3Live: 'Bookings on your recommendations pay you commission.',
     testimonialsHeading: 'Creators on KINNSO',
     ctaTitle: 'Your next trip could pay for itself',
     ctaBody: 'Apply in minutes. Publish your first guide this week.',
@@ -1850,7 +1850,7 @@ const messages: Messages = {
     whyHeading: 'Why merchants choose KINNSO',
     why1: 'Creators are vetted with real audience data, not follower counts.',
     why2: 'You approve work before you pay — no surprises.',
-    why3: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.',
+    why3Waitlist: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.', why3Live: 'Direct booking is live: recommendations link straight to your bookable inventory.',
     testimonialsHeading: 'Merchants on KINNSO',
     ctaTitle: 'Your next campaign starts with a brief',
     ctaBody: 'Post your first mission today — our team reviews every brief within 48 hours.',

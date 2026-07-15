@@ -4,6 +4,7 @@ import { ForMerchantsView } from '@/components/kinnso/pages/ForMerchantsView'
 import { getPublishedTestimonials } from '@/lib/home/queries'
 import { isLocale, LOCALES, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export const revalidate = 300
@@ -26,5 +27,6 @@ export default async function ForMerchantsPage({ params }: { params: Promise<{ l
     getDictionary(locale as Locale),
     getPublishedTestimonials(locale as Locale, 'merchant'),
   ])
-  return <ForMerchantsView locale={locale as Locale} t={messages.forMerchants} testimonials={testimonials} />
+  const { bookingLive } = resolveConfiguredProductState()
+  return <ForMerchantsView locale={locale as Locale} t={messages.forMerchants} testimonials={testimonials} bookingLive={bookingLive} />
 }

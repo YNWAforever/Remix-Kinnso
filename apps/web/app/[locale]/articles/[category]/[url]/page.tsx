@@ -14,6 +14,7 @@ import { ArticleCard } from '@/components/ArticleCard'
 import { ViewPing } from '@/components/ViewPing'
 import { JsonLd } from '@/components/JsonLd'
 import { getPostDirectory } from '@/lib/articles/blocks'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 
 export const revalidate = 2700 // 45 min (matches legacy article-detail cache TTL)
 export const dynamicParams = true
@@ -47,6 +48,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
   if (!a || !a.translation) notFound()       // missing locale / unpublished / category mismatch -> 404
 
   const dict = await getDictionary(loc)
+  const { bookingLive } = resolveConfiguredProductState()
   const directory = getPostDirectory(a.translation.content)
   const youMayLike = await getYouMayLike(a.id, loc, 5)
 
@@ -95,7 +97,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
           {a.thumbnails[0] && <img src={a.thumbnails[0]} alt={a.translation.title ?? ''} className="rounded-card w-full mb-6" />}
           <ArticleBlockRenderer blocks={a.translation.content} />
           <ArticleGuideLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} />
-          <ArticleExperienceLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} />
+          <ArticleExperienceLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} bookingLive={bookingLive} />
 
           {a.faqs.length > 0 && (
             <section className="mt-10">
