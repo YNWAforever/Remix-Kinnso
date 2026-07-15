@@ -9,18 +9,29 @@ import { MerchantValue } from '@/components/kinnso/home/MerchantValue'
 import { CreatorCta } from '@/components/kinnso/home/CreatorCta'
 import en from '@/lib/i18n/messages/en'
 
-describe('AgentTeaser (section 5 — waitlist framing)', () => {
-  it('shows value copy + waitlist CTA to /agent and NO email capture', () => {
-    const { container } = render(<AgentTeaser locale="en" t={en.home} />)
-    expect(screen.getByText(en.home.agentTitle)).toBeTruthy()
-    expect(screen.getByText(en.home.agentBody)).toBeTruthy()
-    expect(screen.getByText(en.home.agentNote)).toBeTruthy()
-    expect(screen.getByRole('link', { name: new RegExp(en.home.agentCta) }).getAttribute('href')).toBe('/en/agent')
+describe('AgentTeaser (section 5)', () => {
+  it('shows the live copy and /agent CTA when Agent is ON', () => {
+    const { container } = render(
+      <AgentTeaser locale="en" t={en.home} featureInterest={en.featureInterest} agentLive />,
+    )
+    expect(screen.getByText(en.home.agentLiveTitle)).toBeTruthy()
+    expect(screen.getByText(en.home.agentLiveBody)).toBeTruthy()
+    expect(screen.getByText(en.home.agentLiveNote)).toBeTruthy()
+    expect(screen.getByRole('link', { name: new RegExp(en.home.agentLiveCta) }).getAttribute('href')).toBe('/en/agent')
     expect(container.querySelector('input')).toBeNull()
     expect(container.querySelector('form')).toBeNull()
   })
-})
 
+  it('shows interest capture and no live CTA when Agent is OFF', () => {
+    render(
+      <AgentTeaser locale="en" t={en.home} featureInterest={en.featureInterest} agentLive={false} />,
+    )
+    expect(screen.getByText(en.home.agentWaitlistTitle)).toBeTruthy()
+    expect(screen.getByText(en.home.agentWaitlistBody)).toBeTruthy()
+    expect(screen.getByRole('form', { name: en.featureInterest.submitAgent })).toBeTruthy()
+    expect(screen.queryByRole('link', { name: new RegExp(en.home.agentLiveCta) })).toBeNull()
+  })
+})
 describe('MerchantValue (section 8)', () => {
   it('renders the three benefit bullets and the CTA to /for-merchants', () => {
     render(<MerchantValue locale="en" t={en.home} />)

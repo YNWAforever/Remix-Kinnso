@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { streamTextMock, getUserMock, rpcMock, getClientIpMock, configuredMock } = vi.hoisted(() => ({
+const { streamTextMock, createSupabaseServerClientMock, getUserMock, rpcMock, getClientIpMock, configuredMock, configuredStateMock } = vi.hoisted(() => ({
   streamTextMock: vi.fn(() => ({ toUIMessageStreamResponse: () => new Response('stream', { status: 200 }) })),
+  createSupabaseServerClientMock: vi.fn(),
   getUserMock: vi.fn(async () => ({ data: { user: null } })),
   rpcMock: vi.fn(async () => ({ data: true, error: null })),
   getClientIpMock: vi.fn(async () => '1.2.3.4'),
   configuredMock: vi.fn(() => true),
+  configuredStateMock: vi.fn(() => ({ agentLive: true, bookingLive: false })),
 }))
 
 vi.mock('ai', () => ({
@@ -15,11 +17,12 @@ vi.mock('ai', () => ({
   tool: (def: unknown) => def,
 }))
 vi.mock('@/lib/agent/config', () => ({ isAgentConfigured: configuredMock }))
+vi.mock('@/lib/product-state', () => ({ resolveConfiguredProductState: configuredStateMock }))
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
 vi.mock('@/lib/agent/queries', () => ({ appendAgentMessage: vi.fn(async () => {}) }))
 vi.mock('@/lib/agent/tools', () => ({ makeAgentTools: () => ({}) }))
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock }, rpc: rpcMock }),
+  createSupabaseServerClient: createSupabaseServerClientMock,
 }))
 
 import { POST } from '@/app/api/agent/route'
@@ -33,9 +36,25 @@ beforeEach(() => {
   getUserMock.mockResolvedValue({ data: { user: null } })
   rpcMock.mockResolvedValue({ data: true, error: null })
   configuredMock.mockReturnValue(true)
+  configuredStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
+  createSupabaseServerClientMock.mockClear()
+  createSupabaseServerClientMock.mockResolvedValue({ auth: { getUser: getUserMock }, rpc: rpcMock })
 })
 
 describe('POST /api/agent', () => {
+  it('returns a stable 503 before request, configuration, auth, model, tools, or persistence work when Agent is OFF', async () => {
+    configuredStateMock.mockReturnValueOnce({ agentLive: false, bookingLive: false })
+    const jsonMock = vi.fn(async () => ({ messages: [] }))
+    const res = await POST({ json: jsonMock } as unknown as Request)
+    expect(res.status).toBe(503)
+    await expect(res.json()).resolves.toEqual({ error: 'agent_unavailable' })
+    expect(jsonMock).not.toHaveBeenCalled()
+    expect(configuredMock).not.toHaveBeenCalled()
+    expect(createSupabaseServerClientMock).not.toHaveBeenCalled()
+    expect(getClientIpMock).not.toHaveBeenCalled()
+    expect(rpcMock).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
   it('503s when the gateway is unconfigured', async () => {
     configuredMock.mockReturnValueOnce(false)
     const res = await POST(req({ messages: [], locale: 'en', anonSessionId: 'sess-1' }))

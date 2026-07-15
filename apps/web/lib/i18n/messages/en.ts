@@ -277,7 +277,8 @@ export interface Messages {
     home: { title: string; description: string }
     explore: { title: string; description: string }
     creators: { title: string; description: string }
-    agent: { title: string; description: string }
+    agentLive: { title: string; description: string }
+    agentWaitlist: { title: string; description: string }
     about: { title: string; description: string }
     contact: { title: string; description: string }
     merchants: { title: string; description: string }
@@ -709,7 +710,8 @@ export interface Messages {
     howC1Title: string; howC1Desc: string; howC2Title: string; howC2Desc: string; howC3Title: string; howC3Desc: string
     howM1Title: string; howM1Desc: string; howM2Title: string; howM2Desc: string; howM3Title: string; howM3Desc: string
     featuredEyebrow: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
-    agentEyebrow: string; agentTitle: string; agentBody: string; agentCta: string; agentNote: string
+    agentLiveEyebrow: string; agentLiveTitle: string; agentLiveBody: string; agentLiveCta: string; agentLiveNote: string
+    agentWaitlistEyebrow: string; agentWaitlistTitle: string; agentWaitlistBody: string; agentWaitlistNote: string
     articlesEyebrow: string; articlesHeading: string; articlesSeeAll: string
     sessionsEyebrow: string; sessionsHeading: string; sessionsSub: string
     merchantEyebrow: string; merchantHeading: string
@@ -734,6 +736,7 @@ export interface Messages {
   }
   agent: {
     eyebrow: string; title: string; body: string
+    waitlistTitle: string; waitlistBody: string
     pointsHeading: string
     point1Title: string; point1Body: string
     point2Title: string; point2Body: string
@@ -1251,9 +1254,13 @@ const messages: Messages = {
       title: 'Discover travel creators',
       description: 'Find travel and lifestyle creators on KINNSO by niche, audience, and platform.',
     },
-    agent: {
+    agentLive: {
+      title: 'KINNSO AI travel agent — plan with real creator guides',
+      description: 'Plan your trip with an AI travel agent that searches real KINNSO creator guides, articles, and experiences.',
+    },
+    agentWaitlist: {
       title: 'KINNSO AI travel agent — join the waitlist',
-      description: 'An AI travel agent grounded in real creator guides. Join the waitlist to be first in when it opens.',
+      description: 'An AI travel agent grounded in real creator guides. Join the waitlist to hear when it opens.',
     },
     about: {
       title: 'About KINNSO',
@@ -1732,11 +1739,15 @@ const messages: Messages = {
     featuredSub: 'The latest city guides published by KINNSO creators.',
     featuredSeeAll: 'See all guides',
     featuredEmpty: 'No published guides yet — the first ones are on their way.',
-    agentEyebrow: 'KINNSO AI Agent',
-    agentTitle: 'An agent that plans like a local.',
-    agentBody: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
-    agentCta: 'Try the AI Agent',
-    agentNote: 'Live now — ask it to plan your next trip.',
+    agentLiveEyebrow: 'KINNSO AI Agent',
+    agentLiveTitle: 'An agent that plans like a local.',
+    agentLiveBody: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
+    agentLiveCta: 'Try the AI Agent',
+    agentLiveNote: 'Live now — ask it to plan your next trip.',
+    agentWaitlistEyebrow: 'KINNSO AI Agent',
+    agentWaitlistTitle: 'Be first to plan with the KINNSO Agent.',
+    agentWaitlistBody: 'Join the list to hear when our travel agent, grounded in real creator guides and articles, is ready for you.',
+    agentWaitlistNote: 'We will only email you about Agent availability.',
     articlesEyebrow: 'From the journal',
     articlesHeading: 'Stories from the ground.',
     articlesSeeAll: 'Read all articles',
@@ -1794,6 +1805,8 @@ const messages: Messages = {
     eyebrow: 'KINNSO AI Agent',
     title: 'Your travel agent, grounded in real creator guides',
     body: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and bookable experiences to help you plan.',
+    waitlistTitle: 'AI travel planning is opening soon',
+    waitlistBody: 'Join the list and we will let you know when the KINNSO Agent is ready to plan with real creator guides and articles.',
     pointsHeading: 'What the agent does',
     point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or bookable experience — no invented spots.',
     point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',

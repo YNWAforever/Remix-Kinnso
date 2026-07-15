@@ -6,7 +6,9 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { isAgentConfigured } from '@/lib/agent/config'
 import { getAgentMessages } from '@/lib/agent/queries'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 import { AgentChatView } from '@/components/kinnso/pages/AgentChatView'
+import { AgentWaitlistView } from '@/components/kinnso/pages/AgentWaitlistView'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export function generateStaticParams() {
@@ -16,30 +18,36 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
   if (!isLocale(locale)) return {}
-  const dict = await getDictionary(locale as Locale)
-  return buildPageMetadata({ path: '/agent', locale: locale as Locale, title: dict.seo.agent.title, description: dict.seo.agent.description })
+  const loc = locale as Locale
+  const dict = await getDictionary(loc)
+  const { agentLive } = resolveConfiguredProductState()
+  const seo = agentLive ? dict.seo.agentLive : dict.seo.agentWaitlist
+  return buildPageMetadata({ path: '/agent', locale: loc, title: seo.title, description: seo.description })
 }
 
 export default async function AgentPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
-  const messages = await getDictionary(locale as Locale)
+  const loc = locale as Locale
+  const messages = await getDictionary(loc)
+  const { agentLive } = resolveConfiguredProductState()
+
+  if (!agentLive) {
+    return <AgentWaitlistView locale={loc} t={messages.agent} featureInterest={messages.featureInterest} />
+  }
 
   const supabase = await createSupabaseServerClient()
   // auth.getUser() makes this page request-dynamic — needed so the chat view knows
-  // whether to send an anonSessionId (same reasoning as the experience page's
-  // equivalent comment from R3A-2).
+  // whether to send an anonSessionId.
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Sign-in unlocks reading a traveller's saved conversation back (D-R4-4 / plan
-  // Ground Truth note). Anon sessions have no read policy at all, so there is
-  // nothing to fetch for an anon visitor — same asymmetry as appendAgentMessage's
-  // insert-only anon path.
+  // Signed-in travellers can read their saved conversation; anonymous visitors
+  // have the insert-only path and therefore no history to fetch.
   const initialMessages = user ? await getAgentMessages(supabase, user.id) : []
 
   return (
     <AgentChatView
-      locale={locale as Locale}
+      locale={loc}
       t={messages.agent}
       configured={isAgentConfigured()}
       viewerSignedIn={Boolean(user)}

@@ -24,10 +24,11 @@ import type { ProductState } from '@/lib/product-state'
  * Every proof section is data-gated: empty data renders nothing, never filler.
  */
 export function HomeView({
-  locale, t, guides, stats, testimonials, articles, sessions, productState,
+  locale, t, featureInterest, guides, stats, testimonials, articles, sessions, productState,
 }: {
   locale: Locale
   t: Messages['home']
+  featureInterest: Messages['featureInterest']
   guides: Guide[]
   stats: PlatformStats | null
   testimonials: Testimonial[]
@@ -116,7 +117,7 @@ export function HomeView({
       </SectionShell>
 
       {/* 5 — AI Agent (waitlist framing until R4) */}
-      <AgentTeaser locale={locale} t={t} />
+      <AgentTeaser locale={locale} t={t} featureInterest={featureInterest} agentLive={productState.agentLive} />
 
       {/* 6 — Articles highlight (3 latest with a resolvable category; hidden when none) */}
       {linkableArticles.length > 0 ? (

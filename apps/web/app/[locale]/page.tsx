@@ -43,6 +43,7 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
     <HomeView
       locale={loc}
       t={messages.home}
+      featureInterest={messages.featureInterest}
       guides={guides}
       stats={stats}
       testimonials={testimonials}

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { streamText, stepCountIs, convertToModelMessages, type UIMessage } from 'ai'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { isAgentConfigured } from '@/lib/agent/config'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 import { AGENT_MODEL, AGENT_RATE_LIMIT } from '@/lib/agent/policy'
 import { makeAgentTools } from '@/lib/agent/tools'
 import { appendAgentMessage, type AgentIdentity } from '@/lib/agent/queries'
@@ -31,6 +32,9 @@ function lastUserText(messages: UIMessage[]): string {
 }
 
 export async function POST(req: Request) {
+  if (!resolveConfiguredProductState().agentLive) {
+    return NextResponse.json({ error: 'agent_unavailable' }, { status: 503 })
+  }
   if (!isAgentConfigured()) return NextResponse.json({ error: 'unconfigured' }, { status: 503 })
 
   const supabase = await createSupabaseServerClient()

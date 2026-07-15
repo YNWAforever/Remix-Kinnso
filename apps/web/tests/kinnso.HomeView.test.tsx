@@ -27,7 +27,7 @@ const articles = [
 const sessions = [{ id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' }]
 
 const productState = { agentLive: true, bookingLive: false, sessionsLive: true }
-const base = { locale: 'en' as const, t: en.home, guides, stats, testimonials, articles, sessions, productState }
+const base = { locale: 'en' as const, t: en.home, featureInterest: en.featureInterest, guides, stats, testimonials, articles, sessions, productState }
 
 describe('HomeView (R1B 10-section homepage)', () => {
   it('renders the locked hero with both CTAs and a real-cover collage', () => {
@@ -75,7 +75,7 @@ describe('HomeView (R1B 10-section homepage)', () => {
   })
 
   it('links each Sessions band card to its detail page', () => {
-    render(<HomeView locale="en" t={en.home} productState={productState} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[
+    render(<HomeView locale="en" t={en.home} featureInterest={en.featureInterest} productState={productState} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[
       { id: 's1', slug: 'tokyo-briefing', title: 'Tokyo briefing', hostHandle: 'sora', startsAt: '2026-08-01T10:00:00Z' },
     ]} />)
     expect(screen.getByRole('link', { name: /Tokyo briefing/ }).getAttribute('href')).toBe('/en/sessions/tokyo-briefing')
@@ -85,13 +85,13 @@ describe('HomeView (R1B 10-section homepage)', () => {
     render(<HomeView {...base} />)
     expect(screen.getByRole('link', { name: en.home.merchantCta }).getAttribute('href')).toBe('/en/for-merchants')
     expect(screen.getByRole('link', { name: en.home.creatorCta }).getAttribute('href')).toBe('/en/for-creators')
-    expect(screen.getByRole('link', { name: new RegExp(en.home.agentCta) }).getAttribute('href')).toBe('/en/agent')
+    expect(screen.getByRole('link', { name: new RegExp(en.home.agentLiveCta) }).getAttribute('href')).toBe('/en/agent')
   })
 
   it('AgentTeaser links straight to /agent with live-chat copy, not waitlist copy', () => {
     render(<HomeView {...base} />)
-    expect(screen.getByText(en.home.agentCta)).toBeTruthy()
-    const link = screen.getByText(en.home.agentCta).closest('a')
+    expect(screen.getByText(en.home.agentLiveCta)).toBeTruthy()
+    const link = screen.getByText(en.home.agentLiveCta).closest('a')
     expect(link?.getAttribute('href')).toBe('/en/agent')
   })
 
