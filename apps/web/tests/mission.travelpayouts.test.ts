@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}))
 
 import {
   buildSubId,
+  canonicalizeTravelpayoutsPartnerUrl,
   createTravelpayoutsPartnerLinks,
   fetchTravelpayoutsActions,
   normalizeTravelpayoutsAction,
@@ -30,6 +31,79 @@ describe('Travelpayouts adapter', () => {
     expect(subId).toMatch(/^[0-9A-Za-z_]+$/)
     expect(subId).toContain(creatorId.replace(/-/g, '')) // creator still recoverable for attribution
     expect(subId.length).toBeLessThanOrEqual(4096)
+  })
+
+  it('canonicalizes a Travelpayouts short link with the deterministic SubID', () => {
+    expect(
+      canonicalizeTravelpayoutsPartnerUrl(
+        'https://brand.tp.st/path?sub_id=wrong&erid=campaign',
+        'creator_sub',
+      ),
+    ).toBe('https://brand.tp.st/path?sub_id=creator_sub&erid=campaign')
+
+    expect(
+      canonicalizeTravelpayoutsPartnerUrl('https://tp.st/path', 'creator_sub'),
+    ).toBe('https://tp.st/path?sub_id=creator_sub')
+  })
+
+  it('canonicalizes a nested Travelpayouts host with one deterministic SubID', () => {
+    const subId = buildSubId({
+      missionId: '389edc00-ed11-468e-a289-52215930c8c0',
+      participantId: 'dd24c548-aae0-4567-b08a-8f8185b186d1',
+      creatorId: 'a0000000-0000-4000-a000-00000000ad01',
+    })
+
+    const canonical = new URL(canonicalizeTravelpayoutsPartnerUrl(
+      'https://a.b.tp.st/path?sub_id=wrong&sub_id=duplicate',
+      subId,
+    ))
+
+    expect(canonical.hostname).toBe('a.b.tp.st')
+    expect(canonical.searchParams.getAll('sub_id')).toEqual([subId])
+  })
+
+  it.each([
+    'https://a.b.tp.st/path',
+    'https://valid-label.deep-host.tp.st/path',
+  ])('accepts a valid Travelpayouts hostname: %s', (partnerUrl) => {
+    expect(canonicalizeTravelpayoutsPartnerUrl(partnerUrl, 'creator_sub'))
+      .toBe(`${partnerUrl}?sub_id=creator_sub`)
+  })
+
+  it.each([
+    'https://.tp.st/path',
+    'https://a..tp.st/path',
+    'https://foo_bar.tp.st/path',
+    'https://-edge.tp.st/path',
+    'https://edge-.tp.st/path',
+  ])('rejects a malformed Travelpayouts hostname: %s', (partnerUrl) => {
+    expect(() => canonicalizeTravelpayoutsPartnerUrl(partnerUrl, 'creator_sub'))
+      .toThrow('Travelpayouts returned an invalid partner URL')
+  })
+  it('collapses duplicate SubIDs, preserves unrelated parameters, and clears fragments', () => {
+    expect(
+      canonicalizeTravelpayoutsPartnerUrl(
+        'https://brand.tp.st/path?sub_id=wrong&erid=campaign&sub_id=other#details',
+        'creator_sub',
+      ),
+    ).toBe('https://brand.tp.st/path?sub_id=creator_sub&erid=campaign')
+  })
+
+  it.each([
+    'http://brand.tp.st/path',
+    'https://brand.tp.st.evil.example/path',
+    'https://example.com/path',
+    'https://user:pass@tp.st/path',
+    'https://tp.st:8443/path',
+    'not-a-url',
+  ])('rejects an untrusted partner URL: %s', (partnerUrl) => {
+    expect(() => canonicalizeTravelpayoutsPartnerUrl(partnerUrl, 'creator_sub'))
+      .toThrow('Travelpayouts returned an invalid partner URL')
+  })
+
+  it('rejects a SubID outside the Travelpayouts-safe character set', () => {
+    expect(() => canonicalizeTravelpayoutsPartnerUrl('https://tp.st/path', 'bad-sub'))
+      .toThrow('Travelpayouts SubID is invalid')
   })
 
   it('creates partner links with server-side token and marker', async () => {

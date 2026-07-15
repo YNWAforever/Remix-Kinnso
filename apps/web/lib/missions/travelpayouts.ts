@@ -63,6 +63,40 @@ export const buildSubId = ({ missionId, participantId, creatorId }: BuildSubIdIn
   return `kinnso_m_${stripHyphens(missionId)}_p_${stripHyphens(participantId)}_c_${stripHyphens(creatorId)}`
 }
 
+export function canonicalizeTravelpayoutsPartnerUrl(partnerUrl: string, subId: string) {
+  if (!/^[0-9A-Za-z_]+$/.test(subId)) {
+    throw new Error('Travelpayouts SubID is invalid')
+  }
+
+  let url: URL
+  try {
+    url = new URL(partnerUrl)
+  } catch {
+    throw new Error('Travelpayouts returned an invalid partner URL')
+  }
+
+  const hostname = url.hostname.toLowerCase()
+  const subdomain = hostname.endsWith('.tp.st')
+    ? hostname.slice(0, -'.tp.st'.length)
+    : ''
+  const validHostnameLabel = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/
+  const trustedHost = hostname === 'tp.st'
+    || (subdomain !== '' && subdomain.split('.').every(label => validHostnameLabel.test(label)))
+  if (
+    url.protocol !== 'https:'
+    || !trustedHost
+    || url.port !== ''
+    || url.username !== ''
+    || url.password !== ''
+  ) {
+    throw new Error('Travelpayouts returned an invalid partner URL')
+  }
+
+  url.hash = ''
+  url.searchParams.set('sub_id', subId)
+  return url.toString()
+}
+
 const requireEnv = (name: string) => {
   const value = process.env[name]?.trim()
   if (!value) throw new Error(`Missing required environment variable: ${name}`)
