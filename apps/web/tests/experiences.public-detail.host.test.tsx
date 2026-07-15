@@ -3,13 +3,17 @@ import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 
-const { getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock, createSupabaseServerClientMock, createCheckoutSessionActionMock } = vi.hoisted(() => ({
+const { resolveConfiguredProductStateMock, joinFeatureInterestActionMock, getExperienceBySlugMock, listPublicAvailabilityMock, getUserMock, createSupabaseServerClientMock, createCheckoutSessionActionMock } = vi.hoisted(() => ({
+  resolveConfiguredProductStateMock: vi.fn(),
+  joinFeatureInterestActionMock: vi.fn(),
   getExperienceBySlugMock: vi.fn(),
   listPublicAvailabilityMock: vi.fn(async (): Promise<PublicAvailability[]> => []),
   getUserMock: vi.fn(async () => ({ data: { user: null as { email: string; id?: string } | null } })),
   createSupabaseServerClientMock: vi.fn(),
   createCheckoutSessionActionMock: vi.fn(),
 }))
+vi.mock('@/lib/product-state', () => ({ resolveConfiguredProductState: resolveConfiguredProductStateMock }))
+vi.mock('@/lib/feature-interest/actions', () => ({ joinFeatureInterestAction: joinFeatureInterestActionMock }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('notFound') },
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -47,6 +51,10 @@ import en from '@/lib/i18n/messages/en'
 afterEach(cleanup)
 
 beforeEach(() => {
+  resolveConfiguredProductStateMock.mockReset()
+  resolveConfiguredProductStateMock.mockReturnValue({ agentLive: true, bookingLive: true })
+  joinFeatureInterestActionMock.mockReset()
+  joinFeatureInterestActionMock.mockResolvedValue({ ok: true })
   getExperienceBySlugMock.mockReset()
   listPublicAvailabilityMock.mockReset()
   listPublicAvailabilityMock.mockResolvedValue([])
@@ -177,6 +185,35 @@ describe('ExperiencePublicPage', () => {
     expect(ld).toContain('"@type":"Product"')
   })
 
+  it('renders Booking interest capture and no checkout or Offer claim when Booking is OFF', async () => {
+    resolveConfiguredProductStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z', savesCount: 42,
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
+
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({ src: 'guide', guideSlug: 'kyoto-tea' }),
+    })
+    render(el)
+
+    expect(resolveConfiguredProductStateMock).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: en.featureInterest.submitBooking })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /book now/i })).toBeNull()
+    expect(screen.queryByLabelText(en.booking.selectDateLabel)).toBeNull()
+    expect(screen.queryByLabelText(en.booking.qtyLabel)).toBeNull()
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).not.toContain('"@type":"Product"')
+
+    fireEvent.change(screen.getByLabelText(en.featureInterest.emailLabel), { target: { value: 'traveller@example.com' } })
+    fireEvent.submit(screen.getByRole('form', { name: en.featureInterest.submitBooking }))
+    await vi.waitFor(() => expect(joinFeatureInterestActionMock).toHaveBeenCalledOnce())
+    expect(createCheckoutSessionActionMock).not.toHaveBeenCalled()
+  })
   it('omits Product/Offer JSON-LD when there is no availability', async () => {
     getExperienceBySlugMock.mockResolvedValue({
       id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',

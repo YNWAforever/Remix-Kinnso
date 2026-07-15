@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Bookmark } from 'lucide-react'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { BookingWidget } from '@/components/kinnso/pages/BookingWidget'
+import { FeatureInterestForm } from '@/components/kinnso/FeatureInterestForm'
 import { ExperienceSaveButton } from '@/components/kinnso/ExperienceSaveButton'
 import type { PublicExperience } from '@/lib/experiences/public-queries'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
@@ -11,11 +12,13 @@ import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 export function ExperiencePublicView({
-  locale, t, bookingT, reviewsT, experienceSaveT, experience, availability, viewerEmail, viewerId, isSaved, rating, reviews, sourceSurface, guideSlug,
+  locale, t, bookingT, featureInterestT, bookingLive, reviewsT, experienceSaveT, experience, availability, viewerEmail, viewerId, isSaved, rating, reviews, sourceSurface, guideSlug,
 }: {
   locale: Locale
   t: Messages['experiencePublic']
   bookingT: Messages['booking']
+  featureInterestT: Messages['featureInterest']
+  bookingLive: boolean
   reviewsT: Messages['reviews']
   experienceSaveT: Messages['experienceSave']
   experience: PublicExperience
@@ -72,7 +75,13 @@ export function ExperiencePublicView({
           {experience.durationMinutes ? (
             <p className="mt-3 text-sm text-kinnso-ink/70">{t.durationLabel}: {experience.durationMinutes} {t.minutesSuffix}</p>
           ) : null}
-          <BookingWidget locale={locale} t={bookingT} experience={experience} availability={availability} viewerEmail={viewerEmail} sourceSurface={sourceSurface} guideSlug={guideSlug} />
+          {bookingLive ? (
+            <BookingWidget locale={locale} t={bookingT} experience={experience} availability={availability} viewerEmail={viewerEmail} sourceSurface={sourceSurface} guideSlug={guideSlug} />
+          ) : (
+            <div className="mt-5">
+              <FeatureInterestForm feature="booking" locale={locale} t={featureInterestT} />
+            </div>
+          )}
           <Link href={p(`/m/${experience.merchant.slug}`)} className="mt-4 inline-block text-sm font-semibold text-kinnso-orangeDark hover:underline">
             {t.backToMerchant} {experience.merchant.companyName}
           </Link>

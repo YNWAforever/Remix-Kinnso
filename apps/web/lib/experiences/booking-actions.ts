@@ -13,6 +13,7 @@ import { getGuideBySlug } from '@/lib/guides/queries'
 import { getStripeClient, toStripeAmount } from '@/lib/stripe/client'
 import { getClientIp } from '@/lib/http/client-ip'
 import type { Locale } from '@/lib/i18n/config'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 
 type ActionFailure = { ok: false; errors: CheckoutValidationErrors }
 type ActionResult<T extends Record<string, unknown> = Record<string, never>> =
@@ -56,6 +57,10 @@ export async function createCheckoutSessionAction(
   rawInput: CreateCheckoutSessionInput,
   options: { locale: Locale; sourceSurface?: string; guideSlug?: string },
 ): Promise<ActionResult<{ checkoutUrl: string }>> {
+  if (!resolveConfiguredProductState().bookingLive) {
+    return formError('Something went wrong. Please try again.')
+  }
+
   const supabase = await createSupabaseServerClient()
   const {
     data: { user },

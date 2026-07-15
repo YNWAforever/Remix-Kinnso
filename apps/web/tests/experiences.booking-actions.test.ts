@@ -2,7 +2,11 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-const { getUserMock, fromMock, rpcMock, getExperienceByIdMock, getClientIpMock, sessionsCreateMock, sessionsExpireMock, getGuideBySlugMock } = vi.hoisted(() => ({
+const { resolveConfiguredProductStateMock, createSupabaseServerClientMock, validateCheckoutInputMock, getStripeClientMock, getUserMock, fromMock, rpcMock, getExperienceByIdMock, getClientIpMock, sessionsCreateMock, sessionsExpireMock, getGuideBySlugMock } = vi.hoisted(() => ({
+  resolveConfiguredProductStateMock: vi.fn(),
+  createSupabaseServerClientMock: vi.fn(),
+  validateCheckoutInputMock: vi.fn(),
+  getStripeClientMock: vi.fn(),
   getUserMock: vi.fn(),
   fromMock: vi.fn(),
   rpcMock: vi.fn(),
@@ -13,19 +17,24 @@ const { getUserMock, fromMock, rpcMock, getExperienceByIdMock, getClientIpMock, 
   getGuideBySlugMock: vi.fn(),
 }))
 
+vi.mock('@/lib/product-state', () => ({ resolveConfiguredProductState: resolveConfiguredProductStateMock }))
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: { getUser: getUserMock },
-    from: fromMock,
-    rpc: rpcMock,
-  }),
+  createSupabaseServerClient: createSupabaseServerClientMock,
 }))
+vi.mock('@/lib/experiences/booking-validation', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/experiences/booking-validation')>()
+  return {
+    ...actual,
+    validateCheckoutInput: (...args: Parameters<typeof actual.validateCheckoutInput>) => {
+      validateCheckoutInputMock(...args)
+      return actual.validateCheckoutInput(...args)
+    },
+  }
+})
 vi.mock('@/lib/experiences/public-queries', () => ({ getExperienceById: getExperienceByIdMock }))
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
 vi.mock('@/lib/stripe/client', () => ({
-  getStripeClient: () => ({
-    checkout: { sessions: { create: sessionsCreateMock, expire: sessionsExpireMock } },
-  }),
+  getStripeClient: getStripeClientMock,
   toStripeAmount: (amount: number) => Math.round(amount * 100),
 }))
 vi.mock('@/lib/guides/queries', () => ({ getGuideBySlug: getGuideBySlugMock }))
@@ -40,6 +49,19 @@ const experience = {
 const openAvailability = { id: 'avail1', capacity: 10, booked_count: 2, status: 'open', date: '2999-01-01' }
 
 beforeEach(() => {
+  resolveConfiguredProductStateMock.mockReset()
+  resolveConfiguredProductStateMock.mockReturnValue({ agentLive: true, bookingLive: true })
+  createSupabaseServerClientMock.mockReset()
+  createSupabaseServerClientMock.mockResolvedValue({
+    auth: { getUser: getUserMock },
+    from: fromMock,
+    rpc: rpcMock,
+  })
+  validateCheckoutInputMock.mockReset()
+  getStripeClientMock.mockReset()
+  getStripeClientMock.mockReturnValue({
+    checkout: { sessions: { create: sessionsCreateMock, expire: sessionsExpireMock } },
+  })
   getUserMock.mockReset()
   fromMock.mockReset()
   rpcMock.mockReset()
@@ -59,6 +81,37 @@ function mockAvailabilityLookup(row: unknown) {
     select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve({ data: row, error: null }) }) }) }),
   })
 }
+
+it('returns a stable failure synchronously before any checkout work when Booking is OFF', async () => {
+  resolveConfiguredProductStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
+  getUserMock.mockResolvedValue({ data: { user: { id: 'u1', email: 'traveler@example.com' } } })
+  mockAvailabilityLookup(openAvailability)
+  sessionsCreateMock.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/cs_123' })
+  fromMock.mockReturnValueOnce({ insert: () => Promise.resolve({ error: null }) })
+
+  const resultPromise = createCheckoutSessionAction(
+    'exp1',
+    { availabilityId: 'avail1', qty: '1' },
+    { locale: 'en', sourceSurface: 'guide', guideSlug: 'kyoto-tea' },
+  )
+
+  const resolverCallsBeforeAwait = resolveConfiguredProductStateMock.mock.calls.length
+  const result = await resultPromise
+  expect(resolverCallsBeforeAwait).toBe(1)
+  expect(resolveConfiguredProductStateMock).toHaveBeenCalledOnce()
+  expect(result).toEqual({ ok: false, errors: { form: ['Something went wrong. Please try again.'] } })
+  expect(createSupabaseServerClientMock).not.toHaveBeenCalled()
+  expect(getUserMock).not.toHaveBeenCalled()
+  expect(validateCheckoutInputMock).not.toHaveBeenCalled()
+  expect(getClientIpMock).not.toHaveBeenCalled()
+  expect(rpcMock).not.toHaveBeenCalled()
+  expect(getExperienceByIdMock).not.toHaveBeenCalled()
+  expect(fromMock).not.toHaveBeenCalled()
+  expect(getGuideBySlugMock).not.toHaveBeenCalled()
+  expect(getStripeClientMock).not.toHaveBeenCalled()
+  expect(sessionsCreateMock).not.toHaveBeenCalled()
+  expect(sessionsExpireMock).not.toHaveBeenCalled()
+})
 
 describe('createCheckoutSessionAction (signed-in traveler)', () => {
   beforeEach(() => {

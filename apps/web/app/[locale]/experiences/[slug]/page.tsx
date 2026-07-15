@@ -14,6 +14,7 @@ import { buildExperienceMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { breadcrumbJsonLd, experienceOfferJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,6 +38,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
   const guideSlug = firstOf(sp.guideSlug)
   if (!isLocale(locale)) notFound()
   const messages = await getDictionary(locale as Locale)
+  const { bookingLive } = resolveConfiguredProductState()
   const experience = await getExperienceBySlug(slug)
   if (!experience) notFound()
 
@@ -66,7 +68,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
       { name: messages.seo.merchants.title, url: `${SITE_URL}/${locale}/merchants` },
       { name: experience.title, url: canonical },
     ]),
-    ...(hasOpenAvailability
+    ...(bookingLive && hasOpenAvailability
       ? [experienceOfferJsonLd({
           name: experience.title,
           description: experience.summary ?? experience.description ?? `${experience.city} experience`,
@@ -85,6 +87,8 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
         locale={locale as Locale}
         t={messages.experiencePublic}
         bookingT={messages.booking}
+        featureInterestT={messages.featureInterest}
+        bookingLive={bookingLive}
         reviewsT={messages.reviews}
         experienceSaveT={messages.experienceSave}
         experience={experience}
