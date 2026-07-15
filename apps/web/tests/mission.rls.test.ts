@@ -579,6 +579,13 @@ d('mission schema RLS', () => {
     })
     expect(conflictingQuerySubId.error).not.toBeNull()
 
+    const smuggledQuerySubId = await creator.rpc('create_travelpayouts_partner_link', {
+      ...rpcArgs,
+      p_original_url: 'https://example.com/travel-rpc-smuggled-sub-id',
+      p_partner_url: `https://brand.tp.st/link?x=?sub_id=${expectedSubId}`,
+    })
+    expect(smuggledQuerySubId.error).not.toBeNull()
+
     const participantDisabled = await svc
       .from('mission_participants')
       .update({ status: 'rejected' })

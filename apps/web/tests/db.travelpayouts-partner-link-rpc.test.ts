@@ -46,6 +46,7 @@ describe('Travelpayouts partner-link persistence migration', () => {
       "v_partner_url !~* '^https://(([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)\\.)*tp\\.st/[^[:space:]#]*$'",
     )
     expect(compact).toContain("position('#' in v_partner_url) > 0")
+    expect(compact).toContain("regexp_count(v_partner_url, '\\?') <> 1")
     expect(compact).toContain("regexp_count(v_partner_url, '[?&]sub_id=') <> 1")
     expect(compact).toContain(
       "v_partner_url !~ ('[?&]sub_id=' || v_expected_sub_id || '(&|$)')",
