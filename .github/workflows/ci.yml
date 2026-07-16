@@ -101,6 +101,10 @@ jobs:
             | tee apps/scan/.env.local > /dev/null
 
       - name: Start scan worker (fixture mode) and web app
+        env:
+          AGENT_LIVE: 'true'
+          BOOKING_LIVE: 'false'
+          VERCEL: '1'
         run: |
           # tsx src/server.ts reads process.env directly (no dotenv), unlike
           # `next dev` which auto-loads .env.local — so export the worker's env here.
@@ -109,7 +113,7 @@ jobs:
           set +a
           SCAN_FIXTURE_MODE=1 pnpm --filter @kinnso/scan-app start &
           pnpm --filter web dev &
-          npx --yes wait-on http://localhost:8788/health http://localhost:3000
+          npx --yes wait-on --timeout 120000 http://localhost:8788/health http://localhost:3000
 
       - name: Run PR smoke journeys
         env:
