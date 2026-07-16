@@ -1,10 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
 
-const { publicClientMock } = vi.hoisted(() => ({ publicClientMock: vi.fn() }))
+const { publicClientMock, upcomingMock, replayMock } = vi.hoisted(() => ({
+  publicClientMock: vi.fn(), upcomingMock: vi.fn(), replayMock: vi.fn(),
+}))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: publicClientMock }))
+vi.mock('@/lib/sessions/public-queries', () => ({ getUpcomingSessionsList: upcomingMock, getReplaySessions: replayMock }))
 
 import {
-  getPlatformStats, getPublishedTestimonials, getUpcomingSessions,
+  getPlatformStats, getPublishedTestimonials, getUpcomingSessions, getHomeSessions,
   STAT_THRESHOLDS, MIN_VISIBLE_STATS, shuffle,
 } from '@/lib/home/queries'
 
@@ -170,6 +173,31 @@ describe('getUpcomingSessions (R5)', () => {
   })
 })
 
+describe('getHomeSessions', () => {
+  const upcoming = { id: 's1', slug: 'upcoming', title: 'Upcoming', startsAt: '2027-01-01T00:00:00Z', host: { handle: 'sora', displayName: 'Sora' }, status: 'scheduled', replayUrl: null }
+  const replay = { id: 's2', slug: 'replay', title: 'Replay', startsAt: '2026-01-01T00:00:00Z', host: { handle: 'mei', displayName: 'Mei' }, status: 'ended', replayUrl: 'https://example.com/replay' }
+  it('returns scheduled/live rows first and does not query replays', async () => {
+    upcomingMock.mockResolvedValue([upcoming, { ...upcoming, id: 'hidden', host: null }]); replayMock.mockResolvedValue([replay])
+    await expect(getHomeSessions(3)).resolves.toEqual([{ id: 's1', slug: 'upcoming', title: 'Upcoming', hostHandle: 'sora', startsAt: '2027-01-01T00:00:00Z' }])
+    expect(upcomingMock).toHaveBeenCalledWith(3); expect(replayMock).not.toHaveBeenCalled()
+  })
+  it('falls back to ended rows with replay URLs when no upcoming rows exist', async () => {
+    upcomingMock.mockResolvedValue([]); replayMock.mockResolvedValue([replay, { ...replay, id: 'hidden', host: null }])
+    await expect(getHomeSessions()).resolves.toEqual([{ id: 's2', slug: 'replay', title: 'Replay', hostHandle: 'mei', startsAt: '2026-01-01T00:00:00Z' }]); expect(replayMock).toHaveBeenCalledWith(3)
+  })
+  it('falls back to replays when all upcoming rows lack an accessible host', async () => {
+    upcomingMock.mockResolvedValue([{ ...upcoming, host: null }]); replayMock.mockResolvedValue([replay])
+    await expect(getHomeSessions()).resolves.toEqual([{ id: 's2', slug: 'replay', title: 'Replay', hostHandle: 'mei', startsAt: '2026-01-01T00:00:00Z' }])
+    expect(replayMock).toHaveBeenCalledWith(3)
+  })
+  it('returns an empty list when neither source has rows', async () => {
+    upcomingMock.mockResolvedValue([]); replayMock.mockResolvedValue([]); await expect(getHomeSessions()).resolves.toEqual([])
+  })
+  it('returns an empty list with only a sanitized warning on query failure', async () => {
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined); upcomingMock.mockRejectedValue(new Error('secret database detail'))
+    await expect(getHomeSessions()).resolves.toEqual([]); expect(warning).toHaveBeenCalledWith('home-sessions-query-failed'); expect(warning.mock.calls.flat().join(' ')).not.toContain('secret database detail'); warning.mockRestore()
+  })
+})
 describe('display thresholds (locked R1B decisions + R3C addition)', () => {
   it('exports the honesty thresholds as constants', () => {
     expect(STAT_THRESHOLDS).toEqual({

@@ -53,11 +53,11 @@ describe('front-of-house route parity', () => {
     const hrefs = new Set<string>()
 
     roles.forEach((role) => {
-      collectInternalLinks(<Navbar locale="en" role={role} t={en.nav} />).forEach((href) => hrefs.add(href))
+      collectInternalLinks(<Navbar locale="en" role={role} sessionsLive t={en.nav} />).forEach((href) => hrefs.add(href))
     })
     collectInternalLinks(<Footer locale="en" t={en.footer} />).forEach((href) => hrefs.add(href))
     collectInternalLinks(
-      <HomeView locale="en" t={en.home} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[]} />,
+      <HomeView locale="en" t={en.home} featureInterest={en.featureInterest} productState={{ agentLive: true, bookingLive: false, sessionsLive: true }} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[]} />,
     ).forEach((href) => hrefs.add(href))
 
     const missing = Array.from(hrefs).filter((href) => !isImplementedLocalRoute(href))

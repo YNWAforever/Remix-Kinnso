@@ -10,6 +10,7 @@ vi.mock('next/navigation', () => ({
   notFound: vi.fn(),
 }))
 vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
+vi.mock('@/lib/product-state', () => ({ getProductState: async () => ({ agentLive: true, bookingLive: false, sessionsLive: false }) }))
 // app/layout.tsx calls next/font/google factories at module eval; they are not
 // callable under vitest (no Next SWC font transform). Stub them to {variable}.
 vi.mock('next/font/google', () => ({
@@ -18,7 +19,7 @@ vi.mock('next/font/google', () => ({
   Inter: () => ({ variable: 'font-inter' }),
 }))
 
-import LocaleLayout from '@/app/[locale]/layout'
+import LocaleLayout, { revalidate } from '@/app/[locale]/layout'
 import en from '@/lib/i18n/messages/en'
 
 describe('[locale]/layout mounts the global shell', () => {
@@ -29,5 +30,10 @@ describe('[locale]/layout mounts the global shell', () => {
     expect(screen.getByText('BODY')).toBeTruthy()
     expect(screen.getByRole('link', { name: en.nav.ctaApply })).toBeTruthy()
     expect(screen.getByText(en.footer.tagline)).toBeTruthy()
+    expect(document.querySelector('header a[href="/en/sessions"]')).toBeNull()
+  })
+
+  it('ISR-revalidates product state every 5 minutes', () => {
+    expect(revalidate).toBe(300)
   })
 })

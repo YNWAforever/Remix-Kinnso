@@ -20,7 +20,7 @@ import type { Messages } from "@/lib/i18n/messages/en";
  * chrome is gated at xl: (tablets get the hamburger) so the row never overflows
  * at 768–1100px.
  */
-export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["nav"] }> = ({ locale, role, t }) => {
+export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: boolean; t: Messages["nav"] }> = ({ locale, role, sessionsLive, t }) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const p = (path: string) => `/${locale}${path}`;
@@ -40,7 +40,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; t: Messages["n
     { to: "/agent",        label: t.linkAgent },
     { to: "/creators",     label: t.linkCreators },
     { to: "/merchants",    label: t.linkMerchants },
-  ];
+  ].filter((anchor) => sessionsLive || anchor.to !== "/sessions");
   // Merchant deep links: slim second row on desktop + tray entries on mobile —
   // never on the top row, which cannot fit nine anchors.
   const merchantAnchors = [

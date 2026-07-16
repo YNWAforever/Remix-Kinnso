@@ -1,3 +1,5 @@
+import { resolveConfiguredProductState } from './product-state-config'
+
 type Env = Partial<NodeJS.ProcessEnv>
 
 const value = (env: Env, name: string) => env[name]?.trim() || undefined
@@ -17,8 +19,6 @@ function oneOf(env: Env, feature: string, names: string[]): string {
   return missing(feature, names.join(' or '))
 }
 
-const enabled = (env: Env, name: string) => value(env, name)?.toLowerCase() === 'true'
-
 export function getSupabasePublicEnv(env: Env = process.env) {
   return {
     url: oneOf(env, 'core web', ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_URL']),
@@ -31,13 +31,15 @@ export function getStripeSecretKey(env: Env = process.env): string {
 }
 
 export function validateBuildEnv(env: Env = process.env): void {
+  const { agentLive, bookingLive } = resolveConfiguredProductState(env)
+
   getSupabasePublicEnv(env)
-  if (enabled(env, 'BOOKING_LIVE')) {
+  if (bookingLive) {
     oneOf(env, 'booking', ['STRIPE_SECRET_KEY'])
     oneOf(env, 'booking', ['STRIPE_WEBHOOK_SECRET'])
     oneOf(env, 'booking', ['NEXT_PUBLIC_SITE_URL'])
   }
-  if (enabled(env, 'AGENT_LIVE') && !value(env, 'AI_GATEWAY_API_KEY') && value(env, 'VERCEL') !== '1') {
+  if (agentLive && !value(env, 'AI_GATEWAY_API_KEY') && value(env, 'VERCEL') !== '1') {
     missing('agent', 'AI_GATEWAY_API_KEY or VERCEL=1')
   }
 }

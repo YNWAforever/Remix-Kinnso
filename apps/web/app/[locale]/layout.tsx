@@ -8,6 +8,9 @@ import { JsonLd } from '@/components/JsonLd'
 import { SITE_URL, OG_LOCALE } from '@/lib/seo/metadata'
 import { organizationJsonLd, websiteJsonLd } from '@/lib/seo/jsonld'
 import { fontVariables } from '../layout'
+import { getProductState } from '@/lib/product-state'
+
+export const revalidate = 300
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -44,7 +47,7 @@ export default async function LocaleLayout({
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   const loc = locale as Locale
-  const messages = await getDictionary(loc)
+  const [messages, productState] = await Promise.all([getDictionary(loc), getProductState()])
   const ld = [
     organizationJsonLd({ url: SITE_URL, logo: `${SITE_URL}/favicon.ico` }),
     websiteJsonLd({
@@ -56,7 +59,7 @@ export default async function LocaleLayout({
     <html lang={htmlLang(loc)} className={`h-full antialiased ${fontVariables}`}>
       <body className="min-h-full flex flex-col font-sans bg-kinnso-cream text-kinnso-ink">
         <JsonLd data={ld} />
-        <SiteChrome locale={loc} nav={messages.nav} footer={messages.footer}>
+        <SiteChrome locale={loc} sessionsLive={productState.sessionsLive} nav={messages.nav} footer={messages.footer}>
           {children}
         </SiteChrome>
       </body>

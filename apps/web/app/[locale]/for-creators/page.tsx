@@ -4,6 +4,7 @@ import { ForCreatorsView } from '@/components/kinnso/pages/ForCreatorsView'
 import { getPublishedTestimonials } from '@/lib/home/queries'
 import { isLocale, LOCALES, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export const revalidate = 300
@@ -26,5 +27,6 @@ export default async function ForCreatorsPage({ params }: { params: Promise<{ lo
     getDictionary(locale as Locale),
     getPublishedTestimonials(locale as Locale, 'creator'),
   ])
-  return <ForCreatorsView locale={locale as Locale} t={messages.forCreators} testimonials={testimonials} />
+  const { bookingLive } = resolveConfiguredProductState()
+  return <ForCreatorsView locale={locale as Locale} t={messages.forCreators} testimonials={testimonials} bookingLive={bookingLive} />
 }

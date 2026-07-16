@@ -269,7 +269,7 @@ export interface Messages {
   brand: string
   categories: { destinations: string; dining: string; shopping: string }
   breadcrumb: { home: string; articles: string }
-  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string; experiencesNearbyEyebrow: string; experiencesNearbyHeading: string }
+  article: { youMayLike: string; faqTitle: string; tableOfContents: string; by: string; fallbackNotice: string; guidesNearbyEyebrow: string; guidesNearbyHeading: string; experiencesNearbyEyebrowWaitlist: string; experiencesNearbyHeadingWaitlist: string; experiencesNearbyEyebrowLive: string; experiencesNearbyHeadingLive: string }
   detailError: { title: string; body: string; retry: string; explore: string }
   seo: {
     brandTitle: string
@@ -277,7 +277,8 @@ export interface Messages {
     home: { title: string; description: string }
     explore: { title: string; description: string }
     creators: { title: string; description: string }
-    agent: { title: string; description: string }
+    agentLive: { title: string; description: string }
+    agentWaitlist: { title: string; description: string }
     about: { title: string; description: string }
     contact: { title: string; description: string }
     merchants: { title: string; description: string }
@@ -705,11 +706,12 @@ export interface Messages {
     testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
     howTabTravellers: string; howTabCreators: string; howTabMerchants: string
-    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3Title: string; howT3Desc: string
+    howT1Title: string; howT1Desc: string; howT2Title: string; howT2Desc: string; howT3TitleLive: string; howT3TitleWaitlist: string; howT3DescLive: string; howT3DescWaitlist: string
     howC1Title: string; howC1Desc: string; howC2Title: string; howC2Desc: string; howC3Title: string; howC3Desc: string
     howM1Title: string; howM1Desc: string; howM2Title: string; howM2Desc: string; howM3Title: string; howM3Desc: string
     featuredEyebrow: string; featuredHeading: string; featuredSub: string; featuredSeeAll: string; featuredEmpty: string
-    agentEyebrow: string; agentTitle: string; agentBody: string; agentCta: string; agentNote: string
+    agentLiveEyebrow: string; agentLiveTitle: string; agentLiveBodyBookingLive: string; agentLiveBodyBookingWaitlist: string; agentLiveCta: string; agentLiveNote: string
+    agentWaitlistEyebrow: string; agentWaitlistTitle: string; agentWaitlistBody: string; agentWaitlistNote: string
     articlesEyebrow: string; articlesHeading: string; articlesSeeAll: string
     sessionsEyebrow: string; sessionsHeading: string; sessionsSub: string
     merchantEyebrow: string; merchantHeading: string
@@ -733,11 +735,13 @@ export interface Messages {
     eyebrow: string; title: string; draftNotice: string; englishNotice: string; back: string
   }
   agent: {
-    eyebrow: string; title: string; body: string
+    eyebrow: string; title: string; bodyBookingLive: string; bodyBookingWaitlist: string
+    waitlistTitle: string; waitlistBody: string
     pointsHeading: string
     point1Title: string; point1Body: string
     point2Title: string; point2Body: string
-    point3Title: string; point3Body: string
+    point3TitleBookingLive: string; point3BodyBookingLive: string
+    point3TitleBookingWaitlist: string; point3BodyBookingWaitlist: string
     errorGeneric: string
     inputPlaceholder: string; send: string; toolWorking: string
     ratingUpLabel: string; ratingDownLabel: string
@@ -750,7 +754,7 @@ export interface Messages {
     step1Title: string; step1Body: string
     step2Title: string; step2Body: string
     step3Title: string; step3Body: string
-    whyHeading: string; why1: string; why2: string; why3: string
+    whyHeading: string; why1: string; why2: string; why3Waitlist: string; why3Live: string
     testimonialsHeading: string
     ctaTitle: string; ctaBody: string; ctaButton: string
   }
@@ -761,7 +765,7 @@ export interface Messages {
     step1Title: string; step1Body: string
     step2Title: string; step2Body: string
     step3Title: string; step3Body: string
-    whyHeading: string; why1: string; why2: string; why3: string
+    whyHeading: string; why1: string; why2: string; why3Waitlist: string; why3Live: string
     testimonialsHeading: string
     ctaTitle: string; ctaBody: string; ctaButton: string
   }
@@ -1185,6 +1189,16 @@ export interface Messages {
     emptyState: string
     anonymousReviewer: string
   }
+  featureInterest: {
+    emailLabel: string
+    emailPlaceholder: string
+    submitAgent: string
+    submitBooking: string
+    pending: string
+    success: string
+    invalidEmail: string
+    retry: string
+  }
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
@@ -1222,7 +1236,7 @@ const messages: Messages = {
   brand: 'Kinnso',
   categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
   breadcrumb: { home: 'Home', articles: 'Articles' },
-  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination', experiencesNearbyEyebrow: 'Ready to book?', experiencesNearbyHeading: 'Bookable experiences here' },
+  article: { youMayLike: 'You may like', faqTitle: 'Frequently asked questions', tableOfContents: 'In this article', by: 'By', fallbackNotice: "This article isn't available in your language yet — showing the original version.", guidesNearbyEyebrow: 'Planning a trip here?', guidesNearbyHeading: 'Creator guides for this destination', experiencesNearbyEyebrowWaitlist: 'Experiences nearby', experiencesNearbyHeadingWaitlist: 'Save for your trip', experiencesNearbyEyebrowLive: 'Bookable experiences', experiencesNearbyHeadingLive: 'Ready to book?' },
   detailError: { title: "We couldn't load this page", body: 'A temporary problem interrupted loading. Try again, or keep exploring.', retry: 'Try again', explore: 'Back to Explore' },
   seo: {
     brandTitle: 'KINNSO — Travel creators, real missions',
@@ -1241,9 +1255,13 @@ const messages: Messages = {
       title: 'Discover travel creators',
       description: 'Find travel and lifestyle creators on KINNSO by niche, audience, and platform.',
     },
-    agent: {
+    agentLive: {
+      title: 'KINNSO AI travel agent — plan with real creator guides',
+      description: 'Plan your trip with an AI travel agent that searches real KINNSO creator guides, articles, and experiences.',
+    },
+    agentWaitlist: {
       title: 'KINNSO AI travel agent — join the waitlist',
-      description: 'An AI travel agent grounded in real creator guides. Join the waitlist to be first in when it opens.',
+      description: 'An AI travel agent grounded in real creator guides. Join the waitlist to hear when it opens.',
     },
     about: {
       title: 'About KINNSO',
@@ -1702,8 +1720,10 @@ const messages: Messages = {
     howT1Desc: 'Browse guides by creators who actually live and travel the places you want to go.',
     howT2Title: 'Save the real spots',
     howT2Desc: 'Every guide is a route of real cafés, streets, and stays — not top-ten filler.',
-    howT3Title: 'Plan and book in one place',
-    howT3Desc: 'Shape the trip with AI help, then book your picks without leaving KINNSO.',
+    howT3TitleLive: 'Plan and book in one place',
+    howT3TitleWaitlist: 'Plan now, book when it opens',
+    howT3DescLive: 'Shape the trip with AI help, then book your picks without leaving KINNSO.',
+    howT3DescWaitlist: 'Booking is not live yet. Join the waitlist and we’ll notify you when it opens.',
     howC1Title: 'Scan your profile',
     howC1Desc: 'Connect your socials and KINNSO maps the cities you genuinely know.',
     howC2Title: 'Publish your guides',
@@ -1721,11 +1741,16 @@ const messages: Messages = {
     featuredSub: 'The latest city guides published by KINNSO creators.',
     featuredSeeAll: 'See all guides',
     featuredEmpty: 'No published guides yet — the first ones are on their way.',
-    agentEyebrow: 'KINNSO AI Agent',
-    agentTitle: 'An agent that plans like a local.',
-    agentBody: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
-    agentCta: 'Try the AI Agent',
-    agentNote: 'Live now — ask it to plan your next trip.',
+    agentLiveEyebrow: 'KINNSO AI Agent',
+    agentLiveTitle: 'An agent that plans like a local.',
+    agentLiveBodyBookingLive: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and bookable experiences, live.',
+    agentLiveBodyBookingWaitlist: 'Tell it where you are going and how you like to travel — it searches real creator guides, articles, and experiences to shape a plan you can save while booking opens soon.',
+    agentLiveCta: 'Try the AI Agent',
+    agentLiveNote: 'Live now — ask it to plan your next trip.',
+    agentWaitlistEyebrow: 'KINNSO AI Agent',
+    agentWaitlistTitle: 'Be first to plan with the KINNSO Agent.',
+    agentWaitlistBody: 'Join the list to hear when our travel agent, grounded in real creator guides and articles, is ready for you.',
+    agentWaitlistNote: 'We will only email you about Agent availability.',
     articlesEyebrow: 'From the journal',
     articlesHeading: 'Stories from the ground.',
     articlesSeeAll: 'Read all articles',
@@ -1782,11 +1807,15 @@ const messages: Messages = {
   agent: {
     eyebrow: 'KINNSO AI Agent',
     title: 'Your travel agent, grounded in real creator guides',
-    body: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and bookable experiences to help you plan.',
+    bodyBookingLive: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and bookable experiences to help you plan and book.',
+    bodyBookingWaitlist: 'Tell it where you\'re going and how you like to travel — it searches real published guides, articles, and experiences to help you plan and save recommendations while booking opens soon.',
+    waitlistTitle: 'AI travel planning is opening soon',
+    waitlistBody: 'Join the list and we will let you know when the KINNSO Agent is ready to plan with real creator guides and articles.',
     pointsHeading: 'What the agent does',
-    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or bookable experience — no invented spots.',
+    point1Title: 'Grounded in real guides', point1Body: 'Every suggestion traces back to a published creator guide, article, or published experience — no invented spots.',
     point2Title: 'Plans around you', point2Body: 'Tell it your destination, dates and pace; it drafts an outline you can actually follow.',
-    point3Title: 'Built for booking', point3Body: 'When it surfaces a bookable experience, you can book it right from the conversation.',
+    point3TitleBookingLive: 'Built for booking', point3BodyBookingLive: 'When it surfaces a bookable experience, you can book it right from the conversation.',
+    point3TitleBookingWaitlist: 'Save now, book later', point3BodyBookingWaitlist: 'Save recommended experiences from the conversation; direct booking opens soon.',
     errorGeneric: 'Something went wrong — please try again.',
     inputPlaceholder: 'Ask about a destination, dates, or style of trip...',
     send: 'Send',
@@ -1808,7 +1837,7 @@ const messages: Messages = {
     whyHeading: 'Why creators choose KINNSO',
     why1: 'You keep your voice — merchants brief you, they don’t script you.',
     why2: 'Transparent payouts with a real ledger, not a black box.',
-    why3: 'Your guides keep earning after the trip ends — bookings are coming, and your recommendations power them.',
+    why3Waitlist: 'Your guides keep earning after the trip ends — bookings are coming, and your recommendations power them.', why3Live: 'Bookings on your recommendations pay you commission.',
     testimonialsHeading: 'Creators on KINNSO',
     ctaTitle: 'Your next trip could pay for itself',
     ctaBody: 'Apply in minutes. Publish your first guide this week.',
@@ -1826,7 +1855,7 @@ const messages: Messages = {
     whyHeading: 'Why merchants choose KINNSO',
     why1: 'Creators are vetted with real audience data, not follower counts.',
     why2: 'You approve work before you pay — no surprises.',
-    why3: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.',
+    why3Waitlist: 'Direct booking is coming: creator recommendations will link straight to your bookable inventory.', why3Live: 'Direct booking is live: recommendations link straight to your bookable inventory.',
     testimonialsHeading: 'Merchants on KINNSO',
     ctaTitle: 'Your next campaign starts with a brief',
     ctaBody: 'Post your first mission today — our team reviews every brief within 48 hours.',
@@ -2561,6 +2590,16 @@ const messages: Messages = {
     countLabel: '{count} reviews',
     emptyState: 'No reviews yet.',
     anonymousReviewer: 'A KINNSO traveller',
+  },
+  featureInterest: {
+    emailLabel: 'Email address',
+    emailPlaceholder: 'you@example.com',
+    submitAgent: 'Join the AI Agent waitlist',
+    submitBooking: 'Get notified when booking opens',
+    pending: 'Submitting…',
+    success: "You're on the list — we'll keep you posted.",
+    invalidEmail: 'Enter a valid email address.',
+    retry: 'Could not save your interest. Please try again.',
   },
   sessions: {
     eyebrow: 'Community Sessions',

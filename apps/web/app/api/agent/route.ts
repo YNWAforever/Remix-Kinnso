@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { streamText, stepCountIs, convertToModelMessages, type UIMessage } from 'ai'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { isAgentConfigured } from '@/lib/agent/config'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 import { AGENT_MODEL, AGENT_RATE_LIMIT } from '@/lib/agent/policy'
 import { makeAgentTools } from '@/lib/agent/tools'
 import { appendAgentMessage, type AgentIdentity } from '@/lib/agent/queries'
@@ -17,11 +18,17 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 // RPC before streamText is even called, not more model latency.
 export const maxDuration = 30
 
-const SYSTEM_PROMPT = `You are the KINNSO travel agent. Help travellers plan trips using
+const SYSTEM_PROMPT_BASE = `You are the KINNSO travel agent. Help travellers plan trips using
 only the search tools available to you (searchGuides, searchArticles,
 searchExperiences) — never invent a place, guide, or experience that a search didn't
-return. When you recommend a bookable experience, mention it can be booked directly on
-KINNSO. Keep answers concise and conversational.`
+return. Keep answers concise and conversational.`
+
+function bookingAwareSystemPrompt(bookingLive: boolean): string {
+  if (bookingLive) {
+    return `${SYSTEM_PROMPT_BASE}\nWhen you recommend a bookable experience, mention it can be booked directly on KINNSO.`
+  }
+  return `${SYSTEM_PROMPT_BASE}\nDo not claim that an experience can be booked directly on KINNSO. Encourage travellers to save recommendations and explain that booking opens soon.`
+}
 
 function lastUserText(messages: UIMessage[]): string {
   const last = [...messages].reverse().find((m) => m.role === 'user')
@@ -31,6 +38,10 @@ function lastUserText(messages: UIMessage[]): string {
 }
 
 export async function POST(req: Request) {
+  const { agentLive, bookingLive } = resolveConfiguredProductState()
+  if (!agentLive) {
+    return NextResponse.json({ error: 'agent_unavailable' }, { status: 503 })
+  }
   if (!isAgentConfigured()) return NextResponse.json({ error: 'unconfigured' }, { status: 503 })
 
   const supabase = await createSupabaseServerClient()
@@ -74,7 +85,7 @@ export async function POST(req: Request) {
   try {
     const result = streamText({
       model: AGENT_MODEL,
-      system: SYSTEM_PROMPT,
+      system: bookingAwareSystemPrompt(bookingLive),
       messages: await convertToModelMessages(messages),
       tools,
       stopWhen: stepCountIs(5),

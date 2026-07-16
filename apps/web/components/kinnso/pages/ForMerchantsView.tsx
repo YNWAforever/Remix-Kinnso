@@ -10,8 +10,8 @@ import type { Messages } from '@/lib/i18n/messages/en'
 /** R1C merchant-acquisition landing (master spec §6 R1). Testimonials are
  *  role-filtered to merchants and data-gated (spec §5 row: surfaced on homepage
  *  AND both landing pages — carry-forward #18). */
-export function ForMerchantsView({ locale, t, testimonials }: {
-  locale: Locale; t: Messages['forMerchants']; testimonials: Testimonial[]
+export function ForMerchantsView({ locale, t, testimonials, bookingLive }: {
+  locale: Locale; t: Messages['forMerchants']; testimonials: Testimonial[]; bookingLive: boolean
 }) {
   const p = (path: string) => `/${locale}${path}`
   const steps = [
@@ -19,7 +19,7 @@ export function ForMerchantsView({ locale, t, testimonials }: {
     { title: t.step2Title, body: t.step2Body, icon: <Users aria-hidden="true" className="h-5 w-5" /> },
     { title: t.step3Title, body: t.step3Body, icon: <Send aria-hidden="true" className="h-5 w-5" /> },
   ]
-  const bullets = [t.why1, t.why2, t.why3]
+  const bullets = [t.why1, t.why2, bookingLive ? t.why3Live : t.why3Waitlist]
   return (
     <main className="bg-kinnso-cream font-sans">
       <SectionShell as="header">

@@ -26,7 +26,7 @@ describe('ArticleExperienceLinks', () => {
   it('renders nothing when no experiences match any region', async () => {
     getExperienceOverridesForArticleMock.mockResolvedValueOnce([])
     getExperiencesForCityMock.mockResolvedValue([])
-    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Osaka'], articleId: 'a1', t: en.article })
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Osaka'], articleId: 'a1', t: en.article, bookingLive: false })
     const { container } = render(jsx)
     expect(container.innerHTML).toBe('')
   })
@@ -34,9 +34,9 @@ describe('ArticleExperienceLinks', () => {
   it('renders up to 3 experience cards from the first region with matches, linking with ?src=article', async () => {
     getExperienceOverridesForArticleMock.mockResolvedValueOnce([])
     getExperiencesForCityMock.mockResolvedValueOnce([experience('a'), experience('b')])
-    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article })
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article, bookingLive: false })
     render(jsx)
-    expect(screen.getByText(en.article.experiencesNearbyHeading)).toBeTruthy()
+    expect(screen.getByText(en.article.experiencesNearbyHeadingWaitlist)).toBeTruthy()
     const link = screen.getByRole('link', { name: /Experience a/ })
     expect(link.getAttribute('href')).toBe('/en/experiences/a?src=article')
   })
@@ -44,7 +44,7 @@ describe('ArticleExperienceLinks', () => {
   it('shows pinned overrides first, then fills remaining slots with heuristic matches, deduped', async () => {
     getExperienceOverridesForArticleMock.mockResolvedValueOnce([experience('pinned')])
     getExperiencesForCityMock.mockResolvedValueOnce([experience('pinned'), experience('heuristic')])
-    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article })
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article, bookingLive: false })
     render(jsx)
     const links = screen.getAllByRole('link')
     expect(links).toHaveLength(2)
@@ -55,8 +55,36 @@ describe('ArticleExperienceLinks', () => {
   it('renders heuristic-only when there are no overrides', async () => {
     getExperienceOverridesForArticleMock.mockResolvedValueOnce([])
     getExperiencesForCityMock.mockResolvedValueOnce([experience('a')])
-    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article })
+    const jsx = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t: en.article, bookingLive: false })
     render(jsx)
     expect(screen.getAllByRole('link')).toHaveLength(1)
+  })
+  it('selects explicit OFF and ON headings without changing cards or article attribution links', async () => {
+    const t = {
+      ...en.article,
+      experiencesNearbyEyebrowWaitlist: 'waitlist eyebrow',
+      experiencesNearbyHeadingWaitlist: 'waitlist heading',
+      experiencesNearbyEyebrowLive: 'live eyebrow',
+      experiencesNearbyHeadingLive: 'live heading',
+    }
+    getExperienceOverridesForArticleMock.mockResolvedValue([])
+    getExperiencesForCityMock.mockResolvedValue([experience('a'), experience('b'), experience('c'), experience('d')])
+
+    const off = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t, bookingLive: false })
+    const { unmount } = render(off)
+    expect(screen.getByText(t.experiencesNearbyEyebrowWaitlist)).toBeTruthy()
+    expect(screen.getByText(t.experiencesNearbyHeadingWaitlist)).toBeTruthy()
+    expect(screen.queryByText(t.experiencesNearbyHeadingLive)).toBeNull()
+    expect(screen.getAllByRole('link')).toHaveLength(3)
+    expect(screen.getAllByRole('link')[0].getAttribute('href')).toBe('/en/experiences/a?src=article')
+    unmount()
+
+    const live = await ArticleExperienceLinks({ locale: 'en', regions: ['Tokyo'], articleId: 'a1', t, bookingLive: true })
+    render(live)
+    expect(screen.getByText(t.experiencesNearbyEyebrowLive)).toBeTruthy()
+    expect(screen.getByText(t.experiencesNearbyHeadingLive)).toBeTruthy()
+    expect(screen.queryByText(t.experiencesNearbyHeadingWaitlist)).toBeNull()
+    expect(screen.getAllByRole('link')).toHaveLength(3)
+    expect(screen.getAllByRole('link')[0].getAttribute('href')).toBe('/en/experiences/a?src=article')
   })
 })

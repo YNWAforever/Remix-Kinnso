@@ -16,7 +16,7 @@ const AUDIENCES: Audience[] = ['traveller', 'creator', 'merchant']
  * (wrapping) and Home/End, with selection following focus (automatic
  * activation).
  */
-export function HowItWorks({ t }: { t: Messages['home'] }) {
+export function HowItWorks({ t, bookingLive }: { t: Messages['home']; bookingLive: boolean }) {
   const [audience, setAudience] = useState<Audience>('traveller')
   const tabs: { id: Audience; label: string }[] = [
     { id: 'traveller', label: t.howTabTravellers },
@@ -27,7 +27,7 @@ export function HowItWorks({ t }: { t: Messages['home'] }) {
     traveller: [
       { title: t.howT1Title, desc: t.howT1Desc },
       { title: t.howT2Title, desc: t.howT2Desc },
-      { title: t.howT3Title, desc: t.howT3Desc },
+      { title: bookingLive ? t.howT3TitleLive : t.howT3TitleWaitlist, desc: bookingLive ? t.howT3DescLive : t.howT3DescWaitlist },
     ],
     creator: [
       { title: t.howC1Title, desc: t.howC1Desc },

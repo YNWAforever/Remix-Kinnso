@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { streamTextMock, getUserMock, rpcMock, getClientIpMock, configuredMock } = vi.hoisted(() => ({
+const { streamTextMock, createSupabaseServerClientMock, getUserMock, rpcMock, getClientIpMock, configuredMock, configuredStateMock } = vi.hoisted(() => ({
   streamTextMock: vi.fn(() => ({ toUIMessageStreamResponse: () => new Response('stream', { status: 200 }) })),
+  createSupabaseServerClientMock: vi.fn(),
   getUserMock: vi.fn(async () => ({ data: { user: null } })),
   rpcMock: vi.fn(async () => ({ data: true, error: null })),
   getClientIpMock: vi.fn(async () => '1.2.3.4'),
   configuredMock: vi.fn(() => true),
+  configuredStateMock: vi.fn(() => ({ agentLive: true, bookingLive: false })),
 }))
 
 vi.mock('ai', () => ({
@@ -15,11 +17,12 @@ vi.mock('ai', () => ({
   tool: (def: unknown) => def,
 }))
 vi.mock('@/lib/agent/config', () => ({ isAgentConfigured: configuredMock }))
+vi.mock('@/lib/product-state', () => ({ resolveConfiguredProductState: configuredStateMock }))
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
 vi.mock('@/lib/agent/queries', () => ({ appendAgentMessage: vi.fn(async () => {}) }))
 vi.mock('@/lib/agent/tools', () => ({ makeAgentTools: () => ({}) }))
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock }, rpc: rpcMock }),
+  createSupabaseServerClient: createSupabaseServerClientMock,
 }))
 
 import { POST } from '@/app/api/agent/route'
@@ -30,12 +33,29 @@ function req(body: unknown) {
 
 beforeEach(() => {
   streamTextMock.mockClear()
+  configuredStateMock.mockClear()
   getUserMock.mockResolvedValue({ data: { user: null } })
   rpcMock.mockResolvedValue({ data: true, error: null })
   configuredMock.mockReturnValue(true)
+  configuredStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
+  createSupabaseServerClientMock.mockClear()
+  createSupabaseServerClientMock.mockResolvedValue({ auth: { getUser: getUserMock }, rpc: rpcMock })
 })
 
 describe('POST /api/agent', () => {
+  it('returns a stable 503 before request, configuration, auth, model, tools, or persistence work when Agent is OFF', async () => {
+    configuredStateMock.mockReturnValueOnce({ agentLive: false, bookingLive: false })
+    const jsonMock = vi.fn(async () => ({ messages: [] }))
+    const res = await POST({ json: jsonMock } as unknown as Request)
+    expect(res.status).toBe(503)
+    await expect(res.json()).resolves.toEqual({ error: 'agent_unavailable' })
+    expect(jsonMock).not.toHaveBeenCalled()
+    expect(configuredMock).not.toHaveBeenCalled()
+    expect(createSupabaseServerClientMock).not.toHaveBeenCalled()
+    expect(getClientIpMock).not.toHaveBeenCalled()
+    expect(rpcMock).not.toHaveBeenCalled()
+    expect(streamTextMock).not.toHaveBeenCalled()
+  })
   it('503s when the gateway is unconfigured', async () => {
     configuredMock.mockReturnValueOnce(false)
     const res = await POST(req({ messages: [], locale: 'en', anonSessionId: 'sess-1' }))
@@ -59,8 +79,22 @@ describe('POST /api/agent', () => {
     expect(res.status).toBe(200)
     expect(rpcMock).toHaveBeenCalledWith('check_and_increment_agent_rate_limit', { p_ip: '1.2.3.4', p_max_requests: 20, p_window_seconds: 3600 })
     expect(streamTextMock).toHaveBeenCalledTimes(1)
-    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { model: string }
+    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { model: string; system: string }
     expect(arg.model).toBe('anthropic/claude-haiku-4.5')
+    expect(arg.system).toContain('Do not claim that an experience can be booked directly on KINNSO')
+    expect(arg.system).toContain('save recommendations')
+    expect(arg.system).toContain('booking opens soon')
+    expect(configuredStateMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('allows direct-booking language in the system prompt when Booking is ON', async () => {
+    configuredStateMock.mockReturnValueOnce({ agentLive: true, bookingLive: true })
+    const res = await POST(req({ messages: [{ role: 'user', parts: [{ type: 'text', text: 'find a Tokyo experience' }] }], locale: 'en', anonSessionId: 'sess-1' }))
+    expect(res.status).toBe(200)
+    const arg = (streamTextMock.mock.calls[0] as unknown[])[0] as { system: string }
+    expect(arg.system).toContain('can be booked directly on KINNSO')
+    expect(arg.system).not.toContain('Do not claim that an experience can be booked directly on KINNSO')
+    expect(configuredStateMock).toHaveBeenCalledTimes(1)
   })
 
   it('streams for a signed-in traveller without requiring anonSessionId', async () => {

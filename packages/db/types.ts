@@ -1374,6 +1374,30 @@ export type Database = {
           },
         ]
       }
+      feature_interest_signups: {
+        Row: {
+          created_at: string
+          email: string
+          feature: string
+          id: string
+          locale: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          feature: string
+          id?: string
+          locale: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          feature?: string
+          id?: string
+          locale?: string
+        }
+        Relationships: []
+      }
       guide_saves: {
         Row: {
           created_at: string
@@ -2824,6 +2848,10 @@ export type Database = {
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
       is_active_ops: { Args: never; Returns: boolean }
       is_active_ops_role: { Args: { p_min: string }; Returns: boolean }
+      join_feature_interest: {
+        Args: { p_email: string; p_feature: string; p_locale: string }
+        Returns: boolean
+      }
       list_active_perks: {
         Args: never
         Returns: {
