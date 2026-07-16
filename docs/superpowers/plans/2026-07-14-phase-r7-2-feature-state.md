@@ -584,10 +584,10 @@ git commit -m "test(web): guard feature-state claims"
 
 ## Final review and publication gate
 
-- [ ] Run `git diff main...HEAD --check` and inspect every changed file.
-- [ ] Confirm no creator-copilot, frozen URL, shipped migration, production data, or Stripe live-mode changes exist.
-- [ ] Use `superpowers:requesting-code-review` and address all actionable findings.
-- [ ] Re-run focused tests, full web tests, typecheck, lint, build, and permitted E2E after review fixes.
+- [x] Run `git diff main...HEAD --check` and inspect every changed file.
+- [x] Confirm no creator-copilot, frozen URL, shipped migration, production data, or Stripe live-mode changes exist.
+- [x] Use `superpowers:requesting-code-review` and address all actionable findings.
+- [x] Re-run focused tests, full web tests, typecheck, lint, build, and permitted E2E after review fixes.
 - [ ] Push `codex/r7-2-feature-state` and open a draft PR titled `Phase R7.2 — Feature-state single source of truth`.
 - [ ] Do not merge or allow production deployment until the authorized migration-application gate is satisfied.
 - [ ] After the authorized operator applies the migration, verify the RPC in a writable non-production/Preview flow first, then squash-merge only with green CI and Preview checks.
