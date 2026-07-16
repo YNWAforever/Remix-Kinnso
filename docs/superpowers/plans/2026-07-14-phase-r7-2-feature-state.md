@@ -561,7 +561,7 @@ Do not submit to production. A local migrated stack or mocked Preview endpoint i
 
 Verified locally on 2026-07-16 against the production build with `AGENT_LIVE=true`, `BOOKING_LIVE=false`, and `VERCEL=1`. A unique `@example.com` Booking-interest address was submitted only to the local Supabase stack; the explicit label, hidden honeypot, keyboard order, delayed pending state, disabled button, and localized status announcement all passed. Home/Agent live state, Sessions nav hiding, Booking interest capture, and merchant/creator/article OFF claims also passed without browser errors.
 
-- [ ] **Step 6: Review migration/deployment gate**
+- [x] **Step 6: Review migration/deployment gate**
 
 Confirm the PR clearly states:
 
@@ -571,7 +571,7 @@ Confirm the PR clearly states:
 - merge/production deployment is blocked until an authorized operator applies the migration, because Booking defaults OFF and renders the form;
 - rollback is a configuration redeploy for Agent/Booking and automatic ISR expiry for Sessions.
 
-Deployment-gate note (2026-07-16): this step remains unchecked because the PR does not exist yet. Its handoff must name `supabase/migrations/20260714072649_r7_2_feature_interest_signups.sql`, record the successful local reset, state that production remains unapplied under read-only access, block merge/deployment until an authorized operator applies the migration, and retain the rollback statement above.
+Deployment-gate note (2026-07-16): draft PR #88 names `supabase/migrations/20260714072649_r7_2_feature_interest_signups.sql`, records the successful local reset and RPC smoke, states that production remains unapplied under read-only access, blocks merge/deployment until an authorized operator applies the migration, and retains the rollback statement above.
 
 - [x] **Step 7: Commit verification artifacts**
 
@@ -588,6 +588,6 @@ git commit -m "test(web): guard feature-state claims"
 - [x] Confirm no creator-copilot, frozen URL, shipped migration, production data, or Stripe live-mode changes exist.
 - [x] Use `superpowers:requesting-code-review` and address all actionable findings.
 - [x] Re-run focused tests, full web tests, typecheck, lint, build, and permitted E2E after review fixes.
-- [ ] Push `codex/r7-2-feature-state` and open a draft PR titled `Phase R7.2 — Feature-state single source of truth`.
-- [ ] Do not merge or allow production deployment until the authorized migration-application gate is satisfied.
+- [x] Push `codex/r7-2-feature-state` and open draft PR #88 titled `Phase R7.2 — Feature-state single source of truth`.
+- [x] Do not merge or allow production deployment until the authorized migration-application gate is satisfied.
 - [ ] After the authorized operator applies the migration, verify the RPC in a writable non-production/Preview flow first, then squash-merge only with green CI and Preview checks.
