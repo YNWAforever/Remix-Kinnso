@@ -38,7 +38,7 @@ begin
   if not public.is_active_ops() then raise exception 'forbidden' using errcode = '42501'; end if;
   if coalesce(btrim(p_reason), '') = '' then raise exception 'reason_required'; end if;
   if length(p_reason) > 500 then raise exception 'reason_too_long'; end if;
-  select is_listed into v_from from public.creators where id = p_id;
+  select is_listed into v_from from public.creators where id = p_id for update;
   if v_from is null then raise exception 'not_found'; end if;
   update public.creators set is_listed = p_is_listed, updated_at = now() where id = p_id;
   perform public.ops_audit_log_append('creator', p_id, 'listing.set', p_reason,

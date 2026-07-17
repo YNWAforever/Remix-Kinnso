@@ -8,6 +8,10 @@ const file = readdirSync(migrationsDir).find((name) => name.endsWith('_r7_3_prod
 expect(file).toBeTruthy()
 
 const sql = readFileSync(join(migrationsDir, file!), 'utf8')
+const liveTestPath = join(process.cwd(), 'tests/r7-3-creator-listing.rls.test.ts')
+const liveTest = readFileSync(liveTestPath, 'utf8')
+const liveConfigPath = join(process.cwd(), 'tests/helpers/r7-3-local-live-config.ts')
+const liveConfig = readFileSync(liveConfigPath, 'utf8')
 
 describe('R7.3 production-honesty migration', () => {
   it('captures the structural, recompute, listing-policy, and editorial contracts', () => {
@@ -20,5 +24,22 @@ describe('R7.3 production-honesty migration', () => {
     expect(sql).toMatch(/grant execute on function public\.admin_set_creator_listed\(uuid, boolean, text\) to authenticated/)
     expect(sql).toContain('create trigger creators_protect_is_listed')
     expect(sql).toContain("'kinnso-editorial'")
+  })
+
+  it('locks the creator row before deriving audited listing metadata', () => {
+    expect(sql).toContain('select is_listed into v_from from public.creators where id = p_id for update')
+  })
+
+  it('requires explicit local-only opt-in before constructing a service-role client', () => {
+    expect(liveConfig).toContain('RUN_R7_3_LOCAL_LIVE_TESTS')
+    expect(liveTest).toContain('resolveR73LocalLiveConfig')
+    expect(liveTest).toMatch(/const svc\s*=\s*liveConfig\s*\?\s*createClient/)
+    expect(liveTest).toMatch(/:\s*null/)
+  })
+
+  it('executes the migration recompute against a drifted local guide with a real save', () => {
+    expect(liveConfig).toContain('SUPABASE_DB_CONTAINER')
+    expect(liveTest).toContain('runPsql(recomputeSql)')
+    expect(liveTest).toContain("expect(afterRecompute.data!.saves_count).toBe(1)")
   })
 })
