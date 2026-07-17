@@ -12,7 +12,7 @@ afterEach(cleanup)
 beforeEach(() => refreshMock.mockReset())
 
 const detail: CreatorDetail = {
-  creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: false, bio: 'Hi', createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-20T00:00:00Z' },
+  creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: false, isListed: false, bio: 'Hi', createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-20T00:00:00Z' },
   contribution: { points: 320, tier: 'pro', tierUpdatedAt: null },
   dna: null, scan: null, socials: [],
   missions: [{ participantId: 'p1', missionId: 'm1', title: 'Tokyo eats', status: 'active', source: 'applied', approvedAt: null, createdAt: '2026-06-02T00:00:00Z', submissionsTotal: 3, submissionsApproved: 1, submissionsPending: 2 }],
@@ -26,6 +26,7 @@ function makeActions() {
     setCreatorStatus: vi.fn(async () => ({ ok: true as const, id: 'c1', status: 'suspended' as const })),
     reinstateCreator: vi.fn(async () => ({ ok: true as const, id: 'c1', status: 'active' as const })),
     setCreatorVerified: vi.fn(async (): Promise<{ ok: true; id: string; verified: boolean } | { ok: false; errors: Record<string, string[]> }> => ({ ok: true, id: 'c1', verified: true })),
+    setCreatorListed: vi.fn(async () => ({ ok: true as const, id: 'c1', isListed: true })),
     addCreatorNote: vi.fn(async () => ({ ok: true as const, id: 'c1' })),
   }
 }
@@ -62,6 +63,17 @@ describe('CreatorDetailView', () => {
     fireEvent.click(screen.getByRole('button', { name: en.creators.saveNote }))
     await waitFor(() => expect(actions.addCreatorNote).toHaveBeenCalledWith('en', 'c1', 'looks fine'))
   })
+  it('lists a guide-less creator from the Moderation tab with a reason', async () => {
+    const actions = renderView()
+    fireEvent.click(screen.getByRole('button', { name: en.creators.tabModeration }))
+    expect(screen.getByText(en.creators.listingGuideBased)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: en.creators.actListCreator }))
+    fireEvent.change(screen.getByPlaceholderText(en.creators.reasonPlaceholder), { target: { value: 'Launch cohort' } })
+    fireEvent.click(screen.getByRole('button', { name: en.creators.actApply }))
+    await waitFor(() => expect(actions.setCreatorListed).toHaveBeenCalledWith('en', 'c1', true, 'Launch cohort'))
+    await waitFor(() => expect(refreshMock).toHaveBeenCalled())
+  })
+
   it('surfaces an action failure instead of refreshing', async () => {
     const actions = makeActions()
     actions.setCreatorVerified.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required.'] } })

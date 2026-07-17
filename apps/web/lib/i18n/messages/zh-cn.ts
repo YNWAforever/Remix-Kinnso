@@ -928,6 +928,7 @@ const messages: Messages = {
     dnaPublished: '已发布', dnaDraft: '草稿', dnaNone: '无',
     actActivate: '启用', actSuspend: '停用', actBan: '封禁', actReinstate: '恢复',
     actVerify: '验证', actUnverify: '取消验证', actNote: '添加备注', actApply: '应用', actCancel: '取消',
+    actListCreator: '列入创作者目录', actRemoveListingOverride: '移除目录覆盖', listingOverrideOn: '已开启显式目录覆盖', listingGuideBased: '仅按指南收录',
     reasonPlaceholder: '原因（必填）', notePlaceholder: '备注（必填）',
     confirmBan: '封禁此创作者？这是永久状态。', confirmReinstate: '恢复这位已封禁的创作者？',
     bulkApply: '应用到已选', bulkSelected: '已选', bulkChooseAction: '选择操作',

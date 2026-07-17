@@ -14,7 +14,7 @@ afterEach(cleanup)
 const t = en.creators
 
 const detail: CreatorDetail = {
-  creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: true, bio: 'Hi', createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-20T00:00:00Z' },
+  creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: true, isListed: false, bio: 'Hi', createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-20T00:00:00Z' },
   contribution: { points: 320, tier: 'pro', tierUpdatedAt: null },
   dna: { id: 'd1', status: 'published', model: 'gpt', draftReadyAt: null, updatedAt: '2026-06-05T00:00:00Z' },
   scan: { id: 'j1', status: 'completed', error: null, startedAt: null, completedAt: '2026-06-04T00:00:00Z', createdAt: '2026-06-04T00:00:00Z' },

@@ -21,6 +21,7 @@ export interface CreatorDetailActions {
   setCreatorStatus: (locale: Locale, id: string, status: CreatorStatus, reason: string) => Promise<ActionResult<{ id: string; status: CreatorStatus }>>
   reinstateCreator: (locale: Locale, id: string, reason: string) => Promise<ActionResult<{ id: string; status: 'active' }>>
   setCreatorVerified: (locale: Locale, id: string, verified: boolean, reason: string) => Promise<ActionResult<{ id: string; verified: boolean }>>
+  setCreatorListed: (locale: Locale, id: string, isListed: boolean, reason: string) => Promise<ActionResult<{ id: string; isListed: boolean }>>
   addCreatorNote: (locale: Locale, id: string, note: string) => Promise<ActionResult<{ id: string }>>
 }
 
@@ -29,6 +30,7 @@ type Pending =
   | { kind: 'status'; status: CreatorStatus }
   | { kind: 'reinstate' }
   | { kind: 'verify'; verified: boolean }
+  | { kind: 'listing'; isListed: boolean }
   | null
 
 const day = (s: string) => s.slice(0, 10)
@@ -58,7 +60,8 @@ export function CreatorDetailView({
     let res: ActionResult<Record<string, unknown>>
     if (pending.kind === 'status') res = await actions.setCreatorStatus(locale, creator.id, pending.status, reason)
     else if (pending.kind === 'reinstate') res = await actions.reinstateCreator(locale, creator.id, reason)
-    else res = await actions.setCreatorVerified(locale, creator.id, pending.verified, reason)
+    else if (pending.kind === 'verify') res = await actions.setCreatorVerified(locale, creator.id, pending.verified, reason)
+    else res = await actions.setCreatorListed(locale, creator.id, pending.isListed, reason)
     setBusy(false)
     if (res.ok) { cancel(); router.refresh() }
     else setError(firstError(res))
@@ -144,6 +147,14 @@ export function CreatorDetailView({
         {tab === 'content' && <ContentTab t={t} content={detail.content} />}
         {tab === 'moderation' && (
           <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-kinnso-line p-3">
+              <p className="text-sm font-bold text-kinnso-ink">
+                {creator.isListed ? t.listingOverrideOn : t.listingGuideBased}
+              </p>
+              <button type="button" className={btn} onClick={() => start({ kind: 'listing', isListed: !creator.isListed })}>
+                {creator.isListed ? t.actRemoveListingOverride : t.actListCreator}
+              </button>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 className="min-w-[16rem] flex-1 rounded-lg border border-kinnso-line px-3 py-1.5 text-sm"

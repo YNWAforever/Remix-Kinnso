@@ -928,6 +928,7 @@ const messages: Messages = {
     dnaPublished: '公開', dnaDraft: '下書き', dnaNone: 'なし',
     actActivate: '有効化', actSuspend: '停止', actBan: '禁止', actReinstate: '復帰',
     actVerify: '認証', actUnverify: '認証解除', actNote: 'メモを追加', actApply: '適用', actCancel: 'キャンセル',
+    actListCreator: 'クリエイターディレクトリに掲載', actRemoveListingOverride: 'ディレクトリのオーバーライドを削除', listingOverrideOn: '明示的なディレクトリのオーバーライドがオン', listingGuideBased: 'ガイドに基づく掲載のみ',
     reasonPlaceholder: '理由（必須）', notePlaceholder: 'メモ（必須）',
     confirmBan: 'このクリエイターを禁止しますか？これは永久的な状態です。', confirmReinstate: 'この禁止されたクリエイターを復帰させますか？',
     bulkApply: '選択に適用', bulkSelected: '選択中', bulkChooseAction: '操作を選択',

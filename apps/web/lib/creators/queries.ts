@@ -41,55 +41,69 @@ function toProfile(json: unknown): PublicProfile {
   }
 }
 
-/**
- * The canonical "publicly listable creator" predicate — active, has a handle, and has a
- * published public_profile — fetched in a deterministic order (newest first, handle as a
- * stable tie-break). Shared by the directory and the sitemap so the two can never drift.
- * Note `getCreatorByHandle` is intentionally broader (active only); because this predicate
- * implies status='active', every listable creator is also renderable, so the sitemap is
- * always a subset of live pages (no indexed-then-404). Rows are returned loosely typed —
- * callers select their own columns and cast the fields they read.
- */
-async function fetchListableCreators(columns: string): Promise<Record<string, unknown>[]> {
+export interface EligibleCreatorRow {
+  id: string
+  isListed: boolean
+  handle: string
+  displayName: string | null
+  bio: string | null
+  publicProfile: unknown
+  createdAt: string | null
+  guideCount: number
+}
+
+/** Shared directory/sitemap eligibility: an active public creator is discoverable when
+ * they have a published guide or ops has explicitly enabled the listing override. */
+export async function fetchEligibleCreators(): Promise<EligibleCreatorRow[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  const { data: creatorRows } = await supabase
     .from('creators')
-    .select(columns)
+    .select('id, is_listed, handle, display_name, bio, public_profile, created_at')
     .eq('status', 'active')
     .not('handle', 'is', null)
     .not('public_profile', 'is', null)
     .order('created_at', { ascending: false })
     .order('handle')
-  return (data ?? []) as unknown as Record<string, unknown>[]
-}
+  if (!creatorRows?.length) return []
 
-export async function getPublicCreators(): Promise<CreatorSummary[]> {
-  const creators = await fetchListableCreators('id, handle, display_name, bio, public_profile')
-  if (creators.length === 0) return []
-
-  const supabase = createSupabasePublicClient()
   const { data: guideRows } = await supabase
     .from('guides')
     .select('creator_id')
     .eq('status', 'published')
   const counts = new Map<string, number>()
-  for (const g of guideRows ?? []) {
-    counts.set(g.creator_id, (counts.get(g.creator_id) ?? 0) + 1)
+  for (const guide of guideRows ?? []) {
+    counts.set(guide.creator_id, (counts.get(guide.creator_id) ?? 0) + 1)
   }
 
+  return creatorRows
+    .map((creator) => ({
+      id: creator.id,
+      isListed: creator.is_listed,
+      handle: creator.handle as string,
+      displayName: creator.display_name,
+      bio: creator.bio,
+      publicProfile: creator.public_profile,
+      createdAt: creator.created_at,
+      guideCount: counts.get(creator.id) ?? 0,
+    }))
+    .filter((creator) => creator.isListed || creator.guideCount > 0)
+}
+
+export async function getPublicCreators(): Promise<CreatorSummary[]> {
+  const creators = await fetchEligibleCreators()
   return creators.map((c) => ({
-    handle: c.handle as string,
-    name: (c.display_name as string | null) ?? (c.handle as string),
-    bio: (c.bio as string | null) ?? '',
-    niches: toProfile(c.public_profile).niches,
-    guideCount: counts.get(c.id as string) ?? 0,
+    handle: c.handle,
+    name: c.displayName ?? c.handle,
+    bio: c.bio ?? '',
+    niches: toProfile(c.publicProfile).niches,
+    guideCount: c.guideCount,
   }))
 }
 
-// Intentionally broader than `fetchListableCreators` (active only, no public_profile
+// Intentionally broader than `fetchEligibleCreators` (active only, no public_profile
 // requirement): a profile renders by direct URL even if it isn't in the directory/sitemap.
 // Since the listable predicate implies status='active', the sitemap stays a subset of
-// renderable pages — see fetchListableCreators.
+// renderable pages — see fetchEligibleCreators.
 export async function getCreatorByHandle(handle: string): Promise<PublicCreator | null> {
   const supabase = createSupabasePublicClient()
   const { data: c } = await supabase
@@ -117,10 +131,10 @@ export async function getCreatorByHandle(handle: string): Promise<PublicCreator 
 }
 
 export async function getCreatorsForSitemap(): Promise<{ handle: string; lastmod: string | null }[]> {
-  const rows = await fetchListableCreators('handle, created_at')
+  const rows = await fetchEligibleCreators()
   return rows.map((r) => ({
-    handle: r.handle as string,
-    lastmod: (r.created_at as string | null) ?? null,
+    handle: r.handle,
+    lastmod: r.createdAt,
   }))
 }
 

@@ -928,6 +928,7 @@ const messages: Messages = {
     dnaPublished: '已發佈', dnaDraft: '草稿', dnaNone: '無',
     actActivate: '啟用', actSuspend: '停用', actBan: '封禁', actReinstate: '恢復',
     actVerify: '驗證', actUnverify: '取消驗證', actNote: '加入備註', actApply: '套用', actCancel: '取消',
+    actListCreator: '加入創作者目錄', actRemoveListingOverride: '移除目錄覆寫', listingOverrideOn: '已開啟明確目錄覆寫', listingGuideBased: '只按指南收錄',
     reasonPlaceholder: '原因（必填）', notePlaceholder: '備註（必填）',
     confirmBan: '封禁此創作者？這是永久狀態。', confirmReinstate: '恢復這位已封禁的創作者？',
     bulkApply: '套用至已選', bulkSelected: '已選', bulkChooseAction: '選擇操作',

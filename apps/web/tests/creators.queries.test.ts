@@ -35,6 +35,7 @@ import { getPublicCreators, getCreatorByHandle, getCreatorPublicNames, getCreato
 
 const creatorRow = {
   id: 'c1',
+  is_listed: false,
   handle: 'maya',
   display_name: 'Maya Wanders',
   bio: 'Slow travel in Asia.',
@@ -56,6 +57,18 @@ beforeEach(() => {
 })
 
 describe('getPublicCreators', () => {
+  it('shares guide-or-override eligibility with the sitemap', async () => {
+    state.creators = [
+      { ...creatorRow, id: 'with-guide', handle: 'with-guide', is_listed: false },
+      { ...creatorRow, id: 'override', handle: 'override', is_listed: true },
+      { ...creatorRow, id: 'hidden', handle: 'hidden', is_listed: false },
+    ]
+    state.guides = [{ creator_id: 'with-guide' }]
+
+    expect((await getPublicCreators()).map((c) => c.handle)).toEqual(['with-guide', 'override'])
+    expect((await getCreatorsForSitemap()).map((c) => c.handle)).toEqual(['with-guide', 'override'])
+  })
+
   it('maps creators and tallies published guides by creator_id', async () => {
     state.creators = [creatorRow]
     state.guides = [{ creator_id: 'c1' }, { creator_id: 'c1' }, { creator_id: 'cX' }]
@@ -77,6 +90,12 @@ describe('getPublicCreators', () => {
 })
 
 describe('getCreatorByHandle', () => {
+  it('keeps a directly returned active hidden creator renderable', async () => {
+    state.single = { ...creatorRow, id: 'hidden', handle: 'hidden', is_listed: false }
+    state.guides = []
+    expect((await getCreatorByHandle('hidden'))?.handle).toBe('hidden')
+  })
+
   it('returns a PublicCreator with projection + published guides', async () => {
     state.single = creatorRow
     state.guides = [
@@ -120,7 +139,7 @@ describe('getCreatorPublicNames', () => {
 
 describe('getCreatorsForSitemap', () => {
   it('returns active handles with a lastmod', async () => {
-    state.creators = [{ handle: 'maya', created_at: '2026-06-03T00:00:00Z' }]
+    state.creators = [{ id: 'c1', is_listed: true, handle: 'maya', created_at: '2026-06-03T00:00:00Z' }]
     const rows = await getCreatorsForSitemap()
     expect(rows).toEqual([{ handle: 'maya', lastmod: '2026-06-03T00:00:00Z' }])
   })

@@ -928,6 +928,7 @@ const messages: Messages = {
     dnaPublished: '게시됨', dnaDraft: '초안', dnaNone: '없음',
     actActivate: '활성화', actSuspend: '정지', actBan: '차단', actReinstate: '복구',
     actVerify: '인증', actUnverify: '인증 해제', actNote: '메모 추가', actApply: '적용', actCancel: '취소',
+    actListCreator: '크리에이터 디렉터리에 표시', actRemoveListingOverride: '디렉터리 재정의 제거', listingOverrideOn: '명시적 디렉터리 재정의 켜짐', listingGuideBased: '가이드 기반 표시만',
     reasonPlaceholder: '사유 (필수)', notePlaceholder: '메모 (필수)',
     confirmBan: '이 크리에이터를 차단하시겠습니까? 영구적인 상태입니다.', confirmReinstate: '차단된 이 크리에이터를 복구하시겠습니까?',
     bulkApply: '선택 항목에 적용', bulkSelected: '선택됨', bulkChooseAction: '작업 선택',

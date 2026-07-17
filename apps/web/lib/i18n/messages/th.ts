@@ -928,6 +928,7 @@ const messages: Messages = {
     dnaPublished: 'เผยแพร่แล้ว', dnaDraft: 'ฉบับร่าง', dnaNone: 'ไม่มี',
     actActivate: 'เปิดใช้งาน', actSuspend: 'ระงับ', actBan: 'แบน', actReinstate: 'คืนสถานะ',
     actVerify: 'ยืนยัน', actUnverify: 'ยกเลิกการยืนยัน', actNote: 'เพิ่มบันทึก', actApply: 'ใช้', actCancel: 'ยกเลิก',
+    actListCreator: 'แสดงในไดเรกทอรีครีเอเตอร์', actRemoveListingOverride: 'ลบการแทนที่ไดเรกทอรี', listingOverrideOn: 'เปิดการแทนที่ไดเรกทอรีแบบชัดเจน', listingGuideBased: 'แสดงตามไกด์เท่านั้น',
     reasonPlaceholder: 'เหตุผล (จำเป็น)', notePlaceholder: 'บันทึก (จำเป็น)',
     confirmBan: 'แบนครีเอเตอร์นี้? นี่เป็นสถานะถาวร', confirmReinstate: 'คืนสถานะครีเอเตอร์ที่ถูกแบนนี้?',
     bulkApply: 'ใช้กับรายการที่เลือก', bulkSelected: 'เลือกแล้ว', bulkChooseAction: 'เลือกการดำเนินการ',
