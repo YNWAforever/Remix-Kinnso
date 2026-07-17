@@ -1158,6 +1158,7 @@ export type Database = {
           display_name: string | null
           handle: string | null
           id: string
+          is_listed: boolean
           public_profile: Json | null
           status: string
           updated_at: string
@@ -1169,6 +1170,7 @@ export type Database = {
           display_name?: string | null
           handle?: string | null
           id: string
+          is_listed?: boolean
           public_profile?: Json | null
           status?: string
           updated_at?: string
@@ -1180,6 +1182,7 @@ export type Database = {
           display_name?: string | null
           handle?: string | null
           id?: string
+          is_listed?: boolean
           public_profile?: Json | null
           status?: string
           updated_at?: string
@@ -1430,7 +1433,7 @@ export type Database = {
       guides: {
         Row: {
           city: string
-          cover_url: string
+          cover_url: string | null
           created_at: string
           creator_handle: string
           creator_id: string
@@ -1447,7 +1450,7 @@ export type Database = {
         }
         Insert: {
           city: string
-          cover_url: string
+          cover_url?: string | null
           created_at?: string
           creator_handle: string
           creator_id: string
@@ -1464,7 +1467,7 @@ export type Database = {
         }
         Update: {
           city?: string
-          cover_url?: string
+          cover_url?: string | null
           created_at?: string
           creator_handle?: string
           creator_id?: string
@@ -2729,6 +2732,10 @@ export type Database = {
           p_reason?: string
           p_status?: string
         }
+        Returns: undefined
+      }
+      admin_set_creator_listed: {
+        Args: { p_id: string; p_is_listed: boolean; p_reason: string }
         Returns: undefined
       }
       admin_set_creator_status: {
