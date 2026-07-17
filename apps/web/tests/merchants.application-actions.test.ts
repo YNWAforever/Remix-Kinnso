@@ -18,7 +18,7 @@ const validInput = {
   companyName: 'Acme Travel',
   contactName: 'Jane Doe',
   contactEmail: 'jane@acme.example',
-  websiteUrl: 'https://acme.example',
+  websiteUrl: 'https://acme.test',
   pitch: 'We run boutique tours.',
 }
 

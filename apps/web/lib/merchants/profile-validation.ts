@@ -1,3 +1,5 @@
+import { validatePublicExternalUrl } from '@kinnso/honesty'
+
 export type ValidationErrors = Record<string, string[]>
 
 export type MerchantProfileInput = {
@@ -28,7 +30,8 @@ export function validateMerchantProfileInput(input: MerchantProfileInput): Valid
   const email = input.contactEmail.trim()
   if (!email) errors.contactEmail = ['required']
   else if (!EMAIL_RE.test(email) || email.length > 254) errors.contactEmail = ['invalid']
-  if (input.websiteUrl.trim() && !isHttpUrl(input.websiteUrl)) errors.websiteUrl = ['invalid_url']
+  const website = input.websiteUrl.trim()
+  if (website && validatePublicExternalUrl(website)) errors.websiteUrl = ['invalid_url']
   if (input.logoUrl.trim() && !isHttpUrl(input.logoUrl)) errors.logoUrl = ['invalid_url']
   if (input.tagline.trim().length > 160) errors.tagline = ['too_long']
   if (input.city.trim().length > 80) errors.city = ['too_long']

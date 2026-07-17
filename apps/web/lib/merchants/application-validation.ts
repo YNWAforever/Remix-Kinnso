@@ -1,3 +1,5 @@
+import { validatePublicExternalUrl } from '@kinnso/honesty'
+
 export type ValidationErrors = Record<string, string[]>
 
 export type MerchantApplicationInput = {
@@ -18,7 +20,9 @@ export function validateMerchantApplicationInput(input: MerchantApplicationInput
   if (!email) errors.contactEmail = ['Contact email is required']
   else if (!EMAIL_RE.test(email) || email.length > 254) errors.contactEmail = ['Enter a valid email address']
   const website = input.websiteUrl.trim()
-  if (website && !/^https?:\/\//i.test(website)) errors.websiteUrl = ['Website must start with http:// or https://']
+  if (website && validatePublicExternalUrl(website)) {
+    errors.websiteUrl = ['Enter a secure https:// website that is not an example domain']
+  }
   if (input.pitch.length > 2000) errors.pitch = ['Keep your pitch under 2000 characters']
   return errors
 }

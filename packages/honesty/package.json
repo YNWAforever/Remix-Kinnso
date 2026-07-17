@@ -1,5 +1,5 @@
 {
-  "name": "@kinnso/sync",
+  "name": "@kinnso/honesty",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,15 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@kinnso/db": "workspace:*",
-    "@kinnso/honesty": "workspace:*",
-    "@supabase/supabase-js": "^2.108.1",
-    "mysql2": "^3.11.0"
-  },
   "devDependencies": {
     "@types/node": "^20",
-    "dotenv": "^17.4.2",
     "typescript": "^5",
     "vitest": "^4.1.8"
   }
