@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { missionDraftFixture } from '@/lib/missions/fixtures'
+import { missionDraftFixture } from './fixtures/missionDraft'
 import {
   buildMissionInsert,
   buildParticipantInsert,

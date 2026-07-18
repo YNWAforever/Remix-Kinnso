@@ -814,7 +814,7 @@ const messages: Messages = {
     spotsLeftLabel: '名様分の空き',
     soldOutLabel: '満席',
     guestEmailLabel: 'メールアドレス',
-    guestEmailPlaceholder: 'you@example.com',
+    guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: 'ご予約確認はこちらのメールアドレスに送信されます。',
     submitCta: '今すぐ予約',
     submittingCta: '安全な決済ページに移動しています…',

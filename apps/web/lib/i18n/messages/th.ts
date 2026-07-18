@@ -814,7 +814,7 @@ const messages: Messages = {
     spotsLeftLabel: 'ที่ว่างเหลือ',
     soldOutLabel: 'เต็มแล้ว',
     guestEmailLabel: 'อีเมล',
-    guestEmailPlaceholder: 'you@example.com',
+    guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: 'เราจะส่งการยืนยันการจองไปที่อีเมลนี้',
     submitCta: 'จองเลย',
     submittingCta: 'กำลังไปยังหน้าชำระเงินที่ปลอดภัย…',

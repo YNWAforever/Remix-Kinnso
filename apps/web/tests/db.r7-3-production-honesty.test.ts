@@ -8,6 +8,11 @@ const file = readdirSync(migrationsDir).find((name) => name.endsWith('_r7_3_prod
 expect(file).toBeTruthy()
 
 const sql = readFileSync(join(migrationsDir, file!), 'utf8')
+const cleanupFile = readdirSync(migrationsDir).find((name) => name.endsWith('_r7_3_honesty_cleanup.sql'))
+
+expect(cleanupFile).toBeTruthy()
+
+const cleanupSql = readFileSync(join(migrationsDir, cleanupFile!), 'utf8')
 const liveTestPath = join(process.cwd(), 'tests/r7-3-creator-listing.rls.test.ts')
 const liveTest = readFileSync(liveTestPath, 'utf8')
 const liveConfigPath = join(process.cwd(), 'tests/helpers/r7-3-local-live-config.ts')
@@ -41,5 +46,49 @@ describe('R7.3 production-honesty migration', () => {
     expect(liveConfig).toContain('SUPABASE_DB_CONTAINER')
     expect(liveTest).toContain('runPsql(recomputeSql)')
     expect(liveTest).toContain("expect(afterRecompute.data!.saves_count).toBe(1)")
+  })
+})
+
+describe('R7.3 production-honesty cleanup migration', () => {
+  it('unpublishes only the exact audited article id and slug pairs', () => {
+    expect(cleanupSql).toContain('update public.articles as article')
+    expect(cleanupSql).toContain('from (values')
+    expect(cleanupSql).toContain("('00000000-0000-0000-0000-000000000001'::uuid, 'pub-article')")
+    expect(cleanupSql).toContain("('00000000-0000-0000-0000-0000000000a1'::uuid, 'ramen-guide')")
+    expect(cleanupSql).toContain("('00000000-0000-0000-0000-0000000000a2'::uuid, 'sushi-guide')")
+    expect(cleanupSql).toContain("('00000000-0000-0000-0000-0000000000a3'::uuid, 'cafe-guide')")
+    expect(cleanupSql).toContain("('00000000-0000-0000-0000-0000000000a4'::uuid, 'mall-coupon')")
+    expect(cleanupSql).toContain("('00000000-0000-0000-0000-000000000003'::uuid, 'expired-article')")
+    expect(cleanupSql).toContain('article.id = target.id')
+    expect(cleanupSql).toContain('article.slug = target.slug')
+    expect(cleanupSql).toContain('article.published_at is not null')
+  })
+
+  it('clears only audited invalid guide covers and merchant websites', () => {
+    expect(cleanupSql).toContain("cover_url ~* '^https://picsum\\.photos(?:/|$)'")
+    for (const id of [
+      'c1219eec-8da0-d78d-7335-f2785d31187e',
+      '02425dc3-b5c6-4b10-c9cb-fab2118ad58b',
+      '04534d55-16f8-95ba-b50e-976fd12a630c',
+      '14e65377-ea50-7c58-fd26-bae99d221caa',
+    ]) {
+      expect(cleanupSql).toContain(`'${id}'::uuid`)
+    }
+    expect(cleanupSql).toContain('website_url is not null')
+    expect(cleanupSql).toContain("website_url !~* '^https://'")
+    expect(cleanupSql).toContain("website_url ~* '^https://[^/]*(^|\\.)example\\.[^/]+'")
+  })
+
+  it('removes only the audited author and ramen map reference without assigning editorial', () => {
+    expect(cleanupSql).toContain("array_remove(authors, 'jane-doe')")
+    expect(cleanupSql).toContain("where 'jane-doe' = any(authors)")
+    expect(cleanupSql).toContain("where slug = 'jane-doe'")
+    expect(cleanupSql).toContain('and not exists')
+    expect(cleanupSql).toContain("content #- '{3,address,link}'")
+    expect(cleanupSql).toContain("translation.article_id = '00000000-0000-0000-0000-0000000000a1'::uuid")
+    expect(cleanupSql).toContain("translation.locale = 'en'")
+    expect(cleanupSql).toContain("translation.content #>> '{3,address,link}' = 'https://maps.example/x'")
+    expect(cleanupSql).not.toContain("set authors = '{kinnso-editorial}'")
+    expect(cleanupSql).not.toContain('source is null')
   })
 })

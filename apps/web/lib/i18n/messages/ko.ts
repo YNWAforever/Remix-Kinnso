@@ -814,7 +814,7 @@ const messages: Messages = {
     spotsLeftLabel: '자리 남음',
     soldOutLabel: '마감',
     guestEmailLabel: '이메일',
-    guestEmailPlaceholder: 'you@example.com',
+    guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '예약 확인 메일을 이 주소로 보내드립니다.',
     submitCta: '지금 예약하기',
     submittingCta: '안전한 결제 페이지로 이동 중…',

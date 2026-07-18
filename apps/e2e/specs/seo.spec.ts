@@ -31,11 +31,3 @@ test('reciprocal hreflang on zh-hk flagship', async ({ page }) => {
   expect(await page.locator('link[rel="alternate"][hreflang="en"]').count()).toBe(1)
   expect(await page.locator('link[rel="alternate"][hreflang="zh-hk"]').count()).toBe(1)
 })
-
-test('EN coupon is noindex; zh-hk coupon is indexable', async ({ page }) => {
-  await page.goto(FIXTURES.couponEn.path)
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
-
-  await page.goto(FIXTURES.couponHk.path)
-  await expect(page.locator('meta[name="robots"]')).not.toHaveAttribute('content', /noindex/)
-})

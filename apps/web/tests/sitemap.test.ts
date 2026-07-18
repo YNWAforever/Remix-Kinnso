@@ -10,6 +10,9 @@ describe('sitemap', () => {
     expect(urls).toContain('https://www.kinnso.ai/en/articles/dining/ramen-guide')
     expect(urls).toContain('https://www.kinnso.ai/zh-hk/articles/dining/ramen-guide')
     expect(urls.some((u) => u.includes('draft-article'))).toBe(false)
+    for (const slug of ['pub-article', 'sushi-guide', 'cafe-guide', 'mall-coupon', 'expired-article']) {
+      expect(urls.some((url) => url.includes(slug))).toBe(false)
+    }
     // hub + category present
     expect(urls).toContain('https://www.kinnso.ai/en/articles')
     expect(urls).toContain('https://www.kinnso.ai/en/articles/dining')

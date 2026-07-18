@@ -814,7 +814,7 @@ const messages: Messages = {
     spotsLeftLabel: '个名额',
     soldOutLabel: '名额已满',
     guestEmailLabel: '邮箱',
-    guestEmailPlaceholder: 'you@example.com',
+    guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '我们会将预约确认发送至此邮箱。',
     submitCta: '立即预约',
     submittingCta: '正在跳转至安全支付页面…',

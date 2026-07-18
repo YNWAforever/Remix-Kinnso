@@ -2048,7 +2048,7 @@ const messages: Messages = {
     spotsLeftLabel: 'spots left',
     soldOutLabel: 'Sold out',
     guestEmailLabel: 'Email',
-    guestEmailPlaceholder: 'you@example.com',
+    guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: "We'll send your booking confirmation here.",
     submitCta: 'Book now',
     submittingCta: 'Redirecting to secure checkout…',

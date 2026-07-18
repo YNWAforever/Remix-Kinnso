@@ -11,25 +11,31 @@ describe('article queries', () => {
     expect(a?.translation?.title).toBe('Best Ramen in Tokyo')
     expect(a?.faqs.length).toBe(2)
     expect(a?.faqs[0].question).toBe('Is ramen cheap?')   // higher weight first
-    expect(a?.author?.name).toBe('Jane Doe')
+    expect(a?.author?.name).toBe('KINNSO Editorial')
   })
-  it('getArticleDetail 404s on category mismatch and on unpublished', async () => {
+  it('getArticleDetail 404s on category mismatch and unpublished fixtures', async () => {
     expect(await getArticleDetail('shopping', 'ramen-guide', 'en')).toBeNull()  // wrong category
     expect(await getArticleDetail('shopping', 'draft-article', 'en')).toBeNull() // RLS-hidden
+    expect(await getArticleDetail('dining', 'pub-article', 'en')).toBeNull()
+    expect(await getArticleDetail('dining', 'sushi-guide', 'en')).toBeNull()
+    expect(await getArticleDetail('dining', 'cafe-guide', 'en')).toBeNull()
+    expect(await getArticleDetail('shopping', 'mall-coupon', 'en')).toBeNull()
+    expect(await getArticleDetail('destinations', 'expired-article', 'en')).toBeNull()
   })
   it('getPresentLocales returns only locales with a translation', async () => {
     expect((await getPresentLocales('ramen-guide')).sort()).toEqual(['en', 'zh-hk'])
   })
-  it('getYouMayLike returns same-category others', async () => {
+  it('getYouMayLike excludes unpublished same-category fixtures', async () => {
     const list = await getYouMayLike('00000000-0000-0000-0000-0000000000a1', 'en', 5)
     const urls = list.map((r) => r.url)
     expect(urls).not.toContain('ramen-guide')
-    expect(urls).toContain('sushi-guide')
+    expect(urls).not.toContain('sushi-guide')
+    expect(urls).not.toContain('cafe-guide')
   })
   it('searchArticles paginates with total', async () => {
     const r = await searchArticles({ locale: 'en', category: 'dining', page: 1, perPage: 2 })
-    expect(r.items.length).toBe(2)
-    expect(r.total).toBeGreaterThanOrEqual(3)
+    expect(r.items.map((item) => item.url)).toEqual(['ramen-guide'])
+    expect(r.total).toBe(1)
   })
   it('getPublishedForSitemap / getStaticArticleParams exclude drafts and unknown categories', async () => {
     const sm = await getPublishedForSitemap()

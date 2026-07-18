@@ -21,6 +21,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm honesty:lint
 
       # Local Supabase stack (Docker is available on GitHub-hosted runners).
       # `supabase start` applies supabase/migrations and seeds supabase/seed.sql.

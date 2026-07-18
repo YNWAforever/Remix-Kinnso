@@ -10,15 +10,9 @@ describe('search_articles RPC', () => {
     })
     expect(error).toBeNull()
     const urls = (data ?? []).map((r: any) => r.url)
-    expect(urls).toContain('ramen-guide')
+    expect(urls).toEqual(['ramen-guide'])
     expect(urls).not.toContain('mall-coupon')         // different category
-    // newest by coalesce(edit_at, published_at): sushi(edit -1d) > ramen(edit -2d) > cafe(pub -3d)
-    // pub-article (Plan 1 fixture) is also a published 'dining' article, so it appears in the
-    // dining listing. Assert the newest-first order of the Plan 3 dining trio rather than
-    // assuming pub-article is absent (sushi edit -1d > ramen edit -2d > cafe pub -3d).
-    const trio = urls.filter((u: string) => ['sushi-guide', 'ramen-guide', 'cafe-guide'].includes(u))
-    expect(trio).toEqual(['sushi-guide', 'ramen-guide', 'cafe-guide'])
-    expect(Number((data ?? [])[0].total_count)).toBeGreaterThanOrEqual(3)
+    expect(Number((data ?? [])[0].total_count)).toBe(1)
   })
 
   it('matches by title FTS and by tag name', async () => {
@@ -28,10 +22,10 @@ describe('search_articles RPC', () => {
     expect((byTag.data ?? []).map((r: any) => r.url)).toContain('ramen-guide')
   })
 
-  it('excludes EN coupon articles from the listing', async () => {
+  it('excludes unpublished coupon articles from every locale listing', async () => {
     const en = await anon.rpc('search_articles', { p_locale: 'en', p_category: 'shopping' })
     expect((en.data ?? []).map((r: any) => r.url)).not.toContain('mall-coupon')
     const hk = await anon.rpc('search_articles', { p_locale: 'zh-hk', p_category: 'shopping' })
-    expect((hk.data ?? []).map((r: any) => r.url)).toContain('mall-coupon')
+    expect((hk.data ?? []).map((r: any) => r.url)).not.toContain('mall-coupon')
   })
 })
