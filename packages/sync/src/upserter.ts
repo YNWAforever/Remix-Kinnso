@@ -21,12 +21,17 @@ export class Upserter {
 
     const { data: existing, error: selErr } = await this.db
       .from('articles')
-      .select('id, source_hash, views, deleted_at, source_synced_at')
+      .select('id, source_hash, published_at, views, deleted_at, source_synced_at')
       .eq('legacy_post_id', article.legacy_post_id!)
       .maybeSingle()
     if (selErr) throw new Error(`select existing article ${article.legacy_post_id} failed: ${selErr.message}`)
 
-    if (existing && existing.source_hash === article.source_hash && !existing.deleted_at) {
+    if (
+      existing
+      && existing.source_hash === article.source_hash
+      && existing.published_at === article.published_at
+      && !existing.deleted_at
+    ) {
       return { skipped: true } // unchanged
     }
 

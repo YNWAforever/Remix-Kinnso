@@ -67,3 +67,21 @@ export const legacyPost: LegacyPostBundle = {
     { category_slug: 'destination', weight: 3 },
   ],
 }
+
+// Publication-policy baseline: every locale has three visible blocks, 160 words,
+// a real HTTPS outbound link, and a named active transformed author row.
+const publicationBlocks = (prefix: string) => {
+  const words = Array.from({ length: 160 }, (_, index) => `${prefix}${index + 1}`)
+  return [
+    { type: 'text', content: `<p>${words.slice(0, 54).join(' ')}</p>` },
+    { type: 'number-box', content: `<p>${words.slice(54, 107).join(' ')}</p>` },
+    { type: 'detail-box', content: `<p>${words.slice(107).join(' ')}</p>`, address: { label: 'Map', link: 'https://maps.google.com/maps' } },
+  ]
+}
+for (const translation of legacyPost.translations) {
+  translation.content = JSON.stringify(publicationBlocks(translation.locale === 'en' ? 'word' : 'locale'))
+}
+legacyPost.authors = legacyPost.authors.map((author) => ({
+  ...author,
+  name: author.language === 'en' ? 'Ramen Editor' : 'Kinnso Editor',
+}))
