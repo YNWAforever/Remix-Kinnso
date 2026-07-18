@@ -89,9 +89,28 @@ describe('validatePublication', () => {
     }))
   })
 
+  it('finds an unquoted HTML href and preserves the containing content path', () => {
+    const input = clone(makeValid())
+    const content = input.translations[0]!.content as Array<Record<string, unknown>>
+    content[1]!.content = `${content[1]!.content}<a href=https://unsafe.example/path>Book</a>`
+    const warnings = validatePublication(input)
+    expect(warnings).toContainEqual(expect.objectContaining({
+      code: 'invalid_external_link',
+      articleSlug: 'honest-guide',
+      locale: 'en',
+      path: 'translations.en.content[1].content',
+    }))
+  })
+
   it('rejects the Jane Doe placeholder', () => {
     const input = clone(makeValid())
     input.authors[0]!.name = 'Jane Doe'
+    expect(validatePublication(input).map((warning) => warning.code)).toContain('invalid_author')
+  })
+
+  it('rejects the Jane Doe placeholder with repeated internal whitespace', () => {
+    const input = clone(makeValid())
+    input.authors[0]!.name = '  Jane \t  Doe  '
     expect(validatePublication(input).map((warning) => warning.code)).toContain('invalid_author')
   })
 

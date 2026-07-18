@@ -29,7 +29,7 @@ const EXCLUDED_VISIBLE_KEYS = new Set([
   'attraction',
 ])
 const LINK_KEYS = new Set(['link', 'href', 'url', 'website'])
-const HREF_PATTERN = /\bhref\s*=\s*(["'])(.*?)\1/gi
+const HREF_PATTERN = /\bhref\s*=\s*(?:(["'])(.*?)\1|([^\s"'=<>`]+))/gi
 
 export function countLocaleWords(text: string, locale: string): number {
   const segmenter = new Intl.Segmenter(locale, { granularity: 'word' })
@@ -92,7 +92,7 @@ function collectLinkWarnings(
   if (typeof value === 'string') {
     if (key && LINK_KEYS.has(key.toLowerCase())) validateLink(input, value, locale, path, warnings)
     for (const match of value.matchAll(HREF_PATTERN)) {
-      validateLink(input, match[2] ?? '', locale, path, warnings)
+      validateLink(input, match[2] ?? match[3] ?? '', locale, path, warnings)
     }
     return
   }
@@ -112,7 +112,7 @@ function hasEligibleAuthor(input: PublicationInput, locale: string): boolean {
 
   return input.authors.some((author) => {
     const slug = author.slug.trim()
-    const name = author.name.trim()
+    const name = author.name.trim().replace(/\s+/g, ' ')
     return requested.has(slug)
       && author.locale === locale
       && author.is_active !== false
