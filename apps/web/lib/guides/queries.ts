@@ -6,7 +6,7 @@ import { sanitizeMatchTerms } from '@/lib/search/sanitize-match-terms'
 interface GuideRowLite {
   slug: string
   title: string
-  cover_url: string
+  cover_url: string | null
   city: string
   saves_count: number
   creator_handle: string
@@ -16,7 +16,7 @@ export function mapRowToGuide(r: GuideRowLite): Guide {
   return {
     slug: r.slug,
     title: r.title,
-    cover: r.cover_url,
+    cover: r.cover_url ?? null,
     city: r.city,
     saves: r.saves_count,
     creatorHandle: r.creator_handle,

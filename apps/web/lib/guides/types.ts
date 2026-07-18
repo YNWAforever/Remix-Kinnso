@@ -2,7 +2,7 @@
 export interface Guide {
   slug: string
   title: string
-  cover: string
+  cover: string | null
   city: string
   saves: number
   creatorHandle: string
@@ -22,7 +22,7 @@ export interface GuideListItem {
   slug: string
   title: string
   city: string
-  cover: string
+  cover: string | null
   status: 'draft' | 'published'
 }
 
