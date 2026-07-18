@@ -21,9 +21,22 @@ describe('GuideCard', () => {
     const onSaveToggle = vi.fn()
     const { container } = render(<GuideCard g={guide} locale="en" isSaved={true} onSaveToggle={onSaveToggle} />)
     const button = screen.getByRole('button')
+    const link = screen.getByRole('link')
+    expect(button.closest('a')).toBeNull()
+    expect(button.parentElement).toBe(link.parentElement)
+    expect(button.tabIndex).toBe(0)
+    expect(link.tabIndex).toBe(0)
     fireEvent.click(button)
     expect(onSaveToggle).toHaveBeenCalledTimes(1)
     expect(screen.queryByText('5')).toBeNull()
     expect(container.innerHTML).not.toContain('picsum.photos')
+  })
+
+  it('renders approved CDN media', () => {
+    const { container } = render(
+      <GuideCard g={{ ...guide, cover: 'https://cdn.kinnso.ai/test/guide.jpg' }} locale="en" />,
+    )
+    expect(container.querySelector('img')).toBeTruthy()
+    expect(container.innerHTML).toContain('cdn.kinnso.ai')
   })
 })

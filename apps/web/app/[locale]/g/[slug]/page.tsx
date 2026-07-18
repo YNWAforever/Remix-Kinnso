@@ -113,7 +113,7 @@ export default async function GuidePage({
             <GuideSaveButton locale={locale as Locale} guideId={guide.id} initialSaved={viewer.isSaved} signedIn={!!viewer.user} t={messages.guideSave} />
           </div>
 
-          {/* TicketCard overlay – title, author, city, saves */}
+          {/* TicketCard overlay – title, author, and city */}
           <div className="k2-card absolute inset-x-4 bottom-4 p-5 sm:inset-x-6 sm:bottom-6 sm:p-7 md:inset-x-8 md:bottom-8">
             <h1 className="k2-display max-w-3xl text-2xl font-semibold leading-tight text-kinnso-ink md:text-4xl">{guide.title}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-kinnso-muted">

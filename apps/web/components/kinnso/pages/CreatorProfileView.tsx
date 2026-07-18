@@ -29,7 +29,6 @@ function Chips({ items }: { items: string[] }) {
 
 export function CreatorProfileView({ creator, locale, embedded, t }: Props) {
   const wrap = embedded ? '' : 'k2-container py-8 md:py-12'
-  const p = (path: string) => `/${locale}${path}`
   const hue = hueFromHandle(creator.handle)
   const pr = creator.profile
   return (

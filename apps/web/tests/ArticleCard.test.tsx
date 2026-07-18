@@ -18,4 +18,11 @@ describe('ArticleCard', () => {
     expect(container.innerHTML).not.toContain('picsum.photos')
   })
 
+  it('renders approved CDN media', () => {
+    const { container } = render(
+      <ArticleCard href="/en/articles/destinations/tea" title="Tea" thumbnail="https://cdn.kinnso.ai/test/article.jpg" />,
+    )
+    expect(container.querySelector('img')).toBeTruthy()
+    expect(container.innerHTML).toContain('cdn.kinnso.ai')
+  })
 })
