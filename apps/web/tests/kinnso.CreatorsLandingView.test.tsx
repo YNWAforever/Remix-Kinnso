@@ -13,8 +13,9 @@ const creators: CreatorSummary[] = [
 
 describe('CreatorsLandingView (directory-first)', () => {
   it('renders a card per real creator linking to the profile', () => {
-    render(<CreatorsLandingView locale="en" t={en.creatorsLanding} creators={creators} />)
-    expect(screen.getByText('Maya Wanders')).toBeInTheDocument()
+    const { container } = render(<CreatorsLandingView locale="en" t={en.creatorsLanding} creators={creators} />)
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(screen.getAllByText('Maya Wanders').length).toBeGreaterThan(0)
     const link = screen.getByRole('link', { name: new RegExp(en.creatorsLanding.viewProfile, 'i') })
     expect(link.getAttribute('href')).toBe('/en/c/maya')
     expect(screen.getByText('3 Guides')).toBeInTheDocument()

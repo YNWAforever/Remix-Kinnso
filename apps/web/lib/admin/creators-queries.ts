@@ -257,6 +257,7 @@ export interface CreatorDetailProfile {
   handle: string | null
   status: string
   verified: boolean
+  isListed: boolean
   bio: string | null
   createdAt: string
   updatedAt: string
@@ -283,7 +284,7 @@ export interface CreatorDetail {
 }
 
 type DetailPayload = {
-  creator: { id: string; display_name: string | null; handle: string | null; status: string; verified: boolean; bio: string | null; created_at: string; updated_at: string }
+  creator: { id: string; display_name: string | null; handle: string | null; status: string; verified: boolean; is_listed: boolean; bio: string | null; created_at: string; updated_at: string }
   contribution: { points: number; tier: string; tier_updated_at: string | null } | null
   dna: { id: string; status: string; model: string | null; draft_ready_at: string | null; updated_at: string } | null
   scan: { id: string; status: string; error: string | null; started_at: string | null; completed_at: string | null; created_at: string } | null
@@ -308,7 +309,7 @@ export async function getCreatorDetail(supabase: Client, creatorId: string): Pro
   return {
     creator: {
       id: p.creator.id, displayName: p.creator.display_name, handle: p.creator.handle,
-      status: p.creator.status, verified: p.creator.verified, bio: p.creator.bio,
+      status: p.creator.status, verified: p.creator.verified, isListed: p.creator.is_listed, bio: p.creator.bio,
       createdAt: p.creator.created_at, updatedAt: p.creator.updated_at,
     },
     contribution: p.contribution

@@ -96,7 +96,7 @@ describe('/[locale]/g/[slug] host', () => {
     const route = await import('@/app/[locale]/g/[slug]/page')
     const ui = await route.default({ params: Promise.resolve({ locale: 'en', slug: 'kyoto-tea' }) })
 
-    render(ui)
+    const { container } = render(ui)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Kyoto Tea Houses' })).toBeTruthy()
     expect(screen.getByRole('link', { name: '@teafan' }).getAttribute('href')).toBe('/en/c/teafan')
@@ -104,6 +104,22 @@ describe('/[locale]/g/[slug] host', () => {
     const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
     expect(ld).toContain('"datePublished":"2026-06-02T00:00:00Z"')
     expect(ld).toContain('"dateModified":"2026-06-02T00:00:00Z"')
+    expect(ld).not.toContain('example.com/kyoto.jpg')
+    expect(screen.queryByText('5')).toBeNull()
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('example.com/kyoto.jpg')
+  })
+
+  it('includes an approved CDN cover in guide JSON-LD', async () => {
+    const approvedCover = 'https://cdn.kinnso.ai/test/guide.jpg'
+    getGuideBySlugMock.mockResolvedValueOnce({ ...defaultGuide, cover: approvedCover })
+    const route = await import('@/app/[locale]/g/[slug]/page')
+    const ui = await route.default({ params: Promise.resolve({ locale: 'en', slug: 'kyoto-tea' }) })
+
+    render(ui)
+
+    const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+    expect(ld).toContain(approvedCover)
   })
 
   it('shows the save button (anon: "Sign in to save") and omits aggregateRating JSON-LD when there are no reviews', async () => {

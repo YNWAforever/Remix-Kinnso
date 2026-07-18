@@ -15,6 +15,7 @@ class Q {
     public table: string,
     public failOn: { table: string; op: string } | undefined,
     public log: string[],
+    public existing: Record<string, unknown> | null,
   ) {}
   select() { return this }
   eq() { return this }
@@ -29,7 +30,7 @@ class Q {
   }
   private run(op: string): Promise<{ data: unknown; error: { message: string } | null }> {
     this.log.push(`${this.table}.${op}`)
-    if (op === 'select-existing') return Promise.resolve({ data: null, error: null })
+    if (op === 'select-existing') return Promise.resolve({ data: this.existing, error: null })
     if (this.failOn && this.failOn.table === this.table && this.failOn.op === op) {
       return Promise.resolve({ data: null, error: { message: 'boom' } })
     }
@@ -39,9 +40,12 @@ class Q {
   }
 }
 
-function fakeDb(failOn?: { table: string; op: string }) {
+function fakeDb(options: {
+  failOn?: { table: string; op: string }
+  existing?: Record<string, unknown> | null
+} = {}) {
   const log: string[] = []
-  return { db: { from: (t: string) => new Q(t, failOn, log) }, log }
+  return { db: { from: (t: string) => new Q(t, options.failOn, log, options.existing ?? null) }, log }
 }
 
 describe('isPostLive', () => {
@@ -54,7 +58,7 @@ describe('isPostLive', () => {
 
 describe('Upserter durability', () => {
   it('throws and does NOT advance the watermark when a child insert fails', async () => {
-    const { db, log } = fakeDb({ table: 'article_translations', op: 'insert' })
+    const { db, log } = fakeDb({ failOn: { table: 'article_translations', op: 'insert' } })
     const up = new Upserter(db as never, 'https://cdn.x')
     await expect(up.upsert(transformPost(legacyPost, 'https://cdn.x'))).rejects.toThrow(/translations/)
     // The watermark update on `articles` must never run after a failed child write.
@@ -68,5 +72,31 @@ describe('Upserter durability', () => {
     expect(res.skipped).toBe(false)
     expect(log).toContain('articles.update')
     expect(log.indexOf('articles.update')).toBe(log.length - 1)
+  })
+
+  it('does not skip when the hash matches but desired publication changes from published to draft', async () => {
+    const payload = transformPost(legacyPost, 'https://cdn.x')
+    payload.article.published_at = null
+    const { db, log } = fakeDb({ existing: {
+      id: 'art-1', source_hash: payload.article.source_hash, published_at: '2026-06-01T00:00:00.000Z',
+      views: 123, deleted_at: null, source_synced_at: '2026-06-11T00:00:00.000Z',
+    } })
+    const result = await new Upserter(db as never, 'https://cdn.x').upsert(payload)
+
+    expect(result.skipped).toBe(false)
+    expect(log).toContain('articles.upsert')
+  })
+
+  it('skips when both hash and desired draft publication state match', async () => {
+    const payload = transformPost(legacyPost, 'https://cdn.x')
+    payload.article.published_at = null
+    const { db, log } = fakeDb({ existing: {
+      id: 'art-1', source_hash: payload.article.source_hash, published_at: null,
+      views: 123, deleted_at: null, source_synced_at: '2026-06-11T00:00:00.000Z',
+    } })
+    const result = await new Upserter(db as never, 'https://cdn.x').upsert(payload)
+
+    expect(result.skipped).toBe(true)
+    expect(log).toEqual(['articles.select-existing'])
   })
 })

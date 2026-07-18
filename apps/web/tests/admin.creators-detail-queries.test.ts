@@ -7,7 +7,7 @@ function clientReturning(data: unknown, error: unknown = null) {
 
 const payload = {
   creator: {
-    id: 'c1', display_name: 'Mia', handle: 'mia', status: 'active', verified: true,
+    id: 'c1', display_name: 'Mia', handle: 'mia', status: 'active', verified: true, is_listed: false,
     bio: 'Travel creator', created_at: '2026-06-01T00:00:00Z', updated_at: '2026-06-20T00:00:00Z',
   },
   contribution: { points: 320, tier: 'pro', tier_updated_at: '2026-06-10T00:00:00Z' },
@@ -25,7 +25,7 @@ describe('getCreatorDetail', () => {
     const supabase = clientReturning(payload)
     const detail = await getCreatorDetail(supabase, 'c1')
     expect(detail).not.toBeNull()
-    expect(detail!.creator).toMatchObject({ id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: true })
+    expect(detail!.creator).toMatchObject({ id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: true, isListed: false })
     expect(detail!.contribution).toMatchObject({ points: 320, tier: 'pro' })
     expect(detail!.dna).toMatchObject({ status: 'published' })
     expect(detail!.scan).toMatchObject({ status: 'completed' })

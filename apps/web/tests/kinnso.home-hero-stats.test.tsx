@@ -8,7 +8,7 @@ import { Hero } from '@/components/kinnso/home/Hero'
 import { StatsBar } from '@/components/kinnso/home/StatsBar'
 import en from '@/lib/i18n/messages/en'
 
-const guide = (slug: string, cover = `/covers/${slug}.jpg`) => ({
+const guide = (slug: string, cover = `https://cdn.kinnso.ai/test/${slug}.jpg`) => ({
   slug, title: `Guide ${slug}`, cover, city: 'Osaka', saves: 3, creatorHandle: 'mei',
 })
 
@@ -27,7 +27,8 @@ describe('Hero (section 1)', () => {
     const { container } = render(<Hero locale="en" t={en.home} guides={[guide('a'), guide('b'), guide('c'), guide('d')]} />)
     const imgs = container.querySelectorAll('img')
     expect(imgs.length).toBe(3)
-    expect(imgs[0].getAttribute('src')).toBe('/covers/a.jpg')
+    const optimizedSrc = new URL(imgs[0].getAttribute('src')!, 'http://localhost')
+    expect(optimizedSrc.searchParams.get('url')).toBe('https://cdn.kinnso.ai/test/a.jpg')
   })
 
   it('renders a purely typographic hero with fewer than 3 covers — no empty frames, no stock photos', () => {

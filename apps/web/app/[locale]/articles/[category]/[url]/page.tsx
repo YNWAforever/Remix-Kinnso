@@ -13,6 +13,8 @@ import { ArticleToc } from '@/components/ArticleToc'
 import { ArticleCard } from '@/components/ArticleCard'
 import { ViewPing } from '@/components/ViewPing'
 import { JsonLd } from '@/components/JsonLd'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
+import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 import { getPostDirectory } from '@/lib/articles/blocks'
 import { resolveConfiguredProductState } from '@/lib/product-state'
 
@@ -31,11 +33,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const a = await getArticleDetail(category, url, locale)
   if (!a || !a.translation) return {}
   const present = await getPresentLocales(url)
+  const approvedOgImage = [a.translation.og_image, a.thumbnails[0]].find(isApprovedEntityMediaUrl) ?? null
   return buildArticleMetadata({
     urlCategory: category as 'destinations' | 'dining' | 'shopping', url, locale,
     presentLocales: present, title: a.translation.title, metaTitle: a.translation.meta_title,
     summary: a.translation.summary, metaDescription: a.translation.meta_description,
-    ogImage: a.translation.og_image ?? a.thumbnails[0] ?? null,
+    ogImage: approvedOgImage,
     publishedAt: a.published_at, editAt: a.edit_at, isCoupon: a.is_coupon,
   })
 }
@@ -53,11 +56,12 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
   const youMayLike = await getYouMayLike(a.id, loc, 5)
 
   const canonical = `${SITE_URL}/${loc}/articles/${category}/${url}`
+  const approvedThumbnails = a.thumbnails.filter(isApprovedEntityMediaUrl)
   const ld: Record<string, unknown>[] = [
     articleJsonLd({
       headline: a.translation.meta_title ?? a.translation.title ?? '',
       description: (a.translation.meta_description?.trim() || a.translation.summary) ?? '',
-      url: canonical, images: a.thumbnails, publishedAt: a.published_at,
+      url: canonical, images: approvedThumbnails, publishedAt: a.published_at,
       modifiedAt: a.edit_at, authorName: a.author?.name ?? null, locale: loc,
     }),
     breadcrumbJsonLd([
@@ -94,7 +98,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
 
       <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
         <article>
-          {a.thumbnails[0] && <img src={a.thumbnails[0]} alt={a.translation.title ?? ''} className="rounded-card w-full mb-6" />}
+          <EntityMedia src={a.thumbnails[0]} title={a.translation.title ?? url} alt={a.translation.title ?? ''} sizes="(min-width: 1024px) 1152px, 100vw" priority className="mb-6 aspect-[16/9] w-full rounded-card" />
           <ArticleBlockRenderer blocks={a.translation.content} />
           <ArticleGuideLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} />
           <ArticleExperienceLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} bookingLive={bookingLive} />

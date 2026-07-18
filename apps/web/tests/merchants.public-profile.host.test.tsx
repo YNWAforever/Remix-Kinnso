@@ -27,14 +27,16 @@ describe('MerchantPublicProfilePage', () => {
   it('renders the merchant identity and an honest empty state with no experiences', async () => {
     getMerchantBySlugMock.mockResolvedValue({
       id: 'm1', slug: 'acme-travel', companyName: 'Acme Travel', tagline: 'Boutique tours',
-      city: 'Hong Kong', logoUrl: null, websiteUrl: 'https://acme.example',
+      city: 'Hong Kong', logoUrl: 'https://picsum.photos/logo.jpg', websiteUrl: 'https://acme.example',
     })
     listPublishedForMerchantMock.mockResolvedValue([])
     const el = await MerchantPublicProfilePage({ params: Promise.resolve({ locale: 'en', slug: 'acme-travel' }) })
-    render(el)
+    const { container } = render(el)
     expect(screen.getByRole('heading', { level: 1, name: 'Acme Travel' })).toBeTruthy()
     expect(screen.getByText(/No experiences published yet/i)).toBeTruthy()
     const website = screen.getByRole('link', { name: /Website/i })
     expect(website.getAttribute('href')).toBe('https://acme.example')
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 })

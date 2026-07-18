@@ -8,6 +8,15 @@ export type TagRow = Database['public']['Tables']['article_tags']['Insert']
 export type TagTransRow = Database['public']['Tables']['article_tag_translations']['Insert']
 export type SeoRedirect = Database['public']['Tables']['seo_redirects']['Insert']
 
+export interface TransformWarning {
+  kind: string
+  code: string
+  detail: string
+  articleSlug: string
+  locale?: string
+  path?: string
+}
+
 /** Raw rows read from legacy MySQL for ONE post (column names = legacy columns). */
 export interface LegacyPostBundle {
   post: {

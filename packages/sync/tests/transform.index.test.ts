@@ -35,6 +35,59 @@ describe('transformPost', () => {
     expect(Array.isArray(en.content)).toBe(true)
   })
 
+  it('keeps a compliant requested-published article published', () => {
+    expect(out.article.published_at).not.toBeNull()
+    expect(out.warnings.filter((warning) => warning.kind === 'publication')).toEqual([])
+  })
+
+  it('downgrades the whole article for one bad locale while retaining child rows and structured warnings', () => {
+    const translations = legacyPost.translations.map((translation) => translation.locale === 'en'
+      ? { ...translation, content: JSON.stringify([{ type: 'text', content: '<p>Too short</p>' }]) }
+      : translation)
+    const invalid = transformPost({ ...legacyPost, translations }, cdn)
+
+    expect(invalid.article.published_at).toBeNull()
+    expect(invalid.translations).toHaveLength(2)
+    expect(invalid.authors).toHaveLength(2)
+    expect(invalid.warnings).toContainEqual(expect.objectContaining({
+      kind: 'publication',
+      code: 'translation_too_shallow',
+      articleSlug: 'best-ramen-tokyo',
+      locale: 'en',
+      path: 'translations.en.content',
+    }))
+  })
+
+  it('downgrades requested publication when every translation was deleted', () => {
+    const translations = legacyPost.translations.map((translation) => ({
+      ...translation,
+      deleted_at: '2026-07-19 00:00:00',
+    }))
+    const invalid = transformPost({ ...legacyPost, translations }, cdn)
+
+    expect(invalid.article.published_at).toBeNull()
+    expect(invalid.translations).toEqual([])
+    expect(invalid.warnings.filter((warning) => warning.kind === 'publication')).toEqual([
+      expect.objectContaining({ code: 'missing_translation', path: 'translations' }),
+      expect.objectContaining({ code: 'invalid_author', path: 'authors' }),
+    ])
+  })
+
+  it('skips publication validation for a requested draft', () => {
+    const draft = transformPost({
+      ...legacyPost,
+      post: { ...legacyPost.post, published_at: null },
+      translations: legacyPost.translations.map((translation) => ({
+        ...translation,
+        content: JSON.stringify([{ type: 'text', content: '<p>Too short</p>', link: 'http://unsafe.test' }]),
+      })),
+      authors: [],
+    }, cdn)
+
+    expect(draft.article.published_at).toBeNull()
+    expect(draft.warnings.filter((warning) => warning.kind === 'publication')).toEqual([])
+  })
+
   it('source_hash is stable for identical input, changes on edit', () => {
     const h1 = sourceHash(legacyPost)
     const edited = { ...legacyPost, post: { ...legacyPost.post, edit_at: '2099-01-01 00:00:00' } }
@@ -69,7 +122,12 @@ describe('transformPost', () => {
     const en = legacyPost.translations.find((t) => t.locale === 'en')!
     const empty = transformPost({ ...legacyPost, translations: [{ ...en, content: '[]' }] }, cdn)
     expect(empty.warnings.some((w) => w.kind === 'content_parse_failed')).toBe(false)
+    expect(empty.warnings).toContainEqual(expect.objectContaining({
+      code: 'translation_too_shallow', articleSlug: 'best-ramen-tokyo', locale: 'en',
+    }))
     const bad = transformPost({ ...legacyPost, translations: [{ ...en, content: 'not json' }] }, cdn)
-    expect(bad.warnings.some((w) => w.kind === 'content_parse_failed')).toBe(true)
+    expect(bad.warnings).toContainEqual(expect.objectContaining({
+      kind: 'content_parse_failed', code: 'content_parse_failed', articleSlug: 'best-ramen-tokyo', locale: 'en',
+    }))
   })
 })

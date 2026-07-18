@@ -32,7 +32,7 @@ export default async function StudioEditGuidePage({
   const initial: GuideInput = {
     title: guide.title,
     city: guide.city,
-    coverUrl: guide.cover_url,
+    coverUrl: guide.cover_url ?? '',
     summary: guide.summary,
   }
 

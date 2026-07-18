@@ -1,4 +1,4 @@
-import type { MissionDraftInput } from './types'
+import type { MissionDraftInput } from '@/lib/missions/types'
 
 export const missionDraftFixture: MissionDraftInput = {
   missionSource: 'merchant',
@@ -7,7 +7,7 @@ export const missionDraftFixture: MissionDraftInput = {
   title: 'Hong Kong staycation coupon',
   summary: 'Promote a weekend staycation discount.',
   couponCode: 'STAY10',
-  couponUrl: 'https://example.com/staycation',
+  couponUrl: 'https://merchant.test/staycation',
   affiliateCommissionRate: 10,
   kinnsoCommissionRate: 4,
   creatorCommissionRate: 6,
@@ -16,13 +16,4 @@ export const missionDraftFixture: MissionDraftInput = {
   affiliateNetworkProgramId: null,
   minTier: null,
   milestones: [{ title: 'Publish post', description: 'Share one post with the tracked link.' }],
-}
-
-export const travelpayoutsMissionDraftFixture: MissionDraftInput = {
-  ...missionDraftFixture,
-  missionSource: 'travelpayouts',
-  affiliateNetworkProgramId: 'program-1',
-  couponCode: null,
-  couponUrl: null,
-  milestones: [],
 }

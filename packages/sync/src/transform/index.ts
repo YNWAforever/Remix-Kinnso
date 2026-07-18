@@ -1,4 +1,4 @@
-import type { LegacyPostBundle, TranslationRow, UpsertPayload } from '../types'
+import type { LegacyPostBundle, TransformWarning, TranslationRow, UpsertPayload } from '../types'
 import { buildArticleRow } from './article'
 import { tryParseBlocks, deriveSummary } from './content'
 import { parseMetaTags, resolveMetaDescription } from './meta'
@@ -6,14 +6,18 @@ import { transformTags } from './tags'
 import { transformAuthors } from './authors'
 import { transformFaqs } from './faqs'
 import { csvToArray, cdnUrl } from './arrays'
-
-export interface TransformWarning { kind: string; detail: string }
+import { validatePublication } from './publication'
 
 export function transformPost(bundle: LegacyPostBundle, cdn: string): UpsertPayload & { warnings: TransformWarning[] } {
   const warnings: TransformWarning[] = []
   const { tags, tagSlugs } = transformTags(bundle.tags)
   const { row: article, categoryDefaulted } = buildArticleRow(bundle, tagSlugs, cdn)
-  if (categoryDefaulted) warnings.push({ kind: 'category_defaulted', detail: bundle.post.slug })
+  if (categoryDefaulted) warnings.push({
+    kind: 'category_defaulted',
+    code: 'category_defaulted',
+    detail: bundle.post.slug,
+    articleSlug: bundle.post.slug,
+  })
 
   const zhHk = bundle.translations.find((t) => t.locale === 'zh-hk')
   const zhHkMetaDesc = parseMetaTags(zhHk?.meta_tags ?? null).metaDescription
@@ -24,7 +28,14 @@ export function transformPost(bundle: LegacyPostBundle, cdn: string): UpsertPayl
       const parsed = tryParseBlocks(t.content, cdn)
       // null ⇒ genuine parse failure; [] ⇒ legitimately empty content (no warning).
       if (t.content && parsed === null) {
-        warnings.push({ kind: 'content_parse_failed', detail: `${bundle.post.slug}:${t.locale}` })
+        warnings.push({
+          kind: 'content_parse_failed',
+          code: 'content_parse_failed',
+          detail: `${bundle.post.slug}:${t.locale}`,
+          articleSlug: bundle.post.slug,
+          locale: t.locale,
+          path: `translations.${t.locale}.content`,
+        })
       }
       const blocks = parsed ?? []
       const summary = deriveSummary(blocks)
@@ -53,11 +64,25 @@ export function transformPost(bundle: LegacyPostBundle, cdn: string): UpsertPayl
       }
     })
 
+  const authors = transformAuthors(bundle.authors, cdn)
+  if (article.published_at !== null) {
+    const publicationWarnings = validatePublication({
+      articleSlug: article.slug,
+      authorSlugs: article.authors ?? [],
+      translations,
+      authors,
+    })
+    if (publicationWarnings.length > 0) {
+      article.published_at = null
+      warnings.push(...publicationWarnings)
+    }
+  }
+
   return {
     article,
     translations,
     faqs: transformFaqs(bundle.faqs).map((f) => ({ ...f, article_id: '' })),
-    authors: transformAuthors(bundle.authors, cdn),
+    authors,
     tags,
     tagSlugs,
     warnings,

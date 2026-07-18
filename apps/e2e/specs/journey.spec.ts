@@ -13,15 +13,13 @@ test.describe('article journey', () => {
     expect(count).toBeGreaterThan(0)
     expect(count).toBeLessThanOrEqual(12) // 12-per-page contract
     await expect(page.locator('a[href$="/en/articles/dining/ramen-guide"]').first()).toBeVisible()
-    // sort: ramen (edit ~5d) appears before cafe (published ~3d)
-    const html = await page.content()
-    expect(html.indexOf('ramen-guide')).toBeLessThan(html.indexOf('cafe-guide'))
+    await expect(page.locator('a[href$="/en/articles/dining/cafe-guide"]')).toHaveCount(0)
 
     await page.goto(FIXTURES.flagship.path)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(FIXTURES.flagship.h1)
     await expect(page.getByText(FIXTURES.flagship.bodyText, { exact: false })).toBeVisible()
     await expect(page.getByText(FIXTURES.flagship.faqQuestion)).toBeVisible()
-    await expect(page.locator(`a[href$="${FIXTURES.flagship.youMayLikeHrefSuffix}"]`).first()).toBeVisible()
+    await expect(page.locator('a[href$="/en/articles/dining/sushi-guide"]')).toHaveCount(0)
   })
 
   test('detail renders CJK on zh-hk', async ({ page }) => {
@@ -36,7 +34,7 @@ test.describe('article journey', () => {
 
     await page.goto(`${FIXTURES.listing.path}?region=tokyo`)
     await expect(page.locator('a[href$="/en/articles/dining/ramen-guide"]').first()).toBeVisible()
-    await expect(page.locator('a[href$="/en/articles/dining/sushi-guide"]').first()).toBeVisible()
+    await expect(page.locator('a[href$="/en/articles/dining/sushi-guide"]')).toHaveCount(0)
     await expect(page.locator('a[href$="/en/articles/dining/cafe-guide"]')).toHaveCount(0) // cafe is osaka
   })
 })

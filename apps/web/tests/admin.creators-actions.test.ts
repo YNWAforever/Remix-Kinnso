@@ -13,7 +13,7 @@ vi.mock('@/lib/admin/guard', () => ({ requireOpsAction: gateMock }))
 
 import {
   setCreatorStatus, reinstateCreator, setCreatorVerified, addCreatorNote, bulkSetCreatorStatus,
-  setSettlementStatus,
+  setSettlementStatus, setCreatorListed,
 } from '@/lib/admin/creators-actions'
 
 beforeEach(() => {
@@ -73,6 +73,31 @@ describe('setCreatorVerified', () => {
     const res = await setCreatorVerified('en', 'c1', true, 'passed KYC')
     expect(rpcMock).toHaveBeenCalledWith('admin_set_creator_verified', { p_id: 'c1', p_verified: true, p_reason: 'passed KYC' })
     expect(res).toEqual({ ok: true, id: 'c1', verified: true })
+  })
+})
+
+describe('setCreatorListed', () => {
+  it('calls the audited RPC and revalidates public discovery', async () => {
+    const res = await setCreatorListed('en', 'c1', true, 'Launch cohort')
+    expect(rpcMock).toHaveBeenCalledWith('admin_set_creator_listed', {
+      p_id: 'c1', p_is_listed: true, p_reason: 'Launch cohort',
+    })
+    expect(res).toEqual({ ok: true, id: 'c1', isListed: true })
+    expect(revalidateMock).toHaveBeenCalledWith('/en/creators')
+    expect(revalidateMock).toHaveBeenCalledWith('/sitemap.xml')
+  })
+
+  it('rejects a blank reason without calling the RPC', async () => {
+    const res = await setCreatorListed('en', 'c1', true, '   ')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+
+  it('maps forbidden to active-ops copy', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await setCreatorListed('en', 'c1', true, 'Launch cohort')
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.errors.form?.[0]).toBe('Active ops access is required.')
   })
 })
 

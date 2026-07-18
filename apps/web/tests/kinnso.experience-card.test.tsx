@@ -25,15 +25,23 @@ const experience = { slug: 'sunset-tour', title: 'Sunset junk boat tour', city: 
 
 describe('ExperienceCard', () => {
   it('links to the experience detail page and shows no save button when onSaveToggle is omitted', () => {
-    render(<ExperienceCard experience={experience} locale="en" />)
+    const { container } = render(<ExperienceCard experience={{ ...experience, coverUrl: 'https://picsum.photos/e.jpg' }} locale="en" />)
     expect(screen.getByRole('link').getAttribute('href')).toBe('/en/experiences/sunset-tour')
     expect(screen.queryByRole('button')).toBeNull()
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 
   it('never navigates the card link when the save button is clicked', () => {
     const onSaveToggle = vi.fn()
     render(<ExperienceCard experience={experience} locale="en" isSaved={false} onSaveToggle={onSaveToggle} />)
-    fireEvent.click(screen.getByRole('button'))
+    const button = screen.getByRole('button')
+    const link = screen.getByRole('link')
+    expect(button.closest('a')).toBeNull()
+    expect(button.parentElement).toBe(link.parentElement)
+    expect(button.tabIndex).toBe(0)
+    expect(link.tabIndex).toBe(0)
+    fireEvent.click(button)
     expect(onSaveToggle).toHaveBeenCalledTimes(1)
   })
 
@@ -43,6 +51,14 @@ describe('ExperienceCard', () => {
     unmount()
     render(<ExperienceCard experience={experience} locale="en" isSaved={false} onSaveToggle={() => {}} />)
     expect(screen.getByRole('button').textContent).toContain('12')
+  })
+
+  it('renders approved CDN media', () => {
+    const { container } = render(
+      <ExperienceCard experience={{ ...experience, coverUrl: 'https://cdn.kinnso.ai/test/experience.jpg' }} locale="en" />,
+    )
+    expect(container.querySelector('img')).toBeTruthy()
+    expect(container.innerHTML).toContain('cdn.kinnso.ai')
   })
 })
 

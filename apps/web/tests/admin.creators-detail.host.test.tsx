@@ -20,7 +20,7 @@ vi.mock('@/lib/admin/guard', () => ({ requireOpsPage: guardMock }))
 vi.mock('@/lib/admin/creators-queries', () => ({ getCreatorDetail: detailMock }))
 vi.mock('@/lib/admin/audit', () => ({ listAudit: auditMock }))
 vi.mock('@/lib/i18n/dictionaries', () => ({ getDictionary: vi.fn(async () => (await import('@/lib/i18n/messages/en')).default) }))
-vi.mock('@/lib/admin/creators-actions', () => ({ setCreatorStatus: vi.fn(), reinstateCreator: vi.fn(), setCreatorVerified: vi.fn(), addCreatorNote: vi.fn() }))
+vi.mock('@/lib/admin/creators-actions', () => ({ setCreatorStatus: vi.fn(), reinstateCreator: vi.fn(), setCreatorVerified: vi.fn(), setCreatorListed: vi.fn(), addCreatorNote: vi.fn() }))
 
 import CreatorDetailPage from '@/app/[locale]/admin/creators/[creatorId]/page'
 
@@ -40,7 +40,7 @@ describe('Creator 360 page gate', () => {
   it('ops + found → renders the view', async () => {
     guardMock.mockResolvedValueOnce(undefined)
     detailMock.mockResolvedValueOnce({
-      creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: false, bio: null, createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-01T00:00:00Z' },
+      creator: { id: 'c1', displayName: 'Mia', handle: 'mia', status: 'active', verified: false, isListed: false, bio: null, createdAt: '2026-06-01T00:00:00Z', updatedAt: '2026-06-01T00:00:00Z' },
       contribution: null, dna: null, scan: null, socials: [], missions: [], settlements: [], pointsEvents: [], content: [],
     })
     auditMock.mockResolvedValueOnce([])

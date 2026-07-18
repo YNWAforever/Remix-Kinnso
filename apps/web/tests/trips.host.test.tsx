@@ -128,10 +128,11 @@ describe('TravelerTripsView', () => {
         savedExperiences={[]}
       />,
     )
-    expect(screen.getByText('Kyoto Tea Houses')).toBeInTheDocument()
+    const guideHeading = screen.getByRole('heading', { level: 3, name: 'Kyoto Tea Houses' })
+    expect(guideHeading.closest('a')).toHaveAttribute('href', '/en/g/kyoto-tea')
     fireEvent.click(screen.getByRole('button'))
     await waitFor(() => expect(unsaveGuideActionMock).toHaveBeenCalledWith('en', 'g1'))
-    await waitFor(() => expect(screen.queryByText('Kyoto Tea Houses')).toBeNull())
+    await waitFor(() => expect(screen.queryByRole('heading', { level: 3, name: 'Kyoto Tea Houses' })).toBeNull())
   })
 
   it('renders a saved experience as a real ExperienceCard and removes it from the list on unsave', async () => {
@@ -141,9 +142,10 @@ describe('TravelerTripsView', () => {
         savedExperiences={[{ experienceId: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', city: 'Hong Kong', priceAmount: 480, currency: 'HKD', coverUrl: null, savesCount: 3 }]}
       />,
     )
-    expect(screen.getByText('Sunset junk boat tour')).toBeInTheDocument()
+    const experienceLink = screen.getByRole('link', { name: /Sunset junk boat tour/ })
+    expect(experienceLink).toHaveAttribute('href', '/en/experiences/sunset-tour')
     fireEvent.click(screen.getByRole('button'))
     await waitFor(() => expect(unsaveExperienceActionMock).toHaveBeenCalledWith('en', 'e1'))
-    await waitFor(() => expect(screen.queryByText('Sunset junk boat tour')).toBeNull())
+    await waitFor(() => expect(screen.queryByRole('link', { name: /Sunset junk boat tour/ })).toBeNull())
   })
 })

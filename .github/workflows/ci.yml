@@ -21,6 +21,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm honesty:lint
 
       # Local Supabase stack (Docker is available on GitHub-hosted runners).
       # `supabase start` applies supabase/migrations and seeds supabase/seed.sql.
@@ -119,7 +120,7 @@ jobs:
         env:
           E2E_BASE_URL: http://localhost:3000
           BOOKING_LIVE: 'false'
-        run: pnpm --filter @kinnso/e2e e2e creator-onboarding funnel-smoke notfound
+        run: pnpm --filter @kinnso/e2e e2e creator-onboarding funnel-smoke honesty notfound
 
       - uses: actions/upload-artifact@v4
         if: always()

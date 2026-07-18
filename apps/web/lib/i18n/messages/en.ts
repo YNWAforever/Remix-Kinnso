@@ -967,6 +967,7 @@ export interface Messages {
     dnaPublished: string; dnaDraft: string; dnaNone: string
     actActivate: string; actSuspend: string; actBan: string; actReinstate: string
     actVerify: string; actUnverify: string; actNote: string; actApply: string; actCancel: string
+    actListCreator: string; actRemoveListingOverride: string; listingOverrideOn: string; listingGuideBased: string
     reasonPlaceholder: string; notePlaceholder: string
     confirmBan: string; confirmReinstate: string
     bulkApply: string; bulkSelected: string; bulkChooseAction: string
@@ -2047,7 +2048,7 @@ const messages: Messages = {
     spotsLeftLabel: 'spots left',
     soldOutLabel: 'Sold out',
     guestEmailLabel: 'Email',
-    guestEmailPlaceholder: 'you@example.com',
+    guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: "We'll send your booking confirmation here.",
     submitCta: 'Book now',
     submittingCta: 'Redirecting to secure checkout…',
@@ -2161,6 +2162,7 @@ const messages: Messages = {
     dnaPublished: 'Published', dnaDraft: 'Draft', dnaNone: 'None',
     actActivate: 'Activate', actSuspend: 'Suspend', actBan: 'Ban', actReinstate: 'Reinstate',
     actVerify: 'Verify', actUnverify: 'Unverify', actNote: 'Add note', actApply: 'Apply', actCancel: 'Cancel',
+    actListCreator: 'List in creator directory', actRemoveListingOverride: 'Remove directory override', listingOverrideOn: 'Explicit directory override on', listingGuideBased: 'Guide-based listing only',
     reasonPlaceholder: 'Reason (required)', notePlaceholder: 'Note (required)',
     confirmBan: 'Ban this creator? This is a permanent state.', confirmReinstate: 'Reinstate this banned creator?',
     bulkApply: 'Apply to selected', bulkSelected: 'selected', bulkChooseAction: 'Choose an action',
@@ -2593,7 +2595,7 @@ const messages: Messages = {
   },
   featureInterest: {
     emailLabel: 'Email address',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'traveller@email.test',
     submitAgent: 'Join the AI Agent waitlist',
     submitBooking: 'Get notified when booking opens',
     pending: 'Submitting…',

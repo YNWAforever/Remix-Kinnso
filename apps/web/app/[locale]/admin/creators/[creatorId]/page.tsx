@@ -6,7 +6,7 @@ import { requireOpsPage } from '@/lib/admin/guard'
 import { getCreatorDetail } from '@/lib/admin/creators-queries'
 import { listAudit } from '@/lib/admin/audit'
 import { CreatorDetailView } from '@/components/kinnso/admin/creators/CreatorDetailView'
-import { setCreatorStatus, reinstateCreator, setCreatorVerified, addCreatorNote } from '@/lib/admin/creators-actions'
+import { setCreatorStatus, reinstateCreator, setCreatorVerified, setCreatorListed, addCreatorNote } from '@/lib/admin/creators-actions'
 
 export default async function CreatorDetailPage({
   params,
@@ -26,7 +26,7 @@ export default async function CreatorDetailPage({
       locale={loc}
       detail={detail}
       audit={audit}
-      actions={{ setCreatorStatus, reinstateCreator, setCreatorVerified, addCreatorNote }}
+      actions={{ setCreatorStatus, reinstateCreator, setCreatorVerified, setCreatorListed, addCreatorNote }}
     />
   )
 }

@@ -1,8 +1,8 @@
 insert into public.articles (id, legacy_post_id, slug, url, category, published_at, end_at)
 values
-  ('00000000-0000-0000-0000-000000000001', 1, 'pub-article',    'pub-article',    'dining',      now() - interval '1 day',  null),
+  ('00000000-0000-0000-0000-000000000001', 1, 'pub-article',    'pub-article',    'dining',      null, null),
   ('00000000-0000-0000-0000-000000000002', 2, 'draft-article',  'draft-article',  'shopping',    null,                       null),
-  ('00000000-0000-0000-0000-000000000003', 3, 'expired-article','expired-article','destination', now() - interval '10 day',  now() - interval '1 day');
+  ('00000000-0000-0000-0000-000000000003', 3, 'expired-article','expired-article','destination', null, now() - interval '1 day');
 
 insert into public.article_translations (article_id, locale, title, summary) values
   ('00000000-0000-0000-0000-000000000001', 'en',    'Published EN', 'A published article.'),
@@ -19,14 +19,14 @@ values
 -- two more same-category (dining) published articles for "you may like"
   ('00000000-0000-0000-0000-0000000000a2', 102, 'sushi-guide', 'sushi-guide', 'dining',
    '{https://cdn.kinnso.ai/a2.jpg}', '{tokyo}', '{sushi}', 4.20, 500,
-   now() - interval '4 day', now() - interval '1 day'),
+   null, now() - interval '1 day'),
   ('00000000-0000-0000-0000-0000000000a3', 103, 'cafe-guide', 'cafe-guide', 'dining',
    '{https://cdn.kinnso.ai/a3.jpg}', '{osaka}', '{coffee}', 4.00, 200,
-   now() - interval '3 day', null),
+   null, null),
 -- an EN coupon article (is_coupon) with en + zh-hk translations
   ('00000000-0000-0000-0000-0000000000a4', 104, 'mall-coupon', 'mall-coupon', 'shopping',
    '{https://cdn.kinnso.ai/a4.jpg}', '{hongkong}', '{coupon}', null, 50,
-   now() - interval '2 day', null);
+   null, null);
 
 update public.articles set is_coupon = true where url = 'mall-coupon';
 
@@ -35,16 +35,25 @@ insert into public.article_translations
 values
   ('00000000-0000-0000-0000-0000000000a1', 'en', 'Best Ramen in Tokyo',
    'A guide to the best ramen shops in Tokyo.',
-   '[{"type":"text","id":"block-0","title":"Intro","content":"<p>Welcome to <strong>Tokyo</strong> ramen.</p>"},
-     {"type":"number-box","id":"block-1","title":"Ichiran","content":"<p>Famous tonkotsu.</p>"},
-     {"type":"number-box","id":"block-2","title":"Afuri","content":"<p>Yuzu shio.</p>"},
-     {"type":"detail-box","id":"block-3","title":"Hours","time":"11:00-22:00","price":"¥1000","address":{"label":"Shibuya","link":"https://maps.example/x"}},
-     {"type":"multiple-image","id":"block-4","images":[{"thumbnail":"https://cdn.kinnso.ai/t1.jpg","original":"https://cdn.kinnso.ai/o1.jpg","desc":"bowl"}]},
-     {"type":"attraction-box","id":"block-5","attraction":"some-slug"}]'::jsonb,
+   jsonb_build_array(
+     jsonb_build_object('type', 'text', 'id', 'block-0', 'title', 'Welcome', 'content',
+       '<p>Welcome to Tokyo ramen. ' || repeat('Tokyo ramen shops welcome curious travellers with regional broths fresh noodles careful toppings friendly service and practical neighbourhood advice. ', 4) || '</p>'),
+     jsonb_build_object('type', 'text', 'id', 'block-1', 'title', 'Choosing a bowl', 'content',
+       '<p>' || repeat('Tokyo ramen shops welcome curious travellers with regional broths fresh noodles careful toppings friendly service and practical neighbourhood advice. ', 4) || '</p>'),
+     jsonb_build_object('type', 'text', 'id', 'block-2', 'title', 'Planning your visit', 'content',
+       '<p>' || repeat('Tokyo ramen shops welcome curious travellers with regional broths fresh noodles careful toppings friendly service and practical neighbourhood advice. ', 4) || '</p>')
+   ),
    'Best Ramen in Tokyo', 'The definitive Tokyo ramen guide.', 'https://cdn.kinnso.ai/og-a1.jpg', 'Ramen FAQ'),
   ('00000000-0000-0000-0000-0000000000a1', 'zh-hk', '東京最佳拉麵',
    '東京最佳拉麵店指南。',
-   '[{"type":"text","id":"block-0","title":"簡介","content":"<p>歡迎來到東京拉麵。</p>"}]'::jsonb,
+   jsonb_build_array(
+     jsonb_build_object('type', 'text', 'id', 'block-0', 'title', '歡迎', 'content',
+       '<p>歡迎來到東京拉麵。 ' || repeat('東京 拉麵 店 歡迎 旅客 品嚐 地道 湯底 新鮮 麵條 用心 配料 親切 服務 實用 社區 指南 。 ', 4) || '</p>'),
+     jsonb_build_object('type', 'text', 'id', 'block-1', 'title', '選擇拉麵', 'content',
+       '<p>' || repeat('東京 拉麵 店 歡迎 旅客 品嚐 地道 湯底 新鮮 麵條 用心 配料 親切 服務 實用 社區 指南 。 ', 4) || '</p>'),
+     jsonb_build_object('type', 'text', 'id', 'block-2', 'title', '行程建議', 'content',
+       '<p>' || repeat('東京 拉麵 店 歡迎 旅客 品嚐 地道 湯底 新鮮 麵條 用心 配料 親切 服務 實用 社區 指南 。 ', 4) || '</p>')
+   ),
    '東京最佳拉麵', '東京拉麵終極指南。', 'https://cdn.kinnso.ai/og-a1-hk.jpg', '拉麵常見問題'),
   ('00000000-0000-0000-0000-0000000000a2', 'en', 'Best Sushi in Tokyo', 'A sushi guide.',
    '[{"type":"text","id":"block-0","content":"<p>Sushi.</p>"}]'::jsonb, null, null, null, null),
@@ -60,9 +69,15 @@ insert into public.article_faqs (article_id, locale, question, answer, weight) v
   ('00000000-0000-0000-0000-0000000000a1', 'en', 'Is ramen cheap?', 'Yes, around ¥1000.', 10),
   ('00000000-0000-0000-0000-0000000000a1', 'en', 'When to go?', 'Lunch is best.', 5);
 
-insert into public.article_authors (slug, locale, name, title, bio, avatar) values
-  ('jane-doe', 'en', 'Jane Doe', 'Food Writer', 'Tokyo-based food writer.', 'https://cdn.kinnso.ai/jane.jpg');
-update public.articles set authors = '{jane-doe}' where url = 'ramen-guide';
+insert into public.article_authors (slug, locale, name, title, bio, avatar, labels, is_active)
+select 'kinnso-editorial', locale, 'KINNSO Editorial', null, null, null, '{}', true
+from unnest(array['en','zh-hk','zh-tw','zh-cn','ja','ko','th']) as locale
+on conflict (slug, locale) do update
+set name = excluded.name, is_active = true;
+
+update public.articles
+set authors = '{kinnso-editorial}'
+where id = '00000000-0000-0000-0000-0000000000a1' and slug = 'ramen-guide' and url = 'ramen-guide';
 
 insert into public.article_tags (id, slug, legacy_tag_id) values
   ('00000000-0000-0000-0000-0000000000b1', 'noodles', 9001);

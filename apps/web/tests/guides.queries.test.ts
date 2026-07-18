@@ -55,6 +55,10 @@ describe('mapRowToGuide', () => {
       creatorHandle: 'teafan',
     })
   })
+
+  it('preserves a missing cover as null', () => {
+    expect(mapRowToGuide({ ...row, cover_url: null }).cover).toBeNull()
+  })
 })
 
 describe('getPublishedGuides', () => {

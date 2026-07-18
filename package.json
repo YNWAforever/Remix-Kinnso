@@ -6,11 +6,13 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
+    "honesty:lint": "tsx scripts/honesty-lint.ts",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test"
   },
   "devDependencies": {
     "supabase": "^2.106.0",
-    "turbo": "^2.1.0"
+    "turbo": "^2.1.0",
+    "tsx": "^4.19.0"
   }
 }

@@ -15,6 +15,7 @@ import { breadcrumbJsonLd, experienceOfferJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
 import { resolveConfiguredProductState } from '@/lib/product-state'
+import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,6 +63,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
 
   const canonical = `${SITE_URL}/${locale}/experiences/${slug}`
   const hasOpenAvailability = availability.some((a) => a.remaining > 0)
+  const approvedCover = isApprovedEntityMediaUrl(experience.coverUrl) ? experience.coverUrl : null
   const ld = optionalValue('experience-jsonld', () => [
     breadcrumbJsonLd([
       { name: messages.breadcrumb.home, url: `${SITE_URL}/${locale}` },
@@ -73,7 +75,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
           name: experience.title,
           description: experience.summary ?? experience.description ?? `${experience.city} experience`,
           url: canonical,
-          image: experience.coverUrl,
+          image: approvedCover,
           priceAmount: experience.priceAmount,
           currency: experience.currency,
           rating: rating ?? undefined,

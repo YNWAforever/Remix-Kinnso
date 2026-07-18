@@ -86,6 +86,33 @@ export async function setCreatorVerified(
   return { ok: true, id, verified }
 }
 
+export async function setCreatorListed(
+  locale: Locale, id: string, isListed: boolean, reason: string,
+): Promise<ActionResult<{ id: string; isListed: boolean }>> {
+  'use server'
+  const supabase = await createSupabaseServerClient()
+  const gate = await requireOpsAction(supabase)
+  if (!gate.ok) return gate
+  const rErr = validateReason(reason)
+  if (rErr) return formError(FRIENDLY[rErr])
+
+  const args: Database['public']['Functions']['admin_set_creator_listed']['Args'] = {
+    p_id: id,
+    p_is_listed: isListed,
+    p_reason: reason.trim(),
+  }
+  const { error } = await supabase.rpc('admin_set_creator_listed', args)
+  if (error) {
+    console.error('[admin:creators] setCreatorListed failed', error)
+    return formError(mapError(error.message, 'Directory listing could not be changed'))
+  }
+  revalidatePath(dirPath(locale))
+  revalidatePath(`/${locale}/admin/creators/${id}`)
+  revalidatePath(`/${locale}/creators`)
+  revalidatePath('/sitemap.xml')
+  return { ok: true, id, isListed }
+}
+
 export async function addCreatorNote(
   locale: Locale, id: string, note: string,
 ): Promise<ActionResult<{ id: string }>> {
