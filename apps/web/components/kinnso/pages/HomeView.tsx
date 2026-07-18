@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import { AgentTeaser } from '@/components/kinnso/home/AgentTeaser'
 import { CreatorCta } from '@/components/kinnso/home/CreatorCta'
 import { Hero } from '@/components/kinnso/home/Hero'
@@ -94,16 +95,15 @@ export function HomeView({
               <Link key={g.slug} href={p(`/g/${g.slug}`)} className="group">
                 <EditorialCard
                   media={
-                    g.cover ? (
-                      <img
-                        src={g.cover}
-                        alt={g.title}
-                        width={640}
-                        height={480}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                      />
-                    ) : undefined
+                    <EntityMedia
+                      src={g.cover}
+                      title={g.title}
+                      location={g.city}
+                      alt={g.title}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="h-full w-full"
+                      imageClassName="transition duration-300 group-hover:scale-[1.02]"
+                    />
                   }
                   kicker={g.city}
                   title={g.title}
@@ -139,16 +139,14 @@ export function HomeView({
                 <Link key={a.url} href={p(`/articles/${cat}/${a.url}`)} className="group">
                   <EditorialCard
                     media={
-                      a.thumbnails[0] ? (
-                        <img
-                          src={a.thumbnails[0]}
-                          alt={a.title ?? ''}
-                          width={640}
-                          height={480}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                        />
-                      ) : undefined
+                      <EntityMedia
+                        src={a.thumbnails[0]}
+                        title={a.title ?? a.url}
+                        alt={a.title ?? ''}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="h-full w-full"
+                        imageClassName="transition duration-300 group-hover:scale-[1.02]"
+                      />
                     }
                     kicker={a.published_at ? dateFmt.format(new Date(a.published_at)) : undefined}
                     title={a.title ?? a.url}

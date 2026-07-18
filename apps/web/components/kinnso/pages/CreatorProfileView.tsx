@@ -1,5 +1,5 @@
 import GuideCard from '@/components/kinnso/GuideCard'
-import { initialsFrom } from '@/lib/studio/identity'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import type { PublicCreator } from '@/lib/creators/queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -41,9 +41,7 @@ export function CreatorProfileView({ creator, locale, embedded, t }: Props) {
           style={{ background: `linear-gradient(135deg, hsl(${hue} 70% 55%), hsl(${(hue + 40) % 360} 70% 45%))` }}
         />
         <div className="k2-card rounded-t-none p-6 sm:p-8">
-          <span className="-mt-16 grid h-20 w-20 place-items-center rounded-full bg-kinnso-ink text-2xl font-black text-white ring-4 ring-kinnso-cream">
-            {initialsFrom(creator.name)}
-          </span>
+          <EntityMedia src={null} title={creator.name} alt="" sizes="80px" className="-mt-16 h-20 w-20 rounded-full ring-4 ring-kinnso-cream [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
           <h1 className="mt-3 k2-display text-3xl font-semibold text-kinnso-ink md:text-4xl">{creator.name}</h1>
           <p className="mt-1 text-sm text-kinnso-muted">@{creator.handle}</p>
           {creator.bio && <p className="mt-3 max-w-xl text-sm text-kinnso-ink/80">{creator.bio}</p>}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Bookmark, MapPin } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import { isLocale, htmlLang, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
@@ -13,10 +13,11 @@ import { optionalQuery, optionalValue } from '@/lib/resilience/optional'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { GuideExperienceLinks } from '@/components/kinnso/GuideExperienceLinks'
 import { GuideSaveButton } from '@/components/kinnso/GuideSaveButton'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
+import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
-import { cssUrl } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,6 +51,7 @@ export default async function GuidePage({
 
   const messages = await getDictionary(locale as Locale)
   const authorName = guide.creatorName ?? guide.creatorHandle
+  const approvedCover = isApprovedEntityMediaUrl(guide.cover) ? guide.cover : null
 
   const viewer = await optionalQuery('guide-viewer', async () => {
     const supabase = await createSupabaseServerClient()
@@ -71,7 +73,7 @@ export default async function GuidePage({
       headline: guide.title,
       description: guide.summary ?? `${guide.city} guide by ${authorName}`,
       url: canonical,
-      images: guide.cover ? [guide.cover] : [],
+      images: approvedCover ? [approvedCover] : [],
       publishedAt: guide.publishedAt,
       modifiedAt: null,
       authorName,
@@ -88,14 +90,16 @@ export default async function GuidePage({
     <article className="k2-container py-8 md:py-12">
       <JsonLd data={ld} />
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
-        <div
-          role="img"
-          aria-label={guide.title}
-          className="relative min-h-[360px] bg-cover bg-center"
-          style={{
-            backgroundImage: cssUrl(guide.cover),
-          }}
-        >
+        <div className="relative min-h-[360px]">
+          <EntityMedia
+            src={approvedCover}
+            title={guide.title}
+            location={guide.city}
+            alt={guide.title}
+            sizes="(min-width: 1024px) 1152px, 100vw"
+            priority
+            className="absolute inset-0"
+          />
           {/* Gradient overlay for legibility */}
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/70" />
 
@@ -116,10 +120,6 @@ export default async function GuidePage({
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-4 w-4" aria-hidden="true" />
                 {guide.city}
-              </span>
-              <span className="inline-flex items-center gap-1 tabular-nums">
-                <Bookmark className="h-4 w-4" aria-hidden="true" />
-                {guide.saves.toLocaleString()}
               </span>
             </div>
             <div className="mt-3">

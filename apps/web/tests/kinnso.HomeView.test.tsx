@@ -8,9 +8,9 @@ import HomeView from '@/components/kinnso/pages/HomeView'
 import en from '@/lib/i18n/messages/en'
 
 const guides = [
-  { slug: 'real-osaka', title: 'Real Osaka Guide', cover: '/a.jpg', city: 'Osaka', saves: 12, creatorHandle: 'mei' },
-  { slug: 'real-seoul', title: 'Real Seoul Guide', cover: '/b.jpg', city: 'Seoul', saves: 7, creatorHandle: 'jun' },
-  { slug: 'real-tokyo', title: 'Real Tokyo Guide', cover: '/c.jpg', city: 'Tokyo', saves: 5, creatorHandle: 'aki' },
+  { slug: 'real-osaka', title: 'Real Osaka Guide', cover: 'https://cdn.kinnso.ai/test/entity.jpg', city: 'Osaka', saves: 12, creatorHandle: 'mei' },
+  { slug: 'real-seoul', title: 'Real Seoul Guide', cover: 'https://cdn.kinnso.ai/test/seoul.jpg', city: 'Seoul', saves: 7, creatorHandle: 'jun' },
+  { slug: 'real-tokyo', title: 'Real Tokyo Guide', cover: 'https://cdn.kinnso.ai/test/tokyo.jpg', city: 'Tokyo', saves: 5, creatorHandle: 'aki' },
 ]
 const stats = { activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4, upcomingSessions: 6 }
 const testimonials = [
@@ -18,7 +18,7 @@ const testimonials = [
 ]
 const articles = [
   {
-    url: 'osaka-food-streets', category: 'destination', thumbnails: ['/th.jpg'], rating: null,
+    url: 'osaka-food-streets', category: 'destination', thumbnails: ['https://cdn.kinnso.ai/test/article.jpg'], rating: null,
     published_at: '2026-06-01T00:00:00Z', edit_at: null, title: 'Osaka food streets', summary: 'Where locals actually eat.',
   },
 ]
@@ -37,7 +37,7 @@ describe('HomeView (R1B 10-section homepage)', () => {
     ).toBeTruthy()
     expect(screen.getByRole('link', { name: new RegExp(en.home.heroPrimaryCta) }).getAttribute('href')).toBe('/en/explore')
     expect(screen.getByRole('link', { name: en.home.heroSecondaryCta }).getAttribute('href')).toBe('/en/creators')
-    expect(container.querySelector('img[src="/a.jpg"]')).toBeTruthy()
+    expect(container.innerHTML).toContain('cdn.kinnso.ai')
   })
 
   it('renders passing stats and the testimonial pull-quote with its role label', () => {
@@ -112,3 +112,12 @@ describe('HomeView (R1B 10-section homepage)', () => {
     expect(container.querySelector('.k-ticket')).toBeNull()
   })
 })
+  it('renders placeholders without leaking non-CDN media', () => {
+    const invalidGuides = guides.map((guide) => ({ ...guide, cover: `https://picsum.photos/${guide.slug}.jpg` }))
+    const invalidArticles = articles.map((article) => ({ ...article, thumbnails: ['https://picsum.photos/article.jpg'] }))
+    const { container } = render(
+      <HomeView {...base} guides={invalidGuides} articles={invalidArticles} />,
+    )
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
+  })

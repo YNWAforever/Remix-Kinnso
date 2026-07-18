@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
-import { initialsFrom } from '@/lib/studio/identity'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import type { CreatorSummary } from '@/lib/creators/queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -41,9 +41,7 @@ export function CreatorsLandingView({
               <li key={c.handle}>
                 <div className="k2-card flex h-full flex-col p-5">
                   <div className="flex items-center gap-3">
-                    <span className="grid h-12 w-12 place-items-center rounded-full bg-kinnso-ink text-sm font-black text-white">
-                      {initialsFrom(c.name)}
-                    </span>
+                    <EntityMedia src={null} title={c.name} alt="" sizes="48px" className="h-12 w-12 shrink-0 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
                     <div>
                       <div className="font-bold text-kinnso-ink">{c.name}</div>
                       <div className="text-xs text-kinnso-muted">@{c.handle}</div>

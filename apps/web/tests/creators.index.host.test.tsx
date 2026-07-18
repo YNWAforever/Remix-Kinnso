@@ -18,7 +18,7 @@ describe('/[locale]/creators host', () => {
   it('renders the directory from real creators', async () => {
     const ui = await CreatorsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
-    expect(screen.getByText('Maya Wanders')).toBeInTheDocument()
+    expect(screen.getAllByText('Maya Wanders').length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: /view profile/i }).getAttribute('href')).toBe('/en/c/maya')
   })
 })

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Bookmark, MapPin } from 'lucide-react'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import { cn } from '@/lib/utils'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -25,11 +26,13 @@ export function ExperienceCard({ experience, locale, savesLabel = 'Saves', isSav
       href={`/${locale}/experiences/${experience.slug}`}
       className="group flex items-center gap-3 rounded-lg border border-kinnso-cream2 bg-white p-3 hover:border-kinnso-orangeDark"
     >
-      <div
-        role="img"
-        aria-label={experience.title}
-        className="h-16 w-16 shrink-0 rounded-md bg-kinnso-cream2 bg-cover bg-center"
-        style={experience.coverUrl ? { backgroundImage: `url(${experience.coverUrl})` } : undefined}
+      <EntityMedia
+        src={experience.coverUrl}
+        title={experience.title}
+        location={experience.city}
+        alt={experience.title}
+        sizes="64px"
+        className="h-16 w-16 shrink-0 rounded-md"
       />
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold text-kinnso-ink">{experience.title}</p>

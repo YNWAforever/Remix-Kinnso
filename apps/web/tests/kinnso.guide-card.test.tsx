@@ -6,20 +6,24 @@ import GuideCard from '@/components/kinnso/GuideCard'
 
 afterEach(cleanup)
 
-const guide = { slug: 'kyoto-tea', title: 'Kyoto Tea Houses', cover: 'https://x/kyoto.jpg', city: 'Kyoto', saves: 5, creatorHandle: 'teafan' }
+const guide = { slug: 'kyoto-tea', title: 'Kyoto Tea Houses', cover: 'https://picsum.photos/seed/kyoto/800/600', city: 'Kyoto', saves: 5, creatorHandle: 'teafan' }
 
 describe('GuideCard', () => {
-  it('renders the static bookmark count when isSaved/onSaveToggle are omitted (existing 3 consumers, unchanged)', () => {
-    render(<GuideCard g={guide} locale="en" />)
+  it('renders honest missing media and no static save proof', () => {
+    const { container } = render(<GuideCard g={guide} locale="en" />)
     expect(screen.queryByRole('button')).toBeNull()
-    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.queryByText('5')).toBeNull()
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 
   it('renders an interactive toggle button when isSaved/onSaveToggle are both supplied, and never navigates the card link on click', () => {
     const onSaveToggle = vi.fn()
-    render(<GuideCard g={guide} locale="en" isSaved={true} onSaveToggle={onSaveToggle} />)
+    const { container } = render(<GuideCard g={guide} locale="en" isSaved={true} onSaveToggle={onSaveToggle} />)
     const button = screen.getByRole('button')
     fireEvent.click(button)
     expect(onSaveToggle).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('5')).toBeNull()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 })

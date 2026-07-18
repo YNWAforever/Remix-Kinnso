@@ -116,7 +116,7 @@ describe('ExperiencePublicPage', () => {
     getExperienceBySlugMock.mockResolvedValue({
       id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
       description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
-      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z', savesCount: 42,
+      durationMinutes: 120, coverUrl: 'https://picsum.photos/e.jpg', publishedAt: '2026-07-01T00:00:00Z', savesCount: 42,
       merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
     })
     listPublicAvailabilityMock.mockResolvedValue([{ id: 'a1', date: '2026-08-01', remaining: 4 }])
@@ -124,13 +124,15 @@ describe('ExperiencePublicPage', () => {
       params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
       searchParams: Promise.resolve({}),
     })
-    render(el)
+    const { container } = render(el)
     expect(screen.getByRole('heading', { level: 1, name: 'Sunset junk boat tour' })).toBeTruthy()
     const merchantLinks = screen.getAllByRole('link', { name: /Acme Travel/i })
     expect(merchantLinks.every((l) => l.getAttribute('href') === '/en/m/acme-travel')).toBe(true)
     expect(screen.queryByText(/Booking opens soon/i)).toBeNull()
     expect(screen.getByRole('button', { name: /book now/i })).toBeTruthy()
     expect(screen.getByText('42')).toBeTruthy()
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 
   it('hides the guest-email field end-to-end when the viewer is signed in', async () => {

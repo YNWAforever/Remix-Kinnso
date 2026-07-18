@@ -3,6 +3,7 @@ import { getExperienceBySlug } from '@/lib/experiences/public-queries'
 import { loadOgFonts } from '@/lib/seo/og/fonts'
 import { ExperienceCard, DefaultCard, OG_SIZE } from '@/lib/seo/og/card'
 import { truncate, loadRemoteImage } from '@/lib/seo/og/data'
+import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 
 export const alt = 'KINNSO experience'
 export const size = OG_SIZE
@@ -14,7 +15,8 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const fontOpt = fonts.length ? { fonts } : {}
   try {
     const experience = await getExperienceBySlug(slug)
-    const cover = experience ? await loadRemoteImage(experience.coverUrl) : undefined
+    const approvedCover = experience && isApprovedEntityMediaUrl(experience.coverUrl) ? experience.coverUrl : null
+    const cover = approvedCover ? await loadRemoteImage(approvedCover) : undefined
     const card = experience
       ? <ExperienceCard title={truncate(experience.title, 70)} city={experience.city} merchantName={experience.merchant.companyName} cover={cover} />
       : <DefaultCard title="Experience" subtitle="KINNSO" />

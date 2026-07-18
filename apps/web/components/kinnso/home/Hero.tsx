@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
+import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 import type { Guide } from '@/lib/guides/types'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -14,7 +16,7 @@ import type { Messages } from '@/lib/i18n/messages/en'
  */
 export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home']; guides: Guide[] }) {
   const p = (path: string) => `/${locale}${path}`
-  const covers = guides.filter((g) => g.cover).slice(0, 3)
+  const covers = guides.filter((g) => isApprovedEntityMediaUrl(g.cover)).slice(0, 3)
   const showCollage = covers.length >= 3
   return (
     <section className="border-b border-kinnso-edge bg-kinnso-cream">
@@ -36,24 +38,25 @@ export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home'
         {showCollage ? (
           <div className="grid grid-cols-2 gap-3 self-center">
             <div className="row-span-2 overflow-hidden rounded-[4px] border border-kinnso-edge bg-kinnso-cream2">
-              <img
+              <EntityMedia
                 src={covers[0].cover}
+                title={covers[0].title}
+                location={covers[0].city}
                 alt={covers[0].title}
-                width={640}
-                height={880}
-                loading="eager"
-                className="h-full w-full object-cover"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority
+                className="h-full w-full"
               />
             </div>
             {covers.slice(1).map((g) => (
               <div key={g.slug} className="aspect-[4/3] overflow-hidden rounded-[4px] border border-kinnso-edge bg-kinnso-cream2">
-                <img
+                <EntityMedia
                   src={g.cover}
+                  title={g.title}
+                  location={g.city}
                   alt={g.title}
-                  width={640}
-                  height={480}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
+                  sizes="(min-width: 1024px) 25vw, 50vw"
+                  className="h-full w-full"
                 />
               </div>
             ))}

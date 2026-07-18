@@ -25,9 +25,11 @@ const experience = { slug: 'sunset-tour', title: 'Sunset junk boat tour', city: 
 
 describe('ExperienceCard', () => {
   it('links to the experience detail page and shows no save button when onSaveToggle is omitted', () => {
-    render(<ExperienceCard experience={experience} locale="en" />)
+    const { container } = render(<ExperienceCard experience={{ ...experience, coverUrl: 'https://picsum.photos/e.jpg' }} locale="en" />)
     expect(screen.getByRole('link').getAttribute('href')).toBe('/en/experiences/sunset-tour')
     expect(screen.queryByRole('button')).toBeNull()
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 
   it('never navigates the card link when the save button is clicked', () => {

@@ -25,12 +25,14 @@ describe('MerchantsDirectoryPage', () => {
   it('renders a merchant card linking to /m/[slug]', async () => {
     getPublicMerchantsMock.mockResolvedValue([{
       id: 'm1', slug: 'acme-travel', companyName: 'Acme Travel', tagline: 'Boutique tours',
-      city: 'Hong Kong', logoUrl: null, websiteUrl: null,
+      city: 'Hong Kong', logoUrl: 'https://picsum.photos/logo.jpg', websiteUrl: null,
     }])
     const el = await MerchantsDirectoryPage({ params: Promise.resolve({ locale: 'en' }) })
-    render(el)
-    expect(screen.getByText('Acme Travel')).toBeTruthy()
+    const { container } = render(el)
+    expect(screen.getByRole('heading', { level: 2, name: 'Acme Travel' })).toBeTruthy()
     const link = screen.getByRole('link', { name: /Acme Travel/i })
     expect(link.getAttribute('href')).toBe('/en/m/acme-travel')
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 })

@@ -1,10 +1,11 @@
 import Link from 'next/link'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 export function ArticleCard({
   href, title, thumbnail, summary,
 }: { href: string; title: string; thumbnail?: string; summary?: string | null }) {
   return (
     <Link href={href} aria-label={title} className="block rounded-card overflow-hidden bg-white shadow-sm hover:shadow-md transition">
-      {thumbnail && <img src={thumbnail} alt={title} loading="lazy" className="w-full h-44 object-cover" />}
+      <EntityMedia src={thumbnail} title={title} alt={title} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="h-44 w-full" />
       <div className="p-4">
         <h3 className="font-semibold text-kinnso-ink line-clamp-2">{title}</h3>
         {summary && <p className="text-sm text-muted mt-1 line-clamp-2">{summary}</p>}

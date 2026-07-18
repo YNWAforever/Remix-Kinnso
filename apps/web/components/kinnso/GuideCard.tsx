@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Bookmark, MapPin } from "lucide-react";
 import { EditorialCard } from "@/components/kinnso/editorial/EditorialCard";
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia';
 import type { Guide } from '@/lib/guides/types';
 import type { Locale } from "@/lib/i18n/config";
 
@@ -12,8 +13,15 @@ const GuideCard = ({ g, locale, savesLabel = 'Saves', isSaved, onSaveToggle }: {
   <Link href={`/${locale}/g/${g.slug}`} className="group block">
     <EditorialCard
       media={
-        <img src={g.cover} alt={g.title} width={640} height={480} loading="lazy"
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
+        <EntityMedia
+          src={g.cover}
+          title={g.title}
+          location={g.city}
+          alt={g.title}
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="h-full w-full"
+          imageClassName="transition duration-300 group-hover:scale-[1.02]"
+        />
       }
       kicker={<span className="inline-flex items-center gap-1"><MapPin aria-hidden="true" className="h-3 w-3" /> {g.city}</span>}
       title={g.title}
@@ -27,16 +35,9 @@ const GuideCard = ({ g, locale, savesLabel = 'Saves', isSaved, onSaveToggle }: {
               className="inline-flex items-center gap-1"
             >
               <Bookmark aria-hidden="true" className={isSaved ? 'h-3 w-3 fill-current' : 'h-3 w-3'} />
-              <span className="sr-only">{savesLabel} </span>
-              {g.saves.toLocaleString()}
+              <span className="sr-only">{savesLabel}</span>
             </button>
-          ) : (
-            <span className="inline-flex items-center gap-1">
-              <Bookmark aria-hidden="true" className="h-3 w-3" />
-              <span className="sr-only">{savesLabel} </span>
-              {g.saves.toLocaleString()}
-            </span>
-          )}
+          ) : null}
         </div>
       }
     />

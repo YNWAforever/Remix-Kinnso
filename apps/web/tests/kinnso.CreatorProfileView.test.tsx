@@ -21,7 +21,7 @@ const creator: PublicCreator = {
     platforms: [{ platform: 'instagram', verified: false }],
   },
   guides: [
-    { slug: 'osaka', title: 'Osaka in a day', cover: 'x', city: 'Osaka', saves: 12, creatorHandle: 'maya' },
+    { slug: 'osaka', title: 'Osaka in a day', cover: 'https://picsum.photos/osaka.jpg', city: 'Osaka', saves: 12, creatorHandle: 'maya' },
   ],
 }
 
@@ -30,7 +30,7 @@ const render0 = () =>
 
 describe('CreatorProfileView', () => {
   it('renders identity + qualitative DNA, no fabricated metrics', () => {
-    render0()
+    const { container } = render0()
     expect(screen.getByRole('heading', { level: 1, name: 'Maya Wanders' })).toBeInTheDocument()
     expect(screen.getAllByText('@maya')[0]).toBeInTheDocument()
     expect(screen.getByText('Slow travel in Asia.')).toBeInTheDocument()
@@ -38,6 +38,8 @@ describe('CreatorProfileView', () => {
     expect(screen.getByText('instagram')).toBeInTheDocument()
     expect(screen.queryByText('/100')).not.toBeInTheDocument()
     expect(screen.getByText(en.creatorProfile.guidesHeading)).toBeInTheDocument()
+    expect(container.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+    expect(container.innerHTML).not.toContain('picsum.photos')
   })
 
   it('links published guides under the active locale', () => {

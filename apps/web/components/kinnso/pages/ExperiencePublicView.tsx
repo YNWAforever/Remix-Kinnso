@@ -5,6 +5,7 @@ import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { BookingWidget } from '@/components/kinnso/pages/BookingWidget'
 import { FeatureInterestForm } from '@/components/kinnso/FeatureInterestForm'
 import { ExperienceSaveButton } from '@/components/kinnso/ExperienceSaveButton'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import type { PublicExperience } from '@/lib/experiences/public-queries'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 import type { RatingAggregate, Review } from '@/lib/reviews/types'
@@ -35,12 +36,16 @@ export function ExperiencePublicView({
   return (
     <article className="k2-container py-8 md:py-12">
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
-        <div
-          role="img"
-          aria-label={experience.title}
-          className="relative aspect-[16/9] w-full bg-kinnso-ink bg-cover bg-center"
-          style={experience.coverUrl ? { backgroundImage: `url(${experience.coverUrl})` } : undefined}
-        >
+        <div className="relative aspect-[16/9] w-full bg-kinnso-ink">
+          <EntityMedia
+            src={experience.coverUrl}
+            title={experience.title}
+            location={experience.city}
+            alt={experience.title}
+            sizes="(min-width: 1024px) 1152px, 100vw"
+            priority
+            className="absolute inset-0"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10" />
           <Eyebrow className="absolute left-4 top-4 rounded-[3px] bg-white/90 px-3 py-1">{experience.city}</Eyebrow>
           <div className="absolute right-4 top-4">
