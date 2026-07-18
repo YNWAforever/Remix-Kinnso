@@ -4,6 +4,7 @@ import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { GuideListItem } from '@/lib/guides/types'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 
 export function MyGuidesView({
   locale,
@@ -38,8 +39,15 @@ export function MyGuidesView({
           <ul className="mt-10 grid gap-4">
             {guides.map((g) => (
               <TicketCard key={g.id} as="li" className="flex items-center gap-4 p-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={g.cover} alt={g.title} className="h-16 w-24 rounded-md object-cover" />
+                <EntityMedia
+                  src={g.cover}
+                  title={g.title}
+                  location={g.city}
+                  alt={g.title}
+                  sizes="96px"
+                  className="h-16 w-24 shrink-0 rounded-md [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0"
+                  imageClassName="object-cover"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold text-kinnso-ink">{g.title}</p>
                   <p className="text-sm text-kinnso-muted">{g.city}</p>
