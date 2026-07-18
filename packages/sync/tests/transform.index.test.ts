@@ -58,6 +58,21 @@ describe('transformPost', () => {
     }))
   })
 
+  it('downgrades requested publication when every translation was deleted', () => {
+    const translations = legacyPost.translations.map((translation) => ({
+      ...translation,
+      deleted_at: '2026-07-19 00:00:00',
+    }))
+    const invalid = transformPost({ ...legacyPost, translations }, cdn)
+
+    expect(invalid.article.published_at).toBeNull()
+    expect(invalid.translations).toEqual([])
+    expect(invalid.warnings.filter((warning) => warning.kind === 'publication')).toEqual([
+      expect.objectContaining({ code: 'missing_translation', path: 'translations' }),
+      expect.objectContaining({ code: 'invalid_author', path: 'authors' }),
+    ])
+  })
+
   it('skips publication validation for a requested draft', () => {
     const draft = transformPost({
       ...legacyPost,

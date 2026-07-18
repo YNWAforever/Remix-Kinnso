@@ -31,6 +31,15 @@ describe('R7.3 production-honesty migration', () => {
     expect(sql).toContain("'kinnso-editorial'")
   })
 
+  it('reserves is_listed updates for the audited RPC at the privilege boundary', () => {
+    expect(sql).toContain('revoke update on public.creators from authenticated')
+    const grant = sql.match(/grant update\s*\(([^)]+)\)\s*on public\.creators\s*to authenticated/i)
+    expect(grant).not.toBeNull()
+    expect(grant![1]).toContain('display_name')
+    expect(grant![1]).toContain('status')
+    expect(grant![1]).not.toContain('is_listed')
+  })
+
   it('locks the creator row before deriving audited listing metadata', () => {
     expect(sql).toContain('select is_listed into v_from from public.creators where id = p_id for update')
   })
@@ -80,8 +89,16 @@ describe('R7.3 production-honesty cleanup migration', () => {
   })
 
   it('removes only the audited author and ramen map reference without assigning editorial', () => {
-    expect(cleanupSql).toContain("array_remove(authors, 'jane-doe')")
-    expect(cleanupSql).toContain("where 'jane-doe' = any(authors)")
+    const authorCleanup = cleanupSql.match(
+      /update public\.articles as article\s+set authors = array_remove\(article\.authors, 'jane-doe'\)[\s\S]*?;/,
+    )?.[0]
+    expect(authorCleanup).toBeTruthy()
+    expect(authorCleanup).toContain('from (values')
+    expect(authorCleanup).toContain("('00000000-0000-0000-0000-000000000001'::uuid, 'pub-article')")
+    expect(authorCleanup).toContain("('00000000-0000-0000-0000-000000000003'::uuid, 'expired-article')")
+    expect(authorCleanup).toContain('article.id = target.id')
+    expect(authorCleanup).toContain('article.slug = target.slug')
+    expect(authorCleanup).toContain("'jane-doe' = any(article.authors)")
     expect(cleanupSql).toContain("where slug = 'jane-doe'")
     expect(cleanupSql).toContain('and not exists')
     expect(cleanupSql).toContain("content #- '{3,address,link}'")

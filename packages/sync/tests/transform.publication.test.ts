@@ -41,6 +41,28 @@ describe('validatePublication', () => {
     expect(validatePublication(makeValid()).map((warning) => warning.code)).toEqual([])
   })
 
+  it('rejects a requested publication with no surviving translations', () => {
+    const input = clone(makeValid())
+    input.translations = []
+    const warnings = validatePublication(input)
+
+    expect(warnings.filter((warning) => warning.code === 'missing_translation')).toEqual([
+      expect.objectContaining({ articleSlug: 'honest-guide', path: 'translations' }),
+    ])
+    expect(warnings.filter((warning) => warning.code === 'invalid_author')).toEqual([
+      expect.objectContaining({ articleSlug: 'honest-guide', path: 'authors' }),
+    ])
+    expect(warnings.every((warning) => warning.locale === undefined)).toBe(true)
+  })
+
+  it('reports a wholly unresolved author once at article level', () => {
+    const input = clone(makeValid())
+    input.authorSlugs = ['unknown-author']
+    expect(validatePublication(input).filter((warning) => warning.code === 'invalid_author')).toEqual([
+      expect.objectContaining({ articleSlug: 'honest-guide', path: 'authors' }),
+    ])
+  })
+
   it('rejects a translation with only two nonempty blocks', () => {
     const input = clone(makeValid())
     input.translations[0]!.content = contentWithWords().slice(0, 2)
@@ -118,6 +140,18 @@ describe('validatePublication', () => {
     const input = clone(makeValid())
     input.authorSlugs = ['unknown-author']
     expect(validatePublication(input).map((warning) => warning.code)).toContain('invalid_author')
+  })
+
+  it('reports only the locale missing an otherwise resolved author', () => {
+    const input = clone(makeValid())
+    input.authors = input.authors.filter((author) => author.locale === 'en')
+    expect(validatePublication(input).filter((warning) => warning.code === 'invalid_author')).toEqual([
+      expect.objectContaining({
+        articleSlug: 'honest-guide',
+        locale: 'zh-hk',
+        path: 'translations.zh-hk.authors',
+      }),
+    ])
   })
 
   it('accepts kinnso-editorial only through an active locale row', () => {

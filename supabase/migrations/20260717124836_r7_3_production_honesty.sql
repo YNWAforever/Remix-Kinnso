@@ -15,6 +15,15 @@ where g.saves_count is distinct from (
 alter table public.creators
   add column if not exists is_listed boolean not null default false;
 
+-- The existing owner policy still governs which row may be edited, while
+-- column privileges make the listing override unreachable through direct
+-- authenticated table updates (including an ops user's own creator row).
+-- SECURITY DEFINER admin_set_creator_listed remains the sole write boundary.
+revoke update on public.creators from authenticated;
+grant update (
+  id, display_name, status, created_at, updated_at, handle, bio, public_profile, verified
+) on public.creators to authenticated;
+
 create or replace function public.protect_creator_is_listed()
 returns trigger language plpgsql set search_path = public as $$
 begin

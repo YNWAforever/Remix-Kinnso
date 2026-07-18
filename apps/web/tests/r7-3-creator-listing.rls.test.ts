@@ -140,6 +140,20 @@ d('R7.3 creator listing boundary (explicit local Postgres only)', () => {
     expect(creator.data).toEqual(expect.objectContaining({ display_name: 'Owner Edit', is_listed: false }))
   }, testTimeout)
 
+  it('denies an active ops creator a direct listing update on their own row', async () => {
+    const ops = await authedClient(opsEmail)
+    const denied = await ops.from('creators').update({ is_listed: true }).eq('id', opsUserId)
+    expect(denied.error).not.toBeNull()
+
+    const opsCreator = await localSvc
+      .from('creators')
+      .select('is_listed')
+      .eq('id', opsUserId)
+      .single()
+    expect(opsCreator.error).toBeNull()
+    expect(opsCreator.data?.is_listed).toBe(false)
+  }, testTimeout)
+
   it('allows an active ops user to set listing state and writes the audit event', async () => {
     const ops = await authedClient(opsEmail)
     const allowed = await ops.rpc('admin_set_creator_listed', {

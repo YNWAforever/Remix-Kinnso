@@ -10,7 +10,7 @@ export interface PublicationInput {
 
 export interface PublicationWarning extends TransformWarning {
   kind: 'publication'
-  code: 'translation_too_shallow' | 'translation_too_short' | 'invalid_external_link' | 'invalid_author'
+  code: 'missing_translation' | 'translation_too_shallow' | 'translation_too_short' | 'invalid_external_link' | 'invalid_author'
 }
 
 const EXCLUDED_VISIBLE_KEYS = new Set([
@@ -125,6 +125,31 @@ function hasEligibleAuthor(input: PublicationInput, locale: string): boolean {
 export function validatePublication(input: PublicationInput): PublicationWarning[] {
   const warnings: PublicationWarning[] = []
 
+  if (input.translations.length === 0) {
+    warnings.push(warning(
+      input,
+      'missing_translation',
+      'expected at least one surviving translation',
+      undefined,
+      'translations',
+    ))
+  }
+
+  const resolvedAuthorLocales = new Set(
+    input.translations
+      .map((translation) => translation.locale)
+      .filter((locale) => hasEligibleAuthor(input, locale)),
+  )
+  if (resolvedAuthorLocales.size === 0) {
+    warnings.push(warning(
+      input,
+      'invalid_author',
+      'no requested author resolves to an active, named translation row',
+      undefined,
+      'authors',
+    ))
+  }
+
   for (const translation of input.translations) {
     const locale = translation.locale
     const contentPath = `translations.${locale}.content`
@@ -156,7 +181,7 @@ export function validatePublication(input: PublicationInput): PublicationWarning
 
     collectLinkWarnings(input, translation, locale, `translations.${locale}`, warnings)
 
-    if (!hasEligibleAuthor(input, locale)) {
+    if (resolvedAuthorLocales.size > 0 && !resolvedAuthorLocales.has(locale)) {
       warnings.push(warning(
         input,
         'invalid_author',

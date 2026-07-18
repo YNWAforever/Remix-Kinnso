@@ -34,9 +34,19 @@ where article.id = target.id
   and article.slug = target.slug
   and article.published_at is not null;
 
-update public.articles
-set authors = array_remove(authors, 'jane-doe')
-where 'jane-doe' = any(authors);
+update public.articles as article
+set authors = array_remove(article.authors, 'jane-doe')
+from (values
+  ('00000000-0000-0000-0000-000000000001'::uuid, 'pub-article'),
+  ('00000000-0000-0000-0000-0000000000a1'::uuid, 'ramen-guide'),
+  ('00000000-0000-0000-0000-0000000000a2'::uuid, 'sushi-guide'),
+  ('00000000-0000-0000-0000-0000000000a3'::uuid, 'cafe-guide'),
+  ('00000000-0000-0000-0000-0000000000a4'::uuid, 'mall-coupon'),
+  ('00000000-0000-0000-0000-000000000003'::uuid, 'expired-article')
+) as target(id, slug)
+where article.id = target.id
+  and article.slug = target.slug
+  and 'jane-doe' = any(article.authors);
 
 delete from public.article_authors as author
 where slug = 'jane-doe'
