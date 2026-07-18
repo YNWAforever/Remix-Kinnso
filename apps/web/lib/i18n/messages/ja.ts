@@ -1349,7 +1349,7 @@ const messages: Messages = {
   },
   featureInterest: {
     emailLabel: 'メールアドレス',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'traveller@email.test',
     submitAgent: 'AIエージェントのウェイトリストに登録',
     submitBooking: '予約開始時に通知を受け取る',
     pending: '送信中…',

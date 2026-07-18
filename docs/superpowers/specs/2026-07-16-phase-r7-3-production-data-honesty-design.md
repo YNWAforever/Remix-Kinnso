@@ -1,7 +1,7 @@
 # Phase R7.3: Production Data Honesty Design
 
-**Status:** Approved design, pending implementation plan  
-**Date:** 2026-07-16  
+**Status:** Approved design, pending implementation plan
+**Date:** 2026-07-16
 **Scope:** KINNSO Phase R7.3 — production data honesty
 
 ## Goal

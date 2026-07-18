@@ -2595,7 +2595,7 @@ const messages: Messages = {
   },
   featureInterest: {
     emailLabel: 'Email address',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'traveller@email.test',
     submitAgent: 'Join the AI Agent waitlist',
     submitBooking: 'Get notified when booking opens',
     pending: 'Submitting…',

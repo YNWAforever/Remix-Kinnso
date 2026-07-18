@@ -1349,7 +1349,7 @@ const messages: Messages = {
   },
   featureInterest: {
     emailLabel: '電郵地址',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'traveller@email.test',
     submitAgent: '加入 AI Agent 等候名單',
     submitBooking: '預約開放時通知我',
     pending: '提交中…',

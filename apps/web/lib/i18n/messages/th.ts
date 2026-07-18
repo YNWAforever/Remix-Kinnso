@@ -1349,7 +1349,7 @@ const messages: Messages = {
   },
   featureInterest: {
     emailLabel: 'อีเมล',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'traveller@email.test',
     submitAgent: 'เข้าร่วมรายชื่อรอ AI Agent',
     submitBooking: 'แจ้งฉันเมื่อเปิดให้จอง',
     pending: 'กำลังส่ง…',

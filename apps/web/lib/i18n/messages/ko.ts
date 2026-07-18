@@ -1349,7 +1349,7 @@ const messages: Messages = {
   },
   featureInterest: {
     emailLabel: '이메일 주소',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'traveller@email.test',
     submitAgent: 'AI 에이전트 대기 명단 등록',
     submitBooking: '예약이 열리면 알림 받기',
     pending: '제출 중…',
