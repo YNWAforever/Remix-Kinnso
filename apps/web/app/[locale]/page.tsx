@@ -9,7 +9,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getProductState } from '@/lib/product-state'
 
-/** ISR: honest stats and content are approximately one hour fresh. */
+/** ISR: this page prefers one hour; the parent locale layout makes effective route ISR about five minutes, while platform stats and testimonials keep their own one-hour Data Cache. */
 export const revalidate = 3600
 
 export function generateStaticParams() {

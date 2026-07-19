@@ -15,6 +15,7 @@ import {
   setTestimonialStatusAction,
   deleteTestimonialAction,
 } from '@/lib/admin/testimonials-actions'
+import { LOCALES } from '@/lib/i18n/config'
 import type { TestimonialInput } from '@/lib/admin/testimonials-validation'
 
 const input: TestimonialInput = {
@@ -23,6 +24,22 @@ const input: TestimonialInput = {
   authorRole: 'creator',
   locale: null,
   sortOrder: 0,
+}
+
+const expectedRevalidationPaths = [
+  '/en/admin/testimonials',
+  ...LOCALES.flatMap((locale) => [
+    `/${locale}`,
+    `/${locale}/for-creators`,
+    `/${locale}/for-merchants`,
+  ]),
+]
+
+function expectAllTestimonialSurfacesRevalidated() {
+  const paths = revalidateMock.mock.calls.map(([path]) => path)
+  expect(paths).toHaveLength(22)
+  expect(paths).toEqual(expectedRevalidationPaths)
+  expect(new Set(paths).size).toBe(22)
 }
 
 /** Chainable stub capturing insert/update/delete payloads; `row: null` models "no row matched" (stale id / RLS). */
@@ -81,12 +98,7 @@ describe('createTestimonialAction', () => {
       locale: null,
       sort_order: 0,
     })
-    // admin list + homepage + both audience pages for all 7 locales
-    expect(revalidateMock).toHaveBeenCalledTimes(22)
-    expect(revalidateMock).toHaveBeenCalledWith('/en/admin/testimonials')
-    expect(revalidateMock).toHaveBeenCalledWith('/zh-hk')
-    expect(revalidateMock).toHaveBeenCalledWith('/zh-hk/for-creators')
-    expect(revalidateMock).toHaveBeenCalledWith('/zh-hk/for-merchants')
+    expectAllTestimonialSurfacesRevalidated()
   })
   it('logs the underlying DB error when the insert fails', async () => {
     const dbError = { message: 'insert failed', code: '23505' }
@@ -122,6 +134,14 @@ describe('updateTestimonialAction', () => {
     expect(r.ok).toBe(false)
     expect(revalidateMock).not.toHaveBeenCalled()
   })
+  it('updates and revalidates every testimonial surface exactly once', async () => {
+    const { client, calls } = makeClient()
+    serverClientMock.mockResolvedValue(client)
+    const r = await updateTestimonialAction('en', 't1', input)
+    expect(r.ok).toBe(true)
+    expect(calls.update).toEqual({ quote: 'KINNSO paid me for what I already knew.', author_name: 'Mei', author_role: 'creator', locale: null, sort_order: 0 })
+    expectAllTestimonialSurfacesRevalidated()
+  })
   it('logs the underlying DB error when the update fails', async () => {
     const dbError = { message: 'update failed', code: '23505' }
     const { client } = makeClient({ row: null, error: dbError })
@@ -149,6 +169,7 @@ describe('setTestimonialStatusAction', () => {
     const r = await setTestimonialStatusAction('en', 't1', 'published')
     expect(r.ok).toBe(true)
     expect(calls.update).toEqual({ status: 'published' })
+    expectAllTestimonialSurfacesRevalidated()
   })
   it('rejects a status outside draft/published WITHOUT writing', async () => {
     const { client, calls } = makeClient()
@@ -174,6 +195,7 @@ describe('deleteTestimonialAction', () => {
     const r = await deleteTestimonialAction('en', 't1')
     expect(r.ok).toBe(true)
     expect(calls.deleted).toBe(true)
+    expectAllTestimonialSurfacesRevalidated()
   })
   it('returns a form error when nothing was deleted', async () => {
     const { client } = makeClient({ row: null })
