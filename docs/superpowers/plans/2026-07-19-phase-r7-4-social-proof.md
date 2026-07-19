@@ -394,7 +394,7 @@ pnpm exec vitest run tests/home.queries.test.ts tests/layout.siteChrome.test.tsx
 pnpm typecheck
 ```
 
-The focused cache-policy test mocks `unstable_cache` as an identity wrapper and asserts both raw readers use 3600 seconds. The fix is committed as `fix(r7): enforce social-proof cache window`.
+The focused cache-policy test uses a stateful `unstable_cache` fake with one resolved-value map per wrapper, keyed by serialized invocation arguments, and clears every map before each test. It retains the 3600-second wrapper assertions and adds fail-then-success cases proving rejected raw reads are retried rather than cached for both platform stats and testimonials. The fix is committed as `fix(r7): enforce social-proof cache window`.
 
 ## Final Verification
 
