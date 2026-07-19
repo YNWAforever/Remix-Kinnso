@@ -7,7 +7,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { resolveConfiguredProductState } from '@/lib/product-state'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
-export const revalidate = 300
+export const revalidate = 3600
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))

@@ -9,8 +9,8 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getProductState } from '@/lib/product-state'
 
-/** ISR: honest stats + fresh guides at most 5 minutes stale. */
-export const revalidate = 300
+/** ISR: honest stats and content are approximately one hour fresh. */
+export const revalidate = 3600
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))

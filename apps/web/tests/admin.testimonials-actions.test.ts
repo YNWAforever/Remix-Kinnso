@@ -81,9 +81,12 @@ describe('createTestimonialAction', () => {
       locale: null,
       sort_order: 0,
     })
-    // admin list + all 7 locale homepages (ISR) refresh
+    // admin list + homepage + both audience pages for all 7 locales
+    expect(revalidateMock).toHaveBeenCalledTimes(22)
     expect(revalidateMock).toHaveBeenCalledWith('/en/admin/testimonials')
     expect(revalidateMock).toHaveBeenCalledWith('/zh-hk')
+    expect(revalidateMock).toHaveBeenCalledWith('/zh-hk/for-creators')
+    expect(revalidateMock).toHaveBeenCalledWith('/zh-hk/for-merchants')
   })
   it('logs the underlying DB error when the insert fails', async () => {
     const dbError = { message: 'insert failed', code: '23505' }

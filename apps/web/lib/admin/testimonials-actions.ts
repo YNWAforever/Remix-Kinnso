@@ -7,14 +7,14 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 const adminTestimonialsPath = (locale: Locale) => `/${locale}/admin/testimonials`
 
-/**
- * Testimonials feed the ISR homepage (revalidate = 300): refresh the admin
- * list now, plus every locale homepage so a publish shows up without waiting
- * out the ISR window.
- */
+/** Refresh every public testimonial consumer after a successful ops mutation. */
 function revalidateTestimonialSurfaces(locale: Locale) {
   revalidatePath(adminTestimonialsPath(locale))
-  for (const l of LOCALES) revalidatePath(`/${l}`)
+  for (const l of LOCALES) {
+    revalidatePath(`/${l}`)
+    revalidatePath(`/${l}/for-creators`)
+    revalidatePath(`/${l}/for-merchants`)
+  }
 }
 
 /**

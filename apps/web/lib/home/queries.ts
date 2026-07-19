@@ -64,8 +64,8 @@ export function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
  *
  * Rotation granularity: this function itself reshuffles on every invocation, but its three
  * callers (`/[locale]`, `/[locale]/for-creators`, `/[locale]/for-merchants`) are ISR pages
- * with `export const revalidate = 300` and `generateStaticParams()` — no cookies/headers/
- * searchParams make them dynamic. Next.js therefore re-runs this function once per ~5-minute
+ * with `export const revalidate = 3600` and `generateStaticParams()` — no cookies/headers/
+ * searchParams make them dynamic. Next.js therefore re-runs this function once per approximately one-hour
  * regeneration per locale, not once per HTTP request: every visitor hitting the cached HTML
  * within a given window sees the same three quotes in the same order. The real guarantee is
  * "rotates every revalidation window, shared across concurrent visitors in that window" —
