@@ -1,6 +1,6 @@
 # Phase R7.4: Social Proof Surfaces Design
 
-**Status:** Proposed for review
+**Status:** Approved
 **Date:** 2026-07-19
 **Scope:** KINNSO Phase R7.4 — social proof surfaces
 
@@ -20,7 +20,7 @@ This design is governed by the Phase R7 UX Hardening specification and the conve
 | Testimonials | `getPublishedTestimonials()` already filters published rows by locale and optional `author_role`, shuffles the pool, and caps output at three | Preserve the data boundary and add regression coverage for the three public callers |
 | Empty testimonial state | Homepage, creator, and merchant views already omit their testimonial section when the supplied list is empty | Preserve and test the current honest empty state |
 | Ops management | A testimonial list/create/toggle console and secured actions already exist | Do not add duplicate CRUD or a migration |
-| Cache policy | The homepage and both audience landing pages currently revalidate every 300 seconds | Move all three social-proof pages to an approximately one-hour ISR window; explicit ops revalidation remains the immediate refresh path |
+| Cache policy | The homepage and both audience landing pages currently revalidate every 300 seconds; testimonial mutations explicitly refresh locale homepages only | Move all three social-proof pages to an approximately one-hour ISR window and extend mutation revalidation to both audience landing pages |
 
 ## Constraints
 
@@ -67,7 +67,7 @@ The existing query remains the single data boundary:
 
 The public surfaces render up to three rows returned by the database and never invent quotes to reach a minimum. If no eligible rows exist, the section is omitted entirely. A pool of fewer than three real rows may render fewer than three; operations content readiness remains responsible for supplying the desired two-to-three homepage testimonials.
 
-The existing testimonial operations console is sufficient. Its create and publish-toggle actions remain behind the current operations authorization boundary and already revalidate the three public paths.
+The existing testimonial operations console is sufficient. Its create and publish-toggle actions remain behind the current operations authorization boundary. Their shared revalidation helper will refresh the homepage plus both audience landing pages for every locale after a successful mutation.
 
 ## Localization
 
@@ -83,7 +83,7 @@ Set `revalidate = 3600` on:
 - `/[locale]/for-creators`
 - `/[locale]/for-merchants`
 
-This implements the R7.4 approximately one-hour ISR requirement consistently for public social-proof reads. Existing testimonial operator actions continue to explicitly revalidate these paths after a mutation, so an editorial publish or unpublish does not have to wait for the passive ISR interval.
+This implements the R7.4 approximately one-hour ISR requirement consistently for public social-proof reads. Extend the testimonial operator action helper to explicitly revalidate all three paths for every locale after a successful mutation, so an editorial publish or unpublish does not have to wait for the passive ISR interval.
 
 ## Error Handling
 
@@ -131,4 +131,4 @@ Rollback is a normal application rollback. Restoring the prior component and cac
 - Use only the four metrics named in R7.4.
 - Preserve the existing testimonial query and operations console.
 - Hide testimonial sections only when their eligible result set is empty; never invent rows.
-- Use a one-hour ISR interval on all three public social-proof pages, with existing mutation revalidation retained.
+- Use a one-hour ISR interval on all three public social-proof pages, extending mutation revalidation to cover each path.
