@@ -67,6 +67,20 @@ describe('getPublishedDestinations', () => {
     const result = await getPublishedDestinations()
     expect(result[0]).toMatchObject({ guideCount: 0, experienceCount: 0 })
   })
+
+  it('filters rows with missing or blank identity fields', async () => {
+    state.list = [
+      row,
+      { ...row, slug: null },
+      { ...row, slug: '   ' },
+      { ...row, name: null },
+      { ...row, name: '   ' },
+    ]
+    expect(await getPublishedDestinations()).toEqual(expect.arrayContaining([
+      expect.objectContaining({ slug: 'tokyo', name: 'Tokyo' }),
+    ]))
+    expect(await getPublishedDestinations()).toHaveLength(1)
+  })
 })
 
 describe('getDestinationBySlug', () => {
@@ -81,13 +95,36 @@ describe('getDestinationBySlug', () => {
     state.single = null
     expect(await getDestinationBySlug('nowhere')).toBeNull()
   })
+
+  it('returns null when the matched row has missing or blank identity fields', async () => {
+    for (const invalidRow of [
+      { ...row, slug: null },
+      { ...row, slug: '   ' },
+      { ...row, name: null },
+      { ...row, name: '   ' },
+    ]) {
+      state.single = invalidRow
+      await expect(getDestinationBySlug('tokyo')).resolves.toBeNull()
+    }
+  })
 })
 
 describe('getDestinationsForSitemap', () => {
   it('maps latest_published_at to lastmod from the inventory view', async () => {
-    state.list = [{ slug: 'tokyo', latest_published_at: '2026-07-01T00:00:00Z' }]
+    state.list = [{ slug: 'tokyo', name: 'Tokyo', latest_published_at: '2026-07-01T00:00:00Z' }]
     expect(await getDestinationsForSitemap()).toEqual([{ slug: 'tokyo', lastmod: '2026-07-01T00:00:00Z' }])
     expect(fromSpy).toHaveBeenCalledWith('destination_index')
+  })
+
+  it('filters sitemap rows with missing or blank identity fields', async () => {
+    state.list = [
+      { slug: 'tokyo', name: 'Tokyo', latest_published_at: '2026-07-01T00:00:00Z' },
+      { slug: null, name: 'Missing slug', latest_published_at: null },
+      { slug: '   ', name: 'Blank slug', latest_published_at: null },
+      { slug: 'missing-name', name: null, latest_published_at: null },
+      { slug: 'blank-name', name: '   ', latest_published_at: null },
+    ]
+    expect(await getDestinationsForSitemap()).toEqual([{ slug: 'tokyo', lastmod: '2026-07-01T00:00:00Z' }])
   })
 
   it('returns [] when there are no published destinations', async () => {

@@ -30,10 +30,17 @@ function nonNegativeNumber(value: number | null): number {
   return Math.max(0, value ?? 0)
 }
 
-function mapRowToDestination(r: DestinationIndexRow): Destination {
+function hasValidIdentity(r: Pick<DestinationIndexRow, 'slug' | 'name'>): r is Pick<DestinationIndexRow, 'slug' | 'name'> & { slug: string; name: string } {
+  return typeof r.slug === 'string' && r.slug.trim().length > 0
+    && typeof r.name === 'string' && r.name.trim().length > 0
+}
+
+function mapRowToDestination(r: DestinationIndexRow): Destination | null {
+  if (!hasValidIdentity(r)) return null
+
   return {
-    slug: r.slug ?? '',
-    name: r.name ?? '',
+    slug: r.slug,
+    name: r.name,
     heroImageUrl: r.hero_image_url,
     description: r.description,
     matchTerms: r.match_terms ?? [],
@@ -52,7 +59,10 @@ export async function getPublishedDestinations(): Promise<Destination[]> {
     .order('name', { ascending: true })
     .order('slug', { ascending: true })
   if (error) throw error
-  return (data ?? []).map(mapRowToDestination)
+  return (data ?? []).flatMap((row) => {
+    const destination = mapRowToDestination(row)
+    return destination ? [destination] : []
+  })
 }
 
 export async function getDestinationBySlug(slug: string): Promise<Destination | null> {
@@ -70,13 +80,13 @@ export async function getDestinationsForSitemap(): Promise<{ slug: string; lastm
   const supabase = createSupabasePublicClient()
   const { data, error } = await supabase
     .from('destination_index')
-    .select('slug, latest_published_at')
+    .select('slug, name, latest_published_at')
     .order('sort_order', { ascending: true })
     .order('name', { ascending: true })
     .order('slug', { ascending: true })
   if (error) throw error
-  return (data ?? []).map((r) => ({
-    slug: r.slug as string,
-    lastmod: (r.latest_published_at as string | null) ?? null,
-  }))
+  return (data ?? []).flatMap((row) => {
+    if (!hasValidIdentity(row)) return []
+    return [{ slug: row.slug, lastmod: row.latest_published_at ?? null }]
+  })
 }
