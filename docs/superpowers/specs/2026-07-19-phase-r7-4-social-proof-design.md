@@ -20,7 +20,7 @@ This design is governed by the Phase R7 UX Hardening specification and the conve
 | Testimonials | `getPublishedTestimonials()` already filters published rows by locale and optional `author_role`, shuffles the pool, and caps output at three | Preserve the data boundary and add regression coverage for the three public callers |
 | Empty testimonial state | Homepage, creator, and merchant views already omit their testimonial section when the supplied list is empty | Preserve and test the current honest empty state |
 | Ops management | A testimonial list/create/toggle console and secured actions already exist | Do not add duplicate CRUD or a migration |
-| Cache policy | The homepage and both audience landing pages currently revalidate every 300 seconds; testimonial mutations explicitly refresh locale homepages only | Move all three social-proof pages to an approximately one-hour ISR window and extend mutation revalidation to both audience landing pages |
+| Cache policy | The locale parent layout intentionally revalidates in five minutes for R7.2 product-state truth, capping route-level ISR despite the three social-proof pages declaring one hour | Keep the parent at five minutes; place a one-hour Next Data Cache around successful platform-stat and testimonial reads, while testimonial mutations retain path invalidation |
 
 ## Constraints
 
@@ -32,6 +32,7 @@ This design is governed by the Phase R7 UX Hardening specification and the conve
 - Add every new UI string to all seven locale files and preserve locale parity.
 - Do not add a database migration or duplicate the existing testimonial operator console.
 - Query failure must not take down a public page.
+- `apps/web/app/[locale]/layout.tsx` remains at `revalidate = 300` for R7.2 product-state freshness; do not raise or remove it to alter social-proof freshness.
 
 ## Stats Bar Behavior
 
@@ -77,13 +78,17 @@ Locale parity tests must fail if any dictionary omits the new key. The stats com
 
 ## Caching and Freshness
 
-Set `revalidate = 3600` on:
+The three public social-proof pages retain their explicit `revalidate = 3600` declarations:
 
 - `/[locale]`
 - `/[locale]/for-creators`
 - `/[locale]/for-merchants`
 
-This implements the R7.4 approximately one-hour ISR requirement consistently for public social-proof reads. Extend the testimonial operator action helper to explicitly revalidate all three paths for every locale after a successful mutation, so an editorial publish or unpublish does not have to wait for the passive ISR interval.
+Next.js selects the lowest route-segment revalidation value, so the binding `revalidate = 300` in `/[locale]/layout.tsx` continues to make the effective route-level ISR window five minutes. That parent setting is intentional R7.2 product-state behavior and must remain unchanged.
+
+To give social proof its required one-hour freshness boundary without weakening parent product-state truth, `getPlatformStats()` and `getPublishedTestimonials()` each call a module-scoped `unstable_cache` raw reader configured with `revalidate: 3600`. The raw readers throw for Supabase errors or missing stats rows. The stable exported functions catch outside the cached readers and return `null` / `[]`, so failures are not cached and public fallback behavior is preserved. Testimonial rotation is therefore cached with successful testimonial data for one hour.
+
+Successful testimonial create, update, publish-toggle, and delete mutations retain their existing `revalidatePath` coverage for the homepage and both audience paths in every locale; cache policy does not replace mutation invalidation.
 
 ## Error Handling
 
@@ -106,7 +111,8 @@ Focused unit and host coverage will verify:
 - Creator and merchant pages pass only their audience role into the testimonial query.
 - Empty testimonial arrays omit each section.
 - All seven locale dictionaries contain the new key.
-- All three public social-proof pages use the one-hour revalidation constant.
+- The three page modules retain their one-hour declaration while the parent locale layout remains explicitly five minutes.
+- The platform-stats and published-testimonial raw readers each use an explicit one-hour Next Data Cache and exported fallbacks remain uncached.
 
 Run focused R7.4 Vitest suites, TypeScript validation, and the production build. The repository-wide baseline is currently expected to retain 27 unrelated Supabase-connected failures across 12 integration files when the external test database is unreachable; new focused tests must pass independently.
 
@@ -131,4 +137,4 @@ Rollback is a normal application rollback. Restoring the prior component and cac
 - Use only the four metrics named in R7.4.
 - Preserve the existing testimonial query and operations console.
 - Hide testimonial sections only when their eligible result set is empty; never invent rows.
-- Use a one-hour ISR interval on all three public social-proof pages, extending mutation revalidation to cover each path.
+- Keep the three page-level one-hour declarations, retain the five-minute locale parent for R7.2 truth, and use explicit one-hour Next Data Cache readers for successful social-proof data; successful testimonial mutations continue invalidating every consumer path.

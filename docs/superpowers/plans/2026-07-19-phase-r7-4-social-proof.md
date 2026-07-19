@@ -381,6 +381,21 @@ git commit -m "feat(r7): refresh audience-matched testimonials"
 
 ---
 
+## Post-plan verification correction
+
+The successful production build manifest showed `/[locale]`, `/[locale]/for-creators`, and `/[locale]/for-merchants` at an effective five-minute revalidation interval even though their page modules declare `revalidate = 3600`. Next.js uses the lowest `revalidate` across a route's page and layouts; the binding `apps/web/app/[locale]/layout.tsx` intentionally remains at `revalidate = 300` for R7.2 product-state truth and must not be raised or removed.
+
+The correction is a module-scoped one-hour Next Data Cache around only the successful `platform_stats()` and published-testimonial raw reads. The raw readers throw on Supabase failures or missing stats rows; the public exported functions catch outside the cache and preserve `null` / `[]` reads-never-crash fallbacks, so failures are not cached. Successful testimonial mutations retain their existing path invalidation.
+
+Verification for this correction is:
+
+```powershell
+pnpm exec vitest run tests/home.queries.test.ts tests/layout.siteChrome.test.tsx tests/home.host.test.tsx tests/r7-4-social-proof-pages.host.test.tsx --reporter=dot
+pnpm typecheck
+```
+
+The focused cache-policy test mocks `unstable_cache` as an identity wrapper and asserts both raw readers use 3600 seconds. The fix is committed as `fix(r7): enforce social-proof cache window`.
+
 ## Final Verification
 
 After both reviewed task commits:

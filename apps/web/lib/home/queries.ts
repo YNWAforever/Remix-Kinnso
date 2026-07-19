@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import type { Locale } from '@/lib/i18n/config'
 import { getReplaySessions, getUpcomingSessionsList } from '@/lib/sessions/public-queries'
@@ -23,18 +24,34 @@ export const STAT_THRESHOLDS = {
  * failure — the bar hides rather than taking the homepage down (same
  * reads-never-crash stance as getPublishedGuides()).
  */
-export async function getPlatformStats(): Promise<PlatformStats | null> {
+export const SOCIAL_PROOF_REVALIDATE_SECONDS = 60 * 60
+
+async function readPlatformStats(): Promise<PlatformStats> {
   const supabase = createSupabasePublicClient()
   const { data, error } = await supabase.rpc('platform_stats')
-  if (error) return null
+  if (error) throw error
   const row = (data ?? [])[0]
-  if (!row) return null
+  if (!row) throw new Error('platform_stats returned no row')
   return {
     activeCreators: Number(row.active_creators),
     publishedGuides: Number(row.published_guides),
     destinations: Number(row.destinations),
     completedBookings: Number(row.completed_bookings),
     upcomingSessions: Number(row.upcoming_sessions),
+  }
+}
+
+const getCachedPlatformStats = unstable_cache(
+  readPlatformStats,
+  ['home-platform-stats'],
+  { revalidate: SOCIAL_PROOF_REVALIDATE_SECONDS },
+)
+
+export async function getPlatformStats(): Promise<PlatformStats | null> {
+  try {
+    return await getCachedPlatformStats()
+  } catch {
+    return null
   }
 }
 
@@ -71,7 +88,7 @@ export function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
  * "rotates every revalidation window, shared across concurrent visitors in that window" —
  * not literal per-request randomness.
  */
-export async function getPublishedTestimonials(
+async function readPublishedTestimonials(
   locale: Locale,
   role?: Testimonial['authorRole'],
 ): Promise<Testimonial[]> {
@@ -82,7 +99,8 @@ export async function getPublishedTestimonials(
     .eq('status', 'published')
     .or(`locale.is.null,locale.eq.${locale}`)
   if (role) query = query.eq('author_role', role)
-  const { data } = await query
+  const { data, error } = await query
+  if (error) throw error
   const rows = (data ?? []).map((r) => ({
     id: r.id as string,
     quote: r.quote as string,
@@ -90,6 +108,23 @@ export async function getPublishedTestimonials(
     authorRole: r.author_role as Testimonial['authorRole'],
   }))
   return shuffle(rows).slice(0, 3)
+}
+
+const getCachedPublishedTestimonials = unstable_cache(
+  readPublishedTestimonials,
+  ['home-published-testimonials'],
+  { revalidate: SOCIAL_PROOF_REVALIDATE_SECONDS },
+)
+
+export async function getPublishedTestimonials(
+  locale: Locale,
+  role?: Testimonial['authorRole'],
+): Promise<Testimonial[]> {
+  try {
+    return await getCachedPublishedTestimonials(locale, role)
+  } catch {
+    return []
+  }
 }
 
 export interface UpcomingSession {

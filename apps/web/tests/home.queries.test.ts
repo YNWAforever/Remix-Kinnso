@@ -1,8 +1,10 @@
 import { describe, it, expect, vi } from 'vitest'
 
-const { publicClientMock, upcomingMock, replayMock } = vi.hoisted(() => ({
+const { publicClientMock, upcomingMock, replayMock, unstableCacheMock } = vi.hoisted(() => ({
   publicClientMock: vi.fn(), upcomingMock: vi.fn(), replayMock: vi.fn(),
+  unstableCacheMock: vi.fn((fn: unknown) => fn),
 }))
+vi.mock('next/cache', () => ({ unstable_cache: unstableCacheMock }))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: publicClientMock }))
 vi.mock('@/lib/sessions/public-queries', () => ({ getUpcomingSessionsList: upcomingMock, getReplaySessions: replayMock }))
 
@@ -10,6 +12,21 @@ import {
   getPlatformStats, getPublishedTestimonials, getUpcomingSessions, getHomeSessions,
   STAT_THRESHOLDS, shuffle,
 } from '@/lib/home/queries'
+
+describe('social-proof cache policy', () => {
+  it('caches stats and testimonial reads for one hour', () => {
+    expect(unstableCacheMock).toHaveBeenCalledWith(
+      expect.any(Function),
+      ['home-platform-stats'],
+      { revalidate: 3600 },
+    )
+    expect(unstableCacheMock).toHaveBeenCalledWith(
+      expect.any(Function),
+      ['home-published-testimonials'],
+      { revalidate: 3600 },
+    )
+  })
+})
 
 describe('getPlatformStats', () => {
   it('maps the RPC row to camelCase numbers, including completed_bookings', async () => {
