@@ -18,7 +18,11 @@ describe('R7.5 destination index migration', () => {
     expect(sql).toContain('experience_count')
     expect(sql).toContain('latest_published_at')
     expect(sql).toContain('revoke all on public.destination_index from anon, authenticated')
-    expect(sql).toContain('grant select on public.destination_index to anon, authenticated')
-    expect(sql).not.toMatch(/grant\s+(?:insert|update|delete)\b[^;]*\bon\s+public\.destination_index/)
+    expect(sql).toContain(String.raw`regexp_replace(lower(observed_city), '\s+', ' ', 'g')`)
+    expect(sql).toContain(String.raw`regexp_replace(lower(btrim(term.value)), '\s+', ' ', 'g')`)
+
+    const grants = [...sql.matchAll(/grant\s+([^;]+?)\s+on\s+public\.destination_index\s+to\s+anon,\s*authenticated/g)]
+      .map(([, privileges]) => privileges.trim().replace(/\s+/g, ' '))
+    expect(grants).toEqual(['select'])
   })
 })

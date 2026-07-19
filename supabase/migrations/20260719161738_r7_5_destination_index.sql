@@ -29,7 +29,7 @@ normalized_inventory as (
   select
     kind,
     observed_city,
-    regexp_replace(lower(observed_city), '\\s+', ' ', 'g') as city_key,
+    regexp_replace(lower(observed_city), '\s+', ' ', 'g') as city_key,
     media_url,
     published_at
   from published_inventory
@@ -61,7 +61,7 @@ published_curated as (
     d.description,
     d.match_terms,
     d.sort_order,
-    regexp_replace(lower(btrim(term.value)), '\\s+', ' ', 'g') as match_key
+    regexp_replace(lower(btrim(term.value)), '\s+', ' ', 'g') as match_key
   from public.destinations d
   cross join lateral unnest(array_append(d.match_terms, d.name)) as term(value)
   where status = 'published'
