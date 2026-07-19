@@ -79,14 +79,11 @@ export function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
  * the anon client; the eq() filter documents intent. sort_order stays on the table as an
  * ops-organizational field but no longer drives display order.
  *
- * Rotation granularity: this function itself reshuffles on every invocation, but its three
- * callers (`/[locale]`, `/[locale]/for-creators`, `/[locale]/for-merchants`) are ISR pages
- * with `export const revalidate = 3600` and `generateStaticParams()` — no cookies/headers/
- * searchParams make them dynamic. Next.js therefore re-runs this function once per approximately one-hour
- * regeneration per locale, not once per HTTP request: every visitor hitting the cached HTML
- * within a given window sees the same three quotes in the same order. The real guarantee is
- * "rotates every revalidation window, shared across concurrent visitors in that window" —
- * not literal per-request randomness.
+ * Rotation granularity: the binding `[locale]` layout makes these routes regenerate about
+ * every five minutes, despite their page-level `revalidate = 3600` declarations. This cached
+ * reader stores each locale/role's successfully shuffled result for one hour, shared across
+ * visitors and those more-frequent page regenerations. Failures are caught outside this cache,
+ * so the public fallback remains uncached; rotation is not literal per-request randomness.
  */
 async function readPublishedTestimonials(
   locale: Locale,
