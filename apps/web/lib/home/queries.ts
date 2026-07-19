@@ -11,21 +11,13 @@ export interface PlatformStats {
   upcomingSessions: number
 }
 
-/**
- * Display thresholds (master spec §4.1 honesty rule): a stat below its
- * threshold is NOT rendered — no zeros, no fake "growing fast" numbers.
- */
+/** Display thresholds for the four R7.4 platform-scale metrics. */
 export const STAT_THRESHOLDS = {
   activeCreators: 5,
   publishedGuides: 10,
   destinations: 3,
-  completedBookings: 3, // coldest-start metric — matches the current lowest threshold (D-R3C-4)
-  upcomingSessions: 1, // any real upcoming session is honest content worth surfacing
+  completedBookings: 3,
 } as const
-
-/** Fewer than this many passing stats → the whole social-proof bar renders null. */
-export const MIN_VISIBLE_STATS = 2
-
 /**
  * Honest platform counts for the social-proof bar. Degrades to null on any
  * failure — the bar hides rather than taking the homepage down (same

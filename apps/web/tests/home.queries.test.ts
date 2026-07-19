@@ -8,7 +8,7 @@ vi.mock('@/lib/sessions/public-queries', () => ({ getUpcomingSessionsList: upcom
 
 import {
   getPlatformStats, getPublishedTestimonials, getUpcomingSessions, getHomeSessions,
-  STAT_THRESHOLDS, MIN_VISIBLE_STATS, shuffle,
+  STAT_THRESHOLDS, shuffle,
 } from '@/lib/home/queries'
 
 describe('getPlatformStats', () => {
@@ -198,11 +198,10 @@ describe('getHomeSessions', () => {
     await expect(getHomeSessions()).resolves.toEqual([]); expect(warning).toHaveBeenCalledWith('home-sessions-query-failed'); expect(warning.mock.calls.flat().join(' ')).not.toContain('secret database detail'); warning.mockRestore()
   })
 })
-describe('display thresholds (locked R1B decisions + R3C addition)', () => {
+describe('display thresholds (R7.4 platform-scale metrics)', () => {
   it('exports the honesty thresholds as constants', () => {
     expect(STAT_THRESHOLDS).toEqual({
-      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3, upcomingSessions: 1,
+      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3,
     })
-    expect(MIN_VISIBLE_STATS).toBe(2)
   })
 })

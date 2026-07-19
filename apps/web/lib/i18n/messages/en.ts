@@ -701,7 +701,7 @@ export interface Messages {
   home: {
     heroEyebrow: string; heroTitle: string; heroSubtitle: string
     heroPrimaryCta: string; heroSecondaryCta: string
-    statCreators: string; statGuides: string; statDestinations: string; statCompletedBookings: string; statUpcomingSessions: string
+    statCreators: string; statGuides: string; statDestinations: string; statCompletedBookings: string; statUpcomingSessions: string; statGrowingFast: string
     roleCreator: string; roleTraveller: string; roleMerchant: string
     testimonialsHeading: string
     howEyebrow: string; howHeading: string; howSub: string
@@ -1710,7 +1710,7 @@ const messages: Messages = {
     heroSubtitle: 'Discover guides from trusted travel creators. Plan with AI. Book in one place.',
     heroPrimaryCta: 'Start Planning',
     heroSecondaryCta: 'Browse Creators',
-    statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered', statCompletedBookings: 'completed bookings', statUpcomingSessions: 'live sessions coming up',
+    statCreators: 'active creators', statGuides: 'published guides', statDestinations: 'destinations covered', statCompletedBookings: 'completed bookings', statUpcomingSessions: 'live sessions coming up', statGrowingFast: 'Growing fast',
     roleCreator: 'Creator', roleTraveller: 'Traveller', roleMerchant: 'Merchant',
     testimonialsHeading: 'What people say about KINNSO',
     howEyebrow: 'How it works',
