@@ -15,17 +15,33 @@ import { MARKETING_PATHS } from '@/lib/seo/routes'
 import en from '@/lib/i18n/messages/en'
 
 describe('/[locale]/destinations host', () => {
-  it('renders published destinations as cards linking to their detail page', async () => {
+  it('renders honest destination inventory on linked cards', async () => {
     getPublishedDestinationsMock.mockResolvedValueOnce([
       {
-        slug: 'tokyo', name: 'Tokyo', heroImageUrl: 'https://x/tokyo.jpg', description: 'Neon nights.', matchTerms: ['Tokyo'],
-        guideCount: 1, experienceCount: 1, latestPublishedAt: '2026-07-19T00:00:00.000Z',
+        slug: 'tokyo', name: 'Tokyo', heroImageUrl: null, description: 'Neon nights.', matchTerms: ['Tokyo'],
+        guideCount: 1, experienceCount: 2, latestPublishedAt: '2026-07-19T00:00:00.000Z',
       },
     ])
     const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
     expect(screen.getByRole('heading', { level: 1, name: en.destinations.title })).toBeTruthy()
     expect(screen.getByRole('link', { name: /Tokyo/ }).getAttribute('href')).toBe('/en/destinations/tokyo')
+    expect(screen.getByText('1 guide')).toBeTruthy()
+    expect(screen.getByText('2 experiences')).toBeTruthy()
+    expect(document.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
+  })
+
+  it('omits zero inventory counts from destination cards', async () => {
+    getPublishedDestinationsMock.mockResolvedValueOnce([
+      {
+        slug: 'tokyo', name: 'Tokyo', heroImageUrl: null, description: null, matchTerms: ['Tokyo'],
+        guideCount: 0, experienceCount: 0, latestPublishedAt: null,
+      },
+    ])
+    const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.queryByText(/0 guides?/)).toBeNull()
+    expect(screen.queryByText(/0 experiences?/)).toBeNull()
   })
 
   it('shows the empty state when there are no published destinations', async () => {
