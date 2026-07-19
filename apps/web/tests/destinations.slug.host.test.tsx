@@ -23,6 +23,7 @@ import en from '@/lib/i18n/messages/en'
 const destination = {
   slug: 'tokyo', name: 'Tokyo', heroImageUrl: null,
   description: 'Neon nights and quiet shrines.', matchTerms: ['Tokyo'],
+  guideCount: 1, experienceCount: 1, latestPublishedAt: '2026-07-19T00:00:00.000Z',
 }
 
 describe('/[locale]/destinations/[slug] detail host', () => {

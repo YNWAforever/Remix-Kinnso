@@ -3,17 +3,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown }))
 const orderSpy = vi.hoisted(() => vi.fn())
+const fromSpy = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/supabase/public', () => ({
   createSupabasePublicClient: () => ({
-    from: () => {
+    from: (relation: string) => {
+      fromSpy(relation)
       const builder = {
         select: () => builder,
         eq: () => builder,
         order: (col: string, opts: unknown) => { orderSpy(col, opts); return builder },
         maybeSingle: async () => ({ data: state.single }),
-        then: (onF: (v: { data: unknown }) => unknown) =>
-          Promise.resolve({ data: state.list }).then(onF),
+        then: (onF: (v: { data: unknown }) => unknown) => Promise.resolve({ data: state.list }).then(onF),
       }
       return builder
     },
@@ -23,25 +24,31 @@ vi.mock('@/lib/supabase/public', () => ({
 import { getPublishedDestinations, getDestinationBySlug, getDestinationsForSitemap } from '@/lib/destinations/queries'
 
 const row = {
-  slug: 'tokyo', name: 'Tokyo', hero_image_url: 'https://example.com/tokyo.jpg',
-  description: 'Neon nights and quiet shrines.', match_terms: ['Tokyo', 'Shibuya', 'Shinjuku'],
+  slug: 'tokyo', name: 'Tokyo', hero_image_url: null, description: null,
+  match_terms: ['Tokyo'], guide_count: 1, experience_count: 1,
+  latest_published_at: '2026-07-19T00:00:00.000Z', sort_order: 0,
 }
 
 beforeEach(() => {
   state.list = []
   state.single = null
   orderSpy.mockClear()
+  fromSpy.mockClear()
 })
 
 describe('getPublishedDestinations', () => {
-  it('maps published rows ordered by sort_order ascending', async () => {
+  it('maps inventory rows ordered by sort_order, name, then slug', async () => {
     state.list = [row]
     const result = await getPublishedDestinations()
     expect(result).toEqual([{
-      slug: 'tokyo', name: 'Tokyo', heroImageUrl: 'https://example.com/tokyo.jpg',
-      description: 'Neon nights and quiet shrines.', matchTerms: ['Tokyo', 'Shibuya', 'Shinjuku'],
+      slug: 'tokyo', name: 'Tokyo', heroImageUrl: null, description: null,
+      matchTerms: ['Tokyo'], guideCount: 1, experienceCount: 1,
+      latestPublishedAt: '2026-07-19T00:00:00.000Z',
     }])
+    expect(fromSpy).toHaveBeenCalledWith('destination_index')
     expect(orderSpy).toHaveBeenCalledWith('sort_order', { ascending: true })
+    expect(orderSpy).toHaveBeenCalledWith('name', { ascending: true })
+    expect(orderSpy).toHaveBeenCalledWith('slug', { ascending: true })
   })
 
   it('returns [] when there are no published destinations', async () => {
@@ -54,13 +61,20 @@ describe('getPublishedDestinations', () => {
     const result = await getPublishedDestinations()
     expect(result[0].matchTerms).toEqual([])
   })
+
+  it('coerces nullable inventory counts to zero', async () => {
+    state.list = [{ ...row, guide_count: null, experience_count: null }]
+    const result = await getPublishedDestinations()
+    expect(result[0]).toMatchObject({ guideCount: 0, experienceCount: 0 })
+  })
 })
 
 describe('getDestinationBySlug', () => {
-  it('returns the mapped destination when a published row exists', async () => {
+  it('returns the mapped destination from the inventory view when a row exists', async () => {
     state.single = row
     const dest = await getDestinationBySlug('tokyo')
     expect(dest?.name).toBe('Tokyo')
+    expect(fromSpy).toHaveBeenCalledWith('destination_index')
   })
 
   it('returns null when no row matches', async () => {
@@ -70,10 +84,12 @@ describe('getDestinationBySlug', () => {
 })
 
 describe('getDestinationsForSitemap', () => {
-  it('returns published slugs with a lastmod', async () => {
-    state.list = [{ slug: 'tokyo', published_at: '2026-07-01T00:00:00Z' }]
+  it('maps latest_published_at to lastmod from the inventory view', async () => {
+    state.list = [{ slug: 'tokyo', latest_published_at: '2026-07-01T00:00:00Z' }]
     expect(await getDestinationsForSitemap()).toEqual([{ slug: 'tokyo', lastmod: '2026-07-01T00:00:00Z' }])
+    expect(fromSpy).toHaveBeenCalledWith('destination_index')
   })
+
   it('returns [] when there are no published destinations', async () => {
     state.list = []
     expect(await getDestinationsForSitemap()).toEqual([])

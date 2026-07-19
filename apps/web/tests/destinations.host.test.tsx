@@ -17,7 +17,10 @@ import en from '@/lib/i18n/messages/en'
 describe('/[locale]/destinations host', () => {
   it('renders published destinations as cards linking to their detail page', async () => {
     getPublishedDestinationsMock.mockResolvedValueOnce([
-      { slug: 'tokyo', name: 'Tokyo', heroImageUrl: 'https://x/tokyo.jpg', description: 'Neon nights.', matchTerms: ['Tokyo'] },
+      {
+        slug: 'tokyo', name: 'Tokyo', heroImageUrl: 'https://x/tokyo.jpg', description: 'Neon nights.', matchTerms: ['Tokyo'],
+        guideCount: 1, experienceCount: 1, latestPublishedAt: '2026-07-19T00:00:00.000Z',
+      },
     ])
     const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
