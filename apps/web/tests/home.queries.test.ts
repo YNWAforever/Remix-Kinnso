@@ -1,15 +1,47 @@
-import { describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
 
-const { publicClientMock, upcomingMock, replayMock } = vi.hoisted(() => ({
-  publicClientMock: vi.fn(), upcomingMock: vi.fn(), replayMock: vi.fn(),
-}))
+const { publicClientMock, upcomingMock, replayMock, unstableCacheMock, cacheMaps } = vi.hoisted(() => {
+  const cacheMaps: Map<string, unknown>[] = []
+  const unstableCacheMock = vi.fn((reader: (...args: unknown[]) => Promise<unknown>) => {
+    const cache = new Map<string, unknown>()
+    cacheMaps.push(cache)
+    return async (...args: unknown[]) => {
+      const key = JSON.stringify(args)
+      if (cache.has(key)) return cache.get(key)
+      const value = await reader(...args)
+      cache.set(key, value)
+      return value
+    }
+  })
+  return { publicClientMock: vi.fn(), upcomingMock: vi.fn(), replayMock: vi.fn(), unstableCacheMock, cacheMaps }
+})
+vi.mock('next/cache', () => ({ unstable_cache: unstableCacheMock }))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: publicClientMock }))
 vi.mock('@/lib/sessions/public-queries', () => ({ getUpcomingSessionsList: upcomingMock, getReplaySessions: replayMock }))
 
 import {
   getPlatformStats, getPublishedTestimonials, getUpcomingSessions, getHomeSessions,
-  STAT_THRESHOLDS, MIN_VISIBLE_STATS, shuffle,
+  STAT_THRESHOLDS, shuffle,
 } from '@/lib/home/queries'
+
+beforeEach(() => {
+  for (const cache of cacheMaps) cache.clear()
+})
+
+describe('social-proof cache policy', () => {
+  it('caches stats and testimonial reads for one hour', () => {
+    expect(unstableCacheMock).toHaveBeenCalledWith(
+      expect.any(Function),
+      ['home-platform-stats'],
+      { revalidate: 3600 },
+    )
+    expect(unstableCacheMock).toHaveBeenCalledWith(
+      expect.any(Function),
+      ['home-published-testimonials'],
+      { revalidate: 3600 },
+    )
+  })
+})
 
 describe('getPlatformStats', () => {
   it('maps the RPC row to camelCase numbers, including completed_bookings', async () => {
@@ -31,6 +63,17 @@ describe('getPlatformStats', () => {
     publicClientMock.mockReturnValue({ rpc: vi.fn(async () => ({ data: [], error: null })) })
     expect(await getPlatformStats()).toBeNull()
   })
+  it('does not cache a failed RPC read, allowing a later request to succeed', async () => {
+    publicClientMock.mockClear()
+    publicClientMock
+      .mockReturnValueOnce({ rpc: vi.fn(async () => ({ data: null, error: { message: 'boom' } })) })
+      .mockReturnValueOnce({ rpc: vi.fn(async () => ({ data: [{ active_creators: 12, published_guides: 48, destinations: 9, completed_bookings: 4, upcoming_sessions: 6 }], error: null })) })
+
+    expect(await getPlatformStats()).toBeNull()
+    expect(await getPlatformStats()).toEqual({ activeCreators: 12, publishedGuides: 48, destinations: 9, completedBookings: 4, upcomingSessions: 6 })
+    expect(publicClientMock).toHaveBeenCalledTimes(2)
+  })
+
   it('maps upcoming_sessions alongside the existing stats', async () => {
     publicClientMock.mockReturnValue({
       rpc: vi.fn(async () => ({
@@ -106,6 +149,18 @@ describe('getPublishedTestimonials', () => {
     publicClientMock.mockReturnValue({ from: vi.fn(() => ({ select })) })
 
     expect(await getPublishedTestimonials('en')).toHaveLength(1)
+  })
+  it('does not cache a failed testimonial read, allowing a later request to succeed', async () => {
+    publicClientMock.mockClear()
+    const failedOr = vi.fn(() => Promise.resolve({ data: null, error: { message: 'boom' } }))
+    const successfulOr = vi.fn(() => Promise.resolve({ data: [{ id: 't1', quote: 'q', author_name: 'Mei', author_role: 'creator' }], error: null }))
+    publicClientMock
+      .mockReturnValueOnce({ from: vi.fn(() => ({ select: () => ({ eq: () => ({ or: failedOr }) }) })) })
+      .mockReturnValueOnce({ from: vi.fn(() => ({ select: () => ({ eq: () => ({ or: successfulOr }) }) })) })
+
+    expect(await getPublishedTestimonials('en')).toEqual([])
+    expect(await getPublishedTestimonials('en')).toEqual([{ id: 't1', quote: 'q', authorName: 'Mei', authorRole: 'creator' }])
+    expect(publicClientMock).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -198,11 +253,10 @@ describe('getHomeSessions', () => {
     await expect(getHomeSessions()).resolves.toEqual([]); expect(warning).toHaveBeenCalledWith('home-sessions-query-failed'); expect(warning.mock.calls.flat().join(' ')).not.toContain('secret database detail'); warning.mockRestore()
   })
 })
-describe('display thresholds (locked R1B decisions + R3C addition)', () => {
+describe('display thresholds (R7.4 platform-scale metrics)', () => {
   it('exports the honesty thresholds as constants', () => {
     expect(STAT_THRESHOLDS).toEqual({
-      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3, upcomingSessions: 1,
+      activeCreators: 5, publishedGuides: 10, destinations: 3, completedBookings: 3,
     })
-    expect(MIN_VISIBLE_STATS).toBe(2)
   })
 })

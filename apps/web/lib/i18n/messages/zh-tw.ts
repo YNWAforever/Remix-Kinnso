@@ -476,7 +476,7 @@ const messages: Messages = {
     heroSubtitle: '探索值得信賴的旅遊創作者攻略、用 AI 規劃行程，一站完成預訂。',
     heroPrimaryCta: '開始規劃',
     heroSecondaryCta: '瀏覽創作者',
-    statCreators: '位活躍創作者', statGuides: '份已發布攻略', statDestinations: '個目的地', statCompletedBookings: '完成預訂', statUpcomingSessions: '場即將舉行的活動',
+    statCreators: '位活躍創作者', statGuides: '份已發布攻略', statDestinations: '個目的地', statCompletedBookings: '完成預訂', statUpcomingSessions: '場即將舉行的活動', statGrowingFast: '快速成長中',
     roleCreator: '創作者', roleTraveller: '旅人', roleMerchant: '商家',
     testimonialsHeading: '大家怎麼看 KINNSO',
     howEyebrow: '如何運作',

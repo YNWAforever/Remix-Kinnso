@@ -476,7 +476,7 @@ const messages: Messages = {
     heroSubtitle: '信頼できるトラベルクリエイターのガイドに出会い、AIで計画し、ひとつの場所で予約まで。',
     heroPrimaryCta: '旅の計画を始める',
     heroSecondaryCta: 'クリエイターを見る',
-    statCreators: '人のアクティブクリエイター', statGuides: '本の公開ガイド', statDestinations: 'の旅行先', statCompletedBookings: '予約完了数', statUpcomingSessions: '件の開催予定セッション',
+    statCreators: '人のアクティブクリエイター', statGuides: '本の公開ガイド', statDestinations: 'の旅行先', statCompletedBookings: '予約完了数', statUpcomingSessions: '件の開催予定セッション', statGrowingFast: '急成長中',
     roleCreator: 'クリエイター', roleTraveller: '旅行者', roleMerchant: '加盟店',
     testimonialsHeading: 'KINNSO利用者の声',
     howEyebrow: '使い方',

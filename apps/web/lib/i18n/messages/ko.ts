@@ -476,7 +476,7 @@ const messages: Messages = {
     heroSubtitle: '믿을 수 있는 여행 크리에이터의 가이드를 만나고, AI로 계획하고, 한곳에서 예약까지.',
     heroPrimaryCta: '여행 계획 시작하기',
     heroSecondaryCta: '크리에이터 둘러보기',
-    statCreators: '명의 활동 중인 크리에이터', statGuides: '개의 공개 가이드', statDestinations: '곳의 여행지', statCompletedBookings: '완료된 예약', statUpcomingSessions: '개의 예정된 라이브 세션',
+    statCreators: '명의 활동 중인 크리에이터', statGuides: '개의 공개 가이드', statDestinations: '곳의 여행지', statCompletedBookings: '완료된 예약', statUpcomingSessions: '개의 예정된 라이브 세션', statGrowingFast: '빠르게 성장 중',
     roleCreator: '크리에이터', roleTraveller: '여행자', roleMerchant: '가맹점',
     testimonialsHeading: 'KINNSO 사용자들의 이야기',
     howEyebrow: '이용 방법',

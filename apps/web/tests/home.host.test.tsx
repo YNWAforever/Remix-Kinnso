@@ -3,13 +3,15 @@ import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
 afterEach(cleanup)
-const { productStateMock, homeSessionsMock } = vi.hoisted(() => ({
+const { productStateMock, homeSessionsMock, testimonialsMock } = vi.hoisted(() => ({
   productStateMock: vi.fn(),
   homeSessionsMock: vi.fn(),
+  testimonialsMock: vi.fn(async () => []),
 }))
 beforeEach(() => {
   productStateMock.mockResolvedValue({ agentLive: true, bookingLive: false, sessionsLive: false })
   homeSessionsMock.mockResolvedValue([])
+  testimonialsMock.mockResolvedValue([])
 })
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
 vi.mock('@/lib/guides/queries', () => ({ getPublishedGuides: async () => [] }))
@@ -18,7 +20,7 @@ vi.mock('@/lib/product-state', () => ({ getProductState: productStateMock }))
 vi.mock('@/lib/home/queries', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/home/queries')>()),
   getPlatformStats: async () => null,
-  getPublishedTestimonials: async () => [],
+  getPublishedTestimonials: testimonialsMock,
   getUpcomingSessions: async () => [],
   getHomeSessions: homeSessionsMock,
 }))
@@ -43,8 +45,12 @@ describe('/[locale] home host', () => {
     expect(screen.getByText('Replay session')).toBeTruthy()
   })
 
-  it('ISR-revalidates every 5 minutes', () => {
-    expect(revalidate).toBe(300)
+  it('loads locale-aware homepage testimonials across audience roles', async () => {
+    await LocaleHome({ params: Promise.resolve({ locale: 'en' }) })
+    expect(testimonialsMock).toHaveBeenCalledWith('en')
+  })
+  it('ISR-revalidates approximately hourly', () => {
+    expect(revalidate).toBe(3600)
   })
   it('uses the updated seo.home strings', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) })

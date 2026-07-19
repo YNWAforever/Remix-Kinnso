@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import type { Locale } from '@/lib/i18n/config'
 import { getReplaySessions, getUpcomingSessionsList } from '@/lib/sessions/public-queries'
@@ -11,38 +12,46 @@ export interface PlatformStats {
   upcomingSessions: number
 }
 
-/**
- * Display thresholds (master spec §4.1 honesty rule): a stat below its
- * threshold is NOT rendered — no zeros, no fake "growing fast" numbers.
- */
+/** Display thresholds for the four R7.4 platform-scale metrics. */
 export const STAT_THRESHOLDS = {
   activeCreators: 5,
   publishedGuides: 10,
   destinations: 3,
-  completedBookings: 3, // coldest-start metric — matches the current lowest threshold (D-R3C-4)
-  upcomingSessions: 1, // any real upcoming session is honest content worth surfacing
+  completedBookings: 3,
 } as const
-
-/** Fewer than this many passing stats → the whole social-proof bar renders null. */
-export const MIN_VISIBLE_STATS = 2
-
 /**
  * Honest platform counts for the social-proof bar. Degrades to null on any
  * failure — the bar hides rather than taking the homepage down (same
  * reads-never-crash stance as getPublishedGuides()).
  */
-export async function getPlatformStats(): Promise<PlatformStats | null> {
+export const SOCIAL_PROOF_REVALIDATE_SECONDS = 60 * 60
+
+async function readPlatformStats(): Promise<PlatformStats> {
   const supabase = createSupabasePublicClient()
   const { data, error } = await supabase.rpc('platform_stats')
-  if (error) return null
+  if (error) throw error
   const row = (data ?? [])[0]
-  if (!row) return null
+  if (!row) throw new Error('platform_stats returned no row')
   return {
     activeCreators: Number(row.active_creators),
     publishedGuides: Number(row.published_guides),
     destinations: Number(row.destinations),
     completedBookings: Number(row.completed_bookings),
     upcomingSessions: Number(row.upcoming_sessions),
+  }
+}
+
+const getCachedPlatformStats = unstable_cache(
+  readPlatformStats,
+  ['home-platform-stats'],
+  { revalidate: SOCIAL_PROOF_REVALIDATE_SECONDS },
+)
+
+export async function getPlatformStats(): Promise<PlatformStats | null> {
+  try {
+    return await getCachedPlatformStats()
+  } catch {
+    return null
   }
 }
 
@@ -70,16 +79,13 @@ export function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
  * the anon client; the eq() filter documents intent. sort_order stays on the table as an
  * ops-organizational field but no longer drives display order.
  *
- * Rotation granularity: this function itself reshuffles on every invocation, but its three
- * callers (`/[locale]`, `/[locale]/for-creators`, `/[locale]/for-merchants`) are ISR pages
- * with `export const revalidate = 300` and `generateStaticParams()` — no cookies/headers/
- * searchParams make them dynamic. Next.js therefore re-runs this function once per ~5-minute
- * regeneration per locale, not once per HTTP request: every visitor hitting the cached HTML
- * within a given window sees the same three quotes in the same order. The real guarantee is
- * "rotates every revalidation window, shared across concurrent visitors in that window" —
- * not literal per-request randomness.
+ * Rotation granularity: the binding `[locale]` layout makes these routes regenerate about
+ * every five minutes, despite their page-level `revalidate = 3600` declarations. This cached
+ * reader stores each locale/role's successfully shuffled result for one hour, shared across
+ * visitors and those more-frequent page regenerations. Failures are caught outside this cache,
+ * so the public fallback remains uncached; rotation is not literal per-request randomness.
  */
-export async function getPublishedTestimonials(
+async function readPublishedTestimonials(
   locale: Locale,
   role?: Testimonial['authorRole'],
 ): Promise<Testimonial[]> {
@@ -90,7 +96,8 @@ export async function getPublishedTestimonials(
     .eq('status', 'published')
     .or(`locale.is.null,locale.eq.${locale}`)
   if (role) query = query.eq('author_role', role)
-  const { data } = await query
+  const { data, error } = await query
+  if (error) throw error
   const rows = (data ?? []).map((r) => ({
     id: r.id as string,
     quote: r.quote as string,
@@ -98,6 +105,23 @@ export async function getPublishedTestimonials(
     authorRole: r.author_role as Testimonial['authorRole'],
   }))
   return shuffle(rows).slice(0, 3)
+}
+
+const getCachedPublishedTestimonials = unstable_cache(
+  readPublishedTestimonials,
+  ['home-published-testimonials'],
+  { revalidate: SOCIAL_PROOF_REVALIDATE_SECONDS },
+)
+
+export async function getPublishedTestimonials(
+  locale: Locale,
+  role?: Testimonial['authorRole'],
+): Promise<Testimonial[]> {
+  try {
+    return await getCachedPublishedTestimonials(locale, role)
+  } catch {
+    return []
+  }
 }
 
 export interface UpcomingSession {
