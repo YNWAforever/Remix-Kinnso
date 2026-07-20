@@ -1385,6 +1385,8 @@ const messages: Messages = {
     emptyGuides: '이 여행지의 가이드가 아직 없어요.',
     experiencesHeading: '체험',
     emptyExperiences: '이 여행지에서 예약 가능한 체험이 아직 없어요.',
+    articlesHeading: '아티클',
+    metadataDescription: (name) => `${name}의 가이드, 체험, 아티클, 세션을 둘러보세요.`,
     sessionsHeading: '예정된 세션',
     emptySessions: '이 여행지에서 예정된 세션이 현재 없어요.',
   },

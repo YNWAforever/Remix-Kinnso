@@ -1385,6 +1385,8 @@ const messages: Messages = {
     emptyGuides: 'จุดหมายนี้ยังไม่มีไกด์',
     experiencesHeading: 'ประสบการณ์',
     emptyExperiences: 'ที่นี่ยังไม่มีประสบการณ์ที่จองได้',
+    articlesHeading: 'บทความ',
+    metadataDescription: (name) => `ค้นพบไกด์ ประสบการณ์ บทความ และเซสชันสำหรับ ${name}`,
     sessionsHeading: 'เซสชันที่จะถึงนี้',
     emptySessions: 'ขณะนี้ยังไม่มีเซสชันที่กำหนดไว้สำหรับจุดหมายนี้',
   },

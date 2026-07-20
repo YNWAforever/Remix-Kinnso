@@ -1213,6 +1213,7 @@ export interface Messages {
     guideCount: (count: number) => string; experienceCount: (count: number) => string
     guidesHeading: string; emptyGuides: string
     experiencesHeading: string; emptyExperiences: string
+    articlesHeading: string; metadataDescription: (name: string) => string
     sessionsHeading: string; emptySessions: string
   }
   sessionsAdmin: {
@@ -2632,6 +2633,8 @@ const messages: Messages = {
     emptyGuides: 'No guides for this destination yet.',
     experiencesHeading: 'Experiences',
     emptyExperiences: 'No bookable experiences here yet.',
+    articlesHeading: 'Articles',
+    metadataDescription: (name) => `Discover guides, experiences, articles, and sessions for ${name}.`,
     sessionsHeading: 'Upcoming sessions',
     emptySessions: 'No sessions scheduled for this destination right now.',
   },

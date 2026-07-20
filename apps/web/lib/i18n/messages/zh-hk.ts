@@ -1385,6 +1385,8 @@ const messages: Messages = {
     emptyGuides: '呢個目的地暫時未有攻略。',
     experiencesHeading: '體驗',
     emptyExperiences: '呢度暫時未有可預約嘅體驗。',
+    articlesHeading: '文章',
+    metadataDescription: (name) => `探索 ${name} 嘅攻略、體驗、文章同社群活動。`,
     sessionsHeading: '即將舉行嘅活動',
     emptySessions: '呢個目的地暫時未有安排活動。',
   },

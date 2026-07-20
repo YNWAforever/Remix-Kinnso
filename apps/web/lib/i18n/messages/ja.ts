@@ -1385,6 +1385,8 @@ const messages: Messages = {
     emptyGuides: 'この旅行先のガイドはまだありません。',
     experiencesHeading: '体験',
     emptyExperiences: 'この旅行先で予約できる体験はまだありません。',
+    articlesHeading: '記事',
+    metadataDescription: (name) => `${name}のガイド、体験、記事、セッションを見つけよう。`,
     sessionsHeading: '開催予定のセッション',
     emptySessions: 'この旅行先で予定されているセッションは現在ありません。',
   },

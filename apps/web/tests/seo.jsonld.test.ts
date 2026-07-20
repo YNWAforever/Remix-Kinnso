@@ -1,6 +1,28 @@
-// apps/web/tests/seo.jsonld.test.ts (add this describe block; keep any existing content in the file)
+// apps/web/tests/seo.jsonld.test.ts
 import { describe, it, expect } from 'vitest'
-import { sessionEventJsonLd } from '@/lib/seo/jsonld'
+import { itemListJsonLd, sessionEventJsonLd } from '@/lib/seo/jsonld'
+
+describe('itemListJsonLd', () => {
+  it('builds a one-based ItemList for every supplied item', () => {
+    const ld = itemListJsonLd({
+      name: 'Tokyo travel resources',
+      items: [
+        { name: 'Tokyo ramen guide', url: 'https://www.kinnso.ai/en/g/tokyo-ramen' },
+        { name: 'Ramen crawl', url: 'https://www.kinnso.ai/en/experiences/ramen-crawl' },
+      ],
+    })
+    expect(ld).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Tokyo travel resources',
+      numberOfItems: 2,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Tokyo ramen guide', url: 'https://www.kinnso.ai/en/g/tokyo-ramen' },
+        { '@type': 'ListItem', position: 2, name: 'Ramen crawl', url: 'https://www.kinnso.ai/en/experiences/ramen-crawl' },
+      ],
+    })
+  })
+})
 
 describe('sessionEventJsonLd', () => {
   it('builds an Event with a VirtualLocation pointed at the embed URL', () => {
