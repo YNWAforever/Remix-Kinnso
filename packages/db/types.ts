@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -2505,6 +2505,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      session_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          locale: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          locale: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          locale?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       testimonials: {
         Row: {
