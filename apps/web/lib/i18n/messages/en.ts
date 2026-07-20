@@ -1203,6 +1203,9 @@ export interface Messages {
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
+    waitlistValue: string; waitlistInvite: string; waitlistFormLabel: string; waitlistEmailLabel: string
+    waitlistSubmit: string; waitlistPending: string; waitlistSuccess: string; waitlistInvalid: string
+    waitlistRateLimited: string; waitlistRetry: string
     rsvpEmailLabel: string; rsvpSubmit: string; rsvpConfirmed: string; rsvpError: string
     rsvpCancelledNotice: string
     typeDestinationBriefing: string; typeAskACreator: string
@@ -2612,6 +2615,16 @@ const messages: Messages = {
     upcomingHeading: 'Upcoming',
     emptyUpcoming: 'No sessions scheduled right now — check back soon.',
     replaysHeading: 'Replays',
+    waitlistValue: 'Live sessions turn practical travel questions into honest answers you can use right away.',
+    waitlistInvite: 'No pressure—join the waitlist for a quiet heads-up when the next one is ready.',
+    waitlistFormLabel: 'Session updates',
+    waitlistEmailLabel: 'Email address',
+    waitlistSubmit: 'Join the waitlist',
+    waitlistPending: 'Joining…',
+    waitlistSuccess: "You're on the waitlist.",
+    waitlistInvalid: 'Enter a valid email address.',
+    waitlistRateLimited: 'Too many attempts. Please try again later.',
+    waitlistRetry: 'Something went wrong. Please try again.',
     rsvpEmailLabel: 'Your email',
     rsvpSubmit: 'RSVP',
     rsvpConfirmed: "You're on the list — we'll be in touch.",
