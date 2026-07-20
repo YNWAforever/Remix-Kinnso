@@ -2,11 +2,15 @@
 import { cleanup, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { getArticleDetailMock } = vi.hoisted(() => ({ getArticleDetailMock: vi.fn() }))
+const { getArticleDetailMock, searchArticlesMock } = vi.hoisted(() => ({
+  getArticleDetailMock: vi.fn(),
+  searchArticlesMock: vi.fn(),
+}))
 
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('notFound') } }))
 vi.mock('@/lib/articles/queries', () => ({
   getArticleDetail: getArticleDetailMock,
+  searchArticles: searchArticlesMock,
   getPresentLocales: vi.fn(async () => ['en']),
   getYouMayLike: vi.fn(async () => []),
   getStaticArticleParams: vi.fn(async () => []),
@@ -14,7 +18,7 @@ vi.mock('@/lib/articles/queries', () => ({
 vi.mock('@/lib/i18n/dictionaries', () => ({
   getDictionary: vi.fn(async () => ({
     breadcrumb: { home: 'Home', articles: 'Articles' },
-    categories: { destinations: 'Destinations' },
+    categories: { destinations: 'Destinations', dining: 'Dining', shopping: 'Shopping' },
     article: {
       by: 'By', fallbackNotice: 'Fallback', faqTitle: 'FAQ',
       youMayLike: 'You may like', tableOfContents: 'Contents',
@@ -28,6 +32,7 @@ vi.mock('@/components/ArticleToc', () => ({ ArticleToc: () => null }))
 vi.mock('@/components/ViewPing', () => ({ ViewPing: () => null }))
 
 import ArticleDetailPage, { generateMetadata } from '@/app/[locale]/articles/[category]/[url]/page'
+import ArticlesHubPage from '@/app/[locale]/articles/page'
 
 const baseArticle = {
   id: 'a1',
@@ -60,7 +65,10 @@ const baseArticle = {
 
 const params = Promise.resolve({ locale: 'en', category: 'destinations', url: 'kyoto-tea' })
 
-beforeEach(() => getArticleDetailMock.mockResolvedValue(baseArticle))
+beforeEach(() => {
+  getArticleDetailMock.mockResolvedValue(baseArticle)
+  searchArticlesMock.mockResolvedValue({ items: [] })
+})
 afterEach(cleanup)
 
 describe('article route media behavior', () => {
@@ -98,5 +106,22 @@ describe('article route media behavior', () => {
     expect(ld).toContain(thumbnail)
     expect(container.innerHTML).toContain('cdn.kinnso.ai')
     expect(container.querySelector('img')).toBeTruthy()
+  })
+})
+
+describe('article hub categories', () => {
+  it('renders populated categories without rendering empty category headings', async () => {
+    searchArticlesMock.mockImplementation(async ({ category }: { category: string }) => ({
+      items: category === 'destination'
+        ? [{ url: 'kyoto-tea', title: 'Kyoto Tea', thumbnails: [], summary: 'Tea houses.' }]
+        : [],
+    }))
+
+    const { getByRole, queryByRole } = render(await ArticlesHubPage({ params: Promise.resolve({ locale: 'en' }) }))
+
+    expect(getByRole('heading', { name: 'Destinations' })).toBeTruthy()
+    expect(getByRole('link', { name: 'Kyoto Tea' })).toBeTruthy()
+    expect(queryByRole('heading', { name: 'Dining' })).toBeNull()
+    expect(queryByRole('heading', { name: 'Shopping' })).toBeNull()
   })
 })
