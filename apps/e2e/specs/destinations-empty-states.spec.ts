@@ -17,12 +17,13 @@ test('seeded Tokyo inventory renders an index card and canonical discovery detai
   await expect(tokyoCard.getByText(/[1-9]\d* guides?/)).toBeVisible()
   await expect(tokyoCard.getByText(/[1-9]\d* experiences?/)).toBeVisible()
 
-  // The fixture may eventually gain approved media. In either case, the card must
-  // render one real media surface rather than a broken or empty image region.
-  await expect(tokyoCard.locator('img, [data-media-placeholder="true"]')).toHaveCount(1)
+  await expect(tokyoCard.locator('[data-media-placeholder="true"]')).toBeVisible()
+  await expect(tokyoCard.locator('img')).toHaveCount(0)
 
-  const detailResponse = await page.goto('/en/destinations/tokyo')
-  expect(detailResponse?.status(), 'Tokyo destination detail should return HTTP 200').toBe(200)
+  await Promise.all([
+    page.waitForURL(/\/en\/destinations\/tokyo$/),
+    tokyoCard.click(),
+  ])
   await expect(page.getByRole('heading', { level: 1, name: 'Tokyo' })).toBeVisible()
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
@@ -35,6 +36,12 @@ test('seeded Tokyo inventory renders an index card and canonical discovery detai
   await expect(page.locator('a[href="/en/g/r7-smoke-tokyo-guide"]')).toBeVisible()
   await expect(page.getByRole('heading', { level: 3, name: 'R7 Smoke Tokyo Guide' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'R7 Smoke Tokyo Experience' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 2, name: 'Articles' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Best Ramen in Tokyo' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 2, name: 'Upcoming sessions' })).toHaveCount(0)
+  await expect(page.getByText('No guides for this destination yet.')).toHaveCount(0)
+  await expect(page.getByText('No bookable experiences here yet.')).toHaveCount(0)
+  await expect(page.getByText('No sessions scheduled for this destination right now.')).toHaveCount(0)
 
   const jsonLd = parseJsonLd(await page.locator('script[type="application/ld+json"]').allTextContents())
   const itemList = jsonLd.find((block) => block['@type'] === 'ItemList') as
@@ -76,4 +83,8 @@ test('article hub omits the known-empty destinations category', async ({ page })
   await expect(page.getByRole('heading', { level: 2, name: 'Dining' })).toBeVisible()
   await expect(page.getByRole('heading', { level: 2, name: 'Shopping' })).toHaveCount(0)
   await expect(page.getByRole('heading', { level: 2, name: 'Destinations' })).toHaveCount(0)
+  await expect(page.locator('a[href="/en/articles/shopping"], a[href="/en/articles/destinations"]')).toHaveCount(0)
+  await expect(
+    page.locator('main section:has(a[href="/en/articles/shopping"]), main section:has(a[href="/en/articles/destinations"])'),
+  ).toHaveCount(0)
 })
