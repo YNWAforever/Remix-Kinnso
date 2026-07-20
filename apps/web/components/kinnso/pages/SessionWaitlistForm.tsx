@@ -60,6 +60,7 @@ export function SessionWaitlistForm({
 
   return (
     <form
+      noValidate
       aria-label={strings.formLabel}
       aria-busy={isSubmitting}
       className="mt-7 grid max-w-md gap-3"
@@ -75,7 +76,7 @@ export function SessionWaitlistForm({
         autoComplete="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        aria-invalid={errorMessage ? true : undefined}
+        aria-invalid={status === 'invalid' ? true : undefined}
         aria-describedby={errorMessage ? feedbackId : undefined}
         className="k2-input w-full"
       />

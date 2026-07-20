@@ -75,28 +75,35 @@ describe('SessionWaitlistForm', () => {
     expect((email as HTMLInputElement).value).toBe('')
   })
 
-  it('keeps the email and shows the localized invalid-email error', async () => {
+  it('disables native validation and announces the localized invalid action result', async () => {
     joinSessionWaitlistActionMock.mockResolvedValueOnce({ ok: false, error: 'invalid' })
     const { email, form } = renderForm()
     fireEvent.change(email, { target: { value: 'bad' } })
 
+    expect((form as HTMLFormElement).noValidate).toBe(true)
     fireEvent.submit(form)
 
-    await waitFor(() => expect(screen.getByRole('alert').textContent).toBe(strings.invalid))
+    const alert = await waitFor(() => screen.getByRole('alert'))
+    expect(alert.textContent).toBe(strings.invalid)
     expect((email as HTMLInputElement).value).toBe('bad')
+    expect(email.getAttribute('aria-invalid')).toBe('true')
+    expect(email.getAttribute('aria-describedby')).toBe(alert.id)
   })
 
   it.each([
     ['rate_limited', strings.rateLimited],
     ['failed', strings.retry],
-  ] as const)('shows the right retry state for %s', async (error, message) => {
+  ] as const)('describes %s without marking the email invalid', async (error, message) => {
     joinSessionWaitlistActionMock.mockResolvedValueOnce({ ok: false, error })
     const { email, form } = renderForm()
     fireEvent.change(email, { target: { value: 'traveller@example.com' } })
 
     fireEvent.submit(form)
 
-    await waitFor(() => expect(screen.getByRole('alert').textContent).toBe(message))
+    const alert = await waitFor(() => screen.getByRole('alert'))
+    expect(alert.textContent).toBe(message)
     expect((email as HTMLInputElement).value).toBe('traveller@example.com')
+    expect(email.getAttribute('aria-invalid')).toBeNull()
+    expect(email.getAttribute('aria-describedby')).toBe(alert.id)
   })
 })
