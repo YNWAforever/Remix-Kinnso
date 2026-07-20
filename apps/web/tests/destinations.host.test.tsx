@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, within } from '@testing-library/react'
 
 afterEach(cleanup)
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
@@ -42,6 +42,24 @@ describe('/[locale]/destinations host', () => {
     render(ui)
     expect(screen.queryByText(/0 guides?/)).toBeNull()
     expect(screen.queryByText(/0 experiences?/)).toBeNull()
+  })
+
+  it('renders only experiences when guide inventory is zero', async () => {
+    getPublishedDestinationsMock.mockResolvedValueOnce([{ slug: 'tokyo', name: 'Tokyo', heroImageUrl: null, description: null, matchTerms: ['Tokyo'], guideCount: 0, experienceCount: 2, latestPublishedAt: null }])
+    const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    const card = screen.getByRole('link', { name: /Tokyo/ })
+    expect(within(card).getByText('2 experiences')).toBeTruthy()
+    expect(within(card).queryByText(/guides?/)).toBeNull()
+  })
+
+  it('renders only guides when experience inventory is zero', async () => {
+    getPublishedDestinationsMock.mockResolvedValueOnce([{ slug: 'tokyo', name: 'Tokyo', heroImageUrl: null, description: null, matchTerms: ['Tokyo'], guideCount: 2, experienceCount: 0, latestPublishedAt: null }])
+    const ui = await DestinationsPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    const card = screen.getByRole('link', { name: /Tokyo/ })
+    expect(within(card).getByText('2 guides')).toBeTruthy()
+    expect(within(card).queryByText(/experiences?/)).toBeNull()
   })
 
   it('shows the empty state when there are no published destinations', async () => {

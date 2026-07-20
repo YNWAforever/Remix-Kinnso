@@ -1379,6 +1379,8 @@ const messages: Messages = {
     title: '每個城市，由最熟路嘅人講畀你聽。',
     body: '瀏覽精選目的地——睇吓我哋創作者目前為每個地方整理咗嘅攻略、可預約體驗同直播活動。',
     empty: '更多目的地即將上線，記得返嚟睇吓。',
+    guideCount: (count) => `${count} 篇攻略`,
+    experienceCount: (count) => `${count} 個體驗`,
     guidesHeading: '攻略',
     emptyGuides: '呢個目的地暫時未有攻略。',
     experiencesHeading: '體驗',

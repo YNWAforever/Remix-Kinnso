@@ -1210,6 +1210,7 @@ export interface Messages {
   }
   destinations: {
     eyebrow: string; title: string; body: string; empty: string
+    guideCount: (count: number) => string; experienceCount: (count: number) => string
     guidesHeading: string; emptyGuides: string
     experiencesHeading: string; emptyExperiences: string
     sessionsHeading: string; emptySessions: string
@@ -2625,6 +2626,8 @@ const messages: Messages = {
     title: 'Every city, told by the people who know it.',
     body: 'Browse curated destinations — the guides, bookable experiences, and live sessions our creators have covered so far.',
     empty: 'New destinations are on the way — check back soon.',
+    guideCount: (count) => count === 1 ? `${count} guide` : `${count} guides`,
+    experienceCount: (count) => count === 1 ? `${count} experience` : `${count} experiences`,
     guidesHeading: 'Guides',
     emptyGuides: 'No guides for this destination yet.',
     experiencesHeading: 'Experiences',

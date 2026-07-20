@@ -1379,6 +1379,8 @@ const messages: Messages = {
     title: '그 도시를 가장 잘 아는 사람이 들려주는 이야기.',
     body: '엄선된 여행지를 둘러보세요 — 크리에이터들이 지금까지 정리한 가이드, 예약 가능한 체험, 라이브 세션을 확인할 수 있어요.',
     empty: '새로운 여행지를 준비 중이에요. 곧 다시 확인해 주세요.',
+    guideCount: (count) => `가이드 ${count}개`,
+    experienceCount: (count) => `체험 ${count}개`,
     guidesHeading: '가이드',
     emptyGuides: '이 여행지의 가이드가 아직 없어요.',
     experiencesHeading: '체험',

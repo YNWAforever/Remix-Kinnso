@@ -1379,6 +1379,8 @@ const messages: Messages = {
     title: '每座城市，都由最懂它的人来讲述。',
     body: '浏览精选目的地——查看我们的创作者目前为每个地方整理的攻略、可预订体验和直播活动。',
     empty: '更多目的地即将上线，敬请期待。',
+    guideCount: (count) => `${count} 篇攻略`,
+    experienceCount: (count) => `${count} 个体验`,
     guidesHeading: '攻略',
     emptyGuides: '这个目的地暂时还没有攻略。',
     experiencesHeading: '体验',

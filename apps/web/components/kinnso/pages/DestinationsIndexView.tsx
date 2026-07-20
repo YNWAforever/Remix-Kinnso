@@ -3,7 +3,6 @@ import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
-import { formatDestinationInventoryCount } from '@/lib/i18n/destination-inventory'
 import type { Destination } from '@/lib/destinations/queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -52,8 +51,8 @@ export function DestinationsIndexView({
                       {d.description ? <p>{d.description}</p> : null}
                       {d.guideCount > 0 || d.experienceCount > 0 ? (
                         <div className="flex flex-wrap gap-x-3 gap-y-1 text-kinnso-ink/60">
-                          {d.guideCount > 0 ? <span>{formatDestinationInventoryCount(locale, 'guides', d.guideCount)}</span> : null}
-                          {d.experienceCount > 0 ? <span>{formatDestinationInventoryCount(locale, 'experiences', d.experienceCount)}</span> : null}
+                          {d.guideCount > 0 ? <span>{t.guideCount(d.guideCount)}</span> : null}
+                          {d.experienceCount > 0 ? <span>{t.experienceCount(d.experienceCount)}</span> : null}
                         </div>
                       ) : null}
                     </>

@@ -1379,6 +1379,8 @@ const messages: Messages = {
     title: 'その街を一番知る人が、その街を語る。',
     body: '厳選された旅行先を見てみましょう——クリエイターがこれまでにまとめたガイド、予約できる体験、ライブセッションをご覧いただけます。',
     empty: '新しい旅行先を準備中です。近日公開をお楽しみに。',
+    guideCount: (count) => `${count}件のガイド`,
+    experienceCount: (count) => `${count}件の体験`,
     guidesHeading: 'ガイド',
     emptyGuides: 'この旅行先のガイドはまだありません。',
     experiencesHeading: '体験',
