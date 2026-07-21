@@ -1203,6 +1203,9 @@ export interface Messages {
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
+    waitlistValue: string; waitlistInvite: string; waitlistFormLabel: string; waitlistEmailLabel: string
+    waitlistSubmit: string; waitlistPending: string; waitlistSuccess: string; waitlistInvalid: string
+    waitlistRateLimited: string; waitlistRetry: string
     rsvpEmailLabel: string; rsvpSubmit: string; rsvpConfirmed: string; rsvpError: string
     rsvpCancelledNotice: string
     typeDestinationBriefing: string; typeAskACreator: string
@@ -1210,8 +1213,10 @@ export interface Messages {
   }
   destinations: {
     eyebrow: string; title: string; body: string; empty: string
+    guideCount: (count: number) => string; experienceCount: (count: number) => string
     guidesHeading: string; emptyGuides: string
     experiencesHeading: string; emptyExperiences: string
+    articlesHeading: string; metadataDescription: (name: string) => string
     sessionsHeading: string; emptySessions: string
   }
   sessionsAdmin: {
@@ -2610,6 +2615,16 @@ const messages: Messages = {
     upcomingHeading: 'Upcoming',
     emptyUpcoming: 'No sessions scheduled right now — check back soon.',
     replaysHeading: 'Replays',
+    waitlistValue: 'Live sessions turn practical travel questions into honest answers you can use right away.',
+    waitlistInvite: 'No pressure—join the waitlist for a quiet heads-up when the next one is ready.',
+    waitlistFormLabel: 'Session updates',
+    waitlistEmailLabel: 'Email address',
+    waitlistSubmit: 'Join the waitlist',
+    waitlistPending: 'Joining…',
+    waitlistSuccess: "You're on the waitlist.",
+    waitlistInvalid: 'Enter a valid email address.',
+    waitlistRateLimited: 'Too many attempts. Please try again later.',
+    waitlistRetry: 'Something went wrong. Please try again.',
     rsvpEmailLabel: 'Your email',
     rsvpSubmit: 'RSVP',
     rsvpConfirmed: "You're on the list — we'll be in touch.",
@@ -2625,10 +2640,14 @@ const messages: Messages = {
     title: 'Every city, told by the people who know it.',
     body: 'Browse curated destinations — the guides, bookable experiences, and live sessions our creators have covered so far.',
     empty: 'New destinations are on the way — check back soon.',
+    guideCount: (count) => count === 1 ? `${count} guide` : `${count} guides`,
+    experienceCount: (count) => count === 1 ? `${count} experience` : `${count} experiences`,
     guidesHeading: 'Guides',
     emptyGuides: 'No guides for this destination yet.',
     experiencesHeading: 'Experiences',
     emptyExperiences: 'No bookable experiences here yet.',
+    articlesHeading: 'Articles',
+    metadataDescription: (name) => `Discover guides, experiences, articles, and sessions for ${name}.`,
     sessionsHeading: 'Upcoming sessions',
     emptySessions: 'No sessions scheduled for this destination right now.',
   },

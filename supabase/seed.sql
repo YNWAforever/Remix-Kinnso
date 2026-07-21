@@ -119,7 +119,7 @@ on conflict (id) do update set
 insert into public.guides
   (id, creator_id, creator_handle, creator_name, slug, title, summary, cover_url, city, status, saves_count, published_at)
 values
-  ('00000000-0000-0000-0000-000000000703', '00000000-0000-0000-0000-000000000701', 'r7-smoke-creator', 'R7 Smoke Creator', 'r7-smoke-tokyo-guide', 'R7 Smoke Tokyo Guide', 'A deterministic local guide for the R7 funnel smoke journey.', 'https://cdn.kinnso.ai/r7-smoke-tokyo-guide.jpg', 'Tokyo', 'published', 0, now())
+  ('00000000-0000-0000-0000-000000000703', '00000000-0000-0000-0000-000000000701', 'r7-smoke-creator', 'R7 Smoke Creator', 'r7-smoke-tokyo-guide', 'R7 Smoke Tokyo Guide', 'A deterministic local guide for the R7 funnel smoke journey.', null, 'Tokyo', 'published', 0, now())
 on conflict (id) do update set
   creator_id = excluded.creator_id, creator_handle = excluded.creator_handle, creator_name = excluded.creator_name,
   slug = excluded.slug, title = excluded.title, summary = excluded.summary, cover_url = excluded.cover_url, city = excluded.city,
@@ -128,7 +128,7 @@ on conflict (id) do update set
 insert into public.experiences
   (id, merchant_profile_id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, status, published_at)
 values
-  ('00000000-0000-0000-0000-000000000704', '00000000-0000-0000-0000-000000000705', 'r7-smoke-tokyo-experience', 'R7 Smoke Tokyo Experience', 'A deterministic local experience for the R7 funnel smoke journey.', 'Explore Tokyo with the R7 smoke-funnel host.', 'Tokyo', 12000, 'JPY', 120, 'https://cdn.kinnso.ai/r7-smoke-tokyo-experience.jpg', 'published', now())
+  ('00000000-0000-0000-0000-000000000704', '00000000-0000-0000-0000-000000000705', 'r7-smoke-tokyo-experience', 'R7 Smoke Tokyo Experience', 'A deterministic local experience for the R7 funnel smoke journey.', 'Explore Tokyo with the R7 smoke-funnel host.', 'Tokyo', 12000, 'JPY', 120, null, 'published', now())
 on conflict (id) do update set
   merchant_profile_id = excluded.merchant_profile_id, slug = excluded.slug, title = excluded.title, summary = excluded.summary, description = excluded.description,
   city = excluded.city, price_amount = excluded.price_amount, currency = excluded.currency, duration_minutes = excluded.duration_minutes,

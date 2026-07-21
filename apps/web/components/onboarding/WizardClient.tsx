@@ -24,7 +24,7 @@ export interface WizardClientProps {
   draft: Dna | null
   final: Dna | null
   thin: boolean
-  messages: Messages
+  messages: Pick<Messages, 'onboarding' | 'dna'>
 }
 
 /** Platforms to render in live progress: the saved handles' platforms (else all three). */

@@ -26,12 +26,12 @@ export default async function ArticlesHubPage({ params }: { params: Promise<{ lo
   const loc = locale as Locale
   const dict = await getDictionary(loc)
 
-  const sections = await Promise.all(
+  const sections = (await Promise.all(
     URL_CATEGORIES.map(async (c) => ({
       category: c as UrlCategory,
       items: (await searchArticles({ locale: loc, category: toDbCategory(c)!, perPage: 6 })).items,
     })),
-  )
+  )).filter((section) => section.items.length > 0)
 
   return (
     <main className="k2-container py-8">

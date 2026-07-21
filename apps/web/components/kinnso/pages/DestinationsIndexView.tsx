@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
+import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import type { Destination } from '@/lib/destinations/queries'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -32,13 +33,31 @@ export function DestinationsIndexView({
             {destinations.map((d) => (
               <Link key={d.slug} href={`/${locale}/destinations/${d.slug}`} className="group">
                 <EditorialCard
-                  media={d.heroImageUrl ? (
-                    <img src={d.heroImageUrl} alt={d.name} width={640} height={480} loading="lazy"
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
-                  ) : undefined}
+                  media={
+                    <EntityMedia
+                      src={d.heroImageUrl}
+                      title={d.name}
+                      location={d.description}
+                      alt={d.name}
+                      sizes="(min-width: 768px) 33vw, 100vw"
+                      className="h-full w-full"
+                      imageClassName="transition duration-300 group-hover:scale-[1.02]"
+                    />
+                  }
                   title={d.name}
                 >
-                  {d.description}
+                  {d.description || d.guideCount > 0 || d.experienceCount > 0 ? (
+                    <>
+                      {d.description ? <p>{d.description}</p> : null}
+                      {d.guideCount > 0 || d.experienceCount > 0 ? (
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-kinnso-ink/60">
+                          {d.guideCount > 0 ? <span>{t.guideCount(d.guideCount)}</span> : null}
+                          {d.guideCount > 0 && d.experienceCount > 0 ? <span> · </span> : null}
+                          {d.experienceCount > 0 ? <span>{t.experienceCount(d.experienceCount)}</span> : null}
+                        </div>
+                      ) : null}
+                    </>
+                  ) : undefined}
                 </EditorialCard>
               </Link>
             ))}

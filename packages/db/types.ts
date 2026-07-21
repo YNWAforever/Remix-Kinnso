@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       affiliate_network_events: {
@@ -2481,6 +2506,30 @@ export type Database = {
           },
         ]
       }
+      session_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          locale: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          locale: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          locale?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           author_name: string
@@ -2546,6 +2595,20 @@ export type Database = {
       }
     }
     Views: {
+      destination_index: {
+        Row: {
+          description: string | null
+          experience_count: number | null
+          guide_count: number | null
+          hero_image_url: string | null
+          latest_published_at: string | null
+          match_terms: string[] | null
+          name: string | null
+          slug: string | null
+          sort_order: number | null
+        }
+        Relationships: []
+      }
       merchant_public_profiles: {
         Row: {
           city: string | null
@@ -3122,6 +3185,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

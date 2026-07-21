@@ -38,6 +38,21 @@ export function breadcrumbJsonLd(items: Array<{ name: string; url: string }>): R
   }
 }
 
+export function itemListJsonLd(i: {
+  name: string
+  items: Array<{ name: string; url: string }>
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: i.name,
+    numberOfItems: i.items.length,
+    itemListElement: i.items.map((item, index) => ({
+      '@type': 'ListItem', position: index + 1, name: item.name, url: item.url,
+    })),
+  }
+}
+
 export function organizationJsonLd(i: { url: string; logo: string }): Record<string, unknown> {
   return {
     '@context': 'https://schema.org', '@type': 'Organization',
