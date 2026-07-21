@@ -141,9 +141,15 @@ regenerate `@kinnso/db` types after each migration.
 
 - **Stripe Checkout (hosted)** for v1 — least PCI surface, fastest build.
 - `/api/stripe/webhook` route confirms/cancels bookings. The Stripe signature is the
-  auth gate; this route is the **one sanctioned exception** to the
-  no-service-role-in-request-paths rule (documented here deliberately). Webhook handling
+  auth gate; this route is a sanctioned exception to the no-service-role-in-request-paths
+  rule (documented here deliberately). Webhook handling
   must be idempotent (unique on payment_intent/event id).
+- The **session waitlist server action** is the other narrow user-request exception.
+  It may construct the server-only service client only after the honeypot and email and
+  locale validation pass, the Vercel-provided `getClientIp()` anti-abuse value succeeds against the shared
+  10-per-hour rate limit, and SSR `getUser()` derives the caller identity. Its only write
+  is a fixed row containing normalized email, derived `user_id`, and validated locale;
+  duplicate email is success, and the privileged client/key is never exposed to the browser.
 - Refunds are an ops-console action (audited RPC + Stripe refund call).
 - Stripe Connect (auto-split at charge time) is explicitly deferred; the platform
   collects and ops settles shares through the payout queue as today.
@@ -219,8 +225,13 @@ deferred deliberately.
   registered in the parity test.
 - Locale pages: `await params` → `isLocale` guard → `notFound()` → `getDictionary`.
 - Public reads anon + RLS; money/state writes via audited SECURITY DEFINER RPCs
-  (`is_active_ops()` for ops surfaces; owner-RLS for user surfaces); the Stripe webhook
-  is the sole documented service-role exception.
+  (`is_active_ops()` for ops surfaces; owner-RLS for user surfaces).
+  Service-role paths are limited to the documented Stripe webhook, shared-secret-gated Travelpayouts cron, and session waitlist server action exceptions.
+  For the waitlist, direct anon/auth table inserts stay revoked and the
+  server-only client is constructed only after the honeypot, email and locale validation,
+  Vercel-provided `getClientIp()` anti-abuse value rate-limit success, and SSR `getUser()` checks. The append is
+  fixed to normalized email, derived `user_id`, and validated locale; duplicate email is
+  success, and the service key is never exposed to the browser.
 - Vitest unit/host tests per surface; e2e specs in apps/e2e for the booking funnel.
 - Sitemap/robots/JSON-LD updated with every new public route; private trees noindexed.
 - Conventional Commits with scope; squash-merged "Phase RN — …" PRs.
