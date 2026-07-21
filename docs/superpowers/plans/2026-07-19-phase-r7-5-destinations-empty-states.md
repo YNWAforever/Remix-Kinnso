@@ -661,4 +661,3 @@ Use `superpowers:finishing-a-development-branch`. Push `codex/r7-5-destinations-
 - explicit statement: **R7.5 migrations have not been applied to production and require separate approval.**
 
 Do not merge until required checks/review pass. After merge, verify the production deployment and public routes. Request separate explicit approval before applying either R7.5 migration to production.
-

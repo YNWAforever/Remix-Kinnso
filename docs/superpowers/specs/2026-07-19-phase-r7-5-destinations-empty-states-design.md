@@ -1,9 +1,9 @@
 # Phase R7.5 — Destinations Index and Empty States Design
 
-**Date:** 2026-07-19  
-**Status:** Approved design  
-**Source of truth:** `kinnso-phase-r7-ux-hardening-spec.md` R7.5, the approved R1–R6 program design §7, and `docs/r7-ground-truth.md`  
-**Branch:** `codex/r7-5-destinations-empty-states`  
+**Date:** 2026-07-19
+**Status:** Approved design
+**Source of truth:** `kinnso-phase-r7-ux-hardening-spec.md` R7.5, the approved R1–R6 program design §7, and `docs/r7-ground-truth.md`
+**Branch:** `codex/r7-5-destinations-empty-states`
 **PR title:** `Phase R7.5 — Destinations index & empty states`
 
 ## 1. Goal and scope
@@ -205,4 +205,3 @@ Implementation follows red-green-refactor for each behavior.
 - One squash-merged PR titled `Phase R7.5 — Destinations index & empty states`.
 - The PR records the production city audit. Current mismatch list: none.
 - Migration files may be pushed and reviewed, but applying them to production requires explicit user approval after CI and review are green.
-
