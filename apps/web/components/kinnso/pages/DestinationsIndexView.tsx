@@ -52,6 +52,7 @@ export function DestinationsIndexView({
                       {d.guideCount > 0 || d.experienceCount > 0 ? (
                         <div className="flex flex-wrap gap-x-3 gap-y-1 text-kinnso-ink/60">
                           {d.guideCount > 0 ? <span>{t.guideCount(d.guideCount)}</span> : null}
+                          {d.guideCount > 0 && d.experienceCount > 0 ? <span> · </span> : null}
                           {d.experienceCount > 0 ? <span>{t.experienceCount(d.experienceCount)}</span> : null}
                         </div>
                       ) : null}

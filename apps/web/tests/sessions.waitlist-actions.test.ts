@@ -1,7 +1,7 @@
 // apps/web/tests/sessions.waitlist-actions.test.ts
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { getUserMock, rpcMock, insertMock, getClientIpMock } = vi.hoisted(() => ({
+const { getUserMock, rpcMock, insertMock, getClientIpMock, createServiceClientMock, serverFromMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(async (): Promise<{ data: { user: { id: string } | null } }> => ({
     data: { user: null },
   })),
@@ -13,16 +13,19 @@ const { getUserMock, rpcMock, insertMock, getClientIpMock } = vi.hoisted(() => (
     error: null,
   })),
   getClientIpMock: vi.fn(async () => '203.0.113.9'),
+  createServiceClientMock: vi.fn(() => ({ from: () => ({ insert: insertMock }) })),
+  serverFromMock: vi.fn(() => { throw new Error('waitlist writes must not use the request-scoped client') }),
 }))
 
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
     auth: { getUser: getUserMock },
     rpc: rpcMock,
-    from: () => ({ insert: insertMock }),
+    from: serverFromMock,
   }),
 }))
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
+vi.mock('@/lib/supabase/service', () => ({ createSupabaseServiceClient: createServiceClientMock }))
 
 import { joinSessionWaitlistAction } from '@/lib/sessions/waitlist-actions'
 
@@ -34,6 +37,8 @@ beforeEach(() => {
   insertMock.mockReset()
   insertMock.mockResolvedValue({ error: null })
   getClientIpMock.mockClear()
+  createServiceClientMock.mockClear()
+  serverFromMock.mockClear()
 })
 
 describe('joinSessionWaitlistAction', () => {
@@ -43,6 +48,7 @@ describe('joinSessionWaitlistAction', () => {
     expect(result).toEqual({ ok: true })
     expect(rpcMock).not.toHaveBeenCalled()
     expect(insertMock).not.toHaveBeenCalled()
+    expect(createServiceClientMock).not.toHaveBeenCalled()
   })
 
   it('rejects an unsupported locale before rate limiting or inserting', async () => {
@@ -51,6 +57,7 @@ describe('joinSessionWaitlistAction', () => {
     expect(result).toEqual({ ok: false, error: 'invalid' })
     expect(rpcMock).not.toHaveBeenCalled()
     expect(insertMock).not.toHaveBeenCalled()
+    expect(createServiceClientMock).not.toHaveBeenCalled()
   })
 
   it('rejects an invalid email before rate limiting or inserting', async () => {
@@ -59,6 +66,7 @@ describe('joinSessionWaitlistAction', () => {
     expect(result).toEqual({ ok: false, error: 'invalid' })
     expect(rpcMock).not.toHaveBeenCalled()
     expect(insertMock).not.toHaveBeenCalled()
+    expect(createServiceClientMock).not.toHaveBeenCalled()
   })
 
   it('uses the real client IP and the shared 10 per hour rate-limit bucket', async () => {
@@ -72,16 +80,17 @@ describe('joinSessionWaitlistAction', () => {
     })
   })
 
-  it('returns rate_limited without inserting when the RPC disallows', async () => {
+  it('returns rate_limited without constructing a privileged client when the RPC disallows', async () => {
     rpcMock.mockResolvedValueOnce({ data: false, error: null })
 
     const result = await joinSessionWaitlistAction('en', 'traveller@example.com')
 
     expect(result).toEqual({ ok: false, error: 'rate_limited' })
     expect(insertMock).not.toHaveBeenCalled()
+    expect(createServiceClientMock).not.toHaveBeenCalled()
   })
 
-  it('normalizes the email and inserts an anonymous waitlist entry', async () => {
+  it('normalizes the email and inserts through the trusted service boundary', async () => {
     await joinSessionWaitlistAction('zh-hk', ' Traveller@Example.COM  ')
 
     expect(insertMock).toHaveBeenCalledWith({
@@ -89,6 +98,8 @@ describe('joinSessionWaitlistAction', () => {
       user_id: null,
       locale: 'zh-hk',
     })
+    expect(createServiceClientMock).toHaveBeenCalledOnce()
+    expect(serverFromMock).not.toHaveBeenCalled()
   })
 
   it('attaches the signed-in user id', async () => {
@@ -118,6 +129,7 @@ describe('joinSessionWaitlistAction', () => {
     expect(result).toEqual({ ok: false, error: 'failed' })
     expect(JSON.stringify(result)).not.toContain('raw rpc details')
     expect(insertMock).not.toHaveBeenCalled()
+    expect(createServiceClientMock).not.toHaveBeenCalled()
   })
 
   it('returns a private failed result for non-duplicate insert errors', async () => {

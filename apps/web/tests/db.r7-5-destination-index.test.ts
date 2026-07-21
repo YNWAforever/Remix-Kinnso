@@ -18,8 +18,12 @@ describe('R7.5 destination index migration', () => {
     expect(sql).toContain('experience_count')
     expect(sql).toContain('latest_published_at')
     expect(sql).toContain('revoke all on public.destination_index from anon, authenticated')
-    expect(sql).toContain(String.raw`regexp_replace(lower(observed_city), '\s+', ' ', 'g')`)
-    expect(sql).toContain(String.raw`regexp_replace(lower(btrim(term.value)), '\s+', ' ', 'g')`)
+    expect(sql).toContain(String.raw`btrim(regexp_replace(lower(observed_city), '[[:punct:][:space:]]+', ' ', 'g'))`)
+    expect(sql).toContain(String.raw`btrim(regexp_replace(lower(btrim(term.value)), '[[:punct:][:space:]]+', ' ', 'g'))`)
+    expect(sql).toContain('count(*) over (partition by generated_slug_base)')
+    expect(sql).toContain('left(md5(city_key), 10)')
+    expect(sql).toContain('partition by slug')
+    expect(sql).toContain('other.generated_slug = c.slug')
 
     const grants = [...sql.matchAll(/grant\s+([^;]+?)\s+on\s+public\.destination_index\s+to\s+anon,\s*authenticated/g)]
       .map(([, privileges]) => privileges.trim().replace(/\s+/g, ' '))

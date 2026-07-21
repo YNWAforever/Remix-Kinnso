@@ -4,6 +4,7 @@
 import { getClientIp } from '@/lib/http/client-ip'
 import { isLocale } from '@/lib/i18n/config'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseServiceClient } from '@/lib/supabase/service'
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 const RSVP_RATE_LIMIT = { maxRequests: 10, windowSeconds: 3600 } as const
@@ -44,7 +45,8 @@ export async function joinSessionWaitlistAction(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const { error } = await supabase.from('session_waitlist').insert({
+  const serviceSupabase = createSupabaseServiceClient()
+  const { error } = await serviceSupabase.from('session_waitlist').insert({
     email: normalized,
     user_id: user?.id ?? null,
     locale,

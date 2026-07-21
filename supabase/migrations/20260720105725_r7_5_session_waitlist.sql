@@ -15,17 +15,12 @@ create unique index session_waitlist_email_lower_key
 
 alter table public.session_waitlist enable row level security;
 
+-- Public callers must use the validated, rate-limited server action. The table is
+-- appendable only through the existing server-only service-role client after that
+-- action has completed its honeypot and rate-limit checks.
 revoke all on table public.session_waitlist from public, anon, authenticated;
-grant insert on table public.session_waitlist to anon, authenticated;
+revoke insert on table public.session_waitlist from anon, authenticated;
 grant select on table public.session_waitlist to authenticated;
-
-create policy session_waitlist_anon_insert
-  on public.session_waitlist for insert to anon
-  with check (user_id is null or user_id = (select auth.uid()));
-
-create policy session_waitlist_authenticated_insert
-  on public.session_waitlist for insert to authenticated
-  with check (user_id is null or user_id = (select auth.uid()));
 
 create policy session_waitlist_ops_read
   on public.session_waitlist for select to authenticated

@@ -23,16 +23,15 @@ describe('R7.5 session waitlist migration', () => {
     expect(sql).toMatch(/create unique index\s+\w+\s+on public\.session_waitlist\s*\(lower\(email\)\)/)
   })
 
-  it('allows append-only signup, while keeping reads ops-only', () => {
+  it('denies direct public inserts while keeping reads ops-only', () => {
     const sql = readFileSync(migrationPath, 'utf8').toLowerCase()
 
     expect(sql).toContain('alter table public.session_waitlist enable row level security')
     expect(sql).toContain('revoke all on table public.session_waitlist from public, anon, authenticated')
-    expect(sql).toContain('grant insert on table public.session_waitlist to anon, authenticated')
+    expect(sql).toContain('revoke insert on table public.session_waitlist from anon, authenticated')
+    expect(sql).not.toContain('grant insert on table public.session_waitlist to anon, authenticated')
+    expect(sql).not.toMatch(/create policy\s+\w*session_waitlist\w*\s+on public\.session_waitlist\s+for\s+insert/)
     expect(sql).toContain('grant select on table public.session_waitlist to authenticated')
-    expect(sql).toContain('create policy session_waitlist_anon_insert')
-    expect(sql).toContain('create policy session_waitlist_authenticated_insert')
-    expect(sql).toContain('with check (user_id is null or user_id = (select auth.uid()))')
     expect(sql).toContain('create policy session_waitlist_ops_read')
     expect(sql).toContain('on public.session_waitlist for select to authenticated')
     expect(sql).toContain('using ((select public.is_active_ops()))')

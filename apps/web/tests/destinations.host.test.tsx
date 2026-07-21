@@ -28,6 +28,7 @@ describe('/[locale]/destinations host', () => {
     expect(screen.getByRole('link', { name: /Tokyo/ }).getAttribute('href')).toBe('/en/destinations/tokyo')
     expect(screen.getByText('1 guide')).toBeTruthy()
     expect(screen.getByText('2 experiences')).toBeTruthy()
+    expect(screen.getByRole('link', { name: /Tokyo/ }).textContent).toContain('1 guide · 2 experiences')
     expect(document.querySelector('[data-media-placeholder="true"]')).toBeTruthy()
   })
 
@@ -51,6 +52,7 @@ describe('/[locale]/destinations host', () => {
     const card = screen.getByRole('link', { name: /Tokyo/ })
     expect(within(card).getByText('2 experiences')).toBeTruthy()
     expect(within(card).queryByText(/guides?/)).toBeNull()
+    expect(card.textContent).not.toContain(' · ')
   })
 
   it('renders only guides when experience inventory is zero', async () => {
@@ -60,6 +62,7 @@ describe('/[locale]/destinations host', () => {
     const card = screen.getByRole('link', { name: /Tokyo/ })
     expect(within(card).getByText('2 guides')).toBeTruthy()
     expect(within(card).queryByText(/experiences?/)).toBeNull()
+    expect(card.textContent).not.toContain(' · ')
   })
 
   it('shows the empty state when there are no published destinations', async () => {
