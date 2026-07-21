@@ -95,7 +95,7 @@ export default async function CreatorPage({
         draft={draft}
         final={final}
         thin={isThin(latestProgress)}
-        messages={messages}
+        messages={{ onboarding: messages.onboarding, dna: messages.dna }}
       />
     </main>
   )
