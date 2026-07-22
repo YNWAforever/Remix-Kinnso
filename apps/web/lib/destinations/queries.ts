@@ -50,6 +50,13 @@ function mapRowToDestination(r: DestinationIndexRow): Destination | null {
   }
 }
 
+function isDestinationIndexUnavailable(error: unknown): boolean {
+  return typeof error === 'object'
+    && error !== null
+    && 'code' in error
+    && error.code === 'PGRST205'
+}
+
 export async function getPublishedDestinations(): Promise<Destination[]> {
   const supabase = createSupabasePublicClient()
   const { data, error } = await supabase
@@ -58,7 +65,10 @@ export async function getPublishedDestinations(): Promise<Destination[]> {
     .order('sort_order', { ascending: true })
     .order('name', { ascending: true })
     .order('slug', { ascending: true })
-  if (error) throw error
+  if (error) {
+    if (isDestinationIndexUnavailable(error)) return []
+    throw error
+  }
   return (data ?? []).flatMap((row) => {
     const destination = mapRowToDestination(row)
     return destination ? [destination] : []
@@ -72,7 +82,10 @@ export async function getDestinationBySlug(slug: string): Promise<Destination | 
     .select(DESTINATION_INDEX_COLUMNS)
     .eq('slug', slug)
     .maybeSingle()
-  if (error) throw error
+  if (error) {
+    if (isDestinationIndexUnavailable(error)) return null
+    throw error
+  }
   return data ? mapRowToDestination(data) : null
 }
 
@@ -84,7 +97,10 @@ export async function getDestinationsForSitemap(): Promise<{ slug: string; lastm
     .order('sort_order', { ascending: true })
     .order('name', { ascending: true })
     .order('slug', { ascending: true })
-  if (error) throw error
+  if (error) {
+    if (isDestinationIndexUnavailable(error)) return []
+    throw error
+  }
   return (data ?? []).flatMap((row) => {
     if (!hasValidIdentity(row)) return []
     return [{ slug: row.slug, lastmod: row.latest_published_at ?? null }]
