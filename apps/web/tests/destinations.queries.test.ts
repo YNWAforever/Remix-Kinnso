@@ -1,7 +1,7 @@
 // apps/web/tests/destinations.queries.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown }))
+const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown, error: null as unknown }))
 const orderSpy = vi.hoisted(() => vi.fn())
 const fromSpy = vi.hoisted(() => vi.fn())
 
@@ -13,8 +13,9 @@ vi.mock('@/lib/supabase/public', () => ({
         select: () => builder,
         eq: () => builder,
         order: (col: string, opts: unknown) => { orderSpy(col, opts); return builder },
-        maybeSingle: async () => ({ data: state.single }),
-        then: (onF: (v: { data: unknown }) => unknown) => Promise.resolve({ data: state.list }).then(onF),
+        maybeSingle: async () => ({ data: state.single, error: state.error }),
+        then: (onF: (v: { data: unknown; error: unknown }) => unknown) =>
+          Promise.resolve({ data: state.list, error: state.error }).then(onF),
       }
       return builder
     },
@@ -28,11 +29,16 @@ const row = {
   match_terms: ['Tokyo'], guide_count: 1, experience_count: 1,
   latest_published_at: '2026-07-19T00:00:00.000Z', sort_order: 0,
 }
+const missingViewError = {
+  code: 'PGRST205',
+  message: "Could not find the table 'public.destination_index' in the schema cache",
+}
 
 beforeEach(() => {
   state.list = []
   state.single = null
   orderSpy.mockClear()
+  state.error = null
   fromSpy.mockClear()
 })
 
@@ -54,6 +60,17 @@ describe('getPublishedDestinations', () => {
   it('returns [] when there are no published destinations', async () => {
     state.list = []
     expect(await getPublishedDestinations()).toEqual([])
+  })
+
+  it('returns an honest empty state while the destination view migration is pending', async () => {
+    state.error = missingViewError
+    await expect(getPublishedDestinations()).resolves.toEqual([])
+  })
+
+  it('still throws unrelated database errors', async () => {
+    const error = { code: '42501', message: 'permission denied' }
+    state.error = error
+    await expect(getPublishedDestinations()).rejects.toBe(error)
   })
 
   it('defaults matchTerms to [] when the row has none', async () => {
@@ -96,6 +113,11 @@ describe('getDestinationBySlug', () => {
     expect(await getDestinationBySlug('nowhere')).toBeNull()
   })
 
+  it('returns null while the destination view migration is pending', async () => {
+    state.error = missingViewError
+    await expect(getDestinationBySlug('tokyo')).resolves.toBeNull()
+  })
+
   it('returns null when the matched row has missing or blank identity fields', async () => {
     for (const invalidRow of [
       { ...row, slug: null },
@@ -130,5 +152,10 @@ describe('getDestinationsForSitemap', () => {
   it('returns [] when there are no published destinations', async () => {
     state.list = []
     expect(await getDestinationsForSitemap()).toEqual([])
+  })
+
+  it('returns no sitemap rows while the destination view migration is pending', async () => {
+    state.error = missingViewError
+    await expect(getDestinationsForSitemap()).resolves.toEqual([])
   })
 })
