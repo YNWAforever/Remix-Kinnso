@@ -1,9 +1,23 @@
 // @vitest-environment node
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { authMock, resolveViewerRoleMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  resolveViewerRoleMock: vi.fn(),
+}))
 
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('notFound') },
+  redirect: (url: string) => { throw new Error(`redirect:${url}`) },
   permanentRedirect: (url: string) => { throw new Error(`permanentRedirect:${url}`) },
+}))
+
+vi.mock('@/lib/supabase/server', () => ({
+  createSupabaseServerClient: async () => ({ auth: { getUser: authMock } }),
+}))
+
+vi.mock('@/lib/auth/viewer-role', () => ({
+  resolveViewerRole: resolveViewerRoleMock,
 }))
 
 import PostStub from '@/app/[locale]/merchants/post/page'
@@ -15,11 +29,50 @@ import InsightsStub from '@/app/[locale]/merchants/insights/page'
 const params = <T extends Record<string, string>>(extra?: T) =>
   Promise.resolve({ locale: 'en', ...(extra as T) })
 
-describe('legacy merchant routes 308 to /merchants/dashboard/*', () => {
-  it('post', async () => {
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
+describe('public merchant post entry', () => {
+  it('sends anonymous visitors to merchant application without resolving a role', async () => {
+    authMock.mockResolvedValue({ data: { user: null } })
+
     await expect(PostStub({ params: params() })).rejects.toThrow(
-      'permanentRedirect:/en/merchants/dashboard/post')
+      'redirect:/en/merchants/apply',
+    )
+    expect(resolveViewerRoleMock).not.toHaveBeenCalled()
   })
+
+  it('sends merchants directly to the dashboard composer', async () => {
+    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    resolveViewerRoleMock.mockResolvedValue('merchant')
+
+    await expect(PostStub({ params: params() })).rejects.toThrow(
+      'redirect:/en/merchants/dashboard/post',
+    )
+  })
+
+  it.each(['traveler', 'creator', 'creator-pending'] as const)(
+    'sends authenticated %s viewers to merchant application',
+    async (role) => {
+      authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+      resolveViewerRoleMock.mockResolvedValue(role)
+
+      await expect(PostStub({ params: params() })).rejects.toThrow(
+        'redirect:/en/merchants/apply',
+      )
+    },
+  )
+
+  it('invalid locale is notFound before auth lookup', async () => {
+    await expect(
+      PostStub({ params: Promise.resolve({ locale: 'xx' }) }),
+    ).rejects.toThrow('notFound')
+    expect(authMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('legacy merchant routes 308 to /merchants/dashboard/*', () => {
   it('missions', async () => {
     await expect(MissionsStub({ params: params() })).rejects.toThrow(
       'permanentRedirect:/en/merchants/dashboard/missions')
@@ -35,8 +88,5 @@ describe('legacy merchant routes 308 to /merchants/dashboard/*', () => {
   it('insights', async () => {
     await expect(InsightsStub({ params: params() })).rejects.toThrow(
       'permanentRedirect:/en/merchants/dashboard/insights')
-  })
-  it('invalid locale is notFound, not redirected', async () => {
-    await expect(PostStub({ params: Promise.resolve({ locale: 'xx' }) })).rejects.toThrow('notFound')
   })
 })
