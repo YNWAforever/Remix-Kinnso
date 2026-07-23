@@ -1,8 +1,8 @@
 # Phase R7.6 — Navigation, Header CTAs, and Footer Design
 
-**Date:** 2026-07-23  
-**Sub-phase:** R7.6 — Navigation, header CTAs, footer  
-**Source of truth:** `kinnso-phase-r7-ux-hardening-spec.md` R7.6, `docs/r7-ground-truth.md`, and the program-wide §7 conventions  
+**Date:** 2026-07-23
+**Sub-phase:** R7.6 — Navigation, header CTAs, footer
+**Source of truth:** `kinnso-phase-r7-ux-hardening-spec.md` R7.6, `docs/r7-ground-truth.md`, and the program-wide §7 conventions
 **Depends on:** R7.2 product-state flags and the R7.3 production-honesty conventions
 
 ## 1. Goal
