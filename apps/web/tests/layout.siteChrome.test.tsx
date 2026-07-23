@@ -28,7 +28,7 @@ describe('[locale]/layout mounts the global shell', () => {
     // The layout returns <html><body>…</body></html>; render the <body>'s children subtree.
     render(<>{ui.props.children.props.children}</>)
     expect(screen.getByText('BODY')).toBeTruthy()
-    expect(screen.getByRole('link', { name: en.nav.ctaApply })).toBeTruthy()
+    expect(screen.getByRole('link', { name: en.nav.signUp })).toBeTruthy()
     expect(screen.getByText(en.footer.tagline)).toBeTruthy()
     expect(document.querySelector('header a[href="/en/sessions"]')).toBeNull()
   })

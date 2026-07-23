@@ -685,8 +685,10 @@ export interface Messages {
     linkCreators: string; linkAgent: string; linkMerchants: string
     linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
-    linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
-    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string; ctaMyTrips: string
+    linkExplore: string; linkDestinations: string; linkSessions: string
+    linkForCreators: string; linkForMerchants: string
+    signUp: string; ctaOpenStudio: string; ctaPending: string
+    ctaPostMission: string; ctaMyTrips: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
     merchantMenuLabel: string
   }
@@ -1694,8 +1696,8 @@ const messages: Messages = {
     linkCreators: 'Creators', linkAgent: 'AI Agent', linkMerchants: 'Merchants',
     linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
-    linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
-    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission', ctaMyTrips: 'My Trips',
+    linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForCreators: 'For Creators', linkForMerchants: 'For Merchants',
+    signUp: 'Sign up', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission', ctaMyTrips: 'My Trips',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
     merchantMenuLabel: 'Merchant menu',
   },

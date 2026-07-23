@@ -30,7 +30,7 @@ describe('SiteChrome', () => {
   it('renders Navbar + Footer + children on a normal path', () => {
     renderAt('/en/articles')
     expect(screen.getByText('PAGE_BODY')).toBeTruthy()
-    expect(screen.getByRole('link', { name: en.nav.ctaApply })).toBeTruthy()       // navbar
+    expect(screen.getByRole('link', { name: en.nav.signUp })).toBeTruthy()       // navbar
     expect(screen.getByText(en.footer.tagline)).toBeTruthy()                        // footer
   })
 
@@ -42,7 +42,7 @@ describe('SiteChrome', () => {
   it.each(['/en/sign-in', '/en/sign-up', '/en/creator'])('hides chrome on %s', (path) => {
     renderAt(path)
     expect(screen.getByText('PAGE_BODY')).toBeTruthy()
-    expect(screen.queryByRole('link', { name: en.nav.ctaApply })).toBeNull()
+    expect(screen.queryByRole('link', { name: en.nav.signUp })).toBeNull()
     expect(screen.queryByText(en.footer.tagline)).toBeNull()
   })
 

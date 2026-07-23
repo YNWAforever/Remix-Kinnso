@@ -55,10 +55,18 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
     if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso-cream2 px-4 py-2 text-sm font-semibold text-kinnso-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange" };
     if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/dashboard/post", className: "k2-btn-primary" };
     if (role === "traveler") return { label: t.ctaMyTrips, to: "/trips", className: "k2-btn-primary" };
-    return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
+    return { label: t.signUp, to: "/sign-up", className: "k2-btn-primary" };
   })();
 
-  const forMerchantsHref = p("/for-merchants");
+  // Audience links remain visible to complementary roles; anonymous viewers see both and the neutral sign-up CTA.
+  const audienceAnchors = [
+    ...(
+      role === "creator" || role === "creator-pending"
+        ? []
+        : [{ to: "/for-creators", label: t.linkForCreators }]
+    ),
+    ...(role === "merchant" ? [] : [{ to: "/for-merchants", label: t.linkForMerchants }]),
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
@@ -80,17 +88,23 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
         </nav>
 
         <div className="hidden items-center gap-3 xl:flex">
-          {role !== "merchant" && (
-            <Link
-              href={forMerchantsHref}
-              aria-current={isActive(forMerchantsHref) ? "page" : undefined}
-              className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
-                isActive(forMerchantsHref) ? "text-kinnso-orangeDark underline underline-offset-8 decoration-2 decoration-kinnso-orangeDark" : "text-kinnso-ink/75 hover:text-kinnso-ink"
-              }`}
-            >
-              {t.linkForMerchants}
-            </Link>
-          )}
+          {audienceAnchors.map((anchor) => {
+            const href = p(anchor.to);
+            return (
+              <Link
+                key={anchor.to}
+                href={href}
+                aria-current={isActive(href) ? 'page' : undefined}
+                className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
+                  isActive(href)
+                    ? 'text-kinnso-orangeDark underline underline-offset-8 decoration-2 decoration-kinnso-orangeDark'
+                    : 'text-kinnso-ink/75 hover:text-kinnso-ink'
+                }`}
+              >
+                {anchor.label}
+              </Link>
+            );
+          })}
           <LocaleSwitcher locale={locale} t={t} />
           {role === "anon" && (
             <Link href={p("/sign-in")} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso-ink transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">{t.signIn}</Link>
@@ -136,11 +150,16 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
                   {a.label}
                 </Link>
               ))}
-              {role !== "merchant" && (
-                <Link href={forMerchantsHref} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso-ink/75 transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">
-                  {t.linkForMerchants}
+              {audienceAnchors.map((anchor) => (
+                <Link
+                  key={anchor.to}
+                  href={p(anchor.to)}
+                  onClick={() => setOpen(false)}
+                  className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso-ink/75 transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange"
+                >
+                  {anchor.label}
                 </Link>
-              )}
+              ))}
             </nav>
             <div className="mt-2 flex items-center justify-between gap-3">
               <LocaleSwitcher locale={locale} t={t} />

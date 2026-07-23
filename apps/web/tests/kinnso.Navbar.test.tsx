@@ -48,20 +48,44 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(screen.getAllByRole('link', { name: en.nav.linkSessions })).toHaveLength(2)
   })
 
-  it('shows a For Merchants link → /en/for-merchants', () => {
+  it('shows traveller-first audience and account links for anonymous viewers on desktop and mobile', () => {
     render(<Navbar locale="en" role="anon" sessionsLive t={en.nav} />)
-    expect(screen.getByRole('link', { name: en.nav.linkForMerchants }).getAttribute('href')).toBe('/en/for-merchants')
+
+    expect(screen.getByRole('link', { name: en.nav.linkForCreators }).getAttribute('href'))
+      .toBe('/en/for-creators')
+    expect(screen.getByRole('link', { name: en.nav.linkForMerchants }).getAttribute('href'))
+      .toBe('/en/for-merchants')
+    expect(screen.getByRole('link', { name: en.nav.signIn }).getAttribute('href'))
+      .toBe('/en/sign-in')
+    expect(screen.getByRole('link', { name: en.nav.signUp }).getAttribute('href'))
+      .toBe('/en/sign-up')
+
+    fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
+    expect(screen.getAllByRole('link', { name: en.nav.linkForCreators })).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: en.nav.linkForMerchants })).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: en.nav.signIn })).toHaveLength(2)
+    expect(screen.getAllByRole('link', { name: en.nav.signUp })).toHaveLength(2)
   })
+
+  it.each([
+    ['creator', false, true],
+    ['creator-pending', false, true],
+    ['merchant', true, false],
+    ['traveler', true, true],
+  ] as const)(
+    '%s audience links: For Creators=%s, For Merchants=%s',
+    (role, creatorsVisible, merchantsVisible) => {
+      render(<Navbar locale="en" role={role} sessionsLive t={en.nav} />)
+      expect(Boolean(screen.queryByRole('link', { name: en.nav.linkForCreators })))
+        .toBe(creatorsVisible)
+      expect(Boolean(screen.queryByRole('link', { name: en.nav.linkForMerchants })))
+        .toBe(merchantsVisible)
+    },
+  )
 
   it('labels the merchant sub-row landmark with the dedicated menu label', () => {
     render(<Navbar locale="en" role="merchant" sessionsLive t={en.nav} />)
     expect(screen.getByRole('navigation', { name: en.nav.merchantMenuLabel })).toBeTruthy()
-  })
-
-  it('anon shows Sign in + Apply CTA → /en/sign-up', () => {
-    render(<Navbar locale="en" role="anon" sessionsLive t={en.nav} />)
-    expect(screen.getByRole('link', { name: en.nav.signIn }).getAttribute('href')).toBe('/en/sign-in')
-    expect(screen.getByRole('link', { name: en.nav.ctaApply }).getAttribute('href')).toBe('/en/sign-up')
   })
 
   it('creator shows Open Studio; merchant keeps queue + creator search + insights + Post a Mission', () => {
