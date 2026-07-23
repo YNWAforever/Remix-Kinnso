@@ -461,9 +461,9 @@ const messages: Messages = {
     merchantMenuLabel: '商家菜单',
   },
   footer: {
-    tagline: 'AI 旅行创作者市集 · 香港 · 台北 · 东京',
+    tagline: 'AI 旅行创作者平台 · 香港 · 台北 · 东京',
     colCreators: '创作者', colMerchants: '商家', colCompany: '公司',
-    colExplore: '探索', colTravellers: '旅行者', lGuides: '攻略', lDestinations: '目的地', lArticles: '文章', lSessions: '社区活动', lTrips: '行程', lSaved: '收藏',
+    colExplore: '探索', colTravellers: '旅客', lGuides: '攻略', lDestinations: '目的地', lArticles: '文章', lSessions: '社区活动', lTrips: '行程', lSaved: '已收藏',
     lApply: '申请', lStudio: '工作室', lMissions: '任务', lEarnings: '收益',
     lPostMission: '发布任务', lPricing: '运作方式', lContact: '联系我们', lDirectory: '目录',
     lAbout: '关于', lAgent: 'AI 助手', lLegal: '条款',
