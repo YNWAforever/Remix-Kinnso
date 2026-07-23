@@ -461,9 +461,9 @@ const messages: Messages = {
     merchantMenuLabel: '加盟店メニュー',
   },
   footer: {
-    tagline: 'AIトラベルコンテンツスタジオ · クリエイターに報酬 · 香港 · 台北 · 東京',
+    tagline: 'AIトラベルクリエイターマーケットプレイス · 香港 · 台北 · 東京',
     colCreators: 'クリエイター', colMerchants: '加盟店', colCompany: '会社',
-    colExplore: '探す', lGuides: 'ガイド', lDestinations: '旅行先', lArticles: '記事', lSessions: 'セッション',
+    colExplore: '探す', colTravellers: '旅行者', lGuides: 'ガイド', lDestinations: '旅行先', lArticles: '記事', lSessions: 'セッション', lTrips: '旅行', lSaved: '保存済み',
     lApply: '応募', lStudio: 'スタジオ', lMissions: 'ミッション', lEarnings: '収益',
     lPostMission: 'ミッションを投稿', lPricing: '仕組み', lContact: 'お問い合わせ', lDirectory: 'ディレクトリ',
     lAbout: '会社概要', lAgent: 'AIエージェント', lLegal: '規約',

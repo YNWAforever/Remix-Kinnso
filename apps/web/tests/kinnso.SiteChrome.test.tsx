@@ -17,10 +17,10 @@ import { SiteChrome } from '@/components/kinnso/SiteChrome'
 import en from '@/lib/i18n/messages/en'
 import zhHk from '@/lib/i18n/messages/zh-hk'
 
-function renderAt(path: string, sessionsLive = true) {
+function renderAt(path: string, sessionsLive = true, bookingLive = false) {
   pathname.value = path
   return render(
-    <SiteChrome locale="en" sessionsLive={sessionsLive} nav={en.nav} footer={en.footer}>
+    <SiteChrome locale="en" sessionsLive={sessionsLive} bookingLive={bookingLive} nav={en.nav} footer={en.footer}>
       <div>PAGE_BODY</div>
     </SiteChrome>,
   )
@@ -39,6 +39,11 @@ describe('SiteChrome', () => {
     expect(document.querySelector('header a[href="/en/sessions"]')).toBeNull()
   })
 
+  it('passes the Booking gate through to the footer', () => {
+    renderAt('/en/articles', true, true)
+    expect(screen.getByRole('link', { name: en.footer.lTrips })).toBeTruthy()
+    expect(screen.getByRole('link', { name: en.footer.lSaved })).toBeTruthy()
+  })
   it.each(['/en/sign-in', '/en/sign-up', '/en/creator'])('hides chrome on %s', (path) => {
     renderAt(path)
     expect(screen.getByText('PAGE_BODY')).toBeTruthy()
@@ -59,7 +64,7 @@ describe('SiteChrome', () => {
   it('localizes the skip link (drive-by fix: was hardcoded English)', () => {
     pathname.value = '/zh-hk/articles'
     render(
-      <SiteChrome locale="zh-hk" sessionsLive nav={zhHk.nav} footer={zhHk.footer}>
+      <SiteChrome locale="zh-hk" sessionsLive bookingLive={false} nav={zhHk.nav} footer={zhHk.footer}>
         <div>PAGE_BODY</div>
       </SiteChrome>,
     )

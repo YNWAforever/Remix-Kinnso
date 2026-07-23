@@ -2,7 +2,18 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
-afterEach(cleanup)
+const { productState } = vi.hoisted(() => ({
+  productState: {
+    agentLive: true,
+    bookingLive: false,
+    sessionsLive: false,
+  },
+}))
+
+afterEach(() => {
+  cleanup()
+  productState.bookingLive = false
+})
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   usePathname: () => '/en/articles',
@@ -10,7 +21,9 @@ vi.mock('next/navigation', () => ({
   notFound: vi.fn(),
 }))
 vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
-vi.mock('@/lib/product-state', () => ({ getProductState: async () => ({ agentLive: true, bookingLive: false, sessionsLive: false }) }))
+vi.mock('@/lib/product-state', () => ({
+  getProductState: async () => productState,
+}))
 // app/layout.tsx calls next/font/google factories at module eval; they are not
 // callable under vitest (no Next SWC font transform). Stub them to {variable}.
 vi.mock('next/font/google', () => ({
@@ -35,5 +48,15 @@ describe('[locale]/layout mounts the global shell', () => {
 
   it('ISR-revalidates product state every 5 minutes', () => {
     expect(revalidate).toBe(300)
+  })
+  it('passes bookingLive from product state to the footer', async () => {
+    productState.bookingLive = true
+    const ui = await LocaleLayout({
+      children: <div>BODY</div>,
+      params: Promise.resolve({ locale: 'en' }),
+    })
+    render(<>{ui.props.children.props.children}</>)
+    expect(screen.getByRole('link', { name: en.footer.lTrips })).toBeTruthy()
+    expect(screen.getByRole('link', { name: en.footer.lSaved })).toBeTruthy()
   })
 })

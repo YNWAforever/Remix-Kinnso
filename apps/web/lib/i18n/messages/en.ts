@@ -694,7 +694,7 @@ export interface Messages {
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
-    colExplore: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string
+    colExplore: string; colTravellers: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string; lTrips: string; lSaved: string
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
     lPostMission: string; lPricing: string; lContact: string; lDirectory: string
     lAbout: string; lAgent: string; lLegal: string; rights: string
@@ -1702,9 +1702,9 @@ const messages: Messages = {
     merchantMenuLabel: 'Merchant menu',
   },
   footer: {
-    tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
+    tagline: 'The AI travel creator marketplace · Hong Kong · Taipei · Tokyo',
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
-    colExplore: 'Explore', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions',
+    colExplore: 'Explore', colTravellers: 'Travellers', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions', lTrips: 'Trips', lSaved: 'Saved',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
     lPostMission: 'Post a mission', lPricing: 'How it works', lContact: 'Contact', lDirectory: 'Directory',
     lAbout: 'About', lAgent: 'AI Agent', lLegal: 'Legal',

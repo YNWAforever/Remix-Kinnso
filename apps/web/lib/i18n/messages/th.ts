@@ -461,9 +461,9 @@ const messages: Messages = {
     merchantMenuLabel: 'เมนูร้านค้า',
   },
   footer: {
-    tagline: 'สตูดิโอคอนเทนต์ท่องเที่ยว AI · จ่ายให้ครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',
+    tagline: 'AI มาร์เก็ตเพลสของทราเวลครีเอเตอร์ · ฮ่องกง · ไทเป · โตเกียว',
     colCreators: 'ครีเอเตอร์', colMerchants: 'ร้านค้า', colCompany: 'บริษัท',
-    colExplore: 'สำรวจ', lGuides: 'ไกด์', lDestinations: 'จุดหมาย', lArticles: 'บทความ', lSessions: 'เซสชัน',
+    colExplore: 'สำรวจ', colTravellers: 'นักเดินทาง', lGuides: 'ไกด์', lDestinations: 'จุดหมาย', lArticles: 'บทความ', lSessions: 'เซสชัน', lTrips: 'ทริป', lSaved: 'บันทึกแล้ว',
     lApply: 'สมัคร', lStudio: 'สตูดิโอ', lMissions: 'ภารกิจ', lEarnings: 'รายได้',
     lPostMission: 'โพสต์ภารกิจ', lPricing: 'วิธีการทำงาน', lContact: 'ติดต่อ', lDirectory: 'ไดเรกทอรี',
     lAbout: 'เกี่ยวกับ', lAgent: 'ผู้ช่วย AI', lLegal: 'ข้อกำหนด',

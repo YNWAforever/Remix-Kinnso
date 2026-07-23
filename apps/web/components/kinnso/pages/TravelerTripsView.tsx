@@ -134,7 +134,7 @@ export function TravelerTripsView({
         )}
       </div>
 
-      <div className="mt-10 border-t border-kinnso-cream2 pt-6">
+      <div id="saved" className="mt-10 scroll-mt-24 border-t border-kinnso-cream2 pt-6">
         <h2 className="k-section-title text-lg">{t.savedGuidesTitle}</h2>
         {savedGuides.length === 0 ? (
           <p className="mt-2 text-sm text-kinnso-muted">{t.savedGuidesEmpty}</p>

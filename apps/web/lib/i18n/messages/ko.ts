@@ -461,9 +461,9 @@ const messages: Messages = {
     merchantMenuLabel: '가맹점 메뉴',
   },
   footer: {
-    tagline: 'AI 트래블 콘텐츠 스튜디오 · 크리에이터에게 지급 · 홍콩 · 타이베이 · 도쿄',
+    tagline: 'AI 여행 크리에이터 마켓플레이스 · 홍콩 · 타이베이 · 도쿄',
     colCreators: '크리에이터', colMerchants: '가맹점', colCompany: '회사',
-    colExplore: '둘러보기', lGuides: '가이드', lDestinations: '여행지', lArticles: '아티클', lSessions: '세션',
+    colExplore: '둘러보기', colTravellers: '여행자', lGuides: '가이드', lDestinations: '여행지', lArticles: '아티클', lSessions: '세션', lTrips: '여행', lSaved: '저장됨',
     lApply: '지원', lStudio: '스튜디오', lMissions: '미션', lEarnings: '수익',
     lPostMission: '미션 등록', lPricing: '이용 방법', lContact: '문의', lDirectory: '디렉토리',
     lAbout: '소개', lAgent: 'AI 에이전트', lLegal: '약관',
