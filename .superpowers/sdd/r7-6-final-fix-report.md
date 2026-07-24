@@ -104,3 +104,81 @@ The primary checkout `pnpm honesty:lint` still sees two ignored `.worktrees/**/f
 
 - The local full web suite remains non-green because of persistent test-database state and one observed load timeout in untouched RLS tests. Hosted fresh-database CI remains the trustworthy next integration signal.
 - No remaining R7.6-focused defect or selected-browser skip is known.
+
+## Second Fix Review
+
+Date: 2026-07-24
+Starting commit: `b7f327edf90ff52483ad77119bc67b620b61b1f8`
+
+### Confirmed root causes
+
+- `creator-onboarding.spec.ts` called `test.skip(!reviewReady, ...)` for every scan mode. PR CI sets `SCAN_FIXTURE_MODE=1` only on the scan-worker child process, so Playwright had no fixture/live discriminator and could mask a real deterministic regression.
+- `/merchants/post` validated `auth.getUser()` once, then called `resolveViewerRole(supabase)`, which performed a second auth lookup and discarded its error. The already verified user id was not carried across that boundary.
+- Both client and server pending-role resolvers destructured only handle query data. A `creator_social_handles` operational error therefore looked identical to a valid empty result and returned `traveler`.
+- The first client error handler logged failures but preserved the prior role, so an ops/merchant viewer could retain a stale privileged header after a later failed resolution.
+- The first workflow wiring enabled tolerance for every manual dispatch, even when `base_url` targeted a strict preview/local environment.
+
+### RED evidence
+
+After the managed `apply_patch` attempt failed again with `windows sandbox failed: helper_unknown_error: apply deny-read ACLs`, the test-only changes used the documented assertion-guarded elevated fallback.
+
+Command:
+
+```text
+pnpm --filter web exec vitest run tests/e2e.creator-onboarding-mode.test.ts tests/auth.viewer-role.test.ts tests/auth.useViewerRole.test.tsx tests/merchants.dashboard-redirects.test.tsx
+```
+
+Terminal RED result: **4 test files failed; 6 tests failed and 27 passed (33 total)**.
+
+The six intended failures were:
+
+1. onboarding source lacked a strict explicit live-external scan opt-in;
+2. deployed verification lacked that step-local opt-in;
+3. `resolveViewerRole` ignored a verified user id and called auth again;
+4. server handle lookup errors resolved to `traveler` instead of rejecting;
+5. client handle lookup errors were not reported and fell through to `traveler`;
+6. merchant post called the resolver without the validated user id.
+
+Independent review then added two more regression-first checks:
+
+- Client transition RED: **1 failed, 10 passed**; an ops role remained `ops` after a later onboarding handle-query error instead of becoming `anon`. After the fail-closed reset, that client suite passed **11/11**.
+- Manual-dispatch policy RED: the workflow contract failed because no default-false boolean input existed. The corrected contract passed with production deployment events automatic and manual dispatch explicit.
+
+### Implementation
+
+- Added strict opt-in `E2E_ALLOW_EXTERNAL_SCAN_SKIP === 'true'` and gated only the live-external skip with it. The subsequent `expect(reviewReady, ...)` makes fixture-backed runs fail closed.
+- Production `deployment_status` verification enables the flag automatically. Manual `workflow_dispatch` now has an explicit `allow_external_scan_skip` boolean that defaults to `false`; only an operator targeting a genuinely live external scan may opt in.
+- Left PR `ci.yml` unflagged; it remains fixture-backed and selects creator onboarding. Left `nightly-funnel.yml` unflagged because it does not select creator onboarding.
+- Added backward-compatible `verifiedUserId?: string` to `resolveViewerRole`. Existing callers retain session resolution; `/merchants/post` passes its already validated `user.id`, eliminating the second lookup.
+- Server pending-role handle query errors are thrown unchanged.
+- Client pending-role handle query errors reset the latest active resolution to fail-closed `anon` and log `Failed to resolve viewer role`, preventing both a false `traveler` classification and stale privileged UI while avoiding unhandled async rejections.
+
+No migrations, dependencies, feature defaults, production/local data, approved plan, progress ledger, `.codex-patches/`, or `task3-red.patch` were changed.
+
+### GREEN and verification evidence
+
+- Targeted second-wave suite: **4 files passed, 34 tests passed, 0 failed**.
+- Complete focused R7.6 suite: **14 files passed, 115 tests passed, 0 failed**.
+- `pnpm --filter web typecheck`: **pass**.
+- `pnpm --filter @kinnso/e2e typecheck`: **pass**.
+- `pnpm --filter web lint`: **pass with 0 errors and the same 18 baseline warnings**.
+- Full `apps/web` retired-phrase guard: **pass, no match**.
+- `git diff --check`: **pass**; only informational LF/CRLF conversion warnings were printed.
+- Independent second-wave code/security re-review: **no remaining blockers** after the fail-closed role and manual-dispatch corrections.
+
+Strict fixture browser clone: `C:\tmp\kinnso-r76-second-wave-e2e-20260724-204135`
+
+Exact command:
+
+```text
+pnpm --filter @kinnso/e2e e2e creator-onboarding funnel-smoke honesty notfound
+```
+
+Environment: `CI=true`, `BOOKING_LIVE=false`, `E2E_BASE_URL=http://127.0.0.1:3100`, scan fixture healthy on 8788, Next dev explicitly bound to `127.0.0.1:3100`. The runner printed `E2E_ALLOW_EXTERNAL_SCAN_SKIP_PRESENT=False`.
+
+Final late-delta browser result: **13 passed, 0 skipped, 0 failed in 22.0s**. Only clone-owned processes were stopped; ports 8788/3100 were released, and the screenshot plus Playwright HTML report remain in the clone.
+
+### Remaining concerns
+
+- The prior report's untouched local Supabase/RLS state concerns remain; this second wave did not run or mutate those database tests.
+- No known second-review behavioral gap remains in the focused or strict fixture-backed gates.

@@ -69,6 +69,8 @@ describe('public merchant post entry', () => {
     await expect(PostStub({ params: params() })).rejects.toThrow(
       'redirect:/en/merchants/dashboard/post',
     )
+    expect(authMock).toHaveBeenCalledTimes(1)
+    expect(resolveViewerRoleMock).toHaveBeenCalledWith(expect.any(Object), 'u1')
   })
 
   it.each(['traveler', 'creator', 'creator-pending'] as const)(

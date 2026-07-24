@@ -16,7 +16,7 @@ export default async function MerchantPostEntryPage({
   if (error && error.name !== 'AuthSessionMissingError') throw error
   if (!user) redirect(`/${locale}/merchants/apply`)
 
-  const role = await resolveViewerRole(supabase)
+  const role = await resolveViewerRole(supabase, user.id)
   if (role === 'merchant') {
     redirect(`/${locale}/merchants/dashboard/post`)
   }

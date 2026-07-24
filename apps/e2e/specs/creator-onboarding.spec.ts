@@ -14,6 +14,7 @@ import { test, expect } from '@playwright/test'
 const STAMP = Date.now()
 const EMAIL = `e2e+onboarding-${STAMP}@kinnso.test`
 const PASSWORD = `E2e!${STAMP}aA`
+const allowExternalScanSkip = process.env.E2E_ALLOW_EXTERNAL_SCAN_SKIP === 'true'
 
 test('creator signs up, adds handles, scans, reviews DNA, publishes, reads back', async ({
   page,
@@ -42,9 +43,8 @@ test('creator signs up, adds handles, scans, reviews DNA, publishes, reads back'
   // 3. Live progress -> review. Hermetic (fixture) runs reach this in seconds. The
   // post-deploy gate runs against LIVE prod, where this exercises the REAL scan, which is
   // non-deterministic in BOTH latency and availability. Wait generously for the review
-  // heading; if the scan instead fails, surfaces a notice, or never reaches a terminal
-  // state, treat it as an upstream scan outage (not a deploy regression) and skip the rest
-  // so this gate stays green on transient scan flakiness.
+  // heading. Only the explicit deployed-live opt-in may treat an upstream outage as a
+  // skip; fixture-backed PR CI must fail when review is not reached.
   const reviewHeading = page.getByRole('heading', { name: /review your creator dna/i })
   const scanDidNotComplete = page
     .getByRole('button', { name: /retry scan/i })
@@ -62,9 +62,10 @@ test('creator signs up, adds handles, scans, reviews DNA, publishes, reads back'
     reviewReady = false
   }
   test.skip(
-    !reviewReady,
+    !reviewReady && allowExternalScanSkip,
     'Upstream scan (Railway worker / RapidAPI / LLM) did not complete — external dependency, not a deploy regression.',
   )
+  expect(reviewReady, 'Fixture-backed creator scan must reach review').toBe(true)
 
   // 4. Edit the bio and publish.
   const bio = page.getByLabel(/^bio$/i)
