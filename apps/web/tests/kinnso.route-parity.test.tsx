@@ -49,13 +49,13 @@ function collectInternalLinks(ui: React.ReactElement): string[] {
 
 describe('front-of-house route parity', () => {
   it('keeps shell and homepage internal links backed by an app route', () => {
-    const roles: ViewerRole[] = ['anon', 'creator', 'creator-pending', 'merchant']
+    const roles: ViewerRole[] = ['anon', 'creator', 'creator-pending', 'merchant', 'traveler', 'ops']
     const hrefs = new Set<string>()
 
     roles.forEach((role) => {
-      collectInternalLinks(<Navbar locale="en" role={role} sessionsLive t={en.nav} />).forEach((href) => hrefs.add(href))
+      collectInternalLinks(<Navbar locale="en" role={role} sessionsLive dashboardLabel={en.admin.navDashboard} t={en.nav} />).forEach((href) => hrefs.add(href))
     })
-    collectInternalLinks(<Footer locale="en" t={en.footer} />).forEach((href) => hrefs.add(href))
+    collectInternalLinks(<Footer locale="en" bookingLive={false} t={en.footer} />).forEach((href) => hrefs.add(href))
     collectInternalLinks(
       <HomeView locale="en" t={en.home} featureInterest={en.featureInterest} productState={{ agentLive: true, bookingLive: false, sessionsLive: true }} guides={[]} stats={null} testimonials={[]} articles={[]} sessions={[]} />,
     ).forEach((href) => hrefs.add(href))

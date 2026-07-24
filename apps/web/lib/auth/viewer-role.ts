@@ -10,16 +10,23 @@ export type ViewerRole = 'anon' | 'creator' | 'creator-pending' | 'merchant' | '
  */
 export async function resolveViewerRole(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  // A caller that already validated auth can provide the verified id and avoid
+  // a second network lookup. All other callers retain cookie-session resolution.
+  verifiedUserId?: string,
 ): Promise<ViewerRole> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return 'anon'
+  let userId = verifiedUserId
+  if (!userId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return 'anon'
+    userId = user.id
+  }
 
   const { data: ops } = await supabase
     .from('kinnso_ops_members')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('status', 'active')
     .maybeSingle()
   if (ops) return 'ops'
@@ -27,7 +34,7 @@ export async function resolveViewerRole(
   const { data: merchant } = await supabase
     .from('merchant_profiles')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .maybeSingle()
   if (merchant) return 'merchant'
 
@@ -38,9 +45,19 @@ export async function resolveViewerRole(
   const { data: creator } = await supabase
     .from('creators')
     .select('status')
-    .eq('id', user.id)
+    .eq('id', userId)
     .maybeSingle()
   if (creator?.status === 'active') return 'creator'
+  if (creator?.status === 'onboarding') {
+    const { data: handle, error: handleError } = await supabase
+      .from('creator_social_handles')
+      .select('id')
+      .eq('creator_id', userId)
+      .limit(1)
+      .maybeSingle()
+    if (handleError) throw handleError
+    if (handle) return 'creator-pending'
+  }
 
   return 'traveler'
 }

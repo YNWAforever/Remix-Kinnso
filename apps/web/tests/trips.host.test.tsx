@@ -68,6 +68,20 @@ const baseBooking = {
 }
 
 describe('TravelerTripsView', () => {
+  it('exposes a stable fragment target for saved traveller content', () => {
+    render(
+      <TravelerTripsView
+        locale="en"
+        t={t}
+        reviewsT={reviewsT}
+        savesLabel="saves"
+        bookings={[]}
+        savedGuides={[]}
+        savedExperiences={[]}
+      />,
+    )
+    expect(document.getElementById('saved')).toBeTruthy()
+  })
   it('renders the empty state', () => {
     render(<TravelerTripsView locale="en" t={t} reviewsT={reviewsT} savesLabel="saves" bookings={[]} savedGuides={[]} savedExperiences={[]} />)
     expect(screen.getByText(/No bookings yet/)).toBeInTheDocument()

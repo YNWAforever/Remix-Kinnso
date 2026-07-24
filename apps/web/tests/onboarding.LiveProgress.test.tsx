@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
+import { StrictMode } from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import type { JobRow } from '@/lib/onboarding/progress'
 
 afterEach(cleanup)
@@ -61,6 +62,42 @@ beforeEach(() => {
 afterEach(() => vi.clearAllMocks())
 
 describe('LiveProgress (fresh run -> live frames)', () => {
+  it('shares one scan start across Strict Mode effect replay', async () => {
+    let resolveResponse: ((value: { status: number; ok: boolean; json: () => Promise<{ jobId: string }> }) => void) | undefined
+    const scanResponse = new Promise<{ status: number; ok: boolean; json: () => Promise<{ jobId: string }> }>((resolve) => {
+      resolveResponse = resolve
+    })
+    ;(globalThis.fetch as ReturnType<typeof vi.fn>).mockReturnValue(scanResponse)
+
+    render(
+      <StrictMode>
+        <LiveProgress
+          creatorId="c1"
+          jobId={null}
+          platforms={['instagram']}
+          t={t}
+          onReady={vi.fn()}
+        />
+      </StrictMode>,
+    )
+
+    await act(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolveResponse?.({
+        status: 202,
+        ok: true,
+        json: async () => ({ jobId: 'job-1' }),
+      })
+      await scanResponse
+    })
+    await waitFor(() => expect(single).toHaveBeenCalled())
+  })
+
   it('POSTs /scan, subscribes, then advances queued->analyzing->ready and calls onReady', async () => {
     ;(globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       status: 202,

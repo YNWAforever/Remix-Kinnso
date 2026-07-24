@@ -43,6 +43,16 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
       if (ops) return 'ops'
       if (merchant) return 'merchant'
       if (creator?.status === 'active') return 'creator'
+      if (creator?.status === 'onboarding') {
+        const { data: handle, error: handleError } = await supabase
+          .from('creator_social_handles')
+          .select('id')
+          .eq('creator_id', userId)
+          .limit(1)
+          .maybeSingle()
+        if (handleError) throw handleError
+        if (handle) return 'creator-pending'
+      }
       return 'traveler'
     }
 
@@ -56,6 +66,11 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
       const nextRole = await resolveSignedInRole(data.user.id)
       if (!active || initialResolution !== latestResolution) return
       setRole(nextRole)
+    }).catch((error: unknown) => {
+      if (active && initialResolution === latestResolution) {
+        setRole('anon')
+        console.error('Failed to resolve viewer role', error)
+      }
     })
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const resolution = ++latestResolution
@@ -63,8 +78,15 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
         if (active) setRole('anon')
         return
       }
-      const nextRole = await resolveSignedInRole(session.user.id)
-      if (active && resolution === latestResolution) setRole(nextRole)
+      try {
+        const nextRole = await resolveSignedInRole(session.user.id)
+        if (active && resolution === latestResolution) setRole(nextRole)
+      } catch (error) {
+        if (active && resolution === latestResolution) {
+          setRole('anon')
+          console.error('Failed to resolve viewer role', error)
+        }
+      }
     })
     return () => {
       active = false

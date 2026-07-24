@@ -105,6 +105,7 @@ export function LiveProgress({
   const [elapsed, setElapsed] = useState(0)
   const jobIdRef = useRef<string | null>(jobId)
   const readyFiredRef = useRef(false)
+  const scanStartRef = useRef<Promise<string | null> | null>(null)
 
   const applyJob = useCallback(
     (incoming: JobRow | null) => {
@@ -212,7 +213,12 @@ export function LiveProgress({
     ;(async () => {
       let id = jobIdRef.current
       if (!id) {
-        id = await startScan('/scan')
+        // React Strict Mode replays effects in development. Share the in-flight
+        // request across that replay so one click creates exactly one scan job.
+        const pendingStart = scanStartRef.current ?? startScan('/scan')
+        scanStartRef.current = pendingStart
+        id = await pendingStart
+        if (scanStartRef.current === pendingStart) scanStartRef.current = null
         if (!id || cancelled) return
         jobIdRef.current = id
       }

@@ -7,6 +7,8 @@ let sessionUser: { id: string } | null = null
 let opsMember: { id: string } | null = null
 let merchantProfile: { id: string } | null = null
 let creatorProfile: { status: string } | null = null
+let socialHandle: { id: string } | null = null
+let socialHandleError: Error | null = null
 let lookupBarrier: Promise<void> | null = null
 const getUser = vi.fn(async () => ({ data: { user: sessionUser }, error: null }))
 let authStateCallback: ((_event: string, session: { user: { id: string } } | null) => void | Promise<void>) | null = null
@@ -20,6 +22,7 @@ const from = vi.fn((table: string) => {
   const builder = {
     select: vi.fn(() => builder),
     eq: vi.fn(() => builder),
+    limit: vi.fn(() => builder),
     maybeSingle: vi.fn(async () => {
       if (lookupBarrier) await lookupBarrier
       return {
@@ -30,8 +33,10 @@ const from = vi.fn((table: string) => {
               ? merchantProfile
               : table === 'creators'
                 ? creatorProfile
-                : null,
-        error: null,
+                : table === 'creator_social_handles'
+                  ? socialHandle
+                  : null,
+        error: table === 'creator_social_handles' ? socialHandleError : null,
       }
     }),
   }
@@ -44,6 +49,8 @@ afterEach(() => {
   opsMember = null
   merchantProfile = null
   creatorProfile = null
+  socialHandle = null
+  socialHandleError = null
   lookupBarrier = null
   authStateCallback = null
   vi.clearAllMocks()
@@ -72,16 +79,45 @@ describe('useViewerRole', () => {
     await waitFor(() => expect(result.current).toBe('creator'))
   })
 
-  it('resolves to traveler for a signed-in user with no active creator profile', async () => {
+  it('resolves to creator-pending for an onboarding creator with a saved handle', async () => {
+    sessionUser = { id: 'u1' }
+    creatorProfile = { status: 'onboarding' }
+    socialHandle = { id: 'handle-1' }
+    const { result } = renderHook(() => useViewerRole())
+    await waitFor(() => expect(result.current).toBe('creator-pending'))
+  })
+
+  it('resolves to traveler for an onboarding creator with no saved handle', async () => {
     sessionUser = { id: 'u1' }
     creatorProfile = { status: 'onboarding' }
     const { result } = renderHook(() => useViewerRole())
     await waitFor(() => expect(result.current).toBe('traveler'))
   })
 
-  it('resolves to merchant for a signed-in user with a merchant profile', async () => {
+  it('reports a handle lookup error without classifying the onboarding creator as traveler', async () => {
+    const handleError = new Error('handle lookup unavailable')
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      sessionUser = { id: 'u1' }
+      creatorProfile = { status: 'onboarding' }
+      socialHandleError = handleError
+
+      const { result } = renderHook(() => useViewerRole())
+
+      await waitFor(() => {
+        expect(consoleError).toHaveBeenCalledWith('Failed to resolve viewer role', handleError)
+      })
+      expect(result.current).toBe('anon')
+    } finally {
+      consoleError.mockRestore()
+    }
+  })
+
+  it('resolves to merchant before an onboarding creator with a saved handle', async () => {
     sessionUser = { id: 'u1' }
     merchantProfile = { id: 'merchant-1' }
+    creatorProfile = { status: 'onboarding' }
+    socialHandle = { id: 'handle-1' }
     const { result } = renderHook(() => useViewerRole())
     await waitFor(() => expect(result.current).toBe('merchant'))
   })
@@ -105,6 +141,29 @@ describe('useViewerRole', () => {
     })
 
     await waitFor(() => expect(result.current).toBe('merchant'))
+  })
+
+  it('fails closed from a prior ops role when a later handle lookup errors', async () => {
+    const handleError = new Error('handle lookup unavailable')
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      sessionUser = { id: 'u1' }
+      opsMember = { id: 'ops-1' }
+      const { result } = renderHook(() => useViewerRole())
+      await waitFor(() => expect(result.current).toBe('ops'))
+
+      opsMember = null
+      creatorProfile = { status: 'onboarding' }
+      socialHandleError = handleError
+      await act(async () => {
+        await authStateCallback?.('USER_UPDATED', { user: { id: 'u1' } })
+      })
+
+      expect(consoleError).toHaveBeenCalledWith('Failed to resolve viewer role', handleError)
+      expect(result.current).toBe('anon')
+    } finally {
+      consoleError.mockRestore()
+    }
   })
 
   it('ignores stale signed-in lookups after sign-out', async () => {
