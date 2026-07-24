@@ -2,17 +2,19 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 
-const { productState } = vi.hoisted(() => ({
+const { productState, viewerRole } = vi.hoisted(() => ({
   productState: {
     agentLive: true,
     bookingLive: false,
     sessionsLive: false,
   },
+  viewerRole: { value: 'anon' },
 }))
 
 afterEach(() => {
   cleanup()
   productState.bookingLive = false
+  viewerRole.value = 'anon'
 })
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -20,7 +22,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
   notFound: vi.fn(),
 }))
-vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => 'anon' }))
+vi.mock('@/lib/auth/useViewerRole', () => ({ useViewerRole: () => viewerRole.value }))
 vi.mock('@/lib/product-state', () => ({
   getProductState: async () => productState,
 }))
@@ -44,6 +46,22 @@ describe('[locale]/layout mounts the global shell', () => {
     expect(screen.getByRole('link', { name: en.nav.signUp })).toBeTruthy()
     expect(screen.getByText(en.footer.tagline)).toBeTruthy()
     expect(document.querySelector('header a[href="/en/sessions"]')).toBeNull()
+    expect(screen.queryByRole('link', { name: en.footer.lTrips })).toBeNull()
+    expect(screen.queryByRole('link', { name: en.footer.lSaved })).toBeNull()
+  })
+
+  it('passes the existing localized Dashboard label to authenticated ops viewers', async () => {
+    viewerRole.value = 'ops'
+    const ui = await LocaleLayout({
+      children: <div>BODY</div>,
+      params: Promise.resolve({ locale: 'en' }),
+    })
+    render(<>{ui.props.children.props.children}</>)
+
+    expect(screen.getByRole('link', { name: en.admin.navDashboard }).getAttribute('href'))
+      .toBe('/en/admin')
+    expect(screen.queryByRole('link', { name: en.nav.signIn })).toBeNull()
+    expect(screen.queryByRole('link', { name: en.nav.signUp })).toBeNull()
   })
 
   it('ISR-revalidates product state every 5 minutes', () => {

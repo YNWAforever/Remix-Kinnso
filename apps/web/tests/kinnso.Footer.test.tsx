@@ -87,7 +87,7 @@ describe('Footer (R1A editorial IA)', () => {
       [zhHk.footer, { tagline: 'AI 旅遊創作者市集 · 香港 · 台北 · 東京', colTravellers: '旅客', lTrips: '行程', lSaved: '已收藏' }],
       [zhTw.footer, { tagline: 'AI 旅遊創作者市集 · 香港 · 台北 · 東京', colTravellers: '旅客', lTrips: '行程', lSaved: '已收藏' }],
       [zhCn.footer, { tagline: 'AI 旅行创作者平台 · 香港 · 台北 · 东京', colTravellers: '旅客', lTrips: '行程', lSaved: '已收藏' }],
-      [ja.footer, { tagline: 'AIトラベルクリエイターマーケットプレイス · 香港 · 台北 · 東京', colTravellers: '旅行者', lTrips: '旅行', lSaved: '保存済み' }],
+      [ja.footer, { tagline: 'AI旅行クリエイターマーケットプレイス · 香港 · 台北 · 東京', colTravellers: '旅行者', lTrips: '旅行', lSaved: '保存済み' }],
       [ko.footer, { tagline: 'AI 여행 크리에이터 마켓플레이스 · 홍콩 · 타이베이 · 도쿄', colTravellers: '여행자', lTrips: '여행', lSaved: '저장됨' }],
       [th.footer, { tagline: 'มาร์เก็ตเพลสครีเอเตอร์ท่องเที่ยว AI · ฮ่องกง · ไทเป · โตเกียว', colTravellers: 'นักท่องเที่ยว', lTrips: 'ทริป', lSaved: 'บันทึกไว้' }],
     ] as const

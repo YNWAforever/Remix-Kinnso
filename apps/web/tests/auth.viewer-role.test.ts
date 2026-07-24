@@ -10,16 +10,19 @@ function fakeSupabase(opts: {
   ops?: Row
   merchant?: Row
   creator?: Row
+  handle?: Row
 }) {
   const from = (table: string) => {
     const builder = {
       select: () => builder,
       eq: () => builder,
+      limit: () => builder,
       maybeSingle: async () => ({
         data:
           table === 'kinnso_ops_members' ? (opts.ops ?? null)
           : table === 'merchant_profiles' ? (opts.merchant ?? null)
           : table === 'creators' ? (opts.creator ?? null)
+          : table === 'creator_social_handles' ? (opts.handle ?? null)
           : null,
         error: null,
       }),
@@ -45,8 +48,15 @@ describe('resolveViewerRole', () => {
     expect(role).toBe('ops')
   })
 
-  it('returns merchant for a user with a merchant profile', async () => {
-    const role = await resolveViewerRole(fakeSupabase({ user: { id: 'u1' }, merchant: { id: 'm1' } }))
+  it('returns merchant before an onboarding creator with a saved handle', async () => {
+    const role = await resolveViewerRole(
+      fakeSupabase({
+        user: { id: 'u1' },
+        merchant: { id: 'm1' },
+        creator: { status: 'onboarding' },
+        handle: { id: 'handle-1' },
+      }),
+    )
     expect(role).toBe('merchant')
   })
 
@@ -57,7 +67,18 @@ describe('resolveViewerRole', () => {
     expect(role).toBe('creator')
   })
 
-  it('returns traveler for a user whose creator profile is still onboarding', async () => {
+  it('returns creator-pending for an onboarding creator with a saved handle', async () => {
+    const role = await resolveViewerRole(
+      fakeSupabase({
+        user: { id: 'u1' },
+        creator: { status: 'onboarding' },
+        handle: { id: 'handle-1' },
+      }),
+    )
+    expect(role).toBe('creator-pending')
+  })
+
+  it('returns traveler for an onboarding creator with no saved handle', async () => {
     const role = await resolveViewerRole(
       fakeSupabase({ user: { id: 'u1' }, creator: { status: 'onboarding' } }),
     )

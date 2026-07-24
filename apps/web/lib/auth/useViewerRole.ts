@@ -43,6 +43,15 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
       if (ops) return 'ops'
       if (merchant) return 'merchant'
       if (creator?.status === 'active') return 'creator'
+      if (creator?.status === 'onboarding') {
+        const { data: handle } = await supabase
+          .from('creator_social_handles')
+          .select('id')
+          .eq('creator_id', userId)
+          .limit(1)
+          .maybeSingle()
+        if (handle) return 'creator-pending'
+      }
       return 'traveler'
     }
 

@@ -34,8 +34,27 @@ beforeEach(() => {
 })
 
 describe('public merchant post entry', () => {
+  it('throws an auth lookup error unchanged instead of treating it as anonymous', async () => {
+    const authError = new Error('auth service unavailable')
+    authMock.mockResolvedValue({ data: { user: null }, error: authError })
+
+    await expect(PostStub({ params: params() })).rejects.toBe(authError)
+    expect(resolveViewerRoleMock).not.toHaveBeenCalled()
+  })
+
+  it('treats AuthSessionMissingError as a genuine anonymous session absence', async () => {
+    const missingSessionError = Object.assign(new Error('Auth session missing!'), {
+      name: 'AuthSessionMissingError',
+    })
+    authMock.mockResolvedValue({ data: { user: null }, error: missingSessionError })
+
+    await expect(PostStub({ params: params() })).rejects.toThrow(
+      'redirect:/en/merchants/apply',
+    )
+    expect(resolveViewerRoleMock).not.toHaveBeenCalled()
+  })
   it('sends anonymous visitors to merchant application without resolving a role', async () => {
-    authMock.mockResolvedValue({ data: { user: null } })
+    authMock.mockResolvedValue({ data: { user: null }, error: null })
 
     await expect(PostStub({ params: params() })).rejects.toThrow(
       'redirect:/en/merchants/apply',

@@ -12,7 +12,8 @@ export default async function MerchantPostEntryPage({
   if (!isLocale(locale)) notFound()
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error && error.name !== 'AuthSessionMissingError') throw error
   if (!user) redirect(`/${locale}/merchants/apply`)
 
   const role = await resolveViewerRole(supabase)

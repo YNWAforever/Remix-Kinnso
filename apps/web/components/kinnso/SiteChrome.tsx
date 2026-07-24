@@ -15,11 +15,12 @@ const BARE_SUFFIXES = ['/sign-in', '/sign-up', '/creator']
  * CTA may flip once after hydration. Chrome hides on auth/onboarding flows.
  */
 export function SiteChrome({
-  locale, sessionsLive, bookingLive, nav, footer, children,
+  locale, sessionsLive, bookingLive, dashboardLabel, nav, footer, children,
 }: {
   locale: Locale
   sessionsLive: boolean
   bookingLive: boolean
+  dashboardLabel: string
   nav: Messages['nav']
   footer: Messages['footer']
   children: React.ReactNode
@@ -38,7 +39,7 @@ export function SiteChrome({
       >
         {nav.skipToContent}
       </a>
-      <Navbar locale={locale} role={role} sessionsLive={sessionsLive} t={nav} />
+      <Navbar locale={locale} role={role} sessionsLive={sessionsLive} dashboardLabel={dashboardLabel} t={nav} />
       <main id="main-content" className="flex-1" tabIndex={-1}>
         {children}
       </main>

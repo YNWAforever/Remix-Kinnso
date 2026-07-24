@@ -20,7 +20,7 @@ import type { Messages } from "@/lib/i18n/messages/en";
  * chrome is gated at xl: (tablets get the hamburger) so the row never overflows
  * at 768–1100px.
  */
-export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: boolean; t: Messages["nav"] }> = ({ locale, role, sessionsLive, t }) => {
+export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: boolean; dashboardLabel: string; t: Messages["nav"] }> = ({ locale, role, sessionsLive, dashboardLabel, t }) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const p = (path: string) => `/${locale}${path}`;
@@ -54,6 +54,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
     if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k2-btn-primary" };
     if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso-cream2 px-4 py-2 text-sm font-semibold text-kinnso-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange" };
     if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/dashboard/post", className: "k2-btn-primary" };
+    if (role === "ops") return { label: dashboardLabel, to: "/admin", className: "k2-btn-primary" };
     if (role === "traveler") return { label: t.ctaMyTrips, to: "/trips", className: "k2-btn-primary" };
     return { label: t.signUp, to: "/sign-up", className: "k2-btn-primary" };
   })();
