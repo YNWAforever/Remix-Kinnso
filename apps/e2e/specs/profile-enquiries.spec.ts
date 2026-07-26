@@ -6,6 +6,7 @@ import {
   PROFILE_ENQUIRIES_LOCAL_DUMMY_SECRET,
   resolveProfileEnquiriesLocalConfig,
 } from '../profile-enquiries-local'
+import { cleanupOwnedEnquiries } from '../profile-enquiries-cleanup'
 
 const local = resolveProfileEnquiriesLocalConfig(process.env)
 const svc = createClient(local.supabaseUrl, local.serviceRoleKey)
@@ -129,10 +130,14 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   const errors: string[] = []
-  if (enquiryIds.length) {
-    await cleanup(errors, 'enquiry audit rows', () => svc.from('ops_audit_log').delete().eq('entity_type', 'enquiry').in('entity_id', enquiryIds))
-    await cleanup(errors, 'enquiries', () => svc.from('enquiries').delete().in('id', enquiryIds))
-  }
+  const ownedCleanup = await cleanupOwnedEnquiries(
+    (emails) => svc.from('enquiries').select('id').in('email', emails),
+    [creatorVisitorEmail, merchantVisitorEmail],
+    enquiryIds,
+    (ids) => svc.from('ops_audit_log').delete().eq('entity_type', 'enquiry').in('entity_id', ids),
+    (ids) => svc.from('enquiries').delete().in('id', ids),
+  )
+  errors.push(...ownedCleanup.errors)
   await cleanup(errors, 'enquiry rate bucket', () => svc.from('enquiry_rate_limits').delete().eq('ip_hash', ipHash(visitorIp)))
   if (merchantProfileId) await cleanup(errors, 'merchant profile', () => svc.from('merchant_profiles').delete().eq('id', merchantProfileId))
   if (opsMemberId) await cleanup(errors, 'ops member', () => svc.from('kinnso_ops_members').delete().eq('id', opsMemberId))
