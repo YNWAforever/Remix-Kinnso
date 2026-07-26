@@ -1,7 +1,7 @@
 # Phase R7.8 — SEO & Metadata Hygiene Design
 
 **Date:** 2026-07-26
-**Status:** Approved in conversation; awaiting written-spec review
+**Status:** Approved
 **Phase:** R7.8 — SEO & metadata hygiene (P1)
 **Repository:** `YNWAforever/Remix-Kinnso`
 
@@ -209,8 +209,8 @@ The offer includes:
 - schema.org availability.
 
 Stripe's separate `toStripeAmount` conversion must not be applied to JSON-LD.
-In particular, the current unconditional `/ 100` behavior is removed so a JPY
-12,000 experience is not advertised to search engines as JPY 120.
+The existing direct `price_amount` output is preserved so a JPY 12,000
+experience is advertised to search engines as JPY 12,000.
 
 Availability is:
 
