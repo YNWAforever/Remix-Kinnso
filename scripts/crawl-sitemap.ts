@@ -84,6 +84,21 @@ function isBrandedErrorShell(body: string): boolean {
   return DETAIL_ERROR_TITLES.some((title) => normalized.includes(title.toLocaleLowerCase()))
 }
 
+function hasHtmlNoindex(body: string): boolean {
+  for (const tag of body.match(/<meta\b[^>]*>/gi) ?? []) {
+    const name = /\bname=["']([^"']+)["']/i.exec(tag)?.[1]?.toLowerCase()
+    const content =
+      /\bcontent=["']([^"']+)["']/i.exec(tag)?.[1]?.toLowerCase() ?? ''
+    if (
+      (name === 'robots' || name === 'googlebot') &&
+      /(?:^|[\s,])noindex(?:$|[\s,])/.test(content)
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 /**
  * Fetch the sitemap index/shards, then request each page URL listed by them.
  * Sitemap documents are visited once and page URLs are de-duplicated before the
@@ -190,6 +205,15 @@ export async function crawlSitemap({
       const url = pages[index]
       try {
         const response = await fetchImpl(url, { redirect: 'follow' })
+        if (response.redirected) {
+          pageFailures[index] = { url, error: 'Redirect' }
+          continue
+        }
+        const xRobotsTag = response.headers.get('x-robots-tag')?.toLowerCase() ?? ''
+        if (/(?:^|[\s,])noindex(?:$|[\s,])/.test(xRobotsTag)) {
+          pageFailures[index] = { url, error: 'HtmlNoindex' }
+          continue
+        }
         if (response.status >= 400) pageFailures[index] = { url, status: response.status }
         else {
           let body: string
@@ -199,7 +223,8 @@ export async function crawlSitemap({
             pageFailures[index] = networkFailure(url)
             continue
           }
-          if (isBrandedErrorShell(body)) pageFailures[index] = { url, error: 'HtmlErrorShell' }
+          if (hasHtmlNoindex(body)) pageFailures[index] = { url, error: 'HtmlNoindex' }
+          else if (isBrandedErrorShell(body)) pageFailures[index] = { url, error: 'HtmlErrorShell' }
         }
       } catch {
         pageFailures[index] = networkFailure(url)

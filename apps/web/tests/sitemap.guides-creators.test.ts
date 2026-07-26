@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 vi.mock('@/lib/articles/queries', () => ({
   getPublishedForSitemap: async () => [
     { url: 'ramen', category: 'dining', lastmod: '2026-06-01T00:00:00Z', locales: ['en', 'zh-hk'] },
+    { url: 'market', category: 'shopping', lastmod: null, locales: ['zh-hk'] },
   ],
 }))
 vi.mock('@/lib/guides/queries', () => ({
@@ -38,6 +39,15 @@ describe('sitemap — guides, creators, marketing', () => {
     const urls = (await sitemap()).map((e) => e.url)
     expect(urls).toContain(`${SITE}/en/articles`)
     expect(urls).toContain(`${SITE}/en/articles/dining/ramen`)
+  })
+
+  it('emits category routes only for locale/category pairs with indexable articles', async () => {
+    const urls = (await sitemap()).map((entry) => entry.url)
+    expect(urls).toContain(`${SITE}/en/articles/dining`)
+    expect(urls).toContain(`${SITE}/zh-hk/articles/dining`)
+    expect(urls).toContain(`${SITE}/zh-hk/articles/shopping`)
+    expect(urls).not.toContain(`${SITE}/en/articles/shopping`)
+    expect(urls).not.toContain(`${SITE}/ja/articles/dining`)
   })
 })
 

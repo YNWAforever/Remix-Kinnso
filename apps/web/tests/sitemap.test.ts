@@ -16,6 +16,8 @@ describe('sitemap', () => {
     // hub + category present
     expect(urls).toContain('https://www.kinnso.ai/en/articles')
     expect(urls).toContain('https://www.kinnso.ai/en/articles/dining')
+    expect(urls).not.toContain('https://www.kinnso.ai/en/articles/shopping')
+    expect(urls.every((url) => !url.includes('/articles/dining/sushi-guide'))).toBe(true)
   })
 
   // Regression guard for a class of bug: a MARKETING_PATHS entry whose page is still

@@ -174,4 +174,51 @@ describe('crawlSitemap', () => {
     expect(result.failures).toEqual([{ url: pageUrl, error: 'NetworkError' }])
     expect(JSON.stringify(result)).not.toContain('private socket details')
   })
+
+  it('reports a followed redirect from a submitted sitemap URL', async () => {
+    const pageUrl = 'https://example.test/en/g/old-guide'
+    const redirected = pageResponse(200)
+    Object.defineProperty(redirected, 'redirected', { value: true })
+    const result = await crawlSitemap({
+      baseUrl: 'https://example.test',
+      fetchImpl: async (input) =>
+        String(input) === sitemapUrl
+          ? xmlResponse(`<urlset><url><loc>${pageUrl}</loc></url></urlset>`)
+          : redirected,
+    })
+    expect(result.failures).toEqual([{ url: pageUrl, error: 'Redirect' }])
+  })
+
+  it('reports HTML meta robots noindex without logging the page body', async () => {
+    const pageUrl = 'https://example.test/en/articles/dining/thin'
+    const body =
+      '<html><head><meta name="robots" content="follow, noindex"></head>' +
+      '<body>private article text</body></html>'
+    const result = await crawlSitemap({
+      baseUrl: 'https://example.test',
+      fetchImpl: async (input) =>
+        String(input) === sitemapUrl
+          ? xmlResponse(`<urlset><url><loc>${pageUrl}</loc></url></urlset>`)
+          : pageResponse(200, body),
+    })
+    expect(result.failures).toEqual([{ url: pageUrl, error: 'HtmlNoindex' }])
+    expect(JSON.stringify(result)).not.toContain('private article text')
+  })
+
+  it('reports an X-Robots-Tag noindex response', async () => {
+    const pageUrl = 'https://example.test/en/articles/shopping/thin'
+    const result = await crawlSitemap({
+      baseUrl: 'https://example.test',
+      fetchImpl: async (input) => {
+        if (String(input) === sitemapUrl) {
+          return xmlResponse(`<urlset><url><loc>${pageUrl}</loc></url></urlset>`)
+        }
+        return new Response('<html>ok</html>', {
+          status: 200,
+          headers: { 'x-robots-tag': 'noindex, follow' },
+        })
+      },
+    })
+    expect(result.failures).toEqual([{ url: pageUrl, error: 'HtmlNoindex' }])
+  })
 })
