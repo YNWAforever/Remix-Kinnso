@@ -62,6 +62,13 @@ const messages: Messages = {
       title: '目的地 — KINNSO',
       description: '瀏覽精選目的地，睇吓我哋創作者目前為各個地方整理咗嘅攻略、可預約體驗同直播活動。',
     },
+    articles: {
+      title: '旅遊攻略、體驗同本地推介',
+      descriptionBookingLive:
+        '發掘創作者主理嘅旅遊攻略、可預訂本地體驗、直播活動，同亞洲各地值得信賴嘅推介。',
+      descriptionBookingWaitlist:
+        '發掘創作者主理嘅旅遊攻略、本地體驗、直播活動，同亞洲各地值得信賴嘅推介。',
+    },
   },
   listing: { searchPlaceholder: '搜尋文章', filterRegion: '地區', filterTag: '標籤', noResults: '找不到文章。', resultsCount: '篇文章' },
   pagination: { prev: '上一頁', next: '下一頁', page: '第' },

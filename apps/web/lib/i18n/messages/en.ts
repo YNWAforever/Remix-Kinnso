@@ -290,6 +290,11 @@ export interface Messages {
     forMerchants: { title: string; description: string }
     sessions: { title: string; description: string }
     destinations: { title: string; description: string }
+    articles: {
+      title: string
+      descriptionBookingLive: string
+      descriptionBookingWaitlist: string
+    }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -1317,6 +1322,13 @@ const messages: Messages = {
     destinations: {
       title: 'Destinations — KINNSO',
       description: 'Browse curated destinations and see the guides, bookable experiences, and live sessions our creators have covered so far.',
+    },
+    articles: {
+      title: 'Travel guides, experiences and local recommendations',
+      descriptionBookingLive:
+        'Discover creator-led travel guides, bookable local experiences, live sessions and trusted recommendations across Asia.',
+      descriptionBookingWaitlist:
+        'Discover creator-led travel guides, local experiences, live sessions and trusted recommendations across Asia.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },

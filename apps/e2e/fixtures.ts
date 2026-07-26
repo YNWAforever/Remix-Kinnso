@@ -18,6 +18,10 @@ export const FIXTURES = {
     '/en/experiences/r7-missing-experience',
   ],
   presentLocales: ['en', 'zh-hk'] as const,
+  seoEntities: {
+    guidePath: '/en/g/r7-smoke-tokyo-guide',
+    experiencePath: '/en/experiences/r7-smoke-tokyo-experience',
+  },
   booking: {
     experiencePath: '/en/experiences/tokyo-after-hours-izakaya-crawl',
   },

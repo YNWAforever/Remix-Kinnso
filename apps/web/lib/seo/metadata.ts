@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { DEFAULT_LOCALE, LOCALES, type Locale, type UrlCategory } from '@/lib/i18n/config'
+import type { ArticleIndexingDecision } from '@/lib/seo/article-indexability'
 
 export const OG_LOCALE: Record<Locale, string> = {
   en: 'en_US', 'zh-hk': 'zh_HK', 'zh-tw': 'zh_TW', 'zh-cn': 'zh_CN', ja: 'ja_JP', ko: 'ko_KR', th: 'th_TH',
@@ -18,55 +19,130 @@ const abs = (l: string, path: string) => `${SITE_URL}/${l}${path}` // path is ''
  */
 export const defaultOgImagePath = (locale: Locale): string => abs(locale, '/opengraph-image')
 
-/** canonical (current locale) + hreflang map (given locales) + x-default → DEFAULT_LOCALE when present, else current. */
+/** canonical (current locale) + genuine hreflang map + x-default to the first preferred genuine locale. */
 function hreflangFor(pathFor: (l: Locale) => string, current: Locale, locales: readonly Locale[]) {
+  const genuineLocales = LOCALES.filter((locale) => locales.includes(locale))
   const languages: Record<string, string> = {}
-  for (const l of locales) languages[l] = pathFor(l)
-  languages['x-default'] = pathFor(locales.includes(DEFAULT_LOCALE) ? DEFAULT_LOCALE : current)
+  for (const locale of genuineLocales) languages[locale] = pathFor(locale)
+  const xDefaultLocale = genuineLocales.includes(DEFAULT_LOCALE)
+    ? DEFAULT_LOCALE
+    : genuineLocales[0]
+  if (xDefaultLocale) languages['x-default'] = pathFor(xDefaultLocale)
   return { canonical: pathFor(current), languages }
 }
 
 // ---------- Articles (existing surface; refactored to bare titles via hreflangFor) ----------
 
 export interface ArticleMetaInput {
-  urlCategory: UrlCategory; url: string; locale: Locale; presentLocales: readonly Locale[]
-  title: string | null; metaTitle: string | null; summary: string | null; metaDescription: string | null
-  ogImage: string | null; publishedAt: string | null; editAt: string | null; isCoupon: boolean
+  urlCategory: UrlCategory
+  url: string
+  locale: Locale
+  resolvedLocale: Locale
+  indexing: ArticleIndexingDecision
+  title: string | null
+  metaTitle: string | null
+  summary: string | null
+  metaDescription: string | null
+  ogImage: string | null
+  publishedAt: string | null
+  editAt: string | null
 }
 
 const articlePath = (l: string, c: string, u: string) => abs(l, `/articles/${c}/${u}`)
 
 export function buildArticleMetadata(i: ArticleMetaInput): Metadata {
   const heading = i.metaTitle ?? i.title ?? ''
-  const description = (i.metaDescription && i.metaDescription.trim()) || i.summary || ''
-  const { canonical, languages } = hreflangFor((l) => articlePath(l, i.urlCategory, i.url), i.locale, i.presentLocales)
-  const index = !(i.isCoupon && i.locale === DEFAULT_LOCALE)
+  const description =
+    (i.metaDescription && i.metaDescription.trim()) || i.summary || ''
+  const canonical = i.indexing.canonicalLocale
+    ? articlePath(i.indexing.canonicalLocale, i.urlCategory, i.url)
+    : null
+  const languages = Object.fromEntries(
+    i.indexing.alternateLocales.map((locale) => [
+      locale,
+      articlePath(locale, i.urlCategory, i.url),
+    ]),
+  ) as Record<string, string>
+  const xDefaultLocale = i.indexing.alternateLocales.includes(DEFAULT_LOCALE)
+    ? DEFAULT_LOCALE
+    : i.indexing.alternateLocales[0]
+  if (canonical && xDefaultLocale) {
+    languages['x-default'] = articlePath(
+      xDefaultLocale,
+      i.urlCategory,
+      i.url,
+    )
+  }
+  const pageUrl = articlePath(i.locale, i.urlCategory, i.url)
   return {
     title: heading,
     description,
-    alternates: { canonical, languages },
+    alternates: canonical
+      ? { canonical, languages }
+      : undefined,
     openGraph: {
-      type: 'article', url: canonical, title: heading, description,
+      type: 'article',
+      url: canonical ?? pageUrl,
+      title: heading,
+      description,
       images: i.ogImage ? [i.ogImage] : [],
       publishedTime: i.publishedAt ?? undefined,
       modifiedTime: i.editAt ?? i.publishedAt ?? undefined,
-      locale: OG_LOCALE[i.locale],
+      locale: OG_LOCALE[i.resolvedLocale],
     },
-    robots: { index, follow: true, 'max-image-preview': 'large' },
+    robots: {
+      index: i.indexing.index,
+      follow: true,
+      'max-image-preview': 'large',
+    },
   }
 }
-
 export interface ListingMetaInput {
-  urlCategory: UrlCategory | null; locale: Locale; presentLocales: readonly Locale[]; title: string
+  urlCategory: UrlCategory | null
+  locale: Locale
+  presentLocales: readonly Locale[]
+  title: string
+  description: string
+  index?: boolean
 }
 
 export function buildListingMetadata(i: ListingMetaInput): Metadata {
-  const seg = i.urlCategory ? `/articles/${i.urlCategory}` : '/articles'
-  const { canonical, languages } = hreflangFor((l) => abs(l, seg), i.locale, i.presentLocales)
+  const segment = i.urlCategory
+    ? `/articles/${i.urlCategory}`
+    : '/articles'
+  const { canonical, languages } = hreflangFor(
+    (locale) => abs(locale, segment),
+    i.locale,
+    i.presentLocales,
+  )
+  const ogImage = defaultOgImagePath(i.locale)
   return {
     title: i.title,
-    alternates: { canonical, languages },
-    robots: { index: true, follow: true, 'max-image-preview': 'large' },
+    description: i.description,
+    alternates: {
+      canonical,
+      languages: i.presentLocales.length > 0 ? languages : {},
+    },
+    openGraph: {
+      type: 'website',
+      url: canonical,
+      title: i.title,
+      description: i.description,
+      siteName: 'KINNSO',
+      locale: OG_LOCALE[i.locale],
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: i.title,
+      description: i.description,
+      images: [ogImage],
+    },
+    robots: {
+      index: i.index ?? true,
+      follow: true,
+      'max-image-preview': 'large',
+    },
   }
 }
 

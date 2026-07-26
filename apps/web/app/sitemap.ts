@@ -28,14 +28,24 @@ async function buildAllSitemapEntries(): Promise<MetadataRoute.Sitemap> {
   ])
   const out: MetadataRoute.Sitemap = []
 
+  const populatedArticleCategories = new Set<string>()
+  for (const article of articles) {
+    const category = toUrlCategory(article.category)
+    if (!category) continue
+    for (const locale of article.locales) {
+      populatedArticleCategories.add(`${locale}:${category}`)
+    }
+  }
+
   // marketing + articles hub/category per locale
   for (const l of LOCALES) {
     for (const p of MARKETING_PATHS) {
       out.push({ url: `${SITE_URL}/${l}${p}`, changeFrequency: 'weekly', priority: p === '' ? 0.8 : 0.5 })
     }
     out.push({ url: `${SITE_URL}/${l}/articles`, changeFrequency: 'daily', priority: 0.6 })
-    for (const c of URL_CATEGORIES) {
-      out.push({ url: `${SITE_URL}/${l}/articles/${c}`, changeFrequency: 'daily', priority: 0.6 })
+    for (const category of URL_CATEGORIES) {
+      if (!populatedArticleCategories.has(`${l}:${category}`)) continue
+      out.push({ url: `${SITE_URL}/${l}/articles/${category}`, changeFrequency: 'daily', priority: 0.6 })
     }
   }
 

@@ -56,4 +56,19 @@ describe('sessionEventJsonLd', () => {
     })
     expect(ld.eventStatus).toBe('https://schema.org/EventCancelled')
   })
+  it.each(['scheduled', 'live', 'ended'] as const)(
+    'maps %s to EventScheduled',
+    (status) => {
+      const ld = sessionEventJsonLd({
+        name: 'A',
+        description: 'B',
+        url: 'https://x/en/sessions/a',
+        startDate: '2027-01-15T18:00:00.000Z',
+        status,
+        embedUrl: null,
+        hostName: null,
+      })
+      expect(ld.eventStatus).toBe('https://schema.org/EventScheduled')
+    },
+  )
 })

@@ -68,6 +68,7 @@ describe('public OG media handlers', () => {
     const guideResponse = await GuideOgImage({ params: Promise.resolve({ locale: 'en', slug: guide.slug }) })
     const experienceResponse = await ExperienceOgImage({ params: Promise.resolve({ locale: 'en', slug: experience.slug }) })
 
+    expect(imageResponseMock).toHaveBeenCalledTimes(2)
     expect(loadRemoteImageMock).toHaveBeenNthCalledWith(1, guideCover)
     expect(loadRemoteImageMock).toHaveBeenNthCalledWith(2, experienceCover)
     expect(renderedProps(guideResponse).cover).toBe('data:image/jpeg;base64,dGVzdA==')

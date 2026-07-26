@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   single: null as unknown,
   selects: [] as string[],
   creatorError: null as unknown,
+  creatorErrors: [] as unknown[],
   guideError: null as unknown,
 }))
 
@@ -28,7 +29,14 @@ vi.mock('@/lib/supabase/public', () => {
     createSupabasePublicClient: () => ({
       from: (table: string) =>
         table === 'creators'
-          ? make(() => state.creators, () => state.creatorError, () => state.single)
+          ? make(
+              () => state.creators,
+              () =>
+                state.creatorErrors.length > 0
+                  ? state.creatorErrors.shift()
+                  : state.creatorError,
+              () => state.single,
+            )
           : make(() => state.guides, () => state.guideError),
     }),
   }
@@ -59,6 +67,7 @@ beforeEach(() => {
   state.single = null
   state.selects = []
   state.creatorError = null
+  state.creatorErrors = []
   state.guideError = null
 })
 
@@ -144,6 +153,47 @@ describe('getCreatorByHandle', () => {
       { platform: 'youtube', verified: false },
       { platform: 'threads', verified: false },
     ])
+  })
+
+  it('retries without avatar_url when production has not applied the R7.7 column yet', async () => {
+    state.single = creatorRow
+    state.creatorErrors = [
+      { code: '42703', message: 'column creators.avatar_url does not exist' },
+      null,
+    ]
+
+    const creator = await getCreatorByHandle('maya')
+
+    expect(state.selects).toEqual([
+      expect.stringContaining('avatar_url'),
+      expect.not.stringContaining('avatar_url'),
+    ])
+    expect(creator).toMatchObject({ id: 'c1', avatarUrl: null })
+  })
+
+  it('does not hide unrelated creator query errors behind the compatibility retry', async () => {
+    const error = { code: '42703', message: 'column creators.public_profile does not exist' }
+    state.creatorErrors = [error]
+
+    await expect(getCreatorByHandle('maya')).rejects.toBe(error)
+    expect(state.selects).toHaveLength(1)
+  })
+
+  it('requires both the missing-column code and exact avatar column message', async () => {
+    const error = { code: 'PGRST204', message: 'column creators.avatar_url does not exist' }
+    state.creatorErrors = [error]
+
+    await expect(getCreatorByHandle('maya')).rejects.toBe(error)
+    expect(state.selects).toHaveLength(1)
+  })
+
+  it('propagates an error from the legacy-schema fallback query', async () => {
+    const missingAvatar = { code: '42703', message: 'column creators.avatar_url does not exist' }
+    const fallbackError = { code: '42501', message: 'permission denied for creators' }
+    state.creatorErrors = [missingAvatar, fallbackError]
+
+    await expect(getCreatorByHandle('maya')).rejects.toBe(fallbackError)
+    expect(state.selects).toHaveLength(2)
   })
 
   it('returns null for an unknown handle', async () => {

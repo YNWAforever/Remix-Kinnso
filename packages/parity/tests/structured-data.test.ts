@@ -18,6 +18,14 @@ const BAD_HTML = `<head>
 <script type="application/ld+json">{"@type":"Article"}</script>
 </head>`
 
+const NON_ENGLISH_HTML = `<head>
+<link rel="alternate" hreflang="zh-tw" href="https://x/zh-tw/articles/dining/tea-guide"/>
+<link rel="alternate" hreflang="ja" href="https://x/ja/articles/dining/tea-guide"/>
+<link rel="alternate" hreflang="x-default" href="https://x/zh-tw/articles/dining/tea-guide"/>
+<meta property="og:type" content="article"/>
+<script type="application/ld+json">[{"@type":"Article","dateModified":"2026-06-12"},{"@type":"BreadcrumbList"}]</script>
+</head>`
+
 function fakeNewstack(htmlByPath: Record<string, string>, articles: PublishedArticle[]): NewStackSource {
   return {
     publishedArticles: async () => articles,
@@ -50,6 +58,55 @@ describe('structured-data', () => {
     expect(byLabel('Article.dateModified').status).toBe('fail')
     expect(byLabel('og:type').status).toBe('fail')
     expect(byLabel('hreflang').status).toBe('fail') // zh-hk + x-default absent
+  })
+
+  it('fails when hreflang advertises a locale absent from genuine translations', async () => {
+    const html = GOOD_HTML.replace(
+      '<link rel="alternate" hreflang="x-default"',
+      '<link rel="alternate" hreflang="ja" href="https://x/ja/articles/dining/ramen-guide"/>' +
+      '<link rel="alternate" hreflang="x-default"',
+    )
+    const result = await structuredData({
+      legacy,
+      newstack: fakeNewstack(
+        {
+          '/en/articles/dining/ramen-guide': html,
+          '/zh-hk/articles/dining/ramen-guide': html,
+        },
+        [{
+          url: 'ramen-guide',
+          category: 'dining',
+          isCoupon: false,
+          locales: ['en', 'zh-hk'],
+        }],
+      ),
+      sample: 1,
+    })
+    expect(result.find((row) => row.target.endsWith('hreflang'))?.status).toBe(
+      'fail',
+    )
+  })
+
+  it('accepts the first genuine locale as x-default for a non-English-only article', async () => {
+    const result = await structuredData({
+      legacy,
+      newstack: fakeNewstack(
+        {
+          '/ja/articles/dining/tea-guide': NON_ENGLISH_HTML,
+          '/zh-tw/articles/dining/tea-guide': NON_ENGLISH_HTML,
+        },
+        [{
+          url: 'tea-guide',
+          category: 'dining',
+          isCoupon: false,
+          locales: ['ja', 'zh-tw'],
+        }],
+      ),
+      sample: 1,
+    })
+    expect(result.find((row) => row.target.endsWith('x-default'))?.status).toBe(
+      'pass',
+    )
   })
 
   it('respects the sample cap', async () => {

@@ -121,14 +121,38 @@ export async function getPublicCreators(): Promise<CreatorSummary[]> {
 // requirement): a profile renders by direct URL even if it isn't in the directory/sitemap.
 // Since the listable predicate implies status='active', the sitemap stays a subset of
 // renderable pages — see fetchEligibleCreators.
+function isMissingCreatorAvatarColumn(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const candidate = error as { code?: unknown; message?: unknown }
+  return candidate.code === '42703' &&
+    typeof candidate.message === 'string' &&
+    candidate.message.includes('creators.avatar_url')
+}
+
 export async function getCreatorByHandle(handle: string): Promise<PublicCreator | null> {
   const supabase = createSupabasePublicClient()
-  const { data: c, error } = await supabase
+  const primary = await supabase
     .from('creators')
     .select('id, handle, display_name, bio, avatar_url, public_profile')
     .eq('handle', handle)
     .eq('status', 'active')
     .maybeSingle()
+  let c = primary.data
+  let error = primary.error
+
+  // Preview and production can briefly lag the R7.7 avatar migration. Preserve the
+  // public profile with no avatar, but keep every unrelated database error visible.
+  if (isMissingCreatorAvatarColumn(error)) {
+    const fallback = await supabase
+      .from('creators')
+      .select('id, handle, display_name, bio, public_profile')
+      .eq('handle', handle)
+      .eq('status', 'active')
+      .maybeSingle()
+    c = fallback.data ? { ...fallback.data, avatar_url: null } : null
+    error = fallback.error
+  }
+
   if (error) throw error
   if (!c) return null
 
