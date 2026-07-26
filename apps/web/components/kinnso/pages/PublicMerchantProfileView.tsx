@@ -24,7 +24,7 @@ export function PublicMerchantProfileView({ locale, t, enquiry, booking, merchan
         <h1 className="k2-display mt-4 text-3xl font-semibold text-kinnso-ink md:text-5xl">{merchant.companyName}</h1>
         {merchant.tagline ? <p className="mt-4 max-w-2xl leading-relaxed text-kinnso-ink/70">{merchant.tagline}</p> : null}
         {isValidEnquiryTargetId(merchant.id) ? (
-          <div className="mt-5"><EnquiryDialog type="merchant_contact" targetId={merchant.id} targetName={merchant.companyName} triggerLabel="Contact this merchant" t={enquiry} /></div>
+          <div className="mt-5"><EnquiryDialog type="merchant_contact" targetId={merchant.id} targetName={merchant.companyName} triggerLabel={t.enquiryCta} t={enquiry} /></div>
         ) : null}
         {merchant.websiteUrl ? (
           <Link href={merchant.websiteUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block font-semibold text-kinnso-orangeDark hover:underline">
@@ -52,7 +52,7 @@ export function PublicMerchantProfileView({ locale, t, enquiry, booking, merchan
 
       {featuredGuides.length > 0 ? (
         <SectionShell className="k2-hairline">
-          <h2 className="k2-display text-2xl font-semibold text-kinnso-ink">Featured in guides</h2>
+          <h2 className="k2-display text-2xl font-semibold text-kinnso-ink">{t.featuredGuidesHeading}</h2>
           <div className="mt-6 grid gap-5 md:grid-cols-3">
             {featuredGuides.map((guide) => <GuideCard key={guide.slug} g={guide} locale={locale} />)}
           </div>

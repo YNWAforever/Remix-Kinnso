@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { getMerchantBySlugMock, listPublishedForMerchantMock, getAttributedGuidesMock, productStateMock } = vi.hoisted(() => ({
   getMerchantBySlugMock: vi.fn(),
@@ -16,6 +16,11 @@ vi.mock('@/lib/product-state-config', () => ({ resolveConfiguredProductState: pr
 
 import MerchantPublicProfilePage from '@/app/[locale]/m/[slug]/page'
 
+beforeEach(() => {
+  getAttributedGuidesMock.mockResolvedValue([])
+  listPublishedForMerchantMock.mockResolvedValue([])
+  productStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
+})
 afterEach(cleanup)
 
 describe('MerchantPublicProfilePage', () => {
@@ -27,12 +32,21 @@ describe('MerchantPublicProfilePage', () => {
     productStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
     getMerchantBySlugMock.mockResolvedValue({ id: '123e4567-e89b-42d3-a456-426614174000', slug: 'acme-travel', companyName: 'Acme Travel', tagline: null, city: null, logoUrl: null, websiteUrl: null })
     listPublishedForMerchantMock.mockResolvedValue([])
-    getAttributedGuidesMock.mockRejectedValue(new Error('attribution unavailable'))
+    getAttributedGuidesMock.mockRejectedValue({ code: 'PGRST202', message: 'attribution RPC unavailable' })
     const el = await MerchantPublicProfilePage({ params: Promise.resolve({ locale: 'en', slug: 'acme-travel' }) })
     render(el)
     expect(screen.getByRole('heading', { level: 1, name: 'Acme Travel' })).toBeTruthy()
     expect(getAttributedGuidesMock).toHaveBeenCalledWith('123e4567-e89b-42d3-a456-426614174000')
     expect(screen.queryByRole('heading', { name: 'Featured in guides' })).not.toBeInTheDocument()
+  })
+
+  it('rethrows unknown merchant attribution failures', async () => {
+    const error = new TypeError('attribution mapper bug')
+    getMerchantBySlugMock.mockResolvedValue({ id: '123e4567-e89b-42d3-a456-426614174000', slug: 'acme-travel', companyName: 'Acme Travel', tagline: null, city: null, logoUrl: null, websiteUrl: null })
+    getAttributedGuidesMock.mockRejectedValueOnce(error)
+    await expect(MerchantPublicProfilePage({
+      params: Promise.resolve({ locale: 'en', slug: 'acme-travel' }),
+    })).rejects.toBe(error)
   })
 
   it('notFound for an unknown slug', async () => {

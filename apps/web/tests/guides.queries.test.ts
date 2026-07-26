@@ -150,7 +150,10 @@ describe('getAttributedGuidesForMerchant', () => {
 
     const result = await getAttributedGuidesForMerchant('123e4567-e89b-42d3-a456-426614174000', 4)
 
-    expect(rpcSpy).toHaveBeenCalledWith('get_attributed_guides_for_merchant', { p_merchant_id: '123e4567-e89b-42d3-a456-426614174000' })
+    expect(rpcSpy).toHaveBeenCalledWith('get_attributed_guides_for_merchant', {
+      p_merchant_id: '123e4567-e89b-42d3-a456-426614174000',
+      p_limit: 4,
+    })
     expect(limitSpy).toHaveBeenCalledWith(4)
     expect(result).toEqual([{ slug: row.slug, title: row.title, cover: row.cover_url, city: row.city, saves: row.saves_count, creatorHandle: row.creator_handle }])
     expect(JSON.stringify(result)).not.toMatch(/booking|traveler|guest|payment|checkout/i)
@@ -169,6 +172,7 @@ describe('getAttributedGuidesForMerchant', () => {
 
     expect(rpcSpy).toHaveBeenCalledWith('get_attributed_guides_for_merchant', {
       p_merchant_id: '123e4567-e89b-42d3-a456-426614174000',
+      p_limit: expected,
     })
     expect(limitSpy).toHaveBeenCalledWith(expected)
     expect(result).toEqual([{ slug: row.slug, title: row.title, cover: row.cover_url, city: row.city, saves: row.saves_count, creatorHandle: row.creator_handle }])

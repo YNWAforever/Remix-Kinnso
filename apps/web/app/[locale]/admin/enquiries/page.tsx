@@ -40,7 +40,7 @@ function isValidCursorTimestamp(value: string) {
   const second = Number(secondValue)
 
   if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month) || hour > 23 || minute > 59 || second > 59) return false
-  if (offsetHourValue !== undefined && (Number(offsetHourValue) > 23 || Number(offsetMinuteValue) > 59)) return false
+  if (offsetHourValue !== undefined && (Number(offsetHourValue) > 15 || Number(offsetMinuteValue) > 59)) return false
   return !Number.isNaN(Date.parse(value))
 }
 

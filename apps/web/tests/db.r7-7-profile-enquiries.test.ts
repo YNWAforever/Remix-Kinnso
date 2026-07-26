@@ -58,4 +58,17 @@ describe('R7.7 profile enquiries migration', () => {
     expect(text).not.toContain("digest(btrim(p_ip), 'sha256')")
     expect(text).toContain('invalid_enquiry_attestation')
   })
+
+  it('uses the Vault secret for a domain-separated rate bucket after structural validation', () => {
+    const text = sql()
+    expect(text).toContain("extensions.hmac(e'r7.7:enquiry-rate-limit:v1\\n' || v_normalized_ip, v_secret, 'sha256')")
+    expect(text).not.toContain("extensions.digest(v_normalized_ip, 'sha256')")
+
+    const targetShape = text.indexOf("if (v_type = 'creator_collab' and (p_creator_id is null")
+    const bucket = text.indexOf("insert into public.enquiry_rate_limits")
+    const eligibility = text.indexOf("if v_type = 'creator_collab' and not exists")
+    expect(targetShape).toBeGreaterThan(-1)
+    expect(bucket).toBeGreaterThan(targetShape)
+    expect(eligibility).toBeGreaterThan(bucket)
+  })
 })

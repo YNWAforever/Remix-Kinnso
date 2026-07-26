@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: 'KINNSO を選ぶ理由',
   },
   merchantProfile: {
+    enquiryCta: 'この事業者に問い合わせる',
+    featuredGuidesHeading: '掲載されたガイド',
     websiteLabel: 'ウェブサイト',
     experiencesHeading: '体験',
     experiencesEmpty: 'まだ公開された体験はありません。',

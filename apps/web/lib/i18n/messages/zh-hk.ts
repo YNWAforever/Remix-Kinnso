@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: '點解揀 KINNSO 做商戶',
   },
   merchantProfile: {
+    enquiryCta: '聯絡此商戶',
+    featuredGuidesHeading: '相關旅遊指南',
     websiteLabel: '網站',
     experiencesHeading: '體驗',
     experiencesEmpty: '仲未有已發布嘅體驗。',

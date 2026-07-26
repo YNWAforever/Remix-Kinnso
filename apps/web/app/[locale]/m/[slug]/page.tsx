@@ -5,7 +5,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getMerchantBySlug } from '@/lib/merchants/public-queries'
 import { listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
 import { getAttributedGuidesForMerchant } from '@/lib/guides/queries'
-import { optionalQuery } from '@/lib/resilience/optional'
+import { optionalEnrichmentQuery } from '@/lib/resilience/optional'
 import { resolveConfiguredProductState } from '@/lib/product-state-config'
 import { buildMerchantMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { merchantProfileJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
@@ -33,7 +33,7 @@ export default async function MerchantPublicProfilePage({ params }: { params: Pr
   const { bookingLive } = resolveConfiguredProductState()
   const [experiences, featuredGuides] = await Promise.all([
     listPublishedExperiencesForMerchant(merchant.id),
-    optionalQuery('merchant-featured-guides', () => getAttributedGuidesForMerchant(merchant.id), []),
+    optionalEnrichmentQuery('merchant-featured-guides', () => getAttributedGuidesForMerchant(merchant.id), []),
   ])
   const canonical = `${SITE_URL}/${locale}/m/${slug}`
   const ld = [

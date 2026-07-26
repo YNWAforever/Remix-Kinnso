@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: '為什麼選擇 KINNSO',
   },
   merchantProfile: {
+    enquiryCta: '聯絡此商家',
+    featuredGuidesHeading: '精選旅遊指南',
     websiteLabel: '網站',
     experiencesHeading: '體驗',
     experiencesEmpty: '尚無已發布的體驗。',

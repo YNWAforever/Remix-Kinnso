@@ -1,4 +1,4 @@
-import { createHash, createHmac } from 'node:crypto'
+import { createHmac, randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
@@ -20,7 +20,11 @@ const viewerEmail = `r7-7-enquiry-viewer-${runId}@example.test`
 const opsEmail = `r7-7-enquiry-ops-${runId}@example.test`
 
 const svc = liveConfig ? createClient(liveConfig.url, liveConfig.serviceRoleKey) : null
-const trackedIps = ['203.0.113.10', '203.0.113.11', '203.0.113.12', '203.0.113.13', '203.0.113.14']
+const trackedIps = Array.from({ length: 13 }, (_, index) => `203.0.113.${10 + index}`)
+const attributedBookingIds: string[] = []
+let attributedGuideId = ''
+let attributedExperienceId = ''
+let attributedAvailabilityId = ''
 
 let creatorId = ''
 let merchantUserId = ''
@@ -29,9 +33,12 @@ let viewerId = ''
 let opsUserId = ''
 let opsMemberId = ''
 const enquiryIds: string[] = []
+type EnquiryStatus = 'new' | 'in_progress' | 'resolved' | 'spam'
 
 function ipHash(ip: string) {
-  return createHash('sha256').update(ip).digest('hex')
+  return createHmac('sha256', localTestAttestationSecret)
+    .update(`r7.7:enquiry-rate-limit:v1\n${ip}`)
+    .digest('hex')
 }
 
 function makeAttestation(ip: string) {
@@ -139,6 +146,27 @@ async function attemptCleanup(cleanupErrors: string[], label: string, cleanup: (
 d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
   const localSvc = svc!
 
+  async function seedEnquiry(status: EnquiryStatus = 'new') {
+    const inserted = await localSvc
+      .from('enquiries')
+      .insert({
+        type: 'creator_collab',
+        creator_id: creatorId,
+        merchant_profile_id: null,
+        name: 'R7.7 Transition Fixture',
+        email: `transition-${randomUUID()}@example.test`,
+        message: 'This row exists only to verify the enquiry transition boundary.',
+        status,
+      })
+      .select('id')
+      .single()
+    expect(inserted.error).toBeNull()
+    const id = inserted.data!.id
+    enquiryIds.push(id)
+    return id
+  }
+
+
   beforeAll(async () => {
     await runPsql(`
       delete from vault.secrets where name = 'r7_7_enquiry_submission_hmac';
@@ -206,6 +234,14 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
 
     // Keep FK-sensitive dependencies in order, but record a failure and keep
     // attempting every later cleanup stage, including Vault and auth users.
+    if (attributedBookingIds.length > 0) {
+      await clean('attributed bookings', () => localSvc.from('bookings').delete().in('id', attributedBookingIds))
+    }
+    if (attributedAvailabilityId) {
+      await clean('attributed availability', () => localSvc.from('experience_availability').delete().eq('id', attributedAvailabilityId))
+    }
+    if (attributedExperienceId) await clean('attributed experience', () => localSvc.from('experiences').delete().eq('id', attributedExperienceId))
+    if (attributedGuideId) await clean('attributed guide', () => localSvc.from('guides').delete().eq('id', attributedGuideId))
     if (enquiryIds.length > 0) {
       await clean('enquiry audit rows', () =>
         localSvc.from('ops_audit_log').delete().eq('entity_type', 'enquiry').in('entity_id', enquiryIds),
@@ -342,5 +378,199 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
       action: 'status.resolved',
       metadata: { from: 'new', to: 'resolved' },
     })
+  }, testTimeout)
+
+  it('enforces creator avatar URLs and enquiry target/type constraints', async () => {
+    const invalidAvatar = await localSvc.from('creators').update({ avatar_url: 'ftp://example.test/avatar.jpg' }).eq('id', creatorId)
+    expect(invalidAvatar.error).not.toBeNull()
+
+    const validAvatar = await localSvc.from('creators').update({ avatar_url: 'https://example.test/avatar.jpg' }).eq('id', creatorId)
+    expect(validAvatar.error).toBeNull()
+    expect((await localSvc.from('creators').update({ avatar_url: null }).eq('id', creatorId)).error).toBeNull()
+
+    const invalidTarget = await localSvc.from('enquiries').insert({
+      type: 'creator_collab',
+      creator_id: creatorId,
+      merchant_profile_id: merchantProfileId,
+      name: 'Invalid Target Fixture',
+      email: `invalid-target-${runId}@example.test`,
+      message: 'This row must be rejected by the target and type constraint.',
+    })
+    expect(invalidTarget.error?.message).toContain('enquiries_target_matches_type')
+  }, testTimeout)
+
+  it('charges ineligible targets and preserves the fixed quota atomically under concurrency', async () => {
+    const ineligibleIp = '203.0.113.14'
+    const ineligibleArgs = { ...creatorArgs(ineligibleIp), p_creator_id: randomUUID() }
+    for (let index = 0; index < 5; index += 1) {
+      const result = await attestedAnon(ineligibleIp).rpc('submit_enquiry', ineligibleArgs)
+      expect(result.error).toBeNull()
+      expect(result.data).toBeNull()
+    }
+    const rejectedSixth = await attestedAnon(ineligibleIp).rpc('submit_enquiry', ineligibleArgs)
+    expect(rejectedSixth.error?.message).toContain('enquiry_rate_limited')
+
+    const ineligibleBucket = await localSvc
+      .from('enquiry_rate_limits')
+      .select('request_count')
+      .eq('ip_hash', ipHash(ineligibleIp))
+      .single()
+    expect(ineligibleBucket.error).toBeNull()
+    expect(ineligibleBucket.data).toMatchObject({ request_count: 5 })
+
+    const concurrentIp = '203.0.113.15'
+    const attempts = await Promise.all(
+      Array.from({ length: 10 }, () => attestedAnon(concurrentIp).rpc('submit_enquiry', creatorArgs(concurrentIp))),
+    )
+    const successes = attempts.filter((result) => result.error === null && result.data)
+    const limited = attempts.filter((result) => result.error?.message.includes('enquiry_rate_limited'))
+    expect(successes).toHaveLength(5)
+    expect(limited).toHaveLength(5)
+    enquiryIds.push(...successes.map((result) => result.data!))
+
+    const concurrentBucket = await localSvc
+      .from('enquiry_rate_limits')
+      .select('request_count')
+      .eq('ip_hash', ipHash(concurrentIp))
+      .single()
+    expect(concurrentBucket.error).toBeNull()
+    expect(concurrentBucket.data).toMatchObject({ request_count: 5 })
+  }, testTimeout)
+
+  it('returns deduplicated attributed guides without booking or traveler data', async () => {
+    const guide = await localSvc
+      .from('guides')
+      .insert({
+        creator_id: creatorId,
+        creator_handle: `r77-creator-${runId}`,
+        creator_name: 'R7.7 Eligible Creator',
+        slug: `r77-attributed-guide-${runId}`,
+        title: 'R7.7 Attributed Guide',
+        summary: 'A published guide used only to verify safe merchant attribution.',
+        cover_url: 'https://example.test/r77-guide.jpg',
+        city: 'Hong Kong',
+        status: 'published',
+        published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(guide.error).toBeNull()
+    attributedGuideId = guide.data!.id
+
+    const experience = await localSvc
+      .from('experiences')
+      .insert({
+        merchant_profile_id: merchantProfileId,
+        slug: `r77-attributed-experience-${runId}`,
+        title: 'R7.7 Attributed Experience',
+        city: 'Hong Kong',
+        price_amount: 100,
+        currency: 'HKD',
+        status: 'published',
+        published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(experience.error).toBeNull()
+    attributedExperienceId = experience.data!.id
+
+    const availability = await localSvc
+      .from('experience_availability')
+      .insert({ experience_id: attributedExperienceId, date: '2027-08-01', capacity: 10 })
+      .select('id')
+      .single()
+    expect(availability.error).toBeNull()
+    attributedAvailabilityId = availability.data!.id
+
+    const bookingBase = {
+      experience_id: attributedExperienceId,
+      availability_id: attributedAvailabilityId,
+      traveler_user_id: viewerId,
+      creator_id: creatorId,
+      guide_id: attributedGuideId,
+      source_surface: 'guide',
+      qty: 1,
+      unit_amount: 100,
+      total_amount: 100,
+      currency: 'HKD',
+    }
+    const bookings = await localSvc
+      .from('bookings')
+      .insert([
+        { ...bookingBase, status: 'confirmed' },
+        { ...bookingBase, status: 'completed' },
+      ])
+      .select('id')
+    expect(bookings.error).toBeNull()
+    attributedBookingIds.push(...(bookings.data ?? []).map((booking) => booking.id))
+
+    if (!liveConfig) throw new Error('R7.7 local live-test config is not enabled')
+    const anon = createClient(liveConfig.url, liveConfig.anonKey)
+    const result = await anon.rpc('get_attributed_guides_for_merchant', {
+      p_merchant_id: merchantProfileId,
+      p_limit: 9,
+    })
+    expect(result.error).toBeNull()
+    expect(result.data).toHaveLength(1)
+    expect(result.data![0]).toMatchObject({ slug: `r77-attributed-guide-${runId}` })
+    expect(Object.keys(result.data![0]).sort()).toEqual(
+      ['slug', 'title', 'cover_url', 'city', 'saves_count', 'creator_handle'].sort(),
+    )
+  }, testTimeout)
+
+  it('enforces the complete enquiry transition and reason matrix', async () => {
+    const ops = await authedClient(opsEmail)
+    const allowed: Array<[EnquiryStatus, EnquiryStatus]> = [
+      ['new', 'in_progress'],
+      ['new', 'resolved'],
+      ['new', 'spam'],
+      ['in_progress', 'resolved'],
+      ['in_progress', 'spam'],
+      ['resolved', 'in_progress'],
+      ['spam', 'in_progress'],
+    ]
+    for (const [from, to] of allowed) {
+      const id = await seedEnquiry(from)
+      const needsReason = from === 'resolved' || from === 'spam' || to === 'resolved' || to === 'spam'
+      const result = await ops.rpc('admin_set_enquiry_status', {
+        p_id: id,
+        p_status: to,
+        p_reason: needsReason ? `${from} to ${to} live-matrix verification` : null,
+      })
+      expect(result.error, `${from} -> ${to}: ${result.error?.message}`).toBeNull()
+    }
+
+    const forbidden: Array<[EnquiryStatus, EnquiryStatus, string]> = [
+      ['new', 'new', 'enquiry_status_no_change'],
+      ['in_progress', 'new', 'invalid_enquiry_transition'],
+      ['in_progress', 'in_progress', 'enquiry_status_no_change'],
+      ['resolved', 'new', 'invalid_enquiry_transition'],
+      ['resolved', 'resolved', 'enquiry_status_no_change'],
+      ['resolved', 'spam', 'invalid_enquiry_transition'],
+      ['spam', 'new', 'invalid_enquiry_transition'],
+      ['spam', 'resolved', 'invalid_enquiry_transition'],
+      ['spam', 'spam', 'enquiry_status_no_change'],
+    ]
+    for (const [from, to, errorMessage] of forbidden) {
+      const id = await seedEnquiry(from)
+      const result = await ops.rpc('admin_set_enquiry_status', {
+        p_id: id,
+        p_status: to,
+        p_reason: 'Forbidden transition matrix verification',
+      })
+      expect(result.error?.message, `${from} -> ${to}`).toContain(errorMessage)
+    }
+
+    const reasonRequired: Array<[EnquiryStatus, EnquiryStatus]> = [
+      ['new', 'resolved'],
+      ['new', 'spam'],
+      ['resolved', 'in_progress'],
+      ['spam', 'in_progress'],
+    ]
+    for (const [from, to] of reasonRequired) {
+      const id = await seedEnquiry(from)
+      const result = await ops.rpc('admin_set_enquiry_status', { p_id: id, p_status: to, p_reason: '   ' })
+      expect(result.error?.message, `${from} -> ${to} without reason`).toContain('enquiry_reason_required')
+    }
   }, testTimeout)
 })

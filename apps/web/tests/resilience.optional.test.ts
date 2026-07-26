@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { optionalQuery, optionalValue } from '@/lib/resilience/optional'
+import { optionalEnrichmentQuery, optionalQuery, optionalValue } from '@/lib/resilience/optional'
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -19,5 +19,26 @@ describe('optional module containment', () => {
   it('returns the sync fallback when JSON-LD construction throws', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
     expect(optionalValue('guide-jsonld', () => { throw new TypeError('bad') }, [])).toEqual([])
+  })
+
+  it.each([
+    ['missing table', { code: 'PGRST205', message: 'schema cache unavailable' }],
+    ['missing column', { code: '42703', message: 'column unavailable' }],
+    ['transient connection', { code: '08006', message: 'connection failed' }],
+    ['transient timeout', { code: '57014', message: 'query canceled' }],
+  ])('degrades a recognized %s enrichment failure', async (_label, error) => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    await expect(optionalEnrichmentQuery('creator-profile-guides', async () => {
+      throw error
+    }, [])).resolves.toEqual([])
+  })
+
+  it.each([
+    new TypeError('programming bug'),
+    { code: 'XX000', message: 'unknown database failure' },
+  ])('rethrows unknown or programming enrichment failures', async (error) => {
+    await expect(optionalEnrichmentQuery('creator-profile-guides', async () => {
+      throw error
+    }, [])).rejects.toBe(error)
   })
 })

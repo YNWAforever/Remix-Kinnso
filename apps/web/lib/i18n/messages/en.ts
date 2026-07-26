@@ -218,6 +218,8 @@ export interface MerchantsDirectoryMessages {
 }
 
 export interface MerchantProfileMessages {
+  enquiryCta: string
+  featuredGuidesHeading: string
   websiteLabel: string
   experiencesHeading: string
   experiencesEmpty: string
@@ -2048,6 +2050,8 @@ const messages: Messages = {
     newHereCta: 'Why KINNSO for merchants',
   },
   merchantProfile: {
+    enquiryCta: 'Contact this merchant',
+    featuredGuidesHeading: 'Featured in guides',
     websiteLabel: 'Website',
     experiencesHeading: 'Experiences',
     experiencesEmpty: 'No experiences published yet.',

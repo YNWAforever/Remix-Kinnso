@@ -150,22 +150,27 @@ begin
   if v_message is null or char_length(v_message) not between 10 and 4000 then raise exception 'invalid_enquiry_message' using errcode = '22023'; end if;
   if (v_type = 'creator_collab' and (p_creator_id is null or p_merchant_profile_id is not null)) or (v_type = 'merchant_contact' and (p_merchant_profile_id is null or p_creator_id is not null)) then raise exception 'invalid_enquiry_target' using errcode = '22023'; end if;
 
-  if v_type = 'creator_collab' and not exists (
-    select 1 from public.creators c
-    where c.id = p_creator_id and c.status = 'active' and c.handle is not null and c.public_profile is not null
-  ) then raise exception 'enquiry_target_not_found' using errcode = '22023'; end if;
-  if v_type = 'merchant_contact' and not exists (
-    select 1 from public.merchant_profiles m
-    where m.id = p_merchant_profile_id and m.status = 'active' and m.slug is not null
-  ) then raise exception 'enquiry_target_not_found' using errcode = '22023'; end if;
-
-  v_ip_hash := encode(extensions.digest(v_normalized_ip, 'sha256'), 'hex');
+  v_ip_hash := encode(
+    extensions.hmac(E'r7.7:enquiry-rate-limit:v1\n' || v_normalized_ip, v_secret, 'sha256'),
+    'hex'
+  );
   v_window_start := to_timestamp(floor(extract(epoch from clock_timestamp()) / v_effective_window_seconds) * v_effective_window_seconds);
   insert into public.enquiry_rate_limits (ip_hash, window_start, request_count)
   values (v_ip_hash, v_window_start, 1)
   on conflict (ip_hash, window_start) do update set request_count = public.enquiry_rate_limits.request_count + 1
   returning request_count into v_request_count;
   if v_request_count > v_effective_max_requests then raise exception 'enquiry_rate_limited' using errcode = '22023'; end if;
+
+  -- Invalid-but-well-formed targets still consume quota. Returning null avoids
+  -- rolling back the rate bucket while revealing no target eligibility detail.
+  if v_type = 'creator_collab' and not exists (
+    select 1 from public.creators c
+    where c.id = p_creator_id and c.status = 'active' and c.handle is not null and c.public_profile is not null
+  ) then return null; end if;
+  if v_type = 'merchant_contact' and not exists (
+    select 1 from public.merchant_profiles m
+    where m.id = p_merchant_profile_id and m.status = 'active' and m.slug is not null
+  ) then return null; end if;
 
   insert into public.enquiries (type, creator_id, merchant_profile_id, name, email, message)
   values (v_type, p_creator_id, p_merchant_profile_id, v_name, v_email, v_message)

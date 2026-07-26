@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: 'KINNSO를 선택하는 이유',
   },
   merchantProfile: {
+    enquiryCta: '이 판매자에게 문의하기',
+    featuredGuidesHeading: '소개된 가이드',
     websiteLabel: '웹사이트',
     experiencesHeading: '체험',
     experiencesEmpty: '아직 게시된 체험이 없습니다.',

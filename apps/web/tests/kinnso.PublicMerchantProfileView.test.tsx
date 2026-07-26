@@ -31,18 +31,34 @@ describe('PublicMerchantProfileView', () => {
   })
   it('omits empty featured guides and uses the canonical guide route when attributed data exists', () => {
     const { rerender } = renderMerchant({ featuredGuides: [] })
-    expect(screen.queryByRole('heading', { name: 'Featured in guides' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: en.merchantProfile.featuredGuidesHeading })).not.toBeInTheDocument()
     rerender(<View locale="en" t={en.merchantProfile} enquiry={en.enquiry} booking={en.booking} merchant={merchant} experiences={experiences} featuredGuides={[guide]} bookingLive />)
-    expect(screen.getByRole('heading', { name: 'Featured in guides' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: en.merchantProfile.featuredGuidesHeading })).toBeVisible()
     expect(screen.getByRole('link', { name: /Harbour guide/i })).toHaveAttribute('href', '/en/g/harbour-guide')
   })
   it('wires the safe merchant enquiry CTA only for a valid target UUID', () => {
     renderMerchant()
-    expect(screen.getByRole('button', { name: 'Contact this merchant' })).toBeVisible()
-    expect(dialogProps.value).toMatchObject({ type: 'merchant_contact', targetId: merchant.id, targetName: merchant.companyName, t: en.enquiry })
+    expect(screen.getByRole('button', { name: en.merchantProfile.enquiryCta })).toBeVisible()
+    expect(dialogProps.value).toMatchObject({
+      type: 'merchant_contact',
+      targetId: merchant.id,
+      targetName: merchant.companyName,
+      triggerLabel: en.merchantProfile.enquiryCta,
+      t: en.enquiry,
+    })
   })
   it('omits the enquiry CTA when the merchant id is invalid', () => {
     renderMerchant({ merchant: { ...merchant, id: 'merchant-1' } })
-    expect(screen.queryByRole('button', { name: 'Contact this merchant' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: en.merchantProfile.enquiryCta })).not.toBeInTheDocument()
+  })
+  it('renders merchant CTA and featured heading from the supplied dictionary', () => {
+    const t = {
+      ...en.merchantProfile,
+      enquiryCta: 'Localized merchant contact',
+      featuredGuidesHeading: 'Localized guide attribution',
+    }
+    renderMerchant({ t, featuredGuides: [guide] })
+    expect(screen.getByRole('button', { name: t.enquiryCta })).toBeVisible()
+    expect(screen.getByRole('heading', { name: t.featuredGuidesHeading })).toBeVisible()
   })
 })

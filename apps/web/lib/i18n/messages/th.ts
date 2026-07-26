@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: 'ทำไมต้องเลือก KINNSO',
   },
   merchantProfile: {
+    enquiryCta: 'ติดต่อผู้ประกอบการนี้',
+    featuredGuidesHeading: 'แนะนำในคู่มือ',
     websiteLabel: 'เว็บไซต์',
     experiencesHeading: 'ประสบการณ์',
     experiencesEmpty: 'ยังไม่มีประสบการณ์ที่เผยแพร่',
