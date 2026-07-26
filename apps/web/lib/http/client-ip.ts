@@ -1,18 +1,16 @@
 import { headers } from 'next/headers'
 
 /**
- * Best-effort caller IP for rate limiting — not a security boundary
- * (`x-forwarded-for` is client-spoofable without a trusted proxy validating
- * it; anti-abuse throttling only, Stripe enforces the real financial
- * guardrails downstream). Vercel sets `x-forwarded-for`; the first entry is
- * the original client. Falls back to a fixed `'unknown'` key when both
- * headers are absent, so the rate limiter still functions rather than
- * throwing — but in production this would mean every such caller shares one
- * rate-limit bucket and could false-positive-block each other; acceptable
- * only because Vercel is expected to always set `x-forwarded-for`.
+ * Vercel-provided caller IP for rate limiting. Direct Vercel deployments
+ * overwrite `x-forwarded-for` to prevent spoofing. Prefer the preserved
+ * `x-vercel-forwarded-for` value if a proxy above Vercel changes that header.
+ * Local/non-Vercel callers retain the existing fallbacks; a Verified Proxy
+ * deployment must review its configured trusted client-IP header first.
  */
 export async function getClientIp(): Promise<string> {
   const h = await headers()
+  const vercelForwardedFor = h.get('x-vercel-forwarded-for')
+  if (vercelForwardedFor) return vercelForwardedFor.split(',')[0].trim()
   const forwardedFor = h.get('x-forwarded-for')
   if (forwardedFor) return forwardedFor.split(',')[0].trim()
   const realIp = h.get('x-real-ip')

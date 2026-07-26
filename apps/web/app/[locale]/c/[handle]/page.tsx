@@ -3,8 +3,11 @@ import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { CreatorProfileView } from '@/components/kinnso/pages/CreatorProfileView'
-import { getCreatorByHandle } from '@/lib/creators/queries'
+import { getCreatorByHandle, getPublishedGuidesForCreator } from '@/lib/creators/queries'
 import { buildCreatorMetadata, SITE_URL } from '@/lib/seo/metadata'
+import { getPublishedArticlesForCreator } from '@/lib/articles/queries'
+import { getPublicSessionsForCreator } from '@/lib/sessions/public-queries'
+import { optionalEnrichmentQuery } from '@/lib/resilience/optional'
 import { creatorProfileJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 
@@ -41,6 +44,11 @@ export default async function CreatorPublicPage({
   const creator = await getCreatorByHandle(handle)
   if (!creator) notFound()
   const canonical = `${SITE_URL}/${locale}/c/${handle}`
+  const [guides, articles, sessions] = await Promise.all([
+    optionalEnrichmentQuery('creator-profile-guides', () => getPublishedGuidesForCreator(creator.id), []),
+    optionalEnrichmentQuery('creator-profile-articles', () => getPublishedArticlesForCreator(creator.handle, locale as Locale), []),
+    optionalEnrichmentQuery('creator-profile-sessions', () => getPublicSessionsForCreator(creator.id), []),
+  ])
   const ld = [
     creatorProfileJsonLd({
       name: creator.name, handle: creator.handle, url: canonical,
@@ -55,7 +63,12 @@ export default async function CreatorPublicPage({
   return (
     <>
       <JsonLd data={ld} />
-      <CreatorProfileView creator={creator} locale={locale as Locale} t={messages.creatorProfile} />
+      <CreatorProfileView creator={{ ...creator, guides }} locale={locale as Locale} t={messages.creatorProfile}
+        enquiry={messages.enquiry}
+        related={messages.destinations}
+        articles={articles}
+        sessions={sessions}
+      />
     </>
   )
 }

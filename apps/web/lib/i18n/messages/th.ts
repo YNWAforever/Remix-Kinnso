@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: 'ทำไมต้องเลือก KINNSO',
   },
   merchantProfile: {
+    enquiryCta: 'ติดต่อผู้ประกอบการนี้',
+    featuredGuidesHeading: 'แนะนำในคู่มือ',
     websiteLabel: 'เว็บไซต์',
     experiencesHeading: 'ประสบการณ์',
     experiencesEmpty: 'ยังไม่มีประสบการณ์ที่เผยแพร่',
@@ -817,6 +819,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: 'เราจะส่งการยืนยันการจองไปที่อีเมลนี้',
     submitCta: 'จองเลย',
+    opensSoonCta: 'เปิดให้จองเร็ว ๆ นี้',
     submittingCta: 'กำลังไปยังหน้าชำระเงินที่ปลอดภัย…',
     invalidEmail: 'กรุณากรอกอีเมลที่ถูกต้อง',
     invalidQty: 'กรุณาเลือกจำนวนผู้เดินทาง',
@@ -904,10 +907,18 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง', navSessions: 'เซสชัน',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง', navSessions: 'เซสชัน', navEnquiries: 'คำถาม',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
+  },
+  enquiriesAdmin: {
+    title: 'คำถาม', subtitle: 'ตรวจสอบและจัดการคำถามเกี่ยวกับโปรไฟล์พร้อมบันทึกการตรวจสอบ',
+    filterActive: 'กำลังดำเนินการ', filterResolved: 'แก้ไขแล้ว', filterSpam: 'สแปม', filterAllTypes: 'ทุกประเภท',
+    typeCreator: 'ร่วมงานกับครีเอเตอร์', typeMerchant: 'ติดต่อร้านค้า', statusNew: 'ใหม่', statusInProgress: 'กำลังดำเนินการ', statusResolved: 'แก้ไขแล้ว', statusSpam: 'สแปม',
+    receivedAt: 'เวลาที่ได้รับ', target: 'เป้าหมาย', markInProgress: 'เริ่มดำเนินการ', markResolved: 'ทำเครื่องหมายว่าแก้ไขแล้ว', markSpam: 'ทำเครื่องหมายเป็นสแปม', reopen: 'เปิดอีกครั้ง',
+    reasonLabel: 'เหตุผล', reasonRequired: 'ต้องระบุเหตุผล', empty: 'ไม่มีคำถามที่ตรงกับตัวกรองนี้', actionFailed: 'ไม่สามารถอัปเดตคำถามได้ โปรดลองอีกครั้ง',
+    next: 'ถัดไป',
   },
   creators: {
     title: 'ครีเอเตอร์',
@@ -1356,6 +1367,12 @@ const messages: Messages = {
     success: 'คุณอยู่ในรายชื่อแล้ว เราจะแจ้งข่าวให้ทราบ',
     invalidEmail: 'กรุณากรอกอีเมลที่ถูกต้อง',
     retry: 'ยังบันทึกไม่ได้ โปรดลองอีกครั้ง',
+  },
+  enquiry: {
+    creatorPurpose: 'ร่วมงานกับครีเอเตอร์', merchantPurpose: 'ติดต่อร้านค้า', dialogTitle: 'ส่งคำถาม', dialogDescription: 'บอกเราว่าคุณต้องการสอบถามเรื่องใด',
+    nameLabel: 'ชื่อ', emailLabel: 'อีเมล', messageLabel: 'ข้อความ', submit: 'ส่งคำถาม', submitting: 'กำลังส่งคำถาม…', cancel: 'ยกเลิก', close: 'ปิด',
+    invalid: 'โปรดตรวจสอบชื่อ อีเมล และข้อความ แล้วลองอีกครั้ง', rateLimited: 'มีการส่งคำถามจากการเชื่อมต่อนี้มากเกินไป โปรดลองอีกครั้งภายหลัง', failed: 'ไม่สามารถส่งคำถามได้ โปรดลองอีกครั้ง',
+    successTitle: 'ส่งคำถามแล้ว', successBody: 'เราได้รับคำถามของคุณแล้ว ขอบคุณที่ติดต่อเรา',
   },
   sessions: {
     eyebrow: 'คอมมูนิตี้เซสชัน',

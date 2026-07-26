@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: 'KINNSO を選ぶ理由',
   },
   merchantProfile: {
+    enquiryCta: 'この事業者に問い合わせる',
+    featuredGuidesHeading: '掲載されたガイド',
     websiteLabel: 'ウェブサイト',
     experiencesHeading: '体験',
     experiencesEmpty: 'まだ公開された体験はありません。',
@@ -817,6 +819,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: 'ご予約確認はこちらのメールアドレスに送信されます。',
     submitCta: '今すぐ予約',
+    opensSoonCta: '予約受付はまもなく開始',
     submittingCta: '安全な決済ページに移動しています…',
     invalidEmail: '有効なメールアドレスを入力してください',
     invalidQty: '人数を選択してください',
@@ -904,10 +907,18 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約', navSessions: 'セッション',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約', navSessions: 'セッション', navEnquiries: '問い合わせ',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
+  },
+  enquiriesAdmin: {
+    title: '問い合わせ', subtitle: '監査記録とともにプロフィールへの問い合わせを確認・処理します。',
+    filterActive: '対応中', filterResolved: '解決済み', filterSpam: 'スパム', filterAllTypes: 'すべての種類',
+    typeCreator: 'クリエイター協業', typeMerchant: 'マーチャントへの連絡', statusNew: '新規', statusInProgress: '対応中', statusResolved: '解決済み', statusSpam: 'スパム',
+    receivedAt: '受信日時', target: '対象', markInProgress: '対応を開始', markResolved: '解決済みにする', markSpam: 'スパムとしてマーク', reopen: '再開',
+    reasonLabel: '理由', reasonRequired: '理由を入力してください。', empty: 'この条件に一致する問い合わせはありません。', actionFailed: '問い合わせを更新できませんでした。もう一度お試しください。',
+    next: '次へ',
   },
   creators: {
     title: 'クリエイター',
@@ -1356,6 +1367,12 @@ const messages: Messages = {
     success: '登録が完了しました。最新情報をお知らせします。',
     invalidEmail: '有効なメールアドレスを入力してください。',
     retry: '登録できませんでした。もう一度お試しください。',
+  },
+  enquiry: {
+    creatorPurpose: 'クリエイターとのコラボレーション', merchantPurpose: '店舗へのお問い合わせ', dialogTitle: 'お問い合わせを送信', dialogDescription: 'ご相談内容をお聞かせください。',
+    nameLabel: 'お名前', emailLabel: 'メールアドレス', messageLabel: 'メッセージ', submit: 'お問い合わせを送信', submitting: '送信中…', cancel: 'キャンセル', close: '閉じる',
+    invalid: 'お名前、メールアドレス、メッセージを確認してもう一度お試しください。', rateLimited: 'この接続からの問い合わせが多すぎます。しばらくしてからもう一度お試しください。', failed: 'お問い合わせを送信できませんでした。もう一度お試しください。',
+    successTitle: 'お問い合わせを送信しました', successBody: 'お問い合わせを受け付けました。ありがとうございます。',
   },
   sessions: {
     eyebrow: 'コミュニティセッション',

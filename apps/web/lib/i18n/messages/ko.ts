@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: 'KINNSO를 선택하는 이유',
   },
   merchantProfile: {
+    enquiryCta: '이 판매자에게 문의하기',
+    featuredGuidesHeading: '소개된 가이드',
     websiteLabel: '웹사이트',
     experiencesHeading: '체험',
     experiencesEmpty: '아직 게시된 체험이 없습니다.',
@@ -817,6 +819,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '예약 확인 메일을 이 주소로 보내드립니다.',
     submitCta: '지금 예약하기',
+    opensSoonCta: '예약이 곧 시작됩니다',
     submittingCta: '안전한 결제 페이지로 이동 중…',
     invalidEmail: '유효한 이메일 주소를 입력해 주세요',
     invalidQty: '인원 수를 선택해 주세요',
@@ -904,10 +907,18 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션', navTestimonials: '추천사', navBookings: '예약', navSessions: '세션',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션', navTestimonials: '추천사', navBookings: '예약', navSessions: '세션', navEnquiries: '문의',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
+  },
+  enquiriesAdmin: {
+    title: '문의', subtitle: '감사 기록과 함께 프로필 문의를 검토하고 처리합니다.',
+    filterActive: '진행 중', filterResolved: '해결됨', filterSpam: '스팸', filterAllTypes: '모든 유형',
+    typeCreator: '크리에이터 협업', typeMerchant: '판매자 문의', statusNew: '신규', statusInProgress: '진행 중', statusResolved: '해결됨', statusSpam: '스팸',
+    receivedAt: '접수 시간', target: '대상', markInProgress: '진행으로 표시', markResolved: '해결로 표시', markSpam: '스팸으로 표시', reopen: '다시 열기',
+    reasonLabel: '사유', reasonRequired: '사유를 입력해야 합니다.', empty: '이 조건에 맞는 문의가 없습니다.', actionFailed: '문의를 업데이트할 수 없습니다. 다시 시도해 주세요.',
+    next: '다음',
   },
   creators: {
     title: '크리에이터',
@@ -1356,6 +1367,12 @@ const messages: Messages = {
     success: '대기 명단에 등록되었습니다. 소식을 알려드릴게요.',
     invalidEmail: '올바른 이메일 주소를 입력해 주세요.',
     retry: '등록하지 못했습니다. 다시 시도해 주세요.',
+  },
+  enquiry: {
+    creatorPurpose: '크리에이터 협업', merchantPurpose: '판매자 문의', dialogTitle: '문의 보내기', dialogDescription: '문의 내용을 알려 주세요.',
+    nameLabel: '이름', emailLabel: '이메일 주소', messageLabel: '메시지', submit: '문의 보내기', submitting: '문의 보내는 중…', cancel: '취소', close: '닫기',
+    invalid: '이름, 이메일 주소, 메시지를 확인한 후 다시 시도해 주세요.', rateLimited: '이 연결에서 문의를 너무 많이 보냈습니다. 잠시 후 다시 시도해 주세요.', failed: '문의를 보내지 못했습니다. 다시 시도해 주세요.',
+    successTitle: '문의가 전송되었습니다', successBody: '문의가 접수되었습니다. 연락해 주셔서 감사합니다.',
   },
   sessions: {
     eyebrow: '커뮤니티 세션',

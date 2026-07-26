@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: '點解揀 KINNSO 做商戶',
   },
   merchantProfile: {
+    enquiryCta: '聯絡此商戶',
+    featuredGuidesHeading: '相關旅遊指南',
     websiteLabel: '網站',
     experiencesHeading: '體驗',
     experiencesEmpty: '仲未有已發布嘅體驗。',
@@ -817,6 +819,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '我們會將預約確認發送至此電郵。',
     submitCta: '立即預約',
+    opensSoonCta: '預約即將開放',
     submittingCta: '正在轉往安全付款頁面…',
     invalidEmail: '請輸入有效的電郵地址',
     invalidQty: '請選擇旅客人數',
@@ -904,10 +907,18 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶', navCreators: '創作者', navMerchants: '商戶', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單', navSessions: '專場',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '用戶', navCreators: '創作者', navMerchants: '商戶', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單', navSessions: '專場', navEnquiries: '查詢',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、用戶同平台內容。',
     statCreators: '創作者', statMerchants: '商戶', statOps: '營運成員',
     statPerksActive: '啟用中福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
+  },
+  enquiriesAdmin: {
+    title: '查詢', subtitle: '以稽核記錄檢視及處理個人檔案查詢。',
+    filterActive: '處理中', filterResolved: '已解決', filterSpam: '垃圾訊息', filterAllTypes: '所有類型',
+    typeCreator: '創作者合作', typeMerchant: '聯絡商戶', statusNew: '新增', statusInProgress: '處理中', statusResolved: '已解決', statusSpam: '垃圾訊息',
+    receivedAt: '接收時間', target: '對象', markInProgress: '標記為處理中', markResolved: '標記為已解決', markSpam: '標記為垃圾訊息', reopen: '重新開啟',
+    reasonLabel: '原因', reasonRequired: '必須提供原因。', empty: '沒有符合這些篩選條件的查詢。', actionFailed: '無法更新查詢，請再試一次。',
+    next: '下一頁',
   },
   creators: {
     title: '創作者',
@@ -1356,6 +1367,12 @@ const messages: Messages = {
     success: '你已加入名單，我哋會通知你。',
     invalidEmail: '請輸入有效的電郵地址。',
     retry: '暫時未能儲存，請再試一次。',
+  },
+  enquiry: {
+    creatorPurpose: '創作者合作', merchantPurpose: '聯絡商戶', dialogTitle: '發送查詢', dialogDescription: '請告訴我哋你想傾啲咩。',
+    nameLabel: '姓名', emailLabel: '電郵地址', messageLabel: '訊息', submit: '發送查詢', submitting: '正在發送查詢…', cancel: '取消', close: '關閉',
+    invalid: '請檢查姓名、電郵地址同訊息後再試。', rateLimited: '呢個連線發送咗太多查詢，請遲啲再試。', failed: '暫時未能發送查詢，請再試一次。',
+    successTitle: '查詢已發送', successBody: '多謝你聯絡我哋，我哋已收到你嘅查詢。',
   },
   sessions: {
     eyebrow: '社群活動',

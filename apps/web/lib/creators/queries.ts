@@ -9,7 +9,13 @@ export interface PublicProfile {
   audience_geos: string[]
   audience_locales: string[]
   languages: string[]
-  platforms: { platform: string; verified: boolean }[]
+  platforms: PublicCreatorPlatform[]
+}
+
+export interface PublicCreatorPlatform {
+  platform: string
+  verified: boolean
+  followers?: number
 }
 
 export interface CreatorSummary {
@@ -22,14 +28,25 @@ export interface CreatorSummary {
 
 export interface PublicCreator {
   handle: string
+  id: string
   name: string
   bio: string
   profile: PublicProfile
+  avatarUrl: string | null
   guides: Guide[]
 }
 
-function toProfile(json: unknown): PublicProfile {
+export function toProfile(json: unknown): PublicProfile {
   const j = (json ?? {}) as Partial<PublicProfile>
+  const platforms = Array.isArray(j.platforms) ? j.platforms.flatMap((value) => {
+    if (!value || typeof value !== 'object') return []
+    const platform = value as Partial<PublicCreatorPlatform>
+    if (typeof platform.platform !== 'string') return []
+    const followers = typeof platform.followers === 'number' && Number.isFinite(platform.followers) && platform.followers >= 0
+      ? { followers: platform.followers }
+      : {}
+    return [{ platform: platform.platform, verified: platform.verified === true, ...followers }]
+  }) : []
   return {
     niches: j.niches ?? [],
     content_pillars: j.content_pillars ?? [],
@@ -37,7 +54,7 @@ function toProfile(json: unknown): PublicProfile {
     audience_geos: j.audience_geos ?? [],
     audience_locales: j.audience_locales ?? [],
     languages: j.languages ?? [],
-    platforms: j.platforms ?? [],
+    platforms,
   }
 }
 
@@ -106,28 +123,36 @@ export async function getPublicCreators(): Promise<CreatorSummary[]> {
 // renderable pages — see fetchEligibleCreators.
 export async function getCreatorByHandle(handle: string): Promise<PublicCreator | null> {
   const supabase = createSupabasePublicClient()
-  const { data: c } = await supabase
+  const { data: c, error } = await supabase
     .from('creators')
-    .select('id, handle, display_name, bio, public_profile')
+    .select('id, handle, display_name, bio, avatar_url, public_profile')
     .eq('handle', handle)
     .eq('status', 'active')
     .maybeSingle()
+  if (error) throw error
   if (!c) return null
-
-  const { data: guideRows } = await supabase
-    .from('guides')
-    .select('slug, title, cover_url, city, saves_count, creator_handle')
-    .eq('creator_id', c.id)
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
 
   return {
     handle: c.handle as string,
+    id: c.id,
+    avatarUrl: c.avatar_url,
     name: c.display_name ?? (c.handle as string),
     bio: c.bio ?? '',
     profile: toProfile(c.public_profile),
-    guides: (guideRows ?? []).map(mapRowToGuide),
+    guides: [],
   }
+}
+
+export async function getPublishedGuidesForCreator(creatorId: string): Promise<Guide[]> {
+  const supabase = createSupabasePublicClient()
+  const { data, error } = await supabase
+    .from('guides')
+    .select('slug, title, cover_url, city, saves_count, creator_handle')
+    .eq('creator_id', creatorId)
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []).map(mapRowToGuide)
 }
 
 export async function getCreatorsForSitemap(): Promise<{ handle: string; lastmod: string | null }[]> {

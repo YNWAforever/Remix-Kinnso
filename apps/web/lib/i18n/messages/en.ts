@@ -218,6 +218,8 @@ export interface MerchantsDirectoryMessages {
 }
 
 export interface MerchantProfileMessages {
+  enquiryCta: string
+  featuredGuidesHeading: string
   websiteLabel: string
   experiencesHeading: string
   experiencesEmpty: string
@@ -238,6 +240,7 @@ export interface BookingMessages {
   noAvailability: string
   qtyLabel: string
   spotsLeftLabel: string
+  opensSoonCta: string
   soldOutLabel: string
   guestEmailLabel: string
   guestEmailPlaceholder: string
@@ -947,10 +950,16 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string; navEnquiries: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
+  }
+  enquiriesAdmin: {
+    title: string; subtitle: string; filterActive: string; filterResolved: string; filterSpam: string; filterAllTypes: string
+    typeCreator: string; typeMerchant: string; statusNew: string; statusInProgress: string; statusResolved: string; statusSpam: string
+    receivedAt: string; target: string; markInProgress: string; markResolved: string; markSpam: string; reopen: string
+    reasonLabel: string; reasonRequired: string; empty: string; actionFailed: string; next: string
   }
   creators: {
     title: string; subtitle: string
@@ -1201,6 +1210,12 @@ export interface Messages {
     success: string
     invalidEmail: string
     retry: string
+  }
+  enquiry: {
+    creatorPurpose: string; merchantPurpose: string; dialogTitle: string; dialogDescription: string
+    nameLabel: string; emailLabel: string; messageLabel: string; submit: string; submitting: string
+    cancel: string; close: string; invalid: string; rateLimited: string; failed: string
+    successTitle: string; successBody: string
   }
   sessions: {
     eyebrow: string; title: string; body: string
@@ -2035,6 +2050,8 @@ const messages: Messages = {
     newHereCta: 'Why KINNSO for merchants',
   },
   merchantProfile: {
+    enquiryCta: 'Contact this merchant',
+    featuredGuidesHeading: 'Featured in guides',
     websiteLabel: 'Website',
     experiencesHeading: 'Experiences',
     experiencesEmpty: 'No experiences published yet.',
@@ -2057,6 +2074,7 @@ const messages: Messages = {
     guestEmailLabel: 'Email',
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: "We'll send your booking confirmation here.",
+    opensSoonCta: 'Booking opens soon',
     submitCta: 'Book now',
     submittingCta: 'Redirecting to secure checkout…',
     invalidEmail: 'Enter a valid email address',
@@ -2145,10 +2163,18 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions', navEnquiries: 'Enquiries',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
+  },
+  enquiriesAdmin: {
+    title: 'Enquiries', subtitle: 'Review and resolve profile enquiries with an audit trail.',
+    filterActive: 'Active', filterResolved: 'Resolved', filterSpam: 'Spam', filterAllTypes: 'All types',
+    typeCreator: 'Creator collaboration', typeMerchant: 'Merchant contact', statusNew: 'New', statusInProgress: 'In progress', statusResolved: 'Resolved', statusSpam: 'Spam',
+    receivedAt: 'Received', target: 'Target', markInProgress: 'Mark in progress', markResolved: 'Mark resolved', markSpam: 'Mark as spam', reopen: 'Reopen',
+    reasonLabel: 'Reason', reasonRequired: 'A reason is required.', empty: 'No enquiries match these filters.', actionFailed: 'The enquiry could not be updated. Please try again.',
+    next: 'Next',
   },
   creators: {
     title: 'Creators',
@@ -2609,6 +2635,14 @@ const messages: Messages = {
     success: "You're on the list — we'll keep you posted.",
     invalidEmail: 'Enter a valid email address.',
     retry: 'Could not save your interest. Please try again.',
+  },
+  enquiry: {
+    creatorPurpose: 'Creator collaboration', merchantPurpose: 'Merchant contact',
+    dialogTitle: 'Send an enquiry', dialogDescription: 'Tell us what you have in mind.',
+    nameLabel: 'Name', emailLabel: 'Email', messageLabel: 'Message',
+    submit: 'Send enquiry', submitting: 'Sending enquiry…', cancel: 'Cancel', close: 'Close',
+    invalid: 'Please check your name, email, and message, then try again.', rateLimited: 'Too many enquiries from this connection. Please try again later.',
+    failed: 'We could not send your enquiry. Please try again.', successTitle: 'Enquiry sent', successBody: 'Thanks for getting in touch. We have received your enquiry.',
   },
   sessions: {
     eyebrow: 'Community Sessions',

@@ -794,6 +794,8 @@ const messages: Messages = {
     newHereCta: '为什么选择 KINNSO',
   },
   merchantProfile: {
+    enquiryCta: '联系此商家',
+    featuredGuidesHeading: '精选旅行指南',
     websiteLabel: '网站',
     experiencesHeading: '体验',
     experiencesEmpty: '尚无已发布的体验。',
@@ -817,6 +819,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '我们会将预约确认发送至此邮箱。',
     submitCta: '立即预约',
+    opensSoonCta: '预约即将开放',
     submittingCta: '正在跳转至安全支付页面…',
     invalidEmail: '请输入有效的邮箱地址',
     invalidQty: '请选择旅客人数',
@@ -904,10 +907,18 @@ const messages: Messages = {
     disclaimer: 'AI 生成内容 — 发布前请先审阅。',
   },
   admin: {
-    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队', navMissions: '任务', navTestimonials: '用户推荐', navBookings: '订单', navSessions: '专场',
+    navDashboard: '仪表盘', navPerks: '福利', navUsers: '用户', navCreators: '创作者', navMerchants: '商家', navTeam: '团队', navMissions: '任务', navTestimonials: '用户推荐', navBookings: '订单', navSessions: '专场', navEnquiries: '咨询',
     dashboardTitle: '管理后台', dashboardSubtitle: '管理福利、用户和平台内容。',
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
+  },
+  enquiriesAdmin: {
+    title: '咨询', subtitle: '通过审计记录查看并处理资料页咨询。',
+    filterActive: '处理中', filterResolved: '已解决', filterSpam: '垃圾信息', filterAllTypes: '所有类型',
+    typeCreator: '创作者合作', typeMerchant: '联系商家', statusNew: '新建', statusInProgress: '处理中', statusResolved: '已解决', statusSpam: '垃圾信息',
+    receivedAt: '接收时间', target: '目标', markInProgress: '标记为处理中', markResolved: '标记为已解决', markSpam: '标记为垃圾信息', reopen: '重新开启',
+    reasonLabel: '原因', reasonRequired: '必须提供原因。', empty: '没有符合这些筛选条件的咨询。', actionFailed: '无法更新咨询，请重试。',
+    next: '下一页',
   },
   creators: {
     title: '创作者',
@@ -1356,6 +1367,12 @@ const messages: Messages = {
     success: '你已加入名单，我们会通知你。',
     invalidEmail: '请输入有效的电子邮箱地址。',
     retry: '暂时无法保存，请重试。',
+  },
+  enquiry: {
+    creatorPurpose: '创作者合作', merchantPurpose: '联系商家', dialogTitle: '发送咨询', dialogDescription: '请告诉我们您的想法。',
+    nameLabel: '姓名', emailLabel: '电子邮箱地址', messageLabel: '留言', submit: '发送咨询', submitting: '正在发送咨询…', cancel: '取消', close: '关闭',
+    invalid: '请检查姓名、电子邮箱地址和留言后再试。', rateLimited: '此连接发送的咨询过多，请稍后再试。', failed: '暂时无法发送咨询，请重试。',
+    successTitle: '咨询已发送', successBody: '感谢您的联系，我们已收到您的咨询。',
   },
   sessions: {
     eyebrow: '社区活动',
