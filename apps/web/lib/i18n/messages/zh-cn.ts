@@ -817,6 +817,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '我们会将预约确认发送至此邮箱。',
     submitCta: '立即预约',
+    opensSoonCta: '预约即将开放',
     submittingCta: '正在跳转至安全支付页面…',
     invalidEmail: '请输入有效的邮箱地址',
     invalidQty: '请选择旅客人数',

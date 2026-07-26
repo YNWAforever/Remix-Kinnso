@@ -35,6 +35,22 @@ export async function getPublishedGuides(limit?: number): Promise<Guide[]> {
   return (data ?? []).map(mapRowToGuide)
 }
 
+export async function getAttributedGuidesForMerchant(merchantId: string, limit?: number): Promise<Guide[]> {
+  const supabase = createSupabasePublicClient()
+  const cap = limit === undefined ? undefined : Math.min(Math.max(limit, 0), 20)
+  let query = supabase.rpc('get_attributed_guides_for_merchant', { p_merchant_id: merchantId })
+  if (cap !== undefined) query = query.limit(cap)
+  const { data, error } = await query
+  if (error) throw error
+
+  const guides = new Map<string, Guide>()
+  for (const row of data ?? []) {
+    const guide = mapRowToGuide(row as GuideRowLite)
+    if (!guides.has(guide.slug)) guides.set(guide.slug, guide)
+  }
+  return [...guides.values()]
+}
+
 export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: string | null }[]> {
   const supabase = createSupabasePublicClient()
   const { data } = await supabase

@@ -817,6 +817,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: 'เราจะส่งการยืนยันการจองไปที่อีเมลนี้',
     submitCta: 'จองเลย',
+    opensSoonCta: 'เปิดให้จองเร็ว ๆ นี้',
     submittingCta: 'กำลังไปยังหน้าชำระเงินที่ปลอดภัย…',
     invalidEmail: 'กรุณากรอกอีเมลที่ถูกต้อง',
     invalidQty: 'กรุณาเลือกจำนวนผู้เดินทาง',

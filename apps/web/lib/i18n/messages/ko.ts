@@ -817,6 +817,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '예약 확인 메일을 이 주소로 보내드립니다.',
     submitCta: '지금 예약하기',
+    opensSoonCta: '예약이 곧 시작됩니다',
     submittingCta: '안전한 결제 페이지로 이동 중…',
     invalidEmail: '유효한 이메일 주소를 입력해 주세요',
     invalidQty: '인원 수를 선택해 주세요',

@@ -238,6 +238,7 @@ export interface BookingMessages {
   noAvailability: string
   qtyLabel: string
   spotsLeftLabel: string
+  opensSoonCta: string
   soldOutLabel: string
   guestEmailLabel: string
   guestEmailPlaceholder: string
@@ -2063,6 +2064,7 @@ const messages: Messages = {
     guestEmailLabel: 'Email',
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: "We'll send your booking confirmation here.",
+    opensSoonCta: 'Booking opens soon',
     submitCta: 'Book now',
     submittingCta: 'Redirecting to secure checkout…',
     invalidEmail: 'Enter a valid email address',

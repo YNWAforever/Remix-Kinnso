@@ -817,6 +817,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: 'ご予約確認はこちらのメールアドレスに送信されます。',
     submitCta: '今すぐ予約',
+    opensSoonCta: '予約受付はまもなく開始',
     submittingCta: '安全な決済ページに移動しています…',
     invalidEmail: '有効なメールアドレスを入力してください',
     invalidQty: '人数を選択してください',

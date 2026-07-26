@@ -817,6 +817,7 @@ const messages: Messages = {
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: '我們會將預約確認發送至此電郵。',
     submitCta: '立即預約',
+    opensSoonCta: '預約即將開放',
     submittingCta: '正在轉往安全付款頁面…',
     invalidEmail: '請輸入有效的電郵地址',
     invalidQty: '請選擇旅客人數',

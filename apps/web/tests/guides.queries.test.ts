@@ -3,9 +3,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Mutable mock state, read fresh on each query call.
 const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown }))
 const limitSpy = vi.hoisted(() => vi.fn())
+const rpcSpy = vi.hoisted(() => vi.fn())
 
 vi.mock('@/lib/supabase/public', () => ({
   createSupabasePublicClient: () => ({
+    rpc: (name: string, args: unknown) => {
+      rpcSpy(name, args)
+      const builder = {
+        limit: (n: number) => {
+          limitSpy(n)
+          return Promise.resolve({ data: state.list })
+        },
+        then: (onF: (v: { data: unknown }) => unknown) =>
+          Promise.resolve({ data: state.list }).then(onF),
+      }
+      return builder
+    },
     from: () => {
       const builder = {
         select: () => builder,
@@ -26,7 +39,7 @@ vi.mock('@/lib/supabase/public', () => ({
   }),
 }))
 
-import { mapRowToGuide, getPublishedGuides, getGuideBySlug, getGuidesForSitemap } from '@/lib/guides/queries'
+import { mapRowToGuide, getPublishedGuides, getGuideBySlug, getGuidesForSitemap, getAttributedGuidesForMerchant } from '@/lib/guides/queries'
 import { guides as mockGuides } from '@/lib/creator-mock'
 
 const row = {
@@ -42,6 +55,7 @@ beforeEach(() => {
   state.list = []
   state.single = null
   limitSpy.mockClear()
+  rpcSpy.mockClear()
 })
 
 describe('mapRowToGuide', () => {
@@ -124,5 +138,21 @@ describe('getGuidesForSitemap', () => {
   it('returns [] when there are no published guides', async () => {
     state.list = []
     expect(await getGuidesForSitemap()).toEqual([])
+  })
+})
+
+describe('getAttributedGuidesForMerchant', () => {
+  it('uses only the attribution RPC, applies the requested cap, and maps the approved public card shape', async () => {
+    state.list = [
+      { ...row, booking_id: 'private-booking', traveler_id: 'private-traveller', guest_email: 'private@example.test', payment_intent: 'pi_private', checkout_session_id: 'cs_private' },
+      { ...row, booking_id: 'duplicate-private-booking' },
+    ]
+
+    const result = await getAttributedGuidesForMerchant('123e4567-e89b-42d3-a456-426614174000', 4)
+
+    expect(rpcSpy).toHaveBeenCalledWith('get_attributed_guides_for_merchant', { p_merchant_id: '123e4567-e89b-42d3-a456-426614174000' })
+    expect(limitSpy).toHaveBeenCalledWith(4)
+    expect(result).toEqual([{ slug: row.slug, title: row.title, cover: row.cover_url, city: row.city, saves: row.saves_count, creatorHandle: row.creator_handle }])
+    expect(JSON.stringify(result)).not.toMatch(/booking|traveler|guest|payment|checkout/i)
   })
 })
