@@ -6,6 +6,7 @@ import {
 import { cleanupOwnedEnquiries } from '../../e2e/profile-enquiries-cleanup'
 
 const safeEnv: NodeJS.ProcessEnv = {
+  NODE_ENV: 'test',
   [PROFILE_ENQUIRIES_LOCAL_OPT_IN]: '1',
   E2E_BASE_URL: 'http://127.0.0.1:3000',
   SUPABASE_URL: 'http://127.0.0.1:54321',
@@ -33,7 +34,8 @@ async function importDedicatedConfig(env: NodeJS.ProcessEnv) {
 
 describe('profile enquiries Playwright isolation', () => {
   it('rejects missing opt-in before a local config is available', () => {
-    const { [PROFILE_ENQUIRIES_LOCAL_OPT_IN]: _, ...withoutOptIn } = safeEnv
+    const withoutOptIn = { ...safeEnv }
+    delete withoutOptIn[PROFILE_ENQUIRIES_LOCAL_OPT_IN]
     expect(() => resolveProfileEnquiriesLocalConfig(withoutOptIn)).toThrow(`${PROFILE_ENQUIRIES_LOCAL_OPT_IN}=1 is required`)
   })
 
@@ -53,8 +55,8 @@ describe('profile enquiries Playwright isolation', () => {
   })
 
   it('imports the dedicated config under a safe environment and scopes a fresh server to the profile spec', async () => {
-    const module = await importDedicatedConfig(safeEnv)
-    const config = module.default as unknown as {
+    const configModule = await importDedicatedConfig(safeEnv)
+    const config = configModule.default as unknown as {
       testMatch: string
       webServer: { reuseExistingServer: boolean }
     }
