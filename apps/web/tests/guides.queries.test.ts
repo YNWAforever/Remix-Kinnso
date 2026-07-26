@@ -155,4 +155,22 @@ describe('getAttributedGuidesForMerchant', () => {
     expect(result).toEqual([{ slug: row.slug, title: row.title, cover: row.cover_url, city: row.city, saves: row.saves_count, creatorHandle: row.creator_handle }])
     expect(JSON.stringify(result)).not.toMatch(/booking|traveler|guest|payment|checkout/i)
   })
+
+  it.each([
+    ['undefined', undefined, 20],
+    ['NaN', Number.NaN, 20],
+    ['negative', -3, 0],
+    ['fractional', 4.9, 4],
+    ['above cap', 99, 20],
+  ])('normalizes a %s limit to the deterministic safe query cap', async (_name, input, expected) => {
+    state.list = [row]
+
+    const result = await getAttributedGuidesForMerchant('123e4567-e89b-42d3-a456-426614174000', input)
+
+    expect(rpcSpy).toHaveBeenCalledWith('get_attributed_guides_for_merchant', {
+      p_merchant_id: '123e4567-e89b-42d3-a456-426614174000',
+    })
+    expect(limitSpy).toHaveBeenCalledWith(expected)
+    expect(result).toEqual([{ slug: row.slug, title: row.title, cover: row.cover_url, city: row.city, saves: row.saves_count, creatorHandle: row.creator_handle }])
+  })
 })

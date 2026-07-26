@@ -37,9 +37,9 @@ export async function getPublishedGuides(limit?: number): Promise<Guide[]> {
 
 export async function getAttributedGuidesForMerchant(merchantId: string, limit?: number): Promise<Guide[]> {
   const supabase = createSupabasePublicClient()
-  const cap = limit === undefined ? undefined : Math.min(Math.max(limit, 0), 20)
+  const cap = normalizeAttributedGuidesLimit(limit)
   let query = supabase.rpc('get_attributed_guides_for_merchant', { p_merchant_id: merchantId })
-  if (cap !== undefined) query = query.limit(cap)
+  query = query.limit(cap)
   const { data, error } = await query
   if (error) throw error
 
@@ -49,6 +49,14 @@ export async function getAttributedGuidesForMerchant(merchantId: string, limit?:
     if (!guides.has(guide.slug)) guides.set(guide.slug, guide)
   }
   return [...guides.values()]
+
+/** Undefined and non-finite values use the safe 20-card default; finite
+ * positives are floored, negatives clamp to zero, and callers cannot exceed
+ * the database contract's 20-row cap. */
+function normalizeAttributedGuidesLimit(limit: number | undefined): number {
+  if (!Number.isFinite(limit)) return 20
+  return Math.min(Math.max(Math.floor(limit as number), 0), 20)
+}
 }
 
 export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: string | null }[]> {
