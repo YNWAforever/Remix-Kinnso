@@ -1357,6 +1357,12 @@ const messages: Messages = {
     invalidEmail: '请输入有效的电子邮箱地址。',
     retry: '暂时无法保存，请重试。',
   },
+  enquiry: {
+    creatorPurpose: '创作者合作', merchantPurpose: '联系商家', dialogTitle: '发送咨询', dialogDescription: '请告诉我们您的想法。',
+    nameLabel: '姓名', emailLabel: '电子邮箱地址', messageLabel: '留言', submit: '发送咨询', submitting: '正在发送咨询…', cancel: '取消', close: '关闭',
+    invalid: '请检查姓名、电子邮箱地址和留言后再试。', rateLimited: '此连接发送的咨询过多，请稍后再试。', failed: '暂时无法发送咨询，请重试。',
+    successTitle: '咨询已发送', successBody: '感谢您的联系，我们已收到您的咨询。',
+  },
   sessions: {
     eyebrow: '社区活动',
     title: '来自一线创作者的实时分享。',

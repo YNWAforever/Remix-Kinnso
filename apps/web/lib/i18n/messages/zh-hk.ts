@@ -1357,6 +1357,12 @@ const messages: Messages = {
     invalidEmail: '請輸入有效的電郵地址。',
     retry: '暫時未能儲存，請再試一次。',
   },
+  enquiry: {
+    creatorPurpose: '創作者合作', merchantPurpose: '聯絡商戶', dialogTitle: '發送查詢', dialogDescription: '請告訴我哋你想傾啲咩。',
+    nameLabel: '姓名', emailLabel: '電郵地址', messageLabel: '訊息', submit: '發送查詢', submitting: '正在發送查詢…', cancel: '取消', close: '關閉',
+    invalid: '請檢查姓名、電郵地址同訊息後再試。', rateLimited: '呢個連線發送咗太多查詢，請遲啲再試。', failed: '暫時未能發送查詢，請再試一次。',
+    successTitle: '查詢已發送', successBody: '多謝你聯絡我哋，我哋已收到你嘅查詢。',
+  },
   sessions: {
     eyebrow: '社群活動',
     title: '創作者現場連線，畀你第一手旅遊情報。',

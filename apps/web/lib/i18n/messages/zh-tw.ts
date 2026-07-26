@@ -1357,6 +1357,12 @@ const messages: Messages = {
     invalidEmail: '請輸入有效的電子郵件地址。',
     retry: '目前無法儲存，請再試一次。',
   },
+  enquiry: {
+    creatorPurpose: '創作者合作', merchantPurpose: '聯絡商家', dialogTitle: '傳送洽詢', dialogDescription: '請告訴我們您的需求。',
+    nameLabel: '姓名', emailLabel: '電子郵件地址', messageLabel: '訊息', submit: '傳送洽詢', submitting: '正在傳送洽詢…', cancel: '取消', close: '關閉',
+    invalid: '請檢查姓名、電子郵件地址和訊息後再試。', rateLimited: '此連線發送的洽詢過多，請稍後再試。', failed: '目前無法傳送洽詢，請再試一次。',
+    successTitle: '洽詢已送出', successBody: '感謝您的聯絡，我們已收到您的洽詢。',
+  },
   sessions: {
     eyebrow: '社群活動',
     title: '來自現場創作者的即時分享。',

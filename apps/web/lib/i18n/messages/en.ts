@@ -1202,6 +1202,12 @@ export interface Messages {
     invalidEmail: string
     retry: string
   }
+  enquiry: {
+    creatorPurpose: string; merchantPurpose: string; dialogTitle: string; dialogDescription: string
+    nameLabel: string; emailLabel: string; messageLabel: string; submit: string; submitting: string
+    cancel: string; close: string; invalid: string; rateLimited: string; failed: string
+    successTitle: string; successBody: string
+  }
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
@@ -2609,6 +2615,14 @@ const messages: Messages = {
     success: "You're on the list — we'll keep you posted.",
     invalidEmail: 'Enter a valid email address.',
     retry: 'Could not save your interest. Please try again.',
+  },
+  enquiry: {
+    creatorPurpose: 'Creator collaboration', merchantPurpose: 'Merchant contact',
+    dialogTitle: 'Send an enquiry', dialogDescription: 'Tell us what you have in mind.',
+    nameLabel: 'Name', emailLabel: 'Email', messageLabel: 'Message',
+    submit: 'Send enquiry', submitting: 'Sending enquiry…', cancel: 'Cancel', close: 'Close',
+    invalid: 'Please check your name, email, and message, then try again.', rateLimited: 'Too many enquiries from this connection. Please try again later.',
+    failed: 'We could not send your enquiry. Please try again.', successTitle: 'Enquiry sent', successBody: 'Thanks for getting in touch. We have received your enquiry.',
   },
   sessions: {
     eyebrow: 'Community Sessions',

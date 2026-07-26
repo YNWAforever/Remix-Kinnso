@@ -1357,6 +1357,12 @@ const messages: Messages = {
     invalidEmail: '有効なメールアドレスを入力してください。',
     retry: '登録できませんでした。もう一度お試しください。',
   },
+  enquiry: {
+    creatorPurpose: 'クリエイターとのコラボレーション', merchantPurpose: '店舗へのお問い合わせ', dialogTitle: 'お問い合わせを送信', dialogDescription: 'ご相談内容をお聞かせください。',
+    nameLabel: 'お名前', emailLabel: 'メールアドレス', messageLabel: 'メッセージ', submit: 'お問い合わせを送信', submitting: '送信中…', cancel: 'キャンセル', close: '閉じる',
+    invalid: 'お名前、メールアドレス、メッセージを確認してもう一度お試しください。', rateLimited: 'この接続からの問い合わせが多すぎます。しばらくしてからもう一度お試しください。', failed: 'お問い合わせを送信できませんでした。もう一度お試しください。',
+    successTitle: 'お問い合わせを送信しました', successBody: 'お問い合わせを受け付けました。ありがとうございます。',
+  },
   sessions: {
     eyebrow: 'コミュニティセッション',
     title: '現地クリエイターによるライブブリーフィング。',

@@ -1357,6 +1357,12 @@ const messages: Messages = {
     invalidEmail: '올바른 이메일 주소를 입력해 주세요.',
     retry: '등록하지 못했습니다. 다시 시도해 주세요.',
   },
+  enquiry: {
+    creatorPurpose: '크리에이터 협업', merchantPurpose: '판매자 문의', dialogTitle: '문의 보내기', dialogDescription: '문의 내용을 알려 주세요.',
+    nameLabel: '이름', emailLabel: '이메일 주소', messageLabel: '메시지', submit: '문의 보내기', submitting: '문의 보내는 중…', cancel: '취소', close: '닫기',
+    invalid: '이름, 이메일 주소, 메시지를 확인한 후 다시 시도해 주세요.', rateLimited: '이 연결에서 문의를 너무 많이 보냈습니다. 잠시 후 다시 시도해 주세요.', failed: '문의를 보내지 못했습니다. 다시 시도해 주세요.',
+    successTitle: '문의가 전송되었습니다', successBody: '문의가 접수되었습니다. 연락해 주셔서 감사합니다.',
+  },
   sessions: {
     eyebrow: '커뮤니티 세션',
     title: '현지 크리에이터의 라이브 브리핑.',
