@@ -18,7 +18,7 @@ export interface ArticleSeoTranslation {
 export interface ArticleIndexingDecision {
   index: boolean
   canonicalLocale: Locale | null
-  alternateLocales: Locale[]
+  alternateLocales: readonly Locale[]
 }
 
 const stringValue = (value: unknown): string =>

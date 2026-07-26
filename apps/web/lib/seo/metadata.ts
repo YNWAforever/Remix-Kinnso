@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { DEFAULT_LOCALE, LOCALES, type Locale, type UrlCategory } from '@/lib/i18n/config'
+import type { ArticleIndexingDecision } from '@/lib/seo/article-indexability'
 
 export const OG_LOCALE: Record<Locale, string> = {
   en: 'en_US', 'zh-hk': 'zh_HK', 'zh-tw': 'zh_TW', 'zh-cn': 'zh_CN', ja: 'ja_JP', ko: 'ko_KR', th: 'th_TH',
@@ -29,33 +30,68 @@ function hreflangFor(pathFor: (l: Locale) => string, current: Locale, locales: r
 // ---------- Articles (existing surface; refactored to bare titles via hreflangFor) ----------
 
 export interface ArticleMetaInput {
-  urlCategory: UrlCategory; url: string; locale: Locale; presentLocales: readonly Locale[]
-  title: string | null; metaTitle: string | null; summary: string | null; metaDescription: string | null
-  ogImage: string | null; publishedAt: string | null; editAt: string | null; isCoupon: boolean
+  urlCategory: UrlCategory
+  url: string
+  locale: Locale
+  resolvedLocale: Locale
+  indexing: ArticleIndexingDecision
+  title: string | null
+  metaTitle: string | null
+  summary: string | null
+  metaDescription: string | null
+  ogImage: string | null
+  publishedAt: string | null
+  editAt: string | null
 }
 
 const articlePath = (l: string, c: string, u: string) => abs(l, `/articles/${c}/${u}`)
 
 export function buildArticleMetadata(i: ArticleMetaInput): Metadata {
   const heading = i.metaTitle ?? i.title ?? ''
-  const description = (i.metaDescription && i.metaDescription.trim()) || i.summary || ''
-  const { canonical, languages } = hreflangFor((l) => articlePath(l, i.urlCategory, i.url), i.locale, i.presentLocales)
-  const index = !(i.isCoupon && i.locale === DEFAULT_LOCALE)
+  const description =
+    (i.metaDescription && i.metaDescription.trim()) || i.summary || ''
+  const canonical = i.indexing.canonicalLocale
+    ? articlePath(i.indexing.canonicalLocale, i.urlCategory, i.url)
+    : null
+  const languages = Object.fromEntries(
+    i.indexing.alternateLocales.map((locale) => [
+      locale,
+      articlePath(locale, i.urlCategory, i.url),
+    ]),
+  ) as Record<string, string>
+  if (canonical && i.indexing.canonicalLocale) {
+    languages['x-default'] = articlePath(
+      i.indexing.alternateLocales.includes(DEFAULT_LOCALE)
+        ? DEFAULT_LOCALE
+        : i.indexing.canonicalLocale,
+      i.urlCategory,
+      i.url,
+    )
+  }
+  const pageUrl = articlePath(i.locale, i.urlCategory, i.url)
   return {
     title: heading,
     description,
-    alternates: { canonical, languages },
+    alternates: canonical
+      ? { canonical, languages }
+      : undefined,
     openGraph: {
-      type: 'article', url: canonical, title: heading, description,
+      type: 'article',
+      url: canonical ?? pageUrl,
+      title: heading,
+      description,
       images: i.ogImage ? [i.ogImage] : [],
       publishedTime: i.publishedAt ?? undefined,
       modifiedTime: i.editAt ?? i.publishedAt ?? undefined,
-      locale: OG_LOCALE[i.locale],
+      locale: OG_LOCALE[i.resolvedLocale],
     },
-    robots: { index, follow: true, 'max-image-preview': 'large' },
+    robots: {
+      index: i.indexing.index,
+      follow: true,
+      'max-image-preview': 'large',
+    },
   }
 }
-
 export interface ListingMetaInput {
   urlCategory: UrlCategory | null; locale: Locale; presentLocales: readonly Locale[]; title: string
 }

@@ -11,7 +11,8 @@ vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('notFound'
 vi.mock('@/lib/articles/queries', () => ({
   getArticleDetail: getArticleDetailMock,
   searchArticles: searchArticlesMock,
-  getPresentLocales: vi.fn(async () => ['en']),
+  getIndexableArticleLocales: vi.fn(async () => ['en']),
+  getIndexableCategoryLocales: vi.fn(async () => ['en']),
   getYouMayLike: vi.fn(async () => []),
   getStaticArticleParams: vi.fn(async () => []),
 }))

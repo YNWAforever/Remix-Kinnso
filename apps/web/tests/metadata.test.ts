@@ -8,11 +8,22 @@ import {
 import { LOCALES } from '@/lib/i18n/config'
 
 const base = {
-  urlCategory: 'dining' as const, url: 'ramen-guide', locale: 'en' as const,
-  presentLocales: ['en', 'zh-hk'] as const,
-  title: 'Best Ramen', metaTitle: null, summary: 'A guide', metaDescription: null,
-  ogImage: 'https://cdn.kinnso.ai/og.jpg', publishedAt: '2026-06-01T00:00:00Z',
-  editAt: '2026-06-10T00:00:00Z', isCoupon: false,
+  urlCategory: 'dining' as const,
+  url: 'ramen-guide',
+  locale: 'en' as const,
+  resolvedLocale: 'en' as const,
+  indexing: {
+    index: true,
+    canonicalLocale: 'en' as const,
+    alternateLocales: ['en', 'zh-hk'] as const,
+  },
+  title: 'Best Ramen',
+  metaTitle: null,
+  summary: 'A guide',
+  metaDescription: null,
+  ogImage: 'https://cdn.kinnso.ai/og.jpg',
+  publishedAt: '2026-06-01T00:00:00Z',
+  editAt: '2026-06-10T00:00:00Z',
 }
 
 describe('buildArticleMetadata', () => {
@@ -24,13 +35,6 @@ describe('buildArticleMetadata', () => {
     expect(Object.keys(langs).sort()).toEqual(['en', 'x-default', 'zh-hk'])
     expect(langs['zh-hk']).toBe(`${SITE_URL}/zh-hk/articles/dining/ramen-guide`)
     expect(langs['x-default']).toBe(`${SITE_URL}/en/articles/dining/ramen-guide`)
-  })
-  it('points x-default at the current locale when EN is not a present translation', () => {
-    const m = buildArticleMetadata({ ...base, locale: 'zh-hk', presentLocales: ['zh-hk'] })
-    const langs = m.alternates!.languages as Record<string, string>
-    expect(Object.keys(langs).sort()).toEqual(['x-default', 'zh-hk'])
-    expect(langs['x-default']).toBe(`${SITE_URL}/zh-hk/articles/dining/ramen-guide`)
-    expect(langs['x-default']).not.toBe(`${SITE_URL}/en/articles/dining/ramen-guide`)
   })
   it('prefers meta_title; description falls back to summary', () => {
     const m = buildArticleMetadata({ ...base, metaTitle: 'SEO Title', metaDescription: null })
@@ -44,9 +48,37 @@ describe('buildArticleMetadata', () => {
     expect(og.modifiedTime).toBe('2026-06-10T00:00:00Z')
     expect(og.images).toEqual(['https://cdn.kinnso.ai/og.jpg'])
   })
-  it('noindexes EN coupon articles only', () => {
-    expect((buildArticleMetadata({ ...base, isCoupon: true, locale: 'en' }).robots as any).index).toBe(false)
-    expect((buildArticleMetadata({ ...base, isCoupon: true, locale: 'zh-hk' }).robots as any).index).toBe(true)
+  it('noindexes fallback content and canonicalizes it to the selected genuine locale', () => {
+    const metadata = buildArticleMetadata({
+      ...base,
+      locale: 'ja',
+      resolvedLocale: 'en',
+      indexing: {
+        index: false,
+        canonicalLocale: 'en',
+        alternateLocales: ['en', 'zh-hk'],
+      },
+    })
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
+    expect(metadata.alternates?.canonical).toBe(
+      `${SITE_URL}/en/articles/dining/ramen-guide`,
+    )
+    expect(Object.keys(
+      metadata.alternates?.languages as Record<string, string>,
+    ).sort()).toEqual(['en', 'x-default', 'zh-hk'])
+  })
+
+  it('omits canonical and hreflang when no translation is indexable', () => {
+    const metadata = buildArticleMetadata({
+      ...base,
+      indexing: {
+        index: false,
+        canonicalLocale: null,
+        alternateLocales: [],
+      },
+    })
+    expect(metadata.alternates).toBeUndefined()
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
   })
 })
 

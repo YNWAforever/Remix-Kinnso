@@ -1,10 +1,16 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getArticleDetail, getPresentLocales, getYouMayLike, getStaticArticleParams } from '@/lib/articles/queries'
+import {
+  getArticleDetail,
+  getIndexableArticleLocales,
+  getYouMayLike,
+  getStaticArticleParams,
+} from '@/lib/articles/queries'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale, toDbCategory, toUrlCategory, type Locale } from '@/lib/i18n/config'
 import { buildArticleMetadata, SITE_URL } from '@/lib/seo/metadata'
+import { resolveArticleIndexing } from '@/lib/seo/article-indexability'
 import { articleJsonLd, faqJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { ArticleBlockRenderer } from '@/components/ArticleBlockRenderer'
 import { ArticleGuideLinks } from '@/components/kinnso/articles/ArticleGuideLinks'
@@ -27,35 +33,62 @@ export async function generateStaticParams() {
 
 type Params = Promise<{ locale: string; category: string; url: string }>
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Params },
+): Promise<Metadata> {
   const { locale, category, url } = await params
   if (!isLocale(locale) || !toDbCategory(category)) return {}
-  const a = await getArticleDetail(category, url, locale)
-  if (!a || !a.translation) return {}
-  const present = await getPresentLocales(url)
-  const approvedOgImage = [a.translation.og_image, a.thumbnails[0]].find(isApprovedEntityMediaUrl) ?? null
+  const [article, indexableLocales] = await Promise.all([
+    getArticleDetail(category, url, locale),
+    getIndexableArticleLocales(url),
+  ])
+  if (!article?.translation || !isLocale(article.translation.locale)) return {}
+  const indexing = resolveArticleIndexing({
+    requestedLocale: locale,
+    resolvedLocale: article.translation.locale,
+    indexableLocales,
+  })
+  const approvedOgImage = [
+    article.translation.og_image,
+    article.thumbnails[0],
+  ].find(isApprovedEntityMediaUrl) ?? null
   return buildArticleMetadata({
-    urlCategory: category as 'destinations' | 'dining' | 'shopping', url, locale,
-    presentLocales: present, title: a.translation.title, metaTitle: a.translation.meta_title,
-    summary: a.translation.summary, metaDescription: a.translation.meta_description,
+    urlCategory: category as 'destinations' | 'dining' | 'shopping',
+    url,
+    locale,
+    resolvedLocale: article.translation.locale,
+    indexing,
+    title: article.translation.title,
+    metaTitle: article.translation.meta_title,
+    summary: article.translation.summary,
+    metaDescription: article.translation.meta_description,
     ogImage: approvedOgImage,
-    publishedAt: a.published_at, editAt: a.edit_at, isCoupon: a.is_coupon,
+    publishedAt: article.published_at,
+    editAt: article.edit_at,
   })
 }
-
 export default async function ArticleDetailPage({ params }: { params: Params }) {
   const { locale, category, url } = await params
   if (!isLocale(locale) || !toDbCategory(category)) notFound()
   const loc = locale as Locale
-  const a = await getArticleDetail(category, url, loc)
-  if (!a || !a.translation) notFound()       // missing locale / unpublished / category mismatch -> 404
+  const [a, indexableLocales] = await Promise.all([
+    getArticleDetail(category, url, loc),
+    getIndexableArticleLocales(url),
+  ])
+  if (!a?.translation || !isLocale(a.translation.locale)) notFound()
+  const indexing = resolveArticleIndexing({
+    requestedLocale: loc,
+    resolvedLocale: a.translation.locale,
+    indexableLocales,
+  })
+  const canonicalLocale = indexing.canonicalLocale ?? loc
 
   const dict = await getDictionary(loc)
   const { bookingLive } = resolveConfiguredProductState()
   const directory = getPostDirectory(a.translation.content)
   const youMayLike = await getYouMayLike(a.id, loc, 5)
 
-  const canonical = `${SITE_URL}/${loc}/articles/${category}/${url}`
+  const canonical = `${SITE_URL}/${canonicalLocale}/articles/${category}/${url}`
   const approvedThumbnails = a.thumbnails.filter(isApprovedEntityMediaUrl)
   const ld: Record<string, unknown>[] = [
     articleJsonLd({

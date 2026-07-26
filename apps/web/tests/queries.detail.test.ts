@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
-  getArticleDetail, searchArticles, getPresentLocales, getYouMayLike,
+  getArticleDetail, searchArticles, getIndexableArticleLocales,
+  getIndexableCategoryLocales, getYouMayLike,
   getPublishedForSitemap, getStaticArticleParams,
 } from '@/lib/articles/queries'
 
@@ -22,8 +23,9 @@ describe('article queries', () => {
     expect(await getArticleDetail('shopping', 'mall-coupon', 'en')).toBeNull()
     expect(await getArticleDetail('destinations', 'expired-article', 'en')).toBeNull()
   })
-  it('getPresentLocales returns only locales with a translation', async () => {
-    expect((await getPresentLocales('ramen-guide')).sort()).toEqual(['en', 'zh-hk'])
+  it('returns only genuine quality-passing locales for article and category SEO', async () => {
+    expect(await getIndexableArticleLocales('ramen-guide')).toEqual(['en', 'zh-hk'])
+    expect(await getIndexableCategoryLocales('dining')).toEqual(['en', 'zh-hk'])
   })
   it('getYouMayLike excludes unpublished same-category fixtures', async () => {
     const list = await getYouMayLike('00000000-0000-0000-0000-0000000000a1', 'en', 5)
@@ -37,11 +39,18 @@ describe('article queries', () => {
     expect(r.items.map((item) => item.url)).toEqual(['ramen-guide'])
     expect(r.total).toBe(1)
   })
-  it('getPublishedForSitemap / getStaticArticleParams exclude drafts and unknown categories', async () => {
-    const sm = await getPublishedForSitemap()
-    expect(sm.some((r) => r.url === 'ramen-guide')).toBe(true)
-    expect(sm.some((r) => r.url === 'draft-article')).toBe(false)
+  it('uses the same locale decisions for sitemap and static params', async () => {
+    const sitemapRows = await getPublishedForSitemap()
+    const ramen = sitemapRows.find((row) => row.url === 'ramen-guide')
+    expect(ramen?.locales).toEqual(['en', 'zh-hk'])
+    expect(sitemapRows.every((row) => row.locales.length > 0)).toBe(true)
+
     const params = await getStaticArticleParams()
-    expect(params.every((p) => ['destinations', 'dining', 'shopping'].includes(p.category))).toBe(true)
+    expect(params).toContainEqual({
+      locale: 'en',
+      category: 'dining',
+      url: 'ramen-guide',
+    })
+    expect(params.some((param) => param.url === 'sushi-guide')).toBe(false)
   })
 })
