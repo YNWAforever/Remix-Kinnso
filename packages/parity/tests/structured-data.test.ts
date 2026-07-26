@@ -52,6 +52,33 @@ describe('structured-data', () => {
     expect(byLabel('hreflang').status).toBe('fail') // zh-hk + x-default absent
   })
 
+  it('fails when hreflang advertises a locale absent from genuine translations', async () => {
+    const html = GOOD_HTML.replace(
+      '<link rel="alternate" hreflang="x-default"',
+      '<link rel="alternate" hreflang="ja" href="https://x/ja/articles/dining/ramen-guide"/>' +
+      '<link rel="alternate" hreflang="x-default"',
+    )
+    const result = await structuredData({
+      legacy,
+      newstack: fakeNewstack(
+        {
+          '/en/articles/dining/ramen-guide': html,
+          '/zh-hk/articles/dining/ramen-guide': html,
+        },
+        [{
+          url: 'ramen-guide',
+          category: 'dining',
+          isCoupon: false,
+          locales: ['en', 'zh-hk'],
+        }],
+      ),
+      sample: 1,
+    })
+    expect(result.find((row) => row.target.endsWith('hreflang'))?.status).toBe(
+      'fail',
+    )
+  })
+
   it('respects the sample cap', async () => {
     const newstack = fakeNewstack(
       { '/en/articles/dining/ramen-guide': GOOD_HTML },

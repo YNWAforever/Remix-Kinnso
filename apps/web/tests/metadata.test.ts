@@ -3,6 +3,9 @@ import {
   buildArticleMetadata, buildListingMetadata,
   buildPageMetadata, buildGuideMetadata, buildCreatorMetadata, noindexMetadata,
   buildDestinationMetadata,
+  buildMerchantMetadata,
+  buildExperienceMetadata,
+  buildSessionMetadata,
   SITE_URL,
 } from '@/lib/seo/metadata'
 import { LOCALES } from '@/lib/i18n/config'
@@ -180,6 +183,36 @@ describe('buildCreatorMetadata', () => {
     expect(m.description).toContain('@maya')
   })
 })
+
+it.each([
+  ['merchant', buildMerchantMetadata({
+    slug: 'acme',
+    locale: 'en',
+    name: 'Acme',
+    tagline: 'Local tours',
+  })],
+  ['experience', buildExperienceMetadata({
+    slug: 'night-tour',
+    locale: 'en',
+    title: 'Night tour',
+    description: 'Local experience',
+  })],
+  ['session', buildSessionMetadata({
+    slug: 'ramen-ama',
+    locale: 'en',
+    title: 'Ramen AMA',
+    description: 'Live questions',
+  })],
+] as const)(
+  '%s metadata has all seven locale alternates and a non-empty description',
+  (_kind, metadata) => {
+    expect(metadata.description).toBeTruthy()
+    expect(Object.keys(
+      metadata.alternates?.languages as Record<string, string>,
+    ).sort()).toEqual([...LOCALES, 'x-default'].sort())
+    expect((metadata.robots as { index: boolean }).index).toBe(true)
+  },
+)
 
 describe('noindexMetadata', () => {
   it('marks the page noindex,nofollow', () => {

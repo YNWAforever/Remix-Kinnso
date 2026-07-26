@@ -33,8 +33,15 @@ export const structuredData: Check = async ({ newstack, sample }) => {
       const hreflangs = extractHreflangs(html)
       const expected = new Set<string>([...a.locales, 'x-default'])
       const got = new Set(hreflangs.keys())
-      const reciprocal = [...expected].every((l) => got.has(l))
-      push('hreflang', reciprocal, `expected ${[...expected].sort().join(',')} got ${[...got].sort().join(',') || '(none)'}`)
+      const exactAlternates =
+        got.size === expected.size &&
+        [...expected].every((locale) => got.has(locale))
+      push(
+        'hreflang',
+        exactAlternates,
+        `expected ${[...expected].sort().join(',')} got ` +
+          `${[...got].sort().join(',') || '(none)'}`,
+      )
 
       const xdef = hreflangs.get('x-default') ?? ''
       push('x-default', xdef.includes(`/${DEFAULT_LOCALE}/`), xdef || '(missing)')
