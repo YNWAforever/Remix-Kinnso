@@ -51,6 +51,11 @@ export function CreatorProfileView({ creator, locale, embedded, t, enquiry, rela
     return name ? [name] : []
   })
   const workWithLabel = t.brandWorkWith.replace('{name}', creator.name)
+  const routedArticles = articles.flatMap((article) => {
+    const urlCategory = toUrlCategory(article.category)
+    return urlCategory ? [{ article, urlCategory }] : []
+  })
+
   return (
     <article className={wrap}>
       <header className="overflow-hidden rounded-xl">
@@ -108,13 +113,10 @@ export function CreatorProfileView({ creator, locale, embedded, t, enquiry, rela
         </div>
       </section>
       }
-      {articles.length > 0 && related && <section className="mt-8">
+      {routedArticles.length > 0 && related && <section className="mt-8">
         <h2 className="text-xl font-bold text-kinnso-ink">{related.articlesHeading}</h2>
         <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.flatMap((article) => {
-            const urlCategory = toUrlCategory(article.category)
-            return urlCategory ? [<ArticleCard key={article.id} href={`/${locale}/articles/${urlCategory}/${article.url}`} title={article.title} summary={article.summary} thumbnail={article.thumbnail ?? undefined} />] : []
-          })}
+          {routedArticles.map(({ article, urlCategory }) => <ArticleCard key={article.id} href={`/${locale}/articles/${urlCategory}/${article.url}`} title={article.title} summary={article.summary} thumbnail={article.thumbnail ?? undefined} />)}
         </div>
       </section>}
       {sessions.length > 0 && related && <section className="mt-8">

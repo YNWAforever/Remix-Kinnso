@@ -50,4 +50,31 @@ describe('CreatorProfileView review fixes', () => {
     rerender(<CreatorProfileView creator={{ ...creator, id: '' }} locale="en" t={en.creatorProfile} enquiry={en.enquiry} related={related} articles={[]} sessions={[]} />)
     expect(screen.queryByRole('button', { name: 'Work with Ada Wong' })).not.toBeInTheDocument()
   })
+
+  it('omits articles entirely when no article category has a public route', () => {
+    render(
+      <CreatorProfileView
+        creator={creator}
+        locale="en"
+        t={en.creatorProfile}
+        enquiry={en.enquiry}
+        related={related}
+        articles={[
+          {
+            id: 'legacy',
+            url: 'legacy',
+            category: 'legacy',
+            title: 'Legacy',
+            summary: '',
+            thumbnail: null,
+            publishedAt: '2026-07-26T00:00:00.000Z',
+          },
+        ]}
+        sessions={[]}
+      />,
+    )
+
+    expect(screen.queryByRole('heading', { name: 'Articles' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Legacy' })).not.toBeInTheDocument()
+  })
 })
