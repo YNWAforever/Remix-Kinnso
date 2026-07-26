@@ -190,7 +190,27 @@ describe('ExperiencePublicPage', () => {
     expect(ld).toContain('https://cdn.kinnso.ai/test/experience.jpg')
   })
 
-  it('renders Booking interest capture and no checkout or Offer claim when Booking is OFF', async () => {
+  it('emits an OutOfStock Product/Offer when the availability query fails closed', async () => {
+    getExperienceBySlugMock.mockResolvedValue({
+      id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
+      description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
+      durationMinutes: 120, coverUrl: null, publishedAt: '2026-07-01T00:00:00Z', savesCount: 42,
+      merchant: { slug: 'acme-travel', companyName: 'Acme Travel' },
+    })
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    listPublicAvailabilityMock.mockRejectedValueOnce(new Error('availability unavailable'))
+
+    const el = await ExperiencePublicPage({
+      params: Promise.resolve({ locale: 'en', slug: 'sunset-tour' }),
+      searchParams: Promise.resolve({}),
+    })
+    const { container } = render(el)
+    const ld = container.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+
+    expect(ld).toContain('"@type":"Product"')
+    expect(ld).toContain('"availability":"https://schema.org/OutOfStock"')
+  })
+  it('renders Booking interest capture and an OutOfStock Offer when Booking is OFF', async () => {
     resolveConfiguredProductStateMock.mockReturnValue({ agentLive: true, bookingLive: false })
     getExperienceBySlugMock.mockResolvedValue({
       id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
@@ -212,14 +232,15 @@ describe('ExperiencePublicPage', () => {
     expect(screen.queryByLabelText(en.booking.selectDateLabel)).toBeNull()
     expect(screen.queryByLabelText(en.booking.qtyLabel)).toBeNull()
     const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
-    expect(ld).not.toContain('"@type":"Product"')
+    expect(ld).toContain('"@type":"Product"')
+    expect(ld).toContain('"availability":"https://schema.org/OutOfStock"')
 
     fireEvent.change(screen.getByLabelText(en.featureInterest.emailLabel), { target: { value: 'traveller@example.com' } })
     fireEvent.submit(screen.getByRole('form', { name: en.featureInterest.submitBooking }))
     await vi.waitFor(() => expect(joinFeatureInterestActionMock).toHaveBeenCalledOnce())
     expect(createCheckoutSessionActionMock).not.toHaveBeenCalled()
   })
-  it('omits Product/Offer JSON-LD when there is no availability', async () => {
+  it('emits an OutOfStock Product/Offer when there is no availability', async () => {
     getExperienceBySlugMock.mockResolvedValue({
       id: 'e1', slug: 'sunset-tour', title: 'Sunset junk boat tour', summary: 'Two hours on the harbour.',
       description: 'Full description.', city: 'Hong Kong', priceAmount: 480, currency: 'HKD',
@@ -233,7 +254,8 @@ describe('ExperiencePublicPage', () => {
     })
     render(el)
     const ld = document.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
-    expect(ld).not.toContain('"@type":"Product"')
+    expect(ld).toContain('"@type":"Product"')
+    expect(ld).toContain('"availability":"https://schema.org/OutOfStock"')
   })
 
   it('threads src/guideSlug query params from searchParams down to the checkout action', async () => {
