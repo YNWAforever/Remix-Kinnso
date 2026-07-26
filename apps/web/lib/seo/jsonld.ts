@@ -1,3 +1,12 @@
+const hasRealRating = (
+  rating: { average: number; count: number } | undefined,
+): rating is { average: number; count: number } =>
+  Boolean(
+    rating &&
+    Number.isFinite(rating.average) &&
+    Number.isFinite(rating.count) &&
+    rating.count > 0,
+  )
 export interface ArticleLdInput {
   headline: string; description: string; url: string; images: string[]
   publishedAt: string | null; modifiedAt: string | null; authorName: string | null; locale: string
@@ -15,16 +24,26 @@ export function articleJsonLd(i: ArticleLdInput): Record<string, unknown> {
     publisher: { '@type': 'Organization', name: 'KINNSO' },
   }
   if (i.authorName) ld.author = { '@type': 'Person', name: i.authorName }
-  if (i.rating) ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: i.rating.average, reviewCount: i.rating.count }
+  if (hasRealRating(i.rating)) ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: i.rating.average, reviewCount: i.rating.count }
   return ld
 }
 
-export function faqJsonLd(faqs: Array<{ question: string; answer: string }>): Record<string, unknown> {
+export function faqJsonLd(
+  faqs: Array<{ question: string; answer: string }>,
+): Record<string, unknown> | null {
+  const visible = faqs.flatMap((faq) => {
+    const question = faq.question.trim()
+    const answer = faq.answer.trim()
+    return question && answer ? [{ question, answer }] : []
+  })
+  if (visible.length === 0) return null
   return {
-    '@context': 'https://schema.org', '@type': 'FAQPage',
-    mainEntity: faqs.map((f) => ({
-      '@type': 'Question', name: f.question,
-      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: visible.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
     })),
   }
 }
@@ -101,20 +120,38 @@ export function merchantProfileJsonLd(i: {
 }
 
 export function experienceOfferJsonLd(i: {
-  name: string; description: string; url: string; image: string | null
-  priceAmount: number; currency: string
+  name: string
+  description: string
+  url: string
+  image: string | null
+  priceAmount: number
+  currency: string
+  available: boolean
   rating?: { average: number; count: number }
 }): Record<string, unknown> {
   const ld: Record<string, unknown> = {
-    '@context': 'https://schema.org', '@type': 'Product',
-    name: i.name, description: i.description,
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: i.name,
+    description: i.description,
     offers: {
-      '@type': 'Offer', url: i.url, priceCurrency: i.currency, price: i.priceAmount,
-      availability: 'https://schema.org/InStock',
+      '@type': 'Offer',
+      url: i.url,
+      priceCurrency: i.currency,
+      price: i.priceAmount,
+      availability: i.available
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
     },
   }
   if (i.image) ld.image = i.image
-  if (i.rating) ld.aggregateRating = { '@type': 'AggregateRating', ratingValue: i.rating.average, reviewCount: i.rating.count }
+  if (hasRealRating(i.rating)) {
+    ld.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: i.rating.average,
+      reviewCount: i.rating.count,
+    }
+  }
   return ld
 }
 

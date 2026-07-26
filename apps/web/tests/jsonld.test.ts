@@ -22,13 +22,18 @@ describe('JSON-LD', () => {
     expect(ld.dateModified).toBe('2026-06-01T00:00:00Z')
     expect(ld.author).toBeUndefined()
   })
-  it('FAQPage maps Q/A to Question/acceptedAnswer', () => {
-    const ld = faqJsonLd([{ question: 'Q1?', answer: 'A1' }])
-    expect(ld['@type']).toBe('FAQPage')
-    expect((ld.mainEntity as unknown[])[0]).toEqual({
-      '@type': 'Question', name: 'Q1?',
+  it('filters empty FAQ rows and returns null when none remain', () => {
+    const ld = faqJsonLd([
+      { question: '  Q1? ', answer: ' A1 ' },
+      { question: ' ', answer: 'hidden' },
+      { question: 'hidden', answer: '' },
+    ])
+    expect((ld?.mainEntity as unknown[])).toEqual([{
+      '@type': 'Question',
+      name: 'Q1?',
       acceptedAnswer: { '@type': 'Answer', text: 'A1' },
-    })
+    }])
+    expect(faqJsonLd([{ question: ' ', answer: ' ' }])).toBeNull()
   })
   it('BreadcrumbList builds positioned items', () => {
     const ld = breadcrumbJsonLd([
@@ -121,22 +126,44 @@ describe('merchantProfileJsonLd', () => {
 })
 
 describe('experienceOfferJsonLd', () => {
-  it('builds a Product/Offer schema from an experience', () => {
+  it('emits major-unit price and InStock only for actual open booking', () => {
     const ld = experienceOfferJsonLd({
-      name: 'Sunset tour', description: 'Two hours on the harbour.', url: 'https://x/experiences/sunset-tour',
-      image: 'https://x/cover.jpg', priceAmount: 480, currency: 'HKD',
+      name: 'Tokyo night',
+      description: 'Izakaya crawl.',
+      url: 'https://x/en/experiences/tokyo-night',
+      image: null,
+      priceAmount: 12000,
+      currency: 'JPY',
+      available: true,
     })
-    expect(ld).toEqual({
-      '@context': 'https://schema.org', '@type': 'Product',
-      name: 'Sunset tour', description: 'Two hours on the harbour.', image: 'https://x/cover.jpg',
-      offers: { '@type': 'Offer', url: 'https://x/experiences/sunset-tour', priceCurrency: 'HKD', price: 480, availability: 'https://schema.org/InStock' },
+    expect(ld.offers).toEqual({
+      '@type': 'Offer',
+      url: 'https://x/en/experiences/tokyo-night',
+      priceCurrency: 'JPY',
+      price: 12000,
+      availability: 'https://schema.org/InStock',
     })
+  })
+
+  it('uses OutOfStock when booking is disabled or availability fails closed', () => {
+    const ld = experienceOfferJsonLd({
+      name: 'Tokyo night',
+      description: 'Izakaya crawl.',
+      url: 'https://x/en/experiences/tokyo-night',
+      image: null,
+      priceAmount: 12000,
+      currency: 'JPY',
+      available: false,
+    })
+    expect((ld.offers as { availability: string }).availability).toBe(
+      'https://schema.org/OutOfStock',
+    )
   })
 
   it('includes aggregateRating when a rating is supplied', () => {
     const ld = experienceOfferJsonLd({
       name: 'Sunset tour', description: 'Two hours on the harbour.', url: 'https://x/experiences/sunset-tour',
-      image: null, priceAmount: 480, currency: 'HKD', rating: { average: 5, count: 1 },
+      image: null, priceAmount: 480, currency: 'HKD', available: true, rating: { average: 5, count: 1 },
     })
     expect(ld.aggregateRating).toEqual({ '@type': 'AggregateRating', ratingValue: 5, reviewCount: 1 })
   })
@@ -144,8 +171,33 @@ describe('experienceOfferJsonLd', () => {
   it('omits aggregateRating entirely when no rating is supplied', () => {
     const ld = experienceOfferJsonLd({
       name: 'Sunset tour', description: 'Two hours on the harbour.', url: 'https://x/experiences/sunset-tour',
-      image: null, priceAmount: 480, currency: 'HKD',
+      image: null, priceAmount: 480, currency: 'HKD', available: true,
     })
     expect(ld.aggregateRating).toBeUndefined()
+  })
+  it('omits aggregateRating when count is zero', () => {
+    const article = articleJsonLd({
+      headline: 'x',
+      description: 'y',
+      url: 'u',
+      images: [],
+      publishedAt: null,
+      modifiedAt: null,
+      authorName: null,
+      locale: 'en',
+      rating: { average: 5, count: 0 },
+    })
+    const experience = experienceOfferJsonLd({
+      name: 'x',
+      description: 'y',
+      url: 'u',
+      image: null,
+      priceAmount: 1,
+      currency: 'HKD',
+      available: true,
+      rating: { average: 5, count: 0 },
+    })
+    expect(article.aggregateRating).toBeUndefined()
+    expect(experience.aggregateRating).toBeUndefined()
   })
 })

@@ -70,17 +70,19 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
       { name: messages.seo.merchants.title, url: `${SITE_URL}/${locale}/merchants` },
       { name: experience.title, url: canonical },
     ]),
-    ...(bookingLive && hasOpenAvailability
-      ? [experienceOfferJsonLd({
-          name: experience.title,
-          description: experience.summary ?? experience.description ?? `${experience.city} experience`,
-          url: canonical,
-          image: approvedCover,
-          priceAmount: experience.priceAmount,
-          currency: experience.currency,
-          rating: rating ?? undefined,
-        })]
-      : []),
+    experienceOfferJsonLd({
+      name: experience.title,
+      description:
+        experience.summary ??
+        experience.description ??
+        `${experience.city} experience`,
+      url: canonical,
+      image: approvedCover,
+      priceAmount: experience.priceAmount,
+      currency: experience.currency,
+      available: bookingLive && hasOpenAvailability,
+      rating: rating ?? undefined,
+    }),
   ], [])
   return (
     <>

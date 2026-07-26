@@ -95,7 +95,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
       headline: a.translation.meta_title ?? a.translation.title ?? '',
       description: (a.translation.meta_description?.trim() || a.translation.summary) ?? '',
       url: canonical, images: approvedThumbnails, publishedAt: a.published_at,
-      modifiedAt: a.edit_at, authorName: a.author?.name ?? null, locale: loc,
+      modifiedAt: a.edit_at, authorName: a.author?.name ?? null, locale: a.translation.locale,
     }),
     breadcrumbJsonLd([
       { name: dict.breadcrumb.home, url: `${SITE_URL}/${loc}` },
@@ -104,7 +104,8 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
       { name: a.translation.title ?? '', url: canonical },
     ]),
   ]
-  if (a.faqs.length) ld.push(faqJsonLd(a.faqs))
+  const faqLd = indexing.index ? faqJsonLd(a.faqs) : null
+  if (faqLd) ld.push(faqLd)
 
   return (
     <main className="k2-container py-8">
