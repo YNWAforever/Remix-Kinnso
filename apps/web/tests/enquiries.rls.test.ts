@@ -117,6 +117,25 @@ async function runPsql(sql: string) {
   })
 }
 
+function cleanupErrorText(error: unknown) {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
+    return error.message
+  }
+  return String(error)
+}
+
+async function attemptCleanup(cleanupErrors: string[], label: string, cleanup: () => PromiseLike<unknown>) {
+  try {
+    const result = await cleanup()
+    if (typeof result === 'object' && result !== null && 'error' in result && result.error) {
+      cleanupErrors.push(`${label}: ${cleanupErrorText(result.error)}`)
+    }
+  } catch (error) {
+    cleanupErrors.push(`${label}: ${cleanupErrorText(error)}`)
+  }
+}
+
 d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
   const localSvc = svc!
 
@@ -182,14 +201,29 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
   }, hookTimeout)
 
   afterAll(async () => {
-    await runPsql("delete from vault.secrets where name = 'r7_7_enquiry_submission_hmac';")
-    if (enquiryIds.length > 0) await localSvc.from('ops_audit_log').delete().eq('entity_type', 'enquiry').in('entity_id', enquiryIds)
-    if (enquiryIds.length > 0) await localSvc.from('enquiries').delete().in('id', enquiryIds)
-    await localSvc.from('enquiry_rate_limits').delete().in('ip_hash', trackedIps.map(ipHash))
-    if (merchantProfileId) await localSvc.from('merchant_profiles').delete().eq('id', merchantProfileId)
-    if (opsMemberId) await localSvc.from('kinnso_ops_members').delete().eq('id', opsMemberId)
+    const cleanupErrors: string[] = []
+    const clean = (label: string, cleanup: () => PromiseLike<unknown>) => attemptCleanup(cleanupErrors, label, cleanup)
+
+    // Keep FK-sensitive dependencies in order, but record a failure and keep
+    // attempting every later cleanup stage, including Vault and auth users.
+    if (enquiryIds.length > 0) {
+      await clean('enquiry audit rows', () =>
+        localSvc.from('ops_audit_log').delete().eq('entity_type', 'enquiry').in('entity_id', enquiryIds),
+      )
+      await clean('enquiries', () => localSvc.from('enquiries').delete().in('id', enquiryIds))
+    }
+    await clean('enquiry rate buckets', () => localSvc.from('enquiry_rate_limits').delete().in('ip_hash', trackedIps.map(ipHash)))
+    if (merchantProfileId) await clean('merchant profile', () => localSvc.from('merchant_profiles').delete().eq('id', merchantProfileId))
+    if (opsMemberId) await clean('ops member', () => localSvc.from('kinnso_ops_members').delete().eq('id', opsMemberId))
     for (const userId of [creatorId, merchantUserId, viewerId, opsUserId]) {
-      if (userId) await localSvc.auth.admin.deleteUser(userId)
+      if (userId) await clean(`auth user ${userId}`, () => localSvc.auth.admin.deleteUser(userId))
+    }
+    await clean('Vault attestation secret', () =>
+      runPsql("delete from vault.secrets where name = 'r7_7_enquiry_submission_hmac';"),
+    )
+
+    if (cleanupErrors.length > 0) {
+      throw new Error(`R7.7 local enquiry cleanup failed: ${cleanupErrors.join(' | ')}`)
     }
   }, hookTimeout)
 
@@ -227,10 +261,14 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
 
   it('submits both eligible target types through the attested public RPC', async () => {
     const creator = await attestedAnon('203.0.113.10').rpc('submit_enquiry', creatorArgs('203.0.113.10'))
-    const merchant = await attestedAnon('203.0.113.11').rpc('submit_enquiry', merchantArgs('203.0.113.11'))
     expect(creator.error).toBeNull()
+    expect(creator.data).toBeTruthy()
+    enquiryIds.push(creator.data!)
+
+    const merchant = await attestedAnon('203.0.113.11').rpc('submit_enquiry', merchantArgs('203.0.113.11'))
     expect(merchant.error).toBeNull()
-    enquiryIds.push(creator.data!, merchant.data!)
+    expect(merchant.data).toBeTruthy()
+    enquiryIds.push(merchant.data!)
   }, testTimeout)
 
   it('uses the fixed 5-per-hour policy despite caller-supplied 100-per-minute values', async () => {
@@ -240,6 +278,15 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
       expect(result.error).toBeNull()
       enquiryIds.push(result.data!)
     }
+
+    const bucket = await localSvc
+      .from('enquiry_rate_limits')
+      .select('request_count, window_start')
+      .eq('ip_hash', ipHash(ip))
+      .single()
+    expect(bucket.error).toBeNull()
+    expect(bucket.data).toMatchObject({ request_count: 5 })
+    expect(Math.floor(new Date(bucket.data!.window_start).getTime() / 1000) % 3600).toBe(0)
 
     const sixth = await attestedAnon(ip).rpc('submit_enquiry', creatorArgs(ip))
     expect(sixth.error?.message).toContain('enquiry_rate_limited')
