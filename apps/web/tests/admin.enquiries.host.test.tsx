@@ -55,6 +55,40 @@ describe('/admin/enquiries host', () => {
     expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, null)
   })
 
+  it('forwards PostgreSQL timestamptz cursor shapes exactly', async () => {
+    const id = '11111111-1111-4111-8111-111111111111'
+    const validTimestamps = [
+      '2026-07-26T10:00:00Z',
+      '2026-07-26T10:00:00.123Z',
+      '2026-07-26T10:00:00.123456Z',
+      '2026-07-26T10:00:00.123456+00:00',
+      '2024-02-29T10:00:00+08:00',
+    ]
+
+    for (const createdAt of validTimestamps) {
+      await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ cursorCreatedAt: createdAt, cursorId: id }) })
+      expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, { createdAt, id })
+    }
+  })
+
+  it('drops both cursor values when the timestamp calendar, ranges, offset, or format is invalid', async () => {
+    const id = '11111111-1111-4111-8111-111111111111'
+    const invalidTimestamps = [
+      '2023-02-29T10:00:00Z',
+      '2026-02-31T10:00:00Z',
+      '2026-13-01T10:00:00Z',
+      '2026-07-26T24:00:00Z',
+      '2026-07-26T10:00:60Z',
+      '2026-07-26T10:00:00+24:00',
+      '2026-07-26T10:00:00+00:60',
+      '2026-07-26 10:00:00Z',
+    ]
+
+    for (const cursorCreatedAt of invalidTimestamps) {
+      await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ cursorCreatedAt, cursorId: id }) })
+      expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, null)
+    }
+  })
   it('keeps the first 25 rows and uses row 25 as the forward cursor when row 26 proves another page exists', async () => {
     const rows = Array.from({ length: 26 }, (_, index) => ({
       id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,

@@ -20,15 +20,36 @@ function queueFilters(searchParams: Record<string, string | string[] | undefined
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/
+const TIMESTAMPTZ = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,6}))?(?:Z|[+-](\d{2}):(\d{2}))$/
+
+function daysInMonth(year: number, month: number) {
+  if (month === 2) return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28
+  return month === 4 || month === 6 || month === 9 || month === 11 ? 30 : 31
+}
+
+function isValidCursorTimestamp(value: string) {
+  const match = TIMESTAMPTZ.exec(value)
+  if (!match) return false
+
+  const [, yearValue, monthValue, dayValue, hourValue, minuteValue, secondValue, , offsetHourValue, offsetMinuteValue] = match
+  const year = Number(yearValue)
+  const month = Number(monthValue)
+  const day = Number(dayValue)
+  const hour = Number(hourValue)
+  const minute = Number(minuteValue)
+  const second = Number(secondValue)
+
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month) || hour > 23 || minute > 59 || second > 59) return false
+  if (offsetHourValue !== undefined && (Number(offsetHourValue) > 23 || Number(offsetMinuteValue) > 59)) return false
+  return !Number.isNaN(Date.parse(value))
+}
 
 function queueCursor(searchParams: Record<string, string | string[] | undefined>): AdminEnquiryCursor | null {
   const createdAt = searchParams.cursorCreatedAt
   const id = searchParams.cursorId
-  if (typeof createdAt !== 'string' || typeof id !== 'string' || !ISO_TIMESTAMP.test(createdAt) || !UUID.test(id) || Number.isNaN(Date.parse(createdAt))) return null
+  if (typeof createdAt !== 'string' || typeof id !== 'string' || !UUID.test(id) || !isValidCursorTimestamp(createdAt)) return null
   return { createdAt, id }
 }
-
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
 }
