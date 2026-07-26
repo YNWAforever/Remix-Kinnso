@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { searchArticles } from '@/lib/articles/queries'
+import { resolveConfiguredProductState } from '@/lib/product-state'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale, toDbCategory, LOCALES, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
 import { buildListingMetadata } from '@/lib/seo/metadata'
@@ -9,14 +10,23 @@ import { ArticleCard } from '@/components/ArticleCard'
 
 export const revalidate = 1800 // 30 min
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+): Promise<Metadata> {
   const { locale } = await params
   if (!isLocale(locale)) return {}
-  const dict = await getDictionary(locale as Locale)
+  const [dict, { bookingLive }] = await Promise.all([
+    getDictionary(locale),
+    Promise.resolve(resolveConfiguredProductState()),
+  ])
   return buildListingMetadata({
-    urlCategory: null, locale: locale as Locale,
+    urlCategory: null,
+    locale,
     presentLocales: LOCALES,
-    title: dict.breadcrumb.articles,
+    title: dict.seo.articles.title,
+    description: bookingLive
+      ? dict.seo.articles.descriptionBookingLive
+      : dict.seo.articles.descriptionBookingWaitlist,
   })
 }
 

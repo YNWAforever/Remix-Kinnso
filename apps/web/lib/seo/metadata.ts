@@ -93,16 +93,51 @@ export function buildArticleMetadata(i: ArticleMetaInput): Metadata {
   }
 }
 export interface ListingMetaInput {
-  urlCategory: UrlCategory | null; locale: Locale; presentLocales: readonly Locale[]; title: string
+  urlCategory: UrlCategory | null
+  locale: Locale
+  presentLocales: readonly Locale[]
+  title: string
+  description: string
+  index?: boolean
 }
 
 export function buildListingMetadata(i: ListingMetaInput): Metadata {
-  const seg = i.urlCategory ? `/articles/${i.urlCategory}` : '/articles'
-  const { canonical, languages } = hreflangFor((l) => abs(l, seg), i.locale, i.presentLocales)
+  const segment = i.urlCategory
+    ? `/articles/${i.urlCategory}`
+    : '/articles'
+  const { canonical, languages } = hreflangFor(
+    (locale) => abs(locale, segment),
+    i.locale,
+    i.presentLocales,
+  )
+  const ogImage = defaultOgImagePath(i.locale)
   return {
     title: i.title,
-    alternates: { canonical, languages },
-    robots: { index: true, follow: true, 'max-image-preview': 'large' },
+    description: i.description,
+    alternates: {
+      canonical,
+      languages: i.presentLocales.length > 0 ? languages : {},
+    },
+    openGraph: {
+      type: 'website',
+      url: canonical,
+      title: i.title,
+      description: i.description,
+      siteName: 'KINNSO',
+      locale: OG_LOCALE[i.locale],
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: i.title,
+      description: i.description,
+      images: [ogImage],
+    },
+    robots: {
+      index: i.index ?? true,
+      follow: true,
+      'max-image-preview': 'large',
+    },
   }
 }
 

@@ -62,6 +62,13 @@ const messages: Messages = {
       title: '旅行先 — KINNSO',
       description: '厳選された旅行先をブラウズし、クリエイターがこれまでにまとめたガイド、予約できる体験、ライブセッションをチェックしましょう。',
     },
+    articles: {
+      title: '旅行ガイド、体験、現地のおすすめ',
+      descriptionBookingLive:
+        'クリエイター発の旅行ガイド、予約できる現地体験、ライブセッション、アジア各地の信頼できるおすすめを見つけましょう。',
+      descriptionBookingWaitlist:
+        'クリエイター発の旅行ガイド、現地体験、ライブセッション、アジア各地の信頼できるおすすめを見つけましょう。',
+    },
   },
   listing: { searchPlaceholder: '記事を検索', filterRegion: '地域', filterTag: 'タグ', noResults: '記事が見つかりません。', resultsCount: '件' },
   pagination: { prev: '前へ', next: '次へ', page: 'ページ' },

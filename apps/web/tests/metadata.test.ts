@@ -84,7 +84,7 @@ describe('buildArticleMetadata', () => {
 
 describe('buildListingMetadata', () => {
   it('category: bare title, canonical, all 7 hreflang + x-default', () => {
-    const m = buildListingMetadata({ urlCategory: 'dining', locale: 'en', presentLocales: LOCALES, title: 'Dining' })
+    const m = buildListingMetadata({ urlCategory: 'dining', locale: 'en', presentLocales: LOCALES, title: 'Dining', description: 'Dining guides' })
     expect(m.title).toBe('Dining')
     expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles/dining`)
     const langs = m.alternates!.languages as Record<string, string>
@@ -93,8 +93,30 @@ describe('buildListingMetadata', () => {
     expect((m.robots as any).index).toBe(true)
   })
   it('hub (urlCategory null): canonical points to /articles', () => {
-    const m = buildListingMetadata({ urlCategory: null, locale: 'en', presentLocales: LOCALES, title: 'Articles' })
+    const m = buildListingMetadata({ urlCategory: null, locale: 'en', presentLocales: LOCALES, title: 'Articles', description: 'Article guides' })
     expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles`)
+  })
+
+  it('adds listing description, OG, Twitter, and explicit noindex state', () => {
+    const metadata = buildListingMetadata({
+      urlCategory: 'shopping',
+      locale: 'ja',
+      presentLocales: ['en', 'ja'],
+      title: 'Shopping',
+      description: 'Trusted recommendations.',
+      index: false,
+    })
+    expect(metadata.description).toBe('Trusted recommendations.')
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
+    expect((metadata.openGraph as { images: string[] }).images).toEqual([
+      `${SITE_URL}/ja/opengraph-image`,
+    ])
+    expect((metadata.twitter as { card: string }).card).toBe(
+      'summary_large_image',
+    )
+    expect(Object.keys(
+      metadata.alternates?.languages as Record<string, string>,
+    ).sort()).toEqual(['en', 'ja', 'x-default'])
   })
 })
 

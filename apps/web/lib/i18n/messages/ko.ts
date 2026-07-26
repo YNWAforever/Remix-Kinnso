@@ -62,6 +62,13 @@ const messages: Messages = {
       title: '여행지 — KINNSO',
       description: '엄선된 여행지를 둘러보고, 크리에이터들이 지금까지 정리한 가이드, 예약 가능한 체험, 라이브 세션을 확인해보세요.',
     },
+    articles: {
+      title: '여행 가이드, 체험, 현지 추천',
+      descriptionBookingLive:
+        '크리에이터가 만든 여행 가이드, 예약 가능한 현지 체험, 라이브 세션과 아시아 전역의 믿을 만한 추천을 만나보세요.',
+      descriptionBookingWaitlist:
+        '크리에이터가 만든 여행 가이드, 현지 체험, 라이브 세션과 아시아 전역의 믿을 만한 추천을 만나보세요.',
+    },
   },
   listing: { searchPlaceholder: '아티클 검색', filterRegion: '지역', filterTag: '태그', noResults: '검색 결과가 없습니다.', resultsCount: '개' },
   pagination: { prev: '이전', next: '다음', page: '페이지' },
