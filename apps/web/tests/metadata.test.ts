@@ -100,6 +100,34 @@ describe('buildListingMetadata', () => {
     expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles`)
   })
 
+  it('uses the first genuine locale for x-default when English is absent', () => {
+    const metadata = buildListingMetadata({
+      urlCategory: 'dining',
+      locale: 'zh-cn',
+      presentLocales: ['ja'],
+      title: 'Dining',
+      description: 'Dining guides',
+      index: false,
+    })
+    const languages = metadata.alternates?.languages as Record<string, string>
+    expect(Object.keys(languages).sort()).toEqual(['ja', 'x-default'])
+    expect(languages['x-default']).toBe(
+      `${SITE_URL}/ja/articles/dining`,
+    )
+  })
+
+  it('omits x-default when the category has no genuine locales', () => {
+    const metadata = buildListingMetadata({
+      urlCategory: 'dining',
+      locale: 'zh-cn',
+      presentLocales: [],
+      title: 'Dining',
+      description: 'Dining guides',
+      index: false,
+    })
+    expect(metadata.alternates?.languages).toEqual({})
+  })
+
   it('adds listing description, OG, Twitter, and explicit noindex state', () => {
     const metadata = buildListingMetadata({
       urlCategory: 'shopping',

@@ -41,11 +41,22 @@ test('reciprocal hreflang on zh-hk flagship', async ({ page }) => {
 
 test('public guide has seven-locale parity and a rendered OG image', async ({ page, request }) => {
   await page.goto(FIXTURES.seoEntities.guidePath)
-  for (const locale of ['en', 'zh-hk', 'zh-tw', 'ja', 'ko', 'th', 'zh-cn']) {
-    await expect(
-      page.locator(`link[rel="alternate"][hreflang="${locale}"]`),
-    ).toHaveCount(1)
-  }
+  const expectedHreflangs = [
+    'en', 'zh-hk', 'zh-tw', 'ja', 'ko', 'th', 'zh-cn', 'x-default',
+  ].sort()
+  const alternates = await page
+    .locator('link[rel="alternate"][hreflang]')
+    .evaluateAll((links) => links.map((link) => ({
+      hreflang: link.getAttribute('hreflang'),
+      href: link.getAttribute('href'),
+    })))
+  expect(alternates.map(({ hreflang }) => hreflang).sort()).toEqual(
+    expectedHreflangs,
+  )
+  const xDefault = alternates.find(
+    ({ hreflang }) => hreflang === 'x-default',
+  )?.href
+  expect(new URL(xDefault!).pathname).toBe(FIXTURES.seoEntities.guidePath)
   expect((await jsonLd(page)).some((item) => item['@type'] === 'Article')).toBe(
     true,
   )
@@ -75,10 +86,15 @@ test('public experience emits Product/Offer and a rendered OG image', async ({ p
 })
 
 test('a public session emits Event when a session fixture is available', async ({ page }) => {
-  await page.goto('/en/sessions')
+  const response = await page.goto('/en/sessions')
+  expect(response?.ok()).toBe(true)
   const firstSession = page.locator('a[href^="/en/sessions/"]').first()
+  const hasPublicSession = await firstSession.count() > 0
+  if (!hasPublicSession) {
+    await expect(page.getByRole('form', { name: 'Session updates' })).toBeVisible()
+  }
   test.skip(
-    await firstSession.count() === 0,
+    !hasPublicSession,
     'No public session exists in this environment',
   )
   await firstSession.click()

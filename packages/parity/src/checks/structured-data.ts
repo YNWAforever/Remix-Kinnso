@@ -1,19 +1,23 @@
 import type { Check, CheckResult } from '../types'
 import { detailPath } from '../url'
 import { extractJsonLd, extractHreflangs, extractMeta } from '../html'
-import { DEFAULT_LOCALE } from '../locales'
+import { DEFAULT_LOCALE, LOCALES } from '../locales'
 
 /**
  * Deep-parse a sample of detail pages. Asserts: Article JSON-LD with dateModified,
  * BreadcrumbList, og:type=article, hreflang covers all present locales + x-default (reciprocity),
- * and x-default points at the default locale.
+ * and x-default points at English when genuine, otherwise the first genuine locale.
  * (FAQPage is asserted on the flagship by Playwright, not in this bulk pass.)
  */
 export const structuredData: Check = async ({ newstack, sample }) => {
   const articles = (await newstack.publishedArticles()).slice(0, Math.max(1, sample))
   const out: CheckResult[] = []
   for (const a of articles) {
-    for (const locale of a.locales) {
+    const genuineLocales = LOCALES.filter((locale) => a.locales.includes(locale))
+    const xDefaultLocale = genuineLocales.includes(DEFAULT_LOCALE)
+      ? DEFAULT_LOCALE
+      : genuineLocales[0]
+    for (const locale of genuineLocales) {
       const path = detailPath(locale, a.category, a.url)
       if (!path) continue
       const html = await newstack.html(path)
@@ -31,7 +35,7 @@ export const structuredData: Check = async ({ newstack, sample }) => {
       push('og:type', ogType === 'article', String(ogType ?? '(missing)'))
 
       const hreflangs = extractHreflangs(html)
-      const expected = new Set<string>([...a.locales, 'x-default'])
+      const expected = new Set<string>([...genuineLocales, 'x-default'])
       const got = new Set(hreflangs.keys())
       const exactAlternates =
         got.size === expected.size &&
@@ -44,7 +48,14 @@ export const structuredData: Check = async ({ newstack, sample }) => {
       )
 
       const xdef = hreflangs.get('x-default') ?? ''
-      push('x-default', xdef.includes(`/${DEFAULT_LOCALE}/`), xdef || '(missing)')
+      const expectedXDefaultPath = xDefaultLocale
+        ? detailPath(xDefaultLocale, a.category, a.url)
+        : null
+      const xDefaultPath = xdef
+        ? new URL(xdef, 'https://parity.invalid').pathname
+        : null
+      push('x-default', xDefaultPath === expectedXDefaultPath,
+        `expected ${expectedXDefaultPath ?? '(missing)'} got ${xDefaultPath ?? '(missing)'}`)
     }
   }
   return out

@@ -58,4 +58,26 @@ describe('/articles metadata state', () => {
       metadata.alternates?.languages as Record<string, string>,
     ).sort()).toEqual(['en', 'x-default', 'zh-hk'])
   })
+
+  it('uses the first genuine locale for a non-English-only category requested from a noindex locale', async () => {
+    indexableCategoryLocalesMock.mockResolvedValueOnce(['ja'])
+    const metadata = await categoryMetadata({
+      params: Promise.resolve({ locale: 'zh-cn', category: 'dining' }),
+    })
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
+    const languages = metadata.alternates?.languages as Record<string, string>
+    expect(Object.keys(languages).sort()).toEqual(['ja', 'x-default'])
+    expect(languages['x-default']).toMatch(
+      /\/ja\/articles\/dining$/,
+    )
+  })
+
+  it('emits no x-default alternate for a category with no genuine locales', async () => {
+    indexableCategoryLocalesMock.mockResolvedValueOnce([])
+    const metadata = await categoryMetadata({
+      params: Promise.resolve({ locale: 'zh-cn', category: 'dining' }),
+    })
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
+    expect(metadata.alternates?.languages).toEqual({})
+  })
 })

@@ -19,11 +19,15 @@ const abs = (l: string, path: string) => `${SITE_URL}/${l}${path}` // path is ''
  */
 export const defaultOgImagePath = (locale: Locale): string => abs(locale, '/opengraph-image')
 
-/** canonical (current locale) + hreflang map (given locales) + x-default → DEFAULT_LOCALE when present, else current. */
+/** canonical (current locale) + genuine hreflang map + x-default to the first preferred genuine locale. */
 function hreflangFor(pathFor: (l: Locale) => string, current: Locale, locales: readonly Locale[]) {
+  const genuineLocales = LOCALES.filter((locale) => locales.includes(locale))
   const languages: Record<string, string> = {}
-  for (const l of locales) languages[l] = pathFor(l)
-  languages['x-default'] = pathFor(locales.includes(DEFAULT_LOCALE) ? DEFAULT_LOCALE : current)
+  for (const locale of genuineLocales) languages[locale] = pathFor(locale)
+  const xDefaultLocale = genuineLocales.includes(DEFAULT_LOCALE)
+    ? DEFAULT_LOCALE
+    : genuineLocales[0]
+  if (xDefaultLocale) languages['x-default'] = pathFor(xDefaultLocale)
   return { canonical: pathFor(current), languages }
 }
 

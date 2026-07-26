@@ -189,21 +189,24 @@ describe('crawlSitemap', () => {
     expect(result.failures).toEqual([{ url: pageUrl, error: 'Redirect' }])
   })
 
-  it('reports HTML meta robots noindex without logging the page body', async () => {
-    const pageUrl = 'https://example.test/en/articles/dining/thin'
-    const body =
-      '<html><head><meta name="robots" content="follow, noindex"></head>' +
-      '<body>private article text</body></html>'
-    const result = await crawlSitemap({
-      baseUrl: 'https://example.test',
-      fetchImpl: async (input) =>
-        String(input) === sitemapUrl
-          ? xmlResponse(`<urlset><url><loc>${pageUrl}</loc></url></urlset>`)
-          : pageResponse(200, body),
-    })
-    expect(result.failures).toEqual([{ url: pageUrl, error: 'HtmlNoindex' }])
-    expect(JSON.stringify(result)).not.toContain('private article text')
-  })
+  it.each(['robots', 'googlebot'] as const)(
+    'reports HTML meta %s noindex without logging the page body',
+    async (directive) => {
+      const pageUrl = 'https://example.test/en/articles/dining/thin'
+      const body =
+        `<html><head><meta name="${directive}" content="follow, noindex"></head>` +
+        '<body>private article text</body></html>'
+      const result = await crawlSitemap({
+        baseUrl: 'https://example.test',
+        fetchImpl: async (input) =>
+          String(input) === sitemapUrl
+            ? xmlResponse(`<urlset><url><loc>${pageUrl}</loc></url></urlset>`)
+            : pageResponse(200, body),
+      })
+      expect(result.failures).toEqual([{ url: pageUrl, error: 'HtmlNoindex' }])
+      expect(JSON.stringify(result)).not.toContain('private article text')
+    },
+  )
 
   it('reports an X-Robots-Tag noindex response', async () => {
     const pageUrl = 'https://example.test/en/articles/shopping/thin'
