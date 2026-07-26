@@ -63,11 +63,12 @@ export function buildArticleMetadata(i: ArticleMetaInput): Metadata {
       articlePath(locale, i.urlCategory, i.url),
     ]),
   ) as Record<string, string>
-  if (canonical && i.indexing.canonicalLocale) {
+  const xDefaultLocale = i.indexing.alternateLocales.includes(DEFAULT_LOCALE)
+    ? DEFAULT_LOCALE
+    : i.indexing.alternateLocales[0]
+  if (canonical && xDefaultLocale) {
     languages['x-default'] = articlePath(
-      i.indexing.alternateLocales.includes(DEFAULT_LOCALE)
-        ? DEFAULT_LOCALE
-        : i.indexing.canonicalLocale,
+      xDefaultLocale,
       i.urlCategory,
       i.url,
     )

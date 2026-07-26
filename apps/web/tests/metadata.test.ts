@@ -51,6 +51,29 @@ describe('buildArticleMetadata', () => {
     expect(og.modifiedTime).toBe('2026-06-10T00:00:00Z')
     expect(og.images).toEqual(['https://cdn.kinnso.ai/og.jpg'])
   })
+  it('keeps a genuine current canonical while x-default uses the first preferred genuine locale', () => {
+    const metadata = buildArticleMetadata({
+      ...base,
+      locale: 'ja',
+      resolvedLocale: 'ja',
+      indexing: {
+        index: true,
+        canonicalLocale: 'ja',
+        alternateLocales: ['zh-tw', 'ja'],
+      },
+    })
+    expect(metadata.alternates?.canonical).toBe(
+      `${SITE_URL}/ja/articles/dining/ramen-guide`,
+    )
+    const languages = metadata.alternates?.languages as Record<string, string>
+    expect(Object.keys(languages).sort()).toEqual(
+      ['ja', 'x-default', 'zh-tw'],
+    )
+    expect(languages['x-default']).toBe(
+      `${SITE_URL}/zh-tw/articles/dining/ramen-guide`,
+    )
+  })
+
   it('noindexes fallback content and canonicalizes it to the selected genuine locale', () => {
     const metadata = buildArticleMetadata({
       ...base,
