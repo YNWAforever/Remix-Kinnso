@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, type FormEvent } from 'react'
+import { useId, useState, useTransition, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -34,7 +34,13 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
   const [submissionState, setSubmissionState] = useState<SubmissionState>('form')
   const [feedback, setFeedback] = useState<Feedback>(null)
   const [isPending, startTransition] = useTransition()
+  const fieldId = useId()
+  const nameId = `${fieldId}-name`
+  const emailId = `${fieldId}-email`
+  const messageId = `${fieldId}-message`
+  const websiteId = `${fieldId}-website`
 
+  const blocksDismissal = isPending && submissionState === 'form'
   const purpose = type === 'creator_collab' ? t.creatorPurpose : t.merchantPurpose
   const feedbackMessage = feedback === 'rate_limited' ? t.rateLimited : feedback ? t[feedback] : null
 
@@ -48,6 +54,7 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
   }
 
   function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && blocksDismissal) return
     setOpen(nextOpen)
     if (!nextOpen && submissionState === 'success') resetCompletedForm()
   }
@@ -81,7 +88,15 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
       <DialogTrigger asChild>
         <Button type="button">{triggerLabel}</Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={false}>
+      <DialogContent
+        showCloseButton={false}
+        onEscapeKeyDown={(event) => {
+          if (blocksDismissal) event.preventDefault()
+        }}
+        onPointerDownOutside={(event) => {
+          if (blocksDismissal) event.preventDefault()
+        }}
+      >
         <DialogHeader aria-live={submissionState === 'success' ? 'polite' : undefined}>
           <DialogTitle>{submissionState === 'success' ? t.successTitle : t.dialogTitle}</DialogTitle>
           <DialogDescription>{submissionState === 'success' ? t.successBody : t.dialogDescription}</DialogDescription>
@@ -94,16 +109,16 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
             </DialogClose>
           </div>
         ) : (
-          <form className="grid gap-4" onSubmit={handleSubmit}>
+          <form className="grid gap-4" noValidate onSubmit={handleSubmit}>
             <div className="rounded-md bg-muted p-3 text-sm">
               <p className="font-medium">{targetName}</p>
               <p className="text-muted-foreground">{purpose}</p>
             </div>
 
             <div className="grid gap-2">
-              <label htmlFor="enquiry-name">{t.nameLabel}</label>
+              <label htmlFor={nameId}>{t.nameLabel}</label>
               <input
-                id="enquiry-name"
+                id={nameId}
                 name="name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -112,11 +127,12 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
               />
             </div>
             <div className="grid gap-2">
-              <label htmlFor="enquiry-email">{t.emailLabel}</label>
+              <label htmlFor={emailId}>{t.emailLabel}</label>
               <input
-                id="enquiry-email"
+                id={emailId}
                 name="email"
                 type="email"
+                spellCheck={false}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="rounded-md border bg-background px-3 py-2"
@@ -124,9 +140,9 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
               />
             </div>
             <div className="grid gap-2">
-              <label htmlFor="enquiry-message">{t.messageLabel}</label>
+              <label htmlFor={messageId}>{t.messageLabel}</label>
               <textarea
-                id="enquiry-message"
+                id={messageId}
                 name="message"
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
@@ -135,6 +151,7 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
             </div>
             <input
               aria-hidden="true"
+              id={websiteId}
               autoComplete="off"
               className="absolute -left-[10000px] h-px w-px overflow-hidden"
               name="website"
