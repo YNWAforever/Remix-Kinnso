@@ -418,6 +418,26 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
     expect(ineligibleBucket.error).toBeNull()
     expect(ineligibleBucket.data).toMatchObject({ request_count: 5 })
 
+    const ineligibleMerchantIp = '203.0.113.16'
+    const ineligibleMerchantArgs = {
+      ...merchantArgs(ineligibleMerchantIp),
+      p_merchant_profile_id: randomUUID(),
+    }
+    for (let index = 0; index < 5; index += 1) {
+      const result = await attestedAnon(ineligibleMerchantIp).rpc('submit_enquiry', ineligibleMerchantArgs)
+      expect(result.error).toBeNull()
+      expect(result.data).toBeNull()
+    }
+    const rejectedMerchantSixth = await attestedAnon(ineligibleMerchantIp).rpc('submit_enquiry', ineligibleMerchantArgs)
+    expect(rejectedMerchantSixth.error?.message).toContain('enquiry_rate_limited')
+    const ineligibleMerchantBucket = await localSvc
+      .from('enquiry_rate_limits')
+      .select('request_count')
+      .eq('ip_hash', ipHash(ineligibleMerchantIp))
+      .single()
+    expect(ineligibleMerchantBucket.error).toBeNull()
+    expect(ineligibleMerchantBucket.data).toMatchObject({ request_count: 5 })
+
     const concurrentIp = '203.0.113.15'
     const attempts = await Promise.all(
       Array.from({ length: 10 }, () => attestedAnon(concurrentIp).rpc('submit_enquiry', creatorArgs(concurrentIp))),
@@ -564,6 +584,8 @@ d('R7.7 enquiry live security boundary (explicit local Postgres only)', () => {
     const reasonRequired: Array<[EnquiryStatus, EnquiryStatus]> = [
       ['new', 'resolved'],
       ['new', 'spam'],
+      ['in_progress', 'resolved'],
+      ['in_progress', 'spam'],
       ['resolved', 'in_progress'],
       ['spam', 'in_progress'],
     ]

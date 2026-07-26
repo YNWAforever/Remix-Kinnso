@@ -7,7 +7,7 @@ const { getClientIpMock, createSupabaseServerClientMock, createEnquiryAttestatio
     ip: '203.0.113.9',
     header: 'v1.2000000000.' + 'a'.repeat(64),
   })),
-  rpcMock: vi.fn(async (): Promise<{ data: string | null; error: { code: string; message: string } | null }> => ({ data: 'enquiry-1', error: null })),
+  rpcMock: vi.fn(async (): Promise<{ data: string | null; error: { code: string; message: string } | null }> => ({ data: '33333333-3333-4333-8333-333333333333', error: null })),
 }))
 
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
@@ -18,6 +18,7 @@ import { submitEnquiryAction } from '@/lib/enquiries/actions'
 
 const CREATOR_ID = '11111111-1111-4111-8111-111111111111'
 const MERCHANT_ID = '22222222-2222-4222-8222-222222222222'
+const ENQUIRY_ID = '33333333-3333-4333-8333-333333333333'
 const valid = {
   type: 'creator_collab' as const,
   targetId: CREATOR_ID,
@@ -32,7 +33,7 @@ beforeEach(() => {
   createEnquiryAttestationMock.mockReset()
   createEnquiryAttestationMock.mockResolvedValue({ ip: '203.0.113.9', header: 'v1.2000000000.' + 'a'.repeat(64) })
   rpcMock.mockReset()
-  rpcMock.mockResolvedValue({ data: 'enquiry-1', error: null })
+  rpcMock.mockResolvedValue({ data: ENQUIRY_ID, error: null })
   createSupabaseServerClientMock.mockReset()
   createSupabaseServerClientMock.mockResolvedValue({ rpc: rpcMock })
 })
@@ -95,6 +96,26 @@ describe('submitEnquiryAction', () => {
     expect(createSupabaseServerClientMock).not.toHaveBeenCalled()
     expect(rpcMock).not.toHaveBeenCalled()
     expect(errorSpy).toHaveBeenCalledWith('[enquiries] attestation_unavailable')
+    errorSpy.mockRestore()
+  })
+
+  it('accepts a returned enquiry UUID as success', async () => {
+    rpcMock.mockResolvedValueOnce({ data: ENQUIRY_ID, error: null })
+
+    await expect(submitEnquiryAction(valid)).resolves.toEqual({ ok: true })
+  })
+
+  it('maps an eligibility-hidden null RPC result to generic failure without logging submitted PII', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: null })
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    await expect(submitEnquiryAction(valid)).resolves.toEqual({ ok: false, error: 'failed' })
+
+    expect(errorSpy).toHaveBeenCalledWith('[enquiries] submission_failed')
+    const logs = JSON.stringify(errorSpy.mock.calls)
+    expect(logs).not.toContain('Ada Wong')
+    expect(logs).not.toContain('ada@example.com')
+    expect(logs).not.toContain('campaign')
     errorSpy.mockRestore()
   })
 

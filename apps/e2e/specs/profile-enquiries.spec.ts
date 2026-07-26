@@ -1,9 +1,9 @@
-import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import {
   PROFILE_ENQUIRIES_LOCAL_DUMMY_SECRET,
+  profileEnquiryRateBucketHash,
   resolveProfileEnquiriesLocalConfig,
 } from '../profile-enquiries-local'
 import { cleanupOwnedEnquiries } from '../profile-enquiries-cleanup'
@@ -32,10 +32,6 @@ let merchantProfileId = ''
 let opsUserId = ''
 let opsMemberId = ''
 const enquiryIds: string[] = []
-
-function ipHash(ip: string) {
-  return createHash('sha256').update(ip).digest('hex')
-}
 
 async function fillEnquiry(page: Page, email: string, message: string) {
   await page.getByLabel('Name').fill('R7.7 E2E visitor')
@@ -138,7 +134,15 @@ test.afterAll(async () => {
     (ids) => svc.from('enquiries').delete().in('id', ids),
   )
   errors.push(...ownedCleanup.errors)
-  await cleanup(errors, 'enquiry rate bucket', () => svc.from('enquiry_rate_limits').delete().eq('ip_hash', ipHash(visitorIp)))
+  const rateBucketHash = profileEnquiryRateBucketHash(visitorIp)
+  await cleanup(errors, 'enquiry rate bucket', () => svc.from('enquiry_rate_limits').delete().eq('ip_hash', rateBucketHash))
+  await cleanup(errors, 'verify enquiry rate bucket absent', async () => {
+    const remaining = await svc.from('enquiry_rate_limits').select('ip_hash').eq('ip_hash', rateBucketHash).maybeSingle()
+    return {
+      error: remaining.error
+        ?? (remaining.data ? new Error('run-owned enquiry rate bucket still exists after cleanup') : null),
+    }
+  })
   if (merchantProfileId) await cleanup(errors, 'merchant profile', () => svc.from('merchant_profiles').delete().eq('id', merchantProfileId))
   if (opsMemberId) await cleanup(errors, 'ops member', () => svc.from('kinnso_ops_members').delete().eq('id', opsMemberId))
   for (const userId of [creatorId, merchantUserId, opsUserId]) {

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   PROFILE_ENQUIRIES_LOCAL_OPT_IN,
+  profileEnquiryRateBucketHash,
   resolveProfileEnquiriesLocalConfig,
 } from '../../e2e/profile-enquiries-local'
 import { cleanupOwnedEnquiries } from '../../e2e/profile-enquiries-cleanup'
@@ -65,6 +66,12 @@ describe('profile enquiries Playwright isolation', () => {
     expect('profile-enquiries.spec.ts').toMatch(config.testMatch)
     expect('journey.spec.ts').not.toMatch(config.testMatch)
     expect(config.webServer.reuseExistingServer).toBe(false)
+  })
+
+  it('derives the cleanup bucket with the exact keyed and domain-separated HMAC', () => {
+    expect(profileEnquiryRateBucketHash('203.0.113.77')).toBe(
+      'e43a26ab0bf95ebe4b48e9dba384d83643825a940ffdf0992bca18b3adf9ab7e',
+    )
   })
 
   it('deletes a creator-only submission discovered during teardown when normal ID capture never ran', async () => {

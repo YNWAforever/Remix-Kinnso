@@ -1,3 +1,5 @@
+import { createHmac } from 'node:crypto'
+
 export const PROFILE_ENQUIRIES_LOCAL_OPT_IN = 'E2E_PROFILE_ENQUIRIES_LOCAL'
 export const PROFILE_ENQUIRIES_LOCAL_DUMMY_SECRET = 'r7-7-e2e-local-only-dummy-not-a-production-secret'
 
@@ -10,6 +12,12 @@ export interface ProfileEnquiriesLocalConfig {
   anonKey: string
   serviceRoleKey: string
   dbContainer: string
+}
+
+export function profileEnquiryRateBucketHash(ip: string) {
+  return createHmac('sha256', PROFILE_ENQUIRIES_LOCAL_DUMMY_SECRET)
+    .update(`r7.7:enquiry-rate-limit:v1\n${ip}`)
+    .digest('hex')
 }
 
 function loopbackHttp(value: string, label: string) {

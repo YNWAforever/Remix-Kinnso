@@ -33,6 +33,20 @@ describe('optional module containment', () => {
     }, [])).resolves.toEqual([])
   })
 
+  it('degrades the PostgREST empty-code fetch failure shape without swallowing ordinary TypeErrors', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const fetchFailure = {
+      code: '',
+      message: 'TypeError: fetch failed',
+      details: 'TypeError: fetch failed\nCaused by: Error: connect ECONNREFUSED',
+      hint: '',
+    }
+
+    await expect(optionalEnrichmentQuery('merchant-featured-guides', async () => {
+      throw fetchFailure
+    }, [])).resolves.toEqual([])
+  })
+
   it.each([
     new TypeError('programming bug'),
     { code: 'XX000', message: 'unknown database failure' },

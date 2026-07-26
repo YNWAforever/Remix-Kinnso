@@ -6,7 +6,7 @@ const { getClientIpMock, createSupabaseServerClientMock, createEnquiryAttestatio
   getClientIpMock: vi.fn(async () => '203.0.113.9'),
   createSupabaseServerClientMock: vi.fn(),
   createEnquiryAttestationMock: vi.fn(async () => ({ ip: '203.0.113.9', header: 'v1.2000000000.' + 'b'.repeat(64) })),
-  rpcMock: vi.fn(async () => ({ data: 'enquiry-1', error: null })),
+  rpcMock: vi.fn(async () => ({ data: '33333333-3333-4333-8333-333333333333', error: null })),
 }))
 
 vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))

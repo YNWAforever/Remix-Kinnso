@@ -6,7 +6,7 @@ import { createEnquiryAttestation } from '@/lib/enquiries/attestation'
 import { getClientIp } from '@/lib/http/client-ip'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { ENQUIRY_RATE_LIMIT, type EnquiryInput, type EnquiryResult } from './types'
-import { validateEnquiryInput } from './validation'
+import { isValidEnquiryTargetId, validateEnquiryInput } from './validation'
 
 
 export async function submitEnquiryAction(input: EnquiryInput): Promise<EnquiryResult> {
@@ -25,7 +25,7 @@ export async function submitEnquiryAction(input: EnquiryInput): Promise<EnquiryR
       global: { headers: { 'x-kinnso-enquiry-attestation': attestation.header } },
     })
     const isCreator = parsed.value.type === 'creator_collab'
-    const { error } = await supabase.rpc('submit_enquiry', {
+    const { data, error } = await supabase.rpc('submit_enquiry', {
       p_type: parsed.value.type,
       // Supabase's generated RPC types currently model nullable SQL function
       // arguments as required strings, although this RPC's XOR contract
@@ -39,8 +39,8 @@ export async function submitEnquiryAction(input: EnquiryInput): Promise<EnquiryR
       p_max_requests: ENQUIRY_RATE_LIMIT.maxRequests,
       p_window_seconds: ENQUIRY_RATE_LIMIT.windowSeconds,
     })
-    if (!error) return { ok: true }
-    if (error.message.includes('enquiry_rate_limited')) return { ok: false, error: 'rate_limited' }
+    if (!error && isValidEnquiryTargetId(data)) return { ok: true }
+    if (error?.message.includes('enquiry_rate_limited')) return { ok: false, error: 'rate_limited' }
     console.error('[enquiries] submission_failed')
     return { ok: false, error: 'failed' }
   } catch {

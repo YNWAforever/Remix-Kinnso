@@ -38,12 +38,24 @@ function optionalEnrichmentErrorCode(error: unknown): string | null {
   return typeof error.code === 'string' ? error.code.toUpperCase() : null
 }
 
+function isPostgrestFetchNetworkError(error: unknown, code: string | null): boolean {
+  if (code !== '' || typeof error !== 'object' || error === null) return false
+  const value = error as Record<string, unknown>
+  if (typeof value.message !== 'string' || typeof value.details !== 'string' || typeof value.hint !== 'string') {
+    return false
+  }
+  return /^(?:TypeError: (?:fetch failed|Failed to fetch|Load failed|Network request failed)|FetchError: |NetworkError: |AbortError: )/.test(
+    value.message,
+  )
+}
+
 function isRecognizedOptionalEnrichmentError(error: unknown): boolean {
   const code = optionalEnrichmentErrorCode(error)
   return code !== null
     && (code.startsWith('08')
       || OPTIONAL_SCHEMA_CODES.has(code)
-      || OPTIONAL_TRANSIENT_CODES.has(code))
+      || OPTIONAL_TRANSIENT_CODES.has(code)
+      || isPostgrestFetchNetworkError(error, code))
 }
 
 export async function optionalEnrichmentQuery<T>(
