@@ -7,9 +7,10 @@ import type { CreatorArticleCard } from '@/lib/articles/queries'
 import type { PublicSession } from '@/lib/sessions/public-queries'
 import { displayName } from '@/lib/i18n/display-names'
 import type { PublicCreator } from '@/lib/creators/queries'
-import type { Locale } from '@/lib/i18n/config'
+import { toUrlCategory, type Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
+import { isValidEnquiryTargetId } from '@/lib/enquiries/validation'
 interface Props {
   creator: PublicCreator
   locale: Locale
@@ -63,7 +64,7 @@ export function CreatorProfileView({ creator, locale, embedded, t, enquiry, rela
           <h1 className="mt-3 k2-display text-3xl font-semibold text-kinnso-ink md:text-4xl">{creator.name}</h1>
           <p className="mt-1 text-sm text-kinnso-muted">@{creator.handle}</p>
           {creator.bio && <p className="mt-3 max-w-xl text-sm text-kinnso-ink/80">{creator.bio}</p>}
-          {enquiry && <div className="mt-5"><EnquiryDialog type="creator_collab" targetId={creator.id} targetName={creator.name} triggerLabel={workWithLabel} t={enquiry} /></div>}
+          {enquiry && isValidEnquiryTargetId(creator.id) && <div className="mt-5"><EnquiryDialog type="creator_collab" targetId={creator.id} targetName={creator.name} triggerLabel={workWithLabel} t={enquiry} /></div>}
         </div>
       </header>
 
@@ -110,7 +111,10 @@ export function CreatorProfileView({ creator, locale, embedded, t, enquiry, rela
       {articles.length > 0 && related && <section className="mt-8">
         <h2 className="text-xl font-bold text-kinnso-ink">{related.articlesHeading}</h2>
         <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => <ArticleCard key={article.id} href={`/${locale}/${article.category}/${article.url}`} title={article.title} summary={article.summary} thumbnail={article.thumbnail ?? undefined} />)}
+          {articles.flatMap((article) => {
+            const urlCategory = toUrlCategory(article.category)
+            return urlCategory ? [<ArticleCard key={article.id} href={`/${locale}/articles/${urlCategory}/${article.url}`} title={article.title} summary={article.summary} thumbnail={article.thumbnail ?? undefined} />] : []
+          })}
         </div>
       </section>}
       {sessions.length > 0 && related && <section className="mt-8">

@@ -23,7 +23,7 @@ afterEach(cleanup)
 const ProfileView = CreatorProfileView as unknown as (props: Record<string, unknown>) => React.ReactNode
 const messages = { ...en.creatorProfile, articlesHeading: 'Articles', sessionsHeading: 'Sessions' }
 const baseCreator = {
-  id: 'creator-1', handle: 'ada', name: 'Ada Wong', bio: 'Local travel writer.', avatarUrl: null,
+  id: '123e4567-e89b-42d3-a456-426614174000', handle: 'ada', name: 'Ada Wong', bio: 'Local travel writer.', avatarUrl: null,
   profile: { niches: [], content_pillars: [], tone: [], audience_geos: [], audience_locales: [], languages: [], platforms: [] },
   guides: [],
 } as unknown as PublicCreator
@@ -60,6 +60,6 @@ describe('CreatorProfileView hardening', () => {
     expect(screen.queryByText('Tone')).not.toBeInTheDocument()
     expect(screen.queryByText('Audience locales')).not.toBeInTheDocument()
     expect(container.querySelector('[data-avatar-src="https://cdn.example.test/ada.jpg"]')).toBeTruthy()
-    expect(dialogProps.value).toMatchObject({ type: 'creator_collab', targetId: 'creator-1', targetName: 'Ada Wong', t: en.enquiry })
+    expect(dialogProps.value).toMatchObject({ type: 'creator_collab', targetId: '123e4567-e89b-42d3-a456-426614174000', targetName: 'Ada Wong', t: en.enquiry })
   })
 })
