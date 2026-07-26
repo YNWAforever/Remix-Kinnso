@@ -87,24 +87,68 @@ create or replace function public.submit_enquiry(
   p_max_requests integer default 5,
   p_window_seconds integer default 3600
 ) returns uuid
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public as $function$
 declare
   v_type text := lower(btrim(p_type));
   v_name text := btrim(p_name);
   v_email text := lower(btrim(p_email));
   v_message text := btrim(p_message);
+  v_request_headers jsonb := coalesce(current_setting('request.headers', true), '{}')::jsonb;
+  v_attestation text;
+  v_expiry_text text;
+  v_expiry bigint;
+  v_now_epoch bigint;
+  v_attestation_hmac text;
+  v_expected_hmac text;
+  v_secret text;
+  v_normalized_ip text;
   v_ip_hash text;
   v_window_start timestamptz;
   v_request_count integer;
   v_id uuid;
+  v_effective_max_requests constant integer := 5;
+  v_effective_window_seconds constant integer := 3600;
 begin
+  -- Reject direct RPC callers before validating fields or consuming a bucket.
+  v_attestation := v_request_headers ->> 'x-kinnso-enquiry-attestation';
+  if v_attestation is null or v_attestation !~ '^v1\.[0-9]{1,10}\.[0-9a-f]{64}$' then
+    raise exception 'invalid_enquiry_attestation' using errcode = '42501';
+  end if;
+
+  v_expiry_text := split_part(v_attestation, '.', 2);
+  v_expiry := v_expiry_text::bigint;
+  v_now_epoch := floor(extract(epoch from clock_timestamp()))::bigint;
+  if v_expiry < v_now_epoch or v_expiry > v_now_epoch + 300 then
+    raise exception 'invalid_enquiry_attestation' using errcode = '42501';
+  end if;
+
+  select ds.decrypted_secret into v_secret
+  from vault.decrypted_secrets ds
+  where ds.name = 'r7_7_enquiry_submission_hmac';
+  if v_secret is null then
+    raise exception 'invalid_enquiry_attestation' using errcode = '42501';
+  end if;
+
+  begin
+    v_normalized_ip := host(btrim(p_ip)::inet);
+  exception when others then
+    raise exception 'invalid_enquiry_attestation' using errcode = '42501';
+  end;
+  v_attestation_hmac := split_part(v_attestation, '.', 3);
+  v_expected_hmac := encode(
+    extensions.hmac(v_normalized_ip || E'\n' || v_expiry::text, v_secret, 'sha256'),
+    'hex'
+  );
+  -- Both values are fixed-length lowercase hex; compare their fixed-length digests.
+  if extensions.digest(v_attestation_hmac, 'sha256') <> extensions.digest(v_expected_hmac, 'sha256') then
+    raise exception 'invalid_enquiry_attestation' using errcode = '42501';
+  end if;
+
   if v_type not in ('creator_collab', 'merchant_contact') then raise exception 'invalid_enquiry_type' using errcode = '22023'; end if;
   if v_name is null or char_length(v_name) not between 1 and 120 then raise exception 'invalid_enquiry_name' using errcode = '22023'; end if;
   if v_email is null or char_length(v_email) > 254 or v_email !~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then raise exception 'invalid_enquiry_email' using errcode = '22023'; end if;
   if v_message is null or char_length(v_message) not between 10 and 4000 then raise exception 'invalid_enquiry_message' using errcode = '22023'; end if;
   if (v_type = 'creator_collab' and (p_creator_id is null or p_merchant_profile_id is not null)) or (v_type = 'merchant_contact' and (p_merchant_profile_id is null or p_creator_id is not null)) then raise exception 'invalid_enquiry_target' using errcode = '22023'; end if;
-  if p_ip is null or btrim(p_ip) = '' then raise exception 'invalid_enquiry_ip' using errcode = '22023'; end if;
-  if p_max_requests not between 1 and 100 or p_window_seconds not between 60 and 86400 then raise exception 'invalid_enquiry_rate_limit' using errcode = '22023'; end if;
 
   if v_type = 'creator_collab' and not exists (
     select 1 from public.creators c
@@ -115,20 +159,20 @@ begin
     where m.id = p_merchant_profile_id and m.status = 'active' and m.slug is not null
   ) then raise exception 'enquiry_target_not_found' using errcode = '22023'; end if;
 
-  v_ip_hash := encode(digest(btrim(p_ip), 'sha256'), 'hex');
-  v_window_start := to_timestamp(floor(extract(epoch from clock_timestamp()) / p_window_seconds) * p_window_seconds);
+  v_ip_hash := encode(extensions.digest(v_normalized_ip, 'sha256'), 'hex');
+  v_window_start := to_timestamp(floor(extract(epoch from clock_timestamp()) / v_effective_window_seconds) * v_effective_window_seconds);
   insert into public.enquiry_rate_limits (ip_hash, window_start, request_count)
   values (v_ip_hash, v_window_start, 1)
   on conflict (ip_hash, window_start) do update set request_count = public.enquiry_rate_limits.request_count + 1
   returning request_count into v_request_count;
-  if v_request_count > p_max_requests then raise exception 'enquiry_rate_limited' using errcode = '22023'; end if;
+  if v_request_count > v_effective_max_requests then raise exception 'enquiry_rate_limited' using errcode = '22023'; end if;
 
   insert into public.enquiries (type, creator_id, merchant_profile_id, name, email, message)
   values (v_type, p_creator_id, p_merchant_profile_id, v_name, v_email, v_message)
   returning id into v_id;
   return v_id;
 end;
-$$;
+$function$;
 revoke all on function public.submit_enquiry(text, uuid, uuid, text, text, text, text, integer, integer) from public, anon, authenticated;
 grant execute on function public.submit_enquiry(text, uuid, uuid, text, text, text, text, integer, integer) to anon, authenticated;
 
