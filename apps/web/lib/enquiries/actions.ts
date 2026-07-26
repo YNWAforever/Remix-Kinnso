@@ -5,10 +5,9 @@ import 'server-only'
 import { createEnquiryAttestation } from '@/lib/enquiries/attestation'
 import { getClientIp } from '@/lib/http/client-ip'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import type { EnquiryInput, EnquiryResult } from './types'
+import { ENQUIRY_RATE_LIMIT, type EnquiryInput, type EnquiryResult } from './types'
 import { validateEnquiryInput } from './validation'
 
-export const ENQUIRY_RATE_LIMIT = { maxRequests: 5, windowSeconds: 3600 } as const
 
 export async function submitEnquiryAction(input: EnquiryInput): Promise<EnquiryResult> {
   if (input.website) return { ok: true }

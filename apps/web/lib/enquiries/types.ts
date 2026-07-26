@@ -20,3 +20,5 @@ export interface NormalizedEnquiryInput {
   email: string
   message: string
 }
+
+export const ENQUIRY_RATE_LIMIT = { maxRequests: 5, windowSeconds: 3600 } as const
