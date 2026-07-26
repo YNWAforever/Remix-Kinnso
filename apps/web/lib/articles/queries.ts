@@ -11,10 +11,50 @@ const db = () =>
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY!,
   )
 
-/** Retry a read once on a transient failure (cold connection, momentary network/DB
- *  blip) so an ISR/dynamic render degrades to a quick retry rather than crashing the
- *  serverless function (FUNCTION_INVOCATION_FAILED). Reads are idempotent, so this is
- *  safe; a persistent failure still throws and is caught by the route error boundary. */
+export interface CreatorArticleCard {
+  id: string
+  url: string
+  category: string
+  title: string
+  summary: string
+  thumbnail: string | null
+  publishedAt: string
+}
+
+export async function getPublishedArticlesForCreator(handle: string, locale: Locale, limit = 6): Promise<CreatorArticleCard[]> {
+  const client = db()
+  const { data: author, error: authorError } = await client
+    .from('article_authors')
+    .select('slug')
+    .eq('slug', handle)
+    .eq('locale', locale)
+    .eq('is_active', true)
+    .maybeSingle()
+  if (authorError) throw authorError
+  if (!author) return []
+
+  const { data, error } = await client
+    .from('articles')
+    .select('id, url, category, thumbnails, published_at, article_translations!inner(locale, title, summary)')
+    .contains('authors', [handle])
+    .is('deleted_at', null)
+    .not('published_at', 'is', null)
+    .eq('article_translations.locale', locale)
+    .order('published_at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+
+  return (data ?? []).flatMap((article) => {
+    const translation = (article.article_translations ?? []).find((item) => item.locale === locale)
+    if (!translation || !article.published_at) return []
+    return [{
+      id: article.id, url: article.url, category: article.category,
+      title: translation.title ?? '', summary: translation.summary ?? '',
+      thumbnail: article.thumbnails?.[0] ?? null, publishedAt: article.published_at,
+    }]
+  })
+}
+
 /** Pick the best translation for a requested locale: exact match → `en` → first available. */
 function pickTranslation<T extends { locale: string }>(translations: T[], locale: string): T | null {
   if (translations.length === 0) return null

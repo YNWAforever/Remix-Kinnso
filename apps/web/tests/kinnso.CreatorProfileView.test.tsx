@@ -8,6 +8,8 @@ import en from '@/lib/i18n/messages/en'
 import type { PublicCreator } from '@/lib/creators/queries'
 
 const creator: PublicCreator = {
+  id: 'creator-1',
+  avatarUrl: null,
   handle: 'maya',
   name: 'Maya Wanders',
   bio: 'Slow travel in Asia.',
@@ -48,8 +50,8 @@ describe('CreatorProfileView', () => {
     expect(link.getAttribute('href')).toBe('/en/g/osaka')
   })
 
-  it('shows the empty note when the creator has no guides', () => {
+  it('omits the guides section when the creator has no guides', () => {
     render(<CreatorProfileView creator={{ ...creator, guides: [] }} locale="en" t={en.creatorProfile} />)
-    expect(screen.getByText(en.creatorProfile.guidesEmpty)).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: en.creatorProfile.guidesHeading })).not.toBeInTheDocument()
   })
 })

@@ -4,6 +4,8 @@ import { render, screen } from '@testing-library/react'
 import type { PublicCreator } from '@/lib/creators/queries'
 
 const creator: PublicCreator = {
+  id: 'creator-1',
+  avatarUrl: null,
   handle: 'maya',
   name: 'Maya Wanders',
   bio: 'Slow travel.',

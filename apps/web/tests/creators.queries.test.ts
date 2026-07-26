@@ -4,12 +4,13 @@ const state = vi.hoisted(() => ({
   creators: [] as unknown[],
   guides: [] as unknown[],
   single: null as unknown,
+  selects: [] as string[],
 }))
 
 vi.mock('@/lib/supabase/public', () => {
   const make = (resolveData: () => unknown, single?: () => unknown) => {
     const builder: Record<string, unknown> = {
-      select: () => builder,
+      select: (columns: string) => { state.selects.push(columns); return builder },
       eq: () => builder,
       not: () => builder,
       in: () => builder,
@@ -54,6 +55,7 @@ beforeEach(() => {
   state.creators = []
   state.guides = []
   state.single = null
+  state.selects = []
 })
 
 describe('getPublicCreators', () => {
@@ -106,6 +108,32 @@ describe('getCreatorByHandle', () => {
     expect(creator?.profile.platforms[0]).toEqual({ platform: 'instagram', verified: false })
     expect(creator?.guides).toHaveLength(1)
     expect(creator?.guides[0].slug).toBe('osaka')
+  })
+
+  it('selects a stable creator id and avatar URL and only retains real follower counts', async () => {
+    state.single = {
+      ...creatorRow,
+      avatar_url: 'https://images.example.test/maya.jpg',
+      public_profile: {
+        ...creatorRow.public_profile,
+        platforms: [
+          { platform: 'instagram', verified: true, followers: 12500 },
+          { platform: 'youtube', verified: false, followers: -1 },
+          { platform: 'threads', verified: false, followers: Number.POSITIVE_INFINITY },
+        ],
+      },
+    }
+
+    const creator = await getCreatorByHandle('maya')
+
+    expect(state.selects[0]).toContain('id')
+    expect(state.selects[0]).toContain('avatar_url')
+    expect(creator).toMatchObject({ id: 'c1', avatarUrl: 'https://images.example.test/maya.jpg' })
+    expect(creator?.profile.platforms).toEqual([
+      { platform: 'instagram', verified: true, followers: 12500 },
+      { platform: 'youtube', verified: false },
+      { platform: 'threads', verified: false },
+    ])
   })
 
   it('returns null for an unknown handle', async () => {
