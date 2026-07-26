@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { defineConfig } from '@playwright/test'
 import baseConfig from './playwright.config'
 import {
@@ -5,9 +7,19 @@ import {
   resolveProfileEnquiriesLocalConfig,
 } from './profile-enquiries-local'
 
+function localTestEnv() {
+  const values: Record<string, string> = {}
+  const source = readFileSync(resolve(import.meta.dirname, '../web/.env.test'), 'utf8')
+  for (const line of source.split(/\r?\n/)) {
+    const match = /^([A-Z0-9_]+)=(.*)$/.exec(line)
+    if (match) values[match[1]] = match[2].replace(/^"|"$/g, '')
+  }
+  return values
+}
+
 // Resolve before defineConfig/webServer construction: without this explicit
 // opt-in and loopback validation, the local fixture must never start.
-const local = resolveProfileEnquiriesLocalConfig(process.env)
+const local = resolveProfileEnquiriesLocalConfig({ ...localTestEnv(), ...process.env })
 const port = new URL(local.baseURL).port || '3000'
 
 Object.assign(process.env, {
