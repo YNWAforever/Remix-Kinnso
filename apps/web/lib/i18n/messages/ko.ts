@@ -916,6 +916,7 @@ const messages: Messages = {
     typeCreator: '크리에이터 협업', typeMerchant: '판매자 문의', statusNew: '신규', statusInProgress: '진행 중', statusResolved: '해결됨', statusSpam: '스팸',
     receivedAt: '접수 시간', target: '대상', markInProgress: '진행으로 표시', markResolved: '해결로 표시', markSpam: '스팸으로 표시', reopen: '다시 열기',
     reasonLabel: '사유', reasonRequired: '사유를 입력해야 합니다.', empty: '이 조건에 맞는 문의가 없습니다.', actionFailed: '문의를 업데이트할 수 없습니다. 다시 시도해 주세요.',
+    next: '다음',
   },
   creators: {
     title: '크리에이터',

@@ -916,6 +916,7 @@ const messages: Messages = {
     typeCreator: 'ร่วมงานกับครีเอเตอร์', typeMerchant: 'ติดต่อร้านค้า', statusNew: 'ใหม่', statusInProgress: 'กำลังดำเนินการ', statusResolved: 'แก้ไขแล้ว', statusSpam: 'สแปม',
     receivedAt: 'เวลาที่ได้รับ', target: 'เป้าหมาย', markInProgress: 'เริ่มดำเนินการ', markResolved: 'ทำเครื่องหมายว่าแก้ไขแล้ว', markSpam: 'ทำเครื่องหมายเป็นสแปม', reopen: 'เปิดอีกครั้ง',
     reasonLabel: 'เหตุผล', reasonRequired: 'ต้องระบุเหตุผล', empty: 'ไม่มีคำถามที่ตรงกับตัวกรองนี้', actionFailed: 'ไม่สามารถอัปเดตคำถามได้ โปรดลองอีกครั้ง',
+    next: 'ถัดไป',
   },
   creators: {
     title: 'ครีเอเตอร์',

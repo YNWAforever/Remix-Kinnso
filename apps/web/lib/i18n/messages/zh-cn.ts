@@ -916,6 +916,7 @@ const messages: Messages = {
     typeCreator: '创作者合作', typeMerchant: '联系商家', statusNew: '新建', statusInProgress: '处理中', statusResolved: '已解决', statusSpam: '垃圾信息',
     receivedAt: '接收时间', target: '目标', markInProgress: '标记为处理中', markResolved: '标记为已解决', markSpam: '标记为垃圾信息', reopen: '重新开启',
     reasonLabel: '原因', reasonRequired: '必须提供原因。', empty: '没有符合这些筛选条件的咨询。', actionFailed: '无法更新咨询，请重试。',
+    next: '下一页',
   },
   creators: {
     title: '创作者',

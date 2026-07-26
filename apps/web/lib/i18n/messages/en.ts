@@ -957,7 +957,7 @@ export interface Messages {
     title: string; subtitle: string; filterActive: string; filterResolved: string; filterSpam: string; filterAllTypes: string
     typeCreator: string; typeMerchant: string; statusNew: string; statusInProgress: string; statusResolved: string; statusSpam: string
     receivedAt: string; target: string; markInProgress: string; markResolved: string; markSpam: string; reopen: string
-    reasonLabel: string; reasonRequired: string; empty: string; actionFailed: string
+    reasonLabel: string; reasonRequired: string; empty: string; actionFailed: string; next: string
   }
   creators: {
     title: string; subtitle: string
@@ -2170,6 +2170,7 @@ const messages: Messages = {
     typeCreator: 'Creator collaboration', typeMerchant: 'Merchant contact', statusNew: 'New', statusInProgress: 'In progress', statusResolved: 'Resolved', statusSpam: 'Spam',
     receivedAt: 'Received', target: 'Target', markInProgress: 'Mark in progress', markResolved: 'Mark resolved', markSpam: 'Mark as spam', reopen: 'Reopen',
     reasonLabel: 'Reason', reasonRequired: 'A reason is required.', empty: 'No enquiries match these filters.', actionFailed: 'The enquiry could not be updated. Please try again.',
+    next: 'Next',
   },
   creators: {
     title: 'Creators',

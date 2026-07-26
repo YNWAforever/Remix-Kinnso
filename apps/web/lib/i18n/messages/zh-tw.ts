@@ -916,6 +916,7 @@ const messages: Messages = {
     typeCreator: '創作者合作', typeMerchant: '聯絡商家', statusNew: '新增', statusInProgress: '處理中', statusResolved: '已解決', statusSpam: '垃圾訊息',
     receivedAt: '接收時間', target: '對象', markInProgress: '標記為處理中', markResolved: '標記為已解決', markSpam: '標記為垃圾訊息', reopen: '重新開啟',
     reasonLabel: '原因', reasonRequired: '必須提供原因。', empty: '沒有符合這些篩選條件的詢問。', actionFailed: '無法更新詢問，請再試一次。',
+    next: '下一頁',
   },
   creators: {
     title: '創作者',

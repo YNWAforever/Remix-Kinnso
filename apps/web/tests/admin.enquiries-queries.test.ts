@@ -23,7 +23,7 @@ describe('listAdminEnquiries', () => {
       targetId: row.target_id, targetName: 'Mei', targetSlug: 'mei-travels',
     }])
     expect(rpc).toHaveBeenCalledWith('admin_list_enquiries', {
-      p_status_group: 'active', p_type: undefined, p_limit: 25,
+      p_status_group: 'active', p_type: undefined, p_limit: 26, p_cursor_created_at: undefined, p_cursor_id: undefined,
     })
   })
 
@@ -39,5 +39,15 @@ describe('listAdminEnquiries', () => {
     const { supabase } = client(null, { code: '42501', message: 'sensitive database detail' })
     await expect(listAdminEnquiries(supabase as never, { status: 'active', type: 'all' }))
       .rejects.toThrow('Unable to load enquiries')
+  })
+  it('forwards a complete keyset cursor with the bounded lookahead limit', async () => {
+    const { supabase, rpc } = client([])
+    await listAdminEnquiries(supabase as never, { status: 'resolved', type: 'creator_collab' }, {
+      createdAt: '2026-07-26T10:00:00.000Z', id: row.id,
+    })
+    expect(rpc).toHaveBeenCalledWith('admin_list_enquiries', {
+      p_status_group: 'resolved', p_type: 'creator_collab', p_limit: 26,
+      p_cursor_created_at: '2026-07-26T10:00:00.000Z', p_cursor_id: row.id,
+    })
   })
 })

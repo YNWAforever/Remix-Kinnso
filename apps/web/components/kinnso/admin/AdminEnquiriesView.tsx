@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import type { ActionResult } from '@/lib/admin/result'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
-import type { AdminEnquiry, EnquiryStatus, EnquiryStatusFilter, EnquiryTypeFilter } from '@/lib/admin/enquiries-queries'
+import type { AdminEnquiry, AdminEnquiryCursor, EnquiryStatus, EnquiryStatusFilter, EnquiryTypeFilter } from '@/lib/admin/enquiries-queries'
 
 type T = Messages['enquiriesAdmin']
 
@@ -18,13 +18,20 @@ function filterHref(locale: Locale, status: EnquiryStatusFilter, type: EnquiryTy
   return `/${locale}/admin/enquiries${query ? `?${query}` : ''}`
 }
 
-function targetHref(locale: Locale, enquiry: AdminEnquiry) {
-  if (!enquiry.targetName || !enquiry.targetSlug) return null
-  return enquiry.type === 'creator_collab'
-    ? `/${locale}/c/${enquiry.targetSlug}`
-    : `/${locale}/m/${enquiry.targetSlug}`
+function nextHref(locale: Locale, filters: { status: EnquiryStatusFilter; type: EnquiryTypeFilter }, cursor: AdminEnquiryCursor) {
+  const search = new URLSearchParams()
+  if (filters.status !== 'active') search.set('status', filters.status)
+  if (filters.type !== 'all') search.set('type', filters.type)
+  search.set('cursorCreatedAt', cursor.createdAt)
+  search.set('cursorId', cursor.id)
+  return `/${locale}/admin/enquiries?${search.toString()}`
 }
 
+function targetHref(locale: Locale, enquiry: AdminEnquiry) {
+  if (!enquiry.targetName || !enquiry.targetSlug) return null
+  const segment = encodeURIComponent(enquiry.targetSlug)
+  return enquiry.type === 'creator_collab' ? `/${locale}/c/${segment}` : `/${locale}/m/${segment}`
+}
 function allowedActions(status: EnquiryStatus): EnquiryStatus[] {
   if (status === 'new') return ['in_progress', 'resolved', 'spam']
   if (status === 'in_progress') return ['resolved', 'spam']
@@ -32,16 +39,17 @@ function allowedActions(status: EnquiryStatus): EnquiryStatus[] {
 }
 
 export function AdminEnquiriesView({
-  locale, t, enquiries, filters, onSetStatus,
+  locale, t, enquiries, filters, nextCursor = null, onSetStatus,
 }: {
   locale: Locale
   t: T
   enquiries: AdminEnquiry[]
   filters: { status: EnquiryStatusFilter; type: EnquiryTypeFilter }
+  nextCursor?: AdminEnquiryCursor | null
   onSetStatus: (id: string, status: EnquiryStatus, reason: string) => Promise<ActionResult<{ status: EnquiryStatus }>>
 }) {
   const router = useRouter()
-  const [busyId, setBusyId] = useState<string | null>(null)
+  const [busyIds, setBusyIds] = useState<Set<string>>(() => new Set())
   const [reasons, setReasons] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -59,23 +67,23 @@ export function AdminEnquiriesView({
   }
 
   async function mutate(enquiry: AdminEnquiry, next: EnquiryStatus) {
-    if (busyId === enquiry.id) return
+    if (busyIds.has(enquiry.id)) return
     const reason = reasons[enquiry.id] ?? ''
     const requiresReason = next === 'resolved' || next === 'spam' || enquiry.status === 'resolved' || enquiry.status === 'spam'
     if (requiresReason && !reason.trim()) {
       setErrors((current) => ({ ...current, [enquiry.id]: t.reasonRequired }))
       return
     }
-    setBusyId(enquiry.id)
+    setBusyIds((current) => new Set(current).add(enquiry.id))
     setErrors((current) => ({ ...current, [enquiry.id]: '' }))
     try {
       const result = await onSetStatus(enquiry.id, next, reason)
       if (result.ok) router.refresh()
-      else setErrors((current) => ({ ...current, [enquiry.id]: result.errors.form?.[0] ?? t.actionFailed }))
+      else setErrors((current) => ({ ...current, [enquiry.id]: t.actionFailed }))
     } catch {
       setErrors((current) => ({ ...current, [enquiry.id]: t.actionFailed }))
     } finally {
-      setBusyId(null)
+      setBusyIds((current) => { const updated = new Set(current); updated.delete(enquiry.id); return updated })
     }
   }
 
@@ -100,7 +108,7 @@ export function AdminEnquiriesView({
           {enquiries.map((enquiry) => {
             const href = targetHref(locale, enquiry)
             const hasReasonAction = allowedActions(enquiry.status).some((next) => next === 'resolved' || next === 'spam' || enquiry.status === 'resolved' || enquiry.status === 'spam')
-            const busy = busyId === enquiry.id
+            const busy = busyIds.has(enquiry.id)
             return (
               <article key={enquiry.id} className="rounded-xl border border-kinnso-ink/10 bg-white p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -126,6 +134,7 @@ export function AdminEnquiriesView({
           })}
         </div>
       )}
+      {nextCursor ? <Link href={nextHref(locale, filters, nextCursor)} className="mt-6 inline-block rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">{t.next}</Link> : null}
     </main>
   )
 }

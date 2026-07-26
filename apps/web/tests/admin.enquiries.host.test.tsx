@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const { roleMock, getUserMock, listMock, viewMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'ops1' } } })),
-  listMock: vi.fn(async () => []), viewMock: vi.fn(() => <div data-testid="enquiries-view" />),
+  listMock: vi.fn<(...args: unknown[]) => Promise<unknown[]>>(async () => []), viewMock: vi.fn(() => <div data-testid="enquiries-view" />),
 }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
@@ -35,14 +35,36 @@ describe('/admin/enquiries host', () => {
 
   it('loads the guarded view with the active/all default queue', async () => {
     const ui = await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) })
-    expect(listMock).toHaveBeenCalledWith(expect.anything(), { status: 'active', type: 'all' })
+    expect(listMock).toHaveBeenCalledWith(expect.anything(), { status: 'active', type: 'all' }, null)
     expect((ui as { props: { enquiries: unknown[] } }).props.enquiries).toEqual([])
   })
 
   it('accepts only approved search-param enums and coerces arbitrary values to the safe defaults', async () => {
     await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ status: 'spam', type: 'merchant_contact' }) })
-    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'spam', type: 'merchant_contact' })
+    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'spam', type: 'merchant_contact' }, null)
     await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ status: 'DROP TABLE', type: 'anything' }) })
-    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' })
+    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, null)
+  })
+  it('forwards only a complete valid cursor and drops partial or invalid cursor pairs', async () => {
+    const cursor = { createdAt: '2026-07-26T10:00:00.000Z', id: '11111111-1111-4111-8111-111111111111' }
+    await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ cursorCreatedAt: cursor.createdAt, cursorId: cursor.id }) })
+    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, cursor)
+    await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ cursorCreatedAt: cursor.createdAt }) })
+    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, null)
+    await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ cursorCreatedAt: 'not-a-timestamp', cursorId: 'bad' }) })
+    expect(listMock).toHaveBeenLastCalledWith(expect.anything(), { status: 'active', type: 'all' }, null)
+  })
+
+  it('keeps the first 25 rows and uses row 25 as the forward cursor when row 26 proves another page exists', async () => {
+    const rows = Array.from({ length: 26 }, (_, index) => ({
+      id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
+      createdAt: `2026-07-26T10:${String(59 - index).padStart(2, '0')}:00.000Z`,
+    }))
+    listMock.mockResolvedValueOnce(rows)
+    const ui = await AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ status: 'spam', type: 'merchant_contact' }) })
+    const props = (ui as { props: { enquiries: typeof rows; nextCursor: { createdAt: string; id: string } | null } }).props
+    expect(props.enquiries).toHaveLength(25)
+    expect(props.nextCursor).toEqual({ createdAt: rows[24].createdAt, id: rows[24].id })
+    expect(props.enquiries.map((row) => row.id)).not.toContain(rows[25].id)
   })
 })

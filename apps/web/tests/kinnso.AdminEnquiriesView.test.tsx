@@ -31,6 +31,8 @@ describe('AdminEnquiriesView', () => {
     expect(screen.getByText('Please plan a collaboration with me.')).toBeTruthy()
     expect((screen.getByRole('link', { name: 'Mei' }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/c/mei-travels')
     expect((screen.getByRole('link', { name: 'Tea House' }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/m/tea-house')
+    renderView({ enquiries: [{ ...enquiries[0], id: '55555555-5555-4555-8555-555555555555', targetName: 'Reserved', targetSlug: 'mei/sea?x#' }] })
+    expect((screen.getByRole('link', { name: 'Reserved' }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/c/mei%2Fsea%3Fx%23')
     expect(screen.queryByRole('link', { name: 'Cy' })).toBeNull()
   })
 
@@ -82,8 +84,37 @@ describe('AdminEnquiriesView', () => {
     const reason = screen.getAllByLabelText(en.enquiriesAdmin.reasonLabel)[0] as HTMLInputElement
     fireEvent.change(reason, { target: { value: 'Completed elsewhere' } })
     fireEvent.click(screen.getAllByRole('button', { name: en.enquiriesAdmin.markResolved })[0])
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('No permission'))
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(en.enquiriesAdmin.actionFailed))
     expect(reason.value).toBe('Completed elsewhere')
     expect(screen.getByText('Aiko')).toBeTruthy()
+  })
+  it('does not render a next link for 25 visible rows without a lookahead cursor', () => {
+    const visibleRows = Array.from({ length: 25 }, (_, index) => ({ ...enquiries[0], id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}` }))
+    renderView({ enquiries: visibleRows, nextCursor: null })
+    expect(screen.queryByRole('link', { name: en.enquiriesAdmin.next })).toBeNull()
+  })
+
+  it('builds a forward link from the displayed cursor while preserving filters and encoding its values', () => {
+    renderView({
+      filters: { status: 'spam', type: 'merchant_contact' },
+      nextCursor: { createdAt: '2026-07-26T10:00:00.000Z', id: enquiries[0].id },
+    })
+    expect((screen.getByRole('link', { name: en.enquiriesAdmin.next }) as HTMLAnchorElement).getAttribute('href'))
+      .toBe(`/en/admin/enquiries?status=spam&type=merchant_contact&cursorCreatedAt=${encodeURIComponent('2026-07-26T10:00:00.000Z')}&cursorId=${enquiries[0].id}`)
+  })
+
+  it('keeps independently pending rows disabled until each overlapping mutation completes', async () => {
+    const rows = [enquiries[0], { ...enquiries[0], id: '66666666-6666-4666-8666-666666666666', name: 'Bea' }]
+    const release: Record<string, (value: { ok: true; status: 'in_progress' }) => void> = {}
+    const onSetStatus = vi.fn((id: string) => new Promise<{ ok: true; status: 'in_progress' }>((resolve) => { release[id] = resolve }))
+    renderView({ enquiries: rows, onSetStatus })
+    const buttons = screen.getAllByRole('button', { name: en.enquiriesAdmin.markInProgress }) as HTMLButtonElement[]
+    fireEvent.click(buttons[0]); fireEvent.click(buttons[1])
+    expect(buttons[0].disabled).toBe(true); expect(buttons[1].disabled).toBe(true)
+    release[rows[0].id]({ ok: true, status: 'in_progress' })
+    await waitFor(() => expect(buttons[0].disabled).toBe(false))
+    expect(buttons[1].disabled).toBe(true)
+    release[rows[1].id]({ ok: true, status: 'in_progress' })
+    await waitFor(() => expect(buttons[1].disabled).toBe(false))
   })
 })

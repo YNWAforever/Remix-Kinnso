@@ -6,6 +6,11 @@ export type EnquiryStatus = 'new' | 'in_progress' | 'resolved' | 'spam'
 export type EnquiryStatusFilter = 'active' | 'resolved' | 'spam'
 export type EnquiryTypeFilter = 'all' | EnquiryType
 
+export interface AdminEnquiryCursor {
+  createdAt: string
+  id: string
+}
+
 export interface AdminEnquiry {
   id: string
   type: EnquiryType
@@ -37,11 +42,14 @@ type EnquiryRpcRow = {
 export async function listAdminEnquiries(
   supabase: SupabaseClient<Database>,
   filters: { status: EnquiryStatusFilter; type: EnquiryTypeFilter },
+  cursor: AdminEnquiryCursor | null = null,
 ): Promise<AdminEnquiry[]> {
   const { data, error } = await supabase.rpc('admin_list_enquiries', {
     p_status_group: filters.status,
     p_type: filters.type === 'all' ? undefined : filters.type,
-    p_limit: 25,
+    p_limit: 26,
+    p_cursor_created_at: cursor?.createdAt,
+    p_cursor_id: cursor?.id,
   })
   if (error) throw new Error('Unable to load enquiries')
 

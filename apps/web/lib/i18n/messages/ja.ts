@@ -916,6 +916,7 @@ const messages: Messages = {
     typeCreator: 'クリエイター協業', typeMerchant: 'マーチャントへの連絡', statusNew: '新規', statusInProgress: '対応中', statusResolved: '解決済み', statusSpam: 'スパム',
     receivedAt: '受信日時', target: '対象', markInProgress: '対応を開始', markResolved: '解決済みにする', markSpam: 'スパムとしてマーク', reopen: '再開',
     reasonLabel: '理由', reasonRequired: '理由を入力してください。', empty: 'この条件に一致する問い合わせはありません。', actionFailed: '問い合わせを更新できませんでした。もう一度お試しください。',
+    next: '次へ',
   },
   creators: {
     title: 'クリエイター',
