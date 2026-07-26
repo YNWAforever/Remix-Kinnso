@@ -905,10 +905,17 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง', navSessions: 'เซสชัน',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง', navSessions: 'เซสชัน', navEnquiries: 'คำถาม',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
+  },
+  enquiriesAdmin: {
+    title: 'คำถาม', subtitle: 'ตรวจสอบและจัดการคำถามเกี่ยวกับโปรไฟล์พร้อมบันทึกการตรวจสอบ',
+    filterActive: 'กำลังดำเนินการ', filterResolved: 'แก้ไขแล้ว', filterSpam: 'สแปม', filterAllTypes: 'ทุกประเภท',
+    typeCreator: 'ร่วมงานกับครีเอเตอร์', typeMerchant: 'ติดต่อร้านค้า', statusNew: 'ใหม่', statusInProgress: 'กำลังดำเนินการ', statusResolved: 'แก้ไขแล้ว', statusSpam: 'สแปม',
+    receivedAt: 'เวลาที่ได้รับ', target: 'เป้าหมาย', markInProgress: 'เริ่มดำเนินการ', markResolved: 'ทำเครื่องหมายว่าแก้ไขแล้ว', markSpam: 'ทำเครื่องหมายเป็นสแปม', reopen: 'เปิดอีกครั้ง',
+    reasonLabel: 'เหตุผล', reasonRequired: 'ต้องระบุเหตุผล', empty: 'ไม่มีคำถามที่ตรงกับตัวกรองนี้', actionFailed: 'ไม่สามารถอัปเดตคำถามได้ โปรดลองอีกครั้ง',
   },
   creators: {
     title: 'ครีเอเตอร์',

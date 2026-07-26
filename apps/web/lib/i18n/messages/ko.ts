@@ -905,10 +905,17 @@ const messages: Messages = {
     disclaimer: 'AI 생성 — 게시 전에 검토하세요.',
   },
   admin: {
-    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션', navTestimonials: '추천사', navBookings: '예약', navSessions: '세션',
+    navDashboard: '대시보드', navPerks: '혜택', navUsers: '사용자', navCreators: '크리에이터', navMerchants: '머천트', navTeam: '팀', navMissions: '미션', navTestimonials: '추천사', navBookings: '예약', navSessions: '세션', navEnquiries: '문의',
     dashboardTitle: '관리', dashboardSubtitle: '혜택, 사용자, 플랫폼 콘텐츠를 관리하세요.',
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
+  },
+  enquiriesAdmin: {
+    title: '문의', subtitle: '감사 기록과 함께 프로필 문의를 검토하고 처리합니다.',
+    filterActive: '진행 중', filterResolved: '해결됨', filterSpam: '스팸', filterAllTypes: '모든 유형',
+    typeCreator: '크리에이터 협업', typeMerchant: '판매자 문의', statusNew: '신규', statusInProgress: '진행 중', statusResolved: '해결됨', statusSpam: '스팸',
+    receivedAt: '접수 시간', target: '대상', markInProgress: '진행으로 표시', markResolved: '해결로 표시', markSpam: '스팸으로 표시', reopen: '다시 열기',
+    reasonLabel: '사유', reasonRequired: '사유를 입력해야 합니다.', empty: '이 조건에 맞는 문의가 없습니다.', actionFailed: '문의를 업데이트할 수 없습니다. 다시 시도해 주세요.',
   },
   creators: {
     title: '크리에이터',

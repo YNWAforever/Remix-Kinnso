@@ -905,10 +905,17 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單', navSessions: '場次',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單', navSessions: '場次', navEnquiries: '詢問',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
     statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
     statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
+  },
+  enquiriesAdmin: {
+    title: '詢問', subtitle: '以稽核紀錄檢視及處理個人檔案詢問。',
+    filterActive: '處理中', filterResolved: '已解決', filterSpam: '垃圾訊息', filterAllTypes: '所有類型',
+    typeCreator: '創作者合作', typeMerchant: '聯絡商家', statusNew: '新增', statusInProgress: '處理中', statusResolved: '已解決', statusSpam: '垃圾訊息',
+    receivedAt: '接收時間', target: '對象', markInProgress: '標記為處理中', markResolved: '標記為已解決', markSpam: '標記為垃圾訊息', reopen: '重新開啟',
+    reasonLabel: '原因', reasonRequired: '必須提供原因。', empty: '沒有符合這些篩選條件的詢問。', actionFailed: '無法更新詢問，請再試一次。',
   },
   creators: {
     title: '創作者',

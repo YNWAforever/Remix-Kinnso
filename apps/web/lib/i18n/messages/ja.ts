@@ -905,10 +905,17 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約', navSessions: 'セッション',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約', navSessions: 'セッション', navEnquiries: '問い合わせ',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
+  },
+  enquiriesAdmin: {
+    title: '問い合わせ', subtitle: '監査記録とともにプロフィールへの問い合わせを確認・処理します。',
+    filterActive: '対応中', filterResolved: '解決済み', filterSpam: 'スパム', filterAllTypes: 'すべての種類',
+    typeCreator: 'クリエイター協業', typeMerchant: 'マーチャントへの連絡', statusNew: '新規', statusInProgress: '対応中', statusResolved: '解決済み', statusSpam: 'スパム',
+    receivedAt: '受信日時', target: '対象', markInProgress: '対応を開始', markResolved: '解決済みにする', markSpam: 'スパムとしてマーク', reopen: '再開',
+    reasonLabel: '理由', reasonRequired: '理由を入力してください。', empty: 'この条件に一致する問い合わせはありません。', actionFailed: '問い合わせを更新できませんでした。もう一度お試しください。',
   },
   creators: {
     title: 'クリエイター',

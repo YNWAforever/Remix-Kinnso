@@ -948,10 +948,16 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string; navEnquiries: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
+  }
+  enquiriesAdmin: {
+    title: string; subtitle: string; filterActive: string; filterResolved: string; filterSpam: string; filterAllTypes: string
+    typeCreator: string; typeMerchant: string; statusNew: string; statusInProgress: string; statusResolved: string; statusSpam: string
+    receivedAt: string; target: string; markInProgress: string; markResolved: string; markSpam: string; reopen: string
+    reasonLabel: string; reasonRequired: string; empty: string; actionFailed: string
   }
   creators: {
     title: string; subtitle: string
@@ -2153,10 +2159,17 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions', navEnquiries: 'Enquiries',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
+  },
+  enquiriesAdmin: {
+    title: 'Enquiries', subtitle: 'Review and resolve profile enquiries with an audit trail.',
+    filterActive: 'Active', filterResolved: 'Resolved', filterSpam: 'Spam', filterAllTypes: 'All types',
+    typeCreator: 'Creator collaboration', typeMerchant: 'Merchant contact', statusNew: 'New', statusInProgress: 'In progress', statusResolved: 'Resolved', statusSpam: 'Spam',
+    receivedAt: 'Received', target: 'Target', markInProgress: 'Mark in progress', markResolved: 'Mark resolved', markSpam: 'Mark as spam', reopen: 'Reopen',
+    reasonLabel: 'Reason', reasonRequired: 'A reason is required.', empty: 'No enquiries match these filters.', actionFailed: 'The enquiry could not be updated. Please try again.',
   },
   creators: {
     title: 'Creators',
