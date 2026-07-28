@@ -23,6 +23,7 @@ test('Explore state is URL-stable, reloadable, paginated, and resettable', async
 
   await page.reload()
   await expect(page.getByRole('radio', { name: 'Tokyo' })).toBeChecked()
+  await expect(page.getByRole('searchbox', { name: 'Search guides' })).toHaveValue('R7')
   await expect(page.getByLabel('Sort by')).toHaveValue('most-saved')
   await expect(page.getByRole('heading', { level: 3 })).toHaveCount(13)
 
@@ -34,6 +35,16 @@ test('Explore state is URL-stable, reloadable, paginated, and resettable', async
   await expect(page.getByRole('heading', { level: 3 })).toHaveCount(12)
 })
 
+test('Explore guide cards retain their established public URLs', async ({ page }) => {
+  const response = await page.goto('/en/explore')
+  expect(response?.status()).toBe(200)
+
+  const guideLink = page.locator('a[href="/en/g/r7-smoke-tokyo-guide"]')
+  await expect(guideLink).toBeVisible()
+  await guideLink.click()
+  await expect(page).toHaveURL('/en/g/r7-smoke-tokyo-guide')
+  await expect(page.getByRole('heading', { level: 1, name: 'R7 Smoke Tokyo Guide' })).toBeVisible()
+})
 test('mobile filters use an accessible bottom sheet', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/en/explore')
