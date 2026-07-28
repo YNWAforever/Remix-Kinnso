@@ -63,6 +63,13 @@ describe('ExploreControls', () => {
     expect(props.onSortChange).toHaveBeenCalledWith('most-saved')
   })
 
+  it('uses distinct radio groups for desktop and mobile destination controls', () => {
+    renderControls()
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(en.explore.filters) }))
+    const tokyoRadios = Array.from(document.querySelectorAll<HTMLInputElement>('input[type="radio"][value="tokyo"]'))
+    expect(tokyoRadios).toHaveLength(2)
+    expect(new Set(tokyoRadios.map((radio) => radio.name)).size).toBe(2)
+  })
   it('opens a labelled bottom sheet and closes it with Escape', async () => {
     renderControls()
     const trigger = screen.getByRole('button', { name: new RegExp(en.explore.filters) })

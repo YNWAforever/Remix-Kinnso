@@ -56,7 +56,7 @@ export function ExploreControls(props: ExploreControlsProps) {
     ...destinations.map(({ slug, name }) => ({ slug, name })),
   ]
 
-  const destinationOptions = hasDestinations ? (
+  const destinationOptions = (groupName: string) => hasDestinations ? (
     <fieldset aria-label={t.destinationFilterLabel} className="space-y-2">
       <legend className="mb-3 text-sm font-semibold text-kinnso-ink">{t.destinationFilterLabel}</legend>
       {options.map((option) => (
@@ -66,7 +66,7 @@ export function ExploreControls(props: ExploreControlsProps) {
         >
           <input
             type="radio"
-            name="explore-destination"
+            name={groupName}
             value={option.slug ?? ''}
             checked={destination === option.slug}
             onChange={() => onDestinationChange(option.slug)}
@@ -117,7 +117,7 @@ export function ExploreControls(props: ExploreControlsProps) {
       </div>
 
       <div className={`mt-6 grid gap-8 ${hasDestinations ? 'lg:grid-cols-[14rem_minmax(0,1fr)]' : ''}`}>
-        {hasDestinations ? <aside className="hidden lg:block">{destinationOptions}</aside> : null}
+        {hasDestinations ? <aside className="hidden lg:block">{destinationOptions('explore-destination-desktop')}</aside> : null}
         <div>{children}</div>
       </div>
 
@@ -136,7 +136,7 @@ export function ExploreControls(props: ExploreControlsProps) {
             </div>
             <SheetDescription>{t.filtersDescription}</SheetDescription>
           </SheetHeader>
-          <div className="grid gap-6 px-4">{destinationOptions}{sortSelect}</div>
+          <div className="grid gap-6 px-4">{destinationOptions('explore-destination-mobile')}{sortSelect}</div>
           <SheetFooter>
             <button type="button" className="k-btn-primary w-full" onClick={() => handleOpenChange(false)}>
               {withCount(t.showResults, total)}
