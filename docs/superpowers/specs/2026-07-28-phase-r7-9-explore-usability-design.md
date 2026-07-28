@@ -1,7 +1,7 @@
 # Phase R7.9 Explore Usability Design
 
-**Date:** 2026-07-28  
-**Status:** Approved  
+**Date:** 2026-07-28
+**Status:** Approved
 **Phase:** R7.9 — Explore usability (P2)
 
 ## Objective
