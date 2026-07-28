@@ -13,11 +13,11 @@ import {
 
 const destinations: Destination[] = [
   {
-    slug: 'tokyo', name: 'Tokyo', matchTerms: ['?曹漪', 'Shinjuku'], guideCount: 2,
+    slug: 'tokyo', name: 'Tokyo', matchTerms: ['東京', 'Shinjuku'], guideCount: 2,
     experienceCount: 0, heroImageUrl: null, description: null, latestPublishedAt: null,
   },
   {
-    slug: 'seoul', name: 'Seoul', matchTerms: ['?'], guideCount: 1,
+    slug: 'seoul', name: 'Seoul', matchTerms: ['서울'], guideCount: 1,
     experienceCount: 0, heroImageUrl: null, description: null, latestPublishedAt: null,
   },
   {
@@ -37,7 +37,7 @@ describe('Explore discovery model', () => {
 
   it('matches exact normalized city values to canonical names and aliases', () => {
     const indexed = indexExploreGuides(
-      [guide('name', ' Tokyo '), guide('alias', '?曹漪'), guide('unknown', 'Osaka')],
+      [guide('name', ' Tokyo '), guide('alias', '東京'), guide('unknown', 'Osaka')],
       destinations,
     )
     expect(indexed.map(({ destination }) => destination?.slug ?? null)).toEqual(['tokyo', 'tokyo', null])
