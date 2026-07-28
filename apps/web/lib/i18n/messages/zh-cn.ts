@@ -766,6 +766,13 @@ const messages: Messages = {
     gridHeading: '全部攻略',
     savesLabel: '次收藏',
     emptyNote: '每周都会新增更多攻略。',
+    destinationFilterLabel: '目的地', allDestinations: '所有目的地',
+    searchLabel: '搜索攻略', searchPlaceholder: '搜索攻略、创作者或城市',
+    sortLabel: '排序方式', newest: '最新', mostSaved: '最多收藏',
+    filters: '筛选', filtersDescription: '选择一个目的地和排序方式。', activeFilters: '已启用筛选',
+    resultsLabel: '{count} 篇攻略', showResults: '显示 {count} 个结果',
+    emptyFilteredTitle: '没有符合筛选条件的攻略', emptyFilteredBody: '尝试其他搜索或重置筛选。',
+    resetFilters: '重置筛选', loadMore: '显示更多', closeFilters: '关闭筛选',
   },
   feed: {
     pill: '动态',

@@ -872,6 +872,13 @@ export interface Messages {
     pill: string; heading: string; subtitle: string
     gridHeading: string
     savesLabel: string; emptyNote: string
+    destinationFilterLabel: string; allDestinations: string
+    searchLabel: string; searchPlaceholder: string
+    sortLabel: string; newest: string; mostSaved: string
+    filters: string; filtersDescription: string; activeFilters: string
+    resultsLabel: string; showResults: string
+    emptyFilteredTitle: string; emptyFilteredBody: string
+    resetFilters: string; loadMore: string; closeFilters: string
   }
   feed: {
     pill: string; heading: string; subtitle: string
@@ -2027,6 +2034,13 @@ const messages: Messages = {
     gridHeading: 'All guides',
     savesLabel: 'saves',
     emptyNote: 'More guides are added every week.',
+    destinationFilterLabel: 'Destinations', allDestinations: 'All destinations',
+    searchLabel: 'Search guides', searchPlaceholder: 'Search guides, creators or cities',
+    sortLabel: 'Sort by', newest: 'Newest', mostSaved: 'Most saved',
+    filters: 'Filters', filtersDescription: 'Choose one destination and a sort order.', activeFilters: 'Active filters',
+    resultsLabel: '{count} guides', showResults: 'Show {count} results',
+    emptyFilteredTitle: 'No guides match these filters', emptyFilteredBody: 'Try another search or reset the filters.',
+    resetFilters: 'Reset filters', loadMore: 'Load more', closeFilters: 'Close filters',
   },
   feed: {
     pill: 'Feed',

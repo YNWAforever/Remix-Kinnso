@@ -766,6 +766,13 @@ const messages: Messages = {
     gridHeading: '모든 가이드',
     savesLabel: '회 저장',
     emptyNote: '매주 더 많은 가이드가 추가됩니다.',
+    destinationFilterLabel: '여행지', allDestinations: '모든 여행지',
+    searchLabel: '가이드 검색', searchPlaceholder: '가이드, 크리에이터 또는 도시 검색',
+    sortLabel: '정렬', newest: '최신순', mostSaved: '저장 많은 순',
+    filters: '필터', filtersDescription: '여행지 하나와 정렬 방식을 선택하세요.', activeFilters: '적용된 필터',
+    resultsLabel: '가이드 {count}개', showResults: '결과 {count}개 보기',
+    emptyFilteredTitle: '조건에 맞는 가이드가 없습니다', emptyFilteredBody: '다른 검색어를 시도하거나 필터를 초기화하세요.',
+    resetFilters: '필터 초기화', loadMore: '더 보기', closeFilters: '필터 닫기',
   },
   feed: {
     pill: '피드',

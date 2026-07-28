@@ -27,6 +27,16 @@ describe('i18n locale parity for new creator-profile groups', () => {
     }
   })
 
+  it('defines the complete Explore discovery contract', () => {
+    expect(Object.keys(en.explore).sort()).toEqual([
+      'activeFilters', 'allDestinations', 'closeFilters', 'destinationFilterLabel',
+      'emptyFilteredBody', 'emptyFilteredTitle', 'emptyNote', 'filters',
+      'filtersDescription', 'gridHeading', 'heading', 'loadMore', 'mostSaved',
+      'newest', 'pill', 'resetFilters', 'resultsLabel', 'savesLabel',
+      'searchLabel', 'searchPlaceholder', 'showResults', 'sortLabel', 'subtitle',
+    ].sort())
+  })
+
   for (const locale of LOCALES) {
     it(`${locale} has identical keys to en for each group`, async () => {
       const dict = (await getDictionary(locale)) as unknown as Record<string, unknown>

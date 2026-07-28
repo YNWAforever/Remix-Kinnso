@@ -766,6 +766,13 @@ const messages: Messages = {
     gridHeading: 'คู่มือทั้งหมด',
     savesLabel: 'ครั้งที่บันทึก',
     emptyNote: 'มีคู่มือใหม่เพิ่มขึ้นทุกสัปดาห์',
+    destinationFilterLabel: 'จุดหมาย', allDestinations: 'จุดหมายทั้งหมด',
+    searchLabel: 'ค้นหาไกด์', searchPlaceholder: 'ค้นหาไกด์ ครีเอเตอร์ หรือเมือง',
+    sortLabel: 'เรียงตาม', newest: 'ใหม่ล่าสุด', mostSaved: 'บันทึกมากที่สุด',
+    filters: 'ตัวกรอง', filtersDescription: 'เลือกหนึ่งจุดหมายและลำดับการเรียง', activeFilters: 'ตัวกรองที่ใช้อยู่',
+    resultsLabel: 'ไกด์ {count} รายการ', showResults: 'แสดง {count} ผลลัพธ์',
+    emptyFilteredTitle: 'ไม่พบไกด์ที่ตรงกับตัวกรอง', emptyFilteredBody: 'ลองค้นหาแบบอื่นหรือรีเซ็ตตัวกรอง',
+    resetFilters: 'รีเซ็ตตัวกรอง', loadMore: 'โหลดเพิ่มเติม', closeFilters: 'ปิดตัวกรอง',
   },
   feed: {
     pill: 'ฟีด',
