@@ -234,7 +234,7 @@ describe('Explore discovery model', () => {
 Run:
 
 ```bash
-pnpm --filter web test -- tests/explore.discovery.test.ts
+pnpm --filter web exec vitest run tests/explore.discovery.test.ts
 ```
 
 Expected: FAIL because `@/lib/explore/discovery` does not exist.
@@ -336,7 +336,7 @@ export function selectExploreResults(indexed: IndexedGuide[], state: ExploreStat
 Run:
 
 ```bash
-pnpm --filter web test -- tests/explore.discovery.test.ts
+pnpm --filter web exec vitest run tests/explore.discovery.test.ts
 ```
 
 Expected: PASS, 8 tests.
@@ -389,7 +389,7 @@ it('defines the complete Explore discovery contract', () => {
 Run:
 
 ```bash
-pnpm --filter web test -- tests/i18n.locale-parity.test.ts
+pnpm --filter web exec vitest run tests/i18n.locale-parity.test.ts
 ```
 
 Expected: FAIL because the English Explore dictionary lacks the discovery keys.
@@ -435,7 +435,7 @@ Add these exact values to each locale's `explore` object:
 Run:
 
 ```bash
-pnpm --filter web test -- tests/i18n.locale-parity.test.ts
+pnpm --filter web exec vitest run tests/i18n.locale-parity.test.ts
 ```
 
 Expected: PASS for all seven locales and the complete Explore key contract.
@@ -562,7 +562,7 @@ describe('ExploreControls', () => {
 - [ ] **Step 2: Run the test and verify the missing-module failure**
 
 ```bash
-pnpm --filter web test -- tests/kinnso.ExploreControls.test.tsx
+pnpm --filter web exec vitest run tests/kinnso.ExploreControls.test.tsx
 ```
 
 Expected: FAIL because `ExploreControls` does not exist.
@@ -688,7 +688,7 @@ shared primitive's English-only default label.
 - [ ] **Step 4: Run the focused control tests**
 
 ```bash
-pnpm --filter web test -- tests/kinnso.ExploreControls.test.tsx
+pnpm --filter web exec vitest run tests/kinnso.ExploreControls.test.tsx
 ```
 
 Expected: PASS, 4 tests.
@@ -805,7 +805,7 @@ it('keeps controls visible in filtered-empty state and resets all state', async 
 Run:
 
 ```bash
-pnpm --filter web test -- tests/kinnso.ExploreView.test.tsx
+pnpm --filter web exec vitest run tests/kinnso.ExploreView.test.tsx
 ```
 
 Expected: FAIL on filtering, URL replacement, debounce, pagination, and reset.
@@ -972,7 +972,7 @@ export function ExploreView({ locale, t, guides, destinations }: {
 Run:
 
 ```bash
-pnpm --filter web test -- tests/explore.discovery.test.ts tests/kinnso.ExploreControls.test.tsx tests/kinnso.ExploreView.test.tsx
+pnpm --filter web exec vitest run tests/explore.discovery.test.ts tests/kinnso.ExploreControls.test.tsx tests/kinnso.ExploreView.test.tsx
 ```
 
 Expected: PASS for pure matching/state and all responsive interaction cases.
@@ -1069,7 +1069,7 @@ describe('/[locale]/explore host', () => {
 Run:
 
 ```bash
-pnpm --filter web test -- tests/explore.host.test.tsx
+pnpm --filter web exec vitest run tests/explore.host.test.tsx
 ```
 
 Expected: FAIL because the page does not request destinations and
@@ -1133,7 +1133,7 @@ export default function ExploreLoading() {
 Run:
 
 ```bash
-pnpm --filter web test -- tests/explore.host.test.tsx tests/kinnso.ExploreControls.test.tsx tests/kinnso.ExploreView.test.tsx tests/i18n.locale-parity.test.ts
+pnpm --filter web exec vitest run tests/explore.host.test.tsx tests/kinnso.ExploreControls.test.tsx tests/kinnso.ExploreView.test.tsx tests/i18n.locale-parity.test.ts
 ```
 
 Expected: PASS.
@@ -1221,7 +1221,7 @@ test('mobile filters use an accessible bottom sheet', async ({ page }) => {
 Run with the repository's local E2E environment:
 
 ```bash
-pnpm --filter @kinnso/e2e e2e -- explore-usability
+pnpm --filter @kinnso/e2e exec playwright test explore-usability
 ```
 
 Expected: FAIL because only one deterministic Tokyo guide exists and Most saved
@@ -1272,7 +1272,7 @@ Run:
 
 ```bash
 pnpm supabase db reset
-pnpm --filter @kinnso/e2e e2e -- explore-usability
+pnpm --filter @kinnso/e2e exec playwright test explore-usability
 ```
 
 Expected: 2 passed.
@@ -1282,7 +1282,7 @@ Expected: 2 passed.
 Run:
 
 ```bash
-pnpm --filter @kinnso/e2e e2e -- destinations-empty-states honesty funnel-smoke notfound
+pnpm --filter @kinnso/e2e exec playwright test destinations-empty-states honesty funnel-smoke notfound
 ```
 
 Expected: all selected existing specs PASS with the expanded published-guide
@@ -1312,7 +1312,7 @@ git commit -m "test(e2e): cover explore discovery journey"
 - [ ] **Step 1: Run all focused web tests**
 
 ```bash
-pnpm --filter web test -- tests/explore.discovery.test.ts tests/kinnso.ExploreControls.test.tsx tests/kinnso.ExploreView.test.tsx tests/explore.host.test.tsx tests/i18n.locale-parity.test.ts tests/guides.queries.test.ts tests/destinations.queries.test.ts
+pnpm --filter web exec vitest run tests/explore.discovery.test.ts tests/kinnso.ExploreControls.test.tsx tests/kinnso.ExploreView.test.tsx tests/explore.host.test.tsx tests/i18n.locale-parity.test.ts tests/guides.queries.test.ts tests/destinations.queries.test.ts
 ```
 
 Expected: PASS.
@@ -1349,7 +1349,7 @@ Expected:
 - [ ] **Step 5: Run the R7.9 and regression E2E suite**
 
 ```bash
-pnpm --filter @kinnso/e2e e2e -- explore-usability destinations-empty-states honesty funnel-smoke notfound
+pnpm --filter @kinnso/e2e exec playwright test explore-usability destinations-empty-states honesty funnel-smoke notfound
 ```
 
 Expected: all selected Playwright tests PASS in Chromium.
