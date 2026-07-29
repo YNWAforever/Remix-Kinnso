@@ -766,6 +766,13 @@ const messages: Messages = {
     gridHeading: 'すべてのガイド',
     savesLabel: '件の保存',
     emptyNote: '毎週新しいガイドが追加されます。',
+    destinationFilterLabel: '目的地', allDestinations: 'すべての目的地',
+    searchLabel: 'ガイドを検索', searchPlaceholder: 'ガイド、クリエイター、都市を検索',
+    sortLabel: '並び順', newest: '新着順', mostSaved: '保存数順',
+    filters: 'フィルター', filtersDescription: '目的地を1つ選び、並び順を指定します。', activeFilters: '適用中のフィルター',
+    resultsLabel: '{count}件のガイド', showResults: '{count}件の結果を表示',
+    emptyFilteredTitle: '条件に一致するガイドがありません', emptyFilteredBody: '検索条件を変えるか、フィルターをリセットしてください。',
+    resetFilters: 'フィルターをリセット', loadMore: 'もっと見る', closeFilters: 'フィルターを閉じる',
   },
   feed: {
     pill: 'フィード',

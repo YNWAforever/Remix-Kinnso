@@ -123,7 +123,36 @@ values
 on conflict (id) do update set
   creator_id = excluded.creator_id, creator_handle = excluded.creator_handle, creator_name = excluded.creator_name,
   slug = excluded.slug, title = excluded.title, summary = excluded.summary, cover_url = excluded.cover_url, city = excluded.city,
-  status = excluded.status, published_at = excluded.published_at;
+  status = excluded.status, saves_count = excluded.saves_count, published_at = excluded.published_at;
+
+insert into public.guides
+  (id, creator_id, creator_handle, creator_name, slug, title, summary, cover_url, city, status, saves_count, published_at)
+select
+  ('00000000-0000-0000-0000-' || lpad((800 + n)::text, 12, '0'))::uuid,
+  '00000000-0000-0000-0000-000000000701'::uuid,
+  'r7-smoke-creator',
+  'R7 Smoke Creator',
+  'r7-explore-tokyo-' || lpad(n::text, 2, '0'),
+  'R7 Explore Tokyo Guide ' || lpad(n::text, 2, '0'),
+  'Deterministic Explore pagination guide ' || n || '.',
+  null,
+  'Tokyo',
+  'published',
+  n,
+  now() - make_interval(days => n)
+from generate_series(1, 12) as series(n)
+on conflict (id) do update set
+  creator_id = excluded.creator_id,
+  creator_handle = excluded.creator_handle,
+  creator_name = excluded.creator_name,
+  slug = excluded.slug,
+  title = excluded.title,
+  summary = excluded.summary,
+  cover_url = excluded.cover_url,
+  city = excluded.city,
+  status = excluded.status,
+  saves_count = excluded.saves_count,
+  published_at = excluded.published_at;
 
 insert into public.experiences
   (id, merchant_profile_id, slug, title, summary, description, city, price_amount, currency, duration_minutes, cover_url, status, published_at)

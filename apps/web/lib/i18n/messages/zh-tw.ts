@@ -766,6 +766,13 @@ const messages: Messages = {
     gridHeading: '全部攻略',
     savesLabel: '次收藏',
     emptyNote: '每週都會新增更多攻略。',
+    destinationFilterLabel: '目的地', allDestinations: '所有目的地',
+    searchLabel: '搜尋攻略', searchPlaceholder: '搜尋攻略、創作者或城市',
+    sortLabel: '排序方式', newest: '最新', mostSaved: '最多收藏',
+    filters: '篩選', filtersDescription: '選擇一個目的地與排序方式。', activeFilters: '已啟用篩選',
+    resultsLabel: '{count} 篇攻略', showResults: '顯示 {count} 個結果',
+    emptyFilteredTitle: '沒有符合篩選條件的攻略', emptyFilteredBody: '請嘗試其他搜尋或重設篩選。',
+    resetFilters: '重設篩選', loadMore: '顯示更多', closeFilters: '關閉篩選',
   },
   feed: {
     pill: '動態',
