@@ -42,7 +42,7 @@ const CityDetailDrawer = ({ open, onOpenChange, location, posts, places }: Props
             <div className="space-y-2">
               {cityPosts.map((p) => (
                 <a key={p.id} href={p.postUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-md bg-white p-2 transition hover:bg-kinnso-cream2">
-                  <img src={p.thumbnail} alt="" className="h-14 w-14 rounded-md object-cover" />
+                  <img src={p.thumbnail} alt={p.caption} className="h-14 w-14 rounded-md object-cover" />
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-xs text-kinnso-ink">{p.caption}</p>
                     <div className="mt-1 flex items-center gap-2 text-[11px] text-kinnso-muted">

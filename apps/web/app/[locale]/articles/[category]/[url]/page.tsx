@@ -132,7 +132,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
 
       <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
         <article>
-          <EntityMedia src={a.thumbnails[0]} title={a.translation.title ?? url} alt={a.translation.title ?? ''} sizes="(min-width: 1024px) 1152px, 100vw" priority className="mb-6 aspect-[16/9] w-full rounded-card" />
+          <EntityMedia src={a.thumbnails[0]} title={a.translation.title ?? url} sizes="(min-width: 1024px) 1152px, 100vw" priority className="mb-6 aspect-[16/9] w-full rounded-card" />
           <ArticleBlockRenderer blocks={a.translation.content} />
           <ArticleGuideLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} />
           <ArticleExperienceLinks locale={loc} regions={a.regions ?? []} articleId={a.id} t={dict.article} bookingLive={bookingLive} />

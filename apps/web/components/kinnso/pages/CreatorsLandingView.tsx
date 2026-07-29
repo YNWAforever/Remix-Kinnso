@@ -41,7 +41,7 @@ export function CreatorsLandingView({
               <li key={c.handle}>
                 <div className="k2-card flex h-full flex-col p-5">
                   <div className="flex items-center gap-3">
-                    <EntityMedia src={null} title={c.name} alt="" sizes="48px" className="h-12 w-12 shrink-0 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
+                    <EntityMedia src={null} title={c.name} sizes="48px" className="h-12 w-12 shrink-0 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
                     <div>
                       <div className="font-bold text-kinnso-ink">{c.name}</div>
                       <div className="text-xs text-kinnso-muted">@{c.handle}</div>

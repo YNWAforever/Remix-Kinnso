@@ -42,7 +42,6 @@ export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home'
                 src={covers[0].cover}
                 title={covers[0].title}
                 location={covers[0].city}
-                alt={covers[0].title}
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 priority
                 className="h-full w-full"
@@ -54,7 +53,6 @@ export function Hero({ locale, t, guides }: { locale: Locale; t: Messages['home'
                   src={g.cover}
                   title={g.title}
                   location={g.city}
-                  alt={g.title}
                   sizes="(min-width: 1024px) 25vw, 50vw"
                   className="h-full w-full"
                 />
