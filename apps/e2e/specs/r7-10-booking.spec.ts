@@ -31,6 +31,22 @@ test('R7.10 local booking config rejects unsafe environments', () => {
   })).toThrow('STRIPE_SECRET_KEY must start with sk_test_')
 })
 
+
+test('R7.10 local booking config pins runner booking state', () => {
+  expect(resolveR710LocalConfig(LOCAL_ENV)).toMatchObject({
+    bookingState: 'off',
+    bookingLive: 'false',
+  })
+  expect(resolveR710LocalConfig({
+    ...LOCAL_ENV,
+    R7_10_BOOKING_STATE: 'on',
+    STRIPE_SECRET_KEY: 'sk_test_local',
+    STRIPE_WEBHOOK_SECRET: 'whsec_local',
+  })).toMatchObject({
+    bookingState: 'on',
+    bookingLive: 'true',
+  })
+})
 test('Booking OFF submits interest capture entirely by keyboard', async ({ page }) => {
   await page.goto(FIXTURES.seoEntities.experiencePath)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()

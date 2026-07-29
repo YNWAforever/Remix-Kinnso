@@ -5,6 +5,7 @@ export type R710BookingState = 'off' | 'on'
 export interface R710LocalConfig {
   bookingState: R710BookingState
   baseURL: string
+  bookingLive: 'true' | 'false'
   supabaseUrl: string
   anonKey: string
   stripeSecretKey?: string
@@ -43,8 +44,9 @@ export function resolveR710LocalConfig(env: NodeJS.ProcessEnv): R710LocalConfig 
     'NEXT_PUBLIC_SUPABASE_URL',
   )
   const anonKey = required(env, 'NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  const bookingLive = bookingState === 'on' ? 'true' : 'false'
 
-  if (bookingState === 'off') return { bookingState, baseURL, supabaseUrl, anonKey }
+  if (bookingState === 'off') return { bookingState, bookingLive, baseURL, supabaseUrl, anonKey }
 
   const stripeSecretKey = env.STRIPE_SECRET_KEY
   if (!stripeSecretKey) throw new Error('STRIPE_SECRET_KEY is required for Booking ON')
@@ -54,5 +56,5 @@ export function resolveR710LocalConfig(env: NodeJS.ProcessEnv): R710LocalConfig 
   const stripeWebhookSecret = env.STRIPE_WEBHOOK_SECRET
   if (!stripeWebhookSecret) throw new Error('STRIPE_WEBHOOK_SECRET is required for Booking ON')
 
-  return { bookingState, baseURL, supabaseUrl, anonKey, stripeSecretKey, stripeWebhookSecret }
+  return { bookingState, bookingLive, baseURL, supabaseUrl, anonKey, stripeSecretKey, stripeWebhookSecret }
 }

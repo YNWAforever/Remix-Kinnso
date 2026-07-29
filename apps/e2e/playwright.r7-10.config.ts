@@ -38,6 +38,7 @@ const local = resolveR710LocalConfig({
 Object.assign(process.env, {
   R7_10_LOCAL: '1',
   R7_10_BOOKING_STATE: local.bookingState,
+  BOOKING_LIVE: local.bookingLive,
   E2E_BASE_URL: local.baseURL,
   NEXT_PUBLIC_SUPABASE_URL: local.supabaseUrl,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: local.anonKey,
