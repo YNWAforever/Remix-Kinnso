@@ -75,24 +75,39 @@ const DESKTOP_PRIMARY_HREFS = [
   '/en/explore', '/en/destinations', '/en/articles', '/en/agent', '/en/creators',
   '/en/merchants', '/en/for-creators', '/en/for-merchants', '/en/sign-in', '/en/sign-up',
 ] as const
+const MOBILE_PRIMARY_HREFS = [
+  '/en/explore', '/en/destinations', '/en/articles', '/en/agent', '/en/creators',
+  '/en/merchants', '/en/for-creators', '/en/for-merchants', '/en/sign-in', '/en/sign-up',
+] as const
+const LOCALE_SWITCHER = { role: 'combobox' as const, name: 'Language' }
 
-test('desktop header advances one Tab through the explicit primary control order', async ({ page }) => {
+test('desktop header advances one Tab through explicit links and LocaleSwitcher', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await waitForRoute(page, R7_10_ROUTES[0] as R710Route)
-
   const header = page.getByRole('banner')
-  await page.keyboard.press('Tab')
-  await expect(header.getByRole('link', { name: 'KINNSO', exact: true })).toBeFocused()
-  for (const href of DESKTOP_PRIMARY_HREFS) {
-    await page.keyboard.press('Tab')
-    const control = header.locator(`a[href="${href}"]`)
+  const assertControl = async (control: ReturnType<typeof header.locator>) => {
     await expect(control).toBeFocused()
-    await expectVisibleFocus(control)
+    await expect(control).toBeVisible()
+  }
+
+  const logo = header.getByRole('link', { name: 'KINNSO', exact: true })
+  await tabTo(page, logo)
+  await assertControl(logo)
+  for (const href of DESKTOP_PRIMARY_HREFS.slice(0, 8)) {
+    await page.keyboard.press('Tab')
+    await assertControl(header.locator(`a[href="${href}"]`))
+  }
+  await page.keyboard.press('Tab')
+  await assertControl(header.getByRole(LOCALE_SWITCHER.role, { name: LOCALE_SWITCHER.name }))
+  for (const href of DESKTOP_PRIMARY_HREFS.slice(8)) {
+    await page.keyboard.press('Tab')
+    await assertControl(header.locator(`a[href="${href}"]`))
   }
 
   await page.goto('/en')
-  await page.keyboard.press('Tab')
-  await page.keyboard.press('Tab')
+  const explore = header.locator('a[href="/en/explore"]')
+  await tabTo(page, explore)
+  await expectVisibleFocus(explore)
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/en\/explore$/)
 })
@@ -103,35 +118,49 @@ for (const route of R7_10_ROUTES.filter((entry) => 'mobileHeaderJourney' in entr
     await waitForRoute(page, route)
 
     const trigger = page.getByRole('button', { name: /menu/i })
+    const triggerControl = page.locator('[data-slot="dialog-trigger"]')
     await tabTo(page, trigger)
     await expectVisibleFocus(trigger)
     await page.keyboard.press('Enter')
-    await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    await expect(triggerControl).toHaveAttribute('aria-expanded', 'true')
 
     const dialog = page.getByRole('dialog', { name: /menu/i })
     await expect(dialog).toBeVisible()
-    const primaryHrefs = DESKTOP_PRIMARY_HREFS
+    const primaryHrefs = MOBILE_PRIMARY_HREFS
     for (const href of primaryHrefs) await expect(dialog.locator(`a[href="${href}"]`)).toBeVisible()
 
+    const assertFocusedDialogControl = async (control: ReturnType<typeof dialog.locator>) => {
+      await expect(control).toBeFocused()
+      await expect(control).toBeVisible()
+      expect(await control.evaluate((element) => element.closest('[role="dialog"]') !== null)).toBe(true)
+    }
     const assertFocusIsInDialog = async (href: string) => {
-      const destination = dialog.locator(`a[href="${href}"]`)
-      await expect(destination).toBeFocused()
-      await expectVisibleFocus(destination)
-      expect(await destination.evaluate((element) => element.closest('[role="dialog"]') !== null)).toBe(true)
+      await assertFocusedDialogControl(dialog.locator(`a[href="${href}"]`))
     }
 
+    await tabTo(page, dialog.locator(`a[href="${primaryHrefs[0]}"]`))
     await assertFocusIsInDialog(primaryHrefs[0])
-    for (const href of primaryHrefs.slice(1)) {
+    for (const href of primaryHrefs.slice(1, 8)) {
       await page.keyboard.press('Tab')
       await assertFocusIsInDialog(href)
     }
-    for (const href of primaryHrefs.slice(0, -1).reverse()) {
+    await page.keyboard.press('Tab')
+    await assertFocusedDialogControl(dialog.getByRole(LOCALE_SWITCHER.role, { name: LOCALE_SWITCHER.name }))
+    for (const href of primaryHrefs.slice(8)) {
+      await page.keyboard.press('Tab')
+      await assertFocusIsInDialog(href)
+    }
+    await page.keyboard.press('Shift+Tab')
+    await assertFocusIsInDialog(primaryHrefs[8])
+    await page.keyboard.press('Shift+Tab')
+    await assertFocusedDialogControl(dialog.getByRole(LOCALE_SWITCHER.role, { name: LOCALE_SWITCHER.name }))
+    for (const href of primaryHrefs.slice(0, 8).reverse()) {
       await page.keyboard.press('Shift+Tab')
       await assertFocusIsInDialog(href)
     }
 
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
-    await expect(trigger).toBeFocused()
+    await expect(triggerControl).toBeFocused()
   })
 }
