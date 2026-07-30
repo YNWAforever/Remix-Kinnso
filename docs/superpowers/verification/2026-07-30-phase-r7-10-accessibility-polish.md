@@ -32,7 +32,8 @@ creator landing axe contract sequentially with zero retries and it passed.
 
 | Command | Result |
 | --- | --- |
-| `pnpm --filter web exec vitest run tests/e2e.creator-onboarding-mode.test.ts tests/og.palette-parity.test.ts tests/ci.product-state.test.ts --pool=forks --maxWorkers=1 --no-file-parallelism` | Pass - 10/10 focused workflow and palette contracts. |
+| `pnpm --filter web exec vitest run tests/ci.product-state.test.ts tests/e2e.creator-onboarding-mode.test.ts tests/og.palette-parity.test.ts --pool=forks --maxWorkers=1 --no-file-parallelism` | Pass - 25/25 focused workflow, preview-read-only, mutation, and palette contracts after review hardening. |
+| `pnpm --filter web typecheck` and targeted ESLint for `tests/ci.product-state.test.ts` | Pass - both fresh review-fix checks exited 0. |
 | `pnpm --filter web exec vitest run tests/creator-rls.test.ts --pool=forks --maxWorkers=1 --no-file-parallelism` | Pass - 14/14 against the clean 645xx fixture after narrowing stale whole-table assumptions to the private onboarding row. |
 | Bounded web Vitest, `--pool=forks --maxWorkers=1 --no-file-parallelism --shard=1/4` | Pass - 97 files passed, 1 skipped; 539 tests passed, 13 skipped; zero failures. JSON: `C:\tmp\kinnso-r7-10-task7-final-web-vitest-q1-green.result.json`. |
 | Bounded web Vitest, corrected `--shard=2/4` | Did not complete inside 480 seconds while still advancing; stderr was empty. No full web-suite pass is claimed. The first completed q2 exposed four failures whose three causes were each reproduced and verified green in focused runs. |
@@ -55,6 +56,15 @@ creator landing axe contract sequentially with zero retries and it passed.
 - The creator RLS integration test now checks the private onboarding row by ID.
   This preserves the intended policy while allowing intentionally public,
   published creator profiles returned by `creators_public_read`.
+- The review-hardened CI contract structurally slices the `e2e` job and named
+  Booking OFF/ON steps, requires their exact env maps and dedicated command in
+  serial order, and rejects misplaced, parallel, reversed, or unrelated text.
+  Preview verification now enforces an `E2E_BASE_URL`-only job env and a strict
+  read-only call allowlist over the actual preview spec and `waitForRoute`.
+- Review-fix TDD recorded 8 expected mutation failures against the broad
+  contracts, then 15/15 green; the expanded prohibited-operation matrix
+  recorded 9 expected failures with a deliberately relaxed allowlist, then
+  21/21 green after restoring the strict allowlist.
 - No production authentication, route, database policy, or browser assertion was
   weakened to obtain these results.
 
