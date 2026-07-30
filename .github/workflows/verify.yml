@@ -93,3 +93,24 @@ jobs:
         if: always()
         run: pnpm --filter @kinnso/e2e cwv
         continue-on-error: true
+  preview-smoke:
+    if: >-
+      github.event_name == 'deployment_status' &&
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment == 'Preview' &&
+      contains(github.event.deployment_status.environment_url, 'remix-kinnso-web')
+    runs-on: ubuntu-latest
+    env:
+      E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm --filter @kinnso/e2e exec playwright install --with-deps chromium
+      - name: R7.10 preview manifest smoke (read-only)
+        run: pnpm --filter @kinnso/e2e e2e r7-10-preview-smoke

@@ -101,11 +101,7 @@ jobs:
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
             | tee apps/scan/.env.local > /dev/null
 
-      - name: Start scan worker (fixture mode) and web app
-        env:
-          AGENT_LIVE: 'true'
-          BOOKING_LIVE: 'false'
-          VERCEL: '1'
+      - name: Start scan worker (fixture mode)
         run: |
           # tsx src/server.ts reads process.env directly (no dotenv), unlike
           # `next dev` which auto-loads .env.local — so export the worker's env here.
@@ -113,15 +109,21 @@ jobs:
           . ./apps/scan/.env.local
           set +a
           SCAN_FIXTURE_MODE=1 pnpm --filter @kinnso/scan-app start &
-          pnpm --filter web dev &
-          npx --yes wait-on --timeout 120000 http://localhost:8788/health http://localhost:3000
+          npx --yes wait-on --timeout 120000 http://localhost:8788/health
 
-      - name: Run PR smoke journeys
+      - name: R7.10 accessibility - Booking OFF
         env:
-          E2E_BASE_URL: http://localhost:3000
+          AGENT_LIVE: 'true'
           BOOKING_LIVE: 'false'
-        run: pnpm --filter @kinnso/e2e e2e creator-onboarding funnel-smoke honesty notfound
+          R7_10_BOOKING_STATE: 'off'
+        run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts
 
+      - name: R7.10 accessibility - Booking ON
+        env:
+          R7_10_BOOKING_STATE: 'on'
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+        run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
