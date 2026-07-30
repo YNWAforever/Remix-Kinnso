@@ -79,8 +79,8 @@ export function ForMerchantsView({ locale, t, testimonials, bookingLive }: {
 
       <section className="bg-kinnso-orange py-16 md:py-24">
         <div className="k2-container">
-          <h2 className="k2-display max-w-2xl text-3xl font-semibold text-kinnso-ink md:text-4xl">{t.ctaTitle}</h2>
-          <p className="mt-4 max-w-2xl leading-relaxed text-kinnso-ink/85">{t.ctaBody}</p>
+          <h2 className="k2-display max-w-2xl text-3xl font-semibold text-white md:text-4xl">{t.ctaTitle}</h2>
+          <p className="mt-4 max-w-2xl leading-relaxed text-white/90">{t.ctaBody}</p>
           <Link href={p('/merchants/post')} className="mt-8 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso-ink px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{t.ctaButton}</Link>
         </div>
       </section>

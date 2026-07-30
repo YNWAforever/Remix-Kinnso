@@ -53,10 +53,10 @@ test('Booking OFF submits interest capture entirely by keyboard', async ({ page 
 
   await tabTo(page, page.getByLabel('Email'))
   await page.keyboard.type('r710-accessibility@kinnso.test')
-  await tabTo(page, page.getByRole('button', { name: /notify me|join/i }))
+  await tabTo(page, page.getByRole('button', { name: 'Get notified when booking opens', exact: true }))
   await page.keyboard.press('Enter')
 
-  await expect(page.getByRole('status')).toContainText(/thank|notify|joined/i)
+  await expect(page.getByRole('status')).toContainText(/you.re on the list/i)
 })
 
 test('Booking ON enters Stripe test checkout entirely by keyboard', async ({ page }) => {

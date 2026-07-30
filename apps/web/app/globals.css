@@ -16,8 +16,8 @@
 
 /* KINNSO brand design tokens (Tailwind v4 @theme) */
 @theme {
-  --color-orange: #F26A1F;
-  --color-orange-dark: #C24E0E;
+  --color-orange: #B94000;
+  --color-orange-dark: #A13E0B;
   --color-amber: #F4BD50;
   --color-cream: #F8F1E6;
   --color-cream-2: #EFE3D2;
@@ -37,8 +37,8 @@
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   /* kinnso-* utility aliases (ported components use the `kinnso-` namespace) */
-  --color-kinnso-orange: #F26A1F;
-  --color-kinnso-orangeDark: #C24E0E;
+  --color-kinnso-orange: #B94000;
+  --color-kinnso-orangeDark: #A13E0B;
   --color-kinnso-amber: #F4BD50;
   --color-kinnso-cream: #F8F1E6;
   --color-kinnso-cream2: #EFE3D2;

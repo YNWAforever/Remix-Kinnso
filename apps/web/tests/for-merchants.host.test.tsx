@@ -23,6 +23,7 @@ describe('ForMerchantsView', () => {
     expect(
       missionLinks.every((link) => link.getAttribute('href') === '/en/merchants/post'),
     ).toBe(true)
+    expect(screen.getByText(en.forMerchants.ctaBody).className).toContain('text-white/90')
   })
   it('shows the testimonials strip when quotes exist', () => {
     render(<ForMerchantsView locale="en" t={en.forMerchants} testimonials={[{ id: '1', quote: 'Great', authorName: 'A', authorRole: 'merchant' }]} bookingLive={false} />)

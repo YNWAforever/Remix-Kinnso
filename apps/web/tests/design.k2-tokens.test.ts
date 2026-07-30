@@ -11,8 +11,10 @@ const layout = readFileSync(join(__dirname, '../app/layout.tsx'), 'utf8')
 
 describe('R1C canonical design tokens', () => {
   it('keeps the original kinnso-* palette as the only color system', () => {
-    expect(css).toContain('--color-kinnso-orange: #F26A1F')
-    expect(css).toContain('--color-kinnso-orangeDark: #C24E0E')
+    expect(css).toContain('--color-orange: #B94000')
+    expect(css).toContain('--color-orange-dark: #A13E0B')
+    expect(css).toContain('--color-kinnso-orange: #B94000')
+    expect(css).toContain('--color-kinnso-orangeDark: #A13E0B')
     expect(css).toContain('--color-kinnso-cream: #F8F1E6')
     expect(css).toContain('--color-kinnso-cream2: #EFE3D2')
     expect(css).toContain('--color-kinnso-ink: #211B16')
@@ -40,6 +42,7 @@ describe('R1C canonical design tokens', () => {
       expect(css).toContain(cls)
     }
     expect(css).toMatch(/\.k2-btn-primary\s*\{[^}]*bg-kinnso-orange/)
+    expect(css).toMatch(/\.k2-btn-primary\s*\{[^}]*text-white/)
     expect(css).toMatch(/\.k2-btn-primary\s*\{[^}]*hover:bg-kinnso-orangeDark/)
     expect(css).toMatch(/\.k2-eyebrow\s*\{[^}]*text-kinnso-orangeDark/)
     expect(css).toMatch(/\.k2-card\s*\{[^}]*border-kinnso-edge/)
