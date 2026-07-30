@@ -3,10 +3,10 @@
 ## Verification snapshot
 
 - Local test date: 2026-07-30 (Asia/Hong_Kong).
-- Pre-commit verification SHA: `0fc6866206d4e8cdfeda2cb7b23b9a500be7ca95`.
-- Scope: Task 7 CI/preview-smoke wiring plus final whole-branch gate drift found during bounded verification.
+- Final reviewed SHA: `f1f4bc35750c2b2b5c6c4028de358607e7deb34a`.
+- Scope: complete R7.10 branch, final whole-branch review fixes, CI wiring, and deployment-specific Preview smoke.
 - Exception ledger: empty; every route below records `None`.
-- No production database write, payment, Preview deployment, or Adfocate resource was used.
+- No production database write, payment, Booking activation, or Adfocate resource was used.
 
 ## Route checklist
 
@@ -45,6 +45,8 @@ creator landing axe contract sequentially with zero retries and it passed.
 | `pnpm honesty:lint` | Pass - fresh final run completed successfully. |
 | `pnpm --filter web build` | Pass - fresh final production build used only isolated fixture values with Agent/Booking disabled, compiled successfully, and generated 490 static pages. |
 | `R7_10_BOOKING_STATE=on pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts` | Not run. No `sk_test_` key was supplied and no Stripe checkout or payment was attempted. |
+| `pnpm --filter web exec vitest run tests/design.k2-tokens.test.ts tests/og.palette-parity.test.ts` | Pass - 8/8; canonical hex, raw HSL, and OG palette contracts are aligned. |
+| `E2E_BASE_URL=https://remix-kinnso-jiqiqyy21-ynwaforevers-projects.vercel.app pnpm --filter @kinnso/e2e e2e r7-10-preview-smoke` | Pass - 9/9 read-only manifest routes in 27.2 seconds against deployment `dpl_7ZswHcwYRYG4eekpdLRpq65dttUJ`. |
 
 ## Final gate drift fixed
 
@@ -65,6 +67,10 @@ creator landing axe contract sequentially with zero retries and it passed.
   contracts, then 15/15 green; the expanded prohibited-operation matrix
   recorded 9 expected failures with a deliberately relaxed allowlist, then
   21/21 green after restoring the strict allowlist.
+- Whole-branch review found that active inline chart/map consumers still used
+  the old raw HSL orange channels. The channels now round-trip exactly to
+  `#B94000` and `#A13E0B`, with permanent design-token assertions; the fix was
+  independently approved with no remaining Critical or Important findings.
 - No production authentication, route, database policy, or browser assertion was
   weakened to obtain these results.
 
@@ -75,9 +81,14 @@ creator landing axe contract sequentially with zero retries and it passed.
   both passed in a sequential zero-retry rerun.
 - Booking ON: not executed in Task 7. The CI job accepts only repository Stripe
   secrets and passes them to the isolated ON invocation; it neither uses a
-  production key nor completes payment.
-- Preview deployment URL: pending a successful `Preview` deployment for the
-  `remix-kinnso-web` environment. This task does not push or deploy.
+  production key nor completes payment. `gh secret list --app actions` returned
+  no configured secret names, so the two Stripe test secrets remain an external
+  configuration gate.
+- Preview deployment: `dpl_7ZswHcwYRYG4eekpdLRpq65dttUJ`, commit `f1f4bc3`,
+  READY at `https://remix-kinnso-jiqiqyy21-ynwaforevers-projects.vercel.app`.
+- Manual deployment-specific Preview smoke passed 9/9 read-only routes in 27.2
+  seconds. GitHub's automatic `preview-smoke` job could not start because the
+  account's Actions billing/spending-limit gate blocked all job steps.
 - The `preview-smoke` job is read-only: it sets only `E2E_BASE_URL`, checks out
   locked dependencies and Chromium, and runs `r7-10-preview-smoke`. It receives
   no Supabase or Stripe secret.
@@ -93,8 +104,9 @@ creator landing axe contract sequentially with zero retries and it passed.
 
 ## External handoff
 
-After this branch is pushed and a qualifying Preview deployment succeeds, GitHub
-Actions must run `preview-smoke` against the emitted environment URL. That run
-is the remaining deployment evidence; it must report every manifest route's
-HTTP/readiness and visible-main checks without submitting a form or starting
-checkout.
+PR `#97` and its Vercel Preview are published. Restore GitHub Actions billing or
+raise the spending limit, configure repository Actions secrets
+`STRIPE_SECRET_KEY` (an `sk_test_...` key) and `STRIPE_WEBHOOK_SECRET`, then rerun
+CI. The automated Booking ON and `preview-smoke` jobs must pass before merge.
+Manual Preview evidence is already green for every manifest route without a
+form submission or checkout.
