@@ -73,3 +73,100 @@ export async function tabTo(page: Page, locator: Locator, maxTabs = 60): Promise
 
   throw new Error(`Unable to reach ${target} within ${maxTabs} Tab presses; visited: ${visited.join(' -> ')}`)
 }
+
+export interface LayoutShiftEntry {
+  value: number
+  startTime: number
+  hadRecentInput: boolean
+}
+
+export function calculateCLS(entries: readonly LayoutShiftEntry[]): number {
+  let maximum = 0
+  let sessionStart = 0
+  let sessionValue = 0
+  let previousStart = 0
+
+  for (const entry of entries
+    .filter((candidate) => !candidate.hadRecentInput)
+    .sort((left, right) => left.startTime - right.startTime)) {
+    const continuesSession = sessionValue > 0
+      && entry.startTime - previousStart < 1_000
+      && entry.startTime - sessionStart < 5_000
+
+    if (continuesSession) {
+      sessionValue += entry.value
+    } else {
+      sessionStart = entry.startTime
+      sessionValue = entry.value
+    }
+    previousStart = entry.startTime
+    maximum = Math.max(maximum, sessionValue)
+  }
+
+  return maximum
+}
+
+export async function installLayoutShiftObserver(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    type BrowserLayoutShiftEntry = {
+      value: number
+      startTime: number
+      hadRecentInput: boolean
+    }
+    const target = window as typeof window & { __r710LayoutShifts?: BrowserLayoutShiftEntry[] }
+    const entries: BrowserLayoutShiftEntry[] = []
+    target.__r710LayoutShifts = entries
+
+    if (!('PerformanceObserver' in window)) return
+
+    try {
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const layoutShift = entry as PerformanceEntry & Partial<BrowserLayoutShiftEntry>
+          if (typeof layoutShift.value === 'number') {
+            entries.push({
+              value: layoutShift.value,
+              startTime: layoutShift.startTime,
+              hadRecentInput: layoutShift.hadRecentInput === true,
+            })
+          }
+        }
+      }).observe({ type: 'layout-shift', buffered: true })
+    } catch {
+      // Layout-shift entries are unavailable in some browser engines.
+    }
+  })
+}
+
+export async function readCLS(page: Page): Promise<number> {
+  const entries = await page.evaluate(() => {
+    const target = window as typeof window & { __r710LayoutShifts?: LayoutShiftEntry[] }
+    return target.__r710LayoutShifts ?? []
+  })
+
+  return calculateCLS(entries)
+}
+
+export async function assertNoHorizontalOverflow(page: Page): Promise<void> {
+  const { scrollWidth, viewportWidth } = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }))
+
+  if (scrollWidth > viewportWidth) {
+    throw new Error(`Document horizontal overflow: scrollWidth ${scrollWidth} exceeds viewport width ${viewportWidth}`)
+  }
+}
+
+export async function waitForRoute(
+  page: Page,
+  route: import('./r7-10-routes').R710Route,
+) {
+  const response = await page.goto(route.path)
+  const status = response?.status()
+  if (status !== 200) {
+    throw new Error(`[${route.id}] expected HTTP 200 for ${route.path}, received ${status ?? 'no response'}`)
+  }
+  await page.getByRole(route.ready.role, { level: route.ready.level }).first().waitFor({ state: 'visible' })
+  return response
+}
