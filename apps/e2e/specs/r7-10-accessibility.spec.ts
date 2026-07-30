@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import {
@@ -30,8 +31,17 @@ async function waitForVisualSettlement(page: Parameters<typeof installLayoutShif
 
 async function expectVisibleFocus(locator: Parameters<typeof tabTo>[1]) {
   await expect(locator).toBeFocused()
-  await expect(locator).toHaveCSS('outline-style', 'solid')
+  const hasVisibleFocus = await locator.evaluate((element) => {
+    const style = getComputedStyle(element)
+    return style.outlineStyle !== 'none' || style.boxShadow !== 'none'
+  })
+  expect(hasVisibleFocus, 'expected a visible outline or focus ring').toBe(true)
 }
+
+test('desktop assertControl structurally requires a visible-focus assertion', async () => {
+  const source = await readFile(new URL(import.meta.url), 'utf8')
+  expect(source).toMatch(/const assertControl[\s\S]*?await expectVisibleFocus\(control\)/)
+})
 
 test('CLS uses the largest input-free session window instead of a page-lifetime sum', () => {
   expect(calculateCLS([
@@ -86,7 +96,7 @@ test('desktop header advances one Tab through explicit links and LocaleSwitcher'
   await waitForRoute(page, R7_10_ROUTES[0] as R710Route)
   const header = page.getByRole('banner')
   const assertControl = async (control: ReturnType<typeof header.locator>) => {
-    await expect(control).toBeFocused()
+    await expectVisibleFocus(control)
     await expect(control).toBeVisible()
   }
 
