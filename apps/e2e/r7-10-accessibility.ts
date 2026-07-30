@@ -20,6 +20,7 @@ export interface AxeViolation {
   id: string
   impact?: string | null
   help?: string
+  helpUrl?: string
   nodes: readonly AxeViolationNode[]
 }
 
@@ -47,7 +48,7 @@ export function unapprovedViolations<T extends AxeViolation>(
 
 export function formatAxeViolations(routeId: R710RouteId, violations: readonly AxeViolation[]): string {
   return violations.flatMap((violation) => violation.nodes.map((node) => (
-    `[${routeId}] ${violation.id} (${violation.impact ?? 'unknown'}) at ${node.target.join(' > ')}${violation.help ? `: ${violation.help}` : ''}`
+    `[${routeId}] ${violation.id} (${violation.impact ?? 'unknown'}) at ${node.target.join(' > ')}${violation.help ? `: ${violation.help}` : ''}${violation.helpUrl ? ` (${violation.helpUrl})` : ''}`
   ))).join('\n')
 }
 
@@ -91,7 +92,7 @@ export function calculateCLS(entries: readonly LayoutShiftEntry[]): number {
     .sort((left, right) => left.startTime - right.startTime)) {
     const continuesSession = sessionValue > 0
       && entry.startTime - previousStart < 1_000
-      && entry.startTime - sessionStart < 5_000
+      && entry.startTime - sessionStart <= 5_000
 
     if (continuesSession) {
       sessionValue += entry.value
@@ -113,38 +114,58 @@ export async function installLayoutShiftObserver(page: Page): Promise<void> {
       startTime: number
       hadRecentInput: boolean
     }
-    const target = window as typeof window & { __r710LayoutShifts?: BrowserLayoutShiftEntry[] }
+    type ObserverState = 'ready' | 'unsupported' | 'failed'
+    const target = window as typeof window & {
+      __r710LayoutShifts?: BrowserLayoutShiftEntry[]
+      __r710LayoutShiftObserverState?: ObserverState
+    }
     const entries: BrowserLayoutShiftEntry[] = []
     target.__r710LayoutShifts = entries
 
-    if (!('PerformanceObserver' in window)) return
+    if (!('PerformanceObserver' in window)) {
+      target.__r710LayoutShiftObserverState = 'unsupported'
+      return
+    }
 
     try {
       new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          const layoutShift = entry as PerformanceEntry & Partial<BrowserLayoutShiftEntry>
-          if (typeof layoutShift.value === 'number') {
-            entries.push({
-              value: layoutShift.value,
-              startTime: layoutShift.startTime,
-              hadRecentInput: layoutShift.hadRecentInput === true,
-            })
+        try {
+          for (const entry of list.getEntries()) {
+            const layoutShift = entry as PerformanceEntry & Partial<BrowserLayoutShiftEntry>
+            if (typeof layoutShift.value === 'number') {
+              entries.push({
+                value: layoutShift.value,
+                startTime: layoutShift.startTime,
+                hadRecentInput: layoutShift.hadRecentInput === true,
+              })
+            }
           }
+        } catch {
+          target.__r710LayoutShiftObserverState = 'failed'
         }
       }).observe({ type: 'layout-shift', buffered: true })
+      target.__r710LayoutShiftObserverState = 'ready'
     } catch {
-      // Layout-shift entries are unavailable in some browser engines.
+      target.__r710LayoutShiftObserverState = 'failed'
     }
   })
 }
 
 export async function readCLS(page: Page): Promise<number> {
-  const entries = await page.evaluate(() => {
-    const target = window as typeof window & { __r710LayoutShifts?: LayoutShiftEntry[] }
-    return target.__r710LayoutShifts ?? []
+  const observation = await page.evaluate(() => {
+    const target = window as typeof window & {
+      __r710LayoutShifts?: LayoutShiftEntry[]
+      __r710LayoutShiftObserverState?: 'ready' | 'unsupported' | 'failed'
+    }
+    return {
+      entries: target.__r710LayoutShifts ?? [],
+      state: target.__r710LayoutShiftObserverState,
+    }
   })
+  if (observation.state === 'unsupported') throw new Error('Layout-shift observation is unsupported')
+  if (observation.state !== 'ready') throw new Error('Layout-shift observation failed')
 
-  return calculateCLS(entries)
+  return calculateCLS(observation.entries)
 }
 
 export async function assertNoHorizontalOverflow(page: Page): Promise<void> {

@@ -71,28 +71,28 @@ test.describe('R7.10 rendered accessibility contracts', () => {
   }
 })
 
-test('desktop header preserves keyboard DOM order, visible focus, and Explore activation', async ({ page }) => {
+const DESKTOP_PRIMARY_HREFS = [
+  '/en/explore', '/en/destinations', '/en/articles', '/en/agent', '/en/creators',
+  '/en/merchants', '/en/for-creators', '/en/for-merchants', '/en/sign-in', '/en/sign-up',
+] as const
+
+test('desktop header advances one Tab through the explicit primary control order', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await waitForRoute(page, R7_10_ROUTES[0] as R710Route)
 
   const header = page.getByRole('banner')
-  const primaryLinks = header.locator('a[href^="/en/"]:visible')
-  const primaryCount = await primaryLinks.count()
-  expect(primaryCount, 'desktop header must expose primary links and its CTA').toBeGreaterThan(0)
-
-  const hrefs = await primaryLinks.evaluateAll((links) => links.map((link) => link.getAttribute('href')))
-  expect(hrefs).toContain('/en/explore')
-  expect(hrefs.indexOf('/en/explore')).toBeLessThan(hrefs.indexOf('/en/for-creators'))
-
-  for (let index = 0; index < primaryCount; index += 1) {
-    const link = primaryLinks.nth(index)
-    await tabTo(page, link)
-    await expectVisibleFocus(link)
+  await page.keyboard.press('Tab')
+  await expect(header.getByRole('link', { name: 'KINNSO', exact: true })).toBeFocused()
+  for (const href of DESKTOP_PRIMARY_HREFS) {
+    await page.keyboard.press('Tab')
+    const control = header.locator(`a[href="${href}"]`)
+    await expect(control).toBeFocused()
+    await expectVisibleFocus(control)
   }
 
-  const explore = header.getByRole('link', { name: 'Explore', exact: true })
-  await tabTo(page, explore)
-  await expectVisibleFocus(explore)
+  await page.goto('/en')
+  await page.keyboard.press('Tab')
+  await page.keyboard.press('Tab')
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/en\/explore$/)
 })
@@ -110,15 +110,24 @@ for (const route of R7_10_ROUTES.filter((entry) => 'mobileHeaderJourney' in entr
 
     const dialog = page.getByRole('dialog', { name: /menu/i })
     await expect(dialog).toBeVisible()
-    const destinations = dialog.locator('a[href^="/en/"]:visible')
-    const destinationCount = await destinations.count()
-    expect(destinationCount, 'mobile header must expose every primary destination').toBeGreaterThan(0)
+    const primaryHrefs = DESKTOP_PRIMARY_HREFS
+    for (const href of primaryHrefs) await expect(dialog.locator(`a[href="${href}"]`)).toBeVisible()
 
-    for (let index = 0; index < destinationCount; index += 1) {
-      const destination = destinations.nth(index)
-      await tabTo(page, destination)
+    const assertFocusIsInDialog = async (href: string) => {
+      const destination = dialog.locator(`a[href="${href}"]`)
+      await expect(destination).toBeFocused()
       await expectVisibleFocus(destination)
-      await expect(destination.evaluate((element) => element.closest('[role="dialog"]') !== null)).resolves.toBe(true)
+      expect(await destination.evaluate((element) => element.closest('[role="dialog"]') !== null)).toBe(true)
+    }
+
+    await assertFocusIsInDialog(primaryHrefs[0])
+    for (const href of primaryHrefs.slice(1)) {
+      await page.keyboard.press('Tab')
+      await assertFocusIsInDialog(href)
+    }
+    for (const href of primaryHrefs.slice(0, -1).reverse()) {
+      await page.keyboard.press('Shift+Tab')
+      await assertFocusIsInDialog(href)
     }
 
     await page.keyboard.press('Escape')
