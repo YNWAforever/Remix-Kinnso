@@ -31,8 +31,7 @@ async function waitForVisualSettlement(page: Parameters<typeof installLayoutShif
   }))
 }
 
-async function captureUnfocusedFocusStyle(locator: Parameters<typeof tabTo>[1]): Promise<FocusStyleSnapshot> {
-  await expect(locator).not.toBeFocused()
+async function readFocusStyle(locator: Parameters<typeof tabTo>[1]): Promise<FocusStyleSnapshot> {
   return locator.evaluate((element) => {
     const style = getComputedStyle(element)
     return {
@@ -44,26 +43,32 @@ async function captureUnfocusedFocusStyle(locator: Parameters<typeof tabTo>[1]):
   })
 }
 
+async function captureUnfocusedFocusStyle(locator: Parameters<typeof tabTo>[1]): Promise<FocusStyleSnapshot> {
+  await expect(locator).not.toBeFocused()
+  return readFocusStyle(locator)
+}
+
 async function expectVisibleFocus(locator: Parameters<typeof tabTo>[1], baseline: FocusStyleSnapshot) {
   await expect(locator).toBeFocused()
-  const focused = await locator.evaluate((element) => {
-    const style = getComputedStyle(element)
-    return {
-      outlineStyle: style.outlineStyle,
-      outlineWidth: style.outlineWidth,
-      outlineColor: style.outlineColor,
-      boxShadow: style.boxShadow,
-    }
-  })
-  expect(
-    hasMeaningfulFocusIndicator(baseline, focused),
-    `expected a focus-induced visible outline or ring; baseline=${JSON.stringify(baseline)} focused=${JSON.stringify(focused)}`,
-  ).toBe(true)
+  await expect.poll(async () => {
+    const focused = await readFocusStyle(locator)
+    return hasMeaningfulFocusIndicator(baseline, focused)
+      ? 'focus-indicator-visible'
+      : JSON.stringify(focused)
+  }, {
+    message: `expected a focus-induced visible outline or ring; baseline=${JSON.stringify(baseline)}`,
+  }).toBe('focus-indicator-visible')
 }
 
 test('desktop assertControl structurally requires a visible-focus assertion', async () => {
   const source = await readFile(new URL(import.meta.url), 'utf8')
   expect(source).toMatch(/const assertControl[\s\S]*?await expectVisibleFocus\(control, baseline\)/)
+})
+
+test('desktop visible focus structurally polls without fixed sleeps', async () => {
+  const source = await readFile(new URL(import.meta.url), 'utf8')
+  expect(source).toMatch(/await expect\.poll\([\s\S]*?hasMeaningfulFocusIndicator\(baseline, focused\)/)
+  expect(source).not.toMatch(/\b(?:waitForTimeout|setTimeout|sleep)\s*\(/)
 })
 
 test('CLS uses the largest input-free session window instead of a page-lifetime sum', () => {
