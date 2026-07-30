@@ -7,6 +7,10 @@ const workflow = readFileSync(resolve(repoRoot, '.github/workflows/ci.yml'), 'ut
 const verificationWorkflow = readFileSync(resolve(repoRoot, '.github/workflows/verify.yml'), 'utf8')
 const previewSpec = readFileSync(resolve(repoRoot, 'apps/e2e/specs/r7-10-preview-smoke.spec.ts'), 'utf8')
 const accessibilitySource = readFileSync(resolve(repoRoot, 'apps/e2e/r7-10-accessibility.ts'), 'utf8')
+const webDeploymentPrefix =
+  "startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-')"
+const syncDeploymentExclusion =
+  "!startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-sync-')"
 const startupStep = workflow.match(
   /- name: Start scan worker \(fixture mode\)[\s\S]*?(?=\n\s{6}- name:)/,
 )?.[0]
@@ -162,7 +166,8 @@ function hasReadOnlyPreviewContract(
     && !/(?:SUPABASE|STRIPE|secrets\.)/i.test(previewJob.source)
     && previewJob.source.includes("github.event.deployment_status.environment == 'Preview'")
     && previewJob.source.includes("github.event.deployment_status.state == 'success'")
-    && previewJob.source.includes("contains(github.event.deployment_status.environment_url, 'remix-kinnso-web')")
+    && previewJob.source.includes(webDeploymentPrefix)
+    && previewJob.source.includes(syncDeploymentExclusion)
     && scalarRunCommand(previewStep.source, 8) === 'pnpm --filter @kinnso/e2e e2e r7-10-preview-smoke'
     && specSource.includes('for (const route of R7_10_ROUTES)')
     && specSource.includes('const response = await waitForRoute(page, route)')
@@ -259,6 +264,21 @@ describe('CI product-state startup contract', () => {
 describe('Preview smoke isolation and read-only contract', () => {
   it('allows only E2E_BASE_URL in the preview job and follows the manifest read-only', () => {
     expect(hasReadOnlyPreviewContract(verificationWorkflow, previewSpec, accessibilitySource)).toBe(true)
+  })
+
+  it('accepts generated Vercel web URLs and excludes sync deployments in every auto-triggered job', () => {
+    const jobs = uniqueSourceBlock(verificationWorkflow, 'jobs:', 0)
+    expect(jobs).not.toBeNull()
+
+    for (const name of ['parity:', 'e2e:', 'preview-smoke:']) {
+      const job = jobs && uniqueSourceBlock(jobs.source, name, 2)
+      expect(job?.source).toContain(webDeploymentPrefix)
+      expect(job?.source).toContain(syncDeploymentExclusion)
+    }
+
+    expect(verificationWorkflow).not.toContain(
+      "contains(github.event.deployment_status.environment_url, 'remix-kinnso-web')",
+    )
   })
 
   it('rejects an additional Stripe or secret-backed preview job variable', () => {

@@ -8,8 +8,8 @@ name: Verify (cutover gate)
 # the sync API app, production AND every PR preview. Only the PRODUCTION WEB deploy is a
 # valid target for this gate (the sync URL serves the Hono API, not the rendered site, and
 # previews lack the gate's secrets). The job `if:` below therefore requires environment
-# 'Production' and an environment_url on the remix-kinnso-web project; everything else is
-# skipped (neutral, not failed). This keeps preview/sync deploys from posting red X's on PRs.
+# 'Production' and the generated remix-kinnso web URL prefix; sync URLs are explicitly
+# excluded. Everything else is skipped (neutral, not failed).
 #
 # To use as a PRE-MERGE gate instead: point E2E_BASE_URL / BASE_URL at a Vercel PREVIEW
 # deployment (or a local `next start`) and trigger via workflow_dispatch.
@@ -37,7 +37,8 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event.deployment_status.state == 'success' &&
        github.event.deployment_status.environment == 'Production' &&
-       contains(github.event.deployment_status.environment_url, 'remix-kinnso-web'))
+       startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-') &&
+       !startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-sync-'))
     runs-on: ubuntu-latest
     env:
       BASE_URL: ${{ github.event.inputs.base_url || github.event.deployment_status.environment_url || vars.VERIFY_BASE_URL || 'https://remix-kinnso-web.vercel.app' }}
@@ -66,7 +67,8 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event.deployment_status.state == 'success' &&
        github.event.deployment_status.environment == 'Production' &&
-       contains(github.event.deployment_status.environment_url, 'remix-kinnso-web'))
+       startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-') &&
+       !startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-sync-'))
     runs-on: ubuntu-latest
     env:
       E2E_BASE_URL: ${{ github.event.inputs.base_url || github.event.deployment_status.environment_url || vars.VERIFY_BASE_URL || 'https://remix-kinnso-web.vercel.app' }}
@@ -98,7 +100,8 @@ jobs:
       github.event_name == 'deployment_status' &&
       github.event.deployment_status.state == 'success' &&
       github.event.deployment_status.environment == 'Preview' &&
-      contains(github.event.deployment_status.environment_url, 'remix-kinnso-web')
+      startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-') &&
+      !startsWith(github.event.deployment_status.environment_url, 'https://remix-kinnso-sync-')
     runs-on: ubuntu-latest
     env:
       E2E_BASE_URL: ${{ github.event.deployment_status.environment_url }}
