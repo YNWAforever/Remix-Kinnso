@@ -57,8 +57,8 @@
 
 /* Raw HSL channels for components that build colors inline via hsl(var(--k-*)). */
 :root {
-  --k-orange:      20 89% 53%;
-  --k-orange-dark: 21 87% 41%;
+  --k-orange:      20.7568 100% 36.2745%;
+  --k-orange-dark: 20.4 87.2093% 33.7255%;
   --k-amber:       35 90% 56%;
   --k-cream:       33 100% 96%;
   --k-cream2:      35 100% 92%;

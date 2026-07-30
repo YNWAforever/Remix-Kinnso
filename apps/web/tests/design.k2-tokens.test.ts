@@ -15,6 +15,8 @@ describe('R1C canonical design tokens', () => {
     expect(css).toContain('--color-orange-dark: #A13E0B')
     expect(css).toContain('--color-kinnso-orange: #B94000')
     expect(css).toContain('--color-kinnso-orangeDark: #A13E0B')
+    expect(css).toContain('--k-orange:      20.7568 100% 36.2745%')
+    expect(css).toContain('--k-orange-dark: 20.4 87.2093% 33.7255%')
     expect(css).toContain('--color-kinnso-cream: #F8F1E6')
     expect(css).toContain('--color-kinnso-cream2: #EFE3D2')
     expect(css).toContain('--color-kinnso-ink: #211B16')
