@@ -5,11 +5,13 @@ import {
   assertNoHorizontalOverflow,
   calculateCLS,
   formatAxeViolations,
+  hasMeaningfulFocusIndicator,
   installLayoutShiftObserver,
   readCLS,
   tabTo,
   unapprovedViolations,
   waitForRoute,
+  type FocusStyleSnapshot,
 } from '../r7-10-accessibility'
 import { AXE_EXCEPTIONS } from '../r7-10-accessibility'
 import { R7_10_ROUTES, type R710Route } from '../r7-10-routes'
@@ -29,18 +31,39 @@ async function waitForVisualSettlement(page: Parameters<typeof installLayoutShif
   }))
 }
 
-async function expectVisibleFocus(locator: Parameters<typeof tabTo>[1]) {
-  await expect(locator).toBeFocused()
-  const hasVisibleFocus = await locator.evaluate((element) => {
+async function captureUnfocusedFocusStyle(locator: Parameters<typeof tabTo>[1]): Promise<FocusStyleSnapshot> {
+  await expect(locator).not.toBeFocused()
+  return locator.evaluate((element) => {
     const style = getComputedStyle(element)
-    return style.outlineStyle !== 'none' || style.boxShadow !== 'none'
+    return {
+      outlineStyle: style.outlineStyle,
+      outlineWidth: style.outlineWidth,
+      outlineColor: style.outlineColor,
+      boxShadow: style.boxShadow,
+    }
   })
-  expect(hasVisibleFocus, 'expected a visible outline or focus ring').toBe(true)
+}
+
+async function expectVisibleFocus(locator: Parameters<typeof tabTo>[1], baseline: FocusStyleSnapshot) {
+  await expect(locator).toBeFocused()
+  const focused = await locator.evaluate((element) => {
+    const style = getComputedStyle(element)
+    return {
+      outlineStyle: style.outlineStyle,
+      outlineWidth: style.outlineWidth,
+      outlineColor: style.outlineColor,
+      boxShadow: style.boxShadow,
+    }
+  })
+  expect(
+    hasMeaningfulFocusIndicator(baseline, focused),
+    `expected a focus-induced visible outline or ring; baseline=${JSON.stringify(baseline)} focused=${JSON.stringify(focused)}`,
+  ).toBe(true)
 }
 
 test('desktop assertControl structurally requires a visible-focus assertion', async () => {
   const source = await readFile(new URL(import.meta.url), 'utf8')
-  expect(source).toMatch(/const assertControl[\s\S]*?await expectVisibleFocus\(control\)/)
+  expect(source).toMatch(/const assertControl[\s\S]*?await expectVisibleFocus\(control, baseline\)/)
 })
 
 test('CLS uses the largest input-free session window instead of a page-lifetime sum', () => {
@@ -95,29 +118,37 @@ test('desktop header advances one Tab through explicit links and LocaleSwitcher'
   await page.setViewportSize({ width: 1440, height: 900 })
   await waitForRoute(page, R7_10_ROUTES[0] as R710Route)
   const header = page.getByRole('banner')
-  const assertControl = async (control: ReturnType<typeof header.locator>) => {
-    await expectVisibleFocus(control)
+  const assertControl = async (control: ReturnType<typeof header.locator>, baseline: FocusStyleSnapshot) => {
+    await expectVisibleFocus(control, baseline)
     await expect(control).toBeVisible()
   }
 
   const logo = header.getByRole('link', { name: 'KINNSO', exact: true })
+  const logoBaseline = await captureUnfocusedFocusStyle(logo)
   await tabTo(page, logo)
-  await assertControl(logo)
+  await assertControl(logo, logoBaseline)
   for (const href of DESKTOP_PRIMARY_HREFS.slice(0, 8)) {
+    const control = header.locator(`a[href="${href}"]`)
+    const baseline = await captureUnfocusedFocusStyle(control)
     await page.keyboard.press('Tab')
-    await assertControl(header.locator(`a[href="${href}"]`))
+    await assertControl(control, baseline)
   }
+  const localeSwitcher = header.getByRole(LOCALE_SWITCHER.role, { name: LOCALE_SWITCHER.name })
+  const localeSwitcherBaseline = await captureUnfocusedFocusStyle(localeSwitcher)
   await page.keyboard.press('Tab')
-  await assertControl(header.getByRole(LOCALE_SWITCHER.role, { name: LOCALE_SWITCHER.name }))
+  await assertControl(localeSwitcher, localeSwitcherBaseline)
   for (const href of DESKTOP_PRIMARY_HREFS.slice(8)) {
+    const control = header.locator(`a[href="${href}"]`)
+    const baseline = await captureUnfocusedFocusStyle(control)
     await page.keyboard.press('Tab')
-    await assertControl(header.locator(`a[href="${href}"]`))
+    await assertControl(control, baseline)
   }
 
   await page.goto('/en')
   const explore = header.locator('a[href="/en/explore"]')
+  const exploreBaseline = await captureUnfocusedFocusStyle(explore)
   await tabTo(page, explore)
-  await expectVisibleFocus(explore)
+  await expectVisibleFocus(explore, exploreBaseline)
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/en\/explore$/)
 })
@@ -129,8 +160,9 @@ for (const route of R7_10_ROUTES.filter((entry) => 'mobileHeaderJourney' in entr
 
     const trigger = page.getByRole('button', { name: /menu/i })
     const triggerControl = page.locator('[data-slot="dialog-trigger"]')
+    const triggerBaseline = await captureUnfocusedFocusStyle(trigger)
     await tabTo(page, trigger)
-    await expectVisibleFocus(trigger)
+    await expectVisibleFocus(trigger, triggerBaseline)
     await page.keyboard.press('Enter')
     await expect(triggerControl).toHaveAttribute('aria-expanded', 'true')
 

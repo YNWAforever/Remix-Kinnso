@@ -75,6 +75,57 @@ export async function tabTo(page: Page, locator: Locator, maxTabs = 60): Promise
   throw new Error(`Unable to reach ${target} within ${maxTabs} Tab presses; visited: ${visited.join(' -> ')}`)
 }
 
+export interface FocusStyleSnapshot {
+  outlineStyle: string
+  outlineWidth: string
+  outlineColor: string
+  boxShadow: string
+}
+
+function hasVisibleColor(value: string): boolean {
+  const colors = value.match(/(?:rgba?|hsla?)\([^)]*\)|#[\da-f]{3,8}\b|\btransparent\b/gi) ?? []
+  return colors.some((color) => {
+    const normalized = color.trim().toLowerCase()
+    if (normalized === 'transparent') return false
+    if (normalized.startsWith('#')) {
+      const alpha = normalized.length === 5 || normalized.length === 9 ? normalized.at(-1) : undefined
+      return alpha === undefined || alpha !== '0'
+    }
+    if (normalized.startsWith('rgba') || normalized.startsWith('hsla')) {
+      const body = normalized.slice(normalized.indexOf('(') + 1, -1)
+      const alpha = body.includes('/')
+        ? body.slice(body.lastIndexOf('/') + 1).trim()
+        : body.split(',').at(-1)?.trim()
+      return alpha !== undefined && Number(alpha) > 0
+    }
+    return true
+  })
+}
+
+function hasNonzeroExtent(boxShadow: string): boolean {
+  const geometry = boxShadow.replace(/(?:rgba?|hsla?)\([^)]*\)|#[\da-f]{3,8}\b|\btransparent\b/gi, '')
+  return [...geometry.matchAll(/-?(?:\d+|\d*\.\d+)(?:px|em|rem|pt|pc|vh|vw|vmin|vmax|%)/gi)]
+    .some((match) => Number.parseFloat(match[0]) !== 0)
+}
+
+export function hasMeaningfulFocusIndicator(
+  baseline: FocusStyleSnapshot,
+  focused: FocusStyleSnapshot,
+): boolean {
+  const outlineChanged = baseline.outlineStyle !== focused.outlineStyle
+    || baseline.outlineWidth !== focused.outlineWidth
+    || baseline.outlineColor !== focused.outlineColor
+  const hasVisibleOutline = !['none', 'hidden'].includes(focused.outlineStyle)
+    && Number.parseFloat(focused.outlineWidth) > 0
+    && hasVisibleColor(focused.outlineColor)
+
+  if (outlineChanged && hasVisibleOutline) return true
+
+  return baseline.boxShadow !== focused.boxShadow
+    && focused.boxShadow !== 'none'
+    && hasVisibleColor(focused.boxShadow)
+    && hasNonzeroExtent(focused.boxShadow)
+}
 export interface LayoutShiftEntry {
   value: number
   startTime: number
