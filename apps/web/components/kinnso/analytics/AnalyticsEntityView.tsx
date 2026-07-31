@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   trackTravellerEvent,
   type TravellerAnalyticsMetadataByEvent,
@@ -9,8 +9,10 @@ import {
 type AnalyticsEntityViewProps = TravellerAnalyticsMetadataByEvent['entity_viewed']
 
 export function AnalyticsEntityView(props: AnalyticsEntityViewProps) {
+  const initialProps = useRef(props)
+
   useEffect(() => {
-    trackTravellerEvent('entity_viewed', props)
+    trackTravellerEvent('entity_viewed', initialProps.current)
   }, [])
 
   return null

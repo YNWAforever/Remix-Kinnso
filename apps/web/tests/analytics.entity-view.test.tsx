@@ -38,7 +38,9 @@ describe('AnalyticsEntityView', () => {
     vi.mocked(fetch).mockClear()
     const track = vi.spyOn(analyticsClient, 'trackTravellerEvent')
 
-    render(<AnalyticsEntityView locale="en" routeKey="guide_detail" entityType="guide" entityId="guide-123" />)
+    const { rerender } = render(
+      <AnalyticsEntityView locale="en" routeKey="guide_detail" entityType="guide" entityId="guide-123" />,
+    )
 
     await waitFor(() => {
       expect(track).toHaveBeenCalledOnce()
@@ -49,6 +51,11 @@ describe('AnalyticsEntityView', () => {
       entityType: 'guide',
       entityId: 'guide-123',
     })
+    rerender(
+      <AnalyticsEntityView locale="en" routeKey="experience_detail" entityType="experience" entityId="experience-456" />,
+    )
+    await flush()
+    expect(track).toHaveBeenCalledOnce()
     await flush()
     expect(fetch).toHaveBeenCalledOnce()
   })
