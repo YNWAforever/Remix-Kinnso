@@ -43,7 +43,7 @@
 
 ## Decision
 
-The verification-only commit `chore(r8.0): verify measurement baseline` was **not created**. An allow-empty verification commit would incorrectly imply that the lint gate and required local migration/runtime checks are green. The branch remains clean and unchanged by Task 9 apart from this uncommitted report for the implementation owner to review.
+The verification-only commit `chore(r8.0): verify measurement baseline` was **not created**. An allow-empty verification commit would incorrectly imply that the required local migration/runtime checks are green.
 
 ## Lint remediation
 
@@ -51,4 +51,8 @@ The lint item in the earlier blocked-check record above was resolved after that 
 
 - **Root cause:** `AnalyticsConsentBanner` synchronously copied the localStorage-derived consent value into React state from a mount `useEffect`. React Hooks lint correctly rejects that pattern because it creates an avoidable render cascade.
 - **Fix:** consent hydration now uses `useSyncExternalStore` with a stable no-op subscription, a server snapshot of `false`, and `hasAnalyticsConsent` as the safe browser snapshot. Click handlers retain local override state, so accepting or revoking consent changes the UI immediately without waiting for a storage event.
-- **Verification after fix:** the banner, client, locale-parity, funnel, and entity suites passed (5 files / 25 tests); targeted banner ESLint passed; `pnpm --filter web lint` passed with only the existing 21 warnings; and `pnpm --filter web typecheck` passed. `git diff --check origin/main...HEAD` still reports only the previously documented whitespace notices in the R8.0 plan/design files.
+- **Verification after fix:** the banner, client, locale-parity, funnel, and entity suites passed; targeted banner ESLint passed; `pnpm --filter web lint` passed with only the existing 21 warnings; and `pnpm --filter web typecheck` passed. `git diff --check origin/main...HEAD` still reports only the previously documented whitespace notices in the R8.0 plan/design files.
+
+## Superseding R8.0 review-fix verification
+
+After the final review fixes (HEAD `167850e`), the checked-in Vitest binary passed 11 focused files / 83 tests, including the retention cron route and qualified aggregate migration contract. Workspace typecheck, lint (21 baseline warnings), and E2E typecheck passed. Remote-target analytics E2E safely skipped both tests. The migration/RLS/browser runtime and production-style build remain blocked by unavailable local Supabase (ECONNREFUSED `127.0.0.1:64521`); no production activation or writes occurred.
