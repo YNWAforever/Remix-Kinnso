@@ -1,26 +1,38 @@
 import { expect, test } from '@playwright/test'
 
 const LOCAL_BASE_URL = /^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?(?:\/|$)/
+const KINNSO_PREVIEW_HOST = /^remix-kinnso-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.vercel\.app$/
+const PRODUCTION_HOST = 'remix-kinnso-web.vercel.app'
 const PROHIBITED_PAYLOAD_KEYS = /email|ip|user-agent|prompt|query/i
 
 function isApprovedAnalyticsE2eTarget(): boolean {
   const baseURL = process.env.E2E_BASE_URL ?? ''
-  return LOCAL_BASE_URL.test(baseURL) || process.env.ANALYTICS_E2E_TEST_MODE === 'true'
-}
 
-function assertApprovedAnalyticsE2eTarget(): void {
-  if (!isApprovedAnalyticsE2eTarget()) {
-    throw new Error(
-      'analytics-consent.spec.ts only runs against localhost or an explicitly test-mode Preview (set ANALYTICS_E2E_TEST_MODE=true).',
+  if (LOCAL_BASE_URL.test(baseURL)) {
+    return true
+  }
+
+  try {
+    const target = new URL(baseURL)
+    const hostname = target.hostname.toLowerCase()
+    return (
+      process.env.ANALYTICS_E2E_TEST_MODE === 'true' &&
+      target.protocol === 'https:' &&
+      hostname !== PRODUCTION_HOST &&
+      !hostname.includes('sync') &&
+      KINNSO_PREVIEW_HOST.test(hostname)
     )
+  } catch {
+    return false
   }
 }
 
-test.describe('analytics consent privacy boundary', () => {
-  test.beforeEach(() => {
-    assertApprovedAnalyticsE2eTarget()
-  })
+test.skip(
+  !isApprovedAnalyticsE2eTarget(),
+  'analytics-consent.spec.ts runs only on localhost/127.0.0.1 or an explicitly test-mode KINNSO Vercel Preview.',
+)
 
+test.describe('analytics consent privacy boundary', () => {
   test('sends only the opted-in journey payload and stops after revocation', async ({ page }) => {
     const payloads: unknown[] = []
 

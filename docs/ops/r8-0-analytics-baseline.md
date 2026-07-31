@@ -11,7 +11,7 @@ NEXT_PUBLIC_ANALYTICS_MODE=test
 ANALYTICS_INGEST_MODE=test
 ```
 
-For a local browser run, point `E2E_BASE_URL` at the local web server. For a Preview, set `ANALYTICS_E2E_TEST_MODE=true` only after confirming that Preview uses both test-mode values above. Never use the E2E spec against production.
+For a local browser run, point `E2E_BASE_URL` at an `http(s)://localhost` or `http(s)://127.0.0.1` web server; no additional flag is needed. For a remote run, the spec requires both `ANALYTICS_E2E_TEST_MODE=true` and an HTTPS KINNSO Preview hostname matching `remix-kinnso-<deployment>-<owner>.vercel.app`. It explicitly skips `remix-kinnso-web.vercel.app`, any hostname containing `sync`, malformed URLs, and every other remote host before Playwright navigates. Set the flag only after confirming that Preview uses both test-mode values above. Never use the E2E spec against production.
 
 Production activation requires separate approval. Only then set both modes to `production` and retain the existing server-only `SUPABASE_SERVICE_ROLE_KEY`; it must never be exposed as a public browser variable.
 
