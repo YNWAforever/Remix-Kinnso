@@ -94,8 +94,8 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).toContain("'signup_start_to_completion'")
     expect(text).toContain('and target.occurred_at >= source.occurred_at')
     expect(text).toContain('target.occurred_at <= source.occurred_at + interval \'7 days\'')
-    expect(text).toContain("event_name = 'checkout_started' and booking_state = 'on' and outcome = 'created'")
-    expect(text).not.toContain("event_name = 'checkout_started' and booking_state = 'on' and outcome = 'success'")
+    expect(text).toContain("te.event_name = 'checkout_started' and te.booking_state = 'on' and te.outcome = 'created'")
+    expect(text).not.toContain("te.event_name = 'checkout_started' and te.booking_state = 'on' and te.outcome = 'success'")
   })
 
   it('qualifies report columns and keeps zero-volume dimensions visible', () => {
