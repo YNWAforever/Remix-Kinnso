@@ -3001,11 +3001,11 @@ export type Database = {
           attribution_window_days: number
           booking_state: string
           denominator: number
-          entity_type: string
+          entity_type: string | null
           locale: string
           metric_key: string
           numerator: number
-          rate: number
+          rate: number | null
           sample_count: number
           status: string
         }[]

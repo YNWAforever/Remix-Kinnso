@@ -37,6 +37,12 @@ create table public.traveller_analytics_events (
   ),
   constraint traveller_analytics_error_outcome_check check (
     error_category is null or outcome = 'error'
+  ),
+  -- Keep event-time attribution bounded to the server receipt time. The ingest
+  -- parser applies this same 15-minute skew allowance before it reaches the DB.
+  constraint traveller_analytics_occurred_at_skew_check check (
+    occurred_at >= received_at - interval '15 minutes'
+    and occurred_at <= received_at + interval '15 minutes'
   )
 );
 
@@ -165,43 +171,201 @@ begin
       e.journey_id,
       e.locale,
       e.entity_type,
-      e.booking_state
+      e.entity_id,
+      e.booking_state,
+      e.outcome,
+      e.occurred_at
     from public.traveller_analytics_events e
     where e.received_at >= p_window_start
       and e.received_at < p_window_end
   ),
-  cohorts as (
-    select locale, booking_state, count(distinct journey_id)::bigint as journey_count
+  journey_starts as (
+    select journey_id, locale, min(occurred_at) as occurred_at
     from scoped_events
-    group by locale, booking_state
+    where event_name = 'journey_started'
+    group by journey_id, locale
   ),
-  stages as (
-    select
-      event_name as metric_key,
-      locale,
-      entity_type,
-      booking_state,
-      count(distinct journey_id)::bigint as journey_count
+  entity_views as (
+    select journey_id, locale, entity_type, entity_id, min(occurred_at) as occurred_at
     from scoped_events
-    group by event_name, locale, entity_type, booking_state
+    where event_name = 'entity_viewed'
+    group by journey_id, locale, entity_type, entity_id
+  ),
+  agent_starts as (
+    select journey_id, locale, min(occurred_at) as occurred_at
+    from scoped_events
+    where event_name = 'agent_started'
+    group by journey_id, locale
+  ),
+  booking_ctas as (
+    select journey_id, locale, entity_type, entity_id, booking_state, min(occurred_at) as occurred_at
+    from scoped_events
+    where event_name = 'booking_cta_clicked'
+    group by journey_id, locale, entity_type, entity_id, booking_state
+  ),
+  booking_outcomes as (
+    select journey_id, locale, entity_type, entity_id, booking_state, event_name, min(occurred_at) as occurred_at
+    from scoped_events
+    where (event_name = 'waitlist_submitted' and booking_state = 'off' and outcome = 'submitted')
+       or (event_name = 'checkout_started' and booking_state = 'on' and outcome = 'success')
+    group by journey_id, locale, entity_type, entity_id, booking_state, event_name
+  ),
+  signup_starts as (
+    select journey_id, locale, min(occurred_at) as occurred_at
+    from scoped_events
+    where event_name = 'signup_started'
+    group by journey_id, locale
+  ),
+  signup_completions as (
+    select journey_id, locale, min(occurred_at) as occurred_at
+    from scoped_events
+    where event_name = 'signup_completed' and outcome = 'success'
+    group by journey_id, locale
+  ),
+  entity_types as (
+    select distinct entity_type from entity_views where entity_type is not null
+  ),
+  booking_states as (
+    select 'off'::text as booking_state
+    union all
+    select 'on'::text as booking_state
+  ),
+  funnel_metrics as (
+    -- Every discovery journey is eligible for each entity-type discovery slice.
+    select
+      'discovery_to_entity'::text as metric_key,
+      source.locale,
+      entity_type.entity_type,
+      'off'::text as booking_state,
+      count(distinct target.journey_id)::bigint as numerator,
+      count(distinct source.journey_id)::bigint as denominator
+    from journey_starts source
+    cross join entity_types entity_type
+    left join entity_views target
+      on target.journey_id = source.journey_id
+      and target.locale = source.locale
+      and target.entity_type = entity_type.entity_type
+      and target.occurred_at >= source.occurred_at
+      and target.occurred_at <= source.occurred_at + interval '7 days'
+    group by source.locale, entity_type.entity_type
+
+    union all
+
+    select
+      'entity_to_agent'::text,
+      source.locale,
+      source.entity_type,
+      'off'::text,
+      count(distinct target.journey_id)::bigint,
+      count(distinct source.journey_id)::bigint
+    from entity_views source
+    left join agent_starts target
+      on target.journey_id = source.journey_id
+      and target.locale = source.locale
+      and target.occurred_at >= source.occurred_at
+      and target.occurred_at <= source.occurred_at + interval '7 days'
+    group by source.locale, source.entity_type
+
+    union all
+
+    -- Booking state is unknown until CTA activation, so each entity-view cohort
+    -- is the explicit common denominator for the off/on CTA comparison.
+    select
+      'entity_to_cta'::text,
+      source.locale,
+      source.entity_type,
+      booking_state.booking_state,
+      count(distinct target.journey_id)::bigint,
+      count(distinct source.journey_id)::bigint
+    from entity_views source
+    cross join booking_states booking_state
+    left join booking_ctas target
+      on target.journey_id = source.journey_id
+      and target.locale = source.locale
+      and target.entity_type = source.entity_type
+      and target.entity_id = source.entity_id
+      and target.booking_state = booking_state.booking_state
+      and target.occurred_at >= source.occurred_at
+      and target.occurred_at <= source.occurred_at + interval '7 days'
+    group by source.locale, source.entity_type, booking_state.booking_state
+
+    union all
+
+    select
+      case when source.booking_state = 'off'
+        then 'cta_to_waitlist_submitted'
+        else 'cta_to_checkout_started'
+      end,
+      source.locale,
+      source.entity_type,
+      source.booking_state,
+      count(distinct target.journey_id)::bigint,
+      count(distinct source.journey_id)::bigint
+    from booking_ctas source
+    left join booking_outcomes target
+      on target.journey_id = source.journey_id
+      and target.locale = source.locale
+      and target.entity_type = source.entity_type
+      and target.entity_id = source.entity_id
+      and target.booking_state = source.booking_state
+      and target.event_name = case when source.booking_state = 'off'
+        then 'waitlist_submitted'
+        else 'checkout_started'
+      end
+      and target.occurred_at >= source.occurred_at
+      and target.occurred_at <= source.occurred_at + interval '7 days'
+    group by source.locale, source.entity_type, source.booking_state
+
+    union all
+
+    select
+      'agent_start_rate'::text,
+      source.locale,
+      null::text,
+      'off'::text,
+      count(distinct target.journey_id)::bigint,
+      count(distinct source.journey_id)::bigint
+    from journey_starts source
+    left join agent_starts target
+      on target.journey_id = source.journey_id
+      and target.locale = source.locale
+      and target.occurred_at >= source.occurred_at
+      and target.occurred_at <= source.occurred_at + interval '7 days'
+    group by source.locale
+
+    union all
+
+    select
+      'signup_start_to_completion'::text,
+      source.locale,
+      null::text,
+      'off'::text,
+      count(distinct target.journey_id)::bigint,
+      count(distinct source.journey_id)::bigint
+    from signup_starts source
+    left join signup_completions target
+      on target.journey_id = source.journey_id
+      and target.locale = source.locale
+      and target.occurred_at >= source.occurred_at
+      and target.occurred_at <= source.occurred_at + interval '7 days'
+    group by source.locale
   )
   select
-    s.metric_key,
-    s.locale,
-    s.entity_type,
-    s.booking_state,
-    s.journey_count as numerator,
-    c.journey_count as denominator,
+    metric_key,
+    locale,
+    entity_type,
+    booking_state,
+    numerator,
+    denominator,
     case
-      when c.journey_count < v_sample_floor or c.journey_count = 0 then null
-      else round(s.journey_count::numeric / c.journey_count::numeric, 4)
+      when denominator < v_sample_floor or denominator = 0 then null
+      else round(numerator::numeric / denominator::numeric, 4)
     end as rate,
-    c.journey_count as sample_count,
-    case when c.journey_count < v_sample_floor then 'insufficient_sample' else 'ok' end as status,
+    denominator as sample_count,
+    case when denominator < v_sample_floor then 'insufficient_sample' else 'ok' end as status,
     v_window_days as attribution_window_days
-  from stages s
-  join cohorts c using (locale, booking_state)
-  order by s.metric_key, s.locale, s.entity_type nulls first, s.booking_state;
+  from funnel_metrics
+  order by metric_key, locale, entity_type nulls first, booking_state;
 end;
 $$;
 

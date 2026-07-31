@@ -57,6 +57,13 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).toContain('grant execute on function public.purge_traveller_analytics_events() to service_role')
   })
 
+  it('bounds client timestamps at the ledger boundary', () => {
+    const text = sql()
+    expect(text).toContain('traveller_analytics_occurred_at_skew_check')
+    expect(text).toContain("occurred_at >= received_at - interval '15 minutes'")
+    expect(text).toContain("occurred_at <= received_at + interval '15 minutes'")
+  })
+
   it('exposes only an ops-gated aggregate report to authenticated callers', () => {
     const text = sql()
     expect(text).toContain('admin_traveller_analytics_report')
@@ -69,5 +76,20 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).toContain('booking_state')
     expect(text).toContain('revoke all on function public.admin_traveller_analytics_report')
     expect(text).toContain('grant execute on function public.admin_traveller_analytics_report(timestamptz, timestamptz) to authenticated')
+  })
+
+  it('uses stage-specific funnel denominators instead of all-event cohorts', () => {
+    const text = sql()
+    expect(text).not.toContain('cohorts as')
+    expect(text).toContain('funnel_metrics as')
+    expect(text).toContain("'discovery_to_entity'")
+    expect(text).toContain("'entity_to_agent'")
+    expect(text).toContain("'entity_to_cta'")
+    expect(text).toContain("'cta_to_waitlist_submitted'")
+    expect(text).toContain("'cta_to_checkout_started'")
+    expect(text).toContain("'agent_start_rate'")
+    expect(text).toContain("'signup_start_to_completion'")
+    expect(text).toContain('and target.occurred_at >= source.occurred_at')
+    expect(text).toContain('target.occurred_at <= source.occurred_at + interval \'7 days\'')
   })
 })
