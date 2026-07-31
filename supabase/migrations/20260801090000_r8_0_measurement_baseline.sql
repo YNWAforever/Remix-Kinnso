@@ -396,11 +396,11 @@ begin
       'error_' || errors.error_category as metric_key,
       errors.locale,
       errors.entity_type,
-      errors.booking_state,
+      coalesce(errors.booking_state, 'off') as booking_state,
       count(*)::bigint as numerator,
       count(distinct errors.journey_id)::bigint as denominator
     from error_events as errors
-    group by errors.error_category, errors.locale, errors.entity_type, errors.booking_state
+    group by errors.error_category, errors.locale, errors.entity_type, coalesce(errors.booking_state, 'off')
   ),
   report_metrics as (
     select
