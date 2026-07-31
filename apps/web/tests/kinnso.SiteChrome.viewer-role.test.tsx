@@ -78,6 +78,7 @@ describe('SiteChrome live viewer-role integration', () => {
         dashboardLabel={en.admin.navDashboard}
         nav={en.nav}
         footer={en.footer}
+        analytics={en.analytics}
       >
         <div>PAGE_BODY</div>
       </SiteChrome>,
