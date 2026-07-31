@@ -17,6 +17,7 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).toContain('create table public.traveller_analytics_events')
     expect(text).toContain('client_event_id uuid not null')
     expect(text).toContain('journey_id uuid not null')
+    expect(text).toMatch(/entity_id text check \(\s*char_length\(entity_id\) between 1 and 120\s*and entity_id ~ '\^\[a-za-z0-9_-\]\+\$'/)
     expect(text).toContain('unique (journey_id, client_event_id)')
     expect(text).toContain('account_id uuid')
     for (const eventName of [
@@ -76,6 +77,8 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).toContain('booking_state')
     expect(text).toContain('revoke all on function public.admin_traveller_analytics_report')
     expect(text).toContain('grant execute on function public.admin_traveller_analytics_report(timestamptz, timestamptz) to authenticated')
+    expect(text).toContain('7 as attribution_window_days')
+    expect(text).not.toContain('v_window_days')
   })
 
   it('uses stage-specific funnel denominators instead of all-event cohorts', () => {

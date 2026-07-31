@@ -24,7 +24,10 @@ create table public.traveller_analytics_events (
   locale text not null check (locale in ('en', 'zh-hk', 'zh-tw', 'zh-cn', 'ja', 'ko', 'th')),
   route_key text not null check (char_length(route_key) between 1 and 120),
   entity_type text check (entity_type in ('guide', 'experience', 'creator', 'article')),
-  entity_id uuid,
+  entity_id text check (
+    char_length(entity_id) between 1 and 120
+    and entity_id ~ '^[A-Za-z0-9_-]+$'
+  ),
   booking_state text not null default 'off' check (booking_state in ('off', 'on')),
   authenticated boolean not null default false,
   outcome text check (outcome in ('created', 'submitted', 'success', 'error')),
@@ -149,7 +152,6 @@ set search_path = public
 as $$
 declare
   v_sample_floor constant integer := 10;
-  v_window_days integer;
 begin
   if not public.is_active_ops() then
     raise exception 'forbidden' using errcode = '42501';
@@ -161,8 +163,6 @@ begin
   if p_window_end - p_window_start > interval '7 days' then
     raise exception 'analytics_window_too_large' using errcode = '22023';
   end if;
-
-  v_window_days := greatest(1, ceil(extract(epoch from p_window_end - p_window_start) / 86400.0)::integer);
 
   return query
   with source_events as (
@@ -418,7 +418,7 @@ begin
     end as rate,
     denominator as sample_count,
     case when denominator < v_sample_floor then 'insufficient_sample' else 'ok' end as status,
-    v_window_days as attribution_window_days
+    7 as attribution_window_days
   from report_metrics
   order by metric_key, locale, entity_type nulls first, booking_state;
 end;
