@@ -141,6 +141,6 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     }
     expect(text).toContain("'error_' || error_category")
     expect(text).toContain('count(*)::bigint as numerator')
-    expect(text).toContain('count(distinct journey_id)::bigint as denominator')
+    expect(text).toContain('count(distinct errors.journey_id)::bigint as denominator')
   })
 })

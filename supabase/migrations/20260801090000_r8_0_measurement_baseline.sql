@@ -452,6 +452,13 @@ begin
     cross join known_locales as locale
     cross join known_entity_types as entity
     cross join known_booking_states as booking
+    union all
+    -- Agent and signup failures have no entity context. Keep their NULL
+    -- entity-type/off-state cells visible instead of dropping the aggregates
+    -- when the fixed entity grid is joined below.
+    select 'error_' || category.error_category, locale.locale, null::text, 'off'::text
+    from known_error_categories as category
+    cross join known_locales as locale
   ),
   coalesced_metrics as (
     select
