@@ -4,14 +4,14 @@
 
 This baseline is private, first-party traveller measurement. It has no production activation, vendor, dashboard, or raw-data export in this PR.
 
-Run browser verification only in a local environment or an explicitly test-mode Preview:
+Run browser verification only in a local environment:
 
 ```bash
 NEXT_PUBLIC_ANALYTICS_MODE=test
 ANALYTICS_INGEST_MODE=test
 ```
 
-For a local browser run, point `E2E_BASE_URL` at an `http(s)://localhost` or `http(s)://127.0.0.1` web server; no additional flag is needed. For a remote run, the spec requires both `ANALYTICS_E2E_TEST_MODE=true` and an HTTPS KINNSO Preview hostname matching `remix-kinnso-<deployment>-<owner>.vercel.app`. It explicitly skips `remix-kinnso-web.vercel.app`, any hostname containing `sync`, malformed URLs, and every other remote host before Playwright navigates. Set the flag only after confirming that Preview uses both test-mode values above. Never use the E2E spec against production.
+For a browser run, point `E2E_BASE_URL` at an `http(s)://localhost` or `http(s)://127.0.0.1` web server; no additional flag is needed. The spec skips every remote URL before Playwright navigates, including when `ANALYTICS_E2E_TEST_MODE=true`. Hostname patterns and a caller-controlled flag cannot establish a deployment's Preview identity or its test-mode configuration. `ANALYTICS_E2E_TEST_MODE` is therefore unsupported for this spec until a verified deployment-identity mechanism exists. Never use the E2E spec against production.
 
 Production activation requires separate approval. Only then set both modes to `production` and retain the existing server-only `SUPABASE_SERVICE_ROLE_KEY`; it must never be exposed as a public browser variable.
 

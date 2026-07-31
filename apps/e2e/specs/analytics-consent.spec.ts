@@ -1,35 +1,16 @@
 import { expect, test } from '@playwright/test'
 
 const LOCAL_BASE_URL = /^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?(?:\/|$)/
-const KINNSO_PREVIEW_HOST = /^remix-kinnso-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.vercel\.app$/
-const PRODUCTION_HOST = 'remix-kinnso-web.vercel.app'
 const PROHIBITED_PAYLOAD_KEYS = /email|ip|user-agent|prompt|query/i
 
 function isApprovedAnalyticsE2eTarget(): boolean {
   const baseURL = process.env.E2E_BASE_URL ?? ''
-
-  if (LOCAL_BASE_URL.test(baseURL)) {
-    return true
-  }
-
-  try {
-    const target = new URL(baseURL)
-    const hostname = target.hostname.toLowerCase()
-    return (
-      process.env.ANALYTICS_E2E_TEST_MODE === 'true' &&
-      target.protocol === 'https:' &&
-      hostname !== PRODUCTION_HOST &&
-      !hostname.includes('sync') &&
-      KINNSO_PREVIEW_HOST.test(hostname)
-    )
-  } catch {
-    return false
-  }
+  return LOCAL_BASE_URL.test(baseURL)
 }
 
 test.skip(
   !isApprovedAnalyticsE2eTarget(),
-  'analytics-consent.spec.ts runs only on localhost/127.0.0.1 or an explicitly test-mode KINNSO Vercel Preview.',
+  'analytics-consent.spec.ts runs only on localhost/127.0.0.1; remote deployment identity cannot be verified safely.',
 )
 
 test.describe('analytics consent privacy boundary', () => {
