@@ -7,11 +7,14 @@ import {
   joinFeatureInterestAction,
   type FeatureInterest,
 } from '@/lib/feature-interest/actions'
+import { trackTravellerEvent } from '@/lib/analytics/client'
 
-export function FeatureInterestForm({ feature, locale, t }: {
+export function FeatureInterestForm({ feature, locale, t, analyticsEntityType, analyticsEntityId }: {
   feature: FeatureInterest
   locale: Locale
   t: Messages['featureInterest']
+  analyticsEntityType?: 'experience'
+  analyticsEntityId?: string
 }) {
   const emailId = useId()
   const [message, setMessage] = useState<string | null>(null)
@@ -25,6 +28,16 @@ export function FeatureInterestForm({ feature, locale, t }: {
     const data = new FormData(form)
     setMessage(null)
 
+    if (feature === 'booking' && analyticsEntityType && analyticsEntityId) {
+      trackTravellerEvent('booking_cta_clicked', {
+        locale,
+        routeKey: 'experience_detail',
+        entityType: analyticsEntityType,
+        entityId: analyticsEntityId,
+        bookingState: 'off',
+      })
+    }
+
     startTransition(async () => {
       const result = await joinFeatureInterestAction({
         feature,
@@ -32,6 +45,17 @@ export function FeatureInterestForm({ feature, locale, t }: {
         email: String(data.get('email') ?? ''),
         company: String(data.get('company') ?? ''),
       })
+
+      if (result.ok && feature === 'booking' && analyticsEntityType && analyticsEntityId) {
+        trackTravellerEvent('waitlist_submitted', {
+          locale,
+          routeKey: 'experience_detail',
+          entityType: analyticsEntityType,
+          entityId: analyticsEntityId,
+          bookingState: 'off',
+          outcome: 'submitted',
+        })
+      }
 
       setMessage(result.ok ? t.success : result.code === 'invalid-email' ? t.invalidEmail : t.retry)
     })

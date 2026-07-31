@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { Bot, Send, ThumbsDown, ThumbsUp, CalendarRange, Compass, MapPinned } from 'lucide-react'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { rateAgentMessageAction } from '@/lib/agent/actions'
+import { trackTravellerEvent } from '@/lib/analytics/client'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -23,6 +24,10 @@ export function AgentChatView({ locale, t, configured, bookingLive, anonSessionI
   viewerSignedIn: boolean
   initialMessages?: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
 }) {
+  useEffect(() => {
+    trackTravellerEvent('agent_started', { locale, routeKey: 'agent' })
+  }, [locale])
+
   const { messages, sendMessage, status, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/agent' }),
     messages: initialMessages.map((m) => ({ id: m.id, role: m.role, parts: [{ type: 'text', text: m.content }] })),

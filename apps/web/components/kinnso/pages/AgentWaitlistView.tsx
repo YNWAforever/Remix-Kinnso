@@ -1,4 +1,8 @@
+'use client'
+
+import { useEffect } from 'react'
 import { FeatureInterestForm } from '@/components/kinnso/FeatureInterestForm'
+import { trackTravellerEvent } from '@/lib/analytics/client'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -7,6 +11,10 @@ export function AgentWaitlistView({ locale, t, featureInterest }: {
   t: Messages['agent']
   featureInterest: Messages['featureInterest']
 }) {
+  useEffect(() => {
+    trackTravellerEvent('agent_started', { locale, routeKey: 'agent' })
+  }, [locale])
+
   return (
     <main className="k2-container py-16">
       <section className="k2-card mx-auto max-w-2xl p-8 md:p-10">

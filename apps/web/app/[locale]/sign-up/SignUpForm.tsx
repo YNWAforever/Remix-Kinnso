@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { trackTravellerEvent } from '@/lib/analytics/client'
 import { AuthForm, type AuthFormLabels } from '@/components/auth/AuthForm'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -39,6 +40,7 @@ export function SignUpForm({
     setError(undefined)
     setPending(true)
     try {
+      trackTravellerEvent('signup_started', { locale, routeKey: 'sign_up' })
       const supabase = createSupabaseBrowserClient()
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -71,6 +73,7 @@ export function SignUpForm({
         setError(errorEmailTaken)
         return
       }
+      trackTravellerEvent('signup_completed', { locale, routeKey: 'sign_up', outcome: 'success' })
       // When email confirmation is disabled (auto-confirm), signUp returns a live
       // session — the creator is already signed in, so send them straight into the
       // onboarding wizard instead of a "check your email" dead-end they can't clear.

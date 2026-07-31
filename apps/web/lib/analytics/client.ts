@@ -28,7 +28,7 @@ export type TravellerAnalyticsMetadataByEvent = {
   waitlist_submitted: ExperienceMetadata & { bookingState: 'off'; outcome: 'submitted' }
   checkout_started: ExperienceMetadata & { bookingState: 'on'; outcome: 'created' }
   signup_started: CommonMetadata & { routeKey: 'sign_up' }
-  signup_completed: CommonMetadata & { routeKey: 'sign_up' }
+  signup_completed: CommonMetadata & { routeKey: 'sign_up'; outcome: 'success' }
 }
 
 function getPublicAnalyticsMode() {
