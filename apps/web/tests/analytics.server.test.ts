@@ -28,7 +28,7 @@ function validPayload(overrides: Partial<TravellerAnalyticsPayload> & Record<str
     entityType: 'experience',
     entityId: 'experience_1',
     bookingState: 'on',
-    outcome: 'success',
+    outcome: 'created',
     ...overrides,
   }
 }
@@ -40,6 +40,87 @@ afterEach(() => {
 })
 
 describe('parseAnalyticsRequest', () => {
+  const base = {
+    clientEventId: '00000000-0000-4000-8000-000000000001',
+    journeyId: '00000000-0000-4000-8000-000000000002',
+    consentVersion: 'v1',
+    occurredAt: new Date().toISOString(),
+    locale: 'en',
+  } as const
+
+  const validEventPayloads = {
+    journey_started: { ...base, event: 'journey_started', routeKey: 'journey' },
+    entity_viewed: {
+      ...base,
+      event: 'entity_viewed',
+      routeKey: 'guide_detail',
+      entityType: 'guide',
+      entityId: 'guide_1',
+    },
+    agent_started: { ...base, event: 'agent_started', routeKey: 'agent' },
+    booking_cta_clicked: {
+      ...base,
+      event: 'booking_cta_clicked',
+      routeKey: 'experience_detail',
+      entityType: 'experience',
+      entityId: 'experience_1',
+      bookingState: 'on',
+    },
+    waitlist_submitted: {
+      ...base,
+      event: 'waitlist_submitted',
+      routeKey: 'experience_detail',
+      entityType: 'experience',
+      entityId: 'experience_1',
+      bookingState: 'off',
+      outcome: 'submitted',
+    },
+    checkout_started: validPayload(),
+    signup_started: { ...base, event: 'signup_started', routeKey: 'sign_up' },
+    signup_completed: { ...base, event: 'signup_completed', routeKey: 'sign_up', outcome: 'success' },
+  }
+
+  it.each(Object.values(validEventPayloads))('accepts the approved event taxonomy', async (payload) => {
+    await expect(
+      parseAnalyticsRequest(
+        new Request('http://kinnso.test/api/analytics', { method: 'POST', body: JSON.stringify(payload) }),
+      ),
+    ).resolves.toMatchObject({ event: payload.event })
+  })
+
+  it.each([
+    { ...validEventPayloads.waitlist_submitted, outcome: 'error', errorCategory: 'unavailable' },
+    { ...validEventPayloads.checkout_started, outcome: 'error', errorCategory: 'unavailable' },
+    { ...validEventPayloads.signup_completed, outcome: 'error', errorCategory: 'unavailable' },
+  ])('accepts an allowed error outcome only when its category is constrained', async (payload) => {
+    await expect(
+      parseAnalyticsRequest(
+        new Request('http://kinnso.test/api/analytics', { method: 'POST', body: JSON.stringify(payload) }),
+      ),
+    ).resolves.toMatchObject({ outcome: 'error', errorCategory: 'unavailable' })
+  })
+
+  it.each([
+    ['journey_started with an arbitrary route', { ...validEventPayloads.journey_started, routeKey: 'home' }],
+    ['entity_viewed with a mismatched entity type', { ...validEventPayloads.entity_viewed, entityType: 'article' }],
+    ['agent_started with entity metadata', { ...validEventPayloads.agent_started, entityType: 'guide', entityId: 'guide_1' }],
+    ['booking_cta_clicked without booking state', (() => {
+      const { bookingState: _bookingState, ...payload } = validEventPayloads.booking_cta_clicked
+      return payload
+    })()],
+    ['waitlist_submitted with a checkout outcome', { ...validEventPayloads.waitlist_submitted, outcome: 'created' }],
+    ['checkout_started with the obsolete success outcome', { ...validEventPayloads.checkout_started, outcome: 'success' }],
+    ['a non-error outcome with an error category', { ...validEventPayloads.checkout_started, errorCategory: 'unknown' }],
+    ['signup_started with an outcome', { ...validEventPayloads.signup_started, outcome: 'success' }],
+    ['signup_completed error without an error category', { ...validEventPayloads.signup_completed, outcome: 'error' }],
+  ])('rejects %s', async (_description, payload) => {
+    await expect(
+      parseAnalyticsRequest(
+        new Request('http://kinnso.test/api/analytics', { method: 'POST', body: JSON.stringify(payload) }),
+      ),
+    ).rejects.toMatchObject({ status: 400, code: 'invalid_request' })
+  })
+
   it('rejects a measured body over 8 KiB before JSON handling', async () => {
     const request = new Request('http://kinnso.test/api/analytics', {
       method: 'POST',

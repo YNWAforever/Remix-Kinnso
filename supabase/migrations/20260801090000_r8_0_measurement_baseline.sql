@@ -236,7 +236,7 @@ begin
     select journey_id, locale, entity_type, entity_id, booking_state, event_name, occurred_at
     from retained_target_events
     where (event_name = 'waitlist_submitted' and booking_state = 'off' and outcome = 'submitted')
-       or (event_name = 'checkout_started' and booking_state = 'on' and outcome = 'success')
+       or (event_name = 'checkout_started' and booking_state = 'on' and outcome = 'created')
   ),
   source_signup_starts as (
     select journey_id, locale, min(occurred_at) as occurred_at

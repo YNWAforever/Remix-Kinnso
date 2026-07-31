@@ -1,86 +1,112 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const { parseMock, persistMock, serverClientMock, rpcMock, getUserMock } = vi.hoisted(() => ({
-  parseMock: vi.fn(),
-  persistMock: vi.fn(),
-  serverClientMock: vi.fn(),
-  rpcMock: vi.fn(),
+const { getUserMock, rpcMock, serverClientMock, serviceClientMock, serviceFromMock, serviceSelectMock, serviceUpsertMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(),
-}))
-
-vi.mock('@/lib/analytics/server', () => ({
-  AnalyticsRequestError: class AnalyticsRequestError extends Error {
-    constructor(readonly code: string, readonly status: number) {
-      super(code)
-    }
-  },
-  parseAnalyticsRequest: parseMock,
-  persistTravellerAnalyticsEvent: persistMock,
+  rpcMock: vi.fn(),
+  serverClientMock: vi.fn(),
+  serviceClientMock: vi.fn(),
+  serviceFromMock: vi.fn(),
+  serviceSelectMock: vi.fn(),
+  serviceUpsertMock: vi.fn(),
 }))
 
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: serverClientMock,
 }))
 
+vi.mock('@/lib/supabase/service', () => ({
+  createSupabaseServiceClient: serviceClientMock,
+}))
+
 import { POST } from '@/app/api/analytics/route'
 
-const payload = {
-  clientEventId: '00000000-0000-4000-8000-000000000001',
-  journeyId: '00000000-0000-4000-8000-000000000002',
-  consentVersion: 'v1' as const,
-  event: 'journey_started' as const,
-  occurredAt: '2026-08-01T00:00:00.000Z',
-  locale: 'en' as const,
-  routeKey: 'home',
+const originalMode = process.env.ANALYTICS_INGEST_MODE
+
+function payload(overrides: Record<string, unknown> = {}) {
+  return {
+    clientEventId: '00000000-0000-4000-8000-000000000001',
+    journeyId: '00000000-0000-4000-8000-000000000002',
+    consentVersion: 'v1',
+    event: 'journey_started',
+    occurredAt: new Date().toISOString(),
+    locale: 'en',
+    routeKey: 'journey',
+    ...overrides,
+  }
 }
 
-afterEach(() => vi.resetAllMocks())
-
-function request() {
-  return new Request('http://kinnso.test/api/analytics', { method: 'POST', body: JSON.stringify(payload) })
+function request(body: unknown, headers?: HeadersInit) {
+  return new Request('http://kinnso.test/api/analytics', {
+    method: 'POST',
+    headers,
+    body: typeof body === 'string' ? body : JSON.stringify(body),
+  })
 }
+
+function allowJourney() {
+  rpcMock.mockResolvedValue({ data: true, error: null })
+  getUserMock.mockResolvedValue({ data: { user: null }, error: null })
+  serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
+}
+
+afterEach(() => {
+  vi.resetAllMocks()
+  if (originalMode === undefined) delete process.env.ANALYTICS_INGEST_MODE
+  else process.env.ANALYTICS_INGEST_MODE = originalMode
+})
 
 describe('POST /api/analytics', () => {
-  it('uses the server-authenticated account ID after a successful journey throttle', async () => {
-    parseMock.mockResolvedValue(payload)
-    rpcMock.mockResolvedValue({ data: true, error: null })
-    getUserMock.mockResolvedValue({ data: { user: { id: 'account-1' } }, error: null })
-    serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
-    persistMock.mockResolvedValue('stored')
+  it('returns 400 for an event whose route is outside the approved taxonomy', async () => {
+    const response = await POST(request(payload({ routeKey: 'home' })))
 
-    const response = await POST(request())
-
-    expect(response.status).toBe(202)
-    expect(rpcMock).toHaveBeenCalledWith('check_and_increment_traveller_analytics_rate_limit', {
-      p_journey_id: payload.journeyId,
-      p_max_requests: 120,
-      p_window_seconds: 600,
-    })
-    expect(persistMock).toHaveBeenCalledWith(payload, 'account-1')
-    await expect(response.json()).resolves.toEqual({ accepted: true })
+    expect(response.status).toBe(400)
+    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'invalid_request' })
+    expect(serverClientMock).not.toHaveBeenCalled()
   })
 
-  it('returns a product-safe 503 without persistence details when analytics storage fails', async () => {
-    parseMock.mockResolvedValue(payload)
-    rpcMock.mockResolvedValue({ data: true, error: null })
-    getUserMock.mockResolvedValue({ data: { user: null }, error: null })
-    serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
-    persistMock.mockRejectedValue(new Error('database connection leaked detail'))
+  it('returns 413 for an oversized raw request without opening a client', async () => {
+    const response = await POST(request(`${JSON.stringify(payload())}${' '.repeat(8_193)}`))
 
-    const response = await POST(request())
-
-    expect(response.status).toBe(503)
-    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'unavailable' })
+    expect(response.status).toBe(413)
+    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'payload_too_large' })
+    expect(serverClientMock).not.toHaveBeenCalled()
   })
 
-  it('returns 429 without service persistence when the journey throttle rejects', async () => {
-    parseMock.mockResolvedValue(payload)
+  it('returns 429 when the journey throttle rejects a valid raw event', async () => {
     rpcMock.mockResolvedValue({ data: false, error: null })
     serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
 
-    const response = await POST(request())
+    const response = await POST(request(payload()))
 
     expect(response.status).toBe(429)
-    expect(persistMock).not.toHaveBeenCalled()
+    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'rate_limited' })
+  })
+
+  it('acknowledges a duplicate ledger event with 202', async () => {
+    process.env.ANALYTICS_INGEST_MODE = 'production'
+    allowJourney()
+    serviceSelectMock.mockResolvedValue({ data: [], error: null })
+    serviceUpsertMock.mockReturnValue({ select: serviceSelectMock })
+    serviceFromMock.mockReturnValue({ upsert: serviceUpsertMock })
+    serviceClientMock.mockReturnValue({ from: serviceFromMock })
+
+    const response = await POST(request(payload()))
+
+    expect(response.status).toBe(202)
+    await expect(response.json()).resolves.toEqual({ accepted: true })
+  })
+
+  it('returns a generic 503 when persistence is unavailable', async () => {
+    process.env.ANALYTICS_INGEST_MODE = 'production'
+    allowJourney()
+    serviceSelectMock.mockResolvedValue({ data: null, error: new Error('database details') })
+    serviceUpsertMock.mockReturnValue({ select: serviceSelectMock })
+    serviceFromMock.mockReturnValue({ upsert: serviceUpsertMock })
+    serviceClientMock.mockReturnValue({ from: serviceFromMock })
+
+    const response = await POST(request(payload()))
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'unavailable' })
   })
 })
