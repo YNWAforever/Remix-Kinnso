@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { travellerAnalyticsPayloadSchema, type TravellerAnalyticsPayload } from '@/lib/analytics/contracts'
-import { getAnalyticsMode } from '@/lib/analytics/config'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
 
 const MAX_REQUEST_BYTES = 8_192
@@ -25,6 +24,10 @@ function declaredBodyIsTooLarge(request: Request) {
 
 function hasAllowedTimestampSkew(occurredAt: string) {
   return Math.abs(Date.now() - new Date(occurredAt).getTime()) <= MAX_CLOCK_SKEW_MS
+}
+
+function isAnalyticsIngestEnabled() {
+  return process.env.ANALYTICS_INGEST_MODE === 'production'
 }
 
 function hasNoEntityMetadata(payload: TravellerAnalyticsPayload) {
@@ -149,7 +152,7 @@ export async function persistTravellerAnalyticsEvent(
   payload: TravellerAnalyticsPayload,
   accountId: string | null,
 ): Promise<'stored' | 'duplicate' | 'discarded'> {
-  if (getAnalyticsMode() !== 'production') return 'discarded'
+  if (!isAnalyticsIngestEnabled()) return 'discarded'
 
   const service = createSupabaseServiceClient()
   const { data, error } = await service

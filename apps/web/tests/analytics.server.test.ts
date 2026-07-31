@@ -15,6 +15,7 @@ import { parseAnalyticsRequest, persistTravellerAnalyticsEvent } from '@/lib/ana
 import type { TravellerAnalyticsPayload } from '@/lib/analytics/contracts'
 
 const originalMode = process.env.ANALYTICS_INGEST_MODE
+const originalPublicMode = process.env.NEXT_PUBLIC_ANALYTICS_MODE
 
 function validPayload(overrides: Partial<TravellerAnalyticsPayload> & Record<string, unknown> = {}): TravellerAnalyticsPayload {
   return {
@@ -37,6 +38,8 @@ afterEach(() => {
   vi.resetAllMocks()
   if (originalMode === undefined) delete process.env.ANALYTICS_INGEST_MODE
   else process.env.ANALYTICS_INGEST_MODE = originalMode
+  if (originalPublicMode === undefined) delete process.env.NEXT_PUBLIC_ANALYTICS_MODE
+  else process.env.NEXT_PUBLIC_ANALYTICS_MODE = originalPublicMode
 })
 
 describe('parseAnalyticsRequest', () => {
@@ -164,6 +167,18 @@ describe('parseAnalyticsRequest', () => {
 })
 
 describe('persistTravellerAnalyticsEvent', () => {
+  it.each([undefined, 'disabled', 'test'])(
+    'discards when only the browser-visible mode is production and ingest mode is %s',
+    async (ingestMode) => {
+      process.env.NEXT_PUBLIC_ANALYTICS_MODE = 'production'
+      if (ingestMode === undefined) delete process.env.ANALYTICS_INGEST_MODE
+      else process.env.ANALYTICS_INGEST_MODE = ingestMode
+
+      await expect(persistTravellerAnalyticsEvent(validPayload(), null)).resolves.toBe('discarded')
+      expect(serviceClientMock).not.toHaveBeenCalled()
+    },
+  )
+
   it('discards validated events in test mode without creating a service client', async () => {
     process.env.ANALYTICS_INGEST_MODE = 'test'
 
