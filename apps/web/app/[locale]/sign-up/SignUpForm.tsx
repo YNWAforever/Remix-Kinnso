@@ -41,6 +41,14 @@ export function SignUpForm({
     setPending(true)
     try {
       trackTravellerEvent('signup_started', { locale, routeKey: 'sign_up' })
+      const trackSignupError = (errorCategory: 'invalid' | 'rate_limited' | 'unavailable' | 'unknown') => {
+        trackTravellerEvent('signup_completed', {
+          locale,
+          routeKey: 'sign_up',
+          outcome: 'error',
+          errorCategory,
+        })
+      }
       const supabase = createSupabaseBrowserClient()
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -55,12 +63,16 @@ export function SignUpForm({
         // Supabase returns "User already registered" for duplicate emails.
         const errorCode = getAuthErrorCode(signUpError)
         if (errorCode === 'email_address_invalid') {
+          trackSignupError('invalid')
           setError(errorInvalidEmail)
         } else if (errorCode === 'over_email_send_rate_limit') {
+          trackSignupError('rate_limited')
           setError(errorRateLimited)
         } else if (signUpError.message.toLowerCase().includes('already registered')) {
+          trackSignupError('invalid')
           setError(errorEmailTaken)
         } else {
+          trackSignupError('unavailable')
           setError(errorGeneric)
         }
         return
@@ -70,6 +82,7 @@ export function SignUpForm({
       // `identities` array is empty — and Supabase sends no confirmation email. Treat
       // that as "already registered" instead of falsely claiming an email was sent.
       if (data.user && data.user.identities && data.user.identities.length === 0) {
+        trackSignupError('invalid')
         setError(errorEmailTaken)
         return
       }
@@ -86,6 +99,12 @@ export function SignUpForm({
       // Otherwise email confirmation is required: show the "check your email" screen.
       router.push(`/${locale}/sign-up?sent=1`)
     } catch {
+      trackTravellerEvent('signup_completed', {
+        locale,
+        routeKey: 'sign_up',
+        outcome: 'error',
+        errorCategory: 'unknown',
+      })
       setError(errorGeneric)
     } finally {
       setPending(false)

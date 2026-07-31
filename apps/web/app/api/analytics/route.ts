@@ -26,6 +26,13 @@ export async function POST(request: Request) {
     return unavailableResponse()
   }
 
+  // Preview/test ingestion is an explicit no-write mode. Keep parsing and
+  // semantic validation active, but never create a Supabase client or touch
+  // the rate-limit ledger outside production.
+  if (process.env.ANALYTICS_INGEST_MODE !== 'production') {
+    return NextResponse.json({ accepted: true }, { status: 202 })
+  }
+
   try {
     const supabase = await createSupabaseServerClient()
     const { data: allowed, error: throttleError } = await supabase.rpc(

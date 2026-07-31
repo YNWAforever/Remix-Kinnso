@@ -55,6 +55,16 @@ export function FeatureInterestForm({ feature, locale, t, analyticsEntityType, a
           bookingState: 'off',
           outcome: 'submitted',
         })
+      } else if (!result.ok && feature === 'booking' && analyticsEntityType && analyticsEntityId) {
+        trackTravellerEvent('waitlist_submitted', {
+          locale,
+          routeKey: 'experience_detail',
+          entityType: analyticsEntityType,
+          entityId: analyticsEntityId,
+          bookingState: 'off',
+          outcome: 'error',
+          errorCategory: result.code === 'invalid-email' ? 'invalid' : 'unavailable',
+        })
       }
 
       setMessage(result.ok ? t.success : result.code === 'invalid-email' ? t.invalidEmail : t.retry)

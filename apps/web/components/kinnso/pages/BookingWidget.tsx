@@ -42,6 +42,15 @@ export function BookingWidget({ locale, t, experience, availability, viewerEmail
         { locale, ...(sourceSurface ? { sourceSurface } : {}), ...(guideSlug ? { guideSlug } : {}) },
       )
       if (!result.ok) {
+        trackTravellerEvent('checkout_started', {
+          locale,
+          routeKey: 'experience_detail',
+          entityType: 'experience',
+          entityId: experience.id,
+          bookingState: 'on',
+          outcome: 'error',
+          errorCategory: Object.keys(result.errors).some((key) => key !== 'form') ? 'invalid' : 'unavailable',
+        })
         setError(
           result.errors.form?.[0] ??
             result.errors.availabilityId?.[0] ??

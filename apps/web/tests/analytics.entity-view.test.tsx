@@ -59,4 +59,22 @@ describe('AnalyticsEntityView', () => {
     await flush()
     expect(fetch).toHaveBeenCalledOnce()
   })
+
+  it('emits once when consent is granted after the surface mounted', async () => {
+    const track = vi.spyOn(analyticsClient, 'trackTravellerEvent')
+    render(<AnalyticsEntityView locale="en" routeKey="guide_detail" entityType="guide" entityId="guide-123" />)
+    await flush()
+    expect(track).not.toHaveBeenCalled()
+
+    analyticsClient.grantAnalyticsConsent('en')
+    await waitFor(() => {
+      expect(track).toHaveBeenCalledWith('entity_viewed', {
+        locale: 'en',
+        routeKey: 'guide_detail',
+        entityType: 'guide',
+        entityId: 'guide-123',
+      })
+    })
+    expect(track.mock.calls.filter(([event]) => event === 'entity_viewed')).toHaveLength(1)
+  })
 })

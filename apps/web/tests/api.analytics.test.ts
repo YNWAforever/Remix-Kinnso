@@ -73,6 +73,7 @@ describe('POST /api/analytics', () => {
   })
 
   it('returns 429 when the journey throttle rejects a valid raw event', async () => {
+    process.env.ANALYTICS_INGEST_MODE = 'production'
     rpcMock.mockResolvedValue({ data: false, error: null })
     serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
 
@@ -80,6 +81,17 @@ describe('POST /api/analytics', () => {
 
     expect(response.status).toBe(429)
     await expect(response.json()).resolves.toEqual({ accepted: false, error: 'rate_limited' })
+  })
+
+  it('acknowledges valid test-mode events without opening a Supabase client', async () => {
+    process.env.ANALYTICS_INGEST_MODE = 'test'
+
+    const response = await POST(request(payload()))
+
+    expect(response.status).toBe(202)
+    await expect(response.json()).resolves.toEqual({ accepted: true })
+    expect(serverClientMock).not.toHaveBeenCalled()
+    expect(rpcMock).not.toHaveBeenCalled()
   })
 
   it('acknowledges a duplicate ledger event with 202', async () => {

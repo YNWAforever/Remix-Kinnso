@@ -7,6 +7,11 @@ import { getAnalyticsMode } from '@/lib/analytics/config'
 export const CONSENT_KEY = 'kinnso.analytics.consent.v1'
 export const CONSENT_VERSION_KEY = 'kinnso.analytics.consent-version.v1'
 export const JOURNEY_KEY = 'kinnso.analytics.journey.v1'
+const CONSENT_VERSION = 'v1'
+const JOURNEY_TTL_MS = 7 * 24 * 60 * 60 * 1_000
+
+type ConsentSubscriber = () => void
+const consentSubscribers = new Set<ConsentSubscriber>()
 
 type CommonMetadata = { locale: Locale }
 type ExperienceMetadata = CommonMetadata & {
@@ -25,10 +30,31 @@ export type TravellerAnalyticsMetadataByEvent = {
   )
   agent_started: CommonMetadata & { routeKey: 'agent' }
   booking_cta_clicked: ExperienceMetadata & { bookingState: 'off' | 'on' }
-  waitlist_submitted: ExperienceMetadata & { bookingState: 'off'; outcome: 'submitted' }
-  checkout_started: ExperienceMetadata & { bookingState: 'on'; outcome: 'created' }
+  waitlist_submitted: ExperienceMetadata & {
+    bookingState: 'off'
+    outcome: 'submitted'
+  } | (ExperienceMetadata & {
+    bookingState: 'off'
+    outcome: 'error'
+    errorCategory: 'invalid' | 'rate_limited' | 'unavailable' | 'unknown'
+  })
+  checkout_started: ExperienceMetadata & {
+    bookingState: 'on'
+    outcome: 'created'
+  } | (ExperienceMetadata & {
+    bookingState: 'on'
+    outcome: 'error'
+    errorCategory: 'invalid' | 'rate_limited' | 'unavailable' | 'unknown'
+  })
   signup_started: CommonMetadata & { routeKey: 'sign_up' }
-  signup_completed: CommonMetadata & { routeKey: 'sign_up'; outcome: 'success' }
+  signup_completed: CommonMetadata & {
+    routeKey: 'sign_up'
+    outcome: 'success'
+  } | (CommonMetadata & {
+    routeKey: 'sign_up'
+    outcome: 'error'
+    errorCategory: 'invalid' | 'rate_limited' | 'unavailable' | 'unknown'
+  })
 }
 
 function getPublicAnalyticsMode() {
@@ -69,26 +95,107 @@ function removeStorageValue(storage: Storage | null, key: string): void {
 }
 
 function randomUuid(): string | null {
-  return typeof window === 'undefined' || typeof window.crypto?.randomUUID !== 'function'
-    ? null
-    : window.crypto.randomUUID()
+  if (typeof window === 'undefined' || typeof window.crypto?.randomUUID !== 'function') return null
+  try {
+    return window.crypto.randomUUID()
+  } catch {
+    return null
+  }
 }
 
 export function hasAnalyticsConsent(): boolean {
   if (getPublicAnalyticsMode() === 'disabled') return false
-  return getStorageValue(getStorage(), CONSENT_KEY) === 'accepted'
+  const storage = getStorage()
+  if (getStorageValue(storage, CONSENT_KEY) !== 'accepted') return false
+  const journeyId = getStorageValue(storage, JOURNEY_KEY)
+  const expiresAt = parseJourneyExpiry(getStorageValue(storage, CONSENT_VERSION_KEY))
+  if (expiresAt !== null && expiresAt <= Date.now()) {
+    // The consent decision remains valid; ensureJourney rotates the expired
+    // journey before the next event and emits a fresh journey_started event.
+    return true
+  }
+  if (!isJourneyId(journeyId) || expiresAt === null) {
+    clearMeasurementStorage(storage)
+    return false
+  }
+  return true
 }
 
-export function grantAnalyticsConsent(locale: Locale): void {
-  if (getPublicAnalyticsMode() === 'disabled') return
+export function subscribeToAnalyticsConsent(callback: ConsentSubscriber): () => void {
+  consentSubscribers.add(callback)
+  return () => consentSubscribers.delete(callback)
+}
+
+function notifyConsentSubscribers() {
+  for (const callback of consentSubscribers) {
+    try {
+      callback()
+    } catch {
+      // A measurement subscriber must never interrupt a product action.
+    }
+  }
+}
+
+function journeyExpiryValue(expiresAt: number) {
+  return `${CONSENT_VERSION}:${expiresAt}`
+}
+
+function parseJourneyExpiry(value: string | null): number | null {
+  if (!value) return null
+  const [version, rawExpiresAt] = value.split(':')
+  if (version !== CONSENT_VERSION || !rawExpiresAt) return null
+  const expiresAt = Number(rawExpiresAt)
+  return Number.isFinite(expiresAt) ? expiresAt : null
+}
+
+function isJourneyId(value: string | null): value is string {
+  return value !== null && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function clearMeasurementStorage(storage: Storage | null) {
+  removeStorageValue(storage, CONSENT_KEY)
+  removeStorageValue(storage, CONSENT_VERSION_KEY)
+  removeStorageValue(storage, JOURNEY_KEY)
+}
+
+function ensureJourney(locale: Locale): string | null {
+  const storage = getStorage()
+  if (!storage || getStorageValue(storage, CONSENT_KEY) !== 'accepted') return null
+
+  const currentJourneyId = getStorageValue(storage, JOURNEY_KEY)
+  const expiresAt = parseJourneyExpiry(getStorageValue(storage, CONSENT_VERSION_KEY))
+  if (isJourneyId(currentJourneyId) && expiresAt !== null && expiresAt > Date.now()) return currentJourneyId
+
+  const journeyId = randomUuid()
+  if (!journeyId) return null
+  const nextExpiresAt = Date.now() + JOURNEY_TTL_MS
+  if (!setStorageValue(storage, JOURNEY_KEY, journeyId) || !setStorageValue(storage, CONSENT_VERSION_KEY, journeyExpiryValue(nextExpiresAt))) {
+    clearMeasurementStorage(storage)
+    notifyConsentSubscribers()
+    return null
+  }
+
+  trackTravellerEvent('journey_started', { locale, routeKey: 'journey' })
+  return journeyId
+}
+
+export function grantAnalyticsConsent(locale: Locale): boolean {
+  if (getPublicAnalyticsMode() === 'disabled') return false
   const storage = getStorage()
   const journeyId = randomUuid()
-  if (!storage || !journeyId) return
+  if (!storage || !journeyId) return false
 
-  if (!setStorageValue(storage, CONSENT_KEY, 'accepted')) return
-  if (!setStorageValue(storage, CONSENT_VERSION_KEY, 'v1')) return
-  if (!setStorageValue(storage, JOURNEY_KEY, journeyId)) return
+  const expiresAt = Date.now() + JOURNEY_TTL_MS
+  if (!setStorageValue(storage, CONSENT_KEY, 'accepted')
+    || !setStorageValue(storage, CONSENT_VERSION_KEY, journeyExpiryValue(expiresAt))
+    || !setStorageValue(storage, JOURNEY_KEY, journeyId)) {
+    clearMeasurementStorage(storage)
+    notifyConsentSubscribers()
+    return false
+  }
+  notifyConsentSubscribers()
   trackTravellerEvent('journey_started', { locale, routeKey: 'journey' })
+  return true
 }
 
 export function revokeAnalyticsConsent(): void {
@@ -96,6 +203,7 @@ export function revokeAnalyticsConsent(): void {
   removeStorageValue(storage, CONSENT_KEY)
   removeStorageValue(storage, CONSENT_VERSION_KEY)
   removeStorageValue(storage, JOURNEY_KEY)
+  notifyConsentSubscribers()
 }
 
 async function postWithOneRetry(payload: unknown): Promise<void> {
@@ -119,8 +227,7 @@ export function trackTravellerEvent<Event extends TravellerAnalyticsEventName>(
   metadata: TravellerAnalyticsMetadataByEvent[Event],
 ): void {
   if (!hasAnalyticsConsent() || getPublicAnalyticsMode() === 'disabled') return
-  const storage = getStorage()
-  const journeyId = getStorageValue(storage, JOURNEY_KEY)
+  const journeyId = ensureJourney(metadata.locale)
   if (!journeyId) return
   const clientEventId = randomUuid()
   if (!clientEventId) return

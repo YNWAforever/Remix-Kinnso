@@ -5,6 +5,7 @@ import {
   CONSENT_VERSION_KEY,
   JOURNEY_KEY,
   grantAnalyticsConsent,
+  hasAnalyticsConsent,
   revokeAnalyticsConsent,
   trackTravellerEvent,
 } from '@/lib/analytics/client'
@@ -22,6 +23,7 @@ describe('traveller analytics client', () => {
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     vi.unstubAllEnvs()
     vi.unstubAllGlobals()
   })
@@ -40,7 +42,7 @@ describe('traveller analytics client', () => {
     await flush()
 
     expect(localStorage.getItem(CONSENT_KEY)).toBe('accepted')
-    expect(localStorage.getItem(CONSENT_VERSION_KEY)).toBe('v1')
+    expect(localStorage.getItem(CONSENT_VERSION_KEY)).toMatch(/^v1:\d+$/)
     expect(localStorage.getItem(JOURNEY_KEY)).toBe('11111111-1111-4111-8111-111111111111')
     expect(fetch).toHaveBeenCalledOnce()
     expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string)).toMatchObject({
@@ -72,6 +74,34 @@ describe('traveller analytics client', () => {
     await flush()
     revokeAnalyticsConsent()
 
+    expect(localStorage.getItem(CONSENT_KEY)).toBeNull()
+    expect(localStorage.getItem(CONSENT_VERSION_KEY)).toBeNull()
+    expect(localStorage.getItem(JOURNEY_KEY)).toBeNull()
+  })
+
+  it('rotates an expired journey while preserving consent and emitting a new start', async () => {
+    grantAnalyticsConsent('en')
+    const previousJourney = localStorage.getItem(JOURNEY_KEY)
+    const now = Date.now()
+    vi.spyOn(Date, 'now').mockReturnValue(now + 8 * 24 * 60 * 60 * 1_000)
+
+    expect(hasAnalyticsConsent()).toBe(true)
+    expect(localStorage.getItem(CONSENT_KEY)).toBe('accepted')
+    trackTravellerEvent('agent_started', { locale: 'en', routeKey: 'agent' })
+    await flush()
+
+    expect(localStorage.getItem(JOURNEY_KEY)).not.toBe(previousJourney)
+    expect(localStorage.getItem(CONSENT_VERSION_KEY)).toMatch(/^v1:\d+$/)
+    expect(fetch).toHaveBeenCalledTimes(3)
+    expect(JSON.parse(vi.mocked(fetch).mock.calls[1][1]?.body as string)).toMatchObject({ event: 'journey_started' })
+    expect(JSON.parse(vi.mocked(fetch).mock.calls[2][1]?.body as string)).toMatchObject({ event: 'agent_started' })
+  })
+
+  it('rolls back all keys when consent storage setup is interrupted', () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem')
+    setItem.mockImplementationOnce(() => undefined).mockImplementationOnce(() => { throw new Error('blocked') })
+
+    expect(grantAnalyticsConsent('en')).toBe(false)
     expect(localStorage.getItem(CONSENT_KEY)).toBeNull()
     expect(localStorage.getItem(CONSENT_VERSION_KEY)).toBeNull()
     expect(localStorage.getItem(JOURNEY_KEY)).toBeNull()

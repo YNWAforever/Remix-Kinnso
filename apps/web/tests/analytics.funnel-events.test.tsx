@@ -9,7 +9,30 @@ const {
   refreshMock,
   signUpMock,
   trackTravellerEventMock,
+  hasAnalyticsConsentMock,
+  subscribeToAnalyticsConsentMock,
+  setConsentMock,
+  resetConsentMock,
 } = vi.hoisted(() => ({
+  ...(() => {
+    let consented = true
+    const subscribers = new Set<() => void>()
+    return {
+      hasAnalyticsConsentMock: vi.fn(() => consented),
+      subscribeToAnalyticsConsentMock: vi.fn((callback: () => void) => {
+        subscribers.add(callback)
+        return () => subscribers.delete(callback)
+      }),
+      setConsentMock: vi.fn((value: boolean) => {
+        consented = value
+        subscribers.forEach((callback) => callback())
+      }),
+      resetConsentMock: () => {
+        consented = true
+        subscribers.clear()
+      },
+    }
+  })(),
   createCheckoutSessionActionMock: vi.fn(),
   joinFeatureInterestActionMock: vi.fn(),
   pushMock: vi.fn(),
@@ -25,7 +48,11 @@ vi.mock('ai', () => ({ DefaultChatTransport: class {} }))
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: pushMock, refresh: refreshMock }),
 }))
-vi.mock('@/lib/analytics/client', () => ({ trackTravellerEvent: trackTravellerEventMock }))
+vi.mock('@/lib/analytics/client', () => ({
+  trackTravellerEvent: trackTravellerEventMock,
+  hasAnalyticsConsent: hasAnalyticsConsentMock,
+  subscribeToAnalyticsConsent: subscribeToAnalyticsConsentMock,
+}))
 vi.mock('@/lib/experiences/booking-actions', () => ({
   createCheckoutSessionAction: createCheckoutSessionActionMock,
 }))
@@ -87,6 +114,9 @@ beforeEach(() => {
   refreshMock.mockReset()
   signUpMock.mockReset()
   trackTravellerEventMock.mockReset()
+  subscribeToAnalyticsConsentMock.mockClear()
+  setConsentMock.mockClear()
+  resetConsentMock()
 })
 
 afterEach(cleanup)
@@ -103,6 +133,19 @@ describe('traveller funnel analytics', () => {
     expect(trackTravellerEventMock).toHaveBeenCalledTimes(2)
     expect(trackTravellerEventMock).toHaveBeenNthCalledWith(1, 'agent_started', { locale: 'en', routeKey: 'agent' })
     expect(trackTravellerEventMock).toHaveBeenNthCalledWith(2, 'agent_started', { locale: 'en', routeKey: 'agent' })
+  })
+
+  it('records an Agent entry when consent is granted after mount', async () => {
+    setConsentMock(false)
+    render(<AgentChatView locale="en" t={en.agent} configured bookingLive anonSessionId="anon-1" viewerSignedIn={false} />)
+
+    expect(trackTravellerEventMock).not.toHaveBeenCalled()
+    setConsentMock(true)
+
+    await waitFor(() => {
+      expect(trackTravellerEventMock).toHaveBeenCalledOnce()
+    })
+    expect(trackTravellerEventMock).toHaveBeenCalledWith('agent_started', { locale: 'en', routeKey: 'agent' })
   })
 
   it('records booking-on CTA and checkout only after a successful checkout action', async () => {
@@ -138,7 +181,7 @@ describe('traveller funnel analytics', () => {
     })
   })
 
-  it('does not record checkout_started when the booking-on action fails', async () => {
+  it('records a constrained checkout error when the booking-on action fails', async () => {
     createCheckoutSessionActionMock.mockResolvedValue({ ok: false, errors: { form: ['Unavailable'] } })
     render(
       <BookingWidget
@@ -154,7 +197,11 @@ describe('traveller funnel analytics', () => {
 
     expect(await screen.findByText('Unavailable')).toBeInTheDocument()
     expect(trackTravellerEventMock).toHaveBeenCalledWith('booking_cta_clicked', expect.objectContaining({ bookingState: 'on' }))
-    expect(trackTravellerEventMock).not.toHaveBeenCalledWith('checkout_started', expect.anything())
+    expect(trackTravellerEventMock).toHaveBeenCalledWith('checkout_started', expect.objectContaining({
+      bookingState: 'on',
+      outcome: 'error',
+      errorCategory: 'unavailable',
+    }))
   })
 
   it('records booking-off CTA and successful waitlist submission without form data', async () => {
@@ -191,7 +238,7 @@ describe('traveller funnel analytics', () => {
     expect(JSON.stringify(trackTravellerEventMock.mock.calls)).not.toContain('traveller@example.com')
   })
 
-  it('does not record booking-off waitlist submission when the action fails', async () => {
+  it('records a constrained booking-off waitlist error when the action fails', async () => {
     joinFeatureInterestActionMock.mockResolvedValue({ ok: false, code: 'retry' })
     render(
       <FeatureInterestForm
@@ -207,7 +254,11 @@ describe('traveller funnel analytics', () => {
 
     expect(await screen.findByText(featureInterestT.retry)).toBeInTheDocument()
     expect(trackTravellerEventMock).toHaveBeenCalledWith('booking_cta_clicked', expect.objectContaining({ bookingState: 'off' }))
-    expect(trackTravellerEventMock).not.toHaveBeenCalledWith('waitlist_submitted', expect.anything())
+    expect(trackTravellerEventMock).toHaveBeenCalledWith('waitlist_submitted', expect.objectContaining({
+      bookingState: 'off',
+      outcome: 'error',
+      errorCategory: 'unavailable',
+    }))
   })
 
   it('records sign-up start before auth and completion after a successful response without credentials', async () => {
