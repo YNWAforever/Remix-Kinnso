@@ -92,4 +92,33 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).toContain('and target.occurred_at >= source.occurred_at')
     expect(text).toContain('target.occurred_at <= source.occurred_at + interval \'7 days\'')
   })
+
+  it('keeps source cohorts in the requested range while retaining seven-day targets after it', () => {
+    const text = sql()
+    const sourceStart = text.indexOf('source_events as')
+    const targetStart = text.indexOf('retained_target_events as')
+    const sourceJourneyStarts = text.indexOf('source_journey_starts as')
+    const sourceScope = text.slice(sourceStart, targetStart)
+    const targetScope = text.slice(targetStart, sourceJourneyStarts)
+
+    expect(sourceScope).toContain('e.received_at >= p_window_start')
+    expect(sourceScope).toContain('e.received_at < p_window_end')
+    expect(targetScope).toContain('e.received_at >= p_window_start')
+    expect(targetScope).not.toContain('p_window_end')
+    expect(text).toContain('from retained_target_events')
+    expect(text).toContain('target.occurred_at <= source.occurred_at + interval \'7 days\'')
+  })
+
+  it('returns privacy-safe error aggregates for every allowed error category', () => {
+    const text = sql()
+    expect(text).toContain('error_category')
+    expect(text).toContain('error_events as')
+    expect(text).toContain("outcome = 'error'")
+    for (const errorCategory of ['invalid', 'rate_limited', 'unavailable', 'unknown']) {
+      expect(text).toContain(`'${errorCategory}'`)
+    }
+    expect(text).toContain("'error_' || error_category")
+    expect(text).toContain('count(*)::bigint as numerator')
+    expect(text).toContain('count(distinct journey_id)::bigint as denominator')
+  })
 })
