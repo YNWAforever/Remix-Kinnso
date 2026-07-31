@@ -139,7 +139,7 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     for (const errorCategory of ['invalid', 'rate_limited', 'unavailable', 'unknown']) {
       expect(text).toContain(`'${errorCategory}'`)
     }
-    expect(text).toContain("'error_' || error_category")
+    expect(text).toContain("'error_' || errors.error_category")
     expect(text).toContain('count(*)::bigint as numerator')
     expect(text).toContain('count(distinct errors.journey_id)::bigint as denominator')
   })
