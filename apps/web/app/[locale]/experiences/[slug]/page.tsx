@@ -16,6 +16,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
 import { resolveConfiguredProductState } from '@/lib/product-state'
 import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
+import { AnalyticsEntityView } from '@/components/kinnso/analytics/AnalyticsEntityView'
 
 export const dynamic = 'force-dynamic'
 
@@ -87,6 +88,7 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
   return (
     <>
       <JsonLd data={ld} />
+      <AnalyticsEntityView locale={locale as Locale} routeKey="experience_detail" entityType="experience" entityId={experience.id} />
       <ExperiencePublicView
         locale={locale as Locale}
         t={messages.experiencePublic}
