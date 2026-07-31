@@ -76,4 +76,29 @@ describe('traveller analytics client', () => {
     expect(localStorage.getItem(CONSENT_VERSION_KEY)).toBeNull()
     expect(localStorage.getItem(JOURNEY_KEY)).toBeNull()
   })
+
+  it('fails closed without fetching when privacy-restricted storage throws', async () => {
+    const storageError = new DOMException('Storage is disabled', 'SecurityError')
+    const restrictedStorage = {
+      getItem: vi.fn(() => { throw storageError }),
+      setItem: vi.fn(() => { throw storageError }),
+      removeItem: vi.fn(() => { throw storageError }),
+    } as unknown as Storage
+    const localStorageGetter = vi.spyOn(window, 'localStorage', 'get')
+
+    localStorageGetter.mockImplementationOnce(() => { throw storageError })
+    expect(() => trackTravellerEvent('agent_started', { locale: 'en', routeKey: 'agent' })).not.toThrow()
+
+    localStorageGetter.mockImplementation(() => restrictedStorage)
+
+    expect(() => trackTravellerEvent('agent_started', { locale: 'en', routeKey: 'agent' })).not.toThrow()
+    expect(() => grantAnalyticsConsent('en')).not.toThrow()
+    expect(() => revokeAnalyticsConsent()).not.toThrow()
+    await flush()
+
+    expect(restrictedStorage.getItem).toHaveBeenCalled()
+    expect(restrictedStorage.setItem).toHaveBeenCalledWith(CONSENT_KEY, 'accepted')
+    expect(restrictedStorage.removeItem).toHaveBeenCalledWith(JOURNEY_KEY)
+    expect(fetch).not.toHaveBeenCalled()
+  })
 })

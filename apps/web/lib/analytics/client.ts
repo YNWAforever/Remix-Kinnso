@@ -36,7 +36,36 @@ function getPublicAnalyticsMode() {
 }
 
 function getStorage(): Storage | null {
-  return typeof window === 'undefined' ? null : window.localStorage
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage
+  } catch {
+    return null
+  }
+}
+
+function getStorageValue(storage: Storage | null, key: string): string | null {
+  try {
+    return storage?.getItem(key) ?? null
+  } catch {
+    return null
+  }
+}
+
+function setStorageValue(storage: Storage | null, key: string, value: string): boolean {
+  try {
+    storage?.setItem(key, value)
+    return storage !== null
+  } catch {
+    return false
+  }
+}
+
+function removeStorageValue(storage: Storage | null, key: string): void {
+  try {
+    storage?.removeItem(key)
+  } catch {
+    // Measurement storage is optional and must never interrupt product flows.
+  }
 }
 
 function randomUuid(): string | null {
@@ -47,7 +76,7 @@ function randomUuid(): string | null {
 
 export function hasAnalyticsConsent(): boolean {
   if (getPublicAnalyticsMode() === 'disabled') return false
-  return getStorage()?.getItem(CONSENT_KEY) === 'accepted'
+  return getStorageValue(getStorage(), CONSENT_KEY) === 'accepted'
 }
 
 export function grantAnalyticsConsent(locale: Locale): void {
@@ -56,17 +85,17 @@ export function grantAnalyticsConsent(locale: Locale): void {
   const journeyId = randomUuid()
   if (!storage || !journeyId) return
 
-  storage.setItem(CONSENT_KEY, 'accepted')
-  storage.setItem(CONSENT_VERSION_KEY, 'v1')
-  storage.setItem(JOURNEY_KEY, journeyId)
+  if (!setStorageValue(storage, CONSENT_KEY, 'accepted')) return
+  if (!setStorageValue(storage, CONSENT_VERSION_KEY, 'v1')) return
+  if (!setStorageValue(storage, JOURNEY_KEY, journeyId)) return
   trackTravellerEvent('journey_started', { locale, routeKey: 'journey' })
 }
 
 export function revokeAnalyticsConsent(): void {
   const storage = getStorage()
-  storage?.removeItem(CONSENT_KEY)
-  storage?.removeItem(CONSENT_VERSION_KEY)
-  storage?.removeItem(JOURNEY_KEY)
+  removeStorageValue(storage, CONSENT_KEY)
+  removeStorageValue(storage, CONSENT_VERSION_KEY)
+  removeStorageValue(storage, JOURNEY_KEY)
 }
 
 async function postWithOneRetry(payload: unknown): Promise<void> {
@@ -91,7 +120,7 @@ export function trackTravellerEvent<Event extends TravellerAnalyticsEventName>(
 ): void {
   if (!hasAnalyticsConsent() || getPublicAnalyticsMode() === 'disabled') return
   const storage = getStorage()
-  const journeyId = storage?.getItem(JOURNEY_KEY)
+  const journeyId = getStorageValue(storage, JOURNEY_KEY)
   if (!journeyId) return
   const clientEventId = randomUuid()
   if (!clientEventId) return
