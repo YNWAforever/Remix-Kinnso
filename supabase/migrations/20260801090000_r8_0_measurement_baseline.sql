@@ -167,115 +167,119 @@ begin
   return query
   with source_events as (
     select
-      e.event_name,
-      e.journey_id,
-      e.locale,
-      e.entity_type,
-      e.entity_id,
-      e.booking_state,
-      e.outcome,
-      e.error_category,
-      e.occurred_at
-    from public.traveller_analytics_events e
-    where e.received_at >= p_window_start
-      and e.received_at < p_window_end
-      and e.received_at >= now() - interval '8 days'
+      se.event_name,
+      se.journey_id,
+      se.locale,
+      se.entity_type,
+      se.entity_id,
+      se.booking_state,
+      se.outcome,
+      se.error_category,
+      se.occurred_at
+    from public.traveller_analytics_events as se
+    where se.received_at >= p_window_start
+      and se.received_at < p_window_end
+      and se.received_at >= now() - interval '8 days'
   ),
   -- Target events may arrive after the requested report window. Keep them in
   -- the retained ledger so each source event can receive its full seven-day
   -- attribution window, without querying data older than retention allows.
   retained_target_events as (
     select
-      e.event_name,
-      e.journey_id,
-      e.locale,
-      e.entity_type,
-      e.entity_id,
-      e.booking_state,
-      e.outcome,
-      e.occurred_at
-    from public.traveller_analytics_events e
-    where e.received_at >= p_window_start
-      and e.received_at >= now() - interval '8 days'
-      and e.received_at < now()
+      te.event_name,
+      te.journey_id,
+      te.locale,
+      te.entity_type,
+      te.entity_id,
+      te.booking_state,
+      te.outcome,
+      te.occurred_at
+    from public.traveller_analytics_events as te
+    where te.received_at >= p_window_start
+      and te.received_at >= now() - interval '8 days'
+      and te.received_at < now()
   ),
   source_journey_starts as (
-    select journey_id, locale, min(occurred_at) as occurred_at
-    from source_events
-    where event_name = 'journey_started'
-    group by journey_id, locale
+    select se.journey_id, se.locale, min(se.occurred_at) as occurred_at
+    from source_events as se
+    where se.event_name = 'journey_started'
+    group by se.journey_id, se.locale
   ),
   source_entity_views as (
-    select journey_id, locale, entity_type, entity_id, min(occurred_at) as occurred_at
-    from source_events
-    where event_name = 'entity_viewed'
-    group by journey_id, locale, entity_type, entity_id
+    select se.journey_id, se.locale, se.entity_type, se.entity_id, min(se.occurred_at) as occurred_at
+    from source_events as se
+    where se.event_name = 'entity_viewed'
+    group by se.journey_id, se.locale, se.entity_type, se.entity_id
   ),
   target_entity_views as (
-    select journey_id, locale, entity_type, entity_id, occurred_at
-    from retained_target_events
-    where event_name = 'entity_viewed'
+    select te.journey_id, te.locale, te.entity_type, te.entity_id, te.occurred_at
+    from retained_target_events as te
+    where te.event_name = 'entity_viewed'
   ),
   target_agent_starts as (
-    select journey_id, locale, occurred_at
-    from retained_target_events
-    where event_name = 'agent_started'
+    select te.journey_id, te.locale, te.occurred_at
+    from retained_target_events as te
+    where te.event_name = 'agent_started'
   ),
   source_booking_ctas as (
-    select journey_id, locale, entity_type, entity_id, booking_state, min(occurred_at) as occurred_at
-    from source_events
-    where event_name = 'booking_cta_clicked'
-    group by journey_id, locale, entity_type, entity_id, booking_state
+    select se.journey_id, se.locale, se.entity_type, se.entity_id, se.booking_state,
+      min(se.occurred_at) as occurred_at
+    from source_events as se
+    where se.event_name = 'booking_cta_clicked'
+    group by se.journey_id, se.locale, se.entity_type, se.entity_id, se.booking_state
   ),
   target_booking_ctas as (
-    select journey_id, locale, entity_type, entity_id, booking_state, occurred_at
-    from retained_target_events
-    where event_name = 'booking_cta_clicked'
+    select te.journey_id, te.locale, te.entity_type, te.entity_id, te.booking_state, te.occurred_at
+    from retained_target_events as te
+    where te.event_name = 'booking_cta_clicked'
   ),
   target_booking_outcomes as (
-    select journey_id, locale, entity_type, entity_id, booking_state, event_name, occurred_at
-    from retained_target_events
-    where (event_name = 'waitlist_submitted' and booking_state = 'off' and outcome = 'submitted')
-       or (event_name = 'checkout_started' and booking_state = 'on' and outcome = 'created')
+    select te.journey_id, te.locale, te.entity_type, te.entity_id, te.booking_state,
+      te.event_name, te.occurred_at
+    from retained_target_events as te
+    where (te.event_name = 'waitlist_submitted' and te.booking_state = 'off' and te.outcome = 'submitted')
+       or (te.event_name = 'checkout_started' and te.booking_state = 'on' and te.outcome = 'created')
   ),
   source_signup_starts as (
-    select journey_id, locale, min(occurred_at) as occurred_at
-    from source_events
-    where event_name = 'signup_started'
-    group by journey_id, locale
+    select se.journey_id, se.locale, min(se.occurred_at) as occurred_at
+    from source_events as se
+    where se.event_name = 'signup_started'
+    group by se.journey_id, se.locale
   ),
   target_signup_completions as (
-    select journey_id, locale, occurred_at
-    from retained_target_events
-    where event_name = 'signup_completed' and outcome = 'success'
+    select te.journey_id, te.locale, te.occurred_at
+    from retained_target_events as te
+    where te.event_name = 'signup_completed' and te.outcome = 'success'
   ),
-  entity_types as (
-    select distinct entity_type from source_entity_views where entity_type is not null
-    union
-    select distinct entity_type from target_entity_views where entity_type is not null
+  known_locales as (
+    select unnest(array['en', 'zh-hk', 'zh-tw', 'zh-cn', 'ja', 'ko', 'th']::text[]) as locale
   ),
-  booking_states as (
-    select 'off'::text as booking_state
-    union all
-    select 'on'::text as booking_state
+  known_entity_types as (
+    select unnest(array['guide', 'experience', 'creator', 'article']::text[]) as entity_type
+  ),
+  known_booking_states as (
+    select unnest(array['off', 'on']::text[]) as booking_state
+  ),
+  known_error_categories as (
+    select unnest(array['invalid', 'rate_limited', 'unavailable', 'unknown']::text[]) as error_category
   ),
   error_events as (
-    select journey_id, locale, entity_type, booking_state, error_category
-    from source_events
-    where outcome = 'error' and error_category is not null
+    select se.journey_id, se.locale, se.entity_type, se.booking_state, se.error_category
+    from source_events as se
+    where se.outcome = 'error' and se.error_category is not null
   ),
   funnel_metrics as (
     -- Every discovery journey is eligible for each entity-type discovery slice.
     select
       'discovery_to_entity'::text as metric_key,
-      source.locale,
-      entity_type.entity_type,
+      source.locale as locale,
+      entity_type.entity_type as entity_type,
       'off'::text as booking_state,
       count(distinct target.journey_id)::bigint as numerator,
       count(distinct source.journey_id)::bigint as denominator
-    from source_journey_starts source
-    cross join entity_types entity_type
-    left join target_entity_views target
+    from source_journey_starts as source
+    cross join known_entity_types as entity_type
+    left join target_entity_views as target
       on target.journey_id = source.journey_id
       and target.locale = source.locale
       and target.entity_type = entity_type.entity_type
@@ -292,8 +296,8 @@ begin
       'off'::text,
       count(distinct target.journey_id)::bigint,
       count(distinct source.journey_id)::bigint
-    from source_entity_views source
-    left join target_agent_starts target
+    from source_entity_views as source
+    left join target_agent_starts as target
       on target.journey_id = source.journey_id
       and target.locale = source.locale
       and target.occurred_at >= source.occurred_at
@@ -311,9 +315,9 @@ begin
       booking_state.booking_state,
       count(distinct target.journey_id)::bigint,
       count(distinct source.journey_id)::bigint
-    from source_entity_views source
-    cross join booking_states booking_state
-    left join target_booking_ctas target
+    from source_entity_views as source
+    cross join known_booking_states as booking_state
+    left join target_booking_ctas as target
       on target.journey_id = source.journey_id
       and target.locale = source.locale
       and target.entity_type = source.entity_type
@@ -335,8 +339,8 @@ begin
       source.booking_state,
       count(distinct target.journey_id)::bigint,
       count(distinct source.journey_id)::bigint
-    from source_booking_ctas source
-    left join target_booking_outcomes target
+    from source_booking_ctas as source
+    left join target_booking_outcomes as target
       on target.journey_id = source.journey_id
       and target.locale = source.locale
       and target.entity_type = source.entity_type
@@ -359,8 +363,8 @@ begin
       'off'::text,
       count(distinct target.journey_id)::bigint,
       count(distinct source.journey_id)::bigint
-    from source_journey_starts source
-    left join target_agent_starts target
+    from source_journey_starts as source
+    left join target_agent_starts as target
       on target.journey_id = source.journey_id
       and target.locale = source.locale
       and target.occurred_at >= source.occurred_at
@@ -376,8 +380,8 @@ begin
       'off'::text,
       count(distinct target.journey_id)::bigint,
       count(distinct source.journey_id)::bigint
-    from source_signup_starts source
-    left join target_signup_completions target
+    from source_signup_starts as source
+    left join target_signup_completions as target
       on target.journey_id = source.journey_id
       and target.locale = source.locale
       and target.occurred_at >= source.occurred_at
@@ -389,38 +393,97 @@ begin
     -- metric: numerator is the aggregate rejected-event count and denominator
     -- is the aggregate number of affected journeys in the same public slice.
     select
-      'error_' || error_category as metric_key,
-      locale,
-      entity_type,
-      booking_state,
+      'error_' || errors.error_category as metric_key,
+      errors.locale,
+      errors.entity_type,
+      errors.booking_state,
       count(*)::bigint as numerator,
-      count(distinct journey_id)::bigint as denominator
-    from error_events
-    group by error_category, locale, entity_type, booking_state
+      count(distinct errors.journey_id)::bigint as denominator
+    from error_events as errors
+    group by errors.error_category, errors.locale, errors.entity_type, errors.booking_state
   ),
   report_metrics as (
-    select metric_key, locale, entity_type, booking_state, numerator, denominator
-    from funnel_metrics
+    select
+      funnel.metric_key,
+      funnel.locale,
+      funnel.entity_type,
+      funnel.booking_state,
+      funnel.numerator,
+      funnel.denominator
+    from funnel_metrics as funnel
     union all
-    select metric_key, locale, entity_type, booking_state, numerator, denominator
-    from error_metrics
+    select
+      errors.metric_key,
+      errors.locale,
+      errors.entity_type,
+      errors.booking_state,
+      errors.numerator,
+      errors.denominator
+    from error_metrics as errors
+  ),
+  -- Keep the report shape stable even when a locale, entity type, booking
+  -- state, or error category has no events in the requested window. This lets
+  -- the ops UI distinguish an honest zero from an omitted dimension.
+  metric_grid as (
+    select metric.metric_key, locale.locale, entity.entity_type, 'off'::text as booking_state
+    from unnest(array['discovery_to_entity', 'entity_to_agent']::text[]) as metric(metric_key)
+    cross join known_locales as locale
+    cross join known_entity_types as entity
+    union all
+    select 'entity_to_cta'::text, locale.locale, entity.entity_type, booking.booking_state
+    from known_locales as locale
+    cross join known_entity_types as entity
+    cross join known_booking_states as booking
+    union all
+    select 'cta_to_waitlist_submitted'::text, locale.locale, entity.entity_type, 'off'::text
+    from known_locales as locale
+    cross join known_entity_types as entity
+    union all
+    select 'cta_to_checkout_started'::text, locale.locale, entity.entity_type, 'on'::text
+    from known_locales as locale
+    cross join known_entity_types as entity
+    union all
+    select metric.metric_key, locale.locale, null::text, 'off'::text
+    from unnest(array['agent_start_rate', 'signup_start_to_completion']::text[]) as metric(metric_key)
+    cross join known_locales as locale
+    union all
+    select 'error_' || category.error_category, locale.locale, entity.entity_type, booking.booking_state
+    from known_error_categories as category
+    cross join known_locales as locale
+    cross join known_entity_types as entity
+    cross join known_booking_states as booking
+  ),
+  coalesced_metrics as (
+    select
+      grid.metric_key,
+      grid.locale,
+      grid.entity_type,
+      grid.booking_state,
+      coalesce(metrics.numerator, 0)::bigint as numerator,
+      coalesce(metrics.denominator, 0)::bigint as denominator
+    from metric_grid as grid
+    left join report_metrics as metrics
+      on metrics.metric_key = grid.metric_key
+      and metrics.locale = grid.locale
+      and metrics.entity_type is not distinct from grid.entity_type
+      and metrics.booking_state = grid.booking_state
   )
   select
-    metric_key,
-    locale,
-    entity_type,
-    booking_state,
-    numerator,
-    denominator,
+    cells.metric_key,
+    cells.locale,
+    cells.entity_type,
+    cells.booking_state,
+    cells.numerator,
+    cells.denominator,
     case
-      when denominator < v_sample_floor or denominator = 0 then null
-      else round(numerator::numeric / denominator::numeric, 4)
+      when cells.denominator < v_sample_floor or cells.denominator = 0 then null
+      else round(cells.numerator::numeric / cells.denominator::numeric, 4)
     end as rate,
-    denominator as sample_count,
-    case when denominator < v_sample_floor then 'insufficient_sample' else 'ok' end as status,
+    cells.denominator as sample_count,
+    case when cells.denominator < v_sample_floor then 'insufficient_sample' else 'ok' end as status,
     7 as attribution_window_days
-  from report_metrics
-  order by metric_key, locale, entity_type nulls first, booking_state;
+  from coalesced_metrics as cells
+  order by cells.metric_key, cells.locale, cells.entity_type nulls first, cells.booking_state;
 end;
 $$;
 

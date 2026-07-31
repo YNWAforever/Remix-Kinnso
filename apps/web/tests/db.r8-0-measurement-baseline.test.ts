@@ -98,6 +98,23 @@ describe('R8.0 private traveller analytics ledger migration', () => {
     expect(text).not.toContain("event_name = 'checkout_started' and booking_state = 'on' and outcome = 'success'")
   })
 
+  it('qualifies report columns and keeps zero-volume dimensions visible', () => {
+    const text = sql()
+    expect(text).toContain('from public.traveller_analytics_events as se')
+    expect(text).toContain('from public.traveller_analytics_events as te')
+    expect(text).toContain('metric_grid as (')
+    expect(text).toContain("known_locales as (")
+    expect(text).toContain("known_entity_types as (")
+    expect(text).toContain("known_booking_states as (")
+    expect(text).toContain("known_error_categories as (")
+    expect(text).toContain('left join report_metrics as metrics')
+    expect(text).toContain('metrics.entity_type is not distinct from grid.entity_type')
+    expect(text).toContain('coalesce(metrics.numerator, 0)::bigint')
+    expect(text).toContain('coalesce(metrics.denominator, 0)::bigint')
+    expect(text).toContain('from coalesced_metrics as cells')
+    expect(text).toContain('order by cells.metric_key, cells.locale, cells.entity_type nulls first, cells.booking_state')
+  })
+
   it('keeps source cohorts in the requested range while retaining seven-day targets after it', () => {
     const text = sql()
     const sourceStart = text.indexOf('source_events as')
