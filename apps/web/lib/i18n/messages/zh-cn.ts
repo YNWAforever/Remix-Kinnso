@@ -935,7 +935,7 @@ const messages: Messages = {
     analyticsTitle: '分析', analyticsSubtitle: '按语言地区和项目类型观察产品漏斗表现。', analyticsWindow: '时间范围', analyticsWindow24h: '过去 24 小时', analyticsWindow7d: '过去 7 天', analyticsFilters: '筛选', analyticsAll: '全部',
     analyticsUtcNote: '时间以 UTC 显示。', analyticsRetentionNote: '分析数据会保留 8 天。', analyticsAttributionNote: '归因采用 7 天窗口。', analyticsSampleFloorNote: '分母低于 10 时不显示比率。', analyticsTableCaption: '分析漏斗指标', analyticsMetric: '指标',
     analyticsLocale: '语言地区', analyticsEntityType: '项目类型', analyticsBookingState: '预订状态', analyticsNumerator: '分子', analyticsDenominator: '分母', analyticsRate: '比率', analyticsStatus: '状态',
-    analyticsOk: '正常', analyticsInsufficientSample: '样本不足', analyticsUnavailable: '不可用', analyticsRetry: '重试', analyticsEmpty: '此选择暂无分析数据。', analyticsObservedZero: '观察到零', analyticsEntityGuide: '指南',
+    analyticsOk: '正常', analyticsInsufficientSample: '样本不足', analyticsUnavailable: '不可用', analyticsRetry: '重试', analyticsEmpty: '此选择暂无分析数据。', analyticsObservedZero: '零是观察到的聚合；样本不足时，比率无法解读。', analyticsEntityGuide: '指南',
     analyticsEntityExperience: '体验', analyticsEntityCreator: '创作者', analyticsEntityArticle: '文章', analyticsBookingOff: '预订关闭', analyticsBookingOn: '预订开启', analyticsMetricDiscoveryToEntity: '探索至项目',
     analyticsMetricEntityToAgent: '项目至助手', analyticsMetricEntityToCta: '项目至行动按钮', analyticsMetricCtaToWaitlist: '行动按钮至候补名单', analyticsMetricCtaToCheckout: '行动按钮至结账', analyticsMetricAgentStart: '助手开始',
     analyticsMetricSignupCompletion: '完成注册', analyticsMetricErrorInvalid: '无效请求错误', analyticsMetricErrorRateLimited: '超出速率限制错误', analyticsMetricErrorUnavailable: '不可用错误', analyticsMetricErrorUnknown: '未知错误', analyticsMetricUnknown: '未知', analyticsNotApplicable: '—',
