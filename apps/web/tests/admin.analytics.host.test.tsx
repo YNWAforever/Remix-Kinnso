@@ -11,7 +11,10 @@ const { roleMock, getUserMock, reportMock, viewMock } = vi.hoisted(() => ({
     attributionWindowDays: 7 as const,
     rows: [],
   })),
-  viewMock: vi.fn((_props: unknown) => <div data-testid="analytics-view" />),
+  viewMock: vi.fn((...args: unknown[]) => {
+    void args
+    return <div data-testid="analytics-view" />
+  }),
 }))
 
 vi.mock('next/navigation', () => ({

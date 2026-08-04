@@ -1,8 +1,8 @@
 # Phase R8.1 — Ops Analytics Dashboard Design
 
-**Phase:** R8.1 — First-party traveller measurement operations surface  
-**Status:** Spec for review  
-**Depends on:** R8.0 measurement baseline (`admin_traveller_analytics_report`)  
+**Phase:** R8.1 — First-party traveller measurement operations surface
+**Status:** Spec for review
+**Depends on:** R8.0 measurement baseline (`admin_traveller_analytics_report`)
 **Delivery:** one squash-merged pull request
 
 ## Objective

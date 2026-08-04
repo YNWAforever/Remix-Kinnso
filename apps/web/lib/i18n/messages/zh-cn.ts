@@ -933,7 +933,7 @@ const messages: Messages = {
     statCreators: '创作者', statMerchants: '商家', statOps: '运营成员',
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
     analyticsTitle: '分析', analyticsSubtitle: '按语言地区和项目类型观察产品漏斗表现。', analyticsWindow24h: '过去 24 小时', analyticsWindow7d: '过去 7 天', analyticsFilters: '筛选', analyticsAll: '全部',
-    analyticsUtcNote: '时间以 UTC 显示。', analyticsRetentionNote: '分析数据仅保留有限时间。', analyticsAttributionNote: '归因以最近观察到的事件为准。', analyticsSampleFloorNote: '比率需要最低样本量。', analyticsTableCaption: '分析漏斗指标', analyticsMetric: '指标',
+    analyticsUtcNote: '时间以 UTC 显示。', analyticsRetentionNote: '分析数据会保留 8 天。', analyticsAttributionNote: '归因采用 7 天窗口。', analyticsSampleFloorNote: '分母低于 10 时不显示比率。', analyticsTableCaption: '分析漏斗指标', analyticsMetric: '指标',
     analyticsLocale: '语言地区', analyticsEntityType: '项目类型', analyticsBookingState: '预订状态', analyticsNumerator: '分子', analyticsDenominator: '分母', analyticsRate: '比率', analyticsStatus: '状态',
     analyticsOk: '正常', analyticsInsufficientSample: '样本不足', analyticsUnavailable: '不可用', analyticsRetry: '重试', analyticsEmpty: '此选择暂无分析数据。', analyticsObservedZero: '观察到零', analyticsEntityGuide: '指南',
     analyticsEntityExperience: '体验', analyticsEntityCreator: '创作者', analyticsEntityArticle: '文章', analyticsBookingOff: '预订关闭', analyticsBookingOn: '预订开启', analyticsMetricDiscoveryToEntity: '探索至项目',

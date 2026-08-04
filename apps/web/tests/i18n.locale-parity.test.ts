@@ -37,6 +37,18 @@ describe('i18n locale parity for new creator-profile groups', () => {
     ].sort())
   })
 
+  it('states the analytics trust metadata in every locale', async () => {
+    const dictionaries = await Promise.all(LOCALES.map(async (locale) => [locale, await getDictionary(locale)] as const))
+    for (const [locale, dict] of dictionaries) {
+      expect(dict.admin.analyticsRetentionNote, `${locale} retention note`).toMatch(/8/)
+      expect(dict.admin.analyticsAttributionNote, `${locale} attribution note`).toMatch(/7/)
+      expect(dict.admin.analyticsSampleFloorNote, `${locale} sample-floor note`).toMatch(/10/)
+    }
+    expect(en.admin.analyticsRetentionNote).toBe('Analytics data is retained for 8 days.')
+    expect(en.admin.analyticsAttributionNote).toBe('Attribution uses a 7-day window.')
+    expect(en.admin.analyticsSampleFloorNote).toBe('Rates are withheld when the denominator is below 10.')
+  })
+
   for (const locale of LOCALES) {
     it(`${locale} has identical keys to en for each group`, async () => {
       const dict = (await getDictionary(locale)) as unknown as Record<string, unknown>

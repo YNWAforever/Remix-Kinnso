@@ -933,7 +933,7 @@ const messages: Messages = {
     statCreators: '크리에이터', statMerchants: '가맹점', statOps: '운영진',
     statPerksActive: '활성 혜택', statPerksTotal: '전체 혜택', statRedemptions: '사용 횟수',
     analyticsTitle: '분석', analyticsSubtitle: '로케일과 엔터티 유형별 제품 퍼널 성과를 관찰합니다.', analyticsWindow24h: '지난 24시간', analyticsWindow7d: '지난 7일', analyticsFilters: '필터', analyticsAll: '전체',
-    analyticsUtcNote: '시간은 UTC로 표시됩니다.', analyticsRetentionNote: '분석 데이터는 제한된 기간 동안 보관됩니다.', analyticsAttributionNote: '기여는 마지막으로 관찰된 이벤트를 기준으로 합니다.', analyticsSampleFloorNote: '비율에는 최소 표본 수가 필요합니다.', analyticsTableCaption: '분석 퍼널 지표', analyticsMetric: '지표',
+    analyticsUtcNote: '시간은 UTC로 표시됩니다.', analyticsRetentionNote: '분석 데이터는 8일 동안 보관됩니다.', analyticsAttributionNote: '어트리뷰션 기간은 7일입니다.', analyticsSampleFloorNote: '분모가 10 미만이면 비율을 표시하지 않습니다.', analyticsTableCaption: '분석 퍼널 지표', analyticsMetric: '지표',
     analyticsLocale: '로케일', analyticsEntityType: '엔터티 유형', analyticsBookingState: '예약 상태', analyticsNumerator: '분자', analyticsDenominator: '분모', analyticsRate: '비율', analyticsStatus: '상태',
     analyticsOk: '정상', analyticsInsufficientSample: '표본 부족', analyticsUnavailable: '사용 불가', analyticsRetry: '다시 시도', analyticsEmpty: '이 선택에는 분석 데이터가 없습니다.', analyticsObservedZero: '관찰된 0', analyticsEntityGuide: '가이드',
     analyticsEntityExperience: '체험', analyticsEntityCreator: '크리에이터', analyticsEntityArticle: '아티클', analyticsBookingOff: '예약 꺼짐', analyticsBookingOn: '예약 켜짐', analyticsMetricDiscoveryToEntity: '탐색에서 엔터티',
