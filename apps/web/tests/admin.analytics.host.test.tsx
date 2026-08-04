@@ -11,7 +11,7 @@ const { roleMock, getUserMock, reportMock, viewMock } = vi.hoisted(() => ({
     attributionWindowDays: 7 as const,
     rows: [],
   })),
-  viewMock: vi.fn(() => <div data-testid="analytics-view" />),
+  viewMock: vi.fn((_props: unknown) => <div data-testid="analytics-view" />),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -21,7 +21,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
 vi.mock('@/lib/admin/analytics-queries', () => ({ getTravellerAnalyticsReport: reportMock }))
-vi.mock(import('@/components/kinnso/admin/analytics/AdminAnalyticsView'), () => ({ AdminAnalyticsView: viewMock }), { virtual: true })
+vi.mock('@/components/kinnso/admin/analytics/AdminAnalyticsView', () => ({ AdminAnalyticsView: viewMock }))
 
 import AdminAnalyticsPage from '@/app/[locale]/admin/analytics/page'
 
