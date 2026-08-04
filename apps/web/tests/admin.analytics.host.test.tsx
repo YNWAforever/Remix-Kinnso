@@ -52,14 +52,14 @@ describe('/admin/analytics host', () => {
   })
 
   it('uses 24h and allowlisted dimensions while coercing invalid values', async () => {
-    await AdminAnalyticsPage({
+    const allowlistedUi = await AdminAnalyticsPage({
       params: Promise.resolve({ locale: 'zh-hk' }),
       searchParams: Promise.resolve({ window: '24h', locale: 'zh-hk', entity: 'experience', booking: 'on' }),
     })
-    expect((viewMock.mock.calls.at(-1)?.[0] as { filters: unknown }).filters)
+    expect((allowlistedUi as { props: { filters: unknown } }).props.filters)
       .toEqual({ window: '24h', locale: 'zh-hk', entity: 'experience', booking: 'on' })
-    await AdminAnalyticsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ window: '30d', locale: 'DROP TABLE' }) })
-    expect((viewMock.mock.calls.at(-1)?.[0] as { filters: unknown }).filters)
+    const coercedUi = await AdminAnalyticsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({ window: '30d', locale: 'DROP TABLE' }) })
+    expect((coercedUi as { props: { filters: unknown } }).props.filters)
       .toEqual({ window: '7d', locale: 'all', entity: 'all', booking: 'all' })
   })
 
