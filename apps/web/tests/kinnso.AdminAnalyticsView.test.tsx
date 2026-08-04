@@ -44,4 +44,36 @@ describe('AdminAnalyticsView', () => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{ ...report, rows: [] }} error={null} />)
     expect(screen.getByText(en.admin.analyticsEmpty)).toBeTruthy()
   })
+
+  it('preserves every current query value when a filter control changes one value', () => {
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={{ window: '24h', locale: 'zh-hk', entity: 'experience', booking: 'on' }} report={report} error={null} />)
+    expect(screen.getByRole('link', { name: en.admin.analyticsWindow7d }).getAttribute('href'))
+      .toBe('/en/admin/analytics?window=7d&locale=zh-hk&entity=experience&booking=on')
+    expect(screen.getByRole('link', { name: 'en' }).getAttribute('href'))
+      .toBe('/en/admin/analytics?window=24h&locale=en&entity=experience&booking=on')
+    expect(screen.getByRole('link', { name: en.admin.analyticsEntityGuide }).getAttribute('href'))
+      .toBe('/en/admin/analytics?window=24h&locale=zh-hk&entity=guide&booking=on')
+    expect(screen.getByRole('link', { name: en.admin.analyticsBookingOff }).getAttribute('href'))
+      .toBe('/en/admin/analytics?window=24h&locale=zh-hk&entity=experience&booking=off')
+  })
+
+  it('renders the observed-zero state for a non-empty zero aggregate', () => {
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
+      ...report,
+      rows: [{ ...report.rows[0], numerator: 0, denominator: 0, sampleCount: 0, rate: 0 }],
+    }} error={null} />)
+    expect(screen.getByText(en.admin.analyticsObservedZero)).toBeTruthy()
+  })
+
+  it('maps untrusted aggregate dimensions to localized unknown copy without rendering raw identifiers', () => {
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
+      ...report,
+      rows: [{ ...report.rows[0], metricKey: 'journey-id', locale: 'account-id', entityType: 'event-id', bookingState: 'raw-metadata' }],
+    }} error={null} />)
+    expect(screen.getAllByText(en.admin.analyticsMetricUnknown)).toHaveLength(4)
+    expect(screen.queryByText('journey-id')).toBeNull()
+    expect(screen.queryByText('account-id')).toBeNull()
+    expect(screen.queryByText('event-id')).toBeNull()
+    expect(screen.queryByText('raw-metadata')).toBeNull()
+  })
 })
