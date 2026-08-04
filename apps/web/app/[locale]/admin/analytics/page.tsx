@@ -22,10 +22,15 @@ export default async function AdminAnalyticsPage({
   await requireOpsPage(supabase, loc)
   const messages = await getDictionary(loc)
 
+  let report: Awaited<ReturnType<typeof getTravellerAnalyticsReport>> | null = null
+  let error: 'unavailable' | null = null
+
   try {
-    const report = await getTravellerAnalyticsReport(supabase, toAnalyticsReportWindow(filters))
-    return <AdminAnalyticsView locale={loc} t={messages.admin} filters={filters} report={{ ...report, rows: filterAnalyticsRows(report.rows, filters) }} error={null} />
+    const result = await getTravellerAnalyticsReport(supabase, toAnalyticsReportWindow(filters))
+    report = { ...result, rows: filterAnalyticsRows(result.rows, filters) }
   } catch {
-    return <AdminAnalyticsView locale={loc} t={messages.admin} filters={filters} report={null} error="unavailable" />
+    error = 'unavailable'
   }
+
+  return <AdminAnalyticsView locale={loc} t={messages.admin} filters={filters} report={report} error={error} />
 }
