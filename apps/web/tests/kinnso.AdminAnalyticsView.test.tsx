@@ -57,12 +57,37 @@ describe('AdminAnalyticsView', () => {
       .toBe('/en/admin/analytics?window=24h&locale=zh-hk&entity=experience&booking=off')
   })
 
-  it('renders the observed-zero state for a non-empty zero aggregate', () => {
+  it('keeps observed-zero aggregate rows and their honest sample-floor cells visible', () => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
       ...report,
-      rows: [{ ...report.rows[0], numerator: 0, denominator: 0, sampleCount: 0, rate: 0 }],
+      rows: [{ ...report.rows[0], numerator: 0, denominator: 0, sampleCount: 0, rate: null, status: 'insufficient_sample' }],
     }} error={null} />)
     expect(screen.getByText(en.admin.analyticsObservedZero)).toBeTruthy()
+    expect(screen.getByRole('table')).toBeTruthy()
+    expect(screen.getByText('—')).toBeTruthy()
+    expect(screen.getByText(en.admin.analyticsInsufficientSample)).toBeTruthy()
+    expect(screen.getAllByText('0')).toHaveLength(2)
+  })
+
+  it('renders a localized neutral value for valid dimensionless rows', () => {
+    expect(en.admin.analyticsNotApplicable).toBe('—')
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
+      ...report,
+      rows: [{ ...report.rows[0], entityType: null }],
+    }} error={null} />)
+    expect(screen.getByText(en.admin.analyticsNotApplicable)).toBeTruthy()
+    expect(screen.queryByText(en.admin.analyticsMetricUnknown)).toBeNull()
+  })
+
+  it('groups filters with visible labels and uniquely named reset links', () => {
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} />)
+    expect(screen.getByRole('group', { name: en.admin.analyticsWindow })).toBeTruthy()
+    expect(screen.getByRole('group', { name: en.admin.analyticsLocale })).toBeTruthy()
+    expect(screen.getByRole('group', { name: en.admin.analyticsEntityType })).toBeTruthy()
+    expect(screen.getByRole('group', { name: en.admin.analyticsBookingState })).toBeTruthy()
+    expect(screen.getByRole('link', { name: `${en.admin.analyticsLocale}: ${en.admin.analyticsAll}` })).toBeTruthy()
+    expect(screen.getByRole('link', { name: `${en.admin.analyticsEntityType}: ${en.admin.analyticsAll}` })).toBeTruthy()
+    expect(screen.getByRole('link', { name: `${en.admin.analyticsBookingState}: ${en.admin.analyticsAll}` })).toBeTruthy()
   })
 
   it('maps untrusted aggregate dimensions to localized unknown copy without rendering raw identifiers', () => {

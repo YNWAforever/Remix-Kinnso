@@ -47,9 +47,9 @@ export function AdminAnalyticsView({ locale, t, filters, report, error }: Props)
     creator: t.analyticsEntityCreator,
     article: t.analyticsEntityArticle,
   }
-  const entityLabel = (value: string | null) => value && value in entityLabels
-    ? entityLabels[value as keyof typeof entityLabels]
-    : t.analyticsMetricUnknown
+  const entityLabel = (value: string | null) => value === null
+    ? t.analyticsNotApplicable
+    : value in entityLabels ? entityLabels[value as keyof typeof entityLabels] : t.analyticsMetricUnknown
   const bookingLabel = (value: string) => value === 'on' ? t.analyticsBookingOn : value === 'off' ? t.analyticsBookingOff : t.analyticsMetricUnknown
   const localeLabel = (value: string) => (LOCALES as readonly string[]).includes(value) ? value : t.analyticsMetricUnknown
 
@@ -59,33 +59,38 @@ export function AdminAnalyticsView({ locale, t, filters, report, error }: Props)
       <p className="mt-2 text-kinnso-muted">{t.analyticsSubtitle}</p>
       <p className="mt-3 text-sm text-kinnso-muted">{t.analyticsUtcNote} {t.analyticsRetentionNote} {t.analyticsAttributionNote} {t.analyticsSampleFloorNote}</p>
 
-      <nav className="mt-6 flex flex-wrap gap-2" aria-label={t.analyticsFilters}>
-        {(['7d', '24h'] as const).map((window) => (
-          <Link key={window} href={href(locale, filters, { window })} aria-current={filters.window === window ? 'page' : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">
-            {window === '7d' ? t.analyticsWindow7d : t.analyticsWindow24h}
-          </Link>
-        ))}
-        {(['all', ...LOCALES] as const).map((value) => (
-          <Link key={value} href={href(locale, filters, { locale: value })} aria-current={filters.locale === value ? 'page' : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">
-            {value === 'all' ? t.analyticsAll : value}
-          </Link>
-        ))}
-        {(['all', 'guide', 'experience', 'creator', 'article'] as const).map((value) => (
-          <Link key={value} href={href(locale, filters, { entity: value })} aria-current={filters.entity === value ? 'page' : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">
-            {value === 'all' ? t.analyticsAll : entityLabels[value]}
-          </Link>
-        ))}
-        {(['all', 'off', 'on'] as const).map((value) => (
-          <Link key={value} href={href(locale, filters, { booking: value })} aria-current={filters.booking === value ? 'page' : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">
-            {value === 'all' ? t.analyticsAll : bookingLabel(value)}
-          </Link>
-        ))}
+      <nav className="mt-6 grid gap-4" aria-label={t.analyticsFilters}>
+        <section role="group" aria-label={t.analyticsWindow}>
+          <p className="text-sm font-bold text-kinnso-ink">{t.analyticsWindow}</p>
+          <div className="mt-2 flex flex-wrap gap-2">{(['7d', '24h'] as const).map((window) => (
+            <Link key={window} href={href(locale, filters, { window })} aria-current={filters.window === window ? 'page' : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">{window === '7d' ? t.analyticsWindow7d : t.analyticsWindow24h}</Link>
+          ))}</div>
+        </section>
+        <section role="group" aria-label={t.analyticsLocale}>
+          <p className="text-sm font-bold text-kinnso-ink">{t.analyticsLocale}</p>
+          <div className="mt-2 flex flex-wrap gap-2">{(['all', ...LOCALES] as const).map((value) => (
+            <Link key={value} href={href(locale, filters, { locale: value })} aria-current={filters.locale === value ? 'page' : undefined} aria-label={value === 'all' ? `${t.analyticsLocale}: ${t.analyticsAll}` : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">{value === 'all' ? t.analyticsAll : value}</Link>
+          ))}</div>
+        </section>
+        <section role="group" aria-label={t.analyticsEntityType}>
+          <p className="text-sm font-bold text-kinnso-ink">{t.analyticsEntityType}</p>
+          <div className="mt-2 flex flex-wrap gap-2">{(['all', 'guide', 'experience', 'creator', 'article'] as const).map((value) => (
+            <Link key={value} href={href(locale, filters, { entity: value })} aria-current={filters.entity === value ? 'page' : undefined} aria-label={value === 'all' ? `${t.analyticsEntityType}: ${t.analyticsAll}` : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">{value === 'all' ? t.analyticsAll : entityLabels[value]}</Link>
+          ))}</div>
+        </section>
+        <section role="group" aria-label={t.analyticsBookingState}>
+          <p className="text-sm font-bold text-kinnso-ink">{t.analyticsBookingState}</p>
+          <div className="mt-2 flex flex-wrap gap-2">{(['all', 'off', 'on'] as const).map((value) => (
+            <Link key={value} href={href(locale, filters, { booking: value })} aria-current={filters.booking === value ? 'page' : undefined} aria-label={value === 'all' ? `${t.analyticsBookingState}: ${t.analyticsAll}` : undefined} className="rounded-lg px-3 py-2 text-sm font-bold text-kinnso-ink">{value === 'all' ? t.analyticsAll : bookingLabel(value)}</Link>
+          ))}</div>
+        </section>
       </nav>
 
       {error ? <p role="alert" className="mt-8 text-sm text-red-600">{t.analyticsUnavailable} {t.analyticsRetry}</p>
         : hasNoRows ? <p className="mt-8 text-sm text-kinnso-muted">{t.analyticsEmpty}</p>
-          : hasObservedZero ? <p className="mt-8 text-sm text-kinnso-muted">{t.analyticsObservedZero}</p>
-            : (
+          : (
+            <>
+              {hasObservedZero ? <p className="mt-8 text-sm text-kinnso-muted">{t.analyticsObservedZero}</p> : null}
               <div className="mt-8 overflow-x-auto rounded-xl border border-kinnso-ink/10 bg-white">
                 <table className="min-w-full text-left text-sm">
                   <caption className="sr-only">{t.analyticsTableCaption}</caption>
@@ -110,7 +115,8 @@ export function AdminAnalyticsView({ locale, t, filters, report, error }: Props)
                   </tbody>
                 </table>
               </div>
-            )}
+            </>
+          )}
     </main>
   )
 }

@@ -969,13 +969,13 @@ export interface Messages {
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
-    analyticsTitle: string; analyticsSubtitle: string; analyticsWindow24h: string; analyticsWindow7d: string; analyticsFilters: string; analyticsAll: string
+    analyticsTitle: string; analyticsSubtitle: string; analyticsWindow: string; analyticsWindow24h: string; analyticsWindow7d: string; analyticsFilters: string; analyticsAll: string
     analyticsUtcNote: string; analyticsRetentionNote: string; analyticsAttributionNote: string; analyticsSampleFloorNote: string; analyticsTableCaption: string; analyticsMetric: string
     analyticsLocale: string; analyticsEntityType: string; analyticsBookingState: string; analyticsNumerator: string; analyticsDenominator: string; analyticsRate: string; analyticsStatus: string
     analyticsOk: string; analyticsInsufficientSample: string; analyticsUnavailable: string; analyticsRetry: string; analyticsEmpty: string; analyticsObservedZero: string; analyticsEntityGuide: string
     analyticsEntityExperience: string; analyticsEntityCreator: string; analyticsEntityArticle: string; analyticsBookingOff: string; analyticsBookingOn: string; analyticsMetricDiscoveryToEntity: string
     analyticsMetricEntityToAgent: string; analyticsMetricEntityToCta: string; analyticsMetricCtaToWaitlist: string; analyticsMetricCtaToCheckout: string; analyticsMetricAgentStart: string
-    analyticsMetricSignupCompletion: string; analyticsMetricErrorInvalid: string; analyticsMetricErrorRateLimited: string; analyticsMetricErrorUnavailable: string; analyticsMetricErrorUnknown: string; analyticsMetricUnknown: string
+    analyticsMetricSignupCompletion: string; analyticsMetricErrorInvalid: string; analyticsMetricErrorRateLimited: string; analyticsMetricErrorUnavailable: string; analyticsMetricErrorUnknown: string; analyticsMetricUnknown: string; analyticsNotApplicable: string
   }
   enquiriesAdmin: {
     title: string; subtitle: string; filterActive: string; filterResolved: string; filterSpam: string; filterAllTypes: string
@@ -2210,13 +2210,13 @@ const messages: Messages = {
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
-    analyticsTitle: 'Analytics', analyticsSubtitle: 'Observe product funnel performance across locales and entity types.', analyticsWindow24h: 'Last 24 hours', analyticsWindow7d: 'Last 7 days', analyticsFilters: 'Filters', analyticsAll: 'All',
+    analyticsTitle: 'Analytics', analyticsSubtitle: 'Observe product funnel performance across locales and entity types.', analyticsWindow: 'Window', analyticsWindow24h: 'Last 24 hours', analyticsWindow7d: 'Last 7 days', analyticsFilters: 'Filters', analyticsAll: 'All',
     analyticsUtcNote: 'Times are shown in UTC.', analyticsRetentionNote: 'Analytics data is retained for 8 days.', analyticsAttributionNote: 'Attribution uses a 7-day window.', analyticsSampleFloorNote: 'Rates are withheld when the denominator is below 10.', analyticsTableCaption: 'Analytics funnel metrics', analyticsMetric: 'Metric',
     analyticsLocale: 'Locale', analyticsEntityType: 'Entity type', analyticsBookingState: 'Booking state', analyticsNumerator: 'Numerator', analyticsDenominator: 'Denominator', analyticsRate: 'Rate', analyticsStatus: 'Status',
     analyticsOk: 'OK', analyticsInsufficientSample: 'Insufficient sample', analyticsUnavailable: 'Unavailable', analyticsRetry: 'Retry', analyticsEmpty: 'No analytics data is available for this selection.', analyticsObservedZero: 'Observed zero', analyticsEntityGuide: 'Guide',
     analyticsEntityExperience: 'Experience', analyticsEntityCreator: 'Creator', analyticsEntityArticle: 'Article', analyticsBookingOff: 'Booking off', analyticsBookingOn: 'Booking on', analyticsMetricDiscoveryToEntity: 'Discovery to entity',
     analyticsMetricEntityToAgent: 'Entity to agent', analyticsMetricEntityToCta: 'Entity to CTA', analyticsMetricCtaToWaitlist: 'CTA to waitlist', analyticsMetricCtaToCheckout: 'CTA to checkout', analyticsMetricAgentStart: 'Agent start',
-    analyticsMetricSignupCompletion: 'Signup completion', analyticsMetricErrorInvalid: 'Invalid request errors', analyticsMetricErrorRateLimited: 'Rate-limited errors', analyticsMetricErrorUnavailable: 'Unavailable errors', analyticsMetricErrorUnknown: 'Unknown errors', analyticsMetricUnknown: 'Unknown',
+    analyticsMetricSignupCompletion: 'Signup completion', analyticsMetricErrorInvalid: 'Invalid request errors', analyticsMetricErrorRateLimited: 'Rate-limited errors', analyticsMetricErrorUnavailable: 'Unavailable errors', analyticsMetricErrorUnknown: 'Unknown errors', analyticsMetricUnknown: 'Unknown', analyticsNotApplicable: '—',
   },
   enquiriesAdmin: {
     title: 'Enquiries', subtitle: 'Review and resolve profile enquiries with an audit trail.',
