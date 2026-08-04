@@ -22,9 +22,9 @@ describe('toAnalyticsReportWindow', () => {
   const now = new Date('2026-08-08T12:00:00.000Z')
 
   it('returns exact UTC ISO boundaries for both presets', () => {
-    expect(toAnalyticsReportWindow({ window: '24h', locale: 'all', entity: 'all', booking: 'all' }, now))
+    expect(toAnalyticsReportWindow({ window: '24h' }, now))
       .toEqual({ from: '2026-08-07T12:00:00.000Z', to: '2026-08-08T12:00:00.000Z' })
-    expect(toAnalyticsReportWindow({ window: '7d', locale: 'all', entity: 'all', booking: 'all' }, now))
+    expect(toAnalyticsReportWindow({ window: '7d' }, now))
       .toEqual({ from: '2026-08-01T12:00:00.000Z', to: '2026-08-08T12:00:00.000Z' })
   })
 })
@@ -36,7 +36,7 @@ describe('filterAnalyticsRows', () => {
   ] as const
 
   it('keeps only rows matching every selected dimension', () => {
-    expect(filterAnalyticsRows([...rows], { window: '7d', locale: 'en', entity: 'guide', booking: 'off' })).toEqual([rows[0]])
-    expect(filterAnalyticsRows([...rows], { window: '7d', locale: 'all', entity: 'all', booking: 'all' })).toEqual(rows)
+    expect(filterAnalyticsRows([...rows], { locale: 'en', entity: 'guide', booking: 'off' })).toEqual([rows[0]])
+    expect(filterAnalyticsRows([...rows], { locale: 'all', entity: 'all', booking: 'all' })).toEqual(rows)
   })
 })
