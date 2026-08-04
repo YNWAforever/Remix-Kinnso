@@ -928,10 +928,17 @@ const messages: Messages = {
     disclaimer: 'AI 生成內容 — 發佈前請先審閱。',
   },
   admin: {
-    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單', navSessions: '場次', navEnquiries: '詢問',
+    navDashboard: '儀表板', navPerks: '福利', navUsers: '使用者', navCreators: '創作者', navMerchants: '商家', navTeam: '團隊', navMissions: '任務', navTestimonials: '用戶推薦', navBookings: '訂單', navSessions: '場次', navEnquiries: '詢問', navAnalytics: '分析',
     dashboardTitle: '管理後台', dashboardSubtitle: '管理福利、使用者與平台內容。',
     statCreators: '創作者', statMerchants: '商家', statOps: '營運成員',
     statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
+    analyticsTitle: '分析', analyticsSubtitle: '依語言地區和項目類型觀察產品漏斗表現。', analyticsWindow24h: '過去 24 小時', analyticsWindow7d: '過去 7 天', analyticsFilters: '篩選', analyticsAll: '全部',
+    analyticsUtcNote: '時間以 UTC 顯示。', analyticsRetentionNote: '分析資料僅保留有限期間。', analyticsAttributionNote: '歸因以最近觀察到的事件為準。', analyticsSampleFloorNote: '比率需要最低樣本數。', analyticsTableCaption: '分析漏斗指標', analyticsMetric: '指標',
+    analyticsLocale: '語言地區', analyticsEntityType: '項目類型', analyticsBookingState: '預訂狀態', analyticsNumerator: '分子', analyticsDenominator: '分母', analyticsRate: '比率', analyticsStatus: '狀態',
+    analyticsOk: '正常', analyticsInsufficientSample: '樣本不足', analyticsUnavailable: '無法使用', analyticsRetry: '重試', analyticsEmpty: '此選擇沒有分析資料。', analyticsObservedZero: '觀察到零', analyticsEntityGuide: '指南',
+    analyticsEntityExperience: '體驗', analyticsEntityCreator: '創作者', analyticsEntityArticle: '文章', analyticsBookingOff: '預訂關閉', analyticsBookingOn: '預訂開啟', analyticsMetricDiscoveryToEntity: '探索至項目',
+    analyticsMetricEntityToAgent: '項目至助理', analyticsMetricEntityToCta: '項目至行動按鈕', analyticsMetricCtaToWaitlist: '行動按鈕至候補名單', analyticsMetricCtaToCheckout: '行動按鈕至結帳', analyticsMetricAgentStart: '助理開始',
+    analyticsMetricSignupCompletion: '完成註冊', analyticsMetricErrorInvalid: '無效請求錯誤', analyticsMetricErrorRateLimited: '超出速率限制錯誤', analyticsMetricErrorUnavailable: '無法使用錯誤', analyticsMetricErrorUnknown: '未知錯誤', analyticsMetricUnknown: '未知',
   },
   enquiriesAdmin: {
     title: '詢問', subtitle: '以稽核紀錄檢視及處理個人檔案詢問。',

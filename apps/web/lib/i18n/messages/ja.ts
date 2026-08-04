@@ -928,10 +928,17 @@ const messages: Messages = {
     disclaimer: 'AI生成 — 公開前にご確認ください。',
   },
   admin: {
-    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約', navSessions: 'セッション', navEnquiries: '問い合わせ',
+    navDashboard: 'ダッシュボード', navPerks: '特典', navUsers: 'ユーザー', navCreators: 'クリエイター', navMerchants: 'マーチャント', navTeam: 'チーム', navMissions: 'ミッション', navTestimonials: 'お客様の声', navBookings: '予約', navSessions: 'セッション', navEnquiries: '問い合わせ', navAnalytics: '分析',
     dashboardTitle: '管理', dashboardSubtitle: '特典、ユーザー、プラットフォームのコンテンツを管理します。',
     statCreators: 'クリエイター', statMerchants: '店舗', statOps: '運営メンバー',
     statPerksActive: '有効な特典', statPerksTotal: '特典総数', statRedemptions: '利用件数',
+    analyticsTitle: '分析', analyticsSubtitle: 'ロケールとエンティティ種別ごとのプロダクトファネルを確認します。', analyticsWindow24h: '過去 24 時間', analyticsWindow7d: '過去 7 日間', analyticsFilters: 'フィルター', analyticsAll: 'すべて',
+    analyticsUtcNote: '時刻は UTC で表示されます。', analyticsRetentionNote: '分析データの保存期間には制限があります。', analyticsAttributionNote: '帰属は最後に観測されたイベントに基づきます。', analyticsSampleFloorNote: '率には最小サンプル数が必要です。', analyticsTableCaption: '分析ファネル指標', analyticsMetric: '指標',
+    analyticsLocale: 'ロケール', analyticsEntityType: 'エンティティ種別', analyticsBookingState: '予約状態', analyticsNumerator: '分子', analyticsDenominator: '分母', analyticsRate: '率', analyticsStatus: 'ステータス',
+    analyticsOk: '正常', analyticsInsufficientSample: 'サンプル不足', analyticsUnavailable: '利用不可', analyticsRetry: '再試行', analyticsEmpty: 'この選択に利用可能な分析データはありません。', analyticsObservedZero: '観測値ゼロ', analyticsEntityGuide: 'ガイド',
+    analyticsEntityExperience: '体験', analyticsEntityCreator: 'クリエイター', analyticsEntityArticle: '記事', analyticsBookingOff: '予約オフ', analyticsBookingOn: '予約オン', analyticsMetricDiscoveryToEntity: '発見からエンティティ',
+    analyticsMetricEntityToAgent: 'エンティティからエージェント', analyticsMetricEntityToCta: 'エンティティから CTA', analyticsMetricCtaToWaitlist: 'CTA から順番待ち', analyticsMetricCtaToCheckout: 'CTA から決済', analyticsMetricAgentStart: 'エージェント開始',
+    analyticsMetricSignupCompletion: '登録完了', analyticsMetricErrorInvalid: '無効なリクエストエラー', analyticsMetricErrorRateLimited: 'レート制限エラー', analyticsMetricErrorUnavailable: '利用不可エラー', analyticsMetricErrorUnknown: '不明なエラー', analyticsMetricUnknown: '不明',
   },
   enquiriesAdmin: {
     title: '問い合わせ', subtitle: '監査記録とともにプロフィールへの問い合わせを確認・処理します。',

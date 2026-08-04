@@ -19,6 +19,7 @@ describe('AdminShell', () => {
     expect((screen.getByRole('link', { name: en.admin.navCreators }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/creators')
     expect((screen.getByRole('link', { name: en.admin.navTestimonials }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/testimonials')
     expect((screen.getByRole('link', { name: en.admin.navEnquiries }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/enquiries')
+    expect((screen.getByRole('link', { name: en.admin.navAnalytics }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/analytics')
     expect(screen.getByText('child-content')).toBeTruthy()
   })
 
@@ -27,6 +28,12 @@ describe('AdminShell', () => {
     render(<AdminShell locale="en" t={en.admin}><p>child-content</p></AdminShell>)
     expect(screen.getByRole('link', { name: en.admin.navEnquiries }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('link', { name: en.admin.navDashboard }).getAttribute('aria-current')).toBeNull()
+  })
+
+  it('highlights the analytics route', () => {
+    pathname = '/en/admin/analytics'
+    render(<AdminShell locale="en" t={en.admin}><p>child-content</p></AdminShell>)
+    expect(screen.getByRole('link', { name: en.admin.navAnalytics }).getAttribute('aria-current')).toBe('page')
   })
 })
 

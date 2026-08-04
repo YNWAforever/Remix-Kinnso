@@ -928,10 +928,17 @@ const messages: Messages = {
     disclaimer: 'สร้างโดย AI — โปรดตรวจสอบก่อนเผยแพร่',
   },
   admin: {
-    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง', navSessions: 'เซสชัน', navEnquiries: 'คำถาม',
+    navDashboard: 'แดชบอร์ด', navPerks: 'สิทธิพิเศษ', navUsers: 'ผู้ใช้', navCreators: 'ครีเอเตอร์', navMerchants: 'ร้านค้า', navTeam: 'ทีม', navMissions: 'ภารกิจ', navTestimonials: 'เสียงจากผู้ใช้', navBookings: 'การจอง', navSessions: 'เซสชัน', navEnquiries: 'คำถาม', navAnalytics: 'การวิเคราะห์',
     dashboardTitle: 'ผู้ดูแลระบบ', dashboardSubtitle: 'จัดการสิทธิพิเศษ ผู้ใช้ และเนื้อหาบนแพลตฟอร์ม',
     statCreators: 'ครีเอเตอร์', statMerchants: 'ร้านค้า', statOps: 'ทีมผู้ดูแล',
     statPerksActive: 'สิทธิพิเศษที่ใช้งานอยู่', statPerksTotal: 'สิทธิพิเศษทั้งหมด', statRedemptions: 'จำนวนการแลก',
+    analyticsTitle: 'การวิเคราะห์', analyticsSubtitle: 'ติดตามประสิทธิภาพฟันเนลผลิตภัณฑ์ตามโลแคลและประเภทเอนทิตี', analyticsWindow24h: '24 ชั่วโมงที่ผ่านมา', analyticsWindow7d: '7 วันที่ผ่านมา', analyticsFilters: 'ตัวกรอง', analyticsAll: 'ทั้งหมด',
+    analyticsUtcNote: 'เวลาแสดงเป็น UTC', analyticsRetentionNote: 'ข้อมูลการวิเคราะห์จะเก็บไว้เพียงระยะเวลาจำกัด', analyticsAttributionNote: 'การระบุแหล่งที่มาอิงจากเหตุการณ์ล่าสุดที่พบ', analyticsSampleFloorNote: 'อัตราต้องมีขนาดตัวอย่างขั้นต่ำ', analyticsTableCaption: 'ตัวชี้วัดฟันเนลการวิเคราะห์', analyticsMetric: 'ตัวชี้วัด',
+    analyticsLocale: 'โลแคล', analyticsEntityType: 'ประเภทเอนทิตี', analyticsBookingState: 'สถานะการจอง', analyticsNumerator: 'ตัวเศษ', analyticsDenominator: 'ตัวส่วน', analyticsRate: 'อัตรา', analyticsStatus: 'สถานะ',
+    analyticsOk: 'ปกติ', analyticsInsufficientSample: 'ตัวอย่างไม่เพียงพอ', analyticsUnavailable: 'ไม่พร้อมใช้งาน', analyticsRetry: 'ลองใหม่', analyticsEmpty: 'ไม่มีข้อมูลการวิเคราะห์สำหรับตัวเลือกนี้', analyticsObservedZero: 'พบค่าเป็นศูนย์', analyticsEntityGuide: 'คู่มือ',
+    analyticsEntityExperience: 'ประสบการณ์', analyticsEntityCreator: 'ครีเอเตอร์', analyticsEntityArticle: 'บทความ', analyticsBookingOff: 'ปิดการจอง', analyticsBookingOn: 'เปิดการจอง', analyticsMetricDiscoveryToEntity: 'การค้นพบสู่เอนทิตี',
+    analyticsMetricEntityToAgent: 'เอนทิตีสู่เอเจนต์', analyticsMetricEntityToCta: 'เอนทิตีสู่ CTA', analyticsMetricCtaToWaitlist: 'CTA สู่รายชื่อรอ', analyticsMetricCtaToCheckout: 'CTA สู่การชำระเงิน', analyticsMetricAgentStart: 'เริ่มเอเจนต์',
+    analyticsMetricSignupCompletion: 'สมัครเสร็จสิ้น', analyticsMetricErrorInvalid: 'ข้อผิดพลาดคำขอไม่ถูกต้อง', analyticsMetricErrorRateLimited: 'ข้อผิดพลาดเกินขีดจำกัดอัตรา', analyticsMetricErrorUnavailable: 'ข้อผิดพลาดไม่พร้อมใช้งาน', analyticsMetricErrorUnknown: 'ข้อผิดพลาดไม่ทราบสาเหตุ', analyticsMetricUnknown: 'ไม่ทราบ',
   },
   enquiriesAdmin: {
     title: 'คำถาม', subtitle: 'ตรวจสอบและจัดการคำถามเกี่ยวกับโปรไฟล์พร้อมบันทึกการตรวจสอบ',

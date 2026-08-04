@@ -16,6 +16,7 @@ export function AdminShell({ locale, t, children }: { locale: Locale; t: Message
     { href: `/${locale}/admin/perks`, label: t.navPerks },
     { href: `/${locale}/admin/testimonials`, label: t.navTestimonials },
     { href: `/${locale}/admin/enquiries`, label: t.navEnquiries },
+    { href: `/${locale}/admin/analytics`, label: t.navAnalytics },
     { href: `/${locale}/admin/sessions`, label: t.navSessions },
     { href: `/${locale}/admin/users`, label: t.navUsers },
     { href: `/${locale}/admin/team`, label: t.navTeam },
