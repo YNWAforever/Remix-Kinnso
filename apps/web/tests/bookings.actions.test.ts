@@ -81,28 +81,137 @@ describe('markBookingCompletedAction', () => {
 })
 
 describe('adminCancelAndRefundBookingAction', () => {
-  it('does not call the RPC if the Stripe refund call fails', async () => {
-    createServerClientMock.mockResolvedValue({ rpc: rpcMock })
-    stripeRefundsCreateMock.mockRejectedValue(new Error('stripe down'))
+  /**
+   * The action reads the booking (for its own payment intent + status) and
+   * calls two RPCs: `is_active_ops_role` to authorize, then the refund RPC.
+   */
+  function mockClient(options: {
+    isOpsAdmin?: boolean
+    roleError?: { message: string } | null
+    booking?: { status: string; stripe_payment_intent_id: string | null } | null
+    bookingError?: { message: string } | null
+  }) {
+    const { isOpsAdmin = true, roleError = null, bookingError = null } = options
+    const booking =
+      options.booking === undefined
+        ? { status: 'confirmed', stripe_payment_intent_id: 'pi_from_booking' }
+        : options.booking
+
+    rpcMock.mockImplementation((name: string) => {
+      if (name === 'is_active_ops_role') {
+        return Promise.resolve({ data: isOpsAdmin, error: roleError })
+      }
+      return Promise.resolve({ error: null })
+    })
+
+    const maybeSingle = vi.fn().mockResolvedValue({ data: booking, error: bookingError })
+    const from = vi.fn(() => ({
+      select: () => ({ eq: () => ({ maybeSingle }) }),
+    }))
+    createServerClientMock.mockResolvedValue({ rpc: rpcMock, from })
+    return { from }
+  }
+
+  it('refuses — and never calls Stripe — when the caller is not an ops admin', async () => {
+    mockClient({ isOpsAdmin: false })
 
     const result = await adminCancelAndRefundBookingAction({
       bookingId: 'booking-1',
-      stripePaymentIntentId: 'pi_123',
       reason: 'traveller requested cancellation',
     })
 
     expect(result.ok).toBe(false)
-    expect(rpcMock).not.toHaveBeenCalled()
+    expect(stripeRefundsCreateMock).not.toHaveBeenCalled()
+    expect(rpcMock).not.toHaveBeenCalledWith(
+      'admin_cancel_and_refund_booking',
+      expect.anything(),
+    )
   })
 
-  it('calls the RPC with the real Stripe refund id on success', async () => {
-    createServerClientMock.mockResolvedValue({ rpc: rpcMock })
-    stripeRefundsCreateMock.mockResolvedValue({ id: 're_abc123' })
-    rpcMock.mockResolvedValue({ error: null })
+  it('refuses a blank reason before any refund is issued', async () => {
+    mockClient({})
+
+    const result = await adminCancelAndRefundBookingAction({ bookingId: 'booking-1', reason: '   ' })
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.errors.form?.[0]).toMatch(/reason is required/i)
+    expect(stripeRefundsCreateMock).not.toHaveBeenCalled()
+  })
+
+  it('refuses an over-long reason before any refund is issued', async () => {
+    mockClient({})
 
     const result = await adminCancelAndRefundBookingAction({
       bookingId: 'booking-1',
-      stripePaymentIntentId: 'pi_123',
+      reason: 'x'.repeat(501),
+    })
+
+    expect(result.ok).toBe(false)
+    expect(stripeRefundsCreateMock).not.toHaveBeenCalled()
+  })
+
+  it('refuses a booking that is not refundable before any refund is issued', async () => {
+    mockClient({ booking: { status: 'pending_payment', stripe_payment_intent_id: 'pi_x' } })
+
+    const result = await adminCancelAndRefundBookingAction({
+      bookingId: 'booking-1',
+      reason: 'traveller requested cancellation',
+    })
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.errors.form?.[0]).toMatch(/not confirmed yet/i)
+    expect(stripeRefundsCreateMock).not.toHaveBeenCalled()
+  })
+
+  it('refuses a missing booking before any refund is issued', async () => {
+    mockClient({ booking: null })
+
+    const result = await adminCancelAndRefundBookingAction({
+      bookingId: 'booking-1',
+      reason: 'traveller requested cancellation',
+    })
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.errors.form?.[0]).toMatch(/not found/i)
+    expect(stripeRefundsCreateMock).not.toHaveBeenCalled()
+  })
+
+  it("refunds the booking's own payment intent, never one supplied by the caller", async () => {
+    mockClient({ booking: { status: 'completed', stripe_payment_intent_id: 'pi_from_booking' } })
+    stripeRefundsCreateMock.mockResolvedValue({ id: 're_abc123' })
+
+    const result = await adminCancelAndRefundBookingAction({
+      bookingId: 'booking-1',
+      // A caller-supplied payment intent is not part of the contract at all.
+      reason: 'traveller requested cancellation',
+    } as { bookingId: string; reason: string })
+
+    expect(result.ok).toBe(true)
+    expect(stripeRefundsCreateMock).toHaveBeenCalledWith({ payment_intent: 'pi_from_booking' })
+  })
+
+  it('does not call the refund RPC if the Stripe refund call fails', async () => {
+    mockClient({})
+    stripeRefundsCreateMock.mockRejectedValue(new Error('stripe down'))
+
+    const result = await adminCancelAndRefundBookingAction({
+      bookingId: 'booking-1',
+      reason: 'traveller requested cancellation',
+    })
+
+    expect(result.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalledWith(
+      'admin_cancel_and_refund_booking',
+      expect.anything(),
+    )
+  })
+
+  it('calls the RPC with the real Stripe refund id on success', async () => {
+    mockClient({})
+    stripeRefundsCreateMock.mockResolvedValue({ id: 're_abc123' })
+
+    const result = await adminCancelAndRefundBookingAction({
+      bookingId: 'booking-1',
       reason: 'traveller requested cancellation',
     })
 
@@ -119,13 +228,15 @@ describe('adminCancelAndRefundBookingAction', () => {
   })
 
   it('surfaces the reconciliation gap plainly when the RPC fails after a successful refund', async () => {
-    createServerClientMock.mockResolvedValue({ rpc: rpcMock })
+    mockClient({})
     stripeRefundsCreateMock.mockResolvedValue({ id: 're_abc123' })
-    rpcMock.mockResolvedValue({ error: { message: 'not_found' } })
+    rpcMock.mockImplementation((name: string) => {
+      if (name === 'is_active_ops_role') return Promise.resolve({ data: true, error: null })
+      return Promise.resolve({ error: { message: 'not_found' } })
+    })
 
     const result = await adminCancelAndRefundBookingAction({
       bookingId: 'booking-1',
-      stripePaymentIntentId: 'pi_123',
       reason: 'traveller requested cancellation',
     })
 

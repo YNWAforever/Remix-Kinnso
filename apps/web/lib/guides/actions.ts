@@ -32,18 +32,41 @@ async function getSupabase(): Promise<Supabase> {
   return createSupabaseServerClient()
 }
 
-async function getAuthedCreator(supabase: Supabase) {
+type AuthedCreator = { id: string; displayName: string | null; handle: string | null }
+
+/**
+ * Guides are public, creator-authored content, so writing one requires an
+ * ACTIVE creator — not merely a signed-in account.
+ *
+ * Every sign-up gets a blank `creators` row (handle_new_user()), so row
+ * existence alone would let any traveller or merchant publish to /explore,
+ * /g/[slug] and the sitemap. `status = 'active'` is the same bar
+ * `resolveViewerRole()` and /studio already use for a "real" creator.
+ */
+async function getAuthedCreator(
+  supabase: Supabase,
+): Promise<{ ok: true; creator: AuthedCreator } | ActionFailure> {
   const {
     data: { user },
     error,
   } = await supabase.auth.getUser()
-  if (error || !user) return null
+  if (error || !user) return formError('Sign in is required')
+
   const { data: creator } = await supabase
     .from('creators')
-    .select('display_name, handle')
+    .select('display_name, handle, status')
     .eq('id', user.id)
-    .single()
-  return { id: user.id, displayName: creator?.display_name ?? null, handle: creator?.handle ?? null }
+    .maybeSingle()
+  if (creator?.status !== 'active') return formError('Creator access is required')
+
+  return {
+    ok: true,
+    creator: {
+      id: user.id,
+      displayName: creator.display_name ?? null,
+      handle: creator.handle ?? null,
+    },
+  }
 }
 
 async function revalidate(paths: string[]) {
@@ -71,8 +94,9 @@ export async function createGuideAction(
   if (!validation.ok) return validation
 
   const supabase = await getSupabase()
-  const creator = await getAuthedCreator(supabase)
-  if (!creator) return formError('Sign in is required')
+  const auth = await getAuthedCreator(supabase)
+  if (!auth.ok) return auth
+  const creator = auth.creator
 
   const name = creator.displayName?.trim() || 'Creator'
   const handle = creator.handle ?? slugify(name)
@@ -110,8 +134,8 @@ export async function updateGuideAction(
   if (!validation.ok) return validation
 
   const supabase = await getSupabase()
-  const creator = await getAuthedCreator(supabase)
-  if (!creator) return formError('Sign in is required')
+  const auth = await getAuthedCreator(supabase)
+  if (!auth.ok) return auth
 
   // Read current row (RLS scopes to owner) to decide publish_at transition.
   const { data: current } = await supabase
@@ -150,8 +174,9 @@ export async function deleteGuideAction(
   'use server'
 
   const supabase = await getSupabase()
-  const creator = await getAuthedCreator(supabase)
-  if (!creator) return formError('Sign in is required')
+  const auth = await getAuthedCreator(supabase)
+  if (!auth.ok) return auth
+  const creator = auth.creator
 
   const { error } = await supabase.from('guides').delete().eq('id', id).eq('creator_id', creator.id)
   if (error) return formError('Guide could not be deleted')
