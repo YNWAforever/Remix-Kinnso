@@ -3,6 +3,12 @@ on:
   pull_request:
   push:
     branches: [main]
+  # On-demand runs. Without this, CI is reachable only through a pull request or a
+  # push to main, so work on a branch — including a change to CI itself — cannot be
+  # exercised before it is proposed. Note GitHub only offers the Run workflow button
+  # once this file is on the default branch; until then a pull request is the only
+  # way to run these jobs.
+  workflow_dispatch:
 
 # Every job here only reads the repository; the Stripe test-mode secrets below are the
 # sole privilege this workflow needs. Without an explicit block the jobs inherit the
