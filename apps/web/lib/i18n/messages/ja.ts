@@ -477,6 +477,13 @@ const messages: Messages = {
     rights: '© 2026 KINNSO. 無断転載を禁じます。',
     lForCreators: 'クリエイター向け',
   },
+  analytics: {
+    title: 'KINNSO の改善にご協力ください',
+    description: 'プライバシーに配慮した計測を許可すると、旅行者の体験改善に役立ちます。',
+    accept: '計測を許可する',
+    decline: '許可しない',
+    changePreference: '計測の設定を変更',
+  },
   home: {
     heroEyebrow: 'トラベルクリエイターのマーケットプレイス',
     heroTitle: '本物のクリエイター、本物の場所。本当に行きたい旅を予約しよう。',

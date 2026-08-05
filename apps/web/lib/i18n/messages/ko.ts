@@ -477,6 +477,13 @@ const messages: Messages = {
     rights: '© 2026 KINNSO. 모든 권리 보유.',
     lForCreators: '크리에이터 안내',
   },
+  analytics: {
+    title: 'KINNSO 개선에 참여해 주세요',
+    description: '개인정보를 보호하는 측정을 허용하면 여행자 경험을 개선하는 데 도움이 됩니다.',
+    accept: '측정 허용',
+    decline: '거절',
+    changePreference: '측정 환경설정 변경',
+  },
   home: {
     heroEyebrow: '여행 크리에이터 마켓플레이스',
     heroTitle: '진짜 크리에이터, 진짜 장소. 정말 가고 싶은 여행을 예약하세요.',

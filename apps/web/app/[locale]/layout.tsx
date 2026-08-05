@@ -59,7 +59,7 @@ export default async function LocaleLayout({
     <html lang={htmlLang(loc)} className={`h-full antialiased ${fontVariables}`}>
       <body className="min-h-full flex flex-col font-sans bg-kinnso-cream text-kinnso-ink">
         <JsonLd data={ld} />
-        <SiteChrome locale={loc} sessionsLive={productState.sessionsLive} bookingLive={productState.bookingLive} dashboardLabel={messages.admin.navDashboard} nav={messages.nav} footer={messages.footer}>
+        <SiteChrome locale={loc} sessionsLive={productState.sessionsLive} bookingLive={productState.bookingLive} dashboardLabel={messages.admin.navDashboard} nav={messages.nav} footer={messages.footer} analytics={messages.analytics}>
           {children}
         </SiteChrome>
       </body>

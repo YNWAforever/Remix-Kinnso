@@ -2650,6 +2650,81 @@ export type Database = {
         }
         Relationships: []
       }
+      traveller_analytics_events: {
+        Row: {
+          account_id: string | null
+          authenticated: boolean
+          booking_state: string
+          client_event_id: string
+          consent_version: string
+          entity_id: string | null
+          entity_type: string | null
+          error_category: string | null
+          event_name: string
+          id: string
+          journey_id: string
+          locale: string
+          occurred_at: string
+          outcome: string | null
+          received_at: string
+          route_key: string
+        }
+        Insert: {
+          account_id?: string | null
+          authenticated?: boolean
+          booking_state?: string
+          client_event_id: string
+          consent_version: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_category?: string | null
+          event_name: string
+          id?: string
+          journey_id: string
+          locale: string
+          occurred_at: string
+          outcome?: string | null
+          received_at?: string
+          route_key: string
+        }
+        Update: {
+          account_id?: string | null
+          authenticated?: boolean
+          booking_state?: string
+          client_event_id?: string
+          consent_version?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_category?: string | null
+          event_name?: string
+          id?: string
+          journey_id?: string
+          locale?: string
+          occurred_at?: string
+          outcome?: string | null
+          received_at?: string
+          route_key?: string
+        }
+        Relationships: []
+      }
+      traveller_analytics_rate_limits: {
+        Row: {
+          event_count: number
+          journey_id: string
+          window_start: string
+        }
+        Insert: {
+          event_count?: number
+          journey_id: string
+          window_start?: string
+        }
+        Update: {
+          event_count?: number
+          journey_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       destination_index: {
@@ -2920,6 +2995,21 @@ export type Database = {
         Args: { p_id: string; p_kind: string; p_status: string }
         Returns: undefined
       }
+      admin_traveller_analytics_report: {
+        Args: { p_window_end: string; p_window_start: string }
+        Returns: {
+          attribution_window_days: number
+          booking_state: string
+          denominator: number
+          entity_type: string | null
+          locale: string
+          metric_key: string
+          numerator: number
+          rate: number | null
+          sample_count: number
+          status: string
+        }[]
+      }
       admin_suspend_ops_member: {
         Args: { p_member_id: string; p_reason: string }
         Returns: undefined
@@ -2943,6 +3033,14 @@ export type Database = {
       }
       check_and_increment_rsvp_rate_limit: {
         Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      check_and_increment_traveller_analytics_rate_limit: {
+        Args: {
+          p_journey_id: string
+          p_max_requests: number
+          p_window_seconds: number
+        }
         Returns: boolean
       }
       confirm_booking_from_webhook: {
@@ -3052,6 +3150,7 @@ export type Database = {
         }
         Returns: string
       }
+      purge_traveller_analytics_events: { Args: never; Returns: undefined }
       platform_stats: {
         Args: never
         Returns: {

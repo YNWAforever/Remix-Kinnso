@@ -708,6 +708,9 @@ export interface Messages {
     lAbout: string; lAgent: string; lLegal: string; rights: string
     lForCreators: string
   }
+  analytics: {
+    title: string; description: string; accept: string; decline: string; changePreference: string
+  }
   home: {
     heroEyebrow: string; heroTitle: string; heroSubtitle: string
     heroPrimaryCta: string; heroSecondaryCta: string
@@ -1744,6 +1747,13 @@ const messages: Messages = {
     lAbout: 'About', lAgent: 'AI Agent', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
     lForCreators: 'For Creators',
+  },
+  analytics: {
+    title: 'Help improve KINNSO',
+    description: 'Allow privacy-preserving measurement to help us improve traveller journeys.',
+    accept: 'Accept measurement',
+    decline: 'Decline',
+    changePreference: 'Change measurement preference',
   },
   home: {
     heroEyebrow: 'The travel creator marketplace',

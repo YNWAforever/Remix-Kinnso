@@ -23,6 +23,7 @@ import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 import { getPostDirectory } from '@/lib/articles/blocks'
 import { resolveConfiguredProductState } from '@/lib/product-state'
+import { AnalyticsEntityView } from '@/components/kinnso/analytics/AnalyticsEntityView'
 
 export const revalidate = 2700 // 45 min (matches legacy article-detail cache TTL)
 export const dynamicParams = true
@@ -111,6 +112,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
     <main className="k2-container py-8">
       <JsonLd data={ld} />
       <ViewPing url={url} />
+      <AnalyticsEntityView locale={loc} routeKey="article_detail" entityType="article" entityId={a.id} />
 
       <nav className="text-sm text-muted mb-4" aria-label="breadcrumb">
         <Link href={`/${loc}`}>{dict.breadcrumb.home}</Link> ·{' '}

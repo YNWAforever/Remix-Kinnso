@@ -7,6 +7,7 @@ import type { Locale } from '@/lib/i18n/config'
 import type { PublicExperience } from '@/lib/experiences/public-queries'
 import type { PublicAvailability } from '@/lib/experiences/public-availability-queries'
 import { createCheckoutSessionAction } from '@/lib/experiences/booking-actions'
+import { trackTravellerEvent } from '@/lib/analytics/client'
 
 export function BookingWidget({ locale, t, experience, availability, viewerEmail, sourceSurface, guideSlug }: {
   locale: Locale
@@ -27,6 +28,13 @@ export function BookingWidget({ locale, t, experience, availability, viewerEmail
 
   function handleSubmit() {
     setError(null)
+    trackTravellerEvent('booking_cta_clicked', {
+      locale,
+      routeKey: 'experience_detail',
+      entityType: 'experience',
+      entityId: experience.id,
+      bookingState: 'on',
+    })
     startTransition(async () => {
       const result = await createCheckoutSessionAction(
         experience.id,
@@ -34,6 +42,15 @@ export function BookingWidget({ locale, t, experience, availability, viewerEmail
         { locale, ...(sourceSurface ? { sourceSurface } : {}), ...(guideSlug ? { guideSlug } : {}) },
       )
       if (!result.ok) {
+        trackTravellerEvent('checkout_started', {
+          locale,
+          routeKey: 'experience_detail',
+          entityType: 'experience',
+          entityId: experience.id,
+          bookingState: 'on',
+          outcome: 'error',
+          errorCategory: Object.keys(result.errors).some((key) => key !== 'form') ? 'invalid' : 'unavailable',
+        })
         setError(
           result.errors.form?.[0] ??
             result.errors.availabilityId?.[0] ??
@@ -43,6 +60,14 @@ export function BookingWidget({ locale, t, experience, availability, viewerEmail
         )
         return
       }
+      trackTravellerEvent('checkout_started', {
+        locale,
+        routeKey: 'experience_detail',
+        entityType: 'experience',
+        entityId: experience.id,
+        bookingState: 'on',
+        outcome: 'created',
+      })
       window.location.href = result.checkoutUrl
     })
   }

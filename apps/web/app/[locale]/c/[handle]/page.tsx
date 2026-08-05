@@ -10,6 +10,7 @@ import { getPublicSessionsForCreator } from '@/lib/sessions/public-queries'
 import { optionalEnrichmentQuery } from '@/lib/resilience/optional'
 import { creatorProfileJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
+import { AnalyticsEntityView } from '@/components/kinnso/analytics/AnalyticsEntityView'
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }))
@@ -63,6 +64,7 @@ export default async function CreatorPublicPage({
   return (
     <>
       <JsonLd data={ld} />
+      <AnalyticsEntityView locale={locale as Locale} routeKey="creator_profile" entityType="creator" entityId={creator.id} />
       <CreatorProfileView creator={{ ...creator, guides }} locale={locale as Locale} t={messages.creatorProfile}
         enquiry={messages.enquiry}
         related={messages.destinations}

@@ -477,6 +477,13 @@ const messages: Messages = {
     rights: '© 2026 KINNSO. 版权所有。',
     lForCreators: '创作者专区',
   },
+  analytics: {
+    title: '帮助改善 KINNSO',
+    description: '允许我们以保护隐私的方式衡量使用情况，帮助改善旅行者体验。',
+    accept: '接受使用衡量',
+    decline: '拒绝',
+    changePreference: '更改衡量偏好',
+  },
   home: {
     heroEyebrow: '旅行创作者平台',
     heroTitle: '真实创作者、真实地方。预订你真正想要的旅程。',

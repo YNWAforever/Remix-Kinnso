@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { Bot, Send, ThumbsDown, ThumbsUp, CalendarRange, Compass, MapPinned } from 'lucide-react'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { rateAgentMessageAction } from '@/lib/agent/actions'
+import { hasAnalyticsConsent, subscribeToAnalyticsConsent, trackTravellerEvent } from '@/lib/analytics/client'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -23,6 +24,16 @@ export function AgentChatView({ locale, t, configured, bookingLive, anonSessionI
   viewerSignedIn: boolean
   initialMessages?: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
 }) {
+  const consented = useSyncExternalStore(subscribeToAnalyticsConsent, hasAnalyticsConsent, () => false)
+  const tracked = useRef(false)
+  const initialLocale = useRef(locale)
+
+  useEffect(() => {
+    if (!consented || tracked.current) return
+    tracked.current = true
+    trackTravellerEvent('agent_started', { locale: initialLocale.current, routeKey: 'agent' })
+  }, [consented])
+
   const { messages, sendMessage, status, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/agent' }),
     messages: initialMessages.map((m) => ({ id: m.id, role: m.role, parts: [{ type: 'text', text: m.content }] })),
