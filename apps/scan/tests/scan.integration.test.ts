@@ -237,12 +237,12 @@ run('apps/scan integration — job lifecycle (fake adapters)', () => {
 
     const { data: job } = await svc
       .from('creator_scan_jobs')
-      .select('id, creator_id, status, created_at')
+      .select('id, creator_id, status, created_at, updated_at')
       .eq('id', jobId)
       .single()
 
     const result = canRetryFn(
-      { id: job!.id, creator_id: job!.creator_id, status: job!.status as never, created_at: job!.created_at },
+      { id: job!.id, creator_id: job!.creator_id, status: job!.status as never, created_at: job!.created_at, updated_at: job!.updated_at },
       USER_B_ID // user B tries to retry user A's job
     )
     expect(result).toEqual({ allowed: false, httpStatus: 404 })
@@ -254,12 +254,12 @@ run('apps/scan integration — job lifecycle (fake adapters)', () => {
 
     const { data: job } = await svc
       .from('creator_scan_jobs')
-      .select('id, creator_id, status, created_at')
+      .select('id, creator_id, status, created_at, updated_at')
       .eq('id', jobId)
       .single()
 
     const result = canRetryFn(
-      { id: job!.id, creator_id: job!.creator_id, status: job!.status as never, created_at: job!.created_at },
+      { id: job!.id, creator_id: job!.creator_id, status: job!.status as never, created_at: job!.created_at, updated_at: job!.updated_at },
       USER_A_ID
     )
     expect(result).toEqual({ allowed: true, httpStatus: 200 })
@@ -271,7 +271,7 @@ run('apps/scan integration — job lifecycle (fake adapters)', () => {
 
     const { data: jobs } = await svc
       .from('creator_scan_jobs')
-      .select('id, creator_id, status, created_at')
+      .select('id, creator_id, status, created_at, updated_at')
       .eq('creator_id', USER_A_ID)
       .in('status', ['queued', 'fetching', 'analyzing'])
 
@@ -281,6 +281,7 @@ run('apps/scan integration — job lifecycle (fake adapters)', () => {
         creator_id: string
         status: 'queued' | 'fetching' | 'analyzing' | 'ready' | 'failed'
         created_at: string
+        updated_at: string
       }> | null) ?? []
     )
     expect(result.limited).toBe(true)

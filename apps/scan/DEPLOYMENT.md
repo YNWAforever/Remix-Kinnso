@@ -30,7 +30,7 @@ This directory ships everything Railway needs:
    | `LLM_API_KEY` | *(LLM gateway key)* | **SECRET** — DNA synthesis LLM |
    | `LLM_BASE_URL` | *(OpenAI-compatible `/chat/completions` URL)* | which provider to call (see below) |
    | `LLM_MODEL` | *(model id)* | a model the chosen gateway serves |
-   | `WEB_ORIGIN` | `https://remix-kinnso-web.vercel.app` | locks CORS to the web app (defaults to `*` if unset) |
+   | `WEB_ORIGIN` | `https://remix-kinnso-web.vercel.app` | locks CORS to the web app. **Required** when `NODE_ENV=production` (boot fails without it); defaults to `*` otherwise, and the worker logs a warning when it does |
 
    **LLM provider is pluggable.** The worker uses a generic OpenAI-compatible chat-completions
    client, so any gateway exposing that shape works — just set `LLM_BASE_URL` (+ `LLM_API_KEY`

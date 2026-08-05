@@ -10,6 +10,8 @@ export interface ScanConfig {
   llmApiKey: string
   llmModel: string
   llmBaseUrl: string
+  /** Allowed CORS origin, or '*' for the permissive local-dev default. */
+  webOrigin: string
   fixtureMode: boolean
 }
 
@@ -33,6 +35,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ScanConfig {
     llmApiKey: env.LLM_API_KEY ?? env.OPENROUTER_API_KEY ?? '',
     llmModel: env.LLM_MODEL ?? env.OPENROUTER_MODEL ?? 'anthropic/claude-3.5-sonnet',
     llmBaseUrl: env.LLM_BASE_URL ?? DEFAULT_LLM_URL,
+    // CORS origin for the browser-facing routes. Requests are bearer-authenticated
+    // rather than cookie-authenticated, so '*' does not by itself hand an attacker
+    // a session — but it removes the one cheap barrier stopping a hostile page from
+    // driving a signed-in creator's token at these paid-API endpoints. So it goes
+    // through the same required-env mechanism as every other setting: named
+    // explicitly in production, permissive only for local dev and CI.
+    // `||`, not `??`: an empty WEB_ORIGIN is a misconfiguration, not a value.
+    webOrigin: env.WEB_ORIGIN || (env.NODE_ENV === 'production' ? req('WEB_ORIGIN') : '*'),
     fixtureMode: env.SCAN_FIXTURE_MODE === '1',
   }
 }
