@@ -965,10 +965,17 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string; navEnquiries: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string; navEnquiries: string; navAnalytics: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
+    analyticsTitle: string; analyticsSubtitle: string; analyticsWindow: string; analyticsWindow24h: string; analyticsWindow7d: string; analyticsFilters: string; analyticsAll: string
+    analyticsUtcNote: string; analyticsRetentionNote: string; analyticsAttributionNote: string; analyticsSampleFloorNote: string; analyticsHealthTitle: string; analyticsHealthStatus: string; analyticsHealthAvailable: string; analyticsHealthNoMatching: string; analyticsHealthObservedZero: string; analyticsHealthInsufficient: string; analyticsHealthUnavailable: string; analyticsHealthReturnedRows: string; analyticsHealthOkRows: string; analyticsHealthInsufficientRows: string; analyticsHealthObservedZeroRows: string; analyticsTableCaption: string; analyticsMetric: string
+    analyticsLocale: string; analyticsEntityType: string; analyticsBookingState: string; analyticsNumerator: string; analyticsDenominator: string; analyticsRate: string; analyticsStatus: string
+    analyticsOk: string; analyticsInsufficientSample: string; analyticsUnavailable: string; analyticsRetry: string; analyticsEmpty: string; analyticsObservedZero: string; analyticsEntityGuide: string
+    analyticsEntityExperience: string; analyticsEntityCreator: string; analyticsEntityArticle: string; analyticsBookingOff: string; analyticsBookingOn: string; analyticsMetricDiscoveryToEntity: string
+    analyticsMetricEntityToAgent: string; analyticsMetricEntityToCta: string; analyticsMetricCtaToWaitlist: string; analyticsMetricCtaToCheckout: string; analyticsMetricAgentStart: string
+    analyticsMetricSignupCompletion: string; analyticsMetricErrorInvalid: string; analyticsMetricErrorRateLimited: string; analyticsMetricErrorUnavailable: string; analyticsMetricErrorUnknown: string; analyticsMetricUnknown: string; analyticsNotApplicable: string
   }
   enquiriesAdmin: {
     title: string; subtitle: string; filterActive: string; filterResolved: string; filterSpam: string; filterAllTypes: string
@@ -2199,10 +2206,17 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions', navEnquiries: 'Enquiries',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions', navEnquiries: 'Enquiries', navAnalytics: 'Analytics',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
+    analyticsTitle: 'Analytics', analyticsSubtitle: 'Observe product funnel performance across locales and entity types.', analyticsWindow: 'Window', analyticsWindow24h: 'Last 24 hours', analyticsWindow7d: 'Last 7 days', analyticsFilters: 'Filters', analyticsAll: 'All',
+    analyticsUtcNote: 'Times are shown in UTC.', analyticsRetentionNote: 'Analytics data is retained for 8 days.', analyticsAttributionNote: 'Attribution uses a 7-day window.', analyticsSampleFloorNote: 'Rates are withheld when the denominator is below 10.', analyticsHealthTitle: 'Measurement health', analyticsHealthStatus: 'Status', analyticsHealthAvailable: 'Available', analyticsHealthNoMatching: 'No matching rows', analyticsHealthObservedZero: 'Observed zero', analyticsHealthInsufficient: 'Insufficient sample', analyticsHealthUnavailable: 'Unavailable', analyticsHealthReturnedRows: 'Rows returned', analyticsHealthOkRows: 'Interpretable rows', analyticsHealthInsufficientRows: 'Withheld rows', analyticsHealthObservedZeroRows: 'Observed-zero rows', analyticsTableCaption: 'Analytics funnel metrics', analyticsMetric: 'Metric',
+    analyticsLocale: 'Locale', analyticsEntityType: 'Entity type', analyticsBookingState: 'Booking state', analyticsNumerator: 'Numerator', analyticsDenominator: 'Denominator', analyticsRate: 'Rate', analyticsStatus: 'Status',
+    analyticsOk: 'OK', analyticsInsufficientSample: 'Insufficient sample', analyticsUnavailable: 'Unavailable', analyticsRetry: 'Retry', analyticsEmpty: 'No analytics data is available for this selection.', analyticsObservedZero: 'Zero is an observed aggregate; insufficient samples are not interpretable rates.', analyticsEntityGuide: 'Guide',
+    analyticsEntityExperience: 'Experience', analyticsEntityCreator: 'Creator', analyticsEntityArticle: 'Article', analyticsBookingOff: 'Booking off', analyticsBookingOn: 'Booking on', analyticsMetricDiscoveryToEntity: 'Discovery to entity',
+    analyticsMetricEntityToAgent: 'Entity to agent', analyticsMetricEntityToCta: 'Entity to CTA', analyticsMetricCtaToWaitlist: 'CTA to waitlist', analyticsMetricCtaToCheckout: 'CTA to checkout', analyticsMetricAgentStart: 'Agent start',
+    analyticsMetricSignupCompletion: 'Signup completion', analyticsMetricErrorInvalid: 'Invalid request errors', analyticsMetricErrorRateLimited: 'Rate-limited errors', analyticsMetricErrorUnavailable: 'Unavailable errors', analyticsMetricErrorUnknown: 'Unknown errors', analyticsMetricUnknown: 'Unknown', analyticsNotApplicable: '—',
   },
   enquiriesAdmin: {
     title: 'Enquiries', subtitle: 'Review and resolve profile enquiries with an audit trail.',
