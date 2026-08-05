@@ -265,10 +265,14 @@ d('creator schema RLS', () => {
       global: { headers: { Authorization: `Bearer ${accessToken}` } },
     })
 
-    // INSERT
+    // INSERT — the bare handle, which is the only form the app ever stores:
+    // validateHandle() runs raw input through normalizeHandle(), stripping a
+    // leading '@' and reducing a profile URL to its last path segment, and
+    // HandlesStep persists that normalized value. handleUrl() adds the '@' back
+    // for display, and the scan worker re-adds it when calling YouTube.
     const { data: inserted, error: insertError } = await owner
       .from('creator_social_handles')
-      .insert({ creator_id: userId, platform: 'instagram', handle: '@sp2test' })
+      .insert({ creator_id: userId, platform: 'instagram', handle: 'sp2test' })
       .select('id, handle')
       .single()
 
@@ -282,12 +286,12 @@ d('creator schema RLS', () => {
       .select('id, handle')
       .eq('id', handleId)
       .single()
-    expect(selected!.handle).toBe('@sp2test')
+    expect(selected!.handle).toBe('sp2test')
 
     // UPDATE
     const { error: updateError } = await owner
       .from('creator_social_handles')
-      .update({ handle: '@sp2test_updated' })
+      .update({ handle: 'sp2test_updated' })
       .eq('id', handleId)
     expect(updateError).toBeNull()
 
@@ -304,6 +308,32 @@ d('creator schema RLS', () => {
       .select('id')
       .eq('id', handleId)
     expect((afterDelete ?? []).length).toBe(0)
+
+    await anon.auth.signOut()
+  })
+
+  it('rejects a handle that could be read as a URL or another profile', async () => {
+    // The handle is forwarded to RapidAPI as `username_or_url`, a field that
+    // accepts a full profile URL — so a stored URL would scan someone else's
+    // account. normalizeHandle() strips these client-side, but the browser
+    // writes to PostgREST directly, so the constraint is the real boundary.
+    const owner = await ownerClient()
+
+    for (const handle of [
+      'https://instagram.com/someone-else',
+      'instagram.com/someone-else',
+      '@sp2test',
+      'has space',
+      'a'.repeat(31),
+      '',
+    ]) {
+      const { error } = await owner
+        .from('creator_social_handles')
+        .insert({ creator_id: userId, platform: 'instagram', handle })
+        .select('id')
+      expect(error, `handle ${JSON.stringify(handle)} should have been rejected`).not.toBeNull()
+      expect(error!.code).toBe('23514')
+    }
 
     await anon.auth.signOut()
   })
