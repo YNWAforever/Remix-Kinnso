@@ -1,5 +1,35 @@
 import { describe, expect, it } from 'vitest'
-import { filterAnalyticsRows, parseAnalyticsDashboardFilters, toAnalyticsReportWindow } from '@/lib/admin/analytics-dashboard'
+import {
+  deriveAnalyticsHealthSummary,
+  filterAnalyticsRows,
+  parseAnalyticsDashboardFilters,
+  toAnalyticsReportWindow,
+  type AnalyticsHealthSummary,
+} from '@/lib/admin/analytics-dashboard'
+import type { TravellerAnalyticsReportRow } from '@/lib/admin/analytics-queries'
+
+const healthRow = (patch: Partial<TravellerAnalyticsReportRow> = {}): TravellerAnalyticsReportRow => ({
+  metricKey: 'entity_to_cta',
+  locale: 'en',
+  entityType: 'guide',
+  bookingState: 'off',
+  numerator: 2,
+  denominator: 10,
+  rate: 0.2,
+  sampleCount: 10,
+  status: 'ok',
+  attributionWindowDays: 7,
+  ...patch,
+})
+
+const summary = (patch: Partial<AnalyticsHealthSummary>): AnalyticsHealthSummary => ({
+  status: 'available',
+  returnedRows: 0,
+  okRows: 0,
+  insufficientRows: 0,
+  observedZeroRows: 0,
+  ...patch,
+})
 
 describe('parseAnalyticsDashboardFilters', () => {
   it('uses safe defaults', () => {
@@ -38,5 +68,41 @@ describe('filterAnalyticsRows', () => {
   it('keeps only rows matching every selected dimension', () => {
     expect(filterAnalyticsRows([...rows], { locale: 'en', entity: 'guide', booking: 'off' })).toEqual([rows[0]])
     expect(filterAnalyticsRows([...rows], { locale: 'all', entity: 'all', booking: 'all' })).toEqual(rows)
+  })
+})
+
+describe('deriveAnalyticsHealthSummary', () => {
+  it('returns unavailable before inspecting rows', () => {
+    expect(deriveAnalyticsHealthSummary(null, 'unavailable')).toEqual(summary({ status: 'unavailable' }))
+  })
+
+  it('keeps a successful empty filter neutral', () => {
+    expect(deriveAnalyticsHealthSummary([], null)).toEqual(summary({ status: 'no_matching_rows' }))
+  })
+
+  it('prioritizes observed zero over insufficient sample', () => {
+    expect(deriveAnalyticsHealthSummary([
+      healthRow({ numerator: 0, denominator: 0, sampleCount: 0, rate: null, status: 'insufficient_sample' }),
+    ], null)).toEqual(summary({ status: 'observed_zero', returnedRows: 1, insufficientRows: 1, observedZeroRows: 1 }))
+  })
+
+  it('reports insufficient samples when rows are non-zero but withheld', () => {
+    expect(deriveAnalyticsHealthSummary([
+      healthRow({ numerator: 1, denominator: 4, sampleCount: 4, rate: null, status: 'insufficient_sample' }),
+    ], null)).toEqual(summary({ status: 'insufficient_sample', returnedRows: 1, insufficientRows: 1 }))
+  })
+
+  it('counts mixed rows and reports available when all rows are interpretable', () => {
+    expect(deriveAnalyticsHealthSummary([
+      healthRow(),
+      healthRow({ numerator: 0, denominator: 0, sampleCount: 0, rate: null, status: 'ok' }),
+    ], null)).toEqual(summary({ status: 'available', returnedRows: 2, okRows: 2, observedZeroRows: 1 }))
+  })
+
+  it('reports insufficient when an interpretable row is mixed with a withheld row', () => {
+    expect(deriveAnalyticsHealthSummary([
+      healthRow(),
+      healthRow({ numerator: 1, denominator: 4, sampleCount: 4, rate: null, status: 'insufficient_sample' }),
+    ], null)).toEqual(summary({ status: 'insufficient_sample', returnedRows: 2, okRows: 1, insufficientRows: 1 }))
   })
 })

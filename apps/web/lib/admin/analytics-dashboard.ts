@@ -46,3 +46,47 @@ export function filterAnalyticsRows(rows: TravellerAnalyticsReportRow[], filters
     && (filters.booking === 'all' || row.bookingState === filters.booking),
   )
 }
+
+export const ANALYTICS_HEALTH_STATUSES = [
+  'unavailable',
+  'no_matching_rows',
+  'observed_zero',
+  'insufficient_sample',
+  'available',
+] as const
+
+export type AnalyticsHealthStatus = (typeof ANALYTICS_HEALTH_STATUSES)[number]
+
+export interface AnalyticsHealthSummary {
+  status: AnalyticsHealthStatus
+  returnedRows: number
+  okRows: number
+  insufficientRows: number
+  observedZeroRows: number
+}
+
+const emptyHealthSummary = (status: AnalyticsHealthStatus): AnalyticsHealthSummary => ({
+  status,
+  returnedRows: 0,
+  okRows: 0,
+  insufficientRows: 0,
+  observedZeroRows: 0,
+})
+
+export function deriveAnalyticsHealthSummary(
+  rows: TravellerAnalyticsReportRow[] | null,
+  error: 'unavailable' | null,
+): AnalyticsHealthSummary {
+  if (error !== null || rows === null) return emptyHealthSummary('unavailable')
+
+  const returnedRows = rows.length
+  const okRows = rows.filter((row) => row.status === 'ok').length
+  const insufficientRows = rows.filter((row) => row.status === 'insufficient_sample').length
+  const observedZeroRows = rows.filter((row) => row.numerator === 0 && row.denominator === 0).length
+  const counts = { returnedRows, okRows, insufficientRows, observedZeroRows }
+
+  if (returnedRows === 0) return { status: 'no_matching_rows', ...counts }
+  if (observedZeroRows === returnedRows) return { status: 'observed_zero', ...counts }
+  if (insufficientRows > 0) return { status: 'insufficient_sample', ...counts }
+  return { status: 'available', ...counts }
+}
