@@ -19,7 +19,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 400 })
   }
 
-  if (event.type === 'checkout.session.completed') {
+  // A delayed-notification payment method (bank debits, some wallets) delivers
+  // `completed` while payment_status is still 'unpaid', and only later
+  // `async_payment_succeeded` once the funds clear. Handling only `completed`
+  // would leave those bookings in pending_payment forever. Both events carry the
+  // same Checkout Session, and confirm_booking_from_webhook is idempotent
+  // (it returns early unless the booking is still pending_payment), so the two
+  // can share one path — including the case where both arrive.
+  if (
+    event.type === 'checkout.session.completed' ||
+    event.type === 'checkout.session.async_payment_succeeded'
+  ) {
     const session = event.data.object as Stripe.Checkout.Session
     if (session.payment_status === 'paid' && session.payment_intent) {
       const paymentIntentId =
