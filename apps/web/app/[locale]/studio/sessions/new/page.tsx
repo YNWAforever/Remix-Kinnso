@@ -3,7 +3,6 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSessionAction } from '@/lib/sessions/studio-actions'
-import { SESSION_TYPES } from '@/lib/sessions/types'
 import { SessionForm } from '@/components/kinnso/pages/SessionForm'
 
 export default async function NewStudioSessionPage({ params }: { params: Promise<{ locale: string }> }) {
