@@ -16,6 +16,12 @@ export interface SyncConfig {
     user: string
     password: string
     ssl?: LegacySslOptions
+    /**
+     * The resolved LEGACY_DB_SSL mode, carried so a connection failure can name
+     * it. Optional: it is diagnostic metadata, not connection config, so test
+     * fixtures may omit it and the reader falls back to inferring from `ssl`.
+     */
+    sslMode?: LegacySslMode
   }
   supabaseUrl: string
   serviceRoleKey: string
@@ -89,6 +95,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): SyncConfig {
       // Omit the key entirely for `disable` — mysql2 treats `ssl: undefined` as "no TLS",
       // but spelling it out keeps the plaintext case obvious at the call site.
       ...(ssl ? { ssl } : {}),
+      sslMode: (env.LEGACY_DB_SSL ?? 'require') as LegacySslMode,
     },
     supabaseUrl: req('SUPABASE_URL'),
     serviceRoleKey: req('SUPABASE_SERVICE_ROLE_KEY'),

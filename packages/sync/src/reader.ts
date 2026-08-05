@@ -1,28 +1,51 @@
 import mysql from 'mysql2/promise'
-import type { SyncConfig } from './config'
+import type { SyncConfig, LegacySslMode } from './config'
 import type { LegacyPostBundle } from './types'
+import { diagnoseLegacyConnectionError } from './diagnose'
 
 export class LegacyReader {
   private pool: mysql.Pool
+  private sslMode: LegacySslMode
   constructor(cfg: SyncConfig['legacy']) {
     // `cfg.ssl` is resolved and validated in config.ts (LEGACY_DB_SSL). It is absent
     // only for the explicit `disable` mode, so spreading cfg is what turns TLS on:
     // mysql2 negotiates plaintext whenever the key is missing.
     this.pool = mysql.createPool({ ...cfg, connectionLimit: 4, dateStrings: true, namedPlaceholders: true })
+    this.sslMode = cfg.sslMode ?? (cfg.ssl ? 'require' : 'disable')
   }
   async close() { await this.pool.end() }
 
+  /**
+   * Every query goes through here so a connection failure arrives as something
+   * actionable. TLS is on by default and this repository cannot see the legacy
+   * server, so the single most likely first-deploy failure is a server with no
+   * TLS — which mysql2 reports as "Server does not support secure connection",
+   * naming neither the cause nor the one env var that fixes it.
+   */
+  private async guard<T>(run: () => Promise<T>): Promise<T> {
+    try {
+      return await run()
+    } catch (error) {
+      const diagnosis = diagnoseLegacyConnectionError(error, this.sslMode)
+      if (!diagnosis.tlsRelated) throw error
+      throw new Error(diagnosis.message, { cause: error })
+    }
+  }
+
   /** Published, non-deleted post ids, ascending (for backfill pagination). */
   async allPostIds(afterId = 0, limit = 200): Promise<number[]> {
+    return this.guard(async () => {
     const [rows] = await this.pool.query<any[]>(
       'select id from posts where id > :afterId and deleted_at is null and published_at is not null order by id asc limit :limit',
       { afterId, limit },
     )
     return rows.map((r) => Number(r.id))
+    })
   }
 
   /** Assemble one post bundle (includes unpublished/soft-deleted posts so the sync can propagate removal). */
   async fetchPostBundle(id: number): Promise<LegacyPostBundle | null> {
+    return this.guard(async () => {
     const [posts] = await this.pool.query<any[]>(
       'select id, slug, url, thumbnails, authors, regions, offers, rating, views, published_at, end_at, edit_at, source, deleted_at, updated_at from posts where id = :id',
       { id },
@@ -68,5 +91,6 @@ export class LegacyReader {
     }
 
     return { post, translations, faqs, authors: authorRows, tags: [...tagMap.values()], categoryWeights: catW }
+    })
   }
 }

@@ -208,3 +208,52 @@ jobs:
           path: |
             apps/e2e/test-results/
             apps/e2e/playwright-report/
+
+  scan-image:
+    name: Scan worker image
+    # apps/scan ships as a container to Railway, and nothing else in CI builds it —
+    # so a broken Dockerfile used to surface only as a failed deploy. This builds the
+    # real image and boots it, which is also the only way to catch a regression in the
+    # non-root setup: the runner drops to `node`, and pnpm/corepack must still resolve
+    # for that user.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Build image
+        run: docker build -f apps/scan/Dockerfile -t kinnso-scan:ci .
+
+      - name: Boot and probe /health
+        run: |
+          # Dummy values only: loadConfig() runs at import and requires these, but /health
+          # touches neither Supabase nor any paid API, so booting proves the image without
+          # needing real credentials.
+          docker run -d --name scan-ci -p 8788:8788 \
+            -e NODE_ENV=production \
+            -e SUPABASE_URL=http://127.0.0.1:54321 \
+            -e SUPABASE_ANON_KEY=ci-dummy-anon-key \
+            -e SUPABASE_SERVICE_ROLE_KEY=ci-dummy-service-role-key \
+            -e WEB_ORIGIN=https://ci.invalid \
+            kinnso-scan:ci
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8788/health; then
+              echo; echo "health OK after ${attempt} attempt(s)"; break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo "scan worker never became healthy"; docker logs scan-ci; exit 1
+            fi
+            sleep 2
+          done
+
+      - name: Assert the container does not run as root
+        run: |
+          uid=$(docker exec scan-ci id -u)
+          echo "container uid: ${uid}"
+          if [ "$uid" = "0" ]; then
+            echo "scan worker is running as root; the USER directive regressed"; exit 1
+          fi
+
+      - name: Container logs
+        if: always()
+        run: docker logs scan-ci || true
