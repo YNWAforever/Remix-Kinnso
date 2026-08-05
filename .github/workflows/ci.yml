@@ -4,16 +4,22 @@ on:
   push:
     branches: [main]
 
+# Every job here only reads the repository; the Stripe test-mode secrets below are the
+# sole privilege this workflow needs. Without an explicit block the jobs inherit the
+# repository default, which can be read/write for the whole GITHUB_TOKEN scope.
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # Reads the pinned packageManager (pnpm@x) from package.json
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: 'pnpm'
@@ -25,7 +31,7 @@ jobs:
 
       # Local Supabase stack (Docker is available on GitHub-hosted runners).
       # `supabase start` applies supabase/migrations and seeds supabase/seed.sql.
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: 2.106.0
       - run: pnpm supabase start
@@ -48,6 +54,10 @@ jobs:
             exit 1
           fi
 
+          # Carried to the env-file step below: the RLS and R7.3 live suites reach the
+          # database through `docker exec` on this container, not only through PostgREST.
+          echo "SUPABASE_DB_CONTAINER=$db_container" >> "$GITHUB_ENV"
+
           docker exec -i "$db_container" \
             psql -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
           delete from auth.users
@@ -68,22 +78,34 @@ jobs:
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
             | tee apps/web/.env.test packages/sync/.env.test apps/scan/.env.test > /dev/null
 
+      - name: Arm the local-stack-only suites
+        # Must append AFTER the tee above, which truncates the file it writes.
+        # Credentials alone are not enough for these suites: without the container name and
+        # the R7.3 opt-in they resolve no local stack and describe.skip themselves, so the
+        # RLS policies and the production-honesty contract report green while untested.
+        run: |
+          set -euo pipefail
+          {
+            echo "SUPABASE_DB_CONTAINER=${SUPABASE_DB_CONTAINER}"
+            echo 'RUN_R7_3_LOCAL_LIVE_TESTS=1'
+          } >> apps/web/.env.test
+
       - run: pnpm test
 
   e2e:
     runs-on: ubuntu-latest
     needs: quality
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @kinnso/e2e e2e:install
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: 2.106.0
       - run: pnpm supabase start
@@ -100,6 +122,24 @@ jobs:
             --override-name auth.anon_key=SUPABASE_ANON_KEY \
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
             | tee apps/scan/.env.local > /dev/null
+
+      - name: Production build
+        # `turbo run build` resolves to exactly one real task (web#build -> next build).
+        # Nothing else in the pipeline runs it, so before this step a change that broke
+        # static generation cleared every required check and only failed later in Vercel.
+        # This job is the one place with the stack already up: generateStaticParams reaches
+        # the local database through the NEXT_PUBLIC_* vars written above.
+        #
+        # next.config.ts calls validateBuildEnv() while it loads, which needs the public
+        # Supabase vars plus AI_GATEWAY_API_KEY or VERCEL=1 for the agent surface. The
+        # escape hatch travels in .env.local rather than the step env because Next loads
+        # the env files before evaluating next.config.ts, while turbo runs tasks in strict
+        # env mode and would filter out an undeclared VERCEL. The dedicated Playwright
+        # configs already set VERCEL=1 for their own dev servers, so this matches.
+        run: |
+          set -euo pipefail
+          echo 'VERCEL=1' >> apps/web/.env.local
+          pnpm build
 
       - name: Start scan worker (fixture mode)
         run: |
@@ -124,7 +164,44 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
         run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts
-      - uses: actions/upload-artifact@v4
+
+      - name: Export service-role env for the profile enquiries journey
+        # playwright.profile-enquiries.config.ts reads apps/web/.env.test, which only the
+        # quality job writes; this job has its own stack and needs its own copy.
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          db_container="$(
+            docker ps \
+              --filter 'label=com.supabase.cli.project=kinnso-v3' \
+              --format '{{.ID}}\t{{.Names}}' \
+              | awk '$2 ~ /^supabase_db_/ { print $1; exit }'
+          )"
+
+          if [[ -z "$db_container" ]]; then
+            echo 'Unable to locate the local Supabase database container.' >&2
+            docker ps --format 'table {{.ID}}\t{{.Names}}\t{{.Labels}}'
+            exit 1
+          fi
+
+          echo "SUPABASE_DB_CONTAINER=$db_container" >> "$GITHUB_ENV"
+
+          pnpm -s supabase status -o env \
+            --override-name api.url=SUPABASE_URL \
+            --override-name auth.anon_key=SUPABASE_ANON_KEY \
+            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            > apps/web/.env.test
+
+      - name: Profile enquiries journey (local stack)
+        # The opt-in is what makes this suite run at all: the spec skips itself without it,
+        # so leaving it unset meant the enquiry-to-ops-queue journey was never exercised.
+        # Its own config owns the dev server (port 3000) and refuses any non-loopback target.
+        env:
+          E2E_PROFILE_ENQUIRIES_LOCAL: '1'
+          E2E_BASE_URL: http://127.0.0.1:3000
+        run: pnpm --filter @kinnso/e2e e2e --config playwright.profile-enquiries.config.ts
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: e2e-artifacts
