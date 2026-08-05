@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { TravellerAnalyticsReport } from '@/lib/admin/analytics-queries'
 
 const { roleMock, getUserMock, reportMock, viewMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'ops1' } } })),
-  reportMock: vi.fn(async () => ({
+  reportMock: vi.fn<() => Promise<TravellerAnalyticsReport>>(async () => ({
     from: '2026-08-01T00:00:00.000Z',
     to: '2026-08-08T00:00:00.000Z',
     timezone: 'UTC' as const,
