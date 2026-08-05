@@ -164,13 +164,6 @@ jobs:
           R7_10_BOOKING_STATE: 'off'
         run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts
 
-      - name: R7.10 accessibility - Booking ON
-        env:
-          R7_10_BOOKING_STATE: 'on'
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts
-
       - name: Export service-role env for the profile enquiries journey
         # playwright.profile-enquiries.config.ts reads apps/web/.env.test, which only the
         # quality job writes; this job has its own stack and needs its own copy.
@@ -207,6 +200,18 @@ jobs:
           E2E_PROFILE_ENQUIRIES_LOCAL: '1'
           E2E_BASE_URL: http://127.0.0.1:3000
         run: pnpm --filter @kinnso/e2e e2e --config playwright.profile-enquiries.config.ts
+      - name: R7.10 accessibility - Booking ON
+        # Deliberately last of the test steps: it is the only one that depends on a
+        # repository secret, and its config refuses to load without STRIPE_SECRET_KEY.
+        # Ahead of the others it would abort the job before they ran, hiding their
+        # result behind a configuration problem rather than a code one. It still fails
+        # the job — nothing here is skipped or softened.
+        env:
+          R7_10_BOOKING_STATE: 'on'
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+        run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
