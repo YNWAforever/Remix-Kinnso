@@ -16,13 +16,13 @@ const partial = computeReadiness({
 
 describe('StudioReadinessChecklist', () => {
   it('renders the progress header with done/total', () => {
-    render(<StudioReadinessChecklist locale="en" t={en.studioDashboard} readiness={partial} />)
+    render(<StudioReadinessChecklist directory={{ listed: true, gaps: [] }} locale="en" t={en.studioDashboard} readiness={partial} />)
     // 2 of 4 done: dna-ready + dna-fresh
     expect(screen.getByText(/2 \/ 4/)).toBeTruthy()
   })
 
   it('exposes per-item done state via data attributes', () => {
-    render(<StudioReadinessChecklist locale="en" t={en.studioDashboard} readiness={partial} />)
+    render(<StudioReadinessChecklist directory={{ listed: true, gaps: [] }} locale="en" t={en.studioDashboard} readiness={partial} />)
     expect(screen.getByTestId('readiness-dna-ready').getAttribute('data-done')).toBe('true')
     expect(screen.getByTestId('readiness-write-guide').getAttribute('data-done')).toBe('false')
     expect(screen.getByTestId('readiness-connect-platforms').getAttribute('data-done')).toBe('false')
@@ -30,14 +30,14 @@ describe('StudioReadinessChecklist', () => {
   })
 
   it('links the write-guide CTA to the new-guide page when not done', () => {
-    render(<StudioReadinessChecklist locale="en" t={en.studioDashboard} readiness={partial} />)
+    render(<StudioReadinessChecklist directory={{ listed: true, gaps: [] }} locale="en" t={en.studioDashboard} readiness={partial} />)
     const link = screen.getByRole('link', { name: en.studioDashboard.itemWriteGuideCta })
     expect(link.getAttribute('href')).toBe('/en/studio/guides/new')
   })
 
   it('renders an injected slot in place of the default connect CTA', () => {
     render(
-      <StudioReadinessChecklist
+      <StudioReadinessChecklist directory={{ listed: true, gaps: [] }}
         locale="en"
         t={en.studioDashboard}
         readiness={partial}
@@ -45,5 +45,29 @@ describe('StudioReadinessChecklist', () => {
       />,
     )
     expect(screen.getByRole('button', { name: 'SLOT-ADD' })).toBeTruthy()
+  })
+
+  it('tells a creator with only drafts that a published guide is what lists them', () => {
+    render(
+      <StudioReadinessChecklist
+        directory={{ listed: false, gaps: ['no_published_guide'] }}
+        locale="en"
+        t={en.studioDashboard}
+        readiness={partial}
+      />,
+    )
+    expect(screen.getByText(en.studioDashboard.directoryNeedsGuide)).toBeTruthy()
+  })
+
+  it('confirms listing when the creator already qualifies', () => {
+    render(
+      <StudioReadinessChecklist
+        directory={{ listed: true, gaps: [] }}
+        locale="en"
+        t={en.studioDashboard}
+        readiness={partial}
+      />,
+    )
+    expect(screen.getByText(en.studioDashboard.directoryListed)).toBeTruthy()
   })
 })

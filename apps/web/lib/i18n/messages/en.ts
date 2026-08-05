@@ -846,6 +846,9 @@ export interface Messages {
     nextActionRefreshDna: string
     nextActionNothingOpen: string
     nextActionCta: string
+    directoryListed: string
+    directoryNeedsGuide: string
+    directoryNotListed: string
     addHandleSaved: string
   }
   studioGuides: {
@@ -1991,6 +1994,9 @@ const messages: Messages = {
     nextActionRefreshDna: 'Your DNA is getting old. Rescan to keep it accurate.',
     nextActionNothingOpen: 'Nothing needs your attention right now.',
     nextActionCta: 'Open',
+    directoryListed: 'You appear in the public creator directory.',
+    directoryNeedsGuide: 'Publish a guide to appear in the public creator directory — drafts do not count.',
+    directoryNotListed: 'Finish the steps above to appear in the public creator directory.',
   },
   studioGuides: {
     listPill: 'Studio',

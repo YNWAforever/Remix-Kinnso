@@ -705,6 +705,9 @@ const messages: Messages = {
     nextActionRefreshDna: 'DNA가 오래되었습니다. 다시 스캔해 최신 상태로 유지하세요.',
     nextActionNothingOpen: '지금 처리할 항목이 없습니다.',
     nextActionCta: '열기',
+    directoryListed: '공개 크리에이터 디렉터리에 등록되어 있습니다.',
+    directoryNeedsGuide: '가이드를 게시하면 디렉터리에 등록됩니다. 임시 저장본은 포함되지 않습니다.',
+    directoryNotListed: '위 단계를 완료하면 디렉터리에 등록됩니다.',
   },
   studioGuides: {
     listPill: '스튜디오',

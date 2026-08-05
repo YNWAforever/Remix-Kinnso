@@ -1,3 +1,4 @@
+import { isDirectoryListed } from '@/lib/creators/eligibility'
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import { mapRowToGuide } from '@/lib/guides/queries'
 import type { Guide } from '@/lib/guides/types'
@@ -103,7 +104,19 @@ export async function fetchEligibleCreators(): Promise<EligibleCreatorRow[]> {
       createdAt: creator.created_at,
       guideCount: counts.get(creator.id) ?? 0,
     }))
-    .filter((creator) => creator.isListed || creator.guideCount > 0)
+    // Shared with the studio readiness checklist so the directory rule has one
+    // definition. `status`, `handle` and `public_profile` are already enforced by
+    // the query above; passing them keeps the predicate whole rather than split
+    // across two places.
+    .filter((creator) =>
+      isDirectoryListed({
+        status: 'active',
+        handle: creator.handle,
+        publicProfile: creator.publicProfile,
+        publishedGuideCount: creator.guideCount,
+        isListed: creator.isListed,
+      }),
+    )
 }
 
 export async function getPublicCreators(): Promise<CreatorSummary[]> {

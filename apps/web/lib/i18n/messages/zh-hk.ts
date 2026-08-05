@@ -705,6 +705,9 @@ const messages: Messages = {
     nextActionRefreshDna: '你的 DNA 已有一段時間，重新掃描以保持準確。',
     nextActionNothingOpen: '目前沒有需要處理的事項。',
     nextActionCta: '開啟',
+    directoryListed: '你已顯示在公開創作者目錄中。',
+    directoryNeedsGuide: '發布一篇指南即可出現在公開創作者目錄——草稿不計算在內。',
+    directoryNotListed: '完成以上步驟即可出現在公開創作者目錄。',
   },
   studioGuides: {
     listPill: '工作室',

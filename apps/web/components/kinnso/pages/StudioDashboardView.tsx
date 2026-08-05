@@ -7,6 +7,7 @@ import type { EarningsCurrencyTotal } from '@/lib/missions/earnings'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { DnaSnapshotCard } from '@/components/kinnso/DnaSnapshotCard'
 import type { StudioNextAction } from '@/lib/studio/next-action'
+import type { DirectoryGap } from '@/lib/creators/eligibility'
 import { StudioReadinessChecklist } from '@/components/kinnso/StudioReadinessChecklist'
 import { StudioQuickLinks } from '@/components/kinnso/StudioQuickLinks'
 import { AddHandleDialog } from '@/components/kinnso/AddHandleDialog'
@@ -31,6 +32,7 @@ export interface StudioDashboardViewProps {
   lastScanned: string // ISO
   readiness: Readiness
   nextAction: StudioNextAction
+  directory: { listed: boolean; gaps: DirectoryGap[] }
   opportunities: OpportunityPreview[]
   earnings: EarningsCurrencyTotal[]
   platforms: Platform[]
@@ -41,7 +43,7 @@ export interface StudioDashboardViewProps {
 }
 
 export function StudioDashboardView(props: StudioDashboardViewProps) {
-  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, nextAction, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT } = props
+  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, nextAction, directory, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT } = props
   const p = (path: string) => `/${locale}${path}`
   const nextActionCopy = {
     await_scan: t.nextActionAwaitScan,
@@ -88,6 +90,7 @@ export function StudioDashboardView(props: StudioDashboardViewProps) {
 
         {/* 3. Readiness checklist (hero) with interactive slots */}
         <StudioReadinessChecklist
+          directory={directory}
           locale={locale}
           t={t}
           readiness={readiness}

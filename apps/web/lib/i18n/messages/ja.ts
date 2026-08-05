@@ -705,6 +705,9 @@ const messages: Messages = {
     nextActionRefreshDna: 'DNA が古くなっています。再スキャンして最新の状態に保ちましょう。',
     nextActionNothingOpen: '現在対応が必要な項目はありません。',
     nextActionCta: '開く',
+    directoryListed: '公開クリエイターディレクトリに掲載されています。',
+    directoryNeedsGuide: 'ガイドを公開するとディレクトリに掲載されます。下書きは対象外です。',
+    directoryNotListed: '上記のステップを完了するとディレクトリに掲載されます。',
   },
   studioGuides: {
     listPill: 'スタジオ',

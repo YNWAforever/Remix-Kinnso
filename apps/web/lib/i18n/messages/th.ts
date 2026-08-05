@@ -705,6 +705,9 @@ const messages: Messages = {
     nextActionRefreshDna: 'ข้อมูล DNA ของคุณเก่าแล้ว สแกนใหม่เพื่อให้ข้อมูลถูกต้อง',
     nextActionNothingOpen: 'ขณะนี้ไม่มีรายการที่ต้องดำเนินการ',
     nextActionCta: 'เปิด',
+    directoryListed: 'คุณปรากฏอยู่ในไดเรกทอรีครีเอเตอร์สาธารณะแล้ว',
+    directoryNeedsGuide: 'เผยแพร่ไกด์เพื่อปรากฏในไดเรกทอรีครีเอเตอร์สาธารณะ — ฉบับร่างไม่นับรวม',
+    directoryNotListed: 'ทำตามขั้นตอนด้านบนให้ครบเพื่อปรากฏในไดเรกทอรีครีเอเตอร์สาธารณะ',
   },
   studioGuides: {
     listPill: 'สตูดิโอ',
