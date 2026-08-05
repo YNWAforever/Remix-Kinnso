@@ -6,9 +6,18 @@ import {
   persistTravellerAnalyticsEvent,
 } from '@/lib/analytics/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getClientIp } from '@/lib/http/client-ip'
 
 const MAX_REQUESTS_PER_WINDOW = 120
 const RATE_LIMIT_WINDOW_SECONDS = 600
+
+// The per-journey limit below is keyed on a client-supplied uuid, so it only
+// bounds a well-behaved session — a caller minting a fresh journeyId per
+// request always gets a fresh bucket. This IP limit is what actually bounds the
+// caller, matching every other public write path (checkout, agent, rsvp). It is
+// deliberately more generous than the per-journey cap: several genuine
+// journeys (tabs, or visitors behind one NAT/corporate egress) can share an IP.
+const MAX_REQUESTS_PER_IP_WINDOW = 600
 
 function unavailableResponse() {
   return NextResponse.json({ accepted: false, error: 'unavailable' }, { status: 503 })
@@ -35,6 +44,21 @@ export async function POST(request: Request) {
 
   try {
     const supabase = await createSupabaseServerClient()
+
+    const ip = await getClientIp()
+    const { data: ipAllowed, error: ipThrottleError } = await supabase.rpc(
+      'check_and_increment_traveller_analytics_ip_rate_limit',
+      {
+        p_ip: ip,
+        p_max_requests: MAX_REQUESTS_PER_IP_WINDOW,
+        p_window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+      },
+    )
+    if (ipThrottleError) return unavailableResponse()
+    if (!ipAllowed) {
+      return NextResponse.json({ accepted: false, error: 'rate_limited' }, { status: 429 })
+    }
+
     const { data: allowed, error: throttleError } = await supabase.rpc(
       'check_and_increment_traveller_analytics_rate_limit',
       {

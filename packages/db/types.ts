@@ -3035,6 +3035,10 @@ export type Database = {
         Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
         Returns: boolean
       }
+      check_and_increment_traveller_analytics_ip_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
       check_and_increment_traveller_analytics_rate_limit: {
         Args: {
           p_journey_id: string
