@@ -179,3 +179,67 @@ Expected: green, with the pre-existing `Booking ON` CI gap (missing `STRIPE_SECR
 - The directory rule is shared with `fetchEligibleCreators`, not paraphrased, so the two cannot drift.
 - All seven locales carry every new key, and the parity test enforces it.
 - Nothing here depends on R9.0: creators earn against their own audience, so this phase can ship before, after, or beside the cutover.
+
+---
+
+## Outcome
+
+All four tasks shipped. Two things landed differently from the plan above; both
+are deliberate and the reasons are recorded here rather than silently absorbed.
+
+### Task 1 - next-best action (`lib/studio/next-action.ts`)
+
+Shipped as a pure, unit-tested rule as specified. **The action set differs from
+the plan's draft.** The plan listed `add_handles`, `review_dna`, `join_mission`,
+`submit_proof` and `redeem_perk`; the implementation ships `await_scan`,
+`start_earning`, `publish_guide`, `connect_platforms`, `refresh_dna` and
+`nothing_open`.
+
+The reason is that the plan's set was written against a snapshot the page does
+not actually assemble. `/studio` has no "DNA reviewed" flag, no per-mission
+submission state, and no redeemed-perk set — deriving those would have meant new
+round trips, which the plan's own first constraint forbids. `join_mission` and
+`submit_proof` collapse into `start_earning` for the same reason: the page knows
+the offer catalogue and whether any settlement exists, not the per-mission state
+in between.
+
+The thesis is unchanged and is asserted explicitly: earning outranks publishing a
+guide when both are outstanding, because `mission_verified` is 40 points against
+`guide_published`'s 15 and travelpayouts missions cannot be tier-gated.
+
+### Task 3 - the two silent rules
+
+- `lib/creators/eligibility.ts` is the single definition of directory listing.
+  `fetchEligibleCreators` and the studio checklist both call it; neither
+  paraphrases it. The studio page reads the four extra columns by widening two
+  selects it already issues — no new round trip.
+- `lib/perks/next-tier.ts` names what the next tier unlocks from the live
+  catalog, states an empty tier plainly, and returns null at the top of the
+  ladder. `listActivePerks` throws by design, so this one caller catches: the
+  tier numbers are true without the catalog, and "nothing is gated there" is a
+  different claim from "we could not look".
+
+### Task 4 - accessibility
+
+**The plan's `playwright.r7-10.config.ts` run does not cover these surfaces.**
+`R7_10_ROUTES` is nine public routes and the suite never signs in, so `/studio`
+and `/studio/tier` have never been scanned by axe.
+
+Rather than report a green run that did not exercise the changed pages,
+`tests/a11y.studio-surfaces.test.tsx` runs axe-core over both views in jsdom at
+the CI gate's own serious/critical threshold. Colour contrast is disabled there:
+jsdom has no layout and no computed paint, so that rule would report a false pass.
+
+That run found a serious violation pre-dating this phase — an unnamed
+progressbar in the readiness checklist, and the same bug on the onboarding scan
+screen. Both are fixed.
+
+### Verification
+
+`pnpm typecheck`, `pnpm lint` (0 errors), `pnpm honesty:lint` and the full web
+suite all green: 2315 passing, with only the 14 known DB-dependent files failing
+for want of a local Supabase stack. `next build` compiles successfully; full
+static generation needs that same stack.
+
+The `Booking ON` e2e leg remains blocked on repository secrets
+(`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`), which is unrelated to this phase.
