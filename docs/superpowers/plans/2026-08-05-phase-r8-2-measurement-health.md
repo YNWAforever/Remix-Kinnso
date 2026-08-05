@@ -373,7 +373,7 @@ const noMatchingHealth: AnalyticsHealthSummary = {
 }
 ~~~
 
-Add health={availableHealth} to every existing AdminAnalyticsView render. Add these tests:
+Add a matching health prop to every existing AdminAnalyticsView render: use availableHealth for the normal all-ok fixture, noMatchingHealth for the empty fixture, an observed-zero summary for the observed-zero fixture, and an unavailable summary for the report-error fixture. Add these tests:
 
 ~~~tsx
 it('renders a labelled health section with localized status and counts', () => {
