@@ -2,6 +2,8 @@ import type { Messages } from '@/lib/i18n/messages/en'
 import type { CreatorContribution, ContributionEvent } from '@/lib/contribution/queries'
 import { TIER_THRESHOLDS } from '@/lib/contribution/tiers'
 import type { GatedTier } from '@/lib/contribution/tiers'
+import type { NextTierUnlocks } from '@/lib/perks/next-tier'
+import { tierMeta } from '@/lib/creator-mock'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import TierBadge from '@/components/kinnso/TierBadge'
 
@@ -16,11 +18,18 @@ export function StudioTierView({
   contribution,
   events,
   gatedCounts,
+  nextUnlocks,
 }: {
   t: Messages['tier']
   contribution: CreatorContribution
   events: ContributionEvent[]
   gatedCounts: Record<GatedTier, number>
+  /**
+   * Null when the perk catalog could not be read — the panel is omitted rather
+   * than rendered empty, because "nothing is gated there" and "we could not look"
+   * are different claims and only one of them is true.
+   */
+  nextUnlocks: { unlocks: NextTierUnlocks | null } | null
 }) {
   const { tier, points } = contribution
   return (
@@ -41,6 +50,46 @@ export function StudioTierView({
             </span>
           </div>
         </TicketCard>
+
+        {/* What the NEXT tier buys, from the live perk catalog. The ladder does pay
+            off — partner_perks.min_tier is hard-gated by the redemption RPC — but
+            this page showed a number to climb toward and never named the reward. */}
+        {nextUnlocks && (
+          <TicketCard as="section" className="p-5" aria-labelledby="next-unlocks-heading">
+            <h2 id="next-unlocks-heading" className="text-lg font-bold text-kinnso-ink">
+              {t.nextUnlocksHeading}
+            </h2>
+            {nextUnlocks.unlocks === null ? (
+              <p className="mt-2 text-sm text-kinnso-muted">
+                {t.nextUnlocksMaxed.replace('{tier}', tierMeta[tier].label)}
+              </p>
+            ) : (
+              <>
+                <p className="mt-2 text-sm text-kinnso-muted">
+                  {t.nextUnlocksIntro
+                    .replace('{points}', String(nextUnlocks.unlocks.pointsForNext))
+                    .replace('{tier}', tierMeta[nextUnlocks.unlocks.nextTier].label)}
+                </p>
+                {/* Empty is said plainly. Borrowing a perk from another tier to fill
+                    the space would promise something crossing this one does not buy. */}
+                {nextUnlocks.unlocks.perks.length === 0 ? (
+                  <p className="mt-2 text-sm text-kinnso-muted">
+                    {t.nextUnlocksNone.replace('{tier}', tierMeta[nextUnlocks.unlocks.nextTier].label)}
+                  </p>
+                ) : (
+                  <ul className="mt-3 space-y-2">
+                    {nextUnlocks.unlocks.perks.map((perk) => (
+                      <li key={`${perk.partnerName}-${perk.title}`} className="text-sm">
+                        <span className="font-semibold text-kinnso-ink">{perk.title}</span>
+                        <span className="text-kinnso-muted"> · {perk.partnerName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+          </TicketCard>
+        )}
 
         {/* All tiers */}
         <TicketCard className="p-5">

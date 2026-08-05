@@ -920,6 +920,10 @@ const messages: Messages = {
     unlocksHeading: '你可解鎖的內容',
     unlocksMissions: '個任務需要此等級',
     unlocksHelp: '提升等級即可參加專屬任務。',
+    nextUnlocksHeading: '升級解鎖什麼',
+    nextUnlocksIntro: '距 {tier} 還差 {points} 分，升級即解鎖：',
+    nextUnlocksNone: '目前沒有任何優惠鎖定在 {tier}。',
+    nextUnlocksMaxed: '{tier} 已經是最高等級，上面沒有再鎖定任何優惠。',
   },
   copilot: {
     title: '創作者副駕駛',

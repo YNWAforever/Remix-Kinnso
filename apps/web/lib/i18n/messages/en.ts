@@ -958,6 +958,10 @@ export interface Messages {
     unlocksHeading: string
     unlocksMissions: string
     unlocksHelp: string
+    nextUnlocksHeading: string
+    nextUnlocksIntro: string
+    nextUnlocksNone: string
+    nextUnlocksMaxed: string
     historyHeading: string
     historyEmpty: string
     eventGuide: string
@@ -2209,6 +2213,10 @@ const messages: Messages = {
     unlocksHeading: 'What you unlock',
     unlocksMissions: 'missions need this tier',
     unlocksHelp: 'Climb tiers to join exclusive missions.',
+    nextUnlocksHeading: 'What your next tier unlocks',
+    nextUnlocksIntro: '{points} pts to {tier} unlocks:',
+    nextUnlocksNone: 'No perks are gated at {tier} right now.',
+    nextUnlocksMaxed: '{tier} is the top tier — nothing is gated above it.',
   },
   copilot: {
     title: 'Creator Copilot',

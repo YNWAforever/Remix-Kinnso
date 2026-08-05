@@ -920,6 +920,10 @@ const messages: Messages = {
     unlocksHeading: 'アンロック内容',
     unlocksMissions: '件のミッションがこのティアを必要とします',
     unlocksHelp: 'ティアを上げると限定ミッションに参加できます。',
+    nextUnlocksHeading: '次のティアで解放されるもの',
+    nextUnlocksIntro: '{tier}まであと{points}pt、到達すると解放されます：',
+    nextUnlocksNone: '現在{tier}に紐づく特典はありません。',
+    nextUnlocksMaxed: '{tier}は最上位ティアで、その上に特典はありません。',
   },
   copilot: {
     title: 'クリエイターコパイロット',

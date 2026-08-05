@@ -920,6 +920,10 @@ const messages: Messages = {
     unlocksHeading: '你可解锁的内容',
     unlocksMissions: '个任务需要此等级',
     unlocksHelp: '提升等级即可参加专属任务。',
+    nextUnlocksHeading: '升级解锁什么',
+    nextUnlocksIntro: '距 {tier} 还差 {points} 分，升级即解锁：',
+    nextUnlocksNone: '目前没有任何权益锁定在 {tier}。',
+    nextUnlocksMaxed: '{tier} 已经是最高等级，上面没有再锁定任何权益。',
   },
   copilot: {
     title: '创作者副驾驶',

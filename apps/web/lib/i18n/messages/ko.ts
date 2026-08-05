@@ -920,6 +920,10 @@ const messages: Messages = {
     unlocksHeading: '잠금 해제 항목',
     unlocksMissions: '개 미션이 이 등급을 요구합니다',
     unlocksHelp: '등급을 올리면 독점 미션에 참여할 수 있습니다.',
+    nextUnlocksHeading: '다음 등급에서 열리는 혜택',
+    nextUnlocksIntro: '{tier}까지 {points}pt, 도달하면 열립니다:',
+    nextUnlocksNone: '현재 {tier}에 걸린 혜택이 없습니다.',
+    nextUnlocksMaxed: '{tier}은 최고 등급이며 그 위에 걸린 혜택은 없습니다.',
   },
   copilot: {
     title: '크리에이터 코파일럿',

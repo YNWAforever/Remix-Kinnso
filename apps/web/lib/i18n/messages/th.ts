@@ -920,6 +920,10 @@ const messages: Messages = {
     unlocksHeading: 'สิ่งที่ปลดล็อก',
     unlocksMissions: 'ภารกิจต้องใช้ระดับนี้',
     unlocksHelp: 'เลื่อนระดับเพื่อเข้าร่วมภารกิจพิเศษ',
+    nextUnlocksHeading: 'สิ่งที่ปลดล็อกในระดับถัดไป',
+    nextUnlocksIntro: 'อีก {points} แต้มสู่ {tier} จะปลดล็อก:',
+    nextUnlocksNone: 'ตอนนี้ยังไม่มีสิทธิพิเศษที่ผูกกับ {tier}',
+    nextUnlocksMaxed: '{tier} คือระดับสูงสุด ไม่มีสิทธิพิเศษผูกไว้เหนือกว่านี้',
   },
   copilot: {
     title: 'โคไพล็อตสำหรับครีเอเตอร์',
