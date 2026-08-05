@@ -100,7 +100,12 @@ export async function adminCancelAndRefundBookingAction(input: {
   const stripe = getStripeClient()
   let refundId: string
   try {
-    const refund = await stripe.refunds.create({ payment_intent: paymentIntentId })
+    // Keyed on the booking so a retried call (network blip, double submit)
+    // returns the original refund instead of issuing a second one.
+    const refund = await stripe.refunds.create(
+      { payment_intent: paymentIntentId },
+      { idempotencyKey: `booking-refund-${input.bookingId}` },
+    )
     refundId = refund.id
   } catch {
     return formError('Stripe refund failed. No changes were made to the booking.')

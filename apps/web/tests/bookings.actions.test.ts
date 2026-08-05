@@ -187,7 +187,11 @@ describe('adminCancelAndRefundBookingAction', () => {
     } as { bookingId: string; reason: string })
 
     expect(result.ok).toBe(true)
-    expect(stripeRefundsCreateMock).toHaveBeenCalledWith({ payment_intent: 'pi_from_booking' })
+    expect(stripeRefundsCreateMock).toHaveBeenCalledWith(
+      { payment_intent: 'pi_from_booking' },
+      // Keyed on the booking so a retry cannot issue a second refund.
+      { idempotencyKey: 'booking-refund-booking-1' },
+    )
   })
 
   it('does not call the refund RPC if the Stripe refund call fails', async () => {

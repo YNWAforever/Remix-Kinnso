@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
+import { safeEqual } from '@/lib/http/safe-equal'
 
 /**
  * Vercel invokes this endpoint once per day. The database function owns the
@@ -11,7 +12,7 @@ export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET
   const authorization = req.headers.get('authorization')
 
-  if (!secret || authorization !== `Bearer ${secret}`) {
+  if (!secret || !safeEqual(authorization, `Bearer ${secret}`)) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 

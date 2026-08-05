@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server'
 import { fetchTravelpayoutsActions } from '@/lib/missions/travelpayouts'
 import { createSupabaseServiceClient } from '@/lib/supabase/service'
+import { safeEqual } from '@/lib/http/safe-equal'
 
 /**
  * D-R3-9: Vercel-Cron-triggered repair job. Vercel Cron authenticates by
@@ -23,7 +24,7 @@ export const maxDuration = 60
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET
   const auth = req.headers.get('authorization')
-  if (!secret || auth !== `Bearer ${secret}`) {
+  if (!secret || !safeEqual(auth, `Bearer ${secret}`)) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 
