@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { TravellerAnalyticsReport } from '@/lib/admin/analytics-queries'
-import type { AnalyticsDashboardFilters } from '@/lib/admin/analytics-dashboard'
+import type { AnalyticsDashboardFilters, AnalyticsHealthSummary } from '@/lib/admin/analytics-dashboard'
 import { LOCALES, type Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -10,6 +10,7 @@ type Props = {
   filters: AnalyticsDashboardFilters
   report: TravellerAnalyticsReport | null
   error: 'unavailable' | null
+  health: AnalyticsHealthSummary
 }
 
 const metricLabel = (t: Messages['admin'], key: string) => ({
@@ -37,7 +38,7 @@ function href(locale: Locale, filters: AnalyticsDashboardFilters, patch: Partial
   return `/${locale}/admin/analytics?${query.toString()}`
 }
 
-export function AdminAnalyticsView({ locale, t, filters, report, error }: Props) {
+export function AdminAnalyticsView({ locale, t, filters, report, error, health }: Props) {
   const rows = report?.rows ?? []
   const hasNoRows = report !== null && rows.length === 0
   const hasObservedZero = report !== null && rows.length > 0 && rows.every((row) => row.numerator === 0 && row.denominator === 0)
@@ -52,12 +53,30 @@ export function AdminAnalyticsView({ locale, t, filters, report, error }: Props)
     : value in entityLabels ? entityLabels[value as keyof typeof entityLabels] : t.analyticsMetricUnknown
   const bookingLabel = (value: string) => value === 'on' ? t.analyticsBookingOn : value === 'off' ? t.analyticsBookingOff : t.analyticsMetricUnknown
   const localeLabel = (value: string) => (LOCALES as readonly string[]).includes(value) ? value : t.analyticsMetricUnknown
+  const healthStatusLabel = {
+    unavailable: t.analyticsHealthUnavailable,
+    no_matching_rows: t.analyticsHealthNoMatching,
+    observed_zero: t.analyticsHealthObservedZero,
+    insufficient_sample: t.analyticsHealthInsufficient,
+    available: t.analyticsHealthAvailable,
+  }[health.status]
 
   return (
     <main>
       <h1 className="k-display">{t.analyticsTitle}</h1>
       <p className="mt-2 text-kinnso-muted">{t.analyticsSubtitle}</p>
       <p className="mt-3 text-sm text-kinnso-muted">{t.analyticsUtcNote} {t.analyticsRetentionNote} {t.analyticsAttributionNote} {t.analyticsSampleFloorNote}</p>
+
+      <section className="mt-6 rounded-xl border border-kinnso-ink/10 bg-white p-4" role={health.status === 'unavailable' ? 'alert' : 'status'}>
+        <h2 className="text-sm font-bold text-kinnso-ink">{t.analyticsHealthTitle}</h2>
+        <p className="mt-1 text-sm text-kinnso-muted">{t.analyticsHealthStatus}: {healthStatusLabel}</p>
+        <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+          <div><dt className="text-kinnso-muted">{t.analyticsHealthReturnedRows}</dt><dd className="font-bold text-kinnso-ink">{health.returnedRows.toLocaleString(locale)}</dd></div>
+          <div><dt className="text-kinnso-muted">{t.analyticsHealthOkRows}</dt><dd className="font-bold text-kinnso-ink">{health.okRows.toLocaleString(locale)}</dd></div>
+          <div><dt className="text-kinnso-muted">{t.analyticsHealthInsufficientRows}</dt><dd className="font-bold text-kinnso-ink">{health.insufficientRows.toLocaleString(locale)}</dd></div>
+          <div><dt className="text-kinnso-muted">{t.analyticsHealthObservedZeroRows}</dt><dd className="font-bold text-kinnso-ink">{health.observedZeroRows.toLocaleString(locale)}</dd></div>
+        </dl>
+      </section>
 
       <nav className="mt-6 grid gap-4" aria-label={t.analyticsFilters}>
         <section role="group" aria-label={t.analyticsWindow}>
@@ -86,7 +105,7 @@ export function AdminAnalyticsView({ locale, t, filters, report, error }: Props)
         </section>
       </nav>
 
-      {error ? <p role="alert" className="mt-8 text-sm text-red-600">{t.analyticsUnavailable} {t.analyticsRetry}</p>
+      {error ? <p className="mt-8 text-sm text-red-600">{t.analyticsUnavailable} {t.analyticsRetry}</p>
         : hasNoRows ? <p className="mt-8 text-sm text-kinnso-muted">{t.analyticsEmpty}</p>
           : (
             <>

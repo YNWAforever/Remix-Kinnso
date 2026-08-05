@@ -934,6 +934,7 @@ const messages: Messages = {
     statPerksActive: '啟用中的福利', statPerksTotal: '福利總數', statRedemptions: '兌換次數',
     analyticsTitle: '分析', analyticsSubtitle: '依語言地區和項目類型觀察產品漏斗表現。', analyticsWindow: '時間範圍', analyticsWindow24h: '過去 24 小時', analyticsWindow7d: '過去 7 天', analyticsFilters: '篩選', analyticsAll: '全部',
     analyticsUtcNote: '時間以 UTC 顯示。', analyticsRetentionNote: '分析資料會保留 8 天。', analyticsAttributionNote: '歸因採用 7 天視窗。', analyticsSampleFloorNote: '分母低於 10 時不會顯示比率。', analyticsTableCaption: '分析漏斗指標', analyticsMetric: '指標',
+    analyticsHealthTitle: '測量健康狀況', analyticsHealthStatus: '狀態', analyticsHealthAvailable: '可用', analyticsHealthNoMatching: '沒有相符列', analyticsHealthObservedZero: '觀察到零值', analyticsHealthInsufficient: '樣本不足', analyticsHealthUnavailable: '無法使用', analyticsHealthReturnedRows: '已傳回列數', analyticsHealthOkRows: '可解讀列數', analyticsHealthInsufficientRows: '已隱藏列數', analyticsHealthObservedZeroRows: '觀察到零值的列數',
     analyticsLocale: '語言地區', analyticsEntityType: '項目類型', analyticsBookingState: '預訂狀態', analyticsNumerator: '分子', analyticsDenominator: '分母', analyticsRate: '比率', analyticsStatus: '狀態',
     analyticsOk: '正常', analyticsInsufficientSample: '樣本不足', analyticsUnavailable: '無法使用', analyticsRetry: '重試', analyticsEmpty: '此選擇沒有分析資料。', analyticsObservedZero: '零是觀察到的彙總；樣本不足時，比率無法解讀。', analyticsEntityGuide: '指南',
     analyticsEntityExperience: '體驗', analyticsEntityCreator: '創作者', analyticsEntityArticle: '文章', analyticsBookingOff: '預訂關閉', analyticsBookingOn: '預訂開啟', analyticsMetricDiscoveryToEntity: '探索至項目',

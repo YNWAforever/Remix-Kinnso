@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 import { AdminAnalyticsView } from '@/components/kinnso/admin/analytics/AdminAnalyticsView'
+import type { AnalyticsHealthSummary } from '@/lib/admin/analytics-dashboard'
 
 afterEach(cleanup)
 
@@ -18,9 +19,17 @@ const report = {
   ],
 }
 
+const health: AnalyticsHealthSummary = {
+  status: 'available',
+  returnedRows: 2,
+  okRows: 1,
+  insufficientRows: 1,
+  observedZeroRows: 0,
+}
+
 describe('AdminAnalyticsView', () => {
   it('renders active window/filter links and the aggregate table', () => {
-    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} />)
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} health={health} />)
     expect(screen.getByRole('link', { name: en.admin.analyticsWindow7d }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('link', { name: en.admin.analyticsWindow24h }).getAttribute('href')).toContain('window=24h')
     expect(screen.getByRole('table')).toBeTruthy()
@@ -28,25 +37,25 @@ describe('AdminAnalyticsView', () => {
   })
 
   it('shows a rate only for ok rows and explains insufficient samples', () => {
-    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} />)
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} health={health} />)
     expect(screen.getByText('20%')).toBeTruthy()
     expect(screen.getByText(en.admin.analyticsInsufficientSample)).toBeTruthy()
     expect(screen.getByText('—')).toBeTruthy()
   })
 
   it('renders generic unavailable and zero-data copy without raw identifiers', () => {
-    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={null} error="unavailable" />)
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={null} error="unavailable" health={{ ...health, status: 'unavailable', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }} />)
     expect(screen.getByRole('alert')).toHaveTextContent(en.admin.analyticsUnavailable)
     expect(screen.queryByText('journey-id')).toBeNull()
   })
 
   it('renders an explicit empty state when the aggregate adapter returns no rows', () => {
-    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{ ...report, rows: [] }} error={null} />)
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{ ...report, rows: [] }} error={null} health={{ ...health, status: 'no_matching_rows', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }} />)
     expect(screen.getByText(en.admin.analyticsEmpty)).toBeTruthy()
   })
 
   it('preserves every current query value when a filter control changes one value', () => {
-    render(<AdminAnalyticsView locale="en" t={en.admin} filters={{ window: '24h', locale: 'zh-hk', entity: 'experience', booking: 'on' }} report={report} error={null} />)
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={{ window: '24h', locale: 'zh-hk', entity: 'experience', booking: 'on' }} report={report} error={null} health={health} />)
     expect(screen.getByRole('link', { name: en.admin.analyticsWindow7d }).getAttribute('href'))
       .toBe('/en/admin/analytics?window=7d&locale=zh-hk&entity=experience&booking=on')
     expect(screen.getByRole('link', { name: 'en' }).getAttribute('href'))
@@ -61,12 +70,12 @@ describe('AdminAnalyticsView', () => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
       ...report,
       rows: [{ ...report.rows[0], numerator: 0, denominator: 0, sampleCount: 0, rate: null, status: 'insufficient_sample' }],
-    }} error={null} />)
+    }} error={null} health={{ ...health, status: 'observed_zero', okRows: 0, insufficientRows: 1, observedZeroRows: 1 }} />)
     expect(screen.getByText(en.admin.analyticsObservedZero)).toBeTruthy()
     expect(screen.getByRole('table')).toBeTruthy()
     expect(screen.getByText('—')).toBeTruthy()
     expect(screen.getByText(en.admin.analyticsInsufficientSample)).toBeTruthy()
-    expect(screen.getAllByText('0')).toHaveLength(2)
+    expect(within(screen.getByRole('table')).getAllByText('0')).toHaveLength(2)
   })
 
   it('renders a localized neutral value for valid dimensionless rows', () => {
@@ -74,13 +83,13 @@ describe('AdminAnalyticsView', () => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
       ...report,
       rows: [{ ...report.rows[0], entityType: null }],
-    }} error={null} />)
+    }} error={null} health={health} />)
     expect(screen.getByText(en.admin.analyticsNotApplicable)).toBeTruthy()
     expect(screen.queryByText(en.admin.analyticsMetricUnknown)).toBeNull()
   })
 
   it('groups filters with visible labels and uniquely named reset links', () => {
-    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} />)
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={report} error={null} health={health} />)
     expect(screen.getByRole('group', { name: en.admin.analyticsWindow })).toBeTruthy()
     expect(screen.getByRole('group', { name: en.admin.analyticsLocale })).toBeTruthy()
     expect(screen.getByRole('group', { name: en.admin.analyticsEntityType })).toBeTruthy()
@@ -94,11 +103,28 @@ describe('AdminAnalyticsView', () => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{
       ...report,
       rows: [{ ...report.rows[0], metricKey: 'journey-id', locale: 'account-id', entityType: 'event-id', bookingState: 'raw-metadata' }],
-    }} error={null} />)
+    }} error={null} health={health} />)
     expect(screen.getAllByText(en.admin.analyticsMetricUnknown)).toHaveLength(4)
     expect(screen.queryByText('journey-id')).toBeNull()
     expect(screen.queryByText('account-id')).toBeNull()
     expect(screen.queryByText('event-id')).toBeNull()
     expect(screen.queryByText('raw-metadata')).toBeNull()
+  })
+
+  it.each([
+    ['available', health, 'status', en.admin.analyticsHealthAvailable],
+    ['no matching rows', { ...health, status: 'no_matching_rows', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }, 'status', en.admin.analyticsHealthNoMatching],
+    ['observed zero', { ...health, status: 'observed_zero', okRows: 0, insufficientRows: 1, observedZeroRows: 2 }, 'status', en.admin.analyticsHealthObservedZero],
+    ['insufficient sample', { ...health, status: 'insufficient_sample' }, 'status', en.admin.analyticsHealthInsufficient],
+    ['unavailable', { ...health, status: 'unavailable', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }, 'alert', en.admin.analyticsHealthUnavailable],
+  ] as const)('renders %s measurement health with counts and its expected live-region role', (_name, summary, role, expectedStatus) => {
+    render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={role === 'alert' ? null : report} error={role === 'alert' ? 'unavailable' : null} health={summary} />)
+    expect(screen.getByRole(role)).toHaveTextContent(en.admin.analyticsHealthTitle)
+    expect(screen.getByRole(role)).toHaveTextContent(en.admin.analyticsHealthStatus)
+    expect(screen.getByRole(role)).toHaveTextContent(expectedStatus)
+    expect(screen.getByRole(role)).toHaveTextContent(String(summary.returnedRows))
+    expect(screen.getByRole(role)).toHaveTextContent(String(summary.okRows))
+    expect(screen.getByRole(role)).toHaveTextContent(String(summary.insufficientRows))
+    expect(screen.getByRole(role)).toHaveTextContent(String(summary.observedZeroRows))
   })
 })

@@ -49,6 +49,32 @@ describe('i18n locale parity for new creator-profile groups', () => {
     expect(en.admin.analyticsSampleFloorNote).toBe('Rates are withheld when the denominator is below 10.')
   })
 
+  it('defines the complete analytics measurement-health contract in every locale', async () => {
+    const healthKeys = [
+      'analyticsHealthTitle', 'analyticsHealthStatus', 'analyticsHealthAvailable',
+      'analyticsHealthNoMatching', 'analyticsHealthObservedZero', 'analyticsHealthInsufficient',
+      'analyticsHealthUnavailable', 'analyticsHealthReturnedRows', 'analyticsHealthOkRows',
+      'analyticsHealthInsufficientRows', 'analyticsHealthObservedZeroRows',
+    ] as const
+    const dictionaries = await Promise.all(LOCALES.map(async (locale) => [locale, await getDictionary(locale)] as const))
+    for (const [locale, dict] of dictionaries) {
+      for (const key of healthKeys) expect(dict.admin[key], `${locale} ${key}`).toBeTruthy()
+    }
+    expect(Object.fromEntries(healthKeys.map((key) => [key, en.admin[key]]))).toEqual({
+      analyticsHealthTitle: 'Measurement health',
+      analyticsHealthStatus: 'Status',
+      analyticsHealthAvailable: 'Available',
+      analyticsHealthNoMatching: 'No matching rows',
+      analyticsHealthObservedZero: 'Observed zero',
+      analyticsHealthInsufficient: 'Insufficient sample',
+      analyticsHealthUnavailable: 'Unavailable',
+      analyticsHealthReturnedRows: 'Rows returned',
+      analyticsHealthOkRows: 'Interpretable rows',
+      analyticsHealthInsufficientRows: 'Withheld rows',
+      analyticsHealthObservedZeroRows: 'Observed-zero rows',
+    })
+  })
+
   it('explains observed-zero aggregates and non-interpretable insufficient rates in every locale', async () => {
     const semanticMarkers: Record<string, string[]> = {
       en: ['observed aggregate', 'insufficient samples', 'not interpretable rates'],

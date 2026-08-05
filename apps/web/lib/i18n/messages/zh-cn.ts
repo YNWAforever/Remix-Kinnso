@@ -934,6 +934,7 @@ const messages: Messages = {
     statPerksActive: '启用中的福利', statPerksTotal: '福利总数', statRedemptions: '兑换次数',
     analyticsTitle: '分析', analyticsSubtitle: '按语言地区和项目类型观察产品漏斗表现。', analyticsWindow: '时间范围', analyticsWindow24h: '过去 24 小时', analyticsWindow7d: '过去 7 天', analyticsFilters: '筛选', analyticsAll: '全部',
     analyticsUtcNote: '时间以 UTC 显示。', analyticsRetentionNote: '分析数据会保留 8 天。', analyticsAttributionNote: '归因采用 7 天窗口。', analyticsSampleFloorNote: '分母低于 10 时不显示比率。', analyticsTableCaption: '分析漏斗指标', analyticsMetric: '指标',
+    analyticsHealthTitle: '测量健康状况', analyticsHealthStatus: '状态', analyticsHealthAvailable: '可用', analyticsHealthNoMatching: '没有匹配的行', analyticsHealthObservedZero: '观察到零值', analyticsHealthInsufficient: '样本不足', analyticsHealthUnavailable: '不可用', analyticsHealthReturnedRows: '返回的行数', analyticsHealthOkRows: '可解读的行数', analyticsHealthInsufficientRows: '已隐藏的行数', analyticsHealthObservedZeroRows: '观察到零值的行数',
     analyticsLocale: '语言地区', analyticsEntityType: '项目类型', analyticsBookingState: '预订状态', analyticsNumerator: '分子', analyticsDenominator: '分母', analyticsRate: '比率', analyticsStatus: '状态',
     analyticsOk: '正常', analyticsInsufficientSample: '样本不足', analyticsUnavailable: '不可用', analyticsRetry: '重试', analyticsEmpty: '此选择暂无分析数据。', analyticsObservedZero: '零是观察到的聚合；样本不足时，比率无法解读。', analyticsEntityGuide: '指南',
     analyticsEntityExperience: '体验', analyticsEntityCreator: '创作者', analyticsEntityArticle: '文章', analyticsBookingOff: '预订关闭', analyticsBookingOn: '预订开启', analyticsMetricDiscoveryToEntity: '探索至项目',
