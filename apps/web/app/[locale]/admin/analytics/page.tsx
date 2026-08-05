@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { AdminAnalyticsView } from '@/components/kinnso/admin/analytics/AdminAnalyticsView'
-import { filterAnalyticsRows, parseAnalyticsDashboardFilters, toAnalyticsReportWindow } from '@/lib/admin/analytics-dashboard'
+import { deriveAnalyticsHealthSummary, filterAnalyticsRows, parseAnalyticsDashboardFilters, toAnalyticsReportWindow } from '@/lib/admin/analytics-dashboard'
 import { getTravellerAnalyticsReport } from '@/lib/admin/analytics-queries'
 import { requireOpsPage } from '@/lib/admin/guard'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -32,5 +32,7 @@ export default async function AdminAnalyticsPage({
     error = 'unavailable'
   }
 
-  return <AdminAnalyticsView locale={loc} t={messages.admin} filters={filters} report={report} error={error} />
+  const health = deriveAnalyticsHealthSummary(report?.rows ?? null, error)
+
+  return <AdminAnalyticsView locale={loc} t={messages.admin} filters={filters} report={report} error={error} health={health} />
 }
