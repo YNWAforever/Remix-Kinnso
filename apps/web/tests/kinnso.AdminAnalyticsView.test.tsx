@@ -51,7 +51,7 @@ describe('AdminAnalyticsView', () => {
 
   it('renders an explicit empty state when the aggregate adapter returns no rows', () => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={{ ...report, rows: [] }} error={null} health={{ ...health, status: 'no_matching_rows', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }} />)
-    expect(screen.getByText(en.admin.analyticsEmpty)).toBeTruthy()
+    expect(screen.getAllByText(en.admin.analyticsEmpty)).toHaveLength(2)
   })
 
   it('preserves every current query value when a filter control changes one value', () => {
@@ -71,7 +71,7 @@ describe('AdminAnalyticsView', () => {
       ...report,
       rows: [{ ...report.rows[0], numerator: 0, denominator: 0, sampleCount: 0, rate: null, status: 'insufficient_sample' }],
     }} error={null} health={{ ...health, status: 'observed_zero', okRows: 0, insufficientRows: 1, observedZeroRows: 1 }} />)
-    expect(screen.getByText(en.admin.analyticsObservedZero)).toBeTruthy()
+    expect(screen.getAllByText(en.admin.analyticsObservedZero)).toHaveLength(2)
     expect(screen.getByRole('table')).toBeTruthy()
     expect(screen.getByText('—')).toBeTruthy()
     expect(screen.getByText(en.admin.analyticsInsufficientSample)).toBeTruthy()
@@ -112,19 +112,28 @@ describe('AdminAnalyticsView', () => {
   })
 
   it.each([
-    ['available', health, 'status', en.admin.analyticsHealthAvailable],
-    ['no matching rows', { ...health, status: 'no_matching_rows', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }, 'status', en.admin.analyticsHealthNoMatching],
-    ['observed zero', { ...health, status: 'observed_zero', okRows: 0, insufficientRows: 1, observedZeroRows: 2 }, 'status', en.admin.analyticsHealthObservedZero],
-    ['insufficient sample', { ...health, status: 'insufficient_sample' }, 'status', en.admin.analyticsHealthInsufficient],
-    ['unavailable', { ...health, status: 'unavailable', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }, 'alert', en.admin.analyticsHealthUnavailable],
-  ] as const)('renders %s measurement health with counts and its expected live-region role', (_name, summary, role, expectedStatus) => {
+    ['available', health, 'status', en.admin.analyticsHealthAvailable, en.admin.analyticsOk],
+    ['no matching rows', { ...health, status: 'no_matching_rows', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }, 'status', en.admin.analyticsHealthNoMatching, en.admin.analyticsEmpty],
+    ['observed zero', { ...health, status: 'observed_zero', okRows: 0, insufficientRows: 1, observedZeroRows: 2 }, 'status', en.admin.analyticsHealthObservedZero, en.admin.analyticsObservedZero],
+    ['insufficient sample', { ...health, status: 'insufficient_sample' }, 'status', en.admin.analyticsHealthInsufficient, en.admin.analyticsInsufficientSample],
+    ['unavailable', { ...health, status: 'unavailable', returnedRows: 0, okRows: 0, insufficientRows: 0, observedZeroRows: 0 }, 'alert', en.admin.analyticsHealthUnavailable, `${en.admin.analyticsUnavailable} ${en.admin.analyticsRetry}`],
+  ] as const)('renders %s measurement health as a labelled region with state explanation and counts', (_name, summary, role, expectedStatus, expectedDescription) => {
     render(<AdminAnalyticsView locale="en" t={en.admin} filters={filters} report={role === 'alert' ? null : report} error={role === 'alert' ? 'unavailable' : null} health={summary} />)
-    expect(screen.getByRole(role)).toHaveTextContent(en.admin.analyticsHealthTitle)
-    expect(screen.getByRole(role)).toHaveTextContent(en.admin.analyticsHealthStatus)
-    expect(screen.getByRole(role)).toHaveTextContent(expectedStatus)
-    expect(screen.getByRole(role)).toHaveTextContent(String(summary.returnedRows))
-    expect(screen.getByRole(role)).toHaveTextContent(String(summary.okRows))
-    expect(screen.getByRole(role)).toHaveTextContent(String(summary.insufficientRows))
-    expect(screen.getByRole(role)).toHaveTextContent(String(summary.observedZeroRows))
+    const healthRegion = screen.getByRole('region', { name: en.admin.analyticsHealthTitle })
+
+    expect(within(healthRegion).getByRole(role)).toHaveTextContent(en.admin.analyticsHealthStatus)
+    expect(within(healthRegion).getByRole(role)).toHaveTextContent(expectedStatus)
+    expect(within(healthRegion).getByText(expectedDescription, { selector: '#analytics-health-description' })).toBeTruthy()
+    expect(within(healthRegion).getByText(en.admin.analyticsHealthReturnedRows)).toBeTruthy()
+    expect(within(healthRegion).getByText(en.admin.analyticsHealthOkRows)).toBeTruthy()
+    expect(within(healthRegion).getByText(en.admin.analyticsHealthInsufficientRows)).toBeTruthy()
+    expect(within(healthRegion).getByText(en.admin.analyticsHealthObservedZeroRows)).toBeTruthy()
+    expect(within(healthRegion).getAllByRole('definition').map((definition) => definition.textContent)).toEqual([
+      String(summary.returnedRows),
+      String(summary.okRows),
+      String(summary.insufficientRows),
+      String(summary.observedZeroRows),
+    ])
+    expect(screen.queryAllByRole('alert')).toHaveLength(role === 'alert' ? 1 : 0)
   })
 })

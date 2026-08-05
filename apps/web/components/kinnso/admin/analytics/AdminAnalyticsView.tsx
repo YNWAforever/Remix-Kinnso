@@ -60,6 +60,13 @@ export function AdminAnalyticsView({ locale, t, filters, report, error, health }
     insufficient_sample: t.analyticsHealthInsufficient,
     available: t.analyticsHealthAvailable,
   }[health.status]
+  const healthDescription = {
+    unavailable: `${t.analyticsUnavailable} ${t.analyticsRetry}`,
+    no_matching_rows: t.analyticsEmpty,
+    observed_zero: t.analyticsObservedZero,
+    insufficient_sample: t.analyticsInsufficientSample,
+    available: t.analyticsOk,
+  }[health.status]
 
   return (
     <main>
@@ -67,15 +74,16 @@ export function AdminAnalyticsView({ locale, t, filters, report, error, health }
       <p className="mt-2 text-kinnso-muted">{t.analyticsSubtitle}</p>
       <p className="mt-3 text-sm text-kinnso-muted">{t.analyticsUtcNote} {t.analyticsRetentionNote} {t.analyticsAttributionNote} {t.analyticsSampleFloorNote}</p>
 
-      <section className="mt-6 rounded-xl border border-kinnso-ink/10 bg-white p-4" role={health.status === 'unavailable' ? 'alert' : 'status'}>
-        <h2 className="text-sm font-bold text-kinnso-ink">{t.analyticsHealthTitle}</h2>
-        <p className="mt-1 text-sm text-kinnso-muted">{t.analyticsHealthStatus}: {healthStatusLabel}</p>
+      <section className="mt-6 rounded-xl border border-kinnso-ink/10 bg-white p-4" aria-labelledby="analytics-health-heading" aria-describedby="analytics-health-description">
+        <h2 id="analytics-health-heading" className="text-sm font-bold text-kinnso-ink">{t.analyticsHealthTitle}</h2>
+        <p role={health.status === 'unavailable' ? 'alert' : 'status'} className="mt-1 text-sm text-kinnso-muted">{t.analyticsHealthStatus}: {healthStatusLabel}</p>
         <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
           <div><dt className="text-kinnso-muted">{t.analyticsHealthReturnedRows}</dt><dd className="font-bold text-kinnso-ink">{health.returnedRows.toLocaleString(locale)}</dd></div>
           <div><dt className="text-kinnso-muted">{t.analyticsHealthOkRows}</dt><dd className="font-bold text-kinnso-ink">{health.okRows.toLocaleString(locale)}</dd></div>
           <div><dt className="text-kinnso-muted">{t.analyticsHealthInsufficientRows}</dt><dd className="font-bold text-kinnso-ink">{health.insufficientRows.toLocaleString(locale)}</dd></div>
           <div><dt className="text-kinnso-muted">{t.analyticsHealthObservedZeroRows}</dt><dd className="font-bold text-kinnso-ink">{health.observedZeroRows.toLocaleString(locale)}</dd></div>
         </dl>
+        <p id="analytics-health-description" className="mt-3 text-sm text-kinnso-muted">{healthDescription}</p>
       </section>
 
       <nav className="mt-6 grid gap-4" aria-label={t.analyticsFilters}>
