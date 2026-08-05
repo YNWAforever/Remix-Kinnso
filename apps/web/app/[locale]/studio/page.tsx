@@ -6,6 +6,7 @@ import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { DnaSchema, type Dna, type Platform } from '@kinnso/scan'
 import { buildStudioIdentity, type HandleRow } from '@/lib/studio/identity'
 import { computeReadiness, REQUIRED_PLATFORMS } from '@/lib/studio/readiness'
+import { deriveStudioNextAction } from '@/lib/studio/next-action'
 import { listCreatorMerchantMissions, listAffiliateOffers, listCreatorSettlements } from '@/lib/missions/queries'
 import { getCreatorContribution } from '@/lib/contribution/queries'
 import { summarizeCreatorEarnings, toCreatorEarningItem, type CreatorSettlementRow } from '@/lib/missions/earnings'
@@ -93,6 +94,21 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
     ((settlementsRes.data ?? []) as unknown as CreatorSettlementRow[]).map(toCreatorEarningItem),
   )
 
+  // Derived from the snapshot above; deliberately no extra round trip on a page
+  // that already issues seven.
+  const nextAction = deriveStudioNextAction({
+    handleCount: handles.length,
+    missingPlatformCount: missingPlatforms.length,
+    guidesCount: (guidesRes.data ?? []).length,
+    activeScanJob: Boolean(activeJobRes.data?.id),
+    affiliateOfferCount: offers.length,
+    hasEarnings: earnings.length > 0,
+    dnaStale: Boolean(
+      readiness.items.find((i) => i.id === 'dna-fresh')?.detail.freshness?.stale,
+    ),
+  })
+
+
   return (
     <StudioDashboardView
       locale={loc}
@@ -104,6 +120,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
       dna={dna}
       lastScanned={updatedAt}
       readiness={readiness}
+      nextAction={nextAction}
       opportunities={opportunities}
       earnings={earnings}
       platforms={handles.map((h) => h.platform)}

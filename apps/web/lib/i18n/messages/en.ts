@@ -838,6 +838,14 @@ export interface Messages {
     addHandleErrorEmpty: string
     addHandleErrorFormat: string
     addHandleErrorLength: string
+    nextActionHeading: string
+    nextActionAwaitScan: string
+    nextActionStartEarning: string
+    nextActionPublishGuide: string
+    nextActionConnectPlatforms: string
+    nextActionRefreshDna: string
+    nextActionNothingOpen: string
+    nextActionCta: string
     addHandleSaved: string
   }
   studioGuides: {
@@ -1975,6 +1983,14 @@ const messages: Messages = {
     addHandleErrorFormat: 'That handle has invalid characters.',
     addHandleErrorLength: 'That handle is too long (max 30).',
     addHandleSaved: 'Added — rescan to include it in your DNA.',
+    nextActionHeading: 'Your next step',
+    nextActionAwaitScan: 'Your scan is running. We will have your DNA shortly.',
+    nextActionStartEarning: 'Promote an offer to your audience and earn commission on every booking it drives.',
+    nextActionPublishGuide: 'Publish your first guide — that is what lists you in the public creator directory.',
+    nextActionConnectPlatforms: 'Connect your remaining platforms so more of your audience can be verified.',
+    nextActionRefreshDna: 'Your DNA is getting old. Rescan to keep it accurate.',
+    nextActionNothingOpen: 'Nothing needs your attention right now.',
+    nextActionCta: 'Open',
   },
   studioGuides: {
     listPill: 'Studio',
