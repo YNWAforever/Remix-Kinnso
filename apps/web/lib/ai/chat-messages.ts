@@ -17,10 +17,17 @@ export type ChatMessagesResult =
 export function totalMessageChars(raw: readonly unknown[]): number {
   let total = 0
   for (const message of raw) {
-    const parts = (message as { parts?: Array<{ text?: unknown }> } | null)?.parts
+    const parts = (message as {
+      parts?: Array<{ text?: unknown; url?: unknown; data?: unknown }>
+    } | null)?.parts
     if (Array.isArray(parts)) {
       for (const part of parts) {
-        if (typeof part?.text === 'string') total += part.text.length
+        // `text` is the common case, but a file part carries its payload in
+        // `url` (often a base64 data: URI) or `data` — charging only `text`
+        // would let an oversized attachment through the cap untouched.
+        for (const value of [part?.text, part?.url, part?.data]) {
+          if (typeof value === 'string') total += value.length
+        }
       }
     }
     // Defensively account for any top-level string `content` some clients send.

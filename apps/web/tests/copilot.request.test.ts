@@ -29,3 +29,14 @@ describe('validateCopilotMessages', () => {
     expect(result.ok).toBe(true)
   })
 })
+
+describe('oversized non-text parts', () => {
+  it('counts a file part payload toward the character cap', () => {
+    const bigDataUri = `data:image/png;base64,${'A'.repeat(50_001)}`
+    const result = validateCopilotMessages([
+      { role: 'user', parts: [{ type: 'file', url: bigDataUri }] },
+    ])
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe('too_large')
+  })
+})
