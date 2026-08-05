@@ -7,11 +7,22 @@ import { transformAuthors } from './authors'
 import { transformFaqs } from './faqs'
 import { csvToArray, cdnUrl } from './arrays'
 import { validatePublication } from './publication'
+import { legacyToIso } from './datetime'
 
-export function transformPost(bundle: LegacyPostBundle, cdn: string): UpsertPayload & { warnings: TransformWarning[] } {
+export interface TransformOptions {
+  /** Zone the legacy DATETIME columns were written in; see config.ts `legacyTimezone`. */
+  legacyTimezone?: string
+}
+
+export function transformPost(
+  bundle: LegacyPostBundle,
+  cdn: string,
+  opts: TransformOptions = {},
+): UpsertPayload & { warnings: TransformWarning[] } {
+  const { legacyTimezone = 'UTC' } = opts
   const warnings: TransformWarning[] = []
   const { tags, tagSlugs } = transformTags(bundle.tags)
-  const { row: article, categoryDefaulted } = buildArticleRow(bundle, tagSlugs, cdn)
+  const { row: article, categoryDefaulted } = buildArticleRow(bundle, tagSlugs, cdn, legacyTimezone)
   if (categoryDefaulted) warnings.push({
     kind: 'category_defaulted',
     code: 'category_defaulted',
@@ -60,7 +71,7 @@ export function transformPost(bundle: LegacyPostBundle, cdn: string): UpsertPayl
         faq_title: t.faq_title ?? null,
         labels: csvToArray(t.labels),
         analyze_tags: csvToArray(t.analyze_tags),
-        validated_at: t.validated_at ? new Date(t.validated_at.replace(' ', 'T') + 'Z').toISOString() : null,
+        validated_at: legacyToIso(t.validated_at, legacyTimezone),
       }
     })
 

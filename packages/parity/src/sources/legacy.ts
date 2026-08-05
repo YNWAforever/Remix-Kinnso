@@ -32,36 +32,21 @@ function createSitemapLegacySource(sitemapUrl: string): LegacySource {
   }
 }
 
+export const MYSQL_MODE_NOT_IMPLEMENTED =
+  '--legacy-mysql is NOT implemented — do not use it as a cutover gate. Its baseline queries ' +
+  '(published URL paths, per-locale post_translations counts) are still TODO in ' +
+  'src/sources/legacy.ts, so every check would compare against an EMPTY baseline, pass ' +
+  'vacuously, and certify a cutover that was never verified. Use --legacy-sitemap, or ' +
+  'implement the queries first.'
+
 /**
- * Legacy MySQL mode (real production cutover only — master spec §8).
- * mysql2 is imported dynamically so the package installs/typechecks without a live DB.
- * Exercised only against production; logic is unit-tested via the fixture source.
+ * Legacy MySQL mode (real production cutover only — master spec §8) — NOT IMPLEMENTED.
+ *
+ * The queries were left as stubs returning empty sets. Empty baselines make every check
+ * vacuously true (nothing to cover, nothing to count, nothing to redirect), so the gate
+ * would have exited 0 while proving nothing. Refusing to construct the source is the only
+ * safe behaviour: a gate that cannot measure must fail, not pass.
  */
-function createMysqlLegacySource(dsn: string): LegacySource {
-  async function withConn<T>(fn: (conn: import('mysql2/promise').Connection) => Promise<T>): Promise<T> {
-    const mysql = await import('mysql2/promise')
-    const conn = await mysql.createConnection(dsn)
-    try {
-      return await fn(conn)
-    } finally {
-      await conn.end()
-    }
-  }
-  return {
-    async expectedUrlPaths() {
-      // TODO(cutover): SELECT published posts from the legacy schema and build
-      // /{locale}/articles/{segment}/{url}. See README "Legacy mode".
-      return withConn(async () => new Set<string>())
-    },
-    async localeCounts() {
-      // TODO(cutover): SELECT locale, COUNT(*) FROM post_translations of published posts.
-      return withConn(async () => ({}))
-    },
-    async redirectSamples() {
-      return []
-    },
-    async negativePaths() {
-      return []
-    },
-  }
+function createMysqlLegacySource(_dsn: string): LegacySource {
+  throw new Error(MYSQL_MODE_NOT_IMPLEMENTED)
 }

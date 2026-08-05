@@ -13,7 +13,7 @@ pnpm --filter @kinnso/parity parity -- \
   --base-url https://remix-kinnso-web.vercel.app \
   --supabase-url "$NEXT_PUBLIC_SUPABASE_URL" \
   --supabase-anon-key "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-  [--legacy-sitemap <url>] [--legacy-mysql <dsn>] \
+  [--legacy-sitemap <url>] \
   [--sample N] [--json] [--fail-fast]
 ```
 
@@ -26,13 +26,16 @@ Flags default to the env vars the web app uses (`BASE_URL`/`E2E_BASE_URL`,
 - **Default (this environment):** the expected baseline is the seed fixtures in
   `kinnso-v3/supabase/seed.sql`, encoded in `src/fixtures/baseline.ts`. The live deploy serves these.
 - **`--legacy-sitemap <url>`:** baseline URL set = the legacy site's `/sitemap.xml` (cutover, no DB).
-- **`--legacy-mysql <dsn>`:** baseline = legacy MySQL `post_translations` (real production cutover).
-  `mysql2` is imported dynamically; the query bodies are TODO until cutover (see `sources/legacy.ts`).
+- **`--legacy-mysql <dsn>`: NOT IMPLEMENTED — the flag exits `2` with an error.** The baseline
+  queries in `sources/legacy.ts` are still TODO, and an empty baseline makes every check vacuously
+  true, so the mode would have exited `0` without proving anything. It fails loudly instead of
+  certifying an unverified cutover. Implement the queries (published URL paths, per-locale
+  `post_translations` counts) before this mode can gate anything.
 
 ## Production acceptance gate (master spec §10 — documented, NOT executed in this plan)
 
-At real cutover, run with `--legacy-mysql` (or `--legacy-sitemap`) against the **legacy production
-URL** to assert: every legacy published URL still resolves (200 or intended 301), the new sitemap is
-a superset of the legacy sitemap, per-locale counts match legacy `post_translations`, and a real
-redirect sample maps 1:1. Pair with a Google Search Console 2-week index watch. These run in the
-deferred cutover plan, not here.
+At real cutover, run with `--legacy-sitemap` (or `--legacy-mysql`, once its queries exist) against
+the **legacy production URL** to assert: every legacy published URL still resolves (200 or intended
+301), the new sitemap is a superset of the legacy sitemap, per-locale counts match legacy
+`post_translations`, and a real redirect sample maps 1:1. Pair with a Google Search Console 2-week
+index watch. These run in the deferred cutover plan, not here.

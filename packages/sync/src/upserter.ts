@@ -4,6 +4,21 @@ import type { UpsertPayload } from './types'
 
 type DB = SupabaseClient<Database>
 
+/**
+ * Compare two timestamps as INSTANTS, not as strings. The two sides are formatted
+ * differently and never match textually: PostgREST renders `timestamptz` as
+ * `2026-06-01T00:00:00+00:00`, while the transform produces `Date.toISOString()`
+ * (`2026-06-01T00:00:00.000Z`). A string `===` would make the unchanged-skip below
+ * dead code for every published article, so each sync would re-run the child
+ * delete+reinsert even when nothing changed.
+ *
+ * Fail-safe by construction: `Date.parse` yields NaN for anything unparseable and
+ * `NaN === NaN` is false, so a malformed value forces a full re-sync rather than a
+ * wrong skip.
+ */
+const sameInstant = (a: string | null, b: string | null): boolean =>
+  a === b || (!!a && !!b && Date.parse(a) === Date.parse(b))
+
 export class Upserter {
   constructor(private db: DB, private cdn: string) {}
 
@@ -29,7 +44,7 @@ export class Upserter {
     if (
       existing
       && existing.source_hash === article.source_hash
-      && existing.published_at === article.published_at
+      && sameInstant(existing.published_at, article.published_at ?? null)
       && !existing.deleted_at
     ) {
       return { skipped: true } // unchanged

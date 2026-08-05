@@ -5,6 +5,9 @@ import type { LegacyPostBundle } from './types'
 export class LegacyReader {
   private pool: mysql.Pool
   constructor(cfg: SyncConfig['legacy']) {
+    // `cfg.ssl` is resolved and validated in config.ts (LEGACY_DB_SSL). It is absent
+    // only for the explicit `disable` mode, so spreading cfg is what turns TLS on:
+    // mysql2 negotiates plaintext whenever the key is missing.
     this.pool = mysql.createPool({ ...cfg, connectionLimit: 4, dateStrings: true, namedPlaceholders: true })
   }
   async close() { await this.pool.end() }

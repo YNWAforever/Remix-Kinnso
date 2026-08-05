@@ -58,7 +58,15 @@ export async function run(cfg: CliConfig): Promise<number> {
     supabaseUrl: cfg.supabaseUrl,
     supabaseAnonKey: cfg.supabaseAnonKey,
   })
-  const legacy = await createLegacySource({ sitemapUrl: cfg.legacySitemap, mysqlDsn: cfg.legacyMysql })
+  // A baseline source that refuses to build is a MISCONFIGURATION (exit 2), not a parity
+  // failure (exit 1) — the gate never ran, so reporting "fail" would misstate what happened.
+  let legacy
+  try {
+    legacy = await createLegacySource({ sitemapUrl: cfg.legacySitemap, mysqlDsn: cfg.legacyMysql })
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err))
+    return 2
+  }
 
   const all: CheckResult[] = []
   for (const check of CHECKS) {
