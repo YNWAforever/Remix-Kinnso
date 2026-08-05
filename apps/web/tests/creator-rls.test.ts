@@ -143,6 +143,58 @@ d('creator schema RLS', () => {
   })
 
   // ────────────────────────────────────────────────────────────────────
+  // 3b. Trust columns: an owner may finish onboarding, but may not moderate
+  //     themselves (status out of suspended/banned, or the verified badge).
+  // ────────────────────────────────────────────────────────────────────
+  async function ownerClient() {
+    const { data: session } = await anon.auth.signInWithPassword({
+      email: TEST_EMAIL,
+      password: TEST_PASSWORD,
+    })
+    return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+      global: { headers: { Authorization: `Bearer ${session.session!.access_token}` } },
+    })
+  }
+
+  it('owner can complete onboarding themselves (onboarding → active)', async () => {
+    await svc.from('creators').update({ status: 'onboarding' }).eq('id', userId)
+    const owner = await ownerClient()
+
+    const { error } = await owner.from('creators').update({ status: 'active' }).eq('id', userId)
+    expect(error).toBeNull()
+
+    const { data } = await svc.from('creators').select('status').eq('id', userId).single()
+    expect(data!.status).toBe('active')
+    await anon.auth.signOut()
+  })
+
+  it('owner cannot award themselves the verified badge', async () => {
+    const owner = await ownerClient()
+
+    const { error } = await owner.from('creators').update({ verified: true }).eq('id', userId)
+    expect(error).not.toBeNull()
+
+    const { data } = await svc.from('creators').select('verified').eq('id', userId).single()
+    expect(data!.verified).toBe(false)
+    await anon.auth.signOut()
+  })
+
+  it('a suspended owner cannot restore their own status', async () => {
+    await svc.from('creators').update({ status: 'suspended' }).eq('id', userId)
+    const owner = await ownerClient()
+
+    const { error } = await owner.from('creators').update({ status: 'active' }).eq('id', userId)
+    expect(error).not.toBeNull()
+
+    const { data } = await svc.from('creators').select('status').eq('id', userId).single()
+    expect(data!.status).toBe('suspended')
+
+    // Leave the fixture active for any later assertions in this file.
+    await svc.from('creators').update({ status: 'active' }).eq('id', userId)
+    await anon.auth.signOut()
+  })
+
+  // ────────────────────────────────────────────────────────────────────
   // 4. creator_scan_jobs: service_role can insert; owner cannot
   // ────────────────────────────────────────────────────────────────────
   it('service_role can insert a creator_scan_jobs row', async () => {
