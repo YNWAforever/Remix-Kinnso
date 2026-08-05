@@ -25,7 +25,10 @@ import { getPostDirectory } from '@/lib/articles/blocks'
 import { resolveConfiguredProductState } from '@/lib/product-state'
 import { AnalyticsEntityView } from '@/components/kinnso/analytics/AnalyticsEntityView'
 
-export const revalidate = 2700 // 45 min (matches legacy article-detail cache TTL)
+// 45 min matches the legacy article-detail cache TTL, but the parent locale
+// layout's 300 is lower and Next takes the lowest across the route, so the
+// effective interval is about five minutes. See app/[locale]/layout.tsx.
+export const revalidate = 2700
 export const dynamicParams = true
 
 export async function generateStaticParams() {

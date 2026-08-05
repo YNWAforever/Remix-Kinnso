@@ -7,7 +7,9 @@ import { buildListingMetadata } from '@/lib/seo/metadata'
 import { ArticleCard } from '@/components/ArticleCard'
 import { Pagination } from '@/components/Pagination'
 
-export const revalidate = 1800 // 30 min
+// 30 min preferred; the parent locale layout caps the effective route ISR at
+// about five minutes. See app/[locale]/layout.tsx.
+export const revalidate = 1800
 
 export function generateStaticParams() {
   return URL_CATEGORIES.map((category) => ({ category }))

@@ -103,10 +103,14 @@ jobs:
         with:
           name: playwright-report
           path: apps/e2e/playwright-report/
-      - name: Lighthouse CWV (warn-only, never fails this job)
+      - name: Lighthouse CWV (CLS is a gate; the rest report)
         if: always()
+        # Measured against the stable public alias, not the per-deployment URL in
+        # E2E_BASE_URL: deployment protection can put that behind SSO, and
+        # Lighthouse would score the auth page rather than the site.
+        env:
+          LHCI_BASE_URL: ${{ vars.VERIFY_PUBLIC_URL || 'https://remix-kinnso-web.vercel.app' }}
         run: pnpm --filter @kinnso/e2e cwv
-        continue-on-error: true
   preview-smoke:
     if: >-
       github.event_name == 'deployment_status' &&

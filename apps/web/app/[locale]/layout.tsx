@@ -10,6 +10,22 @@ import { organizationJsonLd, websiteJsonLd } from '@/lib/seo/jsonld'
 import { fontVariables } from '../layout'
 import { getProductState } from '@/lib/product-state'
 
+/**
+ * Governs every statically-rendered route under this layout, not just the
+ * chrome: Next takes the LOWEST revalidate across a route's layouts and page,
+ * so this 300 caps the longer TTLs the article routes declare for themselves.
+ *
+ * It cannot simply be raised to match them — `getProductState()` below decides
+ * whether Sessions appears in the primary nav, and a 45-minute TTL would leave
+ * that link wrong for 45 minutes after the first session goes live. The two
+ * queries behind it are `select id ... limit 1` against an indexed column, so
+ * the cost of the shorter interval is small.
+ *
+ * Decoupling the two properly means caching the product-state read on its own
+ * TTL. `unstable_cache` would do it but is replaced by `use cache` in Next 16,
+ * which requires opting into Cache Components — a bigger change than this is
+ * worth today.
+ */
 export const revalidate = 300
 
 export function generateStaticParams() {

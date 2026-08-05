@@ -8,7 +8,9 @@ import { isLocale, toDbCategory, LOCALES, URL_CATEGORIES, type Locale, type UrlC
 import { buildListingMetadata } from '@/lib/seo/metadata'
 import { ArticleCard } from '@/components/ArticleCard'
 
-export const revalidate = 1800 // 30 min
+// 30 min preferred; the parent locale layout caps the effective route ISR at
+// about five minutes. See app/[locale]/layout.tsx.
+export const revalidate = 1800
 
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },

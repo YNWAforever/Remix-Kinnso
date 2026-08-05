@@ -12,6 +12,10 @@ const offSpecs = [
   'notfound.spec.ts',
   'r7-10-contract.spec.ts',
   'r7-10-accessibility.spec.ts',
+  // Helper-level coverage for r7-10-accessibility.ts (axe formatting, the CLS
+  // session-window calculation, focus-indicator detection). It matched only the
+  // default config, which nothing runs any more, so it executed nowhere.
+  'r7-10-accessibility-review.spec.ts',
   'r7-10-booking.spec.ts',
 ] as const
 
