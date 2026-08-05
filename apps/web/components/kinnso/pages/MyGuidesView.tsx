@@ -43,7 +43,6 @@ export function MyGuidesView({
                   src={g.cover}
                   title={g.title}
                   location={g.city}
-                  alt={g.title}
                   sizes="96px"
                   className="h-16 w-24 shrink-0 rounded-md [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0"
                   imageClassName="object-cover"

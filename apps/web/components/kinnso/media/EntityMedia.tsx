@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { MediaPlaceholder } from '@/components/kinnso/media/MediaPlaceholder'
 import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
@@ -7,7 +10,6 @@ export interface EntityMediaProps {
   src: string | null | undefined
   title: string
   location?: string | null
-  alt: string
   sizes: string
   priority?: boolean
   className?: string
@@ -18,21 +20,25 @@ export function EntityMedia({
   src,
   title,
   location,
-  alt,
   sizes,
   priority,
   className,
   imageClassName,
 }: EntityMediaProps) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null)
+  const approved = isApprovedEntityMediaUrl(src)
+  const showImage = approved && failedSrc !== src
+
   return (
     <div className={cn('relative overflow-hidden', className)}>
-      {isApprovedEntityMediaUrl(src) ? (
+      {showImage ? (
         <Image
           src={src!}
-          alt={alt}
+          alt={title}
           fill
           sizes={sizes}
           priority={priority}
+          onError={() => setFailedSrc(src ?? null)}
           className={cn('object-cover', imageClassName)}
         />
       ) : (

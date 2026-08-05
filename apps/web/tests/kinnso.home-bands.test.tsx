@@ -69,5 +69,6 @@ describe('CreatorCta (section 9)', () => {
       expect(screen.getByText(b)).toBeTruthy()
     }
     expect(screen.getByRole('link', { name: en.home.creatorCta }).getAttribute('href')).toBe('/en/for-creators')
+    expect(screen.getByText(en.home.creatorBullet1).className).toContain('text-white/90')
   })
 })

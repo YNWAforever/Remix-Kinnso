@@ -18,7 +18,6 @@ const GuideCard = ({ g, locale, savesLabel = 'Saves', isSaved, onSaveToggle }: {
             src={g.cover}
             title={g.title}
             location={g.city}
-            alt={g.title}
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="h-full w-full"
             imageClassName="transition duration-300 group-hover:scale-[1.02]"

@@ -38,7 +38,6 @@ export function DestinationsIndexView({
                       src={d.heroImageUrl}
                       title={d.name}
                       location={d.description}
-                      alt={d.name}
                       sizes="(min-width: 768px) 33vw, 100vw"
                       className="h-full w-full"
                       imageClassName="transition duration-300 group-hover:scale-[1.02]"

@@ -41,7 +41,6 @@ export function ExperiencePublicView({
             src={experience.coverUrl}
             title={experience.title}
             location={experience.city}
-            alt={experience.title}
             sizes="(min-width: 1024px) 1152px, 100vw"
             priority
             className="absolute inset-0"

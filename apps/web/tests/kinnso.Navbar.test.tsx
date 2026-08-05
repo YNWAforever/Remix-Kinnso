@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, cleanup, fireEvent } from '@testing-library/react'
+import { render, screen, cleanup, fireEvent, waitFor, within } from '@testing-library/react'
 
 let mockPathname = '/en'
 
@@ -45,7 +45,7 @@ describe('Navbar (R1A editorial IA)', () => {
     render(<Navbar locale="en" role="anon" sessionsLive dashboardLabel={en.admin.navDashboard} t={en.nav} />)
     expect(screen.getByRole('link', { name: en.nav.linkSessions })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
-    expect(screen.getAllByRole('link', { name: en.nav.linkSessions })).toHaveLength(2)
+    expect(within(screen.getByRole('dialog', { name: en.nav.menuToggle })).getByRole('link', { name: en.nav.linkSessions })).toBeTruthy()
   })
 
   it('shows traveller-first audience and account links for anonymous viewers on desktop and mobile', () => {
@@ -61,10 +61,11 @@ describe('Navbar (R1A editorial IA)', () => {
       .toBe('/en/sign-up')
 
     fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
-    expect(screen.getAllByRole('link', { name: en.nav.linkForCreators })).toHaveLength(2)
-    expect(screen.getAllByRole('link', { name: en.nav.linkForMerchants })).toHaveLength(2)
-    expect(screen.getAllByRole('link', { name: en.nav.signIn })).toHaveLength(2)
-    expect(screen.getAllByRole('link', { name: en.nav.signUp })).toHaveLength(2)
+    const dialog = screen.getByRole('dialog', { name: en.nav.menuToggle })
+    expect(within(dialog).getByRole('link', { name: en.nav.linkForCreators })).toBeTruthy()
+    expect(within(dialog).getByRole('link', { name: en.nav.linkForMerchants })).toBeTruthy()
+    expect(within(dialog).getByRole('link', { name: en.nav.signIn })).toBeTruthy()
+    expect(within(dialog).getByRole('link', { name: en.nav.signUp })).toBeTruthy()
   })
 
   it.each([
@@ -134,9 +135,8 @@ describe('Navbar (R1A editorial IA)', () => {
     }
 
     fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
-    const ctas = screen.getAllByRole('link', { name: label })
-    expect(ctas).toHaveLength(2)
-    expect(ctas.every((link) => link.getAttribute('href') === href)).toBe(true)
+    const mobileCta = within(screen.getByRole('dialog', { name: en.nav.menuToggle })).getByRole('link', { name: label })
+    expect(mobileCta.getAttribute('href')).toBe(href)
     if (role === 'ops') {
       expect(screen.queryByRole('link', { name: en.nav.signIn })).toBeNull()
       expect(screen.queryByRole('link', { name: en.nav.signUp })).toBeNull()
@@ -171,6 +171,47 @@ describe('Navbar (R1A editorial IA)', () => {
     expect(document.getElementById('kinnso-mobile-menu')).toBeTruthy()
   })
 
+  it('opens a named mobile dialog, closes it with Escape, and restores trigger focus', async () => {
+    render(<Navbar locale="en" role="anon" sessionsLive dashboardLabel={en.admin.navDashboard} t={en.nav} />)
+    const trigger = screen.getByRole('button', { name: en.nav.menuToggle })
+
+    fireEvent.click(trigger)
+    expect(screen.getByRole('dialog', { name: en.nav.menuToggle })).toBeTruthy()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    await waitFor(() => expect(document.activeElement).toBe(trigger))
+  })
+
+  it('keeps every anonymous mobile destination inside the dialog and closes it after navigation', async () => {
+    render(<Navbar locale="en" role="anon" sessionsLive dashboardLabel={en.admin.navDashboard} t={en.nav} />)
+    const trigger = screen.getByRole('button', { name: en.nav.menuToggle })
+    const expectedLinks = [
+      en.nav.linkExplore,
+      en.nav.linkDestinations,
+      en.nav.linkArticles,
+      en.nav.linkSessions,
+      en.nav.linkAgent,
+      en.nav.linkCreators,
+      en.nav.linkMerchants,
+      en.nav.linkForCreators,
+      en.nav.linkForMerchants,
+      en.nav.signIn,
+      en.nav.signUp,
+    ]
+
+    fireEvent.click(trigger)
+    const dialog = screen.getByRole('dialog', { name: en.nav.menuToggle })
+    for (const name of expectedLinks) {
+      expect(within(dialog).getByRole('link', { name })).toBeTruthy()
+    }
+
+    const explore = within(dialog).getByRole('link', { name: en.nav.linkExplore })
+    explore.addEventListener('click', (event) => event.preventDefault())
+    fireEvent.click(explore)
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
   it('marks the matching base anchor with aria-current="page" and leaves siblings unmarked', () => {
     mockPathname = '/en/explore'
     render(<Navbar locale="en" role="anon" sessionsLive dashboardLabel={en.admin.navDashboard} t={en.nav} />)
@@ -202,6 +243,6 @@ describe('Navbar (R1A editorial IA)', () => {
     render(<Navbar locale="en" role="merchant" sessionsLive dashboardLabel={en.admin.navDashboard} t={en.nav} />)
     expect(screen.getAllByRole('link', { name: en.nav.linkMissions }).length).toBeGreaterThanOrEqual(1)
     fireEvent.click(screen.getByRole('button', { name: en.nav.menuToggle }))
-    expect(screen.getAllByRole('link', { name: en.nav.linkMissions }).length).toBeGreaterThanOrEqual(2)
+    expect(within(screen.getByRole('dialog', { name: en.nav.menuToggle })).getByRole('link', { name: en.nav.linkMissions })).toBeTruthy()
   })
 })

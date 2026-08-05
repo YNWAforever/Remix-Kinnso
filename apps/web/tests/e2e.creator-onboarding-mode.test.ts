@@ -26,6 +26,7 @@ describe('creator onboarding scan tolerance wiring', () => {
     const verify = readRepo('.github/workflows/verify.yml')
     const ci = readRepo('.github/workflows/ci.yml')
     const nightly = readRepo('.github/workflows/nightly-funnel.yml')
+    const r710Config = readRepo('apps/e2e/playwright.r7-10.config.ts')
 
     expect(verify).toMatch(
       /allow_external_scan_skip:\s*\r?\n\s+description: [^\r\n]+\r?\n\s+required: false\r?\n\s+type: boolean\r?\n\s+default: false/,
@@ -35,7 +36,16 @@ describe('creator onboarding scan tolerance wiring', () => {
     )
     expect([verify, ci, nightly].join('\n').match(new RegExp(FLAG, 'g'))).toHaveLength(1)
     expect(ci).toContain('SCAN_FIXTURE_MODE=1')
-    expect(ci).toContain('e2e creator-onboarding funnel-smoke honesty notfound')
+    expect(ci).toContain("R7_10_BOOKING_STATE: 'off'")
+    expect(ci).toContain('playwright.r7-10.config.ts')
+    for (const spec of [
+      'creator-onboarding.spec.ts',
+      'funnel-smoke.spec.ts',
+      'honesty.spec.ts',
+      'notfound.spec.ts',
+    ]) {
+      expect(r710Config).toContain(`'${spec}'`)
+    }
     expect(ci).not.toContain(FLAG)
     expect(nightly).not.toContain(FLAG)
   })

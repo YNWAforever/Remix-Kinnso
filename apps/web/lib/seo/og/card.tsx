@@ -6,7 +6,7 @@
 export const OG = {
   cream: '#F8F1E6',
   ink: '#211B16',
-  orange: '#F26A1F',
+  orange: '#B94000',
   muted: '#6D6257',
 }
 

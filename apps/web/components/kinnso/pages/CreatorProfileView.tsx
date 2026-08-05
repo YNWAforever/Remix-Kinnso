@@ -65,7 +65,7 @@ export function CreatorProfileView({ creator, locale, embedded, t, enquiry, rela
           style={{ background: `linear-gradient(135deg, hsl(${hue} 70% 55%), hsl(${(hue + 40) % 360} 70% 45%))` }}
         />
         <div className="k2-card rounded-t-none p-6 sm:p-8">
-          <EntityMedia src={creator.avatarUrl} title={creator.name} alt="" sizes="80px" className="-mt-16 h-20 w-20 rounded-full ring-4 ring-kinnso-cream [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
+          <EntityMedia src={creator.avatarUrl} title={creator.name} sizes="80px" className="-mt-16 h-20 w-20 rounded-full ring-4 ring-kinnso-cream [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
           <h1 className="mt-3 k2-display text-3xl font-semibold text-kinnso-ink md:text-4xl">{creator.name}</h1>
           <p className="mt-1 text-sm text-kinnso-muted">@{creator.handle}</p>
           {creator.bio && <p className="mt-3 max-w-xl text-sm text-kinnso-ink/80">{creator.bio}</p>}

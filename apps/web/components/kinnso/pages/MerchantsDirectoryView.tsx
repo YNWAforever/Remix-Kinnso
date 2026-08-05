@@ -25,7 +25,7 @@ export function MerchantsDirectoryView({ locale, t, merchants }: {
           <div className="grid gap-5 md:grid-cols-3">
             {merchants.map((m) => (
               <Link key={m.id} href={p(`/m/${m.slug}`)} className="k2-card block p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">
-                <EntityMedia src={m.logoUrl} title={m.companyName} location={m.city} alt="" sizes="48px" className="mb-4 h-12 w-12 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
+                <EntityMedia src={m.logoUrl} title={m.companyName} location={m.city} sizes="48px" className="mb-4 h-12 w-12 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
                 <h2 className="k2-display text-xl font-semibold text-kinnso-ink">{m.companyName}</h2>
                 {m.tagline ? <p className="mt-2 text-sm text-kinnso-ink/70">{m.tagline}</p> : null}
                 {m.city ? <p className="mt-1 text-xs text-kinnso-muted">{m.city}</p> : null}

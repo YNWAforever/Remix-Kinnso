@@ -27,7 +27,7 @@ export const ShareDnaDialog: React.FC<Props> = ({ open, onOpenChange, creator, p
         </DialogHeader>
         <div className="mt-2 rounded-lg bg-gradient-to-br from-kinnso-orange to-kinnso-amber p-5 text-white">
           <div className="flex items-center gap-4">
-            <img src={creator.avatar} alt="" className="h-16 w-16 rounded-full ring-2 ring-white" />
+            <img src={creator.avatar} alt={creator.name} className="h-16 w-16 rounded-full ring-2 ring-white" />
             <div className="min-w-0 flex-1">
               <div className="truncate text-lg font-black">{creator.name}</div>
               <div className="k-mono text-sm opacity-80">@{creator.handle}</div>

@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import LocaleSwitcher from "@/components/kinnso/LocaleSwitcher";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { ViewerRole } from "@/lib/auth/viewer-role";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
@@ -71,6 +72,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
 
   return (
     <header className="sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
+      <Dialog open={open} onOpenChange={setOpen}>
       <div className="k2-container flex h-16 items-center justify-between gap-4">
         <Link href={p("")} aria-label="KINNSO" className="flex items-baseline gap-1.5">
           <span className="k2-display text-2xl font-semibold tracking-tight text-kinnso-ink">KINNSO</span>
@@ -113,18 +115,17 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
           <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
         </div>
 
-        <button
-          type="button"
-          className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange xl:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={t.menuToggle}
-          aria-expanded={open}
-          // Only reference the menu region while it is actually in the DOM
-          // (it mounts on open); pointing aria-controls at an absent element is an ARIA error.
-          aria-controls={open ? "kinnso-mobile-menu" : undefined}
-        >
-          {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-        </button>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange xl:hidden"
+            aria-label={t.menuToggle}
+            aria-expanded={open}
+            aria-controls={open ? "kinnso-mobile-menu" : undefined}
+          >
+            <Menu aria-hidden="true" />
+          </button>
+        </DialogTrigger>
       </div>
 
       {role === "merchant" && (
@@ -142,8 +143,12 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
         </nav>
       )}
 
-      {open && (
-        <div id="kinnso-mobile-menu" className="border-t border-kinnso-edge bg-kinnso-cream xl:hidden">
+        <DialogContent
+          id="kinnso-mobile-menu"
+          aria-describedby={undefined}
+          className="top-16 bottom-0 left-0 right-0 max-h-[calc(100dvh-4rem)] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-none border-x-0 border-b-0 bg-kinnso-cream p-0 xl:hidden"
+        >
+          <DialogTitle className="sr-only">{t.menuToggle}</DialogTitle>
           <div className="k2-container flex flex-col gap-1 py-3">
             <nav aria-label={t.menuToggle} className="flex flex-col gap-1">
               {trayAnchors.map((a) => (
@@ -172,8 +177,8 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </header>
   );
 };

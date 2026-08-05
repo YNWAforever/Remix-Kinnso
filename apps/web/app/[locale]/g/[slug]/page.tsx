@@ -95,7 +95,6 @@ export default async function GuidePage({
             src={approvedCover}
             title={guide.title}
             location={guide.city}
-            alt={guide.title}
             sizes="(min-width: 1024px) 1152px, 100vw"
             priority
             className="absolute inset-0"

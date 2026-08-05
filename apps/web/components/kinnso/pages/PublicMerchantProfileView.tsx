@@ -19,7 +19,7 @@ export function PublicMerchantProfileView({ locale, t, enquiry, booking, merchan
   return (
     <main className="bg-kinnso-cream font-sans">
       <SectionShell as="header">
-        <EntityMedia src={merchant.logoUrl} title={merchant.companyName} location={merchant.city} alt="" sizes="80px" className="mb-5 h-20 w-20 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
+        <EntityMedia src={merchant.logoUrl} title={merchant.companyName} location={merchant.city} sizes="80px" className="mb-5 h-20 w-20 rounded-full [&_[data-media-placeholder=true]>span]:hidden [&_[data-media-placeholder=true]]:p-0" />
         {merchant.city ? <Eyebrow>{merchant.city}</Eyebrow> : null}
         <h1 className="k2-display mt-4 text-3xl font-semibold text-kinnso-ink md:text-5xl">{merchant.companyName}</h1>
         {merchant.tagline ? <p className="mt-4 max-w-2xl leading-relaxed text-kinnso-ink/70">{merchant.tagline}</p> : null}
@@ -41,7 +41,7 @@ export function PublicMerchantProfileView({ locale, t, enquiry, booking, merchan
           <div className="mt-6 grid gap-5 md:grid-cols-3">
             {experiences.map((exp) => (
               <Link key={exp.id} href={p(`/experiences/${exp.slug}`)} className="k2-card block p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">
-                <EntityMedia src={exp.coverUrl} title={exp.title} location={exp.city} alt={exp.title} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="mb-4 aspect-[4/3] w-full rounded-md" />
+                <EntityMedia src={exp.coverUrl} title={exp.title} location={exp.city} sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="mb-4 aspect-[4/3] w-full rounded-md" />
                 <h3 className="k2-display text-lg font-semibold text-kinnso-ink">{exp.title}</h3>
                 <p className="mt-2 text-sm text-kinnso-ink/70">{exp.city} · {formatExperiencePrice(locale, exp.priceAmount, exp.currency)} · {bookingLabel}</p>
               </Link>

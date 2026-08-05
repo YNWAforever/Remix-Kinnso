@@ -31,7 +31,6 @@ export function ExperienceCard({ experience, locale, savesLabel = 'Saves', isSav
           src={experience.coverUrl}
           title={experience.title}
           location={experience.city}
-          alt={experience.title}
           sizes="64px"
           className="h-16 w-16 shrink-0 rounded-md"
         />

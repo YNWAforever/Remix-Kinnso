@@ -155,7 +155,7 @@ export function GuideForm({ t, mode, initial, backHref, onSubmit }: Props) {
           </label>
           {coverUrl.trim() !== '' && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={coverUrl} alt="" className="aspect-[4/3] w-full rounded-lg object-cover" />
+            <img src={coverUrl} alt={title || t.coverLabel} className="aspect-[4/3] w-full rounded-lg object-cover" />
           )}
 
           <label htmlFor="guide-summary" className="grid gap-1.5">

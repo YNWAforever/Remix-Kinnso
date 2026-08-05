@@ -62,16 +62,14 @@ d('creator schema RLS', () => {
   })
 
   // ────────────────────────────────────────────────────────────────────
-  // 2. Anon sees NOTHING in any creator table (no anon grant + RLS)
+  // 2. Anon cannot read the private onboarding creator or private creator tables
   // ────────────────────────────────────────────────────────────────────
-  it('anon cannot read creators', async () => {
-    const { data, error } = await anon.from('creators').select('id')
-    // anon has NO table grant on the creator tables, so PostgreSQL raises
-    // 42501 permission denied BEFORE RLS runs: `error` is non-null and `data`
-    // is null. (Unlike `articles`, which DOES grant anon SELECT and returns an
-    // empty filtered set.) Assert the negative: anon receives no rows, whether
-    // the block is a permission error or an empty set.
-    expect(error === null ? (data ?? []).length === 0 : /permission denied|42501/i.test(error.message)).toBe(true)
+  it('anon cannot read the private onboarding creator', async () => {
+    const { data, error } = await anon.from('creators').select('id').eq('id', userId)
+    // Published public profiles are intentionally anon-readable. The newly
+    // created onboarding row must still be filtered by RLS.
+    expect(error).toBeNull()
+    expect(data).toEqual([])
   })
 
   it('anon cannot read creator_social_handles', async () => {
@@ -106,10 +104,13 @@ d('creator schema RLS', () => {
       global: { headers: { Authorization: `Bearer ${accessToken}` } },
     })
 
-    const { data, error } = await owner.from('creators').select('id, status')
+    const { data, error } = await owner
+      .from('creators')
+      .select('id, status')
+      .eq('id', userId)
+      .single()
     expect(error).toBeNull()
-    expect((data ?? []).length).toBe(1)
-    expect(data![0].id).toBe(userId)
+    expect(data?.id).toBe(userId)
 
     // Sign out (cleanup session, not strictly necessary but tidy)
     await anon.auth.signOut()
