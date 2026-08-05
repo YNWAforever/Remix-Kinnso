@@ -6,6 +6,7 @@ import { resolveR710LocalConfig } from './r7-10-local'
 
 const offSpecs = [
   'creator-onboarding.spec.ts',
+  'e2e-target.spec.ts',
   'funnel-smoke.spec.ts',
   'honesty.spec.ts',
   'notfound.spec.ts',

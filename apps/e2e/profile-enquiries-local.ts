@@ -29,6 +29,23 @@ function loopbackHttp(value: string, label: string) {
   return url
 }
 
+/**
+ * Non-throwing variant for use at spec module scope.
+ *
+ * Playwright evaluates every collected spec module in one pass, so a throw while a spec
+ * loads aborts collection for the entire run — the unrelated specs never even get listed.
+ * A spec that cannot run in the current environment has to report that as a skip. The
+ * throwing variant stays the contract for the dedicated config, which owns the decision
+ * to start the local fixture and must refuse to start it against anything else.
+ */
+export function tryResolveProfileEnquiriesLocalConfig(env: NodeJS.ProcessEnv): ProfileEnquiriesLocalConfig | null {
+  try {
+    return resolveProfileEnquiriesLocalConfig(env)
+  } catch {
+    return null
+  }
+}
+
 export function resolveProfileEnquiriesLocalConfig(env: NodeJS.ProcessEnv): ProfileEnquiriesLocalConfig {
   if (env[PROFILE_ENQUIRIES_LOCAL_OPT_IN] !== '1') {
     throw new Error(`${PROFILE_ENQUIRIES_LOCAL_OPT_IN}=1 is required for profile enquiries Playwright coverage`)
