@@ -106,6 +106,12 @@ export function LiveProgress({
   const jobIdRef = useRef<string | null>(jobId)
   const readyFiredRef = useRef(false)
   const scanStartRef = useRef<Promise<string | null> | null>(null)
+  // Single owner for the live subscription's disposer. Both the mount effect
+  // and retry() re-subscribe, and a subscription that outlives its job keeps
+  // polling it: reconcileJob arbitrates purely by status rank, with no job-id
+  // check, so a stale poller on the FAILED job would immediately drag a fresh
+  // retry back to 'failed'.
+  const cleanupRef = useRef<(() => void) | undefined>(undefined)
 
   const applyJob = useCallback(
     (incoming: JobRow | null) => {
@@ -207,8 +213,16 @@ export function LiveProgress({
     [applyJob],
   )
 
+  // Dispose whatever subscription is currently live, then attach a new one.
+  const resubscribe = useCallback(
+    (id: string) => {
+      cleanupRef.current?.()
+      cleanupRef.current = subscribeAndSelect(id)
+    },
+    [subscribeAndSelect],
+  )
+
   useEffect(() => {
-    let cleanup: (() => void) | undefined
     let cancelled = false
     ;(async () => {
       let id = jobIdRef.current
@@ -222,14 +236,15 @@ export function LiveProgress({
         if (!id || cancelled) return
         jobIdRef.current = id
       }
-      cleanup = subscribeAndSelect(id)
+      resubscribe(id)
     })()
     return () => {
       cancelled = true
-      cleanup?.()
+      cleanupRef.current?.()
+      cleanupRef.current = undefined
     }
     // creatorId is included so a different creator remounts the subscription.
-  }, [creatorId, startScan, subscribeAndSelect])
+  }, [creatorId, startScan, resubscribe])
 
   // Tick the elapsed-seconds counter once per second; stop once the job reaches a
   // terminal state or a notice blocks the scan.
@@ -246,10 +261,15 @@ export function LiveProgress({
     readyFiredRef.current = false
     setNotice('none')
     setJob(null)
+    // Drop the failed job's subscription before the request, not after: its
+    // 2s poller would otherwise keep re-applying status 'failed' over the
+    // retry we are about to start.
+    cleanupRef.current?.()
+    cleanupRef.current = undefined
     const newId = await startScan(`/scan/${id}/retry`)
     if (newId) {
       jobIdRef.current = newId
-      subscribeAndSelect(newId)
+      resubscribe(newId)
     }
   }
 
