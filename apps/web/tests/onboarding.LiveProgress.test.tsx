@@ -204,4 +204,11 @@ describe('LiveProgress (429 + retry)', () => {
       }),
     )
   })
+
+  // An unnamed progressbar is a serious axe violation, and this one sits on the
+  // scan screen the studio sends creators to while a scan is running.
+  it('gives the progress bar an accessible name', async () => {
+    render(<LiveProgress creatorId="c1" jobId={null} platforms={['instagram']} t={t} onReady={vi.fn()} />)
+    await waitFor(() => expect(screen.getByRole('progressbar', { name: t.heading })).toBeTruthy())
+  })
 })

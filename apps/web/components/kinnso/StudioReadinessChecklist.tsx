@@ -83,11 +83,22 @@ export function StudioReadinessChecklist({
     <TicketCard className="border-2 border-kinnso-orange p-5">
       <div data-testid="readiness">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-black text-kinnso-ink">
+        <h2 id="readiness-heading" className="text-lg font-black text-kinnso-ink">
           {t.checklistTitle} · {progress}
         </h2>
       </div>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-kinnso-orange/20" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+      {/* Named from the heading, which already reads "Setup checklist · 2/4", and
+          aria-valuetext so it is announced as steps rather than a bare percentage.
+          An unnamed progressbar is a serious axe violation. */}
+      <div
+        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-kinnso-orange/20"
+        role="progressbar"
+        aria-labelledby="readiness-heading"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuetext={progress}
+      >
         <div className="h-full rounded-full bg-kinnso-orange transition-[width]" style={{ width: `${pct}%` }} />
       </div>
 

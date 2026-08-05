@@ -292,6 +292,7 @@ export function LiveProgress({
       <div
         className="h-1.5 w-full overflow-hidden rounded-full bg-kinnso-ink/10"
         role="progressbar"
+        aria-label={t.heading}
         aria-valuenow={barPct}
         aria-valuemin={0}
         aria-valuemax={100}
