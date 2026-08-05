@@ -200,12 +200,14 @@ jobs:
           E2E_PROFILE_ENQUIRIES_LOCAL: '1'
           E2E_BASE_URL: http://127.0.0.1:3000
         run: pnpm --filter @kinnso/e2e e2e --config playwright.profile-enquiries.config.ts
+      # Deliberately last of the test steps: it is the only one that depends on a
+      # repository secret, and its config refuses to load without STRIPE_SECRET_KEY.
+      # Ahead of the others it would abort the job before they ran, hiding their
+      # result behind a configuration problem rather than a code one. It still fails
+      # the job — nothing here is skipped or softened. `hasCiProductStateContract`
+      # (apps/web/tests/ci.product-state.test.ts) still enforces that this runs after
+      # Booking OFF; it compares line positions, so intervening steps are allowed.
       - name: R7.10 accessibility - Booking ON
-        # Deliberately last of the test steps: it is the only one that depends on a
-        # repository secret, and its config refuses to load without STRIPE_SECRET_KEY.
-        # Ahead of the others it would abort the job before they ran, hiding their
-        # result behind a configuration problem rather than a code one. It still fails
-        # the job — nothing here is skipped or softened.
         env:
           R7_10_BOOKING_STATE: 'on'
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}

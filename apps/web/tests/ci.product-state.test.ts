@@ -240,7 +240,14 @@ describe('CI product-state startup contract', () => {
           STRIPE_SECRET_KEY: \${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: \${{ secrets.STRIPE_WEBHOOK_SECRET }}
         run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts`
-    const mutated = replaceOnce(workflow, `${off}\n\n${on}`, `${on}\n\n${off}`)
+    // Build the mutant by lifting Booking ON out and re-inserting it ahead of
+    // Booking OFF, rather than swapping one adjacent `off\n\non` block. The
+    // contract compares the two steps' line positions, so other steps are
+    // allowed between them — and there is one (the profile enquiries journey,
+    // which runs first so a missing Stripe secret cannot abort the job before
+    // it). Pinning adjacency here would fail on a workflow the contract permits.
+    const withoutOn = replaceOnce(workflow, on, '')
+    const mutated = replaceOnce(withoutOn, off, `${on}\n\n${off}`)
 
     expect(hasCiProductStateContract(mutated)).toBe(false)
   })
