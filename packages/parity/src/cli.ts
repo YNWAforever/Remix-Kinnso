@@ -6,6 +6,7 @@ import { redirects } from './checks/redirects'
 import { rowCounts } from './checks/row-counts'
 import { structuredData } from './checks/structured-data'
 import { negative404 } from './checks/negative-404'
+import { seoLoss } from './checks/seo-loss'
 import { buildReport, renderTable } from './report'
 import type { Check, CheckResult } from './types'
 
@@ -42,7 +43,7 @@ export function parseArgs(argv: string[], env: NodeJS.ProcessEnv): CliConfig {
   }
 }
 
-const CHECKS: Check[] = [urlCoverage, sitemapSuperset, redirects, rowCounts, structuredData, negative404]
+const CHECKS: Check[] = [urlCoverage, sitemapSuperset, redirects, rowCounts, structuredData, negative404, seoLoss]
 
 /** Runs all checks and returns a process exit code (0 pass, 1 parity fail, 2 misconfig). */
 export async function run(cfg: CliConfig): Promise<number> {

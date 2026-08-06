@@ -42,17 +42,20 @@ describe('run exit codes', () => {
     err.mockRestore()
   })
 
-  it('exits 2 — not 0 — when the baseline source refuses to build (--legacy-mysql)', async () => {
+  it('exits 2 — not 0 — when the baseline cannot be built (--legacy-mysql)', async () => {
     // The gate never ran, so this is a misconfiguration, not a parity failure. Exiting 0
-    // here was the whole defect: an unimplemented baseline certified an unverified cutover.
+    // here was the whole defect: an unmeasurable baseline certified an unverified cutover.
+    // --legacy-mysql is implemented now, so the refusal is no longer a hard-coded message;
+    // the property it protected is asserted directly instead, with a DSN that fails fast.
     const err = vi.spyOn(console, 'error').mockImplementation(() => {})
     const code = await run(parseArgs(
-      ['--supabase-url', 'https://db.test', '--supabase-anon-key', 'anon', '--legacy-mysql', 'mysql://legacy'],
+      ['--supabase-url', 'https://db.test', '--supabase-anon-key', 'anon', '--legacy-mysql', 'not-a-dsn'],
       {},
     ))
 
     expect(code).toBe(2)
-    expect(err).toHaveBeenCalledWith(expect.stringMatching(/not implemented/i))
+    expect(code).not.toBe(0)
+    expect(err).toHaveBeenCalled()
     err.mockRestore()
   })
 })

@@ -93,4 +93,88 @@ export class LegacyReader {
     return { post, translations, faqs, authors: authorRows, tags: [...tagMap.values()], categoryWeights: catW }
     })
   }
+
+  /**
+   * Exact size of the `isPostLive` set. The parity baseline uses this as a
+   * scan-completeness tripwire: a scan that yields fewer bundles than this stopped
+   * early, and a baseline built from a truncated scan would under-report drift while
+   * looking healthy. Predicate mirrors allPostIds exactly.
+   */
+  async livePostCount(): Promise<number> {
+    return this.guard(async () => {
+      const [rows] = await this.pool.query<any[]>(
+        'select count(*) as n from posts where deleted_at is null and published_at is not null',
+        {},
+      )
+      return Number(rows[0]?.n ?? 0)
+    })
+  }
+
+  /**
+   * Per-locale UPPER BOUND on visible translations across the live set. The parity
+   * baseline is built in TypeScript from the real transform, so this is not the
+   * baseline — it is an independent ceiling the baseline must not exceed, which
+   * catches a locale being double-counted or fanned out for a post that has no
+   * translation row.
+   *
+   * Note the explicit `pt.deleted_at is null`: fetchPostBundle SELECTS that column
+   * and filters it in the transform instead, so its query is not a safe template.
+   */
+  async legacyTranslationCeiling(): Promise<Record<string, number>> {
+    return this.guard(async () => {
+      const [rows] = await this.pool.query<any[]>(
+        `select pt.locale as locale, count(*) as n
+           from post_translations pt
+           join posts p on p.id = pt.post_id
+          where p.deleted_at is null
+            and p.published_at is not null
+            and pt.deleted_at is null
+          group by pt.locale`,
+        {},
+      )
+      const out: Record<string, number> = {}
+      for (const r of rows) out[String(r.locale)] = Number(r.n)
+      return out
+    })
+  }
+
+  /**
+   * A bounded sample of NON-live post ids, for the parity gate's negative fixtures.
+   * The predicate is the negation of `isPostLive`, so this is a CANDIDATE GENERATOR
+   * ONLY — the caller must re-assert `!isPostLive(bundle.post)` in TypeScript and drop
+   * any row that disagrees, because SQL is not the definition.
+   */
+  async sampleNonLivePostIds(limit = 25): Promise<number[]> {
+    return this.guard(async () => {
+      const [rows] = await this.pool.query<any[]>(
+        'select id from posts where deleted_at is not null or published_at is null order by id desc limit :limit',
+        { limit },
+      )
+      return rows.map((r) => Number(r.id))
+    })
+  }
+
+  /**
+   * Every live post bundle, lazily. Deliberately composed from `allPostIds` +
+   * `fetchPostBundle` rather than expressed as new bulk SQL: no legacy schema dump
+   * exists in this repository, so every new column name would be unverifiable until
+   * it failed against production MySQL. This adds zero new SQL and inherits both
+   * queries' guard().
+   *
+   * Ids whose post row vanished between the page read and the bundle read are
+   * skipped rather than yielded as a hole.
+   */
+  async *streamPostBundles(opts: { pageSize?: number } = {}): AsyncGenerator<LegacyPostBundle, void, void> {
+    const pageSize = opts.pageSize ?? 200
+    let afterId = 0
+    for (;;) {
+      const ids = await this.allPostIds(afterId, pageSize)
+      if (!ids.length) return
+      for (const id of ids) {
+        const bundle = await this.fetchPostBundle(id)
+        if (bundle) yield bundle
+      }
+      afterId = ids[ids.length - 1]
+    }
+  }
 }
