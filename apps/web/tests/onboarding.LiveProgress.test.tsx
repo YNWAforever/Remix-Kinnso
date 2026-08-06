@@ -208,7 +208,12 @@ describe('LiveProgress (429 + retry)', () => {
   // An unnamed progressbar is a serious axe violation, and this one sits on the
   // scan screen the studio sends creators to while a scan is running.
   it('gives the progress bar an accessible name', async () => {
-    render(<LiveProgress creatorId="c1" jobId={null} platforms={['instagram']} t={t} onReady={vi.fn()} />)
+    // An existing jobId, so the component subscribes to the job it was handed
+    // rather than POSTing a scan start. The shared `globalThis.fetch = vi.fn()`
+    // resolves to undefined, so touching that path would leave a rejection that
+    // outlives the test and fails the run as an unhandled error.
+    render(<LiveProgress creatorId="c1" jobId="job-1" platforms={['instagram']} t={t} onReady={vi.fn()} />)
     await waitFor(() => expect(screen.getByRole('progressbar', { name: t.heading })).toBeTruthy())
+    expect(globalThis.fetch).not.toHaveBeenCalled()
   })
 })
