@@ -113,19 +113,20 @@ export function LiveProgress({
   // retry back to 'failed'.
   const cleanupRef = useRef<(() => void) | undefined>(undefined)
 
-  const applyJob = useCallback(
-    (incoming: JobRow | null) => {
-      setJob((prev) => {
-        const next = reconcileJob(prev, incoming)
-        if (next && next.status === 'ready' && !readyFiredRef.current) {
-          readyFiredRef.current = true
-          onReady(next.id)
-        }
-        return next
-      })
-    },
-    [onReady],
-  )
+  // Pure: React invokes a state updater during the render phase whenever an
+  // update is already queued (it only evaluates a lone one eagerly at dispatch).
+  // onReady is a parent side effect — WizardClient calls router.refresh() and
+  // setStep from it — so firing it in here updated the parent and the Router
+  // mid-render. The ready hand-off belongs in an effect, below.
+  const applyJob = useCallback((incoming: JobRow | null) => {
+    setJob((prev) => reconcileJob(prev, incoming))
+  }, [])
+
+  useEffect(() => {
+    if (job?.status !== 'ready' || readyFiredRef.current) return
+    readyFiredRef.current = true
+    onReady(job.id)
+  }, [job, onReady])
 
   // POST a fresh scan to the worker; returns the jobId or sets a notice.
   const startScan = useCallback(async (path: string): Promise<string | null> => {

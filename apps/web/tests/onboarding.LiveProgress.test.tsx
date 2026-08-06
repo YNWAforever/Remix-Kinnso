@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { StrictMode } from 'react'
+import { StrictMode, useState } from 'react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import type { JobRow } from '@/lib/onboarding/progress'
@@ -141,6 +141,45 @@ describe('LiveProgress (subscribe-after-terminal reconcile)', () => {
     // No POST when resuming with an existing jobId.
     expect(globalThis.fetch).not.toHaveBeenCalled()
     await waitFor(() => expect(onReady).toHaveBeenCalledWith('job-1'))
+  })
+
+  // onReady is a parent side effect — WizardClient calls router.refresh() and
+  // setStep('review') from it. Firing it inside the setJob updater ran it during
+  // LiveProgress's render, so the parent (and the Router) were updated mid-render.
+  it('advances the parent without updating it during render', async () => {
+    const errors: string[] = []
+    const spy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      errors.push(String(args[0]))
+    })
+
+    function Parent() {
+      const [step, setStep] = useState('progress')
+      if (step === 'review') return <p>review</p>
+      return (
+        <LiveProgress
+          creatorId="c1"
+          jobId="job-1"
+          platforms={['instagram']}
+          t={t}
+          onReady={() => setStep('review')}
+        />
+      )
+    }
+
+    render(<Parent />)
+    await waitFor(() => expect(screen.getByText(t.phaseFetching)).toBeTruthy())
+    // Two frames in one batch. React evaluates a lone setState updater eagerly at
+    // dispatch (outside render), so a single frame hides the bug; with an update
+    // already queued the updater is deferred to the render phase, which is exactly
+    // where the production warning came from.
+    await act(async () => {
+      emit?.({ id: 'job-1', status: 'analyzing', progress: { platforms: { instagram: 'ok' } }, error: null })
+      emit?.({ id: 'job-1', status: 'ready', progress: { platforms: { instagram: 'ok' } }, error: null })
+    })
+
+    await waitFor(() => expect(screen.getByText('review')).toBeTruthy())
+    expect(errors.filter((e) => e.includes('Cannot update a component'))).toEqual([])
+    spy.mockRestore()
   })
 })
 
