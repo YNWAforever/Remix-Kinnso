@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createLegacySource, createMysqlLegacySource, parseLegacyDsn, DsnCarriesTlsSettingsError } from '../src/sources/legacy'
+import { createLegacySource, createMysqlLegacySource, parseLegacyDsn, DsnCarriesTlsSettingsError, InvalidLegacyDsnError } from '../src/sources/legacy'
 import { EmptyBaselineError, ScanIncompleteError, TranslationCeilingExceededError } from '../src/sources/mysql-derive'
 import { UnroutableCategoryError } from '../src/sources/mysql-baseline'
 import { seoLoss } from '../src/checks/seo-loss'
@@ -323,5 +323,28 @@ describe('--legacy-mysql guards the expected SET, not a proxy for it', () => {
     // this guard fails here if any link in it changes.
     const src = await build(fakeReader([liveBundle()]))
     expect((await src.expectedUrlPaths()).size).toBeGreaterThan(0)
+  })
+})
+
+describe('--legacy-mysql DSN errors name the actual cause', () => {
+  it.each([
+    ['not a URL at all', 'not-a-dsn'],
+    ['a URL with no host', 'mysql:///kinnso'],
+  ])('reports %s as a malformed DSN, not as a TLS problem', (_label, dsn) => {
+    // Reporting a typo under a TLS error name sends the operator to look at
+    // LEGACY_DB_SSL, which is not what is wrong. Both still exit 2 via the CLI.
+    expect(() => parseLegacyDsn(dsn, {} as NodeJS.ProcessEnv)).toThrow(InvalidLegacyDsnError)
+    expect(() => parseLegacyDsn(dsn, {} as NodeJS.ProcessEnv)).not.toThrow(DsnCarriesTlsSettingsError)
+  })
+
+  it('still reports a TLS-carrying DSN as exactly that', () => {
+    expect(() => parseLegacyDsn('mysql://u:p@legacy/db?sslmode=disable', {} as NodeJS.ProcessEnv))
+      .toThrow(DsnCarriesTlsSettingsError)
+  })
+
+  // URLSearchParams percent-decodes keys, so an obfuscated parameter is still caught.
+  it('catches a percent-encoded TLS parameter', () => {
+    expect(() => parseLegacyDsn('mysql://u:p@legacy/db?%73sl=false', {} as NodeJS.ProcessEnv))
+      .toThrow(DsnCarriesTlsSettingsError)
   })
 })

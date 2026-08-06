@@ -53,6 +53,15 @@ export class DsnCarriesTlsSettingsError extends Error {
   name = 'DsnCarriesTlsSettingsError'
 }
 
+/**
+ * The DSN is malformed. Distinct from DsnCarriesTlsSettingsError on purpose: reporting a
+ * typo'd URL under a TLS error name sends the operator to look at LEGACY_DB_SSL, which is
+ * not the problem. Both still exit 2.
+ */
+export class InvalidLegacyDsnError extends Error {
+  name = 'InvalidLegacyDsnError'
+}
+
 const TLS_PARAMS = ['ssl', 'sslmode', 'usessl', 'ssl-mode', 'ssl_mode']
 
 /**
@@ -67,7 +76,7 @@ export function parseLegacyDsn(dsn: string, env: NodeJS.ProcessEnv = process.env
   try {
     url = new URL(dsn)
   } catch {
-    throw new DsnCarriesTlsSettingsError(`--legacy-mysql is not a valid URL: ${dsn}`)
+    throw new InvalidLegacyDsnError(`--legacy-mysql is not a valid URL: ${dsn}`)
   }
   for (const [key] of url.searchParams) {
     if (TLS_PARAMS.includes(key.toLowerCase())) {
@@ -77,7 +86,7 @@ export function parseLegacyDsn(dsn: string, env: NodeJS.ProcessEnv = process.env
       )
     }
   }
-  if (!url.hostname) throw new DsnCarriesTlsSettingsError('The --legacy-mysql DSN has no host.')
+  if (!url.hostname) throw new InvalidLegacyDsnError('The --legacy-mysql DSN has no host.')
 
   const ssl = legacySsl(env)
   return {
