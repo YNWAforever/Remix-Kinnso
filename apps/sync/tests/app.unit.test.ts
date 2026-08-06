@@ -252,6 +252,39 @@ describe('redirect ingest', () => {
     expect(writes).toHaveLength(0)
   })
 
+  // The route has no try/catch by design: app.onError turns any throw into a 500. That
+  // matters because writeRedirects throws on a failed upsert, and the operator must see a
+  // failure rather than `{ ok: true }` over a table that was never written.
+  it('answers 500 when the write fails, never ok:true', async () => {
+    const { app } = makeDeps({
+      writeRedirects: async () => {
+        throw new Error('upsert redirects failed: permission denied')
+      },
+    })
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const res = await app.request('/redirects', post(REDIRECT_PHP, ADMIN))
+
+    expect(res.status).toBe(500)
+    expect(await res.json()).toEqual({ error: 'internal error' })
+    err.mockRestore()
+  })
+
+  // The admin token is the only thing guarding this route, so a failure must not echo
+  // anything an unauthenticated prober could use.
+  it('does not leak the underlying error to the caller', async () => {
+    const { app } = makeDeps({
+      writeRedirects: async () => {
+        throw new Error('connect ECONNREFUSED 10.0.0.5:5432')
+      },
+    })
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const body = await (await app.request('/redirects', post(REDIRECT_PHP, ADMIN))).text()
+
+    expect(body).not.toContain('ECONNREFUSED')
+    expect(body).not.toContain('10.0.0.5')
+    err.mockRestore()
+  })
+
   it('reports zero rather than inventing a write when the file parses to nothing', async () => {
     const { app, writes } = makeDeps()
     const res = await app.request('/redirects', post('<?php // no redirects here', ADMIN))
