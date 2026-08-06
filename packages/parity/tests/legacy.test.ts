@@ -305,3 +305,23 @@ describe('--legacy-mysql actually samples the redirect map', () => {
     expect(await src.redirectSamples()).toEqual([])
   })
 })
+
+describe('--legacy-mysql guards the expected SET, not a proxy for it', () => {
+  it('refuses a corpus that scans rows but produces no expected URL', async () => {
+    // A zero-translation article is caught one guard earlier: validatePublication warns
+    // `missing_translation`, so the article is never visible. Asserted here because that
+    // is the behaviour a reader would otherwise have to infer from another package.
+    const noTranslations = liveBundle({ id: 5, slug: 'ghost', url: 'ghost' }, [])
+    await expect(build(fakeReader([noTranslations]))).rejects.toThrow(EmptyBaselineError)
+    await expect(build(fakeReader([noTranslations]))).rejects.toThrow(/none are visible/)
+  })
+
+  it('still asserts the expected set directly, since an empty one passes sitemap-superset', async () => {
+    // sitemap-superset returns PASS on an empty expected set, so the set is asserted
+    // rather than inferred from visible.length. The chain that makes those equivalent
+    // (visible => survived validatePublication => has a locale) lives in another package;
+    // this guard fails here if any link in it changes.
+    const src = await build(fakeReader([liveBundle()]))
+    expect((await src.expectedUrlPaths()).size).toBeGreaterThan(0)
+  })
+})

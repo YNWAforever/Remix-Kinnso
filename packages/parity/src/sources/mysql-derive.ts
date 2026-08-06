@@ -137,6 +137,22 @@ export async function deriveMysqlBaseline(
   const expectedUrlPaths = new Set<string>()
   for (const p of visible) for (const path of p.paths) expectedUrlPaths.add(path)
 
+  // Unreachable today, and kept deliberately. sitemap-superset returns PASS on an empty
+  // expected set ("0 expected URLs present"), so an empty set is a vacuous pass — and
+  // `visible.length > 0` only implies a non-empty set via a chain that lives in another
+  // package: a visible article must have survived validatePublication, which warns
+  // `missing_translation` when no translation survives, so every visible article has at
+  // least one locale, and an unroutable category has already thrown. Assert the set
+  // itself so a change to any link in that chain fails here rather than silently
+  // certifying a cutover.
+  if (expectedUrlPaths.size === 0) {
+    throw new EmptyBaselineError(
+      `Scanned ${scanned} posts and ${visible.length} are publishable, but they fan out to zero ` +
+        'URLs. sitemap-superset would report "0 expected URLs present" and pass without ' +
+        'checking anything.',
+    )
+  }
+
   // Tallied from the SAME in-memory snapshot, never a separate query. It differs from
   // expectedUrlPaths by exactly the boundary set, for the reason above.
   const localeCounts: Record<string, number> = {}
