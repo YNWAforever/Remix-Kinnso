@@ -123,14 +123,17 @@ misconfiguration, not a pass.
 
 ## A note on the sitemap
 
-`/sitemap.xml` is a sitemap **index**, not a list of pages: `apps/web/app/sitemap.ts` exports
-`generateSitemaps`, so Next serves an index over `/sitemap/<id>.xml` shards — which is why
-`apps/web/app/robots.ts` points crawlers at `/sitemap/0.xml` rather than at `/sitemap.xml`.
+**There is no `/sitemap.xml`.** `apps/web/app/sitemap.ts` exports `generateSitemaps`, so the only
+sitemap route Next emits is `/sitemap/[__metadata_id__]`, prerendered as `/sitemap/0.xml` — which
+is why `apps/web/app/robots.ts` advertises `/sitemap/0.xml` and not an index.
 
-The gate follows the index and unions the shards. If a shard cannot be read it **fails** rather
-than returning a partial set: every URL in the unread shard would otherwise be reported missing
-by `sitemap-superset`, which is a phantom failure, not a real one.
+So the gate enumerates `/sitemap/0.xml`, `/sitemap/1.xml`, … until one 404s. Only a 404 ends the
+walk; any other status **fails**, because a 5xx read as "no more shards" would silently truncate
+the URL set and `sitemap-superset` would report every URL in the unread shards as missing. That is
+a phantom failure, not a real one. `/sitemap.xml` is still tried first — and both a `urlset` and a
+`sitemapindex` are handled there — so the gate keeps working if one is ever introduced.
 
-An earlier draft of this runbook said this only mattered past 40,000 URLs (`SITEMAP_CHUNK`). That
-was wrong — the index is served at any size, so the scrape returned shard URLs rather than article
-URLs on every run.
+Two earlier drafts of this section were wrong, in opposite directions: the first said the shards
+only appear past 40,000 URLs (`SITEMAP_CHUNK`), the second said `/sitemap.xml` serves an index at
+any size. It serves nothing. The consequence was that the scrape ran against a 404 page, found
+zero `<loc>` elements, and reported the site as publishing **no URLs at all**.

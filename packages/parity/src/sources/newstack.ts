@@ -49,12 +49,66 @@ const locHrefs = (xml: string) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
 
 const locPathnames = (xml: string) => locHrefs(xml).map((href) => new URL(href).pathname)
 
-/** Fetches one sitemap document, failing loudly: a partial URL set silently shrinks the
- *  comparison and turns unread pages into phantom sitemap-superset failures. */
-async function fetchSitemapXml(url: string): Promise<string> {
+/**
+ * Fetches one sitemap document, or null when the route does not exist (404).
+ *
+ * Only 404 means "absent". Any other non-OK status throws, because a 5xx during shard
+ * enumeration is a transient failure, and reading it as "no more shards" would silently
+ * truncate the URL set — every URL in the unread shards would then be reported missing by
+ * sitemap-superset. Same principle as fetchAllPages: a partial read is the worst failure
+ * mode for a gate, because it still reports.
+ */
+async function fetchSitemapXmlIfPresent(url: string): Promise<string | null> {
   const res = await fetch(url, { headers: { 'user-agent': 'kinnso-parity' } })
+  if (res.status === 404) return null
   if (!res.ok) throw new Error(`Sitemap fetch failed for ${url}: HTTP ${res.status}`)
   return res.text()
+}
+
+/** As above, but a missing document is itself an error: a shard named by an index must exist. */
+async function fetchSitemapXml(url: string): Promise<string> {
+  const xml = await fetchSitemapXmlIfPresent(url)
+  if (xml === null) throw new Error(`Sitemap fetch failed for ${url}: HTTP 404`)
+  return xml
+}
+
+/**
+ * Only exists so a server that answers 200 to every /sitemap/<n>.xml cannot spin forever.
+ * SITEMAP_CHUNK is 40,000 URLs per shard, so this bound is 4M URLs — far past any corpus
+ * this gate will ever see. Hitting it throws rather than returning what was read so far.
+ */
+const MAX_SITEMAP_SHARDS = 100
+
+/**
+ * Walk /sitemap/0.xml, /sitemap/1.xml, … until one 404s. This is the shape apps/web
+ * actually serves: generateSitemaps() produces the route /sitemap/[__metadata_id__] and
+ * nothing at /sitemap.xml, so there is no index document to enumerate the shards for us.
+ */
+async function enumerateShardUrls(base: string): Promise<Set<string>> {
+  const urls = new Set<string>()
+  for (let i = 0; i < MAX_SITEMAP_SHARDS; i++) {
+    const url = `${base}/sitemap/${i}.xml`
+    const doc = await fetchSitemapXmlIfPresent(url)
+    if (doc === null) {
+      if (i === 0) {
+        throw new Error(
+          `Neither ${base}/sitemap.xml nor ${url} exists, so the new stack publishes no ` +
+            'discoverable URLs. Reporting that as an empty site would make sitemap-superset ' +
+            'call every expected URL missing, so it fails here instead.',
+        )
+      }
+      return urls
+    }
+    if (isSitemapIndex(doc)) {
+      throw new Error(`Sitemap shard ${url} is a sitemap index; nested indexes are not supported.`)
+    }
+    for (const path of locPathnames(doc)) urls.add(path)
+  }
+  throw new Error(
+    `Stopped after ${MAX_SITEMAP_SHARDS} sitemap shards at ${base}. Either the corpus outgrew ` +
+      'this bound or the server answers 200 to every /sitemap/<n>.xml; returning a partial set ' +
+      'would under-report the site to sitemap-superset.',
+  )
 }
 
 export function createNewStackSource(cfg: NewStackConfig): NewStackSource {
@@ -93,15 +147,19 @@ export function createNewStackSource(cfg: NewStackConfig): NewStackSource {
         sb.from('seo_redirects').select('from_path, to_path').order('from_path').range(from, to))
     },
     async sitemapUrls() {
-      // /sitemap.xml is a sitemap INDEX, not a urlset: apps/web/app/sitemap.ts exports
-      // generateSitemaps, so Next serves an index over /sitemap/<id>.xml — which is why
-      // apps/web/app/robots.ts points crawlers at /sitemap/0.xml rather than /sitemap.xml.
+      // apps/web/app/sitemap.ts exports generateSitemaps(), so the only sitemap route Next
+      // emits is /sitemap/[__metadata_id__], prerendered as /sitemap/0.xml. There is NO
+      // /sitemap.xml — which is why apps/web/app/robots.ts advertises /sitemap/0.xml.
       //
-      // Scraping <loc> without distinguishing the two returns the SHARD urls, and
-      // sitemap-superset then reports every expected URL missing. That phantom failure
-      // would fire precisely at cutover, when --legacy-mysql supplies the first
-      // production-sized expected set.
-      const root = await fetchSitemapXml(`${base}/sitemap.xml`)
+      // This used to fetch /sitemap.xml unconditionally and scrape it. `.text()` on the 404
+      // page yields zero <loc> matches, so it returned an EMPTY set and sitemap-superset
+      // reported every expected URL missing. That phantom failure fires precisely at
+      // cutover, when --legacy-mysql supplies the first production-sized expected set.
+      //
+      // /sitemap.xml is still tried first, and both document types are handled, so the gate
+      // keeps working if an index is ever served there.
+      const root = await fetchSitemapXmlIfPresent(`${base}/sitemap.xml`)
+      if (root === null) return await enumerateShardUrls(base)
       if (!isSitemapIndex(root)) return new Set(locPathnames(root))
 
       const shards = locHrefs(root)

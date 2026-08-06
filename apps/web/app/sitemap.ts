@@ -14,8 +14,12 @@ export const revalidate = 21600 // 6h
 
 // The sitemap protocol caps a single file at 50,000 URLs / 50 MB. Because guides and
 // creators each fan out across every locale, the URL count grows fast, so we shard well
-// under the cap and let Next emit a sitemap index (/sitemap.xml) over /sitemap/<id>.xml
-// instead of silently overflowing one file.
+// under the cap instead of silently overflowing one file.
+//
+// generateSitemaps() gives Next exactly one route — /sitemap/[__metadata_id__], served as
+// /sitemap/0.xml, /sitemap/1.xml, … There is NO /sitemap.xml index: Next does not emit one,
+// which is why robots.ts advertises /sitemap/0.xml and why the parity gate's sitemapUrls()
+// enumerates shards rather than following an index.
 const SITEMAP_CHUNK = 40000
 
 /** The full, deterministically-ordered URL set. Stable order matters: generateSitemaps
