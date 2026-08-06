@@ -42,6 +42,21 @@ async function fetchAllPages<T>(
   }
 }
 
+/** A sitemap index lists other sitemaps; a urlset lists pages. They are scraped alike. */
+const isSitemapIndex = (xml: string) => /<sitemapindex[\s>]/i.test(xml)
+
+const locHrefs = (xml: string) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim())
+
+const locPathnames = (xml: string) => locHrefs(xml).map((href) => new URL(href).pathname)
+
+/** Fetches one sitemap document, failing loudly: a partial URL set silently shrinks the
+ *  comparison and turns unread pages into phantom sitemap-superset failures. */
+async function fetchSitemapXml(url: string): Promise<string> {
+  const res = await fetch(url, { headers: { 'user-agent': 'kinnso-parity' } })
+  if (!res.ok) throw new Error(`Sitemap fetch failed for ${url}: HTTP ${res.status}`)
+  return res.text()
+}
+
 export function createNewStackSource(cfg: NewStackConfig): NewStackSource {
   const base = cfg.baseUrl.replace(/\/$/, '')
   const sb = createClient<Database>(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession: false } })
@@ -78,8 +93,36 @@ export function createNewStackSource(cfg: NewStackConfig): NewStackSource {
         sb.from('seo_redirects').select('from_path, to_path').order('from_path').range(from, to))
     },
     async sitemapUrls() {
-      const xml = await (await fetch(`${base}/sitemap.xml`, { headers })).text()
-      return new Set([...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname))
+      // /sitemap.xml is a sitemap INDEX, not a urlset: apps/web/app/sitemap.ts exports
+      // generateSitemaps, so Next serves an index over /sitemap/<id>.xml — which is why
+      // apps/web/app/robots.ts points crawlers at /sitemap/0.xml rather than /sitemap.xml.
+      //
+      // Scraping <loc> without distinguishing the two returns the SHARD urls, and
+      // sitemap-superset then reports every expected URL missing. That phantom failure
+      // would fire precisely at cutover, when --legacy-mysql supplies the first
+      // production-sized expected set.
+      const root = await fetchSitemapXml(`${base}/sitemap.xml`)
+      if (!isSitemapIndex(root)) return new Set(locPathnames(root))
+
+      const shards = locHrefs(root)
+      if (shards.length === 0) {
+        throw new Error(
+          `${base}/sitemap.xml is a sitemap index with no shards. Treating that as "the site ` +
+            'publishes nothing" would make sitemap-superset report every expected URL missing.',
+        )
+      }
+
+      const urls = new Set<string>()
+      for (const shard of shards) {
+        // Sequential and fail-fast. A partial read is the worst outcome for a gate: every
+        // URL in the unread shard would be reported missing. Same principle as fetchAllPages.
+        const doc = await fetchSitemapXml(shard)
+        if (isSitemapIndex(doc)) {
+          throw new Error(`Sitemap shard ${shard} is itself an index; nested indexes are not supported.`)
+        }
+        for (const path of locPathnames(doc)) urls.add(path)
+      }
+      return urls
     },
     async status(path) {
       return (await fetch(`${base}${path}`, { redirect: 'manual', headers })).status

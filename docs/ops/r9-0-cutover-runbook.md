@@ -121,10 +121,16 @@ what `resolve.ts` emits; `seo_redirects.to_path` itself is locale-agnostic.
 If this check emits no rows at all, the redirect map was never sampled — treat that as a
 misconfiguration, not a pass.
 
-## Known limitation
+## A note on the sitemap
 
-`sitemapUrls()` scrapes `<loc>` elements and does not follow a `<sitemapindex>`. `apps/web` splits
-its sitemap at 40,000 URLs (`SITEMAP_CHUNK`). Past that threshold `sitemap-superset` would compare
-article paths against shard URLs and report every expected URL missing. `--legacy-mysql` is the
-first mode with a production-sized expected set, so confirm the corpus is under 40,000 URLs, or
-teach `sitemapUrls()` to follow the index, before relying on that check.
+`/sitemap.xml` is a sitemap **index**, not a list of pages: `apps/web/app/sitemap.ts` exports
+`generateSitemaps`, so Next serves an index over `/sitemap/<id>.xml` shards — which is why
+`apps/web/app/robots.ts` points crawlers at `/sitemap/0.xml` rather than at `/sitemap.xml`.
+
+The gate follows the index and unions the shards. If a shard cannot be read it **fails** rather
+than returning a partial set: every URL in the unread shard would otherwise be reported missing
+by `sitemap-superset`, which is a phantom failure, not a real one.
+
+An earlier draft of this runbook said this only mattered past 40,000 URLs (`SITEMAP_CHUNK`). That
+was wrong — the index is served at any size, so the scrape returned shard URLs rather than article
+URLs on every run.
