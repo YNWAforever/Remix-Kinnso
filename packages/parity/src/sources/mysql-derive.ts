@@ -112,6 +112,20 @@ export async function deriveMysqlBaseline(
     )
   }
 
+  // The window guard suppresses PATH assertions (200/404 are racy at a boundary), but it
+  // must not remove an article from localeCounts: row-counts is a strict equality against
+  // a live count, so excluding an article Postgres still serves turns a racy assertion
+  // into a certain phantom failure. Counted articles are therefore those whose true window
+  // state at `now` is live, guard or no guard.
+  const counted = projected.filter((p) => p.visible || p.suppression === 'window_boundary')
+    .filter((p) => {
+      if (p.visible) return true
+      const published = p.view.publishedAt ? Date.parse(p.view.publishedAt) : null
+      const end = p.view.endAt ? Date.parse(p.view.endAt) : null
+      const nowMs = opts.now.getTime()
+      return (published === null || published <= nowMs) && (end === null || end >= nowMs)
+    })
+
   const visible = projected.filter((p) => p.visible)
   if (visible.length === 0) {
     throw new EmptyBaselineError(
@@ -121,11 +135,12 @@ export async function deriveMysqlBaseline(
   }
 
   const expectedUrlPaths = new Set<string>()
+  for (const p of visible) for (const path of p.paths) expectedUrlPaths.add(path)
+
+  // Tallied from the SAME in-memory snapshot, never a separate query. It differs from
+  // expectedUrlPaths by exactly the boundary set, for the reason above.
   const localeCounts: Record<string, number> = {}
-  for (const p of visible) {
-    for (const path of p.paths) expectedUrlPaths.add(path)
-    // Tallied from the SAME snapshot as expectedUrlPaths, never a separate query, so the
-    // two methods cannot describe different sets.
+  for (const p of counted) {
     for (const locale of p.view.locales) localeCounts[locale] = (localeCounts[locale] ?? 0) + 1
   }
 
@@ -177,12 +192,32 @@ export async function deriveMysqlBaseline(
 
   const nonLive = await collectNonLiveNegatives(reader, opts, projectOpts, negativeSample)
 
-  const negativePaths = [
-    ...new Set([...negativeFromWindow, ...missingTranslation, ...nonLive]),
-  ]
-    .filter((path) => !expectedUrlPaths.has(path) && !rescuedPaths.has(path))
+  // A path the redirect map answers is a 301, never a 404, so asserting 404 on it would
+  // fail against a proxy behaving exactly as designed. Match on the LOCALE-STRIPPED form,
+  // because from_path is locale-agnostic and resolve.ts strips the locale before lookup.
+  const stripLocale = (path: string) => {
+    const [, first, ...rest] = path.split('/')
+    return (LOCALES as readonly string[]).includes(first) ? `/${rest.join('/')}` : path
+  }
+
+  const candidates = [...new Set([...negativeFromWindow, ...missingTranslation, ...nonLive])]
+    .filter(
+      (path) =>
+        !expectedUrlPaths.has(path) &&
+        !rescuedPaths.has(path) &&
+        !redirectFrom.has(stripLocale(path)),
+    )
     .sort()
-    .slice(0, negativeSample * 3)
+
+  const negativeCap = negativeSample * 3
+  const negativePaths = candidates.slice(0, negativeCap)
+  // Never let a cap read as "these are all of them".
+  if (candidates.length > negativeCap) {
+    console.warn(
+      `[parity] sampling ${negativeCap} of ${candidates.length} negative paths; ` +
+        'raise negativeSample to assert more.',
+    )
+  }
 
   return {
     scanned,

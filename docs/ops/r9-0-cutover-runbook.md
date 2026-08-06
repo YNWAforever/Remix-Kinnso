@@ -112,6 +112,15 @@ re-run step 1. A loss whose locale-stripped path (`/articles/{segment}/{url}`) m
 the locale-stripped form: `from_path` is locale-agnostic and `apps/web/lib/redirects/resolve.ts`
 strips the locale before looking it up.
 
+## Reading `redirects`
+
+`--legacy-mysql` samples the rows step 1 ingested, read through the same Supabase client the
+newstack checks use. The sampled target is **locale-prefixed** (`/en/articles/...`) because that is
+what `resolve.ts` emits; `seo_redirects.to_path` itself is locale-agnostic.
+
+If this check emits no rows at all, the redirect map was never sampled — treat that as a
+misconfiguration, not a pass.
+
 ## Known limitation
 
 `sitemapUrls()` scrapes `<loc>` elements and does not follow a `<sitemapindex>`. `apps/web` splits

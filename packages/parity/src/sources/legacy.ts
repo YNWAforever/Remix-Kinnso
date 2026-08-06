@@ -2,15 +2,29 @@ import { LegacyReader, legacySsl, legacyTimezone, type SyncConfig } from '@kinns
 import type { LegacySource } from '../types'
 import { createFixtureLegacySource } from '../fixtures/baseline'
 import { deriveMysqlBaseline, type MysqlBaselineSnapshot, type SeoLossEntry } from './mysql-derive'
+import { DEFAULT_LOCALE, LOCALES } from '../locales'
+
+/** Mirrors resolve.ts: the locale prefix if the path carries one, else the default. */
+function localeOf(path: string): string {
+  const first = path.split('/')[1]
+  return (LOCALES as readonly string[]).includes(first) ? first : DEFAULT_LOCALE
+}
 
 export interface LegacyConfig {
   sitemapUrl?: string
   mysqlDsn?: string
+  /**
+   * Reads `seo_redirects`. Injected by the CLI from the newstack source so the baseline
+   * never opens a Supabase client of its own — and so `--legacy-mysql` actually samples
+   * the table Task 1 ingests. Without it the redirects check emits zero results and the
+   * report is `ok` with the redirect map entirely unverified.
+   */
+  redirects?: () => Promise<Array<{ from_path: string; to_path: string }>>
 }
 
 /** Default = fixture baseline (this env). --legacy-sitemap / --legacy-mysql are cutover-only. */
 export async function createLegacySource(cfg: LegacyConfig): Promise<LegacySource> {
-  if (cfg.mysqlDsn) return createMysqlLegacySource(cfg.mysqlDsn)
+  if (cfg.mysqlDsn) return createMysqlLegacySource(cfg.mysqlDsn, { redirects: cfg.redirects })
   if (cfg.sitemapUrl) return createSitemapLegacySource(cfg.sitemapUrl)
   return createFixtureLegacySource()
 }
@@ -117,6 +131,7 @@ export async function createMysqlLegacySource(
 ): Promise<ClassifyingLegacySource> {
   const env = opts.env ?? process.env
   const reader = opts.reader ?? new LegacyReader(parseLegacyDsn(dsn, env))
+  const readRedirects = opts.redirects ?? (async () => [])
 
   const snapshot = await deriveMysqlBaseline(reader, {
     cdnBase: opts.cdnBase ?? env.CDN_BASE ?? '',
@@ -125,7 +140,7 @@ export async function createMysqlLegacySource(
     windowGuardMs: opts.windowGuardMs,
     negativeSample: opts.negativeSample,
     pageSize: opts.pageSize,
-    redirects: opts.redirects ?? (async () => []),
+    redirects: readRedirects,
   })
 
   return {
@@ -138,8 +153,13 @@ export async function createMysqlLegacySource(
     async redirectSamples() {
       // The legacy redirect map is the baseline, so sampling what Task 1 ingested closes
       // the loop: these are the rows apps/web/proxy.ts must actually serve.
-      const rows = await (opts.redirects ?? (async () => []))()
-      return rows.map((r) => ({ from: r.from_path, to: r.to_path }))
+      //
+      // `to` must be LOCALE-PREFIXED. seo_redirects.to_path is locale-agnostic, but
+      // resolve.ts emits `/${locale ?? DEFAULT_LOCALE}${to_path}` and checks/redirects.ts
+      // compares against the Location pathname. Returning the raw to_path would fail every
+      // sample while the proxy behaved exactly as designed.
+      const rows = await readRedirects()
+      return rows.map((r) => ({ from: r.from_path, to: `/${localeOf(r.from_path)}${r.to_path}` }))
     },
     async negativePaths() {
       return snapshot.negativePaths

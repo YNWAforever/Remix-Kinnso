@@ -249,3 +249,59 @@ describe('--legacy-mysql routing', () => {
     expect(err.offenders).toHaveLength(2)
   })
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Regressions found by attacking the first implementation of this mode. Each of
+// these produced a PHANTOM failure — the gate reporting a problem while the proxy
+// behaved exactly as designed — or a silent no-op. A phantom failure is not a safe
+// default: it gets overridden, and an overridden gate is a disabled gate.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('--legacy-mysql agrees with the proxy about units', () => {
+  it('returns a LOCALE-PREFIXED redirect target, which is what the proxy emits', async () => {
+    // resolve.ts returns `/${locale ?? DEFAULT_LOCALE}${to_path}` and checks/redirects.ts
+    // compares that Location pathname against `to`. Returning the raw locale-agnostic
+    // to_path failed every sample against a correct proxy.
+    const src = await build(fakeReader([liveBundle()]), {
+      redirects: async () => [
+        { from_path: '/post/old-ramen', to_path: '/articles/dining/ramen-guide' },
+        { from_path: '/zh-hk/post/old-ramen', to_path: '/articles/dining/ramen-guide' },
+      ],
+    })
+    expect(await src.redirectSamples()).toEqual([
+      { from: '/post/old-ramen', to: '/en/articles/dining/ramen-guide' },
+      { from: '/zh-hk/post/old-ramen', to: '/zh-hk/articles/dining/ramen-guide' },
+    ])
+  })
+
+  it('never asserts 404 on a path the redirect map answers with a 301', async () => {
+    const expired = liveBundle({ id: 3, slug: 'expired-thing', url: 'expired-thing', end_at: '2026-05-01 00:00:00' })
+    const src = await build(fakeReader([liveBundle(), expired], { livePostCount: 2 }), {
+      redirects: async () => [{ from_path: '/articles/dining/expired-thing', to_path: '/articles/dining/ramen-guide' }],
+    })
+    expect(await src.negativePaths()).not.toContain('/en/articles/dining/expired-thing')
+  })
+
+  it('still counts an article inside the window guard, which Postgres serves', async () => {
+    // The guard suppresses racy 200/404 PATH assertions. row-counts is a strict equality
+    // against a live count, so dropping the article there turns a racy assertion into a
+    // certain phantom failure.
+    const fresh = liveBundle({ id: 4, slug: 'fresh', url: 'fresh', published_at: '2026-05-31 23:55:00' })
+    const src = await build(fakeReader([liveBundle(), fresh], { livePostCount: 2 }))
+
+    expect(await src.localeCounts()).toEqual({ en: 2 })
+    // ...but its path is NOT asserted either way, because 200 vs 404 is racy there.
+    expect((await src.expectedUrlPaths()).has('/en/articles/dining/fresh')).toBe(false)
+    expect(await src.negativePaths()).not.toContain('/en/articles/dining/fresh')
+  })
+})
+
+describe('--legacy-mysql actually samples the redirect map', () => {
+  it('samples nothing when no reader is supplied, rather than inventing rows', async () => {
+    // The CLI injects newstack.seoRedirects(); without that wiring redirectSamples()
+    // returned [], the redirects check emitted zero results, and buildReport was ok with
+    // the redirect map entirely unverified.
+    const src = await build(fakeReader([liveBundle()]))
+    expect(await src.redirectSamples()).toEqual([])
+  })
+})

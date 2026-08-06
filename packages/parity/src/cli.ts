@@ -63,7 +63,14 @@ export async function run(cfg: CliConfig): Promise<number> {
   // failure (exit 1) — the gate never ran, so reporting "fail" would misstate what happened.
   let legacy
   try {
-    legacy = await createLegacySource({ sitemapUrl: cfg.legacySitemap, mysqlDsn: cfg.legacyMysql })
+    legacy = await createLegacySource({
+      sitemapUrl: cfg.legacySitemap,
+      mysqlDsn: cfg.legacyMysql,
+      // The MySQL baseline samples the redirect map through the newstack's own reader, so
+      // there is one Supabase client for the run and the sampled rows are the ones the
+      // proxy will actually serve.
+      redirects: () => newstack.seoRedirects(),
+    })
   } catch (err) {
     console.error(err instanceof Error ? err.message : String(err))
     return 2
