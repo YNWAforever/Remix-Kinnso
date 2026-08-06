@@ -1,6 +1,15 @@
 import { Hono } from 'hono'
+import { bodyLimit } from 'hono/body-limit'
 import { createHmac } from 'node:crypto'
+import { parseRedirectsPhp, type SeoRedirect } from '@kinnso/sync'
 import { safeEqual } from './safe-equal'
+
+/**
+ * `redirect.php` is a source file, not user input, but the route still accepts a POST
+ * body and must not be an unbounded buffer. 1 MiB is roughly 13,000 redirect lines —
+ * far beyond the real map, and small enough to reject a runaway body early.
+ */
+const MAX_REDIRECTS_BODY_BYTES = 1024 * 1024
 
 /**
  * The slice of `makeSync()` the HTTP layer actually uses. Declared structurally (rather
@@ -16,9 +25,14 @@ export interface AppDeps {
   sync: SyncService
   /** HMAC key shared with the legacy webhook publisher. Empty ⇒ every webhook is rejected. */
   webhookSecret: string
-  /** Admin bearer token for /sync/:id and /backfill. Empty ⇒ both endpoints are closed. */
+  /** Admin bearer token for /sync/:id, /backfill and /redirects. Empty ⇒ all three are closed. */
   adminToken: string
   revalidate: (paths: string[]) => Promise<void>
+  /**
+   * Writes the parsed legacy redirect map. Injected like `sync` so the HTTP layer never
+   * holds a Supabase client and this route stays unit-testable without one.
+   */
+  writeRedirects: (rows: SeoRedirect[]) => Promise<{ written: number }>
 }
 
 export function createApp(deps: AppDeps) {
@@ -66,6 +80,32 @@ export function createApp(deps: AppDeps) {
     if (!isAdmin(c.req.header('x-admin-token'))) return c.json({ error: 'unauthorized' }, 401)
     return c.json(await deps.sync.backfill())
   })
+
+  /**
+   * Ingest the legacy redirect map (the contents of `redirect.php`) into `seo_redirects`.
+   * `apps/web/proxy.ts` already serves 307s from that table; until this route existed
+   * nothing in production wrote it, so every legacy URL would 404 on cutover.
+   *
+   * The guard runs as middleware rather than inline so it precedes `bodyLimit`: an
+   * unauthenticated caller is turned away before streaming a body, and never learns the
+   * size cap. The other admin routes read no body, so they keep their inline check.
+   */
+  app.post(
+    '/redirects',
+    async (c, next) => {
+      if (!isAdmin(c.req.header('x-admin-token'))) return c.json({ error: 'unauthorized' }, 401)
+      await next()
+    },
+    bodyLimit({
+      maxSize: MAX_REDIRECTS_BODY_BYTES,
+      onError: (c) => c.json({ error: 'request body too large' }, 413),
+    }),
+    async (c) => {
+      const parsed = parseRedirectsPhp(await c.req.text())
+      const { written } = await deps.writeRedirects(parsed)
+      return c.json({ ok: true, parsed: parsed.length, written })
+    },
+  )
 
   // Fail closed: any unhandled error in a handler returns 500 rather than crashing the process.
   app.onError((err, c) => {

@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 import { createApp, type AppDeps, type SyncService } from '../src/app'
+import type { SeoRedirect } from '@kinnso/sync'
 
 const SECRET = 'foso-webhook-secret'
 const ADMIN = 'admin-token'
@@ -30,14 +31,19 @@ function makeDeps(overrides: Partial<AppDeps> = {}) {
     },
     syncDelete,
   }
+  const writes: SeoRedirect[][] = []
   const deps: AppDeps = {
     sync,
     webhookSecret: SECRET,
     adminToken: ADMIN,
     revalidate: async () => {},
+    writeRedirects: async (rows) => {
+      writes.push(rows)
+      return { written: rows.length }
+    },
     ...overrides,
   }
-  return { app: createApp(deps), calls, syncDelete }
+  return { app: createApp(deps), calls, syncDelete, writes }
 }
 
 const signed = (body: unknown, secret = SECRET) => {
@@ -171,5 +177,87 @@ describe('health', () => {
     const res = await app.request('/health')
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ ok: true })
+  })
+})
+
+describe('redirect ingest', () => {
+  const REDIRECT_PHP = `
+    Route::redirectI18n('/old-ramen', '/articles/dining/ramen-guide', 301);
+    Route::redirectI18n("/promo-2024", "/articles/destinations/promo", 302);
+  `
+
+  const post = (body: string, token?: string): RequestInit => ({
+    method: 'POST',
+    body,
+    headers: token === undefined ? {} : ({ 'x-admin-token': token } as Record<string, string>),
+  })
+
+  it.each([
+    ['a missing header', undefined],
+    ['a wrong token', 'not-the-token'],
+    ['an empty token', ''],
+    ['a prefix of the real token', ADMIN.slice(0, 5)],
+  ])('rejects the ingest with %s and never writes', async (_label, token) => {
+    const { app, writes } = makeDeps()
+    const res = await app.request('/redirects', post(REDIRECT_PHP, token))
+    expect(res.status).toBe(401)
+    expect(await res.json()).toEqual({ error: 'unauthorized' })
+    expect(writes).toHaveLength(0)
+  })
+
+  it('parses redirect.php and writes the rows it parsed', async () => {
+    const { app, writes } = makeDeps()
+    const res = await app.request('/redirects', post(REDIRECT_PHP, ADMIN))
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true, parsed: 2, written: 2 })
+    expect(writes).toEqual([
+      [
+        { from_path: '/old-ramen', to_path: '/articles/dining/ramen-guide', status_code: 301 },
+        { from_path: '/promo-2024', to_path: '/articles/destinations/promo', status_code: 302 },
+      ],
+    ])
+  })
+
+  // The backfill is re-runnable by design (n8n retries it), so the second post must
+  // converge rather than report a conflict.
+  it('reports the same counts when the same file is posted twice', async () => {
+    const { app, writes } = makeDeps()
+    const first = await app.request('/redirects', post(REDIRECT_PHP, ADMIN))
+    const second = await app.request('/redirects', post(REDIRECT_PHP, ADMIN))
+
+    expect(await first.json()).toEqual(await second.json())
+    expect(writes).toHaveLength(2)
+    expect(writes[0]).toEqual(writes[1])
+  })
+
+  it('rejects a body over the cap without parsing or writing', async () => {
+    const { app, writes } = makeDeps()
+    const oversized = `Route::redirectI18n('/a', '/b', 301);\n`.repeat(40_000)
+    const res = await app.request('/redirects', post(oversized, ADMIN))
+
+    expect(res.status).toBe(413)
+    expect(await res.json()).toEqual({ error: 'request body too large' })
+    expect(writes).toHaveLength(0)
+  })
+
+  // Auth is checked before the body is read at all: an unauthenticated caller should
+  // never learn the size limit, and should never get to stream a body to us.
+  it('answers an oversized unauthenticated request with 401, not 413', async () => {
+    const { app, writes } = makeDeps()
+    const oversized = `Route::redirectI18n('/a', '/b', 301);\n`.repeat(40_000)
+    const res = await app.request('/redirects', post(oversized, 'not-the-token'))
+
+    expect(res.status).toBe(401)
+    expect(writes).toHaveLength(0)
+  })
+
+  it('reports zero rather than inventing a write when the file parses to nothing', async () => {
+    const { app, writes } = makeDeps()
+    const res = await app.request('/redirects', post('<?php // no redirects here', ADMIN))
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true, parsed: 0, written: 0 })
+    expect(writes).toEqual([[]])
   })
 })

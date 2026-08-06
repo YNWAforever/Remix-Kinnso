@@ -4,6 +4,8 @@ import { loadConfig, type SyncConfig } from './config'
 import { LegacyReader } from './reader'
 import { Upserter } from './upserter'
 import { transformPost } from './transform'
+import { writeRedirects } from './redirect-writer'
+import type { SeoRedirect } from './types'
 
 /**
  * A legacy post belongs in the public read-model only if it is published and not
@@ -69,5 +71,13 @@ export function makeSync(cfg: SyncConfig = loadConfig()) {
     return { total, skipped, warnings }
   }
 
-  return { syncOne, syncDelete: (id: number) => up.syncDelete(id), backfill, close: () => reader.close() }
+  return {
+    syncOne,
+    syncDelete: (id: number) => up.syncDelete(id),
+    backfill,
+    // Exposed here so the redirect ingest reuses this one service-role client rather
+    // than opening a second one from the same config.
+    writeRedirects: (rows: SeoRedirect[]) => writeRedirects(db, rows),
+    close: () => reader.close(),
+  }
 }
