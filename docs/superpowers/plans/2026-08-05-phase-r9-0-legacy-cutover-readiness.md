@@ -197,3 +197,99 @@ Expected: green across all packages, with the pre-existing `Booking ON` CI gap (
 - Both sides of every comparison use one definition: `detailPath` for routing, the sync's own predicates for published and visible.
 - The ingest is idempotent by construction (`from_path` is unique) and guarded by the same admin token as the other write routes.
 - No task changes `apps/web`, the sync transform, or any production data path other than the redirect table the proxy already expects to be populated.
+
+---
+
+## Outcome
+
+All four tasks shipped. The plan's central technical premise was wrong, and correcting it is most of
+what this phase turned out to be. Recorded here rather than quietly absorbed.
+
+### The premise that failed
+
+Tasks 2 and 3 assumed the baseline could be derived in SQL from the sync's published predicate:
+
+> "'Published' and 'visible translation' must come from the sync's own predicates, not be
+> re-derived." — Global Constraints
+
+The constraint is right. The identification of the predicate is not. `isPostLive`
+(`!deleted_at && !!published_at`) is **not** what ends up published. `transform/index.ts:79-90` runs
+`validatePublication` and sets `article.published_at = null` for the **whole article** when a locale
+has fewer than three visible blocks, fewer than 150 words, an invalid external link, or no active
+named author. Those need parsed content JSON, word segmentation, URL parsing and joined author rows.
+
+So the legacy-serves set is a strict superset of the new-stack-published set, and a SQL baseline
+would report every article in the gap as a `sitemap-superset` failure that is not real drift. A gate
+that fails on differences that do not exist gets overridden, and an overridden gate is a disabled
+gate.
+
+**What shipped instead:** the baseline runs the real code. `LegacyReader.streamPostBundles()` feeds
+the sync's own `transformPost`, and the verdict is read off the article row it produces. If
+`validatePublication`'s rules change, the baseline follows automatically, because it is the same
+code path rather than a copy of it. Zero new baseline SQL — no legacy schema dump exists anywhere in
+this repository, so every invented column name would be unverifiable until it failed against
+production MySQL.
+
+### Withdrawn and replaced interfaces
+
+- `publishedArticleRows(afterId?, limit?)` (line 114) — **withdrawn**. Cannot express
+  `validatePublication`.
+- `localeTranslationCounts()` (line 115) — **withdrawn as the baseline**; survives as
+  `legacyTranslationCeiling()`, an independent SQL upper bound the TypeScript baseline must not
+  exceed.
+- Added instead: `streamPostBundles()`, `livePostCount()` (scan-completeness tripwire),
+  `sampleNonLivePostIds()`.
+- Line 146 — `"localeCounts() — straight from localeTranslationCounts()"` is wrong: it is tallied
+  from the same in-memory snapshot as `expectedUrlPaths()`, so the two cannot describe different
+  sets.
+
+### Three factual corrections to the plan
+
+Each verified against the tree:
+
+1. **Line 177** names `url-coverage` as a baseline-driven abort. It is not — `url-coverage.ts:5`
+   destructures `{ newstack }` only and never reads the baseline. The sole consumer of
+   `expectedUrlPaths()` is `sitemap-superset`; of `localeCounts()`, `row-counts`. The runbook names
+   the right ones. `row-counts` also fails in *either* direction, not only "below baseline".
+2. **Line 15** says `proxy.ts` serves **307**s from `seo_redirects`. It serves **301**s
+   (`resolve.ts:13`); 307 is only the locale-less fallback.
+3. **File Map Task 1** names `apps/sync/tests/app.test.ts`, which does not exist. The tests are in
+   `app.unit.test.ts`.
+
+### The safety property, preserved
+
+`MYSQL_MODE_NOT_IMPLEMENTED` is deleted, so what it protected is now asserted directly. The gate
+throws (exit 2, never 0) on: an empty scan; a corpus where nothing is visible; a scan shorter than
+`livePostCount()`; a locale fan-out exceeding the SQL ceiling; an unroutable category (aggregated
+into one error, never a dropped path); and a DSN carrying TLS settings.
+
+Worth noting what this replaced: `row-counts.ts:6` returns **`warn`** on an empty baseline, and
+`report.ts:6` is `ok: counts.fail === 0` — so an empty baseline exits **0** today. The refusal was
+load-bearing.
+
+### New: the `seo-loss` check
+
+Articles legacy serves that the new stack will deliberately not publish are neither dropped (shrinks
+the baseline), nor expected (they 404), nor asserted-404 (scores real SEO loss as a pass). They are
+reported by a new check that **fails** unless a redirect covers the URL — keyed on the
+locale-stripped path, because `seo_redirects.from_path` is locale-agnostic and `resolve.ts` strips
+the locale before lookup. It fails rather than warns because a warn would exit 0 and certify the
+loss.
+
+### Known limitation, recorded in the runbook
+
+`sitemapUrls()` does not follow a `<sitemapindex>`, and `apps/web` shards its sitemap at 40,000 URLs
+(`SITEMAP_CHUNK`). `--legacy-mysql` is the first mode with a production-sized expected set, so past
+that threshold `sitemap-superset` would report every expected URL missing. Not fixed here — it is an
+`apps/web`/newstack-source change and this phase's Global Constraints forbid touching `apps/web`.
+
+### Verification
+
+`pnpm typecheck` 8/8 · `pnpm lint` 0 errors · `pnpm honesty:lint` clean · `@kinnso/sync` 89 passed ·
+`@kinnso/sync-app` 25 passed · `@kinnso/parity` 62 passed · web 2316 passed with only the 14 known
+DB-dependent files failing for want of a local Supabase stack (R9.0 does not touch `apps/web`).
+
+The `--legacy-mysql` path has no test against a real MySQL: `reader.contract.test.ts` is
+`describe.skip` unless `LEGACY_DB_HOST` is set. Every new query's column names are therefore
+unverified until first run against the legacy database. That is inherent — the repository contains
+no legacy schema — and it is why the baseline adds no new SQL beyond three tripwire queries.
