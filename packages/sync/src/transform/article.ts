@@ -2,12 +2,7 @@ import { createHash } from 'node:crypto'
 import type { ArticleRow, LegacyPostBundle } from '../types'
 import { csvToArray, cdnUrl } from './arrays'
 import { primaryCategory } from './category'
-
-const toIso = (s: string | null): string | null => {
-  if (!s) return null
-  const d = new Date(s.replace(' ', 'T') + 'Z')
-  return Number.isNaN(d.getTime()) ? null : d.toISOString()
-}
+import { legacyToIso } from './datetime'
 
 // Stable, locale-aware comparator so hashing is independent of reader row order
 // (the legacy SELECTs don't fully ORDER BY, so array order isn't guaranteed).
@@ -37,9 +32,11 @@ export function buildArticleRow(
   bundle: LegacyPostBundle,
   tagSlugs: string[],
   cdn: string,
+  legacyTimezone = 'UTC',
 ): { row: ArticleRow; categoryDefaulted: boolean } {
   const p = bundle.post
   const { category, defaulted } = primaryCategory(bundle.categoryWeights)
+  const toIso = (s: string | null) => legacyToIso(s, legacyTimezone)
   return {
     row: {
       legacy_post_id: p.id,

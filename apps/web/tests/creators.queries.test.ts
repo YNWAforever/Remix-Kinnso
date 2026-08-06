@@ -227,7 +227,10 @@ describe('getCreatorPublicNames', () => {
 
 describe('getCreatorsForSitemap', () => {
   it('returns active handles with a lastmod', async () => {
-    state.creators = [{ id: 'c1', is_listed: true, handle: 'maya', created_at: '2026-06-03T00:00:00Z' }]
+    // Built from creatorRow because the query selects public_profile and filters
+    // `.not('public_profile','is',null)` — a row without one cannot come back from
+    // the database, and the shared eligibility predicate rejects it.
+    state.creators = [{ ...creatorRow, is_listed: true, created_at: '2026-06-03T00:00:00Z' }]
     const rows = await getCreatorsForSitemap()
     expect(rows).toEqual([{ handle: 'maya', lastmod: '2026-06-03T00:00:00Z' }])
   })

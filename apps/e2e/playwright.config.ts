@@ -1,6 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
+import { resolveE2EBaseURL } from './e2e-target'
 
-const baseURL = process.env.E2E_BASE_URL ?? 'https://remix-kinnso-web.vercel.app'
+// Resolved while the config module evaluates, so an unguarded remote target fails before
+// Playwright launches a browser rather than after the first spec has written to it.
+const baseURL = resolveE2EBaseURL(process.env)
 
 export default defineConfig({
   testDir: './specs',

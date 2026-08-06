@@ -94,6 +94,40 @@ describe('i18n locale parity for new creator-profile groups', () => {
     expect(en.admin.analyticsObservedZero).toBe('Zero is an observed aggregate; insufficient samples are not interpretable rates.')
   })
 
+  // Key parity below proves the strings EXIST. These two prove they still SAY the
+  // thing: a translation that drops an interpolation placeholder renders "pts to
+  // unlocks:" with no number and no tier, which key parity cannot see.
+  it('keeps every interpolation placeholder in the next-tier unlocks copy in each locale', async () => {
+    const dictionaries = await Promise.all(LOCALES.map(async (l) => [l, await getDictionary(l)] as const))
+    for (const [locale, dict] of dictionaries) {
+      expect(dict.tier.nextUnlocksIntro, `${locale} intro points`).toContain('{points}')
+      expect(dict.tier.nextUnlocksIntro, `${locale} intro tier`).toContain('{tier}')
+      expect(dict.tier.nextUnlocksNone, `${locale} empty-tier copy`).toContain('{tier}')
+      expect(dict.tier.nextUnlocksMaxed, `${locale} top-tier copy`).toContain('{tier}')
+    }
+  })
+
+  // The directory rule is one a creator acts on, so each locale must actually name
+  // the published-guide requirement rather than a vaguer "finish your profile".
+  it('names the published-guide requirement for the directory in every locale', async () => {
+    const guideMarker: Record<string, string> = {
+      en: 'Publish a guide', 'zh-hk': '發布', 'zh-tw': '發布', 'zh-cn': '发布',
+      ja: '公開', ko: '게시', th: 'เผยแพร่',
+    }
+    // Drafts not counting is the whole point of stating the rule, so each locale
+    // must say that too — otherwise the copy reads as "write a guide", which the
+    // checklist already said and which is not the rule.
+    const draftMarker: Record<string, string> = {
+      en: 'drafts do not count', 'zh-hk': '草稿', 'zh-tw': '草稿', 'zh-cn': '草稿',
+      ja: '下書き', ko: '임시 저장본', th: 'ฉบับร่าง',
+    }
+    const dictionaries = await Promise.all(LOCALES.map(async (l) => [l, await getDictionary(l)] as const))
+    for (const [locale, dict] of dictionaries) {
+      expect(dict.studioDashboard.directoryNeedsGuide, `${locale} directory copy`).toContain(guideMarker[locale])
+      expect(dict.studioDashboard.directoryNeedsGuide, `${locale} drafts caveat`).toContain(draftMarker[locale])
+    }
+  })
+
   for (const locale of LOCALES) {
     it(`${locale} has identical keys to en for each group`, async () => {
       const dict = (await getDictionary(locale)) as unknown as Record<string, unknown>

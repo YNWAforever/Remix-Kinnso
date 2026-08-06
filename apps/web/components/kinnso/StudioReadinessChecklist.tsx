@@ -1,3 +1,4 @@
+import type { DirectoryGap } from '@/lib/creators/eligibility'
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -61,11 +62,13 @@ export function StudioReadinessChecklist({
   locale,
   t,
   readiness,
+  directory,
   slots = {},
 }: {
   locale: Locale
   t: T
   readiness: Readiness
+  directory: { listed: boolean; gaps: DirectoryGap[] }
   slots?: Partial<Record<ReadinessItemId, ReactNode>>
 }) {
   const p = (path: string) => `/${locale}${path}`
@@ -80,11 +83,22 @@ export function StudioReadinessChecklist({
     <TicketCard className="border-2 border-kinnso-orange p-5">
       <div data-testid="readiness">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-black text-kinnso-ink">
+        <h2 id="readiness-heading" className="text-lg font-black text-kinnso-ink">
           {t.checklistTitle} · {progress}
         </h2>
       </div>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-kinnso-orange/20" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
+      {/* Named from the heading, which already reads "Setup checklist · 2/4", and
+          aria-valuetext so it is announced as steps rather than a bare percentage.
+          An unnamed progressbar is a serious axe violation. */}
+      <div
+        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-kinnso-orange/20"
+        role="progressbar"
+        aria-labelledby="readiness-heading"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuetext={progress}
+      >
         <div className="h-full rounded-full bg-kinnso-orange transition-[width]" style={{ width: `${pct}%` }} />
       </div>
 
@@ -114,6 +128,21 @@ export function StudioReadinessChecklist({
           )
         })}
       </ul>
+
+      {/* The directory rule, stated because the product enforces it silently: a
+          creator can finish everything above and still not appear, since listing
+          needs a PUBLISHED guide (or an ops override) — and the guide item above
+          counts drafts. Shared predicate, so this cannot drift from the rule. */}
+      {/* Static explanatory text, not a live region: the page already has one
+          role=status for the next step, and competing live regions make a screen
+          reader announce both on every update. */}
+      <p className="mt-4 border-t border-kinnso-line pt-3 text-xs text-kinnso-muted">
+        {directory.listed
+          ? t.directoryListed
+          : directory.gaps.includes('no_published_guide')
+            ? t.directoryNeedsGuide
+            : t.directoryNotListed}
+      </p>
       </div>
     </TicketCard>
   )

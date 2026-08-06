@@ -1,4 +1,12 @@
 import type { LlmClient, LlmMessage } from '@kinnso/scan'
+import {
+  discardBody,
+  readCappedJson,
+  readCappedText,
+  LLM_TIMEOUT_MS,
+  MAX_LLM_BODY_BYTES,
+  MAX_LLM_ERROR_BODY_BYTES,
+} from './http'
 
 /**
  * Default endpoint when LLM_BASE_URL is unset. OpenRouter's OpenAI-compatible
@@ -26,24 +34,49 @@ export class ChatCompletionsClient implements LlmClient {
   }
 
   async complete(messages: LlmMessage[]): Promise<string> {
-    const res = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ model: this.model, messages }),
-    })
+    // A generation call gets a generous budget, but not an unbounded one: this
+    // runs inside a fire-and-forget job on the single worker process, so a
+    // provider that accepts the request and then never responds would otherwise
+    // hold the job (and its prompt payload) open for undici's default lifetime.
+    let res: Response
+    try {
+      res = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ model: this.model, messages }),
+        signal: AbortSignal.timeout(LLM_TIMEOUT_MS),
+      })
+    } catch (err) {
+      const name = (err as { name?: unknown } | null)?.name
+      if (name === 'TimeoutError' || name === 'AbortError') {
+        // Surfaced to the pipeline, which retries once before failing the job.
+        throw new Error(`LLM request timed out after ${LLM_TIMEOUT_MS}ms`)
+      }
+      throw err
+    }
 
     if (!res.ok) {
       // The body is the provider's error payload (status/message) — never the
-      // API key, which travels only in the Authorization header.
-      const text = await res.text().catch(() => '')
-      throw new Error(`LLM endpoint returned HTTP ${res.status}: ${text}`)
+      // API key, which travels only in the Authorization header. Read a bounded
+      // slice: this message reaches the logs and (capped again) `job.error`.
+      const text = await readCappedText(res, MAX_LLM_ERROR_BODY_BYTES).catch(() => '')
+      throw new Error(
+        `LLM endpoint returned HTTP ${res.status}: ${text.replace(/\s+/g, ' ').slice(0, 500)}`,
+      )
     }
 
-    const data = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>
+    let data: { choices?: Array<{ message?: { content?: string } }> }
+    try {
+      data = await readCappedJson<{ choices?: Array<{ message?: { content?: string } }> }>(
+        res,
+        MAX_LLM_BODY_BYTES,
+      )
+    } catch (err) {
+      await discardBody(res)
+      throw new Error(`LLM response could not be read: ${(err as Error).message}`)
     }
     const content = data.choices?.[0]?.message?.content
     if (typeof content !== 'string' || !content) {

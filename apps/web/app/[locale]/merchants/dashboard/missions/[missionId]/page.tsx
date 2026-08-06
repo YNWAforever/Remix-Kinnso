@@ -1,15 +1,17 @@
 import { notFound, redirect } from 'next/navigation'
 import { MissionDetailView, type MissionDetail } from '@/components/kinnso/pages/MissionDetailView'
-import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
+import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { reviewParticipantAction, reviewSubmissionAction } from '@/lib/missions/actions'
 import { getMerchantProfile, listMerchantMissions } from '@/lib/missions/queries'
 import { getCreatorPublicNames, type CreatorPublicName } from '@/lib/creators/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-export function generateStaticParams() {
-  return LOCALES.map((locale) => ({ locale }))
-}
+// Auth-gated: the page reads the request's session cookie (auth.getUser()
+// below), so it must render dynamically. generateStaticParams() opts a route
+// into static rendering instead, which is what produced the
+// DYNAMIC_SERVER_USAGE 500s on /g/[slug] and /experiences/[slug].
+export const dynamic = 'force-dynamic'
 
 type Params = Promise<{ locale: string; missionId: string }>
 type MerchantMissionDetailData = {

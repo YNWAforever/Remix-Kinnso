@@ -42,6 +42,8 @@ const baseProps = {
   activeJobId: null,
   contribution: progressToNext(0),
   tierT: en.tier,
+  nextAction: { kind: 'publish_guide' as const, path: '/studio/guides/new' },
+  directory: { listed: true, gaps: [] },
 }
 
 describe('StudioDashboardView', () => {
@@ -96,5 +98,38 @@ describe('StudioDashboardView', () => {
     )
     expect(screen.getByText(en.tier.cardTitle)).toBeTruthy()
     expect(screen.getByText('Rising')).toBeTruthy()
+  })
+
+  it('shows the single next step above the checklist, with a link', () => {
+    render(
+      <StudioDashboardView
+        {...baseProps}
+        opportunities={[]}
+        earnings={[]}
+        nextAction={{ kind: 'start_earning', path: '/studio/offers' }}
+      />,
+    )
+    const section = screen.getByRole('region', { name: en.studioDashboard.nextActionHeading })
+    expect(section).toBeTruthy()
+    expect(screen.getByText(en.studioDashboard.nextActionStartEarning)).toBeTruthy()
+    // Conveyed as text with a status role, not colour alone.
+    expect(screen.getByRole('status').textContent).toContain(
+      en.studioDashboard.nextActionStartEarning,
+    )
+    const cta = screen.getByRole('link', { name: en.studioDashboard.nextActionCta })
+    expect(cta.getAttribute('href')).toBe('/en/studio/offers')
+  })
+
+  it('states plainly when nothing is open, and offers no link', () => {
+    render(
+      <StudioDashboardView
+        {...baseProps}
+        opportunities={[]}
+        earnings={[]}
+        nextAction={{ kind: 'nothing_open', path: null }}
+      />,
+    )
+    expect(screen.getByText(en.studioDashboard.nextActionNothingOpen)).toBeTruthy()
+    expect(screen.queryByRole('link', { name: en.studioDashboard.nextActionCta })).toBeNull()
   })
 })

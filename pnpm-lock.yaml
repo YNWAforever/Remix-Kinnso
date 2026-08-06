@@ -8,6 +8,15 @@ importers:
 
   .:
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.39.4
+        version: 9.39.4
+      '@kinnso/honesty':
+        specifier: workspace:*
+        version: link:packages/honesty
+      eslint:
+        specifier: ^9.39.4
+        version: 9.39.4(jiti@2.7.0)
       supabase:
         specifier: ^2.106.0
         version: 2.106.0
@@ -17,12 +26,21 @@ importers:
       turbo:
         specifier: ^2.1.0
         version: 2.9.18
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.61.0
+        version: 8.61.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
 
   apps/e2e:
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
         version: 4.12.1(playwright-core@1.60.0)
+      '@kinnso/honesty':
+        specifier: workspace:*
+        version: link:../../packages/honesty
       '@lhci/cli':
         specifier: ^0.15.0
         version: 0.15.1
@@ -94,6 +112,9 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@20.19.43)(jsdom@29.1.1)(vite@8.0.16(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4))
 
   apps/web:
     dependencies:
@@ -227,6 +248,9 @@ importers:
       '@types/sanitize-html':
         specifier: ^2.16.1
         version: 2.16.1
+      axe-core:
+        specifier: 4.12.1
+        version: 4.12.1
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -268,6 +292,9 @@ importers:
       '@kinnso/db':
         specifier: workspace:*
         version: link:../db
+      '@kinnso/sync':
+        specifier: workspace:*
+        version: link:../sync
       '@supabase/supabase-js':
         specifier: ^2.108.1
         version: 2.108.1
@@ -325,6 +352,9 @@ importers:
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
+      tsx:
+        specifier: ^4.19.0
+        version: 4.22.4
       typescript:
         specifier: ^5
         version: 5.9.3

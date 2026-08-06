@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const { getUserMock, rpcMock, serverClientMock, serviceClientMock, serviceFromMock, serviceSelectMock, serviceUpsertMock } = vi.hoisted(() => ({
+const { getUserMock, rpcMock, serverClientMock, serviceClientMock, serviceFromMock, serviceSelectMock, serviceUpsertMock, getClientIpMock } = vi.hoisted(() => ({
   getUserMock: vi.fn(),
   rpcMock: vi.fn(),
   serverClientMock: vi.fn(),
@@ -8,11 +8,14 @@ const { getUserMock, rpcMock, serverClientMock, serviceClientMock, serviceFromMo
   serviceFromMock: vi.fn(),
   serviceSelectMock: vi.fn(),
   serviceUpsertMock: vi.fn(),
+  getClientIpMock: vi.fn(async () => '1.2.3.4'),
 }))
 
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: serverClientMock,
 }))
+
+vi.mock('@/lib/http/client-ip', () => ({ getClientIp: getClientIpMock }))
 
 vi.mock('@/lib/supabase/service', () => ({
   createSupabaseServiceClient: serviceClientMock,
@@ -44,8 +47,10 @@ function request(body: unknown, headers?: HeadersInit) {
 }
 
 function allowJourney() {
+  // Covers both throttles: the per-IP limit and the per-journey limit.
   rpcMock.mockResolvedValue({ data: true, error: null })
   getUserMock.mockResolvedValue({ data: { user: null }, error: null })
+  getClientIpMock.mockResolvedValue('1.2.3.4')
   serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
 }
 
@@ -81,6 +86,32 @@ describe('POST /api/analytics', () => {
 
     expect(response.status).toBe(429)
     await expect(response.json()).resolves.toEqual({ accepted: false, error: 'rate_limited' })
+  })
+
+  it('returns 429 on the per-IP throttle even when each event uses a fresh journeyId', async () => {
+    process.env.ANALYTICS_INGEST_MODE = 'production'
+    getClientIpMock.mockResolvedValue('9.9.9.9')
+    // The IP limit rejects; the per-journey limit would happily allow, since a
+    // rotated journeyId always lands in a fresh bucket.
+    rpcMock.mockImplementation((name: string) =>
+      Promise.resolve(
+        name === 'check_and_increment_traveller_analytics_ip_rate_limit'
+          ? { data: false, error: null }
+          : { data: true, error: null },
+      ),
+    )
+    serverClientMock.mockResolvedValue({ rpc: rpcMock, auth: { getUser: getUserMock } })
+
+    const response = await POST(
+      request(payload({ journeyId: '00000000-0000-4000-8000-00000000beef' })),
+    )
+
+    expect(response.status).toBe(429)
+    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'rate_limited' })
+    expect(rpcMock).toHaveBeenCalledWith(
+      'check_and_increment_traveller_analytics_ip_rate_limit',
+      expect.objectContaining({ p_ip: '9.9.9.9' }),
+    )
   })
 
   it('acknowledges valid test-mode events without opening a Supabase client', async () => {

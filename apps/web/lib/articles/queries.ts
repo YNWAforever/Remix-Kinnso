@@ -216,9 +216,27 @@ function indexableLocalesFor(row: ArticleSeoRow): Locale[] {
   return indexableArticleLocales(seoTranslations(row), row.is_coupon)
 }
 
+/**
+ * One article's SEO row. `articles.url` is UNIQUE, so this returns exactly the
+ * row a scan of the corpus would have found — without transferring every
+ * article's full translation `content` to decide the indexability of one page.
+ */
+const getArticleSeoRow = cache(async (url: string): Promise<ArticleSeoRow | null> => {
+  const { data, error } = await db()
+    .from('articles')
+    .select(
+      'url, category, is_coupon, end_at, edit_at, updated_at, published_at, ' +
+      'article_translations(locale, title, summary, meta_description, content)',
+    )
+    .eq('url', url)
+    .maybeSingle()
+  if (error) throw error
+  return (data ?? null) as unknown as ArticleSeoRow | null
+})
+
 export const getIndexableArticleLocales = cache(
   async (url: string): Promise<Locale[]> => {
-    const row = (await getArticleSeoRows()).find((article) => article.url === url)
+    const row = await getArticleSeoRow(url)
     return row ? indexableLocalesFor(row) : []
   },
 )

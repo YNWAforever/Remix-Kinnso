@@ -838,6 +838,17 @@ export interface Messages {
     addHandleErrorEmpty: string
     addHandleErrorFormat: string
     addHandleErrorLength: string
+    nextActionHeading: string
+    nextActionAwaitScan: string
+    nextActionStartEarning: string
+    nextActionPublishGuide: string
+    nextActionConnectPlatforms: string
+    nextActionRefreshDna: string
+    nextActionNothingOpen: string
+    nextActionCta: string
+    directoryListed: string
+    directoryNeedsGuide: string
+    directoryNotListed: string
     addHandleSaved: string
   }
   studioGuides: {
@@ -947,6 +958,10 @@ export interface Messages {
     unlocksHeading: string
     unlocksMissions: string
     unlocksHelp: string
+    nextUnlocksHeading: string
+    nextUnlocksIntro: string
+    nextUnlocksNone: string
+    nextUnlocksMaxed: string
     historyHeading: string
     historyEmpty: string
     eventGuide: string
@@ -1975,6 +1990,17 @@ const messages: Messages = {
     addHandleErrorFormat: 'That handle has invalid characters.',
     addHandleErrorLength: 'That handle is too long (max 30).',
     addHandleSaved: 'Added — rescan to include it in your DNA.',
+    nextActionHeading: 'Your next step',
+    nextActionAwaitScan: 'Your scan is running. We will have your DNA shortly.',
+    nextActionStartEarning: 'Promote an offer to your audience and earn commission on every booking it drives.',
+    nextActionPublishGuide: 'Publish your first guide — that is what lists you in the public creator directory.',
+    nextActionConnectPlatforms: 'Connect your remaining platforms so more of your audience can be verified.',
+    nextActionRefreshDna: 'Your DNA is getting old. Rescan to keep it accurate.',
+    nextActionNothingOpen: 'Nothing needs your attention right now.',
+    nextActionCta: 'Open',
+    directoryListed: 'You appear in the public creator directory.',
+    directoryNeedsGuide: 'Publish a guide to appear in the public creator directory — drafts do not count.',
+    directoryNotListed: 'Finish the steps above to appear in the public creator directory.',
   },
   studioGuides: {
     listPill: 'Studio',
@@ -2187,6 +2213,10 @@ const messages: Messages = {
     unlocksHeading: 'What you unlock',
     unlocksMissions: 'missions need this tier',
     unlocksHelp: 'Climb tiers to join exclusive missions.',
+    nextUnlocksHeading: 'What your next tier unlocks',
+    nextUnlocksIntro: '{points} pts to {tier} unlocks:',
+    nextUnlocksNone: 'No perks are gated at {tier} right now.',
+    nextUnlocksMaxed: '{tier} is the top tier — nothing is gated above it.',
   },
   copilot: {
     title: 'Creator Copilot',

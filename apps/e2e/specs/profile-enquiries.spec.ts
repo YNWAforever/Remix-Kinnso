@@ -3,12 +3,27 @@ import { expect, test, type Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import {
   PROFILE_ENQUIRIES_LOCAL_DUMMY_SECRET,
+  PROFILE_ENQUIRIES_LOCAL_OPT_IN,
   profileEnquiryRateBucketHash,
-  resolveProfileEnquiriesLocalConfig,
+  tryResolveProfileEnquiriesLocalConfig,
 } from '../profile-enquiries-local'
 import { cleanupOwnedEnquiries } from '../profile-enquiries-cleanup'
 
-const local = resolveProfileEnquiriesLocalConfig(process.env)
+// This journey provisions auth users, writes enquiries and shells into the Supabase
+// Postgres container, so it runs only under playwright.profile-enquiries.config.ts against
+// an explicitly opted-in local stack. Any other environment must SKIP: a throw at module
+// scope aborts Playwright's collection pass, which silently reduces the whole run to zero
+// tests instead of disabling this one file. The placeholder below keeps module evaluation
+// inert — the file-scope test.skip disables every test here, so nothing ever dials it.
+const resolved = tryResolveProfileEnquiriesLocalConfig(process.env)
+const OPT_IN_ABSENT = 'profile-enquiries-opt-in-absent'
+const local = resolved ?? {
+  baseURL: 'http://127.0.0.1:3000',
+  supabaseUrl: 'http://127.0.0.1:54321',
+  anonKey: OPT_IN_ABSENT,
+  serviceRoleKey: OPT_IN_ABSENT,
+  dbContainer: OPT_IN_ABSENT,
+}
 const svc = createClient(local.supabaseUrl, local.serviceRoleKey)
 const runId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
 const password = `E2e!${runId}aA`
@@ -74,7 +89,17 @@ async function cleanup(errors: string[], label: string, operation: () => Promise
 
 test.describe.configure({ mode: 'serial' })
 
+test.skip(
+  resolved === null,
+  `${PROFILE_ENQUIRIES_LOCAL_OPT_IN}=1 and complete loopback Supabase credentials are required; `
+  + 'run this journey through playwright.profile-enquiries.config.ts.',
+)
+
 test.beforeAll(async () => {
+  // Guards the fixture setup independently of how the runner treats hooks for a fully
+  // skipped file: nothing in this suite may touch a database it did not validate.
+  if (!resolved) return
+
   await runPsql(`
     delete from vault.secrets where name = 'r7_7_enquiry_submission_hmac';
     select vault.create_secret(
@@ -125,6 +150,8 @@ test.beforeAll(async () => {
 })
 
 test.afterAll(async () => {
+  if (!resolved) return
+
   const errors: string[] = []
   const ownedCleanup = await cleanupOwnedEnquiries(
     (emails) => svc.from('enquiries').select('id').in('email', emails),

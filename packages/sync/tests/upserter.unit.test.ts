@@ -77,9 +77,41 @@ describe('Upserter durability', () => {
   it('does not skip when the hash matches but desired publication changes from published to draft', async () => {
     const payload = transformPost(legacyPost, 'https://cdn.x')
     payload.article.published_at = null
+    // PostgREST's timestamptz wire format (offset, no milliseconds) — what a real read returns.
     const { db, log } = fakeDb({ existing: {
-      id: 'art-1', source_hash: payload.article.source_hash, published_at: '2026-06-01T00:00:00.000Z',
-      views: 123, deleted_at: null, source_synced_at: '2026-06-11T00:00:00.000Z',
+      id: 'art-1', source_hash: payload.article.source_hash, published_at: '2026-06-01T00:00:00+00:00',
+      views: 123, deleted_at: null, source_synced_at: '2026-06-11T00:00:00+00:00',
+    } })
+    const result = await new Upserter(db as never, 'https://cdn.x').upsert(payload)
+
+    expect(result.skipped).toBe(false)
+    expect(log).toContain('articles.upsert')
+  })
+
+  it('skips an unchanged published article even though PostgREST and JS format the timestamp differently', async () => {
+    // Supabase returns `2026-06-01T00:00:00+00:00`; the transform produces
+    // `Date.toISOString()` → `2026-06-01T00:00:00.000Z`. Same instant, different text.
+    // A string `===` here made the unchanged-skip unreachable for every published
+    // article, so each sync re-ran the child delete+reinsert for no reason.
+    const payload = transformPost(legacyPost, 'https://cdn.x')
+    expect(payload.article.published_at).toBe('2026-06-01T00:00:00.000Z')
+    const { db, log } = fakeDb({ existing: {
+      id: 'art-1', source_hash: payload.article.source_hash, published_at: '2026-06-01T00:00:00+00:00',
+      views: 123, deleted_at: null, source_synced_at: '2026-06-11T00:00:00+00:00',
+    } })
+    const result = await new Upserter(db as never, 'https://cdn.x').upsert(payload)
+
+    expect(result.skipped).toBe(true)
+    expect(log).toEqual(['articles.select-existing'])
+  })
+
+  it('re-syncs (does NOT skip) when the stored timestamp is unparseable', async () => {
+    // Fail-safe: Date.parse('garbage') is NaN and NaN === NaN is false, so a value we
+    // cannot interpret forces the full write rather than a wrong skip.
+    const payload = transformPost(legacyPost, 'https://cdn.x')
+    const { db, log } = fakeDb({ existing: {
+      id: 'art-1', source_hash: payload.article.source_hash, published_at: 'not-a-timestamp',
+      views: 123, deleted_at: null, source_synced_at: '2026-06-11T00:00:00+00:00',
     } })
     const result = await new Upserter(db as never, 'https://cdn.x').upsert(payload)
 

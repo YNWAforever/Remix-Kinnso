@@ -8,6 +8,16 @@ import { makeAgentTools } from '@/lib/agent/tools'
 import { appendAgentMessage, type AgentIdentity } from '@/lib/agent/queries'
 import { getClientIp } from '@/lib/http/client-ip'
 import { isLocale, type Locale } from '@/lib/i18n/config'
+import { validateChatMessages } from '@/lib/ai/chat-messages'
+
+// Same bound, and the same reason, as the copilot route: `useChat` re-posts the
+// whole conversation every turn, so without a cap a caller can grow the payload
+// unbounded and feed it straight to the model on every request the IP limit
+// still allows.
+const MAX_AGENT_MESSAGES = 100
+const MAX_AGENT_TOTAL_CHARS = 50_000
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 // Same streamText/tool-budget shape as app/api/copilot/route.ts (haiku model,
 // stepCountIs(5), a handful of read-only search tools) — a real caller is
@@ -50,15 +60,28 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     messages?: UIMessage[]; locale?: unknown; anonSessionId?: unknown
   }
-  const messages = body.messages ?? []
+  const validated = validateChatMessages(body.messages ?? [], {
+    maxMessages: MAX_AGENT_MESSAGES,
+    maxTotalChars: MAX_AGENT_TOTAL_CHARS,
+  })
+  // An empty conversation is a valid warm-up call here (unlike the copilot),
+  // so only reject payloads that are actually oversized.
+  if (!validated.ok && validated.reason === 'too_large') {
+    return NextResponse.json({ error: 'payload_too_large' }, { status: 413 })
+  }
+  const messages = validated.ok ? validated.messages : []
   const locale: Locale = typeof body.locale === 'string' && isLocale(body.locale) ? body.locale : 'en'
 
   let identity: AgentIdentity
   if (user) {
     identity = { travelerUserId: user.id }
   } else {
-    const anonSessionId = typeof body.anonSessionId === 'string' ? body.anonSessionId : ''
-    if (!anonSessionId) return NextResponse.json({ error: 'missing_anon_session_id' }, { status: 400 })
+    const anonSessionId = typeof body.anonSessionId === 'string' ? body.anonSessionId.trim() : ''
+    // `agent_messages.anon_session_id` is a uuid column: a non-uuid would throw
+    // inside appendAgentMessage (outside the stream's try/catch) as a 500.
+    if (!UUID_PATTERN.test(anonSessionId)) {
+      return NextResponse.json({ error: 'missing_anon_session_id' }, { status: 400 })
+    }
     identity = { anonSessionId }
   }
 

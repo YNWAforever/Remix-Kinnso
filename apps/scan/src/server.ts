@@ -1,14 +1,17 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { bodyLimit } from 'hono/body-limit'
 import { cors } from 'hono/cors'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import { loadConfig } from './config'
-import { rateLimitDecision, canRetry, type JobRecord } from './policy'
+import { rateLimitDecision, RunLedger, type JobRecord } from './policy'
 import { runScan, type ScanDeps } from './pipeline'
 import { CompositeFetcher, FakeFetcher } from './fetchers'
 import { ChatCompletionsClient, FakeLlm } from './llm'
+import { handleScanRetry } from './scan-server'
 import { handleVerifySubmission, handleVerifyRetry } from './verify-server'
+import { sweepExpiredJobs } from './sweeper'
 
 // ---------------------------------------------------------------------------
 // Bootstrap
@@ -41,6 +44,35 @@ function makeDeps(): ScanDeps {
   return { db, fetcher, llm, model: cfg.llmModel }
 }
 
+// Process-wide ledger of launched verification runs — backs the per-creator
+// daily cap, which cannot come from row counts alone because a retry reuses its
+// row. See RunLedger for why in-process is the right trade here.
+const verificationLedger = new RunLedger()
+
+// ---------------------------------------------------------------------------
+// Stale-job sweep
+// ---------------------------------------------------------------------------
+
+// Jobs are in-process fire-and-forget work with no durable queue, so a restart
+// strands whatever rows were mid-flight in a non-terminal status. Sweep once at
+// boot to retire rows an earlier process abandoned, then on an interval because
+// a healthy long-lived container may not reboot again for weeks — and a row
+// orphaned by THIS boot only becomes stale JOB_STALE_AFTER_MS later, i.e. long
+// after the boot-time pass has run.
+const SWEEP_INTERVAL_MS = 5 * 60 * 1000
+
+function sweepStaleJobs(): void {
+  sweepExpiredJobs(db)
+    .then((n) => {
+      if (n > 0) console.warn(`[scan] swept ${n} stale job(s) to failed`)
+    })
+    .catch((err: unknown) => console.error('[scan] stale-job sweep failed', err))
+}
+
+sweepStaleJobs()
+// unref() so the timer never keeps the process alive on its own.
+setInterval(sweepStaleJobs, SWEEP_INTERVAL_MS).unref()
+
 // ---------------------------------------------------------------------------
 // Auth helper
 // ---------------------------------------------------------------------------
@@ -61,18 +93,41 @@ async function getVerifiedUser(
 
 const app = new Hono()
 
+/**
+ * Inbound body ceiling. The only body any route reads is
+ * `{"submissionId": "<uuid>"}`, so 8 KiB is already orders of magnitude more
+ * than needed. Without a limit Hono buffers the whole request before the
+ * handler runs, letting one unauthenticated POST exhaust the memory of the
+ * single worker process and kill every in-flight job with it.
+ */
+const MAX_REQUEST_BODY_BYTES = 8 * 1024
+
 // CORS: the web app calls this worker cross-origin from the browser
 // (NEXT_PUBLIC_SCAN_URL) with an Authorization header, which triggers a
-// preflight OPTIONS. Requests are bearer-authenticated (not cookie-based), so a
-// permissive default origin is safe; tighten via WEB_ORIGIN in production.
+// preflight OPTIONS. The allowed origin comes from config (required in
+// production, '*' for local dev) — see loadConfig.
 app.use(
   '*',
   cors({
-    origin: process.env.WEB_ORIGIN ?? '*',
+    origin: cfg.webOrigin,
     allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Authorization', 'Content-Type'],
   }),
 )
+
+// Mounted before any route so the limit applies to every path, including ones
+// added later that do not read a body today.
+app.use(
+  '*',
+  bodyLimit({
+    maxSize: MAX_REQUEST_BODY_BYTES,
+    onError: (c) => c.json({ error: 'request body too large' }, 413),
+  }),
+)
+
+if (cfg.webOrigin === '*') {
+  console.warn('[scan] ⚠️  CORS origin is "*" — set WEB_ORIGIN to the web app origin outside local dev')
+}
 
 // GET /health
 app.get('/health', (c) => c.json({ ok: true }))
@@ -89,7 +144,7 @@ app.post('/scan', async (c) => {
   const since = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString() // 25h buffer
   const { data: existingJobs, error: jobsErr } = await db
     .from('creator_scan_jobs')
-    .select('id, creator_id, status, created_at')
+    .select('id, creator_id, status, created_at, updated_at')
     .eq('creator_id', creatorId)
     .gte('created_at', since)
     .order('created_at', { ascending: false })
@@ -102,7 +157,7 @@ app.post('/scan', async (c) => {
   // Also include any non-terminal jobs older than 25h (active guard)
   const { data: activeJobs } = await db
     .from('creator_scan_jobs')
-    .select('id, creator_id, status, created_at')
+    .select('id, creator_id, status, created_at, updated_at')
     .eq('creator_id', creatorId)
     .in('status', ['queued', 'fetching', 'analyzing'])
 
@@ -168,66 +223,11 @@ app.post('/scan/:jobId/retry', async (c) => {
   if (!user) return c.json({ error: 'unauthorized' }, 401)
 
   const jobId = c.req.param('jobId')
-
-  // Use maybeSingle() so a genuinely non-existent jobId yields { data: null,
-  // error: null } (rather than .single()'s PGRST116 error). This lets control
-  // reach canRetry(null, …) → 404 "job not found" instead of leaking a 500.
-  const { data: job, error: jobErr } = await db
-    .from('creator_scan_jobs')
-    .select('id, creator_id, status, created_at')
-    .eq('id', jobId)
-    .maybeSingle()
-
-  if (jobErr) return c.json({ error: 'internal error' }, 500)
-
-  const check = canRetry(
-    job
-      ? {
-          id: job.id,
-          creator_id: job.creator_id,
-          status: job.status as JobRecord['status'],
-          created_at: job.created_at,
-        }
-      : null,
-    user.id
+  const result = await handleScanRetry(
+    { db, userId: user.id, run: (id) => runScan(makeDeps(), id) },
+    { jobId },
   )
-
-  if (!check.allowed) {
-    const status = check.httpStatus
-    // canRetry never returns 401 — owner mismatch maps to 404 (job not found),
-    // which both avoids leaking existence and stops the web client from wrongly
-    // prompting re-login. Genuine bad/missing tokens are already handled above
-    // by the getVerifiedUser → 401 guard.
-    const messages: Record<number, string> = {
-      404: 'job not found',
-      409: 'job is not in failed status',
-    }
-    return c.json({ error: messages[status] }, status as never)
-  }
-
-  // Reset to queued and re-run. Check the reset error so a failed reset surfaces
-  // a 500 (symmetric with the POST /scan insert path) rather than silently
-  // returning 202 { retrying: true } to the client.
-  const { error: resetErr } = await db
-    .from('creator_scan_jobs')
-    .update({ status: 'queued', error: null as never, completed_at: null as never, updated_at: new Date().toISOString() })
-    .eq('id', jobId)
-
-  if (resetErr) {
-    // A unique-violation (23505) means another active job already exists for this
-    // creator (the partial unique index) — surface it as a 429, not a 500.
-    if (resetErr.code === '23505') {
-      return c.json({ error: 'rate limited', reason: 'active_job_exists' }, 429)
-    }
-    console.error('[scan] retry reset failed', jobId, resetErr.message)
-    return c.json({ error: 'internal error' }, 500)
-  }
-
-  runScan(makeDeps(), jobId).catch((err: unknown) => {
-    console.error(`[scan] unhandled pipeline error on retry for job ${jobId}`, err)
-  })
-
-  return c.json({ jobId, retrying: true }, 202)
+  return c.json(result.body, result.status as never)
 })
 
 // POST /verify-submission — insert a verification job and run pipeline in background
@@ -240,7 +240,7 @@ app.post('/verify-submission', async (c) => {
   if (!submissionId) return c.json({ error: 'submissionId is required' }, 400)
 
   const result = await handleVerifySubmission(
-    { db, fetcher, userId: user.id },
+    { db, fetcher, userId: user.id, ledger: verificationLedger },
     { submissionId },
   )
   return c.json(result.body, result.status as never)
@@ -253,7 +253,7 @@ app.post('/verify-submission/:jobId/retry', async (c) => {
 
   const jobId = c.req.param('jobId')
   const result = await handleVerifyRetry(
-    { db, fetcher, userId: user.id },
+    { db, fetcher, userId: user.id, ledger: verificationLedger },
     { jobId },
   )
   return c.json(result.body, result.status as never)
