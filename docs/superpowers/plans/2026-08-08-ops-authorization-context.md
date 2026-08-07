@@ -21,6 +21,7 @@
 - The browser hook must not import the server authorization context or any server-only dependency.
 - RLS remains the final enforcement layer; do not modify RLS, migrations, RPCs, schema, seeds, or production data.
 - Use `pnpm.cmd` for Windows commands and preserve the pre-existing untracked `.codex-patches/`, `.pnpm-store/`, `.superpowers/brainstorm/`, and `task3-red.patch` files.
+- `apps/web/vitest.setup.ts` requires `.env.test`; never copy the secret-bearing file into a worktree. For focused unit suites, set these non-secret placeholders in the same PowerShell process before the direct Vitest command: `$env:SUPABASE_URL='https://example.invalid'; $env:SUPABASE_ANON_KEY='test-anon-key'; $env:SUPABASE_SERVICE_ROLE_KEY='test-service-role-key'; $env:NEXT_PUBLIC_SUPABASE_URL='https://example.invalid'; $env:NEXT_PUBLIC_SUPABASE_ANON_KEY='test-anon-key'`. Live integration tests remain environment-gated.
 - Use test-first steps and commit each completed task with only that task's intended files staged.
 
 ---
