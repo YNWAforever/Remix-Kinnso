@@ -119,7 +119,8 @@ describe('resolveViewerRoleFromFacts', () => {
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.viewer-role-policy.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.viewer-role-policy.test.ts
 ```
 
 Expected: FAIL because `@/lib/auth/viewer-role-policy` does not exist yet.
@@ -152,7 +153,8 @@ export function resolveViewerRoleFromFacts(facts: ViewerRoleFacts): ViewerRole {
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.viewer-role-policy.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.viewer-role-policy.test.ts
 ```
 
 Expected: PASS with five policy cases.
@@ -271,7 +273,8 @@ describe('getAuthorizationContext', () => {
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.authorization-context.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.authorization-context.test.ts
 ```
 
 Expected: FAIL because `@/lib/auth/authorization-context` does not exist yet.
@@ -368,7 +371,8 @@ Keep the existing export path and return type so the 27 current server callers r
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.authorization-context.test.ts tests/auth.viewer-role.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.authorization-context.test.ts tests/auth.viewer-role.test.ts
 ```
 
 Expected: PASS for the new context cases and all existing role-resolution cases.
@@ -480,7 +484,8 @@ it('keeps traveler actions authentication-only', async () => {
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/admin.guard.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/admin.guard.test.ts
 ```
 
 Expected: FAIL because the current guard imports `resolveViewerRole` and still performs its own `auth.getUser()` call instead of using the mocked context.
@@ -550,7 +555,8 @@ Keep the existing comments documenting creator ownership, merchant scoping, trav
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/admin.guard.test.ts tests/experiences.actions.test.ts tests/experiences.availability-actions.test.ts tests/merchants.profile-actions.test.ts tests/merchants.saved-actions.test.ts tests/merchants.invite-actions.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/admin.guard.test.ts tests/experiences.actions.test.ts tests/experiences.availability-actions.test.ts tests/merchants.profile-actions.test.ts tests/merchants.saved-actions.test.ts tests/merchants.invite-actions.test.ts
 ```
 
 Expected: PASS with unchanged action result shapes and merchant scoping assertions.
@@ -584,7 +590,8 @@ Expected: one commit containing only the guard refactor and its tests.
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.useViewerRole.test.tsx
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.useViewerRole.test.tsx
 ```
 
 Expected: PASS for the current lifecycle, precedence, stale-resolution, and override behavior. This is the baseline for the behavior-preserving refactor.
@@ -635,7 +642,8 @@ Do not move the Supabase client, `useEffect`, subscription, override, `active` f
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.useViewerRole.test.tsx
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.useViewerRole.test.tsx
 rg -n "authorization-context|from './viewer-role'|from './viewer-role-policy'" apps/web/lib/auth/useViewerRole.ts
 ```
 
@@ -646,7 +654,8 @@ Expected: browser tests PASS; the hook imports `./viewer-role-policy` and has no
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.viewer-role-policy.test.ts tests/auth.authorization-context.test.ts tests/auth.viewer-role.test.ts tests/auth.useViewerRole.test.tsx tests/admin.guard.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.viewer-role-policy.test.ts tests/auth.authorization-context.test.ts tests/auth.viewer-role.test.ts tests/auth.useViewerRole.test.tsx tests/admin.guard.test.ts
 ```
 
 Expected: PASS across pure policy, server context, compatibility facade, browser lifecycle, and guards.
@@ -677,7 +686,8 @@ Expected: one commit containing the browser-policy integration and any necessary
 Run:
 
 ```powershell
-pnpm.cmd --filter web test -- tests/auth.viewer-role-policy.test.ts tests/auth.authorization-context.test.ts tests/auth.viewer-role.test.ts tests/auth.useViewerRole.test.tsx tests/admin.guard.test.ts tests/experiences.actions.test.ts tests/experiences.availability-actions.test.ts tests/merchants.profile-actions.test.ts tests/merchants.saved-actions.test.ts tests/merchants.invite-actions.test.ts
+Set-Location apps/web
+& '.\\node_modules\\.bin\\vitest.cmd' run tests/auth.viewer-role-policy.test.ts tests/auth.authorization-context.test.ts tests/auth.viewer-role.test.ts tests/auth.useViewerRole.test.tsx tests/admin.guard.test.ts tests/experiences.actions.test.ts tests/experiences.availability-actions.test.ts tests/merchants.profile-actions.test.ts tests/merchants.saved-actions.test.ts tests/merchants.invite-actions.test.ts
 ```
 
 Expected: PASS. Any failure must be classified as a source regression, a pre-existing baseline failure, or an environment/provider blocker before changing code.
