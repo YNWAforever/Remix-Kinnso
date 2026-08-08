@@ -75,14 +75,16 @@ jobs:
 
           tmp_env="$(mktemp)"
           pnpm -s supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
             | awk -F= '
-                $1 == "api.url" {
-                  print "NEXT_PUBLIC_SUPABASE_URL=" $2
+                $1 == "NEXT_PUBLIC_SUPABASE_URL" {
+                  print
                   seen_url = 1
                   next
                 }
-                $1 == "auth.anon_key" {
-                  print "NEXT_PUBLIC_SUPABASE_ANON_KEY=" $2
+                $1 == "NEXT_PUBLIC_SUPABASE_ANON_KEY" {
+                  print
                   seen_anon = 1
                   next
                 }
@@ -91,6 +93,8 @@ jobs:
               ' > "$tmp_env"
 
           test "$(wc -l < "$tmp_env")" -eq 2
+          grep -q '^NEXT_PUBLIC_SUPABASE_URL=' "$tmp_env"
+          grep -q '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' "$tmp_env"
           mv "$tmp_env" apps/web/.env.local
 
       - name: Check web build environment
