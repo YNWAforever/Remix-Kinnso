@@ -17,7 +17,7 @@
 - The workflow uses permissions: contents: read and event/ref-scoped concurrency.
 - The quality job remains the single source of typecheck, lint, honesty lint, local Supabase setup, public-only web build environment, web build, and full test execution.
 - apps/web/.env.local contains only NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY; the service-role value remains confined to the existing test environment files.
-- The public build environment rejects blank or unexpected supabase status -o env output before moving the temporary file into place.
+- The public build environment reuses the already-exported test environment, rejects blank or unexpected entries before moving the temporary file into place, and does not invoke `supabase status` a second time.
 - The web build runs with AGENT_LIVE=false and BOOKING_LIVE=false before pnpm test.
 - No application source, authorization behavior, schema, migration, RLS policy, RPC, seed, production data, deployment workflow, GitHub setting, branch-protection rule, secret, or paid provider configuration changes.
 - Do not create a second quality workflow or modify .github/workflows/verify.yml or .github/workflows/nightly-funnel.yml.
@@ -235,8 +235,12 @@ if ($publicStart -lt 0 -or $publicEnd -le $publicStart) {
 
 $publicSection = $workflow.Substring($publicStart, $publicEnd - $publicStart)
 foreach ($fragment in @(
-  '--override-name api.url=NEXT_PUBLIC_SUPABASE_URL',
-  '--override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'apps/web/.env.test',
+  '$1 == "SUPABASE_URL"',
+  '$1 == "SUPABASE_ANON_KEY"',
+  '$1 == "SUPABASE_SERVICE_ROLE_KEY" { next }',
+  'NEXT_PUBLIC_SUPABASE_URL=',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY=',
   'index($0, "=") == 0 { exit 1 }',
   'substr($0, index($0, "=") + 1) !~ /[^[:space:]]/',
   'NF { exit 1 }'
@@ -246,7 +250,11 @@ foreach ($fragment in @(
   }
 }
 
-if ($publicSection.Contains('SERVICE_ROLE')) {
+if ($publicSection.Contains('pnpm -s supabase status -o env')) {
+  throw 'The public web build environment must reuse the validated test env instead of querying Supabase status again.'
+}
+
+if ($publicSection.Contains('NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY')) {
   throw 'The public web build environment contains a service-role value.'
 }
 
@@ -280,7 +288,7 @@ Run:
 $workflow = (Get-Content -Raw -LiteralPath '.github/workflows/ci.yml') -replace "`r`n", "`n"
 $match = [regex]::Match(
   $workflow,
-  "(?s)\\| awk -F= '(?<script>.*?)' > ""\\$tmp_env"""
+  "(?s)awk -F= '(?<script>.*?)'\s+apps/web/\.env\.test\s+>\s+"
 )
 
 if (-not $match.Success) {
@@ -302,8 +310,9 @@ if (-not (Test-Path -LiteralPath $awkPath)) {
 }
 
 [System.IO.File]::WriteAllLines($inputPath, @(
-  'NEXT_PUBLIC_SUPABASE_URL=   '
-  'NEXT_PUBLIC_SUPABASE_ANON_KEY=token=='
+  'SUPABASE_URL=   '
+  'SUPABASE_ANON_KEY=token=='
+  'SUPABASE_SERVICE_ROLE_KEY=service-token=='
 ), [System.Text.UTF8Encoding]::new($false))
 [System.IO.File]::WriteAllText($scriptPath, $awkScript, [System.Text.UTF8Encoding]::new($false))
 if (Test-Path -LiteralPath $outputPath) {
@@ -322,7 +331,7 @@ if ((Test-Path -LiteralPath $outputPath) -and ((Get-Item -LiteralPath $outputPat
 Write-Output 'BLANK_VALUE_REJECTED'
 ~~~
 
-Expected: the command exits 0 and prints BLANK_VALUE_REJECTED after awk rejects the whitespace-only public URL value without writing a promoted env file.
+Expected: the command exits 0 and prints BLANK_VALUE_REJECTED after awk rejects the whitespace-only source URL value without writing a promoted env file.
 
 - [ ] Step 3: Run the available web typecheck.
 

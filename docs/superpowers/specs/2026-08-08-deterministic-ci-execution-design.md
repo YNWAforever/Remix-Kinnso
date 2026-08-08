@@ -52,7 +52,7 @@ All event paths enter the existing `quality` job after checkout and package setu
 2. Run the existing repository typecheck, lint, and honesty lint tasks.
 3. Install/use the pinned Supabase CLI and start the local Supabase stack.
 4. Preserve the existing test environment export, including its test-only service-role value.
-5. Generate a separate `apps/web/.env.local` containing only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the local stack. Reject malformed or unexpected output before promoting the temporary file.
+5. Generate a separate `apps/web/.env.local` containing only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the already-exported test environment. Reject malformed, blank, or unexpected test-env entries before promoting the temporary file; do not invoke `supabase status` a second time for the public build.
 6. Validate the public build environment.
 7. Run `pnpm --filter web build` with `AGENT_LIVE=false` and `BOOKING_LIVE=false`.
 8. Run the existing `pnpm test` suite.
