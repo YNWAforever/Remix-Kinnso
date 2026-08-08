@@ -68,6 +68,27 @@ jobs:
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
             | tee apps/web/.env.test packages/sync/.env.test apps/scan/.env.test > /dev/null
 
+      - name: Export local Supabase env for web build
+        run: |
+          pnpm -s supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+            | tee apps/web/.env.local > /dev/null
+
+      - name: Check web build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s apps/web/.env.local
+          grep -q '^NEXT_PUBLIC_SUPABASE_URL=' apps/web/.env.local
+          grep -q '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' apps/web/.env.local
+
+      - name: Build web with safe product flags
+        env:
+          AGENT_LIVE: 'false'
+          BOOKING_LIVE: 'false'
+        run: pnpm --filter web build
+
       - run: pnpm test
 
   e2e:
