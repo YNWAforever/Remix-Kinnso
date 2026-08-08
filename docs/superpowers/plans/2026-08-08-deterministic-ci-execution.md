@@ -58,7 +58,7 @@ No application, database, dependency, test-source, or deployment files are expec
 Run this PowerShell check before editing the workflow:
 
 ~~~powershell
-$workflow = (Get-Content -Raw -LiteralPath '.github/workflows/ci.yml').Replace([Environment]::NewLine, [char]10)
+$workflow = (Get-Content -Raw -LiteralPath '.github/workflows/ci.yml') -replace "`r`n", "`n"
 
 if ($workflow.Contains("      - 'codex/**'")) {
   throw 'The pre-change workflow unexpectedly already contains the codex push fallback.'
@@ -190,7 +190,7 @@ Run:
 
 ~~~powershell
 $path = '.github/workflows/ci.yml'
-$workflow = (Get-Content -Raw -LiteralPath $path).Replace([Environment]::NewLine, [char]10)
+$workflow = (Get-Content -Raw -LiteralPath $path) -replace "`r`n", "`n"
 
 $requiredHeader = @'
 on:
@@ -209,7 +209,7 @@ concurrency:
   group: ${{ github.event_name }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 '@
-$requiredHeader = $requiredHeader.Trim().Replace([Environment]::NewLine, [char]10)
+$requiredHeader = $requiredHeader.Trim() -replace "`r`n", "`n"
 
 if (-not $workflow.Contains($requiredHeader)) {
   throw 'The top-level CI event, permission, or concurrency contract is incorrect.'
@@ -221,7 +221,7 @@ $requiredE2eHeader = @'
     runs-on: ubuntu-latest
     needs: quality
 '@
-$requiredE2eHeader = $requiredE2eHeader.Trim().Replace([Environment]::NewLine, [char]10)
+$requiredE2eHeader = $requiredE2eHeader.Trim() -replace "`r`n", "`n"
 
 if (-not $workflow.Contains($requiredE2eHeader)) {
   throw 'The E2E event-routing condition is incorrect.'
