@@ -237,6 +237,8 @@ $publicSection = $workflow.Substring($publicStart, $publicEnd - $publicStart)
 foreach ($fragment in @(
   '--override-name api.url=NEXT_PUBLIC_SUPABASE_URL',
   '--override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'index($0, "=") == 0 { exit 1 }',
+  'substr($0, index($0, "=") + 1) !~ /[^[:space:]]/',
   'NF { exit 1 }'
 )) {
   if (-not $publicSection.Contains($fragment)) {
@@ -270,7 +272,59 @@ Write-Output 'CI_CONTRACT_OK'
 
 Expected: the command exits 0 and prints CI_CONTRACT_OK. It must not print any environment values.
 
-- [ ] Step 2: Run the available web typecheck.
+- [ ] Step 2: Run the focused blank-value rejection harness against the same awk logic.
+
+Run:
+
+~~~powershell
+$workflow = (Get-Content -Raw -LiteralPath '.github/workflows/ci.yml') -replace "`r`n", "`n"
+$match = [regex]::Match(
+  $workflow,
+  "(?s)\\| awk -F= '(?<script>.*?)' > ""\\$tmp_env"""
+)
+
+if (-not $match.Success) {
+  throw 'Unable to extract the public-only awk guard from .github/workflows/ci.yml.'
+}
+
+$awkScript = ($match.Groups['script'].Value -replace "\n                ", "`n").Trim()
+$inputPath = Join-Path $env:TEMP 'kinnso-public-env-blank-input.txt'
+$scriptPath = Join-Path $env:TEMP 'kinnso-public-env-guard.awk'
+$outputPath = Join-Path $env:TEMP 'kinnso-public-env-blank-output.txt'
+$awkPath = (Get-Command awk -ErrorAction SilentlyContinue).Source
+
+if (-not $awkPath) {
+  $awkPath = 'C:\Program Files\Git\usr\bin\awk.exe'
+}
+
+if (-not (Test-Path -LiteralPath $awkPath)) {
+  throw 'Unable to locate awk for the blank-value regression harness.'
+}
+
+[System.IO.File]::WriteAllLines($inputPath, @(
+  'NEXT_PUBLIC_SUPABASE_URL=   '
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY=token=='
+), [System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText($scriptPath, $awkScript, [System.Text.UTF8Encoding]::new($false))
+if (Test-Path -LiteralPath $outputPath) {
+  Remove-Item -LiteralPath $outputPath
+}
+
+& $awkPath '-F=' '-f' $scriptPath $inputPath > $outputPath
+if ($LASTEXITCODE -eq 0) {
+  throw 'The blank-value regression unexpectedly passed.'
+}
+
+if ((Test-Path -LiteralPath $outputPath) -and ((Get-Item -LiteralPath $outputPath).Length -ne 0)) {
+  throw 'The blank-value regression wrote filtered output unexpectedly.'
+}
+
+Write-Output 'BLANK_VALUE_REJECTED'
+~~~
+
+Expected: the command exits 0 and prints BLANK_VALUE_REJECTED after awk rejects the whitespace-only public URL value without writing a promoted env file.
+
+- [ ] Step 3: Run the available web typecheck.
 
 Run:
 
@@ -280,7 +334,7 @@ pnpm.cmd --filter web typecheck
 
 Expected: exit code 0. This checks the existing application source without requiring the CI runner's Docker-backed local Supabase stack.
 
-- [ ] Step 3: Run the available web lint.
+- [ ] Step 4: Run the available web lint.
 
 Run:
 
@@ -290,7 +344,7 @@ pnpm.cmd --filter web lint
 
 Expected: exit code 0 with no lint errors; any warnings must match the repository's existing baseline.
 
-- [ ] Step 4: Verify tracked file boundaries and whitespace.
+- [ ] Step 5: Verify tracked file boundaries and whitespace.
 
 Run:
 
@@ -399,8 +453,8 @@ Expected: the handoff identifies the exact SHA, workflow query, PR head SHA, and
 
 - Explicit PR event types, codex/** push fallback, main preservation, manual dispatch, read-only permissions, and event/ref concurrency are covered by Task 1.
 - E2E behavior for pull requests, main pushes, codex/** pushes, and manual dispatches is covered by Task 2 and Task 4, Step 3.
-- The existing quality sequence, public-only env allow-list, malformed-output rejection, safe flags, and build-before-test ordering are checked by Task 3, Step 1.
-- Local typecheck, lint, whitespace, and workflow-boundary checks are covered by Task 3, Steps 2-4.
+- The existing quality sequence, public-only env allow-list, malformed-output rejection, nonblank public-value rejection, safe flags, and build-before-test ordering are checked by Task 3, Steps 1-2.
+- Local typecheck, lint, whitespace, and workflow-boundary checks are covered by Task 3, Steps 3-5.
 - Exact-head CI registration, quality-job success, PR check evidence, and missing-run classification are covered by Task 4.
 - The repository-only boundary and all excluded production, database, deployment, secret, and settings changes are enforced by the Global Constraints and Task 4, Step 5.
 - The plan contains concrete paths, commands, workflow fragments, expected outputs, and commit messages for every implementation action.

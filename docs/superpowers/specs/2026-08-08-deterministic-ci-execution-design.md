@@ -1,7 +1,7 @@
 # Deterministic Pre-merge CI Execution Design
 
-**Date:** 2026-08-08  
-**Status:** Proposed  
+**Date:** 2026-08-08
+**Status:** Proposed
 **Scope:** Repository-only CI trigger and execution hardening for PR #106
 
 ## Goal
