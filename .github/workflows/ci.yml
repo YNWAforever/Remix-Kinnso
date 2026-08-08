@@ -101,7 +101,7 @@ jobs:
                   next
                 }
                 $1 == "SUPABASE_SERVICE_ROLE_KEY" { next }
-                NF { exit 1 }
+                { next }
                 END { if (!seen_url || !seen_anon) exit 1 }
               ' apps/web/.env.test > "$tmp_env"
 

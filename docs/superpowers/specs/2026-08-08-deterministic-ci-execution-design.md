@@ -52,7 +52,7 @@ All event paths enter the existing `quality` job after checkout and package setu
 2. Run the existing repository typecheck, lint, and honesty lint tasks.
 3. Install/use the pinned Supabase CLI and start the local Supabase stack.
 4. Preserve the existing test environment export, including its test-only service-role value.
-5. Generate a separate `apps/web/.env.local` containing only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the already-exported test environment. Reject malformed, blank, or unexpected test-env entries before promoting the temporary file; do not invoke `supabase status` a second time for the public build.
+5. Generate a separate `apps/web/.env.local` containing only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the already-exported test environment. Reject malformed or blank public-source entries, ignore unrelated valid Supabase status variables, and exclude the service-role value before promoting the temporary file; do not invoke `supabase status` a second time for the public build.
 6. Validate the public build environment.
 7. Run `pnpm --filter web build` with `AGENT_LIVE=false` and `BOOKING_LIVE=false`.
 8. Run the existing `pnpm test` suite.
@@ -61,7 +61,7 @@ The existing test environment and the new public-only build environment remain s
 
 ## Failure handling
 
-- A missing local Supabase stack, missing public variable, malformed env output, build failure, or test failure fails the quality job.
+- A missing local Supabase stack, missing public variable, malformed or blank public-source value, build failure, or test failure fails the quality job. Unrelated valid variables emitted by `supabase status -o env` are ignored by the public allow-list.
 - A skipped E2E job on `codex/**` push or manual dispatch is expected and is not evidence that quality passed or failed.
 - A registered `CI` run with a failed quality step is a source/configuration failure and must be fixed before completion.
 - If neither PR nor exact-head push/manual execution registers a `CI` run, the result is an external GitHub Actions/permissions/registration blocker. The phase must not claim build or test success, add secrets, or mutate production state to work around it.

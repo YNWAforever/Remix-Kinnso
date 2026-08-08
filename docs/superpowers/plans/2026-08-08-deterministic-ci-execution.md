@@ -17,7 +17,7 @@
 - The workflow uses permissions: contents: read and event/ref-scoped concurrency.
 - The quality job remains the single source of typecheck, lint, honesty lint, local Supabase setup, public-only web build environment, web build, and full test execution.
 - apps/web/.env.local contains only NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY; the service-role value remains confined to the existing test environment files.
-- The public build environment reuses the already-exported test environment, rejects blank or unexpected entries before moving the temporary file into place, and does not invoke `supabase status` a second time.
+- The public build environment reuses the already-exported test environment, rejects malformed or blank public-source entries before moving the temporary file into place, ignores unrelated valid Supabase status variables, and does not invoke `supabase status` a second time.
 - The web build runs with AGENT_LIVE=false and BOOKING_LIVE=false before pnpm test.
 - No application source, authorization behavior, schema, migration, RLS policy, RPC, seed, production data, deployment workflow, GitHub setting, branch-protection rule, secret, or paid provider configuration changes.
 - Do not create a second quality workflow or modify .github/workflows/verify.yml or .github/workflows/nightly-funnel.yml.
@@ -243,7 +243,7 @@ foreach ($fragment in @(
   'NEXT_PUBLIC_SUPABASE_ANON_KEY=',
   'index($0, "=") == 0 { exit 1 }',
   'substr($0, index($0, "=") + 1) !~ /[^[:space:]]/',
-  'NF { exit 1 }'
+  '                { next }'
 )) {
   if (-not $publicSection.Contains($fragment)) {
     throw "Missing public-env safety fragment: $fragment"
@@ -280,7 +280,7 @@ Write-Output 'CI_CONTRACT_OK'
 
 Expected: the command exits 0 and prints CI_CONTRACT_OK. It must not print any environment values.
 
-- [ ] Step 2: Run the focused blank-value rejection harness against the same awk logic.
+- [ ] Step 2: Run focused public-env regression harnesses against the same awk logic.
 
 Run:
 
