@@ -69,11 +69,29 @@ jobs:
             | tee apps/web/.env.test packages/sync/.env.test apps/scan/.env.test > /dev/null
 
       - name: Export local Supabase env for web build
+        shell: bash
         run: |
+          set -euo pipefail
+
+          tmp_env="$(mktemp)"
           pnpm -s supabase status -o env \
-            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
-            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
-            | tee apps/web/.env.local > /dev/null
+            | awk -F= '
+                $1 == "api.url" {
+                  print "NEXT_PUBLIC_SUPABASE_URL=" $2
+                  seen_url = 1
+                  next
+                }
+                $1 == "auth.anon_key" {
+                  print "NEXT_PUBLIC_SUPABASE_ANON_KEY=" $2
+                  seen_anon = 1
+                  next
+                }
+                NF { exit 1 }
+                END { if (!seen_url || !seen_anon) exit 1 }
+              ' > "$tmp_env"
+
+          test "$(wc -l < "$tmp_env")" -eq 2
+          mv "$tmp_env" apps/web/.env.local
 
       - name: Check web build environment
         shell: bash
