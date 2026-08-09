@@ -645,6 +645,36 @@ describe('createPartnerLinkAction adapter boundary', () => {
     })
   })
 
+  it.each([
+    ['participant-not-found', 'Participant was not found'],
+    ['mission-unavailable', 'Mission is not available'],
+    ['program-unavailable', 'Affiliate program is not available'],
+    ['partner-link-load-failed', 'Partner link could not be loaded'],
+  ])('maps %s to an existing form error without revalidation', async (code, message) => {
+    const supabase = createSupabaseMock({}, {
+      getUser: vi.fn(async () => ({
+        data: { user: { id: 'user-1' } },
+        error: null,
+      })),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+    createPartnerLinkStoreMock.mockReturnValue({})
+    createTravelpayoutsPartnerLinkProviderMock.mockReturnValue({})
+    createPartnerLinkCommandMock.mockResolvedValue({
+      kind: 'failed',
+      code,
+    })
+
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
+      originalUrl: 'https://example.com/hotel',
+    })).resolves.toEqual({
+      ok: false,
+      errors: { form: [message] },
+    })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+
   it('keeps the unauthenticated early return before adapter construction', async () => {
     const supabase = createSupabaseMock({}, {
       getUser: vi.fn(async () => ({
