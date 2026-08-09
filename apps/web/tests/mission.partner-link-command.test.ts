@@ -68,6 +68,57 @@ describe('createPartnerLinkCommand', () => {
     expect(provider.create).not.toHaveBeenCalled()
   })
 
+  it('classifies an unavailable mission before downstream work', async () => {
+    const store = makeStore({
+      loadMission: vi.fn(async () => ({
+        data: { ...mission, status: 'draft' },
+        error: null,
+      })),
+    })
+    const provider = makeProvider()
+    const result = await createPartnerLinkCommand(actor, input, { store, provider })
+
+    expect(result).toEqual({ kind: 'failed', code: 'mission-unavailable' })
+    expect(store.loadProgram).not.toHaveBeenCalled()
+    expect(store.findSuccessfulLink).not.toHaveBeenCalled()
+    expect(store.savePartnerLink).not.toHaveBeenCalled()
+    expect(provider.buildSubId).not.toHaveBeenCalled()
+    expect(provider.create).not.toHaveBeenCalled()
+  })
+
+  it('classifies an unavailable program before provider or persistence work', async () => {
+    const store = makeStore({
+      loadProgram: vi.fn(async () => ({
+        data: { ...program, network: 'impact' },
+        error: null,
+      })),
+    })
+    const provider = makeProvider()
+    const result = await createPartnerLinkCommand(actor, input, { store, provider })
+
+    expect(result).toEqual({ kind: 'failed', code: 'program-unavailable' })
+    expect(store.findSuccessfulLink).not.toHaveBeenCalled()
+    expect(store.savePartnerLink).not.toHaveBeenCalled()
+    expect(provider.buildSubId).not.toHaveBeenCalled()
+    expect(provider.create).not.toHaveBeenCalled()
+  })
+
+  it('classifies a partner-link load error before provider or persistence work', async () => {
+    const store = makeStore({
+      findSuccessfulLink: vi.fn(async () => ({
+        data: null,
+        error: new Error('lookup failed'),
+      })),
+    })
+    const provider = makeProvider()
+    const result = await createPartnerLinkCommand(actor, input, { store, provider })
+
+    expect(result).toEqual({ kind: 'failed', code: 'partner-link-load-failed' })
+    expect(store.savePartnerLink).not.toHaveBeenCalled()
+    expect(provider.buildSubId).not.toHaveBeenCalled()
+    expect(provider.create).not.toHaveBeenCalled()
+  })
+
   it('returns validation errors before idempotency lookup', async () => {
     const store = makeStore({
       loadParticipant: vi.fn(async () => ({
@@ -146,6 +197,23 @@ describe('createPartnerLinkCommand', () => {
       kind: 'failed',
       code: 'provider-failed',
       reason: 'Unsupported link',
+    })
+    expect(store.savePartnerLink).not.toHaveBeenCalled()
+  })
+
+  it('classifies a thrown provider dependency with its reason', async () => {
+    const store = makeStore()
+    const provider = makeProvider({
+      create: vi.fn(async () => {
+        throw new Error('Travelpayouts timeout')
+      }),
+    })
+    const result = await createPartnerLinkCommand(actor, input, { store, provider })
+
+    expect(result).toEqual({
+      kind: 'failed',
+      code: 'provider-failed',
+      reason: 'Travelpayouts timeout',
     })
     expect(store.savePartnerLink).not.toHaveBeenCalled()
   })
