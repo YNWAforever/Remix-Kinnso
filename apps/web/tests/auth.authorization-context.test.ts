@@ -41,7 +41,7 @@ describe('getAuthorizationContext', () => {
     expect(from).not.toHaveBeenCalled()
   })
 
-  it('reads auth once, preserves Ops precedence, and retains merchant ID', async () => {
+  it('preserves Ops precedence and retains the merchant ID when all role facts resolve', async () => {
     const { supabase, getUser } = fakeSupabase({
       user: { id: 'u1' },
       rows: {
@@ -59,16 +59,48 @@ describe('getAuthorizationContext', () => {
     expect(getUser).toHaveBeenCalledTimes(1)
   })
 
-  it('treats role-query errors as absent facts and falls through to remaining facts', async () => {
+  it('fails closed when the Ops fact query errors even if merchant and creator facts exist', async () => {
     const { supabase } = fakeSupabase({
       user: { id: 'u1' },
-      rows: { merchant_profiles: { id: 'merchant-1' } },
+      rows: {
+        merchant_profiles: { id: 'merchant-1' },
+        creators: { status: 'active' },
+      },
       errors: { kinnso_ops_members: new Error('ops read failed') },
     })
 
-    await expect(getAuthorizationContext(supabase)).resolves.toMatchObject({
-      role: 'merchant',
-      merchantId: 'merchant-1',
+    await expect(getAuthorizationContext(supabase)).resolves.toEqual({
+      user: { id: 'u1' },
+      role: 'traveler',
+      merchantId: null,
+    })
+  })
+
+  it('fails closed when the merchant fact query errors even if a creator fact exists', async () => {
+    const { supabase } = fakeSupabase({
+      user: { id: 'u1' },
+      rows: { creators: { status: 'active' } },
+      errors: { merchant_profiles: new Error('merchant read failed') },
+    })
+
+    await expect(getAuthorizationContext(supabase)).resolves.toEqual({
+      user: { id: 'u1' },
+      role: 'traveler',
+      merchantId: null,
+    })
+  })
+
+  it('fails closed when the creator fact query errors', async () => {
+    const { supabase } = fakeSupabase({
+      user: { id: 'u1' },
+      rows: { merchant_profiles: { id: 'merchant-1' } },
+      errors: { creators: new Error('creator read failed') },
+    })
+
+    await expect(getAuthorizationContext(supabase)).resolves.toEqual({
+      user: { id: 'u1' },
+      role: 'traveler',
+      merchantId: null,
     })
   })
 })

@@ -25,24 +25,28 @@ export async function getAuthorizationContext(
     return { user: null, role: 'anon', merchantId: null }
   }
 
-  const { data: ops } = await supabase
+  const { data: ops, error: opsError } = await supabase
     .from('kinnso_ops_members')
     .select('id')
     .eq('user_id', user.id)
     .eq('status', 'active')
     .maybeSingle()
 
-  const { data: merchant } = await supabase
+  const { data: merchant, error: merchantError } = await supabase
     .from('merchant_profiles')
     .select('id')
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const { data: creator } = await supabase
+  const { data: creator, error: creatorError } = await supabase
     .from('creators')
     .select('status')
     .eq('id', user.id)
     .maybeSingle()
+
+  if (opsError || merchantError || creatorError) {
+    return { user: { id: user.id }, role: 'traveler', merchantId: null }
+  }
 
   const merchantId = merchant && typeof merchant.id === 'string' ? merchant.id : null
 
