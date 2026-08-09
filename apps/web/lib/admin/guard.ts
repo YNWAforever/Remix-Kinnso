@@ -14,6 +14,28 @@ export async function requireOpsPage(supabase: Supabase, loc: Locale): Promise<{
   return { user: context.user }
 }
 
+/** Page gate: redirect anon, hide non-merchants, and return the server-derived merchant ID. */
+export async function requireMerchantPage(
+  supabase: Supabase,
+  loc: Locale,
+): Promise<{ user: { id: string }; merchantId: string }> {
+  const context = await getAuthorizationContext(supabase)
+  if (!context.user) redirect(`/${loc}/sign-in`)
+  if (context.role !== 'merchant' || !context.merchantId) notFound()
+  return { user: context.user, merchantId: context.merchantId }
+}
+
+/** Page gate: redirect anon and hide non-creators for creator-only pages. */
+export async function requireCreatorPage(
+  supabase: Supabase,
+  loc: Locale,
+): Promise<{ user: { id: string } }> {
+  const context = await getAuthorizationContext(supabase)
+  if (!context.user) redirect(`/${loc}/sign-in`)
+  if (context.role !== 'creator') notFound()
+  return { user: context.user }
+}
+
 /** Action gate: typed failure for anon/non-ops; ok+user for ops. */
 export async function requireOpsAction(
   supabase: Supabase,

@@ -27,6 +27,8 @@ const contextFor = (overrides: Partial<TestContext> = {}): TestContext => ({
 
 import {
   requireOpsPage,
+  requireMerchantPage,
+  requireCreatorPage,
   requireOpsAction,
   requireCreatorAction,
   requireMerchantAction,
@@ -56,6 +58,50 @@ describe('requireOpsPage', () => {
   })
   it('returns the user for ops', async () => {
     expect(await requireOpsPage(sb(), 'en')).toEqual({ user: { id: 'u1' } })
+  })
+})
+
+describe('requireMerchantPage', () => {
+  it('redirects anon to sign-in', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon', merchantId: null }))
+    await expect(requireMerchantPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('notFound for a non-merchant viewer', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'creator', merchantId: null }))
+    await expect(requireMerchantPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('notFound for a merchant context without a server-derived ID', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant', merchantId: null }))
+    await expect(requireMerchantPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('returns the authenticated user and server-derived merchant ID', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant', merchantId: 'merchant-1' }))
+    await expect(requireMerchantPage(sb(), 'en')).resolves.toEqual({
+      user: { id: 'u1' },
+      merchantId: 'merchant-1',
+    })
+  })
+})
+
+describe('requireCreatorPage', () => {
+  it('redirects anon to sign-in', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('notFound for a non-creator viewer', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant' }))
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('returns the authenticated creator user', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: { id: 'creator-1' }, role: 'creator' }))
+    await expect(requireCreatorPage(sb(), 'en')).resolves.toEqual({
+      user: { id: 'creator-1' },
+    })
   })
 })
 
