@@ -2,9 +2,8 @@
 import { render, screen, cleanup } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const { authMock, resolveViewerRoleMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  resolveViewerRoleMock: vi.fn(),
+const { merchantPageGateMock } = vi.hoisted(() => ({
+  merchantPageGateMock: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -14,7 +13,6 @@ vi.mock('next/navigation', () => ({
 }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
-    auth: { getUser: authMock },
     from: () => ({
       select: () => ({
         eq: () => ({
@@ -25,7 +23,7 @@ vi.mock('@/lib/supabase/server', () => ({
     }),
   }),
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: resolveViewerRoleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireMerchantPage: merchantPageGateMock }))
 vi.mock('@/lib/experiences/queries', () => ({
   listMyExperiences: vi.fn(async () => ([{
     id: 'e1', slug: 'sunset-tour-abc123', title: 'Sunset tour', city: 'Hong Kong',
@@ -36,27 +34,26 @@ vi.mock('@/lib/experiences/queries', () => ({
 
 import MerchantDashboardHomePage from '@/app/[locale]/merchants/dashboard/page'
 import MerchantExperiencesPage from '@/app/[locale]/merchants/dashboard/experiences/page'
+import { listMyExperiences } from '@/lib/experiences/queries'
 import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
 
 describe('MerchantDashboardHomePage', () => {
   it('redirects anon to sign-in', async () => {
-    authMock.mockResolvedValue({ data: { user: null } })
+    merchantPageGateMock.mockRejectedValue(new Error('redirect:/en/sign-in'))
     await expect(MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) }))
       .rejects.toThrow('redirect:/en/sign-in')
   })
 
   it('notFound for non-merchant viewers', async () => {
-    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
-    resolveViewerRoleMock.mockResolvedValue('creator')
+    merchantPageGateMock.mockRejectedValue(new Error('notFound'))
     await expect(MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) }))
       .rejects.toThrow('notFound')
   })
 
   it('renders all six cards with dashboard-prefixed links for merchants', async () => {
-    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
-    resolveViewerRoleMock.mockResolvedValue('merchant')
+    merchantPageGateMock.mockResolvedValue({ user: { id: 'u1' }, merchantId: 'm1' })
     const el = await MerchantDashboardHomePage({ params: Promise.resolve({ locale: 'en' }) })
     render(el)
     const hrefs = screen.getAllByRole('link').map((l) => l.getAttribute('href'))
@@ -82,13 +79,13 @@ describe('MerchantDashboardHomePage', () => {
 
 describe('MerchantExperiencesPage', () => {
   it('lists the merchant experiences with an edit link and publish action', async () => {
-    authMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
-    resolveViewerRoleMock.mockResolvedValue('merchant')
+    merchantPageGateMock.mockResolvedValue({ user: { id: 'u1' }, merchantId: 'm1' })
     const el = await MerchantExperiencesPage({ params: Promise.resolve({ locale: 'en' }) })
     render(el)
     expect(screen.getByText('Sunset tour')).toBeTruthy()
     const edit = screen.getByRole('link', { name: en.merchantDashboard.actEdit })
     expect(edit.getAttribute('href')).toBe('/en/merchants/dashboard/experiences/e1/edit')
     expect(screen.getByRole('button', { name: en.merchantDashboard.actPublish })).toBeTruthy()
+    expect(listMyExperiences).toHaveBeenCalledWith(expect.anything(), 'm1')
   })
 })
