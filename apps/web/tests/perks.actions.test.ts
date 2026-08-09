@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { roleMock, getUserMock, rpcMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'creator'),
+const { gateMock, getUserMock, rpcMock } = vi.hoisted(() => ({
+  gateMock: vi.fn(async () => ({ ok: true, user: { id: 'c1' } })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'c1' } } })),
   rpcMock: vi.fn(),
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorAction: gateMock }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock }, rpc: rpcMock }),
 }))
@@ -13,17 +13,18 @@ vi.mock('@/lib/supabase/server', () => ({
 import { redeemPerkAction } from '@/lib/perks/actions'
 
 beforeEach(() => {
-  roleMock.mockResolvedValue('creator')
+  gateMock.mockResolvedValue({ ok: true, user: { id: 'c1' } })
   getUserMock.mockResolvedValue({ data: { user: { id: 'c1' } } })
   // rpc(...).single() shape
   rpcMock.mockReturnValue({ single: async () => ({ data: { redemption_type: 'code', redemption_value: 'CODE10' }, error: null }) })
 })
 
 describe('redeemPerkAction', () => {
-  it('rejects a non-creator', async () => {
-    roleMock.mockResolvedValueOnce('ops')
+  it('rejects a non-creator before calling the RPC', async () => {
+    gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Creator access is required'] } })
     const r = await redeemPerkAction('p1')
     expect(r.ok).toBe(false)
+    expect(rpcMock).not.toHaveBeenCalled()
   })
   it('returns the redemption value at tier', async () => {
     const r = await redeemPerkAction('p1')

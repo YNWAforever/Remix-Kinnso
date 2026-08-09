@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { roleMock, serverClientMock, revalidateMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'creator'),
+const { gateMock, serverClientMock, revalidateMock } = vi.hoisted(() => ({
+  gateMock: vi.fn(async () => ({ ok: true, user: { id: 'c1' } })),
   serverClientMock: vi.fn(),
   revalidateMock: vi.fn(),
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorAction: gateMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: serverClientMock }))
 vi.mock('next/cache', () => ({ revalidatePath: revalidateMock }))
 
@@ -25,13 +25,13 @@ function makeRpcClient(result: { data?: unknown; error?: unknown }) {
 }
 
 beforeEach(() => {
-  roleMock.mockResolvedValue('creator')
+  gateMock.mockResolvedValue({ ok: true, user: { id: 'c1' } })
   revalidateMock.mockClear()
 })
 
 describe('acceptInviteAction', () => {
   it('rejects a non-creator caller before calling the RPC', async () => {
-    roleMock.mockResolvedValueOnce('merchant')
+    gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Creator access is required'] } })
     const { client, calls } = makeRpcClient({})
     serverClientMock.mockResolvedValue(client)
     const r = await acceptInviteAction('en', 'mission-1')

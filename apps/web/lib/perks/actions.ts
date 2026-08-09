@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 
 /**
@@ -12,9 +12,8 @@ export async function redeemPerkAction(
 ): Promise<ActionResult<{ redemptionType: 'code' | 'link'; value: string }>> {
   'use server'
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return formError('Sign in is required')
-  if ((await resolveViewerRole(supabase)) !== 'creator') return formError('Creator access is required')
+  const gate = await requireCreatorAction(supabase)
+  if (!gate.ok) return gate
 
   const { data, error } = await supabase.rpc('redeem_perk', { p_perk_id: perkId }).single()
   if (error || !data) {
