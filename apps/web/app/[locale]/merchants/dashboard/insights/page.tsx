@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { getMerchantInsights } from '@/lib/insights/merchant'
 import { MerchantInsightsView } from '@/components/kinnso/pages/MerchantInsightsView'
 
@@ -16,9 +16,7 @@ export default async function MerchantsInsightsPage({ params }: { params: Promis
   const loc = locale as Locale
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'merchant') notFound()
+  await requireMerchantPage(supabase, loc)
 
   const messages = await getDictionary(loc)
   const data = await getMerchantInsights(supabase)
