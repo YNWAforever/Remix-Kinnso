@@ -71,7 +71,7 @@ describe('getAuthorizationContext', () => {
 
     await expect(getAuthorizationContext(supabase)).resolves.toEqual({
       user: { id: 'u1' },
-      role: 'traveler',
+      role: 'indeterminate',
       merchantId: null,
     })
   })
@@ -85,7 +85,7 @@ describe('getAuthorizationContext', () => {
 
     await expect(getAuthorizationContext(supabase)).resolves.toEqual({
       user: { id: 'u1' },
-      role: 'traveler',
+      role: 'indeterminate',
       merchantId: null,
     })
   })
@@ -99,7 +99,7 @@ describe('getAuthorizationContext', () => {
 
     await expect(getAuthorizationContext(supabase)).resolves.toEqual({
       user: { id: 'u1' },
-      role: 'traveler',
+      role: 'indeterminate',
       merchantId: null,
     })
   })

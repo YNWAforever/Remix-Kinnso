@@ -10,6 +10,7 @@ function fakeSupabase(opts: {
   ops?: Row
   merchant?: Row
   creator?: Row
+  errors?: Record<string, unknown>
 }) {
   const from = (table: string) => {
     const builder = {
@@ -21,7 +22,7 @@ function fakeSupabase(opts: {
           : table === 'merchant_profiles' ? (opts.merchant ?? null)
           : table === 'creators' ? (opts.creator ?? null)
           : null,
-        error: null,
+        error: opts.errors?.[table] ?? null,
       }),
     }
     return builder
@@ -67,5 +68,16 @@ describe('resolveViewerRole', () => {
   it('returns traveler for a user with no creators row at all', async () => {
     const role = await resolveViewerRole(fakeSupabase({ user: { id: 'u1' } }))
     expect(role).toBe('traveler')
+  })
+
+  it('rejects with a generic authorization-context error when role facts are indeterminate', async () => {
+    await expect(
+      resolveViewerRole(
+        fakeSupabase({
+          user: { id: 'u1' },
+          errors: { creators: new Error('creator read failed') },
+        }),
+      ),
+    ).rejects.toThrow('Unable to determine authorization context')
   })
 })

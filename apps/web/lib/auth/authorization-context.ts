@@ -10,7 +10,7 @@ export type AuthorizationUser = { id: string }
 
 export type AuthorizationContext = {
   user: AuthorizationUser | null
-  role: ViewerRole
+  role: ViewerRole | 'indeterminate'
   merchantId: string | null
 }
 
@@ -45,7 +45,7 @@ export async function getAuthorizationContext(
     .maybeSingle()
 
   if (opsError || merchantError || creatorError) {
-    return { user: { id: user.id }, role: 'traveler', merchantId: null }
+    return { user: { id: user.id }, role: 'indeterminate', merchantId: null }
   }
 
   const merchantId = merchant && typeof merchant.id === 'string' ? merchant.id : null

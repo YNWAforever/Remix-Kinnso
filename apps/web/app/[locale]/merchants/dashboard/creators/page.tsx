@@ -38,7 +38,7 @@ export default async function MerchantsCreatorsPage({
   const loc = locale as Locale
 
   const supabase = await createSupabaseServerClient()
-  const { user, merchantId } = await requireMerchantPage(supabase, loc)
+  const { merchantId } = await requireMerchantPage(supabase, loc)
 
   const { data: profile } = await supabase
     .from('merchant_profiles')
