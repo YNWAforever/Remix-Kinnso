@@ -34,6 +34,74 @@ it('maps the owned participant query', async () => {
   expect(participantQuery.eq).toHaveBeenNthCalledWith(2, 'creator_id', 'c1')
 })
 
+it('maps the mission query', async () => {
+  const missionQuery = builder({
+    data: {
+      id: 'm1',
+      affiliate_network_program_id: 'program-1',
+      mission_source: 'travelpayouts',
+      status: 'published',
+    },
+    error: null,
+  })
+  const supabase = {
+    from: vi.fn((table: string) => {
+      if (table === 'missions') return missionQuery
+      throw new Error('unexpected table ' + table)
+    }),
+  }
+
+  const store = createPartnerLinkStore(supabase as never)
+  await expect(store.loadMission('m1')).resolves.toEqual({
+    data: {
+      id: 'm1',
+      affiliateNetworkProgramId: 'program-1',
+      missionSource: 'travelpayouts',
+      status: 'published',
+    },
+    error: null,
+  })
+  expect(missionQuery.select).toHaveBeenCalledWith(
+    'id, affiliate_network_program_id, mission_source, status',
+  )
+  expect(missionQuery.eq).toHaveBeenCalledWith('id', 'm1')
+})
+
+it('maps the affiliate program query', async () => {
+  const programQuery = builder({
+    data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
+    error: null,
+  })
+  const supabase = {
+    from: vi.fn((table: string) => {
+      if (table === 'affiliate_network_programs') return programQuery
+      throw new Error('unexpected table ' + table)
+    }),
+  }
+
+  const store = createPartnerLinkStore(supabase as never)
+  await expect(store.loadProgram('program-1')).resolves.toEqual({
+    data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
+    error: null,
+  })
+  expect(programQuery.select).toHaveBeenCalledWith('id, network, status')
+  expect(programQuery.eq).toHaveBeenCalledWith('id', 'program-1')
+})
+
+it('propagates query errors without a mapped record', async () => {
+  const error = new Error('mission lookup failed')
+  const missionQuery = builder({ data: null, error })
+  const supabase = {
+    from: vi.fn((table: string) => {
+      if (table === 'missions') return missionQuery
+      throw new Error('unexpected table ' + table)
+    }),
+  }
+
+  const store = createPartnerLinkStore(supabase as never)
+  await expect(store.loadMission('m1')).resolves.toEqual({ data: null, error })
+})
+
 it('uses the complete successful-link identity', async () => {
   const linkQuery = builder({
     data: { id: 'link-1', partner_url: 'https://tp.st/existing' },
@@ -92,4 +160,20 @@ it('saves through the existing RPC', async () => {
     p_partner_url: 'https://tp.st/abc?sub_id=s1',
     p_sub_id: 's1',
   })
+})
+
+it('propagates RPC errors without a mapped record', async () => {
+  const error = new Error('partner-link RPC failed')
+  const rpc = vi.fn(async () => ({ data: null, error }))
+  const store = createPartnerLinkStore({ rpc } as never)
+
+  await expect(store.savePartnerLink({
+    affiliateNetworkProgramId: 'program-1',
+    missionId: 'mission-1',
+    missionParticipantId: 'participant-1',
+    creatorId: 'creator-1',
+    originalUrl: 'https://example.com/hotel',
+    partnerUrl: 'https://tp.st/abc?sub_id=s1',
+    subId: 's1',
+  })).resolves.toEqual({ data: null, error })
 })
