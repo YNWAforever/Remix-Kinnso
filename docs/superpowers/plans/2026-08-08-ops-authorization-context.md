@@ -16,7 +16,7 @@
 - Unauthorized actions continue returning the existing `formError` shape and message family.
 - `requireMerchantAction` continues returning a server-derived `merchantId`; no browser-provided ID is accepted.
 - `requireTravelerAction` remains authentication-only and must not begin querying role tables.
-- Role-query errors remain absent facts, matching the current data-only behavior.
+- Role-query errors are authorization failures: preserve an explicit context-only `indeterminate` state with no merchant ID, and never resolve it as a normal `ViewerRole`.
 - The server context performs one `auth.getUser()` call per authorization-context decision.
 - The browser hook must not import the server authorization context or any server-only dependency.
 - RLS remains the final enforcement layer; do not modify RLS, migrations, RPCs, schema, seeds, or production data.
@@ -184,9 +184,9 @@ Expected: one commit containing only the policy module and its test.
 - Consumes: `resolveViewerRoleFromFacts` and `ViewerRole` from `./viewer-role-policy`.
 - Produces `ServerSupabase = Awaited<ReturnType<typeof createSupabaseServerClient>>`.
 - Produces `AuthorizationUser = { id: string }`.
-- Produces `AuthorizationContext = { user: AuthorizationUser | null; role: ViewerRole; merchantId: string | null }`.
+- Produces `AuthorizationContext = { user: AuthorizationUser | null; role: ViewerRole | 'indeterminate'; merchantId: string | null }`; `indeterminate` is server-context-only and is not part of the browser-safe `ViewerRole` union.
 - Produces `getAuthorizationContext(supabase: ServerSupabase): Promise<AuthorizationContext>`.
-- Keeps `resolveViewerRole(supabase: ServerSupabase): Promise<ViewerRole>` as the existing role-only facade.
+- Keeps `resolveViewerRole(supabase: ServerSupabase): Promise<ViewerRole>` as the existing role-only facade; it rejects with a generic non-sensitive error when the context is indeterminate.
 
 - [ ] **Step 1: Write failing context tests for authentication reuse, merchant identity, and errors.**
 
@@ -254,16 +254,17 @@ describe('getAuthorizationContext', () => {
     expect(getUser).toHaveBeenCalledTimes(1)
   })
 
-  it('treats role-query errors as absent facts and falls through to remaining facts', async () => {
+  it('fails closed when a higher-priority role fact query errors', async () => {
     const { supabase } = fakeSupabase({
       user: { id: 'u1' },
       rows: { merchant_profiles: { id: 'merchant-1' } },
       errors: { kinnso_ops_members: new Error('ops read failed') },
     })
 
-    await expect(getAuthorizationContext(supabase)).resolves.toMatchObject({
-      role: 'merchant',
-      merchantId: 'merchant-1',
+    await expect(getAuthorizationContext(supabase)).resolves.toEqual({
+      user: { id: 'u1' },
+      role: 'indeterminate',
+      merchantId: null,
     })
   })
 })
@@ -297,7 +298,7 @@ export type AuthorizationUser = { id: string }
 
 export type AuthorizationContext = {
   user: AuthorizationUser | null
-  role: ViewerRole
+  role: ViewerRole | 'indeterminate'
   merchantId: string | null
 }
 
@@ -312,24 +313,28 @@ export async function getAuthorizationContext(
     return { user: null, role: 'anon', merchantId: null }
   }
 
-  const { data: ops } = await supabase
+  const { data: ops, error: opsError } = await supabase
     .from('kinnso_ops_members')
     .select('id')
     .eq('user_id', user.id)
     .eq('status', 'active')
     .maybeSingle()
 
-  const { data: merchant } = await supabase
+  const { data: merchant, error: merchantError } = await supabase
     .from('merchant_profiles')
     .select('id')
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const { data: creator } = await supabase
+  const { data: creator, error: creatorError } = await supabase
     .from('creators')
     .select('status')
     .eq('id', user.id)
     .maybeSingle()
+
+  if (opsError || merchantError || creatorError) {
+    return { user: { id: user.id }, role: 'indeterminate', merchantId: null }
+  }
 
   const merchantId = merchant && typeof merchant.id === 'string' ? merchant.id : null
 
@@ -346,7 +351,7 @@ export async function getAuthorizationContext(
 }
 ```
 
-The context deliberately reads the existing tables and ignores query-error fields exactly as the current resolver does. A query error contributes no data fact; it never creates an active role.
+The context reads the existing tables and captures query errors. Any role-fact error makes the context indeterminate, with no merchant identity. This prevents a higher-priority fact failure from falling through to a lower role.
 
 - [ ] **Step 4: Convert `viewer-role.ts` into the compatibility facade.**
 
@@ -361,7 +366,11 @@ export type { ViewerRole } from './viewer-role-policy'
 export async function resolveViewerRole(
   supabase: ServerSupabase,
 ): Promise<ViewerRole> {
-  return (await getAuthorizationContext(supabase)).role
+  const context = await getAuthorizationContext(supabase)
+  if (context.role === 'indeterminate') {
+    throw new Error('Unable to determine authorization context')
+  }
+  return context.role
 }
 ```
 
@@ -734,8 +743,8 @@ Expected: no whitespace errors; only intended authorization files are modified o
 - One authenticated-user read and merchant-ID reuse are covered by Task 2 and Task 3.
 - Page/action outcome compatibility is covered by Task 3.
 - Browser overrides, auth subscription, parallel reads, and stale-resolution protection are characterized in Task 4.
-- Query-error fallback is covered by Task 2.
+- Query-error fail-closed behavior is covered by Task 2, including the context-only indeterminate state and compatibility-facade rejection.
 - RLS, schema, RPC, migration, seed, production-data, and browser-boundary constraints are repeated in the global constraints and Task 5.
 - Existing `resolveViewerRole` callers remain supported through the facade in Task 2.
 
-The plan contains no unresolved implementation placeholders. The cross-task types and function names are consistent: `ViewerRoleFacts` feeds `resolveViewerRoleFromFacts`; `getAuthorizationContext` returns `AuthorizationContext`; guards consume `context.user`, `context.role`, and `context.merchantId`; and `resolveViewerRole` returns `context.role`.
+The plan contains no unresolved implementation placeholders. The cross-task types and function names are consistent: `ViewerRoleFacts` feeds `resolveViewerRoleFromFacts`; `getAuthorizationContext` returns `AuthorizationContext`; guards consume `context.user`, `context.role`, and `context.merchantId`; and `resolveViewerRole` returns a normal `ViewerRole` only after rejecting an indeterminate context.
