@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { ActionFailure } from '@/lib/admin/result'
 
 const { gateMock, serverClientMock, revalidateMock } = vi.hoisted(() => ({
-  gateMock: vi.fn(async () => ({ ok: true, user: { id: 'c1' } })),
+  gateMock: vi.fn<() => Promise<{ ok: true; user: { id: string } } | ActionFailure>>(async () => ({ ok: true, user: { id: 'c1' } })),
   serverClientMock: vi.fn(),
   revalidateMock: vi.fn(),
 }))
