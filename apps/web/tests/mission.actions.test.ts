@@ -14,18 +14,16 @@ import {
 } from '@/lib/missions/actions'
 
 const {
-  buildSubIdMock,
-  canonicalizeTravelpayoutsPartnerUrlMock,
-  createServiceClientMock,
+  createPartnerLinkCommandMock,
+  createPartnerLinkStoreMock,
   createSupabaseServerClientMock,
-  createTravelpayoutsPartnerLinksMock,
+  createTravelpayoutsPartnerLinkProviderMock,
   revalidatePathMock,
 } = vi.hoisted(() => ({
-  buildSubIdMock: vi.fn(),
-  canonicalizeTravelpayoutsPartnerUrlMock: vi.fn(),
-  createServiceClientMock: vi.fn(),
+  createPartnerLinkCommandMock: vi.fn(),
+  createPartnerLinkStoreMock: vi.fn(),
   createSupabaseServerClientMock: vi.fn(),
-  createTravelpayoutsPartnerLinksMock: vi.fn(),
+  createTravelpayoutsPartnerLinkProviderMock: vi.fn(),
   revalidatePathMock: vi.fn(),
 }))
 
@@ -33,18 +31,21 @@ vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: createSupabaseServerClientMock,
 }))
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: createServiceClientMock,
-}))
-
 vi.mock('next/cache', () => ({
   revalidatePath: revalidatePathMock,
 }))
 
-vi.mock('@/lib/missions/travelpayouts', () => ({
-  buildSubId: buildSubIdMock,
-  canonicalizeTravelpayoutsPartnerUrl: canonicalizeTravelpayoutsPartnerUrlMock,
-  createTravelpayoutsPartnerLinks: createTravelpayoutsPartnerLinksMock,
+vi.mock('@/lib/missions/partner-link-command', () => ({
+  createPartnerLinkCommand: createPartnerLinkCommandMock,
+}))
+
+vi.mock('@/lib/missions/partner-link-store', () => ({
+  createPartnerLinkStore: createPartnerLinkStoreMock,
+}))
+
+vi.mock('@/lib/missions/partner-link-provider', () => ({
+  createTravelpayoutsPartnerLinkProvider:
+    createTravelpayoutsPartnerLinkProviderMock,
 }))
 
 vi.mock('server-only', () => ({}))
@@ -110,11 +111,10 @@ const createSupabaseMock = (
 }
 
 beforeEach(() => {
-  buildSubIdMock.mockReset()
-  canonicalizeTravelpayoutsPartnerUrlMock.mockReset()
-  createServiceClientMock.mockReset()
+  createPartnerLinkCommandMock.mockReset()
+  createPartnerLinkStoreMock.mockReset()
   createSupabaseServerClientMock.mockReset()
-  createTravelpayoutsPartnerLinksMock.mockReset()
+  createTravelpayoutsPartnerLinkProviderMock.mockReset()
   revalidatePathMock.mockReset()
 })
 
@@ -534,376 +534,139 @@ describe('updateSettlementAction', () => {
   })
 })
 
-describe('createPartnerLinkAction', () => {
-  it('requires sign in before calling Travelpayouts', async () => {
+describe('createPartnerLinkAction adapter boundary', () => {
+  it('maps a created result and revalidates once', async () => {
     const supabase = createSupabaseMock({}, {
-      getUser: vi.fn(async () => ({ data: { user: null }, error: null })),
-    })
-    createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
-      originalUrl: 'https://example.com/hotel',
-    })
-
-    expect(result).toEqual({
-      ok: false,
-      errors: { form: ['Sign in is required'] },
-    })
-    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
-    expect(createServiceClientMock).not.toHaveBeenCalled()
-  })
-
-  it('returns an error for a missing or not-owned participant before calling Travelpayouts', async () => {
-    const participantBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-    })
-    const supabase = createSupabaseMock({
-      mission_participants: participantBuilder,
-    })
-    createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
-      originalUrl: 'https://example.com/hotel',
-    })
-
-    expect(result).toEqual({
-      ok: false,
-      errors: { form: ['Participant was not found'] },
-    })
-    expect(participantBuilder.eq).toHaveBeenCalledWith('creator_id', 'user-1')
-    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
-    expect(createServiceClientMock).not.toHaveBeenCalled()
-  })
-
-  it('validates inactive participant and program states before calling Travelpayouts', async () => {
-    const supabase = createSupabaseMock({
-      mission_participants: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'applied' },
-          error: null,
-        })),
-      }),
-      missions: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: {
-            id: 'mission-1',
-            affiliate_network_program_id: 'program-1',
-            mission_source: 'travelpayouts',
-            status: 'published',
-          },
-          error: null,
-        })),
-      }),
-      affiliate_network_programs: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: { id: 'program-1', network: 'travelpayouts', status: 'paused' },
-          error: null,
-        })),
-      }),
-    })
-    createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
-      originalUrl: 'https://example.com/hotel',
-    })
-
-    expect(result).toEqual({
-      ok: false,
-      errors: {
-        participantStatus: ['active'],
-        programStatus: ['active'],
-      },
-    })
-    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
-    expect(createServiceClientMock).not.toHaveBeenCalled()
-  })
-
-  it('returns an existing partner link without calling Travelpayouts', async () => {
-    const existingLinkBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({
-        data: { id: 'partner-link-1', partner_url: 'https://tp.st/existing' },
+      getUser: vi.fn(async () => ({
+        data: { user: { id: 'user-1' } },
         error: null,
       })),
     })
-    const supabase = createSupabaseMock({
-      mission_participants: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
-          error: null,
-        })),
-      }),
-      missions: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: {
-            id: 'mission-1',
-            affiliate_network_program_id: 'program-1',
-            mission_source: 'travelpayouts',
-            status: 'published',
-          },
-          error: null,
-        })),
-      }),
-      affiliate_network_programs: createBuilder({
-        maybeSingle: vi.fn(async () => ({
-          data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
-          error: null,
-        })),
-      }),
-      affiliate_partner_links: existingLinkBuilder,
-    })
+    const store = { loadParticipant: vi.fn() }
+    const provider = { create: vi.fn() }
     createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
-      originalUrl: 'https://example.com/hotel',
+    createPartnerLinkStoreMock.mockReturnValue(store)
+    createTravelpayoutsPartnerLinkProviderMock.mockReturnValue(provider)
+    createPartnerLinkCommandMock.mockResolvedValue({
+      kind: 'created',
+      link: { id: 'link-1', partnerUrl: 'https://tp.st/abc?sub_id=s1' },
     })
 
-    expect(result).toEqual({
-      ok: true,
-      link: { id: 'partner-link-1', partner_url: 'https://tp.st/existing' },
-    })
-    expect(existingLinkBuilder.eq).toHaveBeenCalledWith('creator_id', 'user-1')
-    expect(existingLinkBuilder.eq).toHaveBeenCalledWith('external_status', 'success')
-    expect(createTravelpayoutsPartnerLinksMock).not.toHaveBeenCalled()
-    expect(createServiceClientMock).not.toHaveBeenCalled()
-  })
-
-  it('validates membership before generating and storing a Travelpayouts partner link via the security-definer RPC', async () => {
-    buildSubIdMock.mockReturnValue('creator-sub')
-    canonicalizeTravelpayoutsPartnerUrlMock.mockReturnValue(
-      'https://tp.st/abc?sub_id=creator-sub',
-    )
-    createTravelpayoutsPartnerLinksMock.mockResolvedValue([
-      {
-        originalUrl: 'https://example.com/hotel',
-        partnerUrl: 'https://tp.st/abc',
-        status: 'success',
-      },
-    ])
-    const participantBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({
-        data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
-        error: null,
-      })),
-    })
-    const missionBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({
-        data: {
-          id: 'mission-1',
-          affiliate_network_program_id: 'program-1',
-          mission_source: 'travelpayouts',
-          status: 'published',
-        },
-        error: null,
-      })),
-    })
-    const programBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({
-        data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
-        error: null,
-      })),
-    })
-    const existingLinkBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-    })
-    const rpcMock = vi.fn(async () => ({
-      data: [{ id: 'partner-link-1', partner_url: 'https://tp.st/abc?sub_id=creator-sub' }],
-      error: null,
-    }))
-    const supabase = createSupabaseMock(
-      {
-        mission_participants: participantBuilder,
-        missions: missionBuilder,
-        affiliate_network_programs: programBuilder,
-        affiliate_partner_links: existingLinkBuilder,
-      },
-      { rpc: rpcMock },
-    )
-    createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
       originalUrl: 'https://example.com/hotel',
       locale: 'zh-hk',
+    })).resolves.toEqual({
+      ok: true,
+      link: { id: 'link-1', partner_url: 'https://tp.st/abc?sub_id=s1' },
     })
 
-    expect(result).toEqual({
-      ok: true,
-      link: { id: 'partner-link-1', partner_url: 'https://tp.st/abc?sub_id=creator-sub' },
-    })
-    expect(participantBuilder.maybeSingle.mock.invocationCallOrder[0])
-      .toBeLessThan(createTravelpayoutsPartnerLinksMock.mock.invocationCallOrder[0])
-    expect(missionBuilder.maybeSingle.mock.invocationCallOrder[0])
-      .toBeLessThan(createTravelpayoutsPartnerLinksMock.mock.invocationCallOrder[0])
-    expect(programBuilder.maybeSingle.mock.invocationCallOrder[0])
-      .toBeLessThan(createTravelpayoutsPartnerLinksMock.mock.invocationCallOrder[0])
-    expect(buildSubIdMock).toHaveBeenCalledWith({
-      missionId: 'mission-1',
-      participantId: 'participant-1',
-      creatorId: 'user-1',
-    })
-    expect(canonicalizeTravelpayoutsPartnerUrlMock).toHaveBeenCalledWith(
-      'https://tp.st/abc',
-      'creator-sub',
+    expect(createPartnerLinkCommandMock).toHaveBeenCalledWith(
+      { id: 'user-1' },
+      { missionParticipantId: 'p1', originalUrl: 'https://example.com/hotel' },
+      { store, provider },
     )
-    // Persists through the SECURITY DEFINER RPC on the creator's own client — no
-    // service-role key client is constructed.
-    expect(rpcMock).toHaveBeenCalledWith('create_travelpayouts_partner_link', {
-      p_affiliate_network_program_id: 'program-1',
-      p_mission_id: 'mission-1',
-      p_mission_participant_id: 'participant-1',
-      p_original_url: 'https://example.com/hotel',
-      p_partner_url: 'https://tp.st/abc?sub_id=creator-sub',
-      p_sub_id: 'creator-sub',
-    })
-    expect(createServiceClientMock).not.toHaveBeenCalled()
     expect(revalidatePathMock).toHaveBeenCalledWith('/zh-hk/studio/missions')
   })
 
-  it('returns a save error when the partner-link RPC rejects', async () => {
-    buildSubIdMock.mockReturnValue('creator-sub')
-    canonicalizeTravelpayoutsPartnerUrlMock.mockReturnValue(
-      'https://tp.st/abc?sub_id=creator-sub',
-    )
-    createTravelpayoutsPartnerLinksMock.mockResolvedValue([
-      {
-        originalUrl: 'https://example.com/hotel',
-        partnerUrl: 'https://tp.st/abc',
-        status: 'success',
-      },
-    ])
-    const rpcMock = vi.fn(async () => ({ data: null, error: { message: 'Partner link is not allowed' } }))
-    const supabase = createSupabaseMock(
-      {
-        mission_participants: createBuilder({
-          maybeSingle: vi.fn(async () => ({
-            data: { id: 'participant-1', mission_id: 'mission-1', creator_id: 'user-1', status: 'active' },
-            error: null,
-          })),
-        }),
-        missions: createBuilder({
-          maybeSingle: vi.fn(async () => ({
-            data: {
-              id: 'mission-1',
-              affiliate_network_program_id: 'program-1',
-              mission_source: 'travelpayouts',
-              status: 'published',
-            },
-            error: null,
-          })),
-        }),
-        affiliate_network_programs: createBuilder({
-          maybeSingle: vi.fn(async () => ({
-            data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
-            error: null,
-          })),
-        }),
-        affiliate_partner_links: createBuilder({
-          maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-        }),
-      },
-      { rpc: rpcMock },
-    )
+  it('maps a reused result without revalidation', async () => {
+    const supabase = createSupabaseMock({}, {
+      getUser: vi.fn(async () => ({
+        data: { user: { id: 'user-1' } },
+        error: null,
+      })),
+    })
     createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
-      originalUrl: 'https://example.com/hotel',
-      locale: 'zh-hk',
+    createPartnerLinkStoreMock.mockReturnValue({})
+    createTravelpayoutsPartnerLinkProviderMock.mockReturnValue({})
+    createPartnerLinkCommandMock.mockResolvedValue({
+      kind: 'reused',
+      link: { id: 'link-1', partnerUrl: 'https://tp.st/existing' },
     })
 
-    expect(result).toEqual({
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
+      originalUrl: 'https://example.com/hotel',
+    })).resolves.toEqual({
+      ok: true,
+      link: { id: 'link-1', partner_url: 'https://tp.st/existing' },
+    })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+
+  it('maps validation and provider/save failures to existing form errors', async () => {
+    const supabase = createSupabaseMock({}, {
+      getUser: vi.fn(async () => ({
+        data: { user: { id: 'user-1' } },
+        error: null,
+      })),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+    createPartnerLinkStoreMock.mockReturnValue({})
+    createTravelpayoutsPartnerLinkProviderMock.mockReturnValue({})
+
+    createPartnerLinkCommandMock.mockResolvedValueOnce({
+      kind: 'validation-failed',
+      errors: { originalUrl: ['https'] },
+    })
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
+      originalUrl: 'http://example.com',
+    })).resolves.toEqual({
+      ok: false,
+      errors: { originalUrl: ['https'] },
+    })
+
+    createPartnerLinkCommandMock.mockResolvedValueOnce({
+      kind: 'failed',
+      code: 'provider-failed',
+      reason: 'Unsupported link',
+    })
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
+      originalUrl: 'https://example.com/hotel',
+    })).resolves.toEqual({
+      ok: false,
+      errors: {
+        form: ['Travelpayouts partner link could not be generated: Unsupported link'],
+      },
+    })
+
+    createPartnerLinkCommandMock.mockResolvedValueOnce({
+      kind: 'failed',
+      code: 'persistence-failed',
+    })
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
+      originalUrl: 'https://example.com/hotel',
+    })).resolves.toEqual({
       ok: false,
       errors: { form: ['Partner link could not be saved'] },
     })
-    expect(rpcMock).toHaveBeenCalledWith(
-      'create_travelpayouts_partner_link',
-      expect.objectContaining({
-        p_mission_participant_id: 'participant-1',
-        p_partner_url: 'https://tp.st/abc?sub_id=creator-sub',
-        p_sub_id: 'creator-sub',
-      }),
-    )
-    expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 
-  it('rejects an untrusted provider URL before calling the persistence RPC', async () => {
-    buildSubIdMock.mockReturnValue('creator-sub')
-    createTravelpayoutsPartnerLinksMock.mockResolvedValue([
-      {
-        originalUrl: 'https://example.com/hotel',
-        partnerUrl: 'https://example.net/not-travelpayouts',
-        status: 'success',
-      },
-    ])
-    canonicalizeTravelpayoutsPartnerUrlMock.mockImplementation(() => {
-      throw new Error('Travelpayouts returned an invalid partner URL')
+  it('keeps the unauthenticated early return before adapter construction', async () => {
+    const supabase = createSupabaseMock({}, {
+      getUser: vi.fn(async () => ({
+        data: { user: null },
+        error: null,
+      })),
     })
-
-    const rpcMock = vi.fn(async () => ({ data: null, error: null }))
-    const supabase = createSupabaseMock(
-      {
-        mission_participants: createBuilder({
-          maybeSingle: vi.fn(async () => ({
-            data: {
-              id: 'participant-1',
-              mission_id: 'mission-1',
-              creator_id: 'user-1',
-              status: 'active',
-            },
-            error: null,
-          })),
-        }),
-        missions: createBuilder({
-          maybeSingle: vi.fn(async () => ({
-            data: {
-              id: 'mission-1',
-              affiliate_network_program_id: 'program-1',
-              mission_source: 'travelpayouts',
-              status: 'published',
-            },
-            error: null,
-          })),
-        }),
-        affiliate_network_programs: createBuilder({
-          maybeSingle: vi.fn(async () => ({
-            data: { id: 'program-1', network: 'travelpayouts', status: 'active' },
-            error: null,
-          })),
-        }),
-        affiliate_partner_links: createBuilder({
-          maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-        }),
-      },
-      { rpc: rpcMock },
-    )
     createSupabaseServerClientMock.mockResolvedValue(supabase)
 
-    const result = await createPartnerLinkAction({
-      missionParticipantId: 'participant-1',
+    await expect(createPartnerLinkAction({
+      missionParticipantId: 'p1',
       originalUrl: 'https://example.com/hotel',
-      locale: 'zh-hk',
-    })
-
-    expect(result).toEqual({
+    })).resolves.toEqual({
       ok: false,
-      errors: {
-        form: [
-          'Travelpayouts partner link could not be generated: Travelpayouts returned an invalid partner URL',
-        ],
-      },
+      errors: { form: ['Sign in is required'] },
     })
-    expect(canonicalizeTravelpayoutsPartnerUrlMock).toHaveBeenCalledWith(
-      'https://example.net/not-travelpayouts',
-      'creator-sub',
-    )
-    expect(rpcMock).not.toHaveBeenCalled()
-    expect(revalidatePathMock).not.toHaveBeenCalled()
+    expect(createPartnerLinkCommandMock).not.toHaveBeenCalled()
+    expect(createPartnerLinkStoreMock).not.toHaveBeenCalled()
+    expect(createTravelpayoutsPartnerLinkProviderMock).not.toHaveBeenCalled()
   })
 })
+
 
 describe('social enrichment boundary', () => {
   it('returns unavailable instead of throwing when enrichment is not configured', async () => {
