@@ -12,6 +12,8 @@ interface SignInFormProps {
   errorInvalidCredentials: string
   errorGeneric: string
   serverError?: string
+  /** Validated in-app destination from `?next=`, or undefined for the default hub. */
+  nextPath?: string
 }
 
 export function SignInForm({
@@ -20,6 +22,7 @@ export function SignInForm({
   errorInvalidCredentials,
   errorGeneric,
   serverError,
+  nextPath,
 }: SignInFormProps) {
   const router = useRouter()
   const [error, setError] = useState<string | undefined>(serverError)
@@ -36,10 +39,11 @@ export function SignInForm({
         setError(errorInvalidCredentials)
         return
       }
-      // On success, hard-navigate through the role-aware hub (/studio routes
-      // merchant/ops/creator to the right place). refresh() forces the server to
-      // pick up the new auth cookie.
-      router.push(`/${locale}/studio`)
+      // On success, honour a validated `?next=` (the ops invite deep-link
+      // depends on it) and otherwise navigate through the role-aware hub
+      // (/studio routes merchant/ops/creator to the right place). refresh()
+      // forces the server to pick up the new auth cookie.
+      router.push(nextPath ?? `/${locale}/studio`)
       router.refresh()
     } catch {
       setError(errorGeneric)

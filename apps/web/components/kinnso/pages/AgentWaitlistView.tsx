@@ -1,4 +1,8 @@
+'use client'
+
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { FeatureInterestForm } from '@/components/kinnso/FeatureInterestForm'
+import { hasAnalyticsConsent, subscribeToAnalyticsConsent, trackTravellerEvent } from '@/lib/analytics/client'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -7,6 +11,16 @@ export function AgentWaitlistView({ locale, t, featureInterest }: {
   t: Messages['agent']
   featureInterest: Messages['featureInterest']
 }) {
+  const consented = useSyncExternalStore(subscribeToAnalyticsConsent, hasAnalyticsConsent, () => false)
+  const tracked = useRef(false)
+  const initialLocale = useRef(locale)
+
+  useEffect(() => {
+    if (!consented || tracked.current) return
+    tracked.current = true
+    trackTravellerEvent('agent_started', { locale: initialLocale.current, routeKey: 'agent' })
+  }, [consented])
+
   return (
     <main className="k2-container py-16">
       <section className="k2-card mx-auto max-w-2xl p-8 md:p-10">

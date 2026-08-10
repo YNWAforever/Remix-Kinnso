@@ -6,6 +6,7 @@ import { redirects } from './checks/redirects'
 import { rowCounts } from './checks/row-counts'
 import { structuredData } from './checks/structured-data'
 import { negative404 } from './checks/negative-404'
+import { seoLoss } from './checks/seo-loss'
 import { buildReport, renderTable } from './report'
 import type { Check, CheckResult } from './types'
 
@@ -42,7 +43,7 @@ export function parseArgs(argv: string[], env: NodeJS.ProcessEnv): CliConfig {
   }
 }
 
-const CHECKS: Check[] = [urlCoverage, sitemapSuperset, redirects, rowCounts, structuredData, negative404]
+const CHECKS: Check[] = [urlCoverage, sitemapSuperset, redirects, rowCounts, structuredData, negative404, seoLoss]
 
 /** Runs all checks and returns a process exit code (0 pass, 1 parity fail, 2 misconfig). */
 export async function run(cfg: CliConfig): Promise<number> {
@@ -58,7 +59,22 @@ export async function run(cfg: CliConfig): Promise<number> {
     supabaseUrl: cfg.supabaseUrl,
     supabaseAnonKey: cfg.supabaseAnonKey,
   })
-  const legacy = await createLegacySource({ sitemapUrl: cfg.legacySitemap, mysqlDsn: cfg.legacyMysql })
+  // A baseline source that refuses to build is a MISCONFIGURATION (exit 2), not a parity
+  // failure (exit 1) — the gate never ran, so reporting "fail" would misstate what happened.
+  let legacy
+  try {
+    legacy = await createLegacySource({
+      sitemapUrl: cfg.legacySitemap,
+      mysqlDsn: cfg.legacyMysql,
+      // The MySQL baseline samples the redirect map through the newstack's own reader, so
+      // there is one Supabase client for the run and the sampled rows are the ones the
+      // proxy will actually serve.
+      redirects: () => newstack.seoRedirects(),
+    })
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err))
+    return 2
+  }
 
   const all: CheckResult[] = []
   for (const check of CHECKS) {

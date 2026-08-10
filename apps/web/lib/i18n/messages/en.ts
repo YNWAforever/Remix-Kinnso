@@ -218,6 +218,8 @@ export interface MerchantsDirectoryMessages {
 }
 
 export interface MerchantProfileMessages {
+  enquiryCta: string
+  featuredGuidesHeading: string
   websiteLabel: string
   experiencesHeading: string
   experiencesEmpty: string
@@ -238,6 +240,7 @@ export interface BookingMessages {
   noAvailability: string
   qtyLabel: string
   spotsLeftLabel: string
+  opensSoonCta: string
   soldOutLabel: string
   guestEmailLabel: string
   guestEmailPlaceholder: string
@@ -287,6 +290,11 @@ export interface Messages {
     forMerchants: { title: string; description: string }
     sessions: { title: string; description: string }
     destinations: { title: string; description: string }
+    articles: {
+      title: string
+      descriptionBookingLive: string
+      descriptionBookingWaitlist: string
+    }
   }
   listing: { searchPlaceholder: string; filterRegion: string; filterTag: string; noResults: string; resultsCount: string }
   pagination: { prev: string; next: string; page: string }
@@ -685,18 +693,23 @@ export interface Messages {
     linkCreators: string; linkAgent: string; linkMerchants: string
     linkArticles: string; linkFindCreators: string; linkMissions: string
     linkInsights: string
-    linkExplore: string; linkDestinations: string; linkSessions: string; linkForMerchants: string
-    ctaApply: string; ctaOpenStudio: string; ctaPending: string; ctaPostMission: string; ctaMyTrips: string
+    linkExplore: string; linkDestinations: string; linkSessions: string
+    linkForCreators: string; linkForMerchants: string
+    signUp: string; ctaOpenStudio: string; ctaPending: string
+    ctaPostMission: string; ctaMyTrips: string
     signIn: string; language: string; menuToggle: string; skipToContent: string
     merchantMenuLabel: string
   }
   footer: {
     tagline: string; colCreators: string; colMerchants: string; colCompany: string
-    colExplore: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string
+    colExplore: string; colTravellers: string; lGuides: string; lDestinations: string; lArticles: string; lSessions: string; lTrips: string; lSaved: string
     lApply: string; lStudio: string; lMissions: string; lEarnings: string
     lPostMission: string; lPricing: string; lContact: string; lDirectory: string
     lAbout: string; lAgent: string; lLegal: string; rights: string
     lForCreators: string
+  }
+  analytics: {
+    title: string; description: string; accept: string; decline: string; changePreference: string
   }
   home: {
     heroEyebrow: string; heroTitle: string; heroSubtitle: string
@@ -825,6 +838,17 @@ export interface Messages {
     addHandleErrorEmpty: string
     addHandleErrorFormat: string
     addHandleErrorLength: string
+    nextActionHeading: string
+    nextActionAwaitScan: string
+    nextActionStartEarning: string
+    nextActionPublishGuide: string
+    nextActionConnectPlatforms: string
+    nextActionRefreshDna: string
+    nextActionNothingOpen: string
+    nextActionCta: string
+    directoryListed: string
+    directoryNeedsGuide: string
+    directoryNotListed: string
     addHandleSaved: string
   }
   studioGuides: {
@@ -862,6 +886,13 @@ export interface Messages {
     pill: string; heading: string; subtitle: string
     gridHeading: string
     savesLabel: string; emptyNote: string
+    destinationFilterLabel: string; allDestinations: string
+    searchLabel: string; searchPlaceholder: string
+    sortLabel: string; newest: string; mostSaved: string
+    filters: string; filtersDescription: string; activeFilters: string
+    resultsLabel: string; showResults: string
+    emptyFilteredTitle: string; emptyFilteredBody: string
+    resetFilters: string; loadMore: string; closeFilters: string
   }
   feed: {
     pill: string; heading: string; subtitle: string
@@ -927,6 +958,10 @@ export interface Messages {
     unlocksHeading: string
     unlocksMissions: string
     unlocksHelp: string
+    nextUnlocksHeading: string
+    nextUnlocksIntro: string
+    nextUnlocksNone: string
+    nextUnlocksMaxed: string
     historyHeading: string
     historyEmpty: string
     eventGuide: string
@@ -945,10 +980,23 @@ export interface Messages {
     disclaimer: string
   }
   admin: {
-    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string
+    navDashboard: string; navPerks: string; navUsers: string; navCreators: string; navMerchants: string; navTeam: string; navMissions: string; navTestimonials: string; navBookings: string; navSessions: string; navEnquiries: string; navAnalytics: string
     dashboardTitle: string; dashboardSubtitle: string
     statCreators: string; statMerchants: string; statOps: string
     statPerksActive: string; statPerksTotal: string; statRedemptions: string
+    analyticsTitle: string; analyticsSubtitle: string; analyticsWindow: string; analyticsWindow24h: string; analyticsWindow7d: string; analyticsFilters: string; analyticsAll: string
+    analyticsUtcNote: string; analyticsRetentionNote: string; analyticsAttributionNote: string; analyticsSampleFloorNote: string; analyticsHealthTitle: string; analyticsHealthStatus: string; analyticsHealthAvailable: string; analyticsHealthNoMatching: string; analyticsHealthObservedZero: string; analyticsHealthInsufficient: string; analyticsHealthUnavailable: string; analyticsHealthReturnedRows: string; analyticsHealthOkRows: string; analyticsHealthInsufficientRows: string; analyticsHealthObservedZeroRows: string; analyticsTableCaption: string; analyticsMetric: string
+    analyticsLocale: string; analyticsEntityType: string; analyticsBookingState: string; analyticsNumerator: string; analyticsDenominator: string; analyticsRate: string; analyticsStatus: string
+    analyticsOk: string; analyticsInsufficientSample: string; analyticsUnavailable: string; analyticsRetry: string; analyticsEmpty: string; analyticsObservedZero: string; analyticsEntityGuide: string
+    analyticsEntityExperience: string; analyticsEntityCreator: string; analyticsEntityArticle: string; analyticsBookingOff: string; analyticsBookingOn: string; analyticsMetricDiscoveryToEntity: string
+    analyticsMetricEntityToAgent: string; analyticsMetricEntityToCta: string; analyticsMetricCtaToWaitlist: string; analyticsMetricCtaToCheckout: string; analyticsMetricAgentStart: string
+    analyticsMetricSignupCompletion: string; analyticsMetricErrorInvalid: string; analyticsMetricErrorRateLimited: string; analyticsMetricErrorUnavailable: string; analyticsMetricErrorUnknown: string; analyticsMetricUnknown: string; analyticsNotApplicable: string
+  }
+  enquiriesAdmin: {
+    title: string; subtitle: string; filterActive: string; filterResolved: string; filterSpam: string; filterAllTypes: string
+    typeCreator: string; typeMerchant: string; statusNew: string; statusInProgress: string; statusResolved: string; statusSpam: string
+    receivedAt: string; target: string; markInProgress: string; markResolved: string; markSpam: string; reopen: string
+    reasonLabel: string; reasonRequired: string; empty: string; actionFailed: string; next: string
   }
   creators: {
     title: string; subtitle: string
@@ -1200,6 +1248,12 @@ export interface Messages {
     invalidEmail: string
     retry: string
   }
+  enquiry: {
+    creatorPurpose: string; merchantPurpose: string; dialogTitle: string; dialogDescription: string
+    nameLabel: string; emailLabel: string; messageLabel: string; submit: string; submitting: string
+    cancel: string; close: string; invalid: string; rateLimited: string; failed: string
+    successTitle: string; successBody: string
+  }
   sessions: {
     eyebrow: string; title: string; body: string
     upcomingHeading: string; emptyUpcoming: string; replaysHeading: string
@@ -1300,6 +1354,13 @@ const messages: Messages = {
     destinations: {
       title: 'Destinations — KINNSO',
       description: 'Browse curated destinations and see the guides, bookable experiences, and live sessions our creators have covered so far.',
+    },
+    articles: {
+      title: 'Travel guides, experiences and local recommendations',
+      descriptionBookingLive:
+        'Discover creator-led travel guides, bookable local experiences, live sessions and trusted recommendations across Asia.',
+      descriptionBookingWaitlist:
+        'Discover creator-led travel guides, local experiences, live sessions and trusted recommendations across Asia.',
     },
   },
   listing: { searchPlaceholder: 'Search articles', filterRegion: 'Region', filterTag: 'Tag', noResults: 'No articles found.', resultsCount: 'articles' },
@@ -1694,20 +1755,27 @@ const messages: Messages = {
     linkCreators: 'Creators', linkAgent: 'AI Agent', linkMerchants: 'Merchants',
     linkArticles: 'Articles', linkFindCreators: 'Find Creators', linkMissions: 'Missions',
     linkInsights: 'Insights',
-    linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForMerchants: 'For Merchants',
-    ctaApply: 'Apply as Creator', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission', ctaMyTrips: 'My Trips',
+    linkExplore: 'Explore', linkDestinations: 'Destinations', linkSessions: 'Sessions', linkForCreators: 'For Creators', linkForMerchants: 'For Merchants',
+    signUp: 'Sign up', ctaOpenStudio: 'Open Studio', ctaPending: 'Application pending', ctaPostMission: 'Post a Mission', ctaMyTrips: 'My Trips',
     signIn: 'Sign in', language: 'Language', menuToggle: 'Menu', skipToContent: 'Skip to content',
     merchantMenuLabel: 'Merchant menu',
   },
   footer: {
-    tagline: 'AI Travel Content Studio · Pays creators · Hong Kong · Taipei · Tokyo',
+    tagline: 'The AI travel creator marketplace · Hong Kong · Taipei · Tokyo',
     colCreators: 'Creators', colMerchants: 'Merchants', colCompany: 'Company',
-    colExplore: 'Explore', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions',
+    colExplore: 'Explore', colTravellers: 'Travellers', lGuides: 'Guides', lDestinations: 'Destinations', lArticles: 'Articles', lSessions: 'Sessions', lTrips: 'Trips', lSaved: 'Saved',
     lApply: 'Apply', lStudio: 'Studio', lMissions: 'Missions', lEarnings: 'Earnings',
     lPostMission: 'Post a mission', lPricing: 'How it works', lContact: 'Contact', lDirectory: 'Directory',
     lAbout: 'About', lAgent: 'AI Agent', lLegal: 'Legal',
     rights: '© 2026 KINNSO. All rights reserved.',
     lForCreators: 'For Creators',
+  },
+  analytics: {
+    title: 'Help improve KINNSO',
+    description: 'Allow privacy-preserving measurement to help us improve traveller journeys.',
+    accept: 'Accept measurement',
+    decline: 'Decline',
+    changePreference: 'Change measurement preference',
   },
   home: {
     heroEyebrow: 'The travel creator marketplace',
@@ -1922,6 +1990,17 @@ const messages: Messages = {
     addHandleErrorFormat: 'That handle has invalid characters.',
     addHandleErrorLength: 'That handle is too long (max 30).',
     addHandleSaved: 'Added — rescan to include it in your DNA.',
+    nextActionHeading: 'Your next step',
+    nextActionAwaitScan: 'Your scan is running. We will have your DNA shortly.',
+    nextActionStartEarning: 'Promote an offer to your audience and earn commission on every booking it drives.',
+    nextActionPublishGuide: 'Publish your first guide — that is what lists you in the public creator directory.',
+    nextActionConnectPlatforms: 'Connect your remaining platforms so more of your audience can be verified.',
+    nextActionRefreshDna: 'Your DNA is getting old. Rescan to keep it accurate.',
+    nextActionNothingOpen: 'Nothing needs your attention right now.',
+    nextActionCta: 'Open',
+    directoryListed: 'You appear in the public creator directory.',
+    directoryNeedsGuide: 'Publish a guide to appear in the public creator directory — drafts do not count.',
+    directoryNotListed: 'Finish the steps above to appear in the public creator directory.',
   },
   studioGuides: {
     listPill: 'Studio',
@@ -1998,6 +2077,13 @@ const messages: Messages = {
     gridHeading: 'All guides',
     savesLabel: 'saves',
     emptyNote: 'More guides are added every week.',
+    destinationFilterLabel: 'Destinations', allDestinations: 'All destinations',
+    searchLabel: 'Search guides', searchPlaceholder: 'Search guides, creators or cities',
+    sortLabel: 'Sort by', newest: 'Newest', mostSaved: 'Most saved',
+    filters: 'Filters', filtersDescription: 'Choose one destination and a sort order.', activeFilters: 'Active filters',
+    resultsLabel: '{count} guides', showResults: 'Show {count} results',
+    emptyFilteredTitle: 'No guides match these filters', emptyFilteredBody: 'Try another search or reset the filters.',
+    resetFilters: 'Reset filters', loadMore: 'Load more', closeFilters: 'Close filters',
   },
   feed: {
     pill: 'Feed',
@@ -2033,6 +2119,8 @@ const messages: Messages = {
     newHereCta: 'Why KINNSO for merchants',
   },
   merchantProfile: {
+    enquiryCta: 'Contact this merchant',
+    featuredGuidesHeading: 'Featured in guides',
     websiteLabel: 'Website',
     experiencesHeading: 'Experiences',
     experiencesEmpty: 'No experiences published yet.',
@@ -2055,6 +2143,7 @@ const messages: Messages = {
     guestEmailLabel: 'Email',
     guestEmailPlaceholder: 'traveller@email.test',
     guestEmailHint: "We'll send your booking confirmation here.",
+    opensSoonCta: 'Booking opens soon',
     submitCta: 'Book now',
     submittingCta: 'Redirecting to secure checkout…',
     invalidEmail: 'Enter a valid email address',
@@ -2124,6 +2213,10 @@ const messages: Messages = {
     unlocksHeading: 'What you unlock',
     unlocksMissions: 'missions need this tier',
     unlocksHelp: 'Climb tiers to join exclusive missions.',
+    nextUnlocksHeading: 'What your next tier unlocks',
+    nextUnlocksIntro: '{points} pts to {tier} unlocks:',
+    nextUnlocksNone: 'No perks are gated at {tier} right now.',
+    nextUnlocksMaxed: '{tier} is the top tier — nothing is gated above it.',
   },
   copilot: {
     title: 'Creator Copilot',
@@ -2143,10 +2236,25 @@ const messages: Messages = {
     disclaimer: 'AI-generated — review before you publish.',
   },
   admin: {
-    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions',
+    navDashboard: 'Dashboard', navPerks: 'Perks', navUsers: 'Users', navCreators: 'Creators', navMerchants: 'Merchants', navTeam: 'Team', navMissions: 'Missions', navTestimonials: 'Testimonials', navBookings: 'Bookings', navSessions: 'Sessions', navEnquiries: 'Enquiries', navAnalytics: 'Analytics',
     dashboardTitle: 'Admin', dashboardSubtitle: 'Manage perks, users, and platform content.',
     statCreators: 'Creators', statMerchants: 'Merchants', statOps: 'Ops members',
     statPerksActive: 'Active perks', statPerksTotal: 'Total perks', statRedemptions: 'Redemptions',
+    analyticsTitle: 'Analytics', analyticsSubtitle: 'Observe product funnel performance across locales and entity types.', analyticsWindow: 'Window', analyticsWindow24h: 'Last 24 hours', analyticsWindow7d: 'Last 7 days', analyticsFilters: 'Filters', analyticsAll: 'All',
+    analyticsUtcNote: 'Times are shown in UTC.', analyticsRetentionNote: 'Analytics data is retained for 8 days.', analyticsAttributionNote: 'Attribution uses a 7-day window.', analyticsSampleFloorNote: 'Rates are withheld when the denominator is below 10.', analyticsHealthTitle: 'Measurement health', analyticsHealthStatus: 'Status', analyticsHealthAvailable: 'Available', analyticsHealthNoMatching: 'No matching rows', analyticsHealthObservedZero: 'Observed zero', analyticsHealthInsufficient: 'Insufficient sample', analyticsHealthUnavailable: 'Unavailable', analyticsHealthReturnedRows: 'Rows returned', analyticsHealthOkRows: 'Interpretable rows', analyticsHealthInsufficientRows: 'Withheld rows', analyticsHealthObservedZeroRows: 'Observed-zero rows', analyticsTableCaption: 'Analytics funnel metrics', analyticsMetric: 'Metric',
+    analyticsLocale: 'Locale', analyticsEntityType: 'Entity type', analyticsBookingState: 'Booking state', analyticsNumerator: 'Numerator', analyticsDenominator: 'Denominator', analyticsRate: 'Rate', analyticsStatus: 'Status',
+    analyticsOk: 'OK', analyticsInsufficientSample: 'Insufficient sample', analyticsUnavailable: 'Unavailable', analyticsRetry: 'Retry', analyticsEmpty: 'No analytics data is available for this selection.', analyticsObservedZero: 'Zero is an observed aggregate; insufficient samples are not interpretable rates.', analyticsEntityGuide: 'Guide',
+    analyticsEntityExperience: 'Experience', analyticsEntityCreator: 'Creator', analyticsEntityArticle: 'Article', analyticsBookingOff: 'Booking off', analyticsBookingOn: 'Booking on', analyticsMetricDiscoveryToEntity: 'Discovery to entity',
+    analyticsMetricEntityToAgent: 'Entity to agent', analyticsMetricEntityToCta: 'Entity to CTA', analyticsMetricCtaToWaitlist: 'CTA to waitlist', analyticsMetricCtaToCheckout: 'CTA to checkout', analyticsMetricAgentStart: 'Agent start',
+    analyticsMetricSignupCompletion: 'Signup completion', analyticsMetricErrorInvalid: 'Invalid request errors', analyticsMetricErrorRateLimited: 'Rate-limited errors', analyticsMetricErrorUnavailable: 'Unavailable errors', analyticsMetricErrorUnknown: 'Unknown errors', analyticsMetricUnknown: 'Unknown', analyticsNotApplicable: '—',
+  },
+  enquiriesAdmin: {
+    title: 'Enquiries', subtitle: 'Review and resolve profile enquiries with an audit trail.',
+    filterActive: 'Active', filterResolved: 'Resolved', filterSpam: 'Spam', filterAllTypes: 'All types',
+    typeCreator: 'Creator collaboration', typeMerchant: 'Merchant contact', statusNew: 'New', statusInProgress: 'In progress', statusResolved: 'Resolved', statusSpam: 'Spam',
+    receivedAt: 'Received', target: 'Target', markInProgress: 'Mark in progress', markResolved: 'Mark resolved', markSpam: 'Mark as spam', reopen: 'Reopen',
+    reasonLabel: 'Reason', reasonRequired: 'A reason is required.', empty: 'No enquiries match these filters.', actionFailed: 'The enquiry could not be updated. Please try again.',
+    next: 'Next',
   },
   creators: {
     title: 'Creators',
@@ -2607,6 +2715,14 @@ const messages: Messages = {
     success: "You're on the list — we'll keep you posted.",
     invalidEmail: 'Enter a valid email address.',
     retry: 'Could not save your interest. Please try again.',
+  },
+  enquiry: {
+    creatorPurpose: 'Creator collaboration', merchantPurpose: 'Merchant contact',
+    dialogTitle: 'Send an enquiry', dialogDescription: 'Tell us what you have in mind.',
+    nameLabel: 'Name', emailLabel: 'Email', messageLabel: 'Message',
+    submit: 'Send enquiry', submitting: 'Sending enquiry…', cancel: 'Cancel', close: 'Close',
+    invalid: 'Please check your name, email, and message, then try again.', rateLimited: 'Too many enquiries from this connection. Please try again later.',
+    failed: 'We could not send your enquiry. Please try again.', successTitle: 'Enquiry sent', successBody: 'Thanks for getting in touch. We have received your enquiry.',
   },
   sessions: {
     eyebrow: 'Community Sessions',

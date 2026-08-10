@@ -1,7 +1,14 @@
 import { cache } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
-import { LOCALES, toUrlCategory, type Locale } from '@/lib/i18n/config'
+import {
+  LOCALES,
+  isLocale,
+  toUrlCategory,
+  type DbCategory,
+  type Locale,
+} from '@/lib/i18n/config'
+import { indexableArticleLocales, type ArticleSeoTranslation } from '@/lib/seo/article-indexability'
 
 // Plain anon client so this helper is testable in Node without Next's
 // request-scoped `cookies()`. RLS still hides unpublished/expired rows.
@@ -11,10 +18,50 @@ const db = () =>
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY!,
   )
 
-/** Retry a read once on a transient failure (cold connection, momentary network/DB
- *  blip) so an ISR/dynamic render degrades to a quick retry rather than crashing the
- *  serverless function (FUNCTION_INVOCATION_FAILED). Reads are idempotent, so this is
- *  safe; a persistent failure still throws and is caught by the route error boundary. */
+export interface CreatorArticleCard {
+  id: string
+  url: string
+  category: string
+  title: string
+  summary: string
+  thumbnail: string | null
+  publishedAt: string
+}
+
+export async function getPublishedArticlesForCreator(handle: string, locale: Locale, limit = 6): Promise<CreatorArticleCard[]> {
+  const client = db()
+  const { data: author, error: authorError } = await client
+    .from('article_authors')
+    .select('slug')
+    .eq('slug', handle)
+    .eq('locale', locale)
+    .eq('is_active', true)
+    .maybeSingle()
+  if (authorError) throw authorError
+  if (!author) return []
+
+  const { data, error } = await client
+    .from('articles')
+    .select('id, url, category, thumbnails, published_at, article_translations!inner(locale, title, summary)')
+    .contains('authors', [handle])
+    .is('deleted_at', null)
+    .not('published_at', 'is', null)
+    .eq('article_translations.locale', locale)
+    .order('published_at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+
+  return (data ?? []).flatMap((article) => {
+    const translation = (article.article_translations ?? []).find((item) => item.locale === locale)
+    if (!translation || !article.published_at) return []
+    return [{
+      id: article.id, url: article.url, category: article.category,
+      title: translation.title ?? '', summary: translation.summary ?? '',
+      thumbnail: article.thumbnails?.[0] ?? null, publishedAt: article.published_at,
+    }]
+  })
+}
+
 /** Pick the best translation for a requested locale: exact match → `en` → first available. */
 function pickTranslation<T extends { locale: string }>(translations: T[], locale: string): T | null {
   if (translations.length === 0) return null
@@ -122,19 +169,88 @@ export const getArticleDetail = cache((
   }
 }))
 
-/** Locales that have a translation for a (visible) article — drives hreflang + sitemap. */
-export const getPresentLocales = cache((url: string): Promise<Locale[]> => withRetry(async () => {
+type ArticleSeoRow = {
+  url: string
+  category: string
+  is_coupon: boolean
+  end_at: string | null
+  edit_at: string | null
+  updated_at: string | null
+  published_at: string | null
+  article_translations: Array<{
+    locale: string
+    title: string | null
+    summary: string | null
+    meta_description: string | null
+    content: unknown
+  }>
+}
+
+const getArticleSeoRows = cache(async (): Promise<ArticleSeoRow[]> => {
   const { data, error } = await db()
     .from('articles')
-    .select('article_translations(locale)')
+    .select(
+      'url, category, is_coupon, end_at, edit_at, updated_at, published_at, ' +
+      'article_translations(locale, title, summary, meta_description, content)',
+    )
+    .order('url')
+  if (error) throw error
+  return (data ?? []) as unknown as ArticleSeoRow[]
+})
+
+function seoTranslations(row: ArticleSeoRow): ArticleSeoTranslation[] {
+  return row.article_translations.flatMap((translation) =>
+    isLocale(translation.locale)
+      ? [{
+          locale: translation.locale,
+          title: translation.title,
+          summary: translation.summary,
+          metaDescription: translation.meta_description,
+          content: translation.content,
+        }]
+      : [],
+  )
+}
+
+function indexableLocalesFor(row: ArticleSeoRow): Locale[] {
+  return indexableArticleLocales(seoTranslations(row), row.is_coupon)
+}
+
+/**
+ * One article's SEO row. `articles.url` is UNIQUE, so this returns exactly the
+ * row a scan of the corpus would have found — without transferring every
+ * article's full translation `content` to decide the indexability of one page.
+ */
+const getArticleSeoRow = cache(async (url: string): Promise<ArticleSeoRow | null> => {
+  const { data, error } = await db()
+    .from('articles')
+    .select(
+      'url, category, is_coupon, end_at, edit_at, updated_at, published_at, ' +
+      'article_translations(locale, title, summary, meta_description, content)',
+    )
     .eq('url', url)
     .maybeSingle()
   if (error) throw error
-  if (!data) return []
-  const set = new Set((data.article_translations ?? []).map((t) => t.locale))
-  return LOCALES.filter((l) => set.has(l))
-}))
+  return (data ?? null) as unknown as ArticleSeoRow | null
+})
 
+export const getIndexableArticleLocales = cache(
+  async (url: string): Promise<Locale[]> => {
+    const row = await getArticleSeoRow(url)
+    return row ? indexableLocalesFor(row) : []
+  },
+)
+
+export const getIndexableCategoryLocales = cache(
+  async (category: DbCategory): Promise<Locale[]> => {
+    const found = new Set<Locale>()
+    for (const row of await getArticleSeoRows()) {
+      if (row.category !== category) continue
+      for (const locale of indexableLocalesFor(row)) found.add(locale)
+    }
+    return LOCALES.filter((locale) => found.has(locale))
+  },
+)
 export async function getYouMayLike(articleId: string, locale: Locale, limit = 5) {
   return withRetry(async () => {
     const { data, error } = await db().rpc('get_you_may_like', {
@@ -183,33 +299,30 @@ export async function searchArticles(p: SearchParams): Promise<SearchResult> {
   })
 }
 
-/** All visible articles + their present locales — for sitemap.ts. */
 export async function getPublishedForSitemap() {
-  const { data, error } = await db()
-    .from('articles')
-    .select('url, category, edit_at, updated_at, published_at, article_translations(locale)')
-    .order('url') // stable order so sitemap.ts sharding partitions a deterministic sequence
-  if (error) throw error
-  return (data ?? []).map((a) => ({
-    url: a.url, category: a.category,
-    lastmod: a.edit_at ?? a.updated_at ?? a.published_at,
-    locales: LOCALES.filter((l) => (a.article_translations ?? []).some((t) => t.locale === l)),
-  }))
+  return (await getArticleSeoRows()).flatMap((row) => {
+    const locales = indexableLocalesFor(row)
+    return locales.length > 0
+      ? [{
+          url: row.url,
+          category: row.category,
+          lastmod: row.edit_at ?? row.updated_at ?? row.published_at,
+          locales,
+        }]
+      : []
+  })
 }
 
-/** Evergreen (end_at null) published articles, expanded across present locales — generateStaticParams. */
-export async function getStaticArticleParams(): Promise<Array<{ locale: Locale; category: string; url: string }>> {
-  const { data, error } = await db()
-    .from('articles')
-    .select('url, category, end_at, article_translations(locale)')
-    .is('end_at', null)
-  if (error) throw error
+export async function getStaticArticleParams(): Promise<
+  Array<{ locale: Locale; category: string; url: string }>
+> {
   const out: Array<{ locale: Locale; category: string; url: string }> = []
-  for (const a of data ?? []) {
-    const category = toUrlCategory(a.category)
+  for (const row of await getArticleSeoRows()) {
+    if (row.end_at !== null) continue
+    const category = toUrlCategory(row.category)
     if (!category) continue
-    for (const l of LOCALES) {
-      if ((a.article_translations ?? []).some((t) => t.locale === l)) out.push({ locale: l, category, url: a.url })
+    for (const locale of indexableLocalesFor(row)) {
+      out.push({ locale, category, url: row.url })
     }
   }
   return out

@@ -3,16 +3,30 @@ import {
   buildArticleMetadata, buildListingMetadata,
   buildPageMetadata, buildGuideMetadata, buildCreatorMetadata, noindexMetadata,
   buildDestinationMetadata,
+  buildMerchantMetadata,
+  buildExperienceMetadata,
+  buildSessionMetadata,
   SITE_URL,
 } from '@/lib/seo/metadata'
 import { LOCALES } from '@/lib/i18n/config'
 
 const base = {
-  urlCategory: 'dining' as const, url: 'ramen-guide', locale: 'en' as const,
-  presentLocales: ['en', 'zh-hk'] as const,
-  title: 'Best Ramen', metaTitle: null, summary: 'A guide', metaDescription: null,
-  ogImage: 'https://cdn.kinnso.ai/og.jpg', publishedAt: '2026-06-01T00:00:00Z',
-  editAt: '2026-06-10T00:00:00Z', isCoupon: false,
+  urlCategory: 'dining' as const,
+  url: 'ramen-guide',
+  locale: 'en' as const,
+  resolvedLocale: 'en' as const,
+  indexing: {
+    index: true,
+    canonicalLocale: 'en' as const,
+    alternateLocales: ['en', 'zh-hk'] as const,
+  },
+  title: 'Best Ramen',
+  metaTitle: null,
+  summary: 'A guide',
+  metaDescription: null,
+  ogImage: 'https://cdn.kinnso.ai/og.jpg',
+  publishedAt: '2026-06-01T00:00:00Z',
+  editAt: '2026-06-10T00:00:00Z',
 }
 
 describe('buildArticleMetadata', () => {
@@ -24,13 +38,6 @@ describe('buildArticleMetadata', () => {
     expect(Object.keys(langs).sort()).toEqual(['en', 'x-default', 'zh-hk'])
     expect(langs['zh-hk']).toBe(`${SITE_URL}/zh-hk/articles/dining/ramen-guide`)
     expect(langs['x-default']).toBe(`${SITE_URL}/en/articles/dining/ramen-guide`)
-  })
-  it('points x-default at the current locale when EN is not a present translation', () => {
-    const m = buildArticleMetadata({ ...base, locale: 'zh-hk', presentLocales: ['zh-hk'] })
-    const langs = m.alternates!.languages as Record<string, string>
-    expect(Object.keys(langs).sort()).toEqual(['x-default', 'zh-hk'])
-    expect(langs['x-default']).toBe(`${SITE_URL}/zh-hk/articles/dining/ramen-guide`)
-    expect(langs['x-default']).not.toBe(`${SITE_URL}/en/articles/dining/ramen-guide`)
   })
   it('prefers meta_title; description falls back to summary', () => {
     const m = buildArticleMetadata({ ...base, metaTitle: 'SEO Title', metaDescription: null })
@@ -44,15 +51,66 @@ describe('buildArticleMetadata', () => {
     expect(og.modifiedTime).toBe('2026-06-10T00:00:00Z')
     expect(og.images).toEqual(['https://cdn.kinnso.ai/og.jpg'])
   })
-  it('noindexes EN coupon articles only', () => {
-    expect((buildArticleMetadata({ ...base, isCoupon: true, locale: 'en' }).robots as any).index).toBe(false)
-    expect((buildArticleMetadata({ ...base, isCoupon: true, locale: 'zh-hk' }).robots as any).index).toBe(true)
+  it('keeps a genuine current canonical while x-default uses the first preferred genuine locale', () => {
+    const metadata = buildArticleMetadata({
+      ...base,
+      locale: 'ja',
+      resolvedLocale: 'ja',
+      indexing: {
+        index: true,
+        canonicalLocale: 'ja',
+        alternateLocales: ['zh-tw', 'ja'],
+      },
+    })
+    expect(metadata.alternates?.canonical).toBe(
+      `${SITE_URL}/ja/articles/dining/ramen-guide`,
+    )
+    const languages = metadata.alternates?.languages as Record<string, string>
+    expect(Object.keys(languages).sort()).toEqual(
+      ['ja', 'x-default', 'zh-tw'],
+    )
+    expect(languages['x-default']).toBe(
+      `${SITE_URL}/zh-tw/articles/dining/ramen-guide`,
+    )
+  })
+
+  it('noindexes fallback content and canonicalizes it to the selected genuine locale', () => {
+    const metadata = buildArticleMetadata({
+      ...base,
+      locale: 'ja',
+      resolvedLocale: 'en',
+      indexing: {
+        index: false,
+        canonicalLocale: 'en',
+        alternateLocales: ['en', 'zh-hk'],
+      },
+    })
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
+    expect(metadata.alternates?.canonical).toBe(
+      `${SITE_URL}/en/articles/dining/ramen-guide`,
+    )
+    expect(Object.keys(
+      metadata.alternates?.languages as Record<string, string>,
+    ).sort()).toEqual(['en', 'x-default', 'zh-hk'])
+  })
+
+  it('omits canonical and hreflang when no translation is indexable', () => {
+    const metadata = buildArticleMetadata({
+      ...base,
+      indexing: {
+        index: false,
+        canonicalLocale: null,
+        alternateLocales: [],
+      },
+    })
+    expect(metadata.alternates).toBeUndefined()
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
   })
 })
 
 describe('buildListingMetadata', () => {
   it('category: bare title, canonical, all 7 hreflang + x-default', () => {
-    const m = buildListingMetadata({ urlCategory: 'dining', locale: 'en', presentLocales: LOCALES, title: 'Dining' })
+    const m = buildListingMetadata({ urlCategory: 'dining', locale: 'en', presentLocales: LOCALES, title: 'Dining', description: 'Dining guides' })
     expect(m.title).toBe('Dining')
     expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles/dining`)
     const langs = m.alternates!.languages as Record<string, string>
@@ -61,8 +119,58 @@ describe('buildListingMetadata', () => {
     expect((m.robots as any).index).toBe(true)
   })
   it('hub (urlCategory null): canonical points to /articles', () => {
-    const m = buildListingMetadata({ urlCategory: null, locale: 'en', presentLocales: LOCALES, title: 'Articles' })
+    const m = buildListingMetadata({ urlCategory: null, locale: 'en', presentLocales: LOCALES, title: 'Articles', description: 'Article guides' })
     expect(m.alternates!.canonical).toBe(`${SITE_URL}/en/articles`)
+  })
+
+  it('uses the first genuine locale for x-default when English is absent', () => {
+    const metadata = buildListingMetadata({
+      urlCategory: 'dining',
+      locale: 'zh-cn',
+      presentLocales: ['ja'],
+      title: 'Dining',
+      description: 'Dining guides',
+      index: false,
+    })
+    const languages = metadata.alternates?.languages as Record<string, string>
+    expect(Object.keys(languages).sort()).toEqual(['ja', 'x-default'])
+    expect(languages['x-default']).toBe(
+      `${SITE_URL}/ja/articles/dining`,
+    )
+  })
+
+  it('omits x-default when the category has no genuine locales', () => {
+    const metadata = buildListingMetadata({
+      urlCategory: 'dining',
+      locale: 'zh-cn',
+      presentLocales: [],
+      title: 'Dining',
+      description: 'Dining guides',
+      index: false,
+    })
+    expect(metadata.alternates?.languages).toEqual({})
+  })
+
+  it('adds listing description, OG, Twitter, and explicit noindex state', () => {
+    const metadata = buildListingMetadata({
+      urlCategory: 'shopping',
+      locale: 'ja',
+      presentLocales: ['en', 'ja'],
+      title: 'Shopping',
+      description: 'Trusted recommendations.',
+      index: false,
+    })
+    expect(metadata.description).toBe('Trusted recommendations.')
+    expect((metadata.robots as { index: boolean }).index).toBe(false)
+    expect((metadata.openGraph as { images: string[] }).images).toEqual([
+      `${SITE_URL}/ja/opengraph-image`,
+    ])
+    expect((metadata.twitter as { card: string }).card).toBe(
+      'summary_large_image',
+    )
+    expect(Object.keys(
+      metadata.alternates?.languages as Record<string, string>,
+    ).sort()).toEqual(['en', 'ja', 'x-default'])
   })
 })
 
@@ -126,6 +234,36 @@ describe('buildCreatorMetadata', () => {
     expect(m.description).toContain('@maya')
   })
 })
+
+it.each([
+  ['merchant', buildMerchantMetadata({
+    slug: 'acme',
+    locale: 'en',
+    name: 'Acme',
+    tagline: 'Local tours',
+  })],
+  ['experience', buildExperienceMetadata({
+    slug: 'night-tour',
+    locale: 'en',
+    title: 'Night tour',
+    description: 'Local experience',
+  })],
+  ['session', buildSessionMetadata({
+    slug: 'ramen-ama',
+    locale: 'en',
+    title: 'Ramen AMA',
+    description: 'Live questions',
+  })],
+] as const)(
+  '%s metadata has all seven locale alternates and a non-empty description',
+  (_kind, metadata) => {
+    expect(metadata.description).toBeTruthy()
+    expect(Object.keys(
+      metadata.alternates?.languages as Record<string, string>,
+    ).sort()).toEqual([...LOCALES, 'x-default'].sort())
+    expect((metadata.robots as { index: boolean }).index).toBe(true)
+  },
+)
 
 describe('noindexMetadata', () => {
   it('marks the page noindex,nofollow', () => {

@@ -5,6 +5,7 @@ export type ViewerRoleFacts = {
   hasActiveOps: boolean
   hasMerchantProfile: boolean
   hasActiveCreator: boolean
+  hasCreatorHandle: boolean
 }
 
 export function resolveViewerRoleFromFacts(facts: ViewerRoleFacts): ViewerRole {
@@ -12,5 +13,6 @@ export function resolveViewerRoleFromFacts(facts: ViewerRoleFacts): ViewerRole {
   if (facts.hasActiveOps) return 'ops'
   if (facts.hasMerchantProfile) return 'merchant'
   if (facts.hasActiveCreator) return 'creator'
+  if (facts.hasCreatorHandle) return 'creator-pending'
   return 'traveler'
 }

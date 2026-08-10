@@ -19,15 +19,12 @@ export interface AdminBookingsViewProps {
   ) => Promise<ActionResult<{ id: string }>>
 }
 
-// NOTE: `admin_cancel_and_refund_booking` (Task 6) needs `stripePaymentIntentId`
-// (and `bookings.status`) to fire, but `OpsBookingSettlementRow` /
-// `listOpsBookingSettlements` only carry booking-settlement fields — there is no
-// clean way to wire a real "Cancel & refund" button from this row shape yet.
-// This is a documented, accepted deferral (confirmed in Task 6's review), not
-// an oversight: this first cut only ships the settlement-status ("mark paid")
-// side of the UI. `adminCancelAndRefundBookingAction` already exists in
-// lib/bookings/actions.ts and can be wired here once a query change adds the
-// missing fields keyed by bookingId.
+// NOTE: this first cut only ships the settlement-status ("mark paid") side of
+// the UI. `adminCancelAndRefundBookingAction` already exists in
+// lib/bookings/actions.ts and now takes only `{ bookingId, reason }` — it
+// resolves the payment intent and validates the booking's status server-side —
+// so wiring a "Cancel & refund" button here needs nothing from this row shape
+// beyond a booking id.
 export function AdminBookingsView({ t, settlements, onMarkPaid }: AdminBookingsViewProps) {
   const [rows, setRows] = useState(settlements)
   const [reasons, setReasons] = useState<Record<string, string>>({})

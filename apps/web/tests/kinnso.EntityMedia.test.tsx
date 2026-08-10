@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import { entityMediaHue, isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 
@@ -25,7 +25,7 @@ describe('entity media policy', () => {
 describe('EntityMedia', () => {
   it('renders a decorative placeholder when media is absent', () => {
     const { container } = render(
-      <EntityMedia src={null} title="Tokyo ramen" location="Tokyo" alt="Tokyo ramen" sizes="100vw" />,
+      <EntityMedia src={null} title="Tokyo ramen" location="Tokyo" sizes="100vw" />,
     )
 
     const placeholder = container.querySelector('[data-media-placeholder="true"]')
@@ -40,12 +40,28 @@ describe('EntityMedia', () => {
         src="https://cdn.kinnso.ai/guides/tokyo-ramen.jpg"
         title="Tokyo ramen"
         location="Tokyo"
-        alt="Tokyo ramen bowl"
         sizes="100vw"
       />,
     )
 
-    expect(screen.getByRole('img', { name: 'Tokyo ramen bowl' })).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'Tokyo ramen' })).toBeTruthy()
     expect(container.querySelector('[data-media-placeholder="true"]')).toBeNull()
+  })
+  it('uses the decorative placeholder when an approved image fails to load', () => {
+    const { container } = render(
+      <EntityMedia
+        src="https://cdn.kinnso.ai/guides/tokyo-ramen.jpg"
+        title="Tokyo ramen"
+        location="Tokyo"
+        sizes="100vw"
+      />,
+    )
+
+    fireEvent.error(screen.getByRole('img', { name: 'Tokyo ramen' }))
+
+    const placeholder = container.querySelector('[data-media-placeholder="true"]')
+    expect(placeholder).toBeTruthy()
+    expect(placeholder?.getAttribute('aria-hidden')).toBe('true')
+    expect(screen.queryByRole('img')).toBeNull()
   })
 })

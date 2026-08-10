@@ -1,12 +1,5 @@
 import { expect, test } from '@playwright/test'
-
-const forbidden = [
-  'picsum.photos',
-  'example.com',
-  'maps.example',
-  'jane doe',
-  'lorem ipsum',
-] as const
+import { findForbiddenPlaceholderTokens } from '@kinnso/honesty'
 
 const routes = [
   '/en',
@@ -25,8 +18,8 @@ for (const route of routes) {
     const response = await page.goto(route)
     expect(response?.status(), `${route} should return HTTP 200`).toBe(200)
 
-    const html = (await page.content()).toLowerCase()
-    for (const token of forbidden) expect(html).not.toContain(token)
+    const html = await page.content()
+    expect(findForbiddenPlaceholderTokens(html), `${route} must not render placeholder content`).toEqual([])
 
     if (route === '/en') {
       const guide = page.locator(`a[href="${smokeGuide.href}"]`).first()

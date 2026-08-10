@@ -1144,12 +1144,32 @@ d('mission schema RLS', () => {
   it('ops can delete an empty Travelpayouts mission for rollback', async () => {
     let opsRollbackMissionId = ''
 
+    // `missions_tp_program_uniq` is a partial unique index allowing ONE
+    // travelpayouts mission per affiliate program, and the suite fixture
+    // already holds that slot for `affiliateProgramId`. This case therefore
+    // needs a program of its own — reusing the shared one can never insert.
+    const rollbackProgram = await svc
+      .from('affiliate_network_programs')
+      .upsert(
+        {
+          network: 'travelpayouts',
+          external_program_id: 'tp-rls-rollback-program',
+          program_name: 'Travelpayouts RLS Rollback Program',
+          status: 'active',
+        },
+        { onConflict: 'network,external_program_id' },
+      )
+      .select('id')
+      .single()
+    expect(rollbackProgram.error).toBeNull()
+    const rollbackProgramId = rollbackProgram.data!.id
+
     try {
       const mission = await svc
         .from('missions')
         .insert({
           created_by_ops_member_id: opsMemberId,
-          affiliate_network_program_id: affiliateProgramId,
+          affiliate_network_program_id: rollbackProgramId,
           title: 'Ops rollback Travelpayouts mission',
           summary: 'Ops can roll back empty Travelpayouts missions',
           mission_source: 'travelpayouts',
@@ -1173,6 +1193,11 @@ d('mission schema RLS', () => {
       if (opsRollbackMissionId) {
         await runPsql(`delete from public.missions where id = ${sqlString(opsRollbackMissionId)};`)
       }
+      // Drop the dedicated program too, so a re-run starts from the same state
+      // whether or not the assertions above got as far as deleting the mission.
+      await runPsql(
+        `delete from public.affiliate_network_programs where id = ${sqlString(rollbackProgramId)};`,
+      )
     }
   }, testTimeout)
 })

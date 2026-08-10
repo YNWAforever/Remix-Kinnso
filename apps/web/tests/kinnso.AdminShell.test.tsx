@@ -4,7 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
-vi.mock('next/navigation', () => ({ usePathname: () => '/en/admin' }))
+let pathname = '/en/admin'
+vi.mock('next/navigation', () => ({ usePathname: () => pathname }))
 
 import { AdminShell } from '@/components/kinnso/admin/AdminShell'
 import { AdminDashboardView } from '@/components/kinnso/admin/AdminDashboardView'
@@ -17,7 +18,22 @@ describe('AdminShell', () => {
     expect((screen.getByRole('link', { name: en.admin.navUsers }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/users')
     expect((screen.getByRole('link', { name: en.admin.navCreators }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/creators')
     expect((screen.getByRole('link', { name: en.admin.navTestimonials }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/testimonials')
+    expect((screen.getByRole('link', { name: en.admin.navEnquiries }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/enquiries')
+    expect((screen.getByRole('link', { name: en.admin.navAnalytics }) as HTMLAnchorElement).getAttribute('href')).toBe('/en/admin/analytics')
     expect(screen.getByText('child-content')).toBeTruthy()
+  })
+
+  it('highlights only the exact enquiries route', () => {
+    pathname = '/en/admin/enquiries'
+    render(<AdminShell locale="en" t={en.admin}><p>child-content</p></AdminShell>)
+    expect(screen.getByRole('link', { name: en.admin.navEnquiries }).getAttribute('aria-current')).toBe('page')
+    expect(screen.getByRole('link', { name: en.admin.navDashboard }).getAttribute('aria-current')).toBeNull()
+  })
+
+  it('highlights the analytics route', () => {
+    pathname = '/en/admin/analytics'
+    render(<AdminShell locale="en" t={en.admin}><p>child-content</p></AdminShell>)
+    expect(screen.getByRole('link', { name: en.admin.navAnalytics }).getAttribute('aria-current')).toBe('page')
   })
 })
 

@@ -105,20 +105,28 @@ export function LiveProgress({
   const [elapsed, setElapsed] = useState(0)
   const jobIdRef = useRef<string | null>(jobId)
   const readyFiredRef = useRef(false)
+  const scanStartRef = useRef<Promise<string | null> | null>(null)
+  // Single owner for the live subscription's disposer. Both the mount effect
+  // and retry() re-subscribe, and a subscription that outlives its job keeps
+  // polling it: reconcileJob arbitrates purely by status rank, with no job-id
+  // check, so a stale poller on the FAILED job would immediately drag a fresh
+  // retry back to 'failed'.
+  const cleanupRef = useRef<(() => void) | undefined>(undefined)
 
-  const applyJob = useCallback(
-    (incoming: JobRow | null) => {
-      setJob((prev) => {
-        const next = reconcileJob(prev, incoming)
-        if (next && next.status === 'ready' && !readyFiredRef.current) {
-          readyFiredRef.current = true
-          onReady(next.id)
-        }
-        return next
-      })
-    },
-    [onReady],
-  )
+  // Pure: React invokes a state updater during the render phase whenever an
+  // update is already queued (it only evaluates a lone one eagerly at dispatch).
+  // onReady is a parent side effect — WizardClient calls router.refresh() and
+  // setStep from it — so firing it in here updated the parent and the Router
+  // mid-render. The ready hand-off belongs in an effect, below.
+  const applyJob = useCallback((incoming: JobRow | null) => {
+    setJob((prev) => reconcileJob(prev, incoming))
+  }, [])
+
+  useEffect(() => {
+    if (job?.status !== 'ready' || readyFiredRef.current) return
+    readyFiredRef.current = true
+    onReady(job.id)
+  }, [job, onReady])
 
   // POST a fresh scan to the worker; returns the jobId or sets a notice.
   const startScan = useCallback(async (path: string): Promise<string | null> => {
@@ -206,24 +214,38 @@ export function LiveProgress({
     [applyJob],
   )
 
+  // Dispose whatever subscription is currently live, then attach a new one.
+  const resubscribe = useCallback(
+    (id: string) => {
+      cleanupRef.current?.()
+      cleanupRef.current = subscribeAndSelect(id)
+    },
+    [subscribeAndSelect],
+  )
+
   useEffect(() => {
-    let cleanup: (() => void) | undefined
     let cancelled = false
     ;(async () => {
       let id = jobIdRef.current
       if (!id) {
-        id = await startScan('/scan')
+        // React Strict Mode replays effects in development. Share the in-flight
+        // request across that replay so one click creates exactly one scan job.
+        const pendingStart = scanStartRef.current ?? startScan('/scan')
+        scanStartRef.current = pendingStart
+        id = await pendingStart
+        if (scanStartRef.current === pendingStart) scanStartRef.current = null
         if (!id || cancelled) return
         jobIdRef.current = id
       }
-      cleanup = subscribeAndSelect(id)
+      resubscribe(id)
     })()
     return () => {
       cancelled = true
-      cleanup?.()
+      cleanupRef.current?.()
+      cleanupRef.current = undefined
     }
     // creatorId is included so a different creator remounts the subscription.
-  }, [creatorId, startScan, subscribeAndSelect])
+  }, [creatorId, startScan, resubscribe])
 
   // Tick the elapsed-seconds counter once per second; stop once the job reaches a
   // terminal state or a notice blocks the scan.
@@ -240,10 +262,15 @@ export function LiveProgress({
     readyFiredRef.current = false
     setNotice('none')
     setJob(null)
+    // Drop the failed job's subscription before the request, not after: its
+    // 2s poller would otherwise keep re-applying status 'failed' over the
+    // retry we are about to start.
+    cleanupRef.current?.()
+    cleanupRef.current = undefined
     const newId = await startScan(`/scan/${id}/retry`)
     if (newId) {
       jobIdRef.current = newId
-      subscribeAndSelect(newId)
+      resubscribe(newId)
     }
   }
 
@@ -266,6 +293,7 @@ export function LiveProgress({
       <div
         className="h-1.5 w-full overflow-hidden rounded-full bg-kinnso-ink/10"
         role="progressbar"
+        aria-label={t.heading}
         aria-valuenow={barPct}
         aria-valuemin={0}
         aria-valuemax={100}

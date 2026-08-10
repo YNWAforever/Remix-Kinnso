@@ -4,6 +4,9 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getMerchantBySlug } from '@/lib/merchants/public-queries'
 import { listPublishedExperiencesForMerchant } from '@/lib/experiences/public-queries'
+import { getAttributedGuidesForMerchant } from '@/lib/guides/queries'
+import { optionalEnrichmentQuery } from '@/lib/resilience/optional'
+import { resolveConfiguredProductState } from '@/lib/product-state-config'
 import { buildMerchantMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { merchantProfileJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
@@ -27,7 +30,11 @@ export default async function MerchantPublicProfilePage({ params }: { params: Pr
   const messages = await getDictionary(locale as Locale)
   const merchant = await getMerchantBySlug(slug)
   if (!merchant) notFound()
-  const experiences = await listPublishedExperiencesForMerchant(merchant.id)
+  const { bookingLive } = resolveConfiguredProductState()
+  const [experiences, featuredGuides] = await Promise.all([
+    listPublishedExperiencesForMerchant(merchant.id),
+    optionalEnrichmentQuery('merchant-featured-guides', () => getAttributedGuidesForMerchant(merchant.id), []),
+  ])
   const canonical = `${SITE_URL}/${locale}/m/${slug}`
   const ld = [
     merchantProfileJsonLd({ name: merchant.companyName, url: canonical, tagline: merchant.tagline, city: merchant.city }),
@@ -40,7 +47,7 @@ export default async function MerchantPublicProfilePage({ params }: { params: Pr
   return (
     <>
       <JsonLd data={ld} />
-      <PublicMerchantProfileView locale={locale as Locale} t={messages.merchantProfile} merchant={merchant} experiences={experiences} />
+      <PublicMerchantProfileView locale={locale as Locale} t={messages.merchantProfile} enquiry={messages.enquiry} booking={messages.booking} merchant={merchant} experiences={experiences} featuredGuides={featuredGuides} bookingLive={bookingLive} />
     </>
   )
 }

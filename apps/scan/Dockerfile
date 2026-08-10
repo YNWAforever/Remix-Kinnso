@@ -13,6 +13,13 @@ FROM node:22-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+# Pin corepack's cache to a shared path instead of $HOME/.cache. The image
+# installs as root but RUNS as `node` (see the runner stage), and railway.json
+# pins `startCommand: pnpm --filter @kinnso/scan-app start` — so the pnpm that
+# corepack downloaded at build time must still be resolvable, and writable-free,
+# for the unprivileged user. Without this it lands in /root/.cache and the
+# container would try to re-download pnpm at boot.
+ENV COREPACK_HOME=/corepack
 RUN corepack enable
 
 # 1. Prune the monorepo down to scan-app + its workspace dependencies.
@@ -27,6 +34,15 @@ WORKDIR /app
 COPY --from=pruner /app/out/json/ ./
 RUN pnpm install --frozen-lockfile
 COPY --from=pruner /app/out/full/ ./
+
+# Drop root. This process parses attacker-influenced third-party scraper JSON
+# while holding the Supabase service-role key and the paid-API keys in its
+# environment, so a code-execution bug must not land as uid 0. `node` is the
+# unprivileged user the base image already ships. devDependencies are kept
+# installed on purpose — `start` runs the TypeScript entrypoint through `tsx`,
+# which lives there.
+RUN mkdir -p /corepack && chown -R node:node /app /corepack
+USER node
 
 # The worker binds 0.0.0.0:$PORT — Railway injects PORT; 8788 is the local fallback.
 ENV PORT=8788

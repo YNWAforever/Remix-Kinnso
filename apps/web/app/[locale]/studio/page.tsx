@@ -6,6 +6,8 @@ import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { DnaSchema, type Dna, type Platform } from '@kinnso/scan'
 import { buildStudioIdentity, type HandleRow } from '@/lib/studio/identity'
 import { computeReadiness, REQUIRED_PLATFORMS } from '@/lib/studio/readiness'
+import { deriveStudioNextAction } from '@/lib/studio/next-action'
+import { directoryGaps, isDirectoryListed } from '@/lib/creators/eligibility'
 import { listCreatorMerchantMissions, listAffiliateOffers, listCreatorSettlements } from '@/lib/missions/queries'
 import { getCreatorContribution } from '@/lib/contribution/queries'
 import { summarizeCreatorEarnings, toCreatorEarningItem, type CreatorSettlementRow } from '@/lib/missions/earnings'
@@ -37,7 +39,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
   // too, so status is the real check.
   const { data: creatorRow } = await supabase
     .from('creators')
-    .select('display_name, status')
+    .select('display_name, status, handle, public_profile, is_listed')
     .eq('id', user.id)
     .single()
   if (!creatorRow || creatorRow.status !== 'active') redirect(`/${loc}/creator`)
@@ -56,7 +58,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
 
   const [handleRes, guidesRes, activeJobRes, missionsRes, offersRes, settlementsRes, contribution] = await Promise.all([
     supabase.from('creator_social_handles').select('platform, handle, url').eq('creator_id', user.id),
-    supabase.from('guides').select('id').eq('creator_id', user.id),
+    supabase.from('guides').select('id, status').eq('creator_id', user.id),
     supabase.from('creator_scan_jobs').select('id, status').eq('creator_id', user.id).in('status', ['queued', 'fetching', 'analyzing']).limit(1).maybeSingle(),
     listCreatorMerchantMissions(supabase),
     listAffiliateOffers(supabase),
@@ -93,6 +95,36 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
     ((settlementsRes.data ?? []) as unknown as CreatorSettlementRow[]).map(toCreatorEarningItem),
   )
 
+  // Derived from the snapshot above; deliberately no extra round trip on a page
+  // that already issues seven.
+  // Same rule the public directory enforces, shared rather than restated. Note it
+  // counts PUBLISHED guides: the checklist's write-a-guide item counts drafts too,
+  // so a creator can satisfy that and still not be listed.
+  const eligibility = {
+    status: creatorRow.status,
+    handle: creatorRow.handle,
+    publicProfile: creatorRow.public_profile,
+    publishedGuideCount: (guidesRes.data ?? []).filter((g) => g.status === 'published').length,
+    isListed: creatorRow.is_listed,
+  }
+  const directory = {
+    listed: isDirectoryListed(eligibility),
+    gaps: directoryGaps(eligibility),
+  }
+
+  const nextAction = deriveStudioNextAction({
+    handleCount: handles.length,
+    missingPlatformCount: missingPlatforms.length,
+    guidesCount: (guidesRes.data ?? []).length,
+    activeScanJob: Boolean(activeJobRes.data?.id),
+    affiliateOfferCount: offers.length,
+    hasEarnings: earnings.length > 0,
+    dnaStale: Boolean(
+      readiness.items.find((i) => i.id === 'dna-fresh')?.detail.freshness?.stale,
+    ),
+  })
+
+
   return (
     <StudioDashboardView
       locale={loc}
@@ -104,6 +136,8 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
       dna={dna}
       lastScanned={updatedAt}
       readiness={readiness}
+      nextAction={nextAction}
+      directory={directory}
       opportunities={opportunities}
       earnings={earnings}
       platforms={handles.map((h) => h.platform)}

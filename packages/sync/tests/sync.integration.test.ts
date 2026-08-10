@@ -26,8 +26,11 @@ run('sync integration', () => {
   it('upserts an article with translations, faqs, tags, map (idempotent)', async () => {
     const up = new Upserter(svc as any, 'https://cdn.x')
     const payload = transformPost(legacyPost, 'https://cdn.x')
-    await up.upsert(payload)
-    await up.upsert(payload) // second run = no-op via source_hash
+    expect((await up.upsert(payload)).skipped).toBe(false)
+    // Second run must be a real no-op. This asserts against the LIVE PostgREST timestamp
+    // format (`+00:00`, no milliseconds), which is the only place the skip's timestamp
+    // comparison is exercised end to end.
+    expect((await up.upsert(payload)).skipped).toBe(true)
 
     const { data: a } = await svc.from('articles').select('id, category, views, source_hash').eq('legacy_post_id', LEGACY_ID).single()
     expect(a!.category).toBe('dining')

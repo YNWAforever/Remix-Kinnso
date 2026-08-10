@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import LocaleSwitcher from "@/components/kinnso/LocaleSwitcher";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { ViewerRole } from "@/lib/auth/viewer-role";
 import type { Locale } from "@/lib/i18n/config";
 import type { Messages } from "@/lib/i18n/messages/en";
@@ -20,7 +21,7 @@ import type { Messages } from "@/lib/i18n/messages/en";
  * chrome is gated at xl: (tablets get the hamburger) so the row never overflows
  * at 768–1100px.
  */
-export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: boolean; t: Messages["nav"] }> = ({ locale, role, sessionsLive, t }) => {
+export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: boolean; dashboardLabel: string; t: Messages["nav"] }> = ({ locale, role, sessionsLive, dashboardLabel, t }) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const p = (path: string) => `/${locale}${path}`;
@@ -54,14 +55,24 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
     if (role === "creator") return { label: t.ctaOpenStudio, to: "/studio", className: "k2-btn-primary" };
     if (role === "creator-pending") return { label: t.ctaPending, to: "/creators/apply", className: "inline-flex min-h-[44px] items-center rounded-[3px] bg-kinnso-cream2 px-4 py-2 text-sm font-semibold text-kinnso-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange" };
     if (role === "merchant") return { label: t.ctaPostMission, to: "/merchants/dashboard/post", className: "k2-btn-primary" };
+    if (role === "ops") return { label: dashboardLabel, to: "/admin", className: "k2-btn-primary" };
     if (role === "traveler") return { label: t.ctaMyTrips, to: "/trips", className: "k2-btn-primary" };
-    return { label: t.ctaApply, to: "/sign-up", className: "k2-btn-primary" };
+    return { label: t.signUp, to: "/sign-up", className: "k2-btn-primary" };
   })();
 
-  const forMerchantsHref = p("/for-merchants");
+  // Audience links remain visible to complementary roles; anonymous viewers see both and the neutral sign-up CTA.
+  const audienceAnchors = [
+    ...(
+      role === "creator" || role === "creator-pending"
+        ? []
+        : [{ to: "/for-creators", label: t.linkForCreators }]
+    ),
+    ...(role === "merchant" ? [] : [{ to: "/for-merchants", label: t.linkForMerchants }]),
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
+      <Dialog open={open} onOpenChange={setOpen}>
       <div className="k2-container flex h-16 items-center justify-between gap-4">
         <Link href={p("")} aria-label="KINNSO" className="flex items-baseline gap-1.5">
           <span className="k2-display text-2xl font-semibold tracking-tight text-kinnso-ink">KINNSO</span>
@@ -80,17 +91,23 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
         </nav>
 
         <div className="hidden items-center gap-3 xl:flex">
-          {role !== "merchant" && (
-            <Link
-              href={forMerchantsHref}
-              aria-current={isActive(forMerchantsHref) ? "page" : undefined}
-              className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
-                isActive(forMerchantsHref) ? "text-kinnso-orangeDark underline underline-offset-8 decoration-2 decoration-kinnso-orangeDark" : "text-kinnso-ink/75 hover:text-kinnso-ink"
-              }`}
-            >
-              {t.linkForMerchants}
-            </Link>
-          )}
+          {audienceAnchors.map((anchor) => {
+            const href = p(anchor.to);
+            return (
+              <Link
+                key={anchor.to}
+                href={href}
+                aria-current={isActive(href) ? 'page' : undefined}
+                className={`whitespace-nowrap px-2 py-2 text-sm font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange ${
+                  isActive(href)
+                    ? 'text-kinnso-orangeDark underline underline-offset-8 decoration-2 decoration-kinnso-orangeDark'
+                    : 'text-kinnso-ink/75 hover:text-kinnso-ink'
+                }`}
+              >
+                {anchor.label}
+              </Link>
+            );
+          })}
           <LocaleSwitcher locale={locale} t={t} />
           {role === "anon" && (
             <Link href={p("/sign-in")} className="whitespace-nowrap px-3 py-2 text-sm font-semibold text-kinnso-ink transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">{t.signIn}</Link>
@@ -98,18 +115,17 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
           <Link href={p(cta.to)} className={cta.className}>{cta.label}</Link>
         </div>
 
-        <button
-          type="button"
-          className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange xl:hidden"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={t.menuToggle}
-          aria-expanded={open}
-          // Only reference the menu region while it is actually in the DOM
-          // (it mounts on open); pointing aria-controls at an absent element is an ARIA error.
-          aria-controls={open ? "kinnso-mobile-menu" : undefined}
-        >
-          {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-        </button>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange xl:hidden"
+            aria-label={t.menuToggle}
+            aria-expanded={open}
+            aria-controls={open ? "kinnso-mobile-menu" : undefined}
+          >
+            <Menu aria-hidden="true" />
+          </button>
+        </DialogTrigger>
       </div>
 
       {role === "merchant" && (
@@ -127,8 +143,12 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
         </nav>
       )}
 
-      {open && (
-        <div id="kinnso-mobile-menu" className="border-t border-kinnso-edge bg-kinnso-cream xl:hidden">
+        <DialogContent
+          id="kinnso-mobile-menu"
+          aria-describedby={undefined}
+          className="top-16 bottom-0 left-0 right-0 max-h-[calc(100dvh-4rem)] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-none border-x-0 border-b-0 bg-kinnso-cream p-0 xl:hidden"
+        >
+          <DialogTitle className="sr-only">{t.menuToggle}</DialogTitle>
           <div className="k2-container flex flex-col gap-1 py-3">
             <nav aria-label={t.menuToggle} className="flex flex-col gap-1">
               {trayAnchors.map((a) => (
@@ -136,11 +156,16 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
                   {a.label}
                 </Link>
               ))}
-              {role !== "merchant" && (
-                <Link href={forMerchantsHref} onClick={() => setOpen(false)} className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso-ink/75 transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange">
-                  {t.linkForMerchants}
+              {audienceAnchors.map((anchor) => (
+                <Link
+                  key={anchor.to}
+                  href={p(anchor.to)}
+                  onClick={() => setOpen(false)}
+                  className="whitespace-nowrap px-3 py-2 text-sm font-medium text-kinnso-ink/75 transition hover:text-kinnso-orangeDark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange"
+                >
+                  {anchor.label}
                 </Link>
-              )}
+              ))}
             </nav>
             <div className="mt-2 flex items-center justify-between gap-3">
               <LocaleSwitcher locale={locale} t={t} />
@@ -152,8 +177,8 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </header>
   );
 };

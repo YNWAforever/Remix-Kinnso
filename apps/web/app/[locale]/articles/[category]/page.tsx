@@ -1,13 +1,15 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { searchArticles } from '@/lib/articles/queries'
+import { searchArticles, getIndexableCategoryLocales } from '@/lib/articles/queries'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { isLocale, toDbCategory, LOCALES, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
+import { isLocale, toDbCategory, URL_CATEGORIES, type Locale, type UrlCategory } from '@/lib/i18n/config'
 import { buildListingMetadata } from '@/lib/seo/metadata'
 import { ArticleCard } from '@/components/ArticleCard'
 import { Pagination } from '@/components/Pagination'
 
-export const revalidate = 1800 // 30 min
+// 30 min preferred; the parent locale layout caps the effective route ISR at
+// about five minutes. See app/[locale]/layout.tsx.
+export const revalidate = 1800
 
 export function generateStaticParams() {
   return URL_CATEGORIES.map((category) => ({ category }))
@@ -16,14 +18,23 @@ export function generateStaticParams() {
 type Params = Promise<{ locale: string; category: string }>
 type Search = Promise<{ page?: string; q?: string; region?: string; tag?: string }>
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Params },
+): Promise<Metadata> {
   const { locale, category } = await params
-  if (!isLocale(locale) || !toDbCategory(category)) return {}
-  const dict = await getDictionary(locale as Locale)
+  const dbCategory = toDbCategory(category)
+  if (!isLocale(locale) || !dbCategory) return {}
+  const [dict, presentLocales] = await Promise.all([
+    getDictionary(locale),
+    getIndexableCategoryLocales(dbCategory),
+  ])
   return buildListingMetadata({
-    urlCategory: category as UrlCategory, locale: locale as Locale,
-    presentLocales: LOCALES,
+    urlCategory: category as UrlCategory,
+    locale,
+    presentLocales,
     title: dict.categories[category as UrlCategory],
+    description: dict.seo.articles.descriptionBookingWaitlist,
+    index: presentLocales.includes(locale),
   })
 }
 

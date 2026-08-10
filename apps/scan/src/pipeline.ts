@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import {
   normalize,
@@ -221,8 +221,12 @@ export async function runScan(deps: ScanDeps, jobId: string): Promise<void> {
   try {
     await upsertDna(db, creatorId, jobId, parsed.dna, rawSnapshots, model, thin, progress)
   } catch (upsertErr) {
+    // The raw PostgREST/Postgres error names tables, columns and constraints,
+    // and `job.error` is owner-readable via RLS — so keep the detail in the
+    // server logs and store a generic message, exactly as the parse path above.
+    console.error('[scan] DNA upsert failed', jobId, (upsertErr as Error).message)
     await setJobStatus(db, jobId, 'failed', {
-      error: `DNA upsert failed: ${(upsertErr as Error).message}`,
+      error: 'Could not save the analysis result, please retry.',
       completed_at: new Date().toISOString(),
     })
     return

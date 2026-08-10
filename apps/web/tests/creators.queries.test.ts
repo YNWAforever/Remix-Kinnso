@@ -4,20 +4,24 @@ const state = vi.hoisted(() => ({
   creators: [] as unknown[],
   guides: [] as unknown[],
   single: null as unknown,
+  selects: [] as string[],
+  creatorError: null as unknown,
+  creatorErrors: [] as unknown[],
+  guideError: null as unknown,
 }))
 
 vi.mock('@/lib/supabase/public', () => {
-  const make = (resolveData: () => unknown, single?: () => unknown) => {
+  const make = (resolveData: () => unknown, resolveError: () => unknown, single?: () => unknown) => {
     const builder: Record<string, unknown> = {
-      select: () => builder,
+      select: (columns: string) => { state.selects.push(columns); return builder },
       eq: () => builder,
       not: () => builder,
       in: () => builder,
       // queries chain one or more .order() calls, then await the builder (thenable)
       order: () => builder,
-      maybeSingle: async () => ({ data: single ? single() : null }),
+      maybeSingle: async () => ({ data: single ? single() : null, error: resolveError() }),
       then: (onF: (v: { data: unknown }) => unknown) =>
-        Promise.resolve({ data: resolveData() }).then(onF),
+        Promise.resolve({ data: resolveData(), error: resolveError() }).then(onF),
     }
     return builder
   }
@@ -25,13 +29,20 @@ vi.mock('@/lib/supabase/public', () => {
     createSupabasePublicClient: () => ({
       from: (table: string) =>
         table === 'creators'
-          ? make(() => state.creators, () => state.single)
-          : make(() => state.guides),
+          ? make(
+              () => state.creators,
+              () =>
+                state.creatorErrors.length > 0
+                  ? state.creatorErrors.shift()
+                  : state.creatorError,
+              () => state.single,
+            )
+          : make(() => state.guides, () => state.guideError),
     }),
   }
 })
 
-import { getPublicCreators, getCreatorByHandle, getCreatorPublicNames, getCreatorsForSitemap } from '@/lib/creators/queries'
+import { getPublicCreators, getCreatorByHandle, getCreatorPublicNames, getCreatorsForSitemap, getPublishedGuidesForCreator } from '@/lib/creators/queries'
 
 const creatorRow = {
   id: 'c1',
@@ -54,6 +65,10 @@ beforeEach(() => {
   state.creators = []
   state.guides = []
   state.single = null
+  state.selects = []
+  state.creatorError = null
+  state.creatorErrors = []
+  state.guideError = null
 })
 
 describe('getPublicCreators', () => {
@@ -96,7 +111,7 @@ describe('getCreatorByHandle', () => {
     expect((await getCreatorByHandle('hidden'))?.handle).toBe('hidden')
   })
 
-  it('returns a PublicCreator with projection + published guides', async () => {
+  it('keeps the core creator independent from its published guides enrichment', async () => {
     state.single = creatorRow
     state.guides = [
       { slug: 'osaka', title: 'Osaka', cover_url: 'x', city: 'Osaka', saves_count: 3, creator_handle: 'maya' },
@@ -104,8 +119,81 @@ describe('getCreatorByHandle', () => {
     const creator = await getCreatorByHandle('maya')
     expect(creator?.handle).toBe('maya')
     expect(creator?.profile.platforms[0]).toEqual({ platform: 'instagram', verified: false })
-    expect(creator?.guides).toHaveLength(1)
-    expect(creator?.guides[0].slug).toBe('osaka')
+    expect(creator?.guides).toEqual([])
+    expect((await getPublishedGuidesForCreator('c1'))[0].slug).toBe('osaka')
+  })
+
+  it('throws an explicit Supabase error from the creator guides query', async () => {
+    const error = { code: 'PGRST205', message: 'guides schema unavailable' }
+    state.guideError = error
+    await expect(getPublishedGuidesForCreator('c1')).rejects.toBe(error)
+  })
+
+  it('selects a stable creator id and avatar URL and only retains real follower counts', async () => {
+    state.single = {
+      ...creatorRow,
+      avatar_url: 'https://images.example.test/maya.jpg',
+      public_profile: {
+        ...creatorRow.public_profile,
+        platforms: [
+          { platform: 'instagram', verified: true, followers: 12500 },
+          { platform: 'youtube', verified: false, followers: -1 },
+          { platform: 'threads', verified: false, followers: Number.POSITIVE_INFINITY },
+        ],
+      },
+    }
+
+    const creator = await getCreatorByHandle('maya')
+
+    expect(state.selects[0]).toContain('id')
+    expect(state.selects[0]).toContain('avatar_url')
+    expect(creator).toMatchObject({ id: 'c1', avatarUrl: 'https://images.example.test/maya.jpg' })
+    expect(creator?.profile.platforms).toEqual([
+      { platform: 'instagram', verified: true, followers: 12500 },
+      { platform: 'youtube', verified: false },
+      { platform: 'threads', verified: false },
+    ])
+  })
+
+  it('retries without avatar_url when production has not applied the R7.7 column yet', async () => {
+    state.single = creatorRow
+    state.creatorErrors = [
+      { code: '42703', message: 'column creators.avatar_url does not exist' },
+      null,
+    ]
+
+    const creator = await getCreatorByHandle('maya')
+
+    expect(state.selects).toEqual([
+      expect.stringContaining('avatar_url'),
+      expect.not.stringContaining('avatar_url'),
+    ])
+    expect(creator).toMatchObject({ id: 'c1', avatarUrl: null })
+  })
+
+  it('does not hide unrelated creator query errors behind the compatibility retry', async () => {
+    const error = { code: '42703', message: 'column creators.public_profile does not exist' }
+    state.creatorErrors = [error]
+
+    await expect(getCreatorByHandle('maya')).rejects.toBe(error)
+    expect(state.selects).toHaveLength(1)
+  })
+
+  it('requires both the missing-column code and exact avatar column message', async () => {
+    const error = { code: 'PGRST204', message: 'column creators.avatar_url does not exist' }
+    state.creatorErrors = [error]
+
+    await expect(getCreatorByHandle('maya')).rejects.toBe(error)
+    expect(state.selects).toHaveLength(1)
+  })
+
+  it('propagates an error from the legacy-schema fallback query', async () => {
+    const missingAvatar = { code: '42703', message: 'column creators.avatar_url does not exist' }
+    const fallbackError = { code: '42501', message: 'permission denied for creators' }
+    state.creatorErrors = [missingAvatar, fallbackError]
+
+    await expect(getCreatorByHandle('maya')).rejects.toBe(fallbackError)
+    expect(state.selects).toHaveLength(2)
   })
 
   it('returns null for an unknown handle', async () => {
@@ -139,7 +227,10 @@ describe('getCreatorPublicNames', () => {
 
 describe('getCreatorsForSitemap', () => {
   it('returns active handles with a lastmod', async () => {
-    state.creators = [{ id: 'c1', is_listed: true, handle: 'maya', created_at: '2026-06-03T00:00:00Z' }]
+    // Built from creatorRow because the query selects public_profile and filters
+    // `.not('public_profile','is',null)` — a row without one cannot come back from
+    // the database, and the shared eligibility predicate rejects it.
+    state.creators = [{ ...creatorRow, is_listed: true, created_at: '2026-06-03T00:00:00Z' }]
     const rows = await getCreatorsForSitemap()
     expect(rows).toEqual([{ handle: 'maya', lastmod: '2026-06-03T00:00:00Z' }])
   })

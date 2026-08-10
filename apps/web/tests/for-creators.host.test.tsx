@@ -13,6 +13,7 @@ describe('ForCreatorsView', () => {
     const applyLinks = screen.getAllByRole('link', { name: en.forCreators.heroCtaPrimary })
     expect(applyLinks[0].getAttribute('href')).toBe('/en/sign-up')
     expect(document.getElementById('for-creators-testimonials')).toBeNull()
+    expect(screen.getByText(en.forCreators.ctaBody).className).toContain('text-white/90')
   })
 
   it('shows the testimonials strip when quotes exist', () => {

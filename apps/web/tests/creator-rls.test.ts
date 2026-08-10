@@ -62,16 +62,14 @@ d('creator schema RLS', () => {
   })
 
   // ────────────────────────────────────────────────────────────────────
-  // 2. Anon sees NOTHING in any creator table (no anon grant + RLS)
+  // 2. Anon cannot read the private onboarding creator or private creator tables
   // ────────────────────────────────────────────────────────────────────
-  it('anon cannot read creators', async () => {
-    const { data, error } = await anon.from('creators').select('id')
-    // anon has NO table grant on the creator tables, so PostgreSQL raises
-    // 42501 permission denied BEFORE RLS runs: `error` is non-null and `data`
-    // is null. (Unlike `articles`, which DOES grant anon SELECT and returns an
-    // empty filtered set.) Assert the negative: anon receives no rows, whether
-    // the block is a permission error or an empty set.
-    expect(error === null ? (data ?? []).length === 0 : /permission denied|42501/i.test(error.message)).toBe(true)
+  it('anon cannot read the private onboarding creator', async () => {
+    const { data, error } = await anon.from('creators').select('id').eq('id', userId)
+    // Published public profiles are intentionally anon-readable. The newly
+    // created onboarding row must still be filtered by RLS.
+    expect(error).toBeNull()
+    expect(data).toEqual([])
   })
 
   it('anon cannot read creator_social_handles', async () => {
@@ -106,10 +104,13 @@ d('creator schema RLS', () => {
       global: { headers: { Authorization: `Bearer ${accessToken}` } },
     })
 
-    const { data, error } = await owner.from('creators').select('id, status')
+    const { data, error } = await owner
+      .from('creators')
+      .select('id, status')
+      .eq('id', userId)
+      .single()
     expect(error).toBeNull()
-    expect((data ?? []).length).toBe(1)
-    expect(data![0].id).toBe(userId)
+    expect(data?.id).toBe(userId)
 
     // Sign out (cleanup session, not strictly necessary but tidy)
     await anon.auth.signOut()
@@ -138,6 +139,58 @@ d('creator schema RLS', () => {
     const { data } = await owner.from('creators').select('display_name').eq('id', userId).single()
     expect(data!.display_name).toBe('SP2 Test Creator')
 
+    await anon.auth.signOut()
+  })
+
+  // ────────────────────────────────────────────────────────────────────
+  // 3b. Trust columns: an owner may finish onboarding, but may not moderate
+  //     themselves (status out of suspended/banned, or the verified badge).
+  // ────────────────────────────────────────────────────────────────────
+  async function ownerClient() {
+    const { data: session } = await anon.auth.signInWithPassword({
+      email: TEST_EMAIL,
+      password: TEST_PASSWORD,
+    })
+    return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+      global: { headers: { Authorization: `Bearer ${session.session!.access_token}` } },
+    })
+  }
+
+  it('owner can complete onboarding themselves (onboarding → active)', async () => {
+    await svc.from('creators').update({ status: 'onboarding' }).eq('id', userId)
+    const owner = await ownerClient()
+
+    const { error } = await owner.from('creators').update({ status: 'active' }).eq('id', userId)
+    expect(error).toBeNull()
+
+    const { data } = await svc.from('creators').select('status').eq('id', userId).single()
+    expect(data!.status).toBe('active')
+    await anon.auth.signOut()
+  })
+
+  it('owner cannot award themselves the verified badge', async () => {
+    const owner = await ownerClient()
+
+    const { error } = await owner.from('creators').update({ verified: true }).eq('id', userId)
+    expect(error).not.toBeNull()
+
+    const { data } = await svc.from('creators').select('verified').eq('id', userId).single()
+    expect(data!.verified).toBe(false)
+    await anon.auth.signOut()
+  })
+
+  it('a suspended owner cannot restore their own status', async () => {
+    await svc.from('creators').update({ status: 'suspended' }).eq('id', userId)
+    const owner = await ownerClient()
+
+    const { error } = await owner.from('creators').update({ status: 'active' }).eq('id', userId)
+    expect(error).not.toBeNull()
+
+    const { data } = await svc.from('creators').select('status').eq('id', userId).single()
+    expect(data!.status).toBe('suspended')
+
+    // Leave the fixture active for any later assertions in this file.
+    await svc.from('creators').update({ status: 'active' }).eq('id', userId)
     await anon.auth.signOut()
   })
 
@@ -212,10 +265,14 @@ d('creator schema RLS', () => {
       global: { headers: { Authorization: `Bearer ${accessToken}` } },
     })
 
-    // INSERT
+    // INSERT — the bare handle, which is the only form the app ever stores:
+    // validateHandle() runs raw input through normalizeHandle(), stripping a
+    // leading '@' and reducing a profile URL to its last path segment, and
+    // HandlesStep persists that normalized value. handleUrl() adds the '@' back
+    // for display, and the scan worker re-adds it when calling YouTube.
     const { data: inserted, error: insertError } = await owner
       .from('creator_social_handles')
-      .insert({ creator_id: userId, platform: 'instagram', handle: '@sp2test' })
+      .insert({ creator_id: userId, platform: 'instagram', handle: 'sp2test' })
       .select('id, handle')
       .single()
 
@@ -229,12 +286,12 @@ d('creator schema RLS', () => {
       .select('id, handle')
       .eq('id', handleId)
       .single()
-    expect(selected!.handle).toBe('@sp2test')
+    expect(selected!.handle).toBe('sp2test')
 
     // UPDATE
     const { error: updateError } = await owner
       .from('creator_social_handles')
-      .update({ handle: '@sp2test_updated' })
+      .update({ handle: 'sp2test_updated' })
       .eq('id', handleId)
     expect(updateError).toBeNull()
 
@@ -251,6 +308,32 @@ d('creator schema RLS', () => {
       .select('id')
       .eq('id', handleId)
     expect((afterDelete ?? []).length).toBe(0)
+
+    await anon.auth.signOut()
+  })
+
+  it('rejects a handle that could be read as a URL or another profile', async () => {
+    // The handle is forwarded to RapidAPI as `username_or_url`, a field that
+    // accepts a full profile URL — so a stored URL would scan someone else's
+    // account. normalizeHandle() strips these client-side, but the browser
+    // writes to PostgREST directly, so the constraint is the real boundary.
+    const owner = await ownerClient()
+
+    for (const handle of [
+      'https://instagram.com/someone-else',
+      'instagram.com/someone-else',
+      '@sp2test',
+      'has space',
+      'a'.repeat(31),
+      '',
+    ]) {
+      const { error } = await owner
+        .from('creator_social_handles')
+        .insert({ creator_id: userId, platform: 'instagram', handle })
+        .select('id')
+      expect(error, `handle ${JSON.stringify(handle)} should have been rejected`).not.toBeNull()
+      expect(error!.code).toBe('23514')
+    }
 
     await anon.auth.signOut()
   })

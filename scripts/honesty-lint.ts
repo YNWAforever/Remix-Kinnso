@@ -1,13 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { basename, extname, relative, resolve, sep } from 'node:path'
-
-const FORBIDDEN = [
-  'picsum.photos',
-  'example.com',
-  'maps.example',
-  'Jane Doe',
-  'lorem ipsum',
-] as const
+import { findForbiddenPlaceholderTokens } from '@kinnso/honesty'
 
 const ROOT = resolve(__dirname, '..')
 const SCAN_ROOTS = [
@@ -88,9 +81,7 @@ async function main() {
   for (const file of [...candidates].sort()) {
     const lines = (await readFile(file, 'utf8')).split(/\r?\n/u)
     for (const [index, line] of lines.entries()) {
-      const normalizedLine = line.toLowerCase()
-      for (const token of FORBIDDEN) {
-        if (!normalizedLine.includes(token.toLowerCase())) continue
+      for (const token of findForbiddenPlaceholderTokens(line)) {
         console.error(`${portablePath(relative(ROOT, file))}:${index + 1}: ${token}`)
         findingCount += 1
       }

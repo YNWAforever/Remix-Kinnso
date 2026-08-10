@@ -1,3 +1,4 @@
+import { isDirectoryListed } from '@/lib/creators/eligibility'
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import { mapRowToGuide } from '@/lib/guides/queries'
 import type { Guide } from '@/lib/guides/types'
@@ -9,7 +10,13 @@ export interface PublicProfile {
   audience_geos: string[]
   audience_locales: string[]
   languages: string[]
-  platforms: { platform: string; verified: boolean }[]
+  platforms: PublicCreatorPlatform[]
+}
+
+export interface PublicCreatorPlatform {
+  platform: string
+  verified: boolean
+  followers?: number
 }
 
 export interface CreatorSummary {
@@ -22,14 +29,25 @@ export interface CreatorSummary {
 
 export interface PublicCreator {
   handle: string
+  id: string
   name: string
   bio: string
   profile: PublicProfile
+  avatarUrl: string | null
   guides: Guide[]
 }
 
-function toProfile(json: unknown): PublicProfile {
+export function toProfile(json: unknown): PublicProfile {
   const j = (json ?? {}) as Partial<PublicProfile>
+  const platforms = Array.isArray(j.platforms) ? j.platforms.flatMap((value) => {
+    if (!value || typeof value !== 'object') return []
+    const platform = value as Partial<PublicCreatorPlatform>
+    if (typeof platform.platform !== 'string') return []
+    const followers = typeof platform.followers === 'number' && Number.isFinite(platform.followers) && platform.followers >= 0
+      ? { followers: platform.followers }
+      : {}
+    return [{ platform: platform.platform, verified: platform.verified === true, ...followers }]
+  }) : []
   return {
     niches: j.niches ?? [],
     content_pillars: j.content_pillars ?? [],
@@ -37,7 +55,7 @@ function toProfile(json: unknown): PublicProfile {
     audience_geos: j.audience_geos ?? [],
     audience_locales: j.audience_locales ?? [],
     languages: j.languages ?? [],
-    platforms: j.platforms ?? [],
+    platforms,
   }
 }
 
@@ -86,7 +104,19 @@ export async function fetchEligibleCreators(): Promise<EligibleCreatorRow[]> {
       createdAt: creator.created_at,
       guideCount: counts.get(creator.id) ?? 0,
     }))
-    .filter((creator) => creator.isListed || creator.guideCount > 0)
+    // Shared with the studio readiness checklist so the directory rule has one
+    // definition. `status`, `handle` and `public_profile` are already enforced by
+    // the query above; passing them keeps the predicate whole rather than split
+    // across two places.
+    .filter((creator) =>
+      isDirectoryListed({
+        status: 'active',
+        handle: creator.handle,
+        publicProfile: creator.publicProfile,
+        publishedGuideCount: creator.guideCount,
+        isListed: creator.isListed,
+      }),
+    )
 }
 
 export async function getPublicCreators(): Promise<CreatorSummary[]> {
@@ -104,30 +134,62 @@ export async function getPublicCreators(): Promise<CreatorSummary[]> {
 // requirement): a profile renders by direct URL even if it isn't in the directory/sitemap.
 // Since the listable predicate implies status='active', the sitemap stays a subset of
 // renderable pages — see fetchEligibleCreators.
+function isMissingCreatorAvatarColumn(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const candidate = error as { code?: unknown; message?: unknown }
+  return candidate.code === '42703' &&
+    typeof candidate.message === 'string' &&
+    candidate.message.includes('creators.avatar_url')
+}
+
 export async function getCreatorByHandle(handle: string): Promise<PublicCreator | null> {
   const supabase = createSupabasePublicClient()
-  const { data: c } = await supabase
+  const primary = await supabase
     .from('creators')
-    .select('id, handle, display_name, bio, public_profile')
+    .select('id, handle, display_name, bio, avatar_url, public_profile')
     .eq('handle', handle)
     .eq('status', 'active')
     .maybeSingle()
-  if (!c) return null
+  let c = primary.data
+  let error = primary.error
 
-  const { data: guideRows } = await supabase
-    .from('guides')
-    .select('slug, title, cover_url, city, saves_count, creator_handle')
-    .eq('creator_id', c.id)
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
+  // Preview and production can briefly lag the R7.7 avatar migration. Preserve the
+  // public profile with no avatar, but keep every unrelated database error visible.
+  if (isMissingCreatorAvatarColumn(error)) {
+    const fallback = await supabase
+      .from('creators')
+      .select('id, handle, display_name, bio, public_profile')
+      .eq('handle', handle)
+      .eq('status', 'active')
+      .maybeSingle()
+    c = fallback.data ? { ...fallback.data, avatar_url: null } : null
+    error = fallback.error
+  }
+
+  if (error) throw error
+  if (!c) return null
 
   return {
     handle: c.handle as string,
+    id: c.id,
+    avatarUrl: c.avatar_url,
     name: c.display_name ?? (c.handle as string),
     bio: c.bio ?? '',
     profile: toProfile(c.public_profile),
-    guides: (guideRows ?? []).map(mapRowToGuide),
+    guides: [],
   }
+}
+
+export async function getPublishedGuidesForCreator(creatorId: string): Promise<Guide[]> {
+  const supabase = createSupabasePublicClient()
+  const { data, error } = await supabase
+    .from('guides')
+    .select('slug, title, cover_url, city, saves_count, creator_handle')
+    .eq('creator_id', creatorId)
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []).map(mapRowToGuide)
 }
 
 export async function getCreatorsForSitemap(): Promise<{ handle: string; lastmod: string | null }[]> {

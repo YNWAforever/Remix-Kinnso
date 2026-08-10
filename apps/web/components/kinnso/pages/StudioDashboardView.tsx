@@ -6,6 +6,8 @@ import type { Readiness } from '@/lib/studio/readiness'
 import type { EarningsCurrencyTotal } from '@/lib/missions/earnings'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { DnaSnapshotCard } from '@/components/kinnso/DnaSnapshotCard'
+import type { StudioNextAction } from '@/lib/studio/next-action'
+import type { DirectoryGap } from '@/lib/creators/eligibility'
 import { StudioReadinessChecklist } from '@/components/kinnso/StudioReadinessChecklist'
 import { StudioQuickLinks } from '@/components/kinnso/StudioQuickLinks'
 import { AddHandleDialog } from '@/components/kinnso/AddHandleDialog'
@@ -29,6 +31,8 @@ export interface StudioDashboardViewProps {
   dna: Dna
   lastScanned: string // ISO
   readiness: Readiness
+  nextAction: StudioNextAction
+  directory: { listed: boolean; gaps: DirectoryGap[] }
   opportunities: OpportunityPreview[]
   earnings: EarningsCurrencyTotal[]
   platforms: Platform[]
@@ -39,8 +43,16 @@ export interface StudioDashboardViewProps {
 }
 
 export function StudioDashboardView(props: StudioDashboardViewProps) {
-  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT } = props
+  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, nextAction, directory, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT } = props
   const p = (path: string) => `/${locale}${path}`
+  const nextActionCopy = {
+    await_scan: t.nextActionAwaitScan,
+    start_earning: t.nextActionStartEarning,
+    publish_guide: t.nextActionPublishGuide,
+    connect_platforms: t.nextActionConnectPlatforms,
+    refresh_dna: t.nextActionRefreshDna,
+    nothing_open: t.nextActionNothingOpen,
+  }[nextAction.kind]
 
   return (
     <main>
@@ -59,8 +71,26 @@ export function StudioDashboardView(props: StudioDashboardViewProps) {
         {/* 2b. Tier progress */}
         <TierProgressCard locale={locale} t={tierT} contribution={contribution} />
 
+        {/* 2b. The single next step. The checklist below says what is outstanding;
+            this says which one to do first — and ranks earning above the rest,
+            because that is what the contribution weights already imply. */}
+        <section aria-labelledby="studio-next-step" className="rounded-2xl border border-kinnso-line bg-white p-5">
+          <h2 id="studio-next-step" className="text-sm font-bold uppercase tracking-wide text-kinnso-muted">
+            {t.nextActionHeading}
+          </h2>
+          <p role="status" className="mt-2 text-base text-kinnso-ink">
+            {nextActionCopy}
+          </p>
+          {nextAction.path ? (
+            <Link href={p(nextAction.path)} className="k-btn-primary mt-3 inline-flex">
+              {t.nextActionCta}
+            </Link>
+          ) : null}
+        </section>
+
         {/* 3. Readiness checklist (hero) with interactive slots */}
         <StudioReadinessChecklist
+          directory={directory}
           locale={locale}
           t={t}
           readiness={readiness}

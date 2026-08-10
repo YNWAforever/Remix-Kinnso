@@ -41,7 +41,6 @@ export function ExperiencePublicView({
             src={experience.coverUrl}
             title={experience.title}
             location={experience.city}
-            alt={experience.title}
             sizes="(min-width: 1024px) 1152px, 100vw"
             priority
             className="absolute inset-0"
@@ -84,7 +83,13 @@ export function ExperiencePublicView({
             <BookingWidget locale={locale} t={bookingT} experience={experience} availability={availability} viewerEmail={viewerEmail} sourceSurface={sourceSurface} guideSlug={guideSlug} />
           ) : (
             <div className="mt-5">
-              <FeatureInterestForm feature="booking" locale={locale} t={featureInterestT} />
+              <FeatureInterestForm
+                feature="booking"
+                locale={locale}
+                t={featureInterestT}
+                analyticsEntityType="experience"
+                analyticsEntityId={experience.id}
+              />
             </div>
           )}
           <Link href={p(`/m/${experience.merchant.slug}`)} className="mt-4 inline-block text-sm font-semibold text-kinnso-orangeDark hover:underline">

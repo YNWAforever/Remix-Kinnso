@@ -18,6 +18,7 @@ import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
 import { buildGuideMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
+import { AnalyticsEntityView } from '@/components/kinnso/analytics/AnalyticsEntityView'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,13 +90,13 @@ export default async function GuidePage({
   return (
     <article className="k2-container py-8 md:py-12">
       <JsonLd data={ld} />
+      <AnalyticsEntityView locale={locale as Locale} routeKey="guide_detail" entityType="guide" entityId={guide.id} />
       <section className="overflow-hidden rounded-xl bg-white shadow-kinnso">
         <div className="relative min-h-[360px]">
           <EntityMedia
             src={approvedCover}
             title={guide.title}
             location={guide.city}
-            alt={guide.title}
             sizes="(min-width: 1024px) 1152px, 100vw"
             priority
             className="absolute inset-0"

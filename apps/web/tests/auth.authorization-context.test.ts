@@ -14,6 +14,7 @@ function fakeSupabase(options: {
     const builder = {
       select: () => builder,
       eq: () => builder,
+      limit: () => builder,
       maybeSingle: async () => ({
         data: options.rows?.[table] ?? null,
         error: options.errors?.[table] ?? null,
@@ -95,6 +96,36 @@ describe('getAuthorizationContext', () => {
       user: { id: 'u1' },
       rows: { merchant_profiles: { id: 'merchant-1' } },
       errors: { creators: new Error('creator read failed') },
+    })
+
+    await expect(getAuthorizationContext(supabase)).resolves.toEqual({
+      user: { id: 'u1' },
+      role: 'indeterminate',
+      merchantId: null,
+    })
+  })
+
+  it('returns creator-pending for an onboarding creator with a saved handle', async () => {
+    const { supabase } = fakeSupabase({
+      user: { id: 'u1' },
+      rows: {
+        creators: { status: 'onboarding' },
+        creator_social_handles: { id: 'handle-1' },
+      },
+    })
+
+    await expect(getAuthorizationContext(supabase)).resolves.toEqual({
+      user: { id: 'u1' },
+      role: 'creator-pending',
+      merchantId: null,
+    })
+  })
+
+  it('fails closed when the onboarding creator handle query errors', async () => {
+    const { supabase } = fakeSupabase({
+      user: { id: 'u1' },
+      rows: { creators: { status: 'onboarding' } },
+      errors: { creator_social_handles: new Error('handle read failed') },
     })
 
     await expect(getAuthorizationContext(supabase)).resolves.toEqual({

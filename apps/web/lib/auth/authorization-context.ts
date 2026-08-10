@@ -16,10 +16,11 @@ export type AuthorizationContext = {
 
 export async function getAuthorizationContext(
   supabase: ServerSupabase,
+  verifiedUserId?: string,
 ): Promise<AuthorizationContext> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = verifiedUserId
+    ? { id: verifiedUserId }
+    : (await supabase.auth.getUser()).data.user
 
   if (!user) {
     return { user: null, role: 'anon', merchantId: null }
@@ -49,6 +50,22 @@ export async function getAuthorizationContext(
   }
 
   const merchantId = merchant && typeof merchant.id === 'string' ? merchant.id : null
+  let hasCreatorHandle = false
+
+  if (!ops && !merchant && creator?.status === 'onboarding') {
+    const { data: handle, error: handleError } = await supabase
+      .from('creator_social_handles')
+      .select('id')
+      .eq('creator_id', user.id)
+      .limit(1)
+      .maybeSingle()
+
+    if (handleError) {
+      return { user: { id: user.id }, role: 'indeterminate', merchantId: null }
+    }
+
+    hasCreatorHandle = Boolean(handle)
+  }
 
   return {
     user: { id: user.id },
@@ -57,6 +74,7 @@ export async function getAuthorizationContext(
       hasActiveOps: Boolean(ops),
       hasMerchantProfile: Boolean(merchant),
       hasActiveCreator: creator?.status === 'active',
+      hasCreatorHandle,
     }),
     merchantId,
   }

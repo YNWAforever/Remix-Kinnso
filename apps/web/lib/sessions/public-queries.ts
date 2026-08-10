@@ -68,6 +68,19 @@ export async function getUpcomingSessionsList(limit = 20): Promise<PublicSession
   return attachHost(supabase, (data ?? []) as unknown as SessionRow[])
 }
 
+export async function getPublicSessionsForCreator(creatorId: string, limit = 6): Promise<PublicSession[]> {
+  const supabase = createSupabasePublicClient()
+  const [upcoming, replays] = await Promise.all([
+    supabase.from('community_sessions').select(SESSION_COLUMNS).eq('host_creator_id', creatorId)
+      .in('status', ['scheduled', 'live']).order('starts_at', { ascending: true }).limit(limit),
+    supabase.from('community_sessions').select(SESSION_COLUMNS).eq('host_creator_id', creatorId)
+      .eq('status', 'ended').not('replay_url', 'is', null).order('starts_at', { ascending: false }).limit(limit),
+  ])
+  if (upcoming.error) throw upcoming.error
+  if (replays.error) throw replays.error
+  return attachHost(supabase, [...(upcoming.data ?? []), ...(replays.data ?? [])] as unknown as SessionRow[])
+}
+
 /**
  * Upcoming sessions tagged for a destination (array-overlap on destination_tags). First
  * .overlaps() query in this codebase — confirmed via repo-wide grep during R6B design

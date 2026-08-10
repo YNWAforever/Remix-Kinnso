@@ -5,7 +5,7 @@ const { fromMock } = vi.hoisted(() => ({ fromMock: vi.fn() }))
 vi.mock('@/lib/supabase/public', () => ({ createSupabasePublicClient: () => ({ from: fromMock }) }))
 
 import {
-  getUpcomingSessionsList, getReplaySessions, getSessionBySlug, getSessionsForSitemap, getSessionsForDestination,
+  getUpcomingSessionsList, getReplaySessions, getSessionBySlug, getSessionsForSitemap, getSessionsForDestination, getPublicSessionsForCreator,
 } from '@/lib/sessions/public-queries'
 
 const sessionRow = {
@@ -53,6 +53,27 @@ describe('getReplaySessions', () => {
     expect(sessionsChain.eq).toHaveBeenCalledWith('status', 'ended')
     expect(sessionsChain.not).toHaveBeenCalledWith('replay_url', 'is', null)
     expect(sessionsChain.order).toHaveBeenCalledWith('starts_at', { ascending: false })
+  })
+})
+
+describe('getPublicSessionsForCreator', () => {
+  it('keeps public session types while filtering an exact host and only upcoming or replayable ended sessions', async () => {
+    const upcomingChain = chain({ data: [{ ...sessionRow, type: 'merchant_spotlight', status: 'live' }], error: null })
+    const replayChain = chain({ data: [{ ...sessionRow, id: 's2', slug: 'replay', status: 'ended', replay_url: 'https://youtu.be/replay' }], error: null })
+    const creatorsChain = chain({ data: [creatorRow], error: null })
+    let sessions = 0
+    fromMock.mockImplementation((table: string) => table === 'creators'
+      ? creatorsChain
+      : (++sessions === 1 ? upcomingChain : replayChain))
+
+    const result = await getPublicSessionsForCreator('creator-1')
+
+    expect(upcomingChain.eq).toHaveBeenCalledWith('host_creator_id', 'creator-1')
+    expect(upcomingChain.in).toHaveBeenCalledWith('status', ['scheduled', 'live'])
+    expect(replayChain.eq).toHaveBeenCalledWith('host_creator_id', 'creator-1')
+    expect(replayChain.eq).toHaveBeenCalledWith('status', 'ended')
+    expect(replayChain.not).toHaveBeenCalledWith('replay_url', 'is', null)
+    expect(result.map((session) => session.type)).toEqual(['merchant_spotlight', 'ask_a_creator'])
   })
 })
 

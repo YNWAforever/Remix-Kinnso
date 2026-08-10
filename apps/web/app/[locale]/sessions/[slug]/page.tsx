@@ -10,9 +10,12 @@ import { breadcrumbJsonLd, sessionEventJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
 import { SessionDetailView } from '@/components/kinnso/pages/SessionDetailView'
 
-export function generateStaticParams() {
-  return [] // DB-only; resolve on demand, same choice as /experiences/[slug]
-}
+// The page reads the request's auth cookie (see auth.getUser() below), so it
+// must render dynamically. An empty generateStaticParams() would instead opt
+// this route into static rendering at first visit, which is what produced the
+// DYNAMIC_SERVER_USAGE 500s on /g/[slug] and /experiences/[slug] (docs/r7-ground-truth.md);
+// both were fixed this same way.
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }): Promise<Metadata> {
   const { locale, slug } = await params

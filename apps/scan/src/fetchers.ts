@@ -1,4 +1,12 @@
 import type { PlatformFetcher, Platform } from '@kinnso/scan'
+import {
+  discardBody,
+  readCappedJson,
+  MAX_RAPIDAPI_BODY_BYTES,
+  MAX_YOUTUBE_BODY_BYTES,
+  RAPIDAPI_TIMEOUT_MS,
+  YOUTUBE_TIMEOUT_MS,
+} from './http'
 
 // ---------------------------------------------------------------------------
 // Single-post fetch types (for mission verification)
@@ -45,27 +53,61 @@ function redactUrl(url: string): string {
   }
 }
 
+/** A timed-out attempt surfaces as a DOMException, not an Error subclass. */
+function isTimeout(err: unknown): boolean {
+  const name = (err as { name?: unknown } | null)?.name
+  return name === 'TimeoutError' || name === 'AbortError'
+}
+
+/**
+ * Builds the message thrown once every attempt has been spent.
+ *
+ * The raw value can be an undici network error, a DOMException from the
+ * per-attempt timeout, or a synthesised HTTP-status error, and it ends up in
+ * logs (and, via the pipeline, in a client-readable `job.error`). So it is
+ * normalised to one redacted, single-line, length-capped string.
+ */
+function fetchFailureMessage(url: string, err: unknown, timeoutMs: number): string {
+  const target = redactUrl(url)
+  if (isTimeout(err)) return `request to ${target} timed out after ${timeoutMs}ms`
+  const detail = err instanceof Error ? err.message : String(err ?? '')
+  if (!detail) return `request to ${target} failed`
+  return `request to ${target} failed: ${detail.replace(/\s+/g, ' ').slice(0, 200)}`
+}
+
+/**
+ * `fetch` plus bounded retries and a per-ATTEMPT wall-clock budget.
+ *
+ * The timeout is applied per attempt rather than across the whole call so a
+ * retry always gets a full budget; the caller-visible ceiling is therefore
+ * `timeoutMs × (maxRetries + 1)` plus backoff. Without it a stalled upstream
+ * inherits undici's multi-minute defaults and pins an in-process job — and its
+ * memory — for as long as the peer keeps the socket open.
+ */
 async function fetchWithRetry(
   url: string,
   init: RequestInit,
-  maxRetries = MAX_RETRIES
+  opts: { timeoutMs: number; maxRetries?: number }
 ): Promise<Response> {
+  const { timeoutMs, maxRetries = MAX_RETRIES } = opts
   let lastError: unknown
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     if (attempt > 0) await sleepMs(INITIAL_DELAY_MS * 2 ** (attempt - 1))
     let res: Response
     try {
-      res = await fetch(url, init)
+      res = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) })
     } catch (err) {
+      // Includes the timeout abort: a slow upstream is a transient failure, so
+      // it feeds the retry loop exactly like a dropped connection would.
       lastError = err
       continue
     }
     if (!RETRYABLE_STATUSES.has(res.status)) return res
-    // Redact the query string — some URLs carry secrets as query params (e.g. the
-    // YouTube Data API key), and this Error message is surfaced to logs.
-    lastError = new Error(`HTTP ${res.status} from ${redactUrl(url)}`)
+    // Nothing will read this body, so hand its socket back before sleeping.
+    await discardBody(res)
+    lastError = new Error(`HTTP ${res.status}`)
   }
-  throw lastError
+  throw new Error(fetchFailureMessage(url, lastError, timeoutMs))
 }
 
 // ---------------------------------------------------------------------------
@@ -109,7 +151,7 @@ export class RapidApiFetcher implements PlatformFetcher {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({ username_or_url: handle }).toString(),
-          })
+          }, { timeoutMs: RAPIDAPI_TIMEOUT_MS })
         : await fetchWithRetry(`https://${host}/user/info?username=${encodeURIComponent(handle)}`, {
             method: 'GET',
             headers: {
@@ -117,12 +159,13 @@ export class RapidApiFetcher implements PlatformFetcher {
               'x-rapidapi-host': host,
               Accept: 'application/json',
             },
-          })
+          }, { timeoutMs: RAPIDAPI_TIMEOUT_MS })
 
     if (!res.ok) {
+      await discardBody(res)
       throw new Error(`RapidAPI ${platform} returned HTTP ${res.status} for handle "${handle}"`)
     }
-    const raw = (await res.json()) as Record<string, unknown>
+    const raw = await readCappedJson<Record<string, unknown>>(res, MAX_RAPIDAPI_BODY_BYTES)
 
     // Instagram: the profile endpoint carries no captions, so enrich it with
     // recent post captions from `/get_ig_user_posts.php` (POST form; captions live
@@ -147,12 +190,15 @@ export class RapidApiFetcher implements PlatformFetcher {
               amount: '12',
               pagination_token: token,
             }).toString(),
-          })
-          if (!postsRes.ok) break
-          const pj = (await postsRes.json()) as {
+          }, { timeoutMs: RAPIDAPI_TIMEOUT_MS })
+          if (!postsRes.ok) {
+            await discardBody(postsRes)
+            break
+          }
+          const pj = await readCappedJson<{
             posts?: Array<{ node?: { caption?: { text?: string } } }>
             pagination_token?: string
-          }
+          }>(postsRes, MAX_RAPIDAPI_BODY_BYTES)
           for (const p of pj.posts ?? []) {
             const t = p?.node?.caption?.text
             if (typeof t === 'string' && t.trim().length > 0 && !seen.has(t)) {
@@ -236,9 +282,12 @@ export class RapidApiFetcher implements PlatformFetcher {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: new URLSearchParams({ shortcode: id }).toString(),
-        })
-        if (!res.ok) return null
-        const raw = (await res.json()) as Record<string, any>
+        }, { timeoutMs: RAPIDAPI_TIMEOUT_MS })
+        if (!res.ok) {
+          await discardBody(res)
+          return null
+        }
+        const raw = await readCappedJson<Record<string, any>>(res, MAX_RAPIDAPI_BODY_BYTES)
         const node = (raw.data ?? raw.media ?? raw) as Record<string, any>
         const author =
           node?.owner?.username ?? node?.user?.username ?? node?.author?.username ?? null
@@ -258,9 +307,12 @@ export class RapidApiFetcher implements PlatformFetcher {
           'x-rapidapi-host': RAPIDAPI_THREADS_HOST,
           Accept: 'application/json',
         },
-      })
-      if (!res.ok) return null
-      const raw = (await res.json()) as Record<string, any>
+      }, { timeoutMs: RAPIDAPI_TIMEOUT_MS })
+      if (!res.ok) {
+        await discardBody(res)
+        return null
+      }
+      const raw = await readCappedJson<Record<string, any>>(res, MAX_RAPIDAPI_BODY_BYTES)
       const node = (raw.data ?? raw.post ?? raw) as Record<string, any>
       const author = node?.user?.username ?? node?.author?.username ?? node?.owner?.username ?? null
       const likes = Number(node?.like_count ?? node?.likes ?? NaN)
@@ -303,11 +355,18 @@ export class YouTubeFetcher implements PlatformFetcher {
       const vurl =
         `${YOUTUBE_BASE}/videos?part=snippet,statistics` +
         `&id=${encodeURIComponent(id)}&key=${encodeURIComponent(this.apiKey)}`
-      const vres = await fetchWithRetry(vurl, { method: 'GET', headers: { Accept: 'application/json' } })
-      if (!vres.ok) return null
-      const vbody = (await vres.json()) as {
-        items?: Array<{ snippet?: { channelId?: string }; statistics?: { likeCount?: string; viewCount?: string } }>
+      const vres = await fetchWithRetry(
+        vurl,
+        { method: 'GET', headers: { Accept: 'application/json' } },
+        { timeoutMs: YOUTUBE_TIMEOUT_MS },
+      )
+      if (!vres.ok) {
+        await discardBody(vres)
+        return null
       }
+      const vbody = await readCappedJson<{
+        items?: Array<{ snippet?: { channelId?: string }; statistics?: { likeCount?: string; viewCount?: string } }>
+      }>(vres, MAX_YOUTUBE_BODY_BYTES)
       const item = vbody.items?.[0]
       const channelId = item?.snippet?.channelId ?? null
       if (!channelId) return null
@@ -321,10 +380,19 @@ export class YouTubeFetcher implements PlatformFetcher {
         const curl =
           `${YOUTUBE_BASE}/channels?part=snippet` +
           `&id=${encodeURIComponent(channelId)}&key=${encodeURIComponent(this.apiKey)}`
-        const cres = await fetchWithRetry(curl, { method: 'GET', headers: { Accept: 'application/json' } })
+        const cres = await fetchWithRetry(
+          curl,
+          { method: 'GET', headers: { Accept: 'application/json' } },
+          { timeoutMs: YOUTUBE_TIMEOUT_MS },
+        )
         if (cres.ok) {
-          const cbody = (await cres.json()) as { items?: Array<{ snippet?: { customUrl?: string } }> }
+          const cbody = await readCappedJson<{ items?: Array<{ snippet?: { customUrl?: string } }> }>(
+            cres,
+            MAX_YOUTUBE_BODY_BYTES,
+          )
           authorHandle = cbody.items?.[0]?.snippet?.customUrl ?? null
+        } else {
+          await discardBody(cres)
         }
       } catch (err) {
         console.warn(`[scan] youtube customUrl fetch failed for "${channelId}"`, (err as Error).message)
@@ -345,9 +413,16 @@ export class YouTubeFetcher implements PlatformFetcher {
       const url =
         `${YOUTUBE_BASE}/channels?part=id` +
         `&forHandle=${encodeURIComponent(forHandle)}&key=${encodeURIComponent(this.apiKey)}`
-      const res = await fetchWithRetry(url, { method: 'GET', headers: { Accept: 'application/json' } })
-      if (!res.ok) return null
-      const body = (await res.json()) as { items?: Array<{ id?: string }> }
+      const res = await fetchWithRetry(
+        url,
+        { method: 'GET', headers: { Accept: 'application/json' } },
+        { timeoutMs: YOUTUBE_TIMEOUT_MS },
+      )
+      if (!res.ok) {
+        await discardBody(res)
+        return null
+      }
+      const body = await readCappedJson<{ items?: Array<{ id?: string }> }>(res, MAX_YOUTUBE_BODY_BYTES)
       return body.items?.[0]?.id ?? null
     } catch (err) {
       console.warn(`[scan] youtube resolveChannelId failed for "${handle}"`, (err as Error).message)
@@ -365,19 +440,21 @@ export class YouTubeFetcher implements PlatformFetcher {
       `&forHandle=${encodeURIComponent(forHandle)}` +
       `&key=${encodeURIComponent(this.apiKey)}`
 
-    const res = await fetchWithRetry(url, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    })
+    const res = await fetchWithRetry(
+      url,
+      { method: 'GET', headers: { Accept: 'application/json' } },
+      { timeoutMs: YOUTUBE_TIMEOUT_MS },
+    )
 
     if (!res.ok) {
+      await discardBody(res)
       throw new Error(`YouTube Data API returned HTTP ${res.status} for handle "${handle}"`)
     }
-    const body = (await res.json()) as {
+    const body = await readCappedJson<{
       items?: Array<{
         contentDetails?: { relatedPlaylists?: { uploads?: string } }
       }>
-    }
+    }>(res, MAX_YOUTUBE_BODY_BYTES)
     const channel = body.items?.[0]
     if (!channel) {
       throw new Error(`YouTube Data API returned no channel for handle "${handle}"`)
@@ -396,15 +473,19 @@ export class YouTubeFetcher implements PlatformFetcher {
           `&playlistId=${encodeURIComponent(uploads)}` +
           `&maxResults=10` +
           `&key=${encodeURIComponent(this.apiKey)}`
-        const vres = await fetchWithRetry(vurl, {
-          method: 'GET',
-          headers: { Accept: 'application/json' },
-        })
+        const vres = await fetchWithRetry(
+          vurl,
+          { method: 'GET', headers: { Accept: 'application/json' } },
+          { timeoutMs: YOUTUBE_TIMEOUT_MS },
+        )
         if (vres.ok) {
-          const vbody = (await vres.json()) as {
-            items?: Array<{ snippet?: unknown }>
-          }
+          const vbody = await readCappedJson<{ items?: Array<{ snippet?: unknown }> }>(
+            vres,
+            MAX_YOUTUBE_BODY_BYTES,
+          )
           recentVideos = (vbody.items ?? []).map((it) => ({ snippet: it.snippet }))
+        } else {
+          await discardBody(vres)
         }
       }
     } catch (err) {

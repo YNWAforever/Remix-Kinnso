@@ -9,6 +9,7 @@ const facts = (overrides: Partial<ViewerRoleFacts> = {}): ViewerRoleFacts => ({
   hasActiveOps: false,
   hasMerchantProfile: false,
   hasActiveCreator: false,
+  hasCreatorHandle: false,
   ...overrides,
 })
 
@@ -34,6 +35,17 @@ describe('resolveViewerRoleFromFacts', () => {
 
   it('returns creator only for an active creator fact', () => {
     expect(resolveViewerRoleFromFacts(facts({ hasActiveCreator: true }))).toBe('creator')
+  })
+
+  it('returns creator-pending for an onboarding creator with a saved handle', () => {
+    expect(resolveViewerRoleFromFacts(facts({ hasCreatorHandle: true }))).toBe('creator-pending')
+  })
+
+  it('keeps active creator precedence over a saved onboarding handle', () => {
+    expect(resolveViewerRoleFromFacts(facts({
+      hasActiveCreator: true,
+      hasCreatorHandle: true,
+    }))).toBe('creator')
   })
 
   it('falls back to traveler for an authenticated user without a higher role', () => {

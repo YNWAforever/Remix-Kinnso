@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       affiliate_network_events: {
@@ -1178,6 +1153,7 @@ export type Database = {
       }
       creators: {
         Row: {
+          avatar_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
@@ -1190,6 +1166,7 @@ export type Database = {
           verified: boolean
         }
         Insert: {
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
@@ -1202,6 +1179,7 @@ export type Database = {
           verified?: boolean
         }
         Update: {
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
@@ -1254,6 +1232,85 @@ export type Database = {
           sort_order?: number
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      enquiries: {
+        Row: {
+          created_at: string
+          creator_id: string | null
+          email: string
+          id: string
+          merchant_profile_id: string | null
+          message: string
+          name: string
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id?: string | null
+          email: string
+          id?: string
+          merchant_profile_id?: string | null
+          message: string
+          name: string
+          status?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string | null
+          email?: string
+          id?: string
+          merchant_profile_id?: string | null
+          message?: string
+          name?: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enquiries_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      enquiry_rate_limits: {
+        Row: {
+          ip_hash: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          ip_hash: string
+          request_count?: number
+          window_start: string
+        }
+        Update: {
+          ip_hash?: string
+          request_count?: number
+          window_start?: string
         }
         Relationships: []
       }
@@ -2593,6 +2650,81 @@ export type Database = {
         }
         Relationships: []
       }
+      traveller_analytics_events: {
+        Row: {
+          account_id: string | null
+          authenticated: boolean
+          booking_state: string
+          client_event_id: string
+          consent_version: string
+          entity_id: string | null
+          entity_type: string | null
+          error_category: string | null
+          event_name: string
+          id: string
+          journey_id: string
+          locale: string
+          occurred_at: string
+          outcome: string | null
+          received_at: string
+          route_key: string
+        }
+        Insert: {
+          account_id?: string | null
+          authenticated?: boolean
+          booking_state?: string
+          client_event_id: string
+          consent_version: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_category?: string | null
+          event_name: string
+          id?: string
+          journey_id: string
+          locale: string
+          occurred_at: string
+          outcome?: string | null
+          received_at?: string
+          route_key: string
+        }
+        Update: {
+          account_id?: string | null
+          authenticated?: boolean
+          booking_state?: string
+          client_event_id?: string
+          consent_version?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_category?: string | null
+          event_name?: string
+          id?: string
+          journey_id?: string
+          locale?: string
+          occurred_at?: string
+          outcome?: string | null
+          received_at?: string
+          route_key?: string
+        }
+        Relationships: []
+      }
+      traveller_analytics_rate_limits: {
+        Row: {
+          event_count: number
+          journey_id: string
+          window_start: string
+        }
+        Insert: {
+          event_count?: number
+          journey_id: string
+          window_start?: string
+        }
+        Update: {
+          event_count?: number
+          journey_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       destination_index: {
@@ -2691,6 +2823,28 @@ export type Database = {
           handle: string
           id: string
           status: string
+        }[]
+      }
+      admin_list_enquiries: {
+        Args: {
+          p_cursor_created_at?: string
+          p_cursor_id?: string
+          p_limit?: number
+          p_status_group?: string
+          p_type?: string
+        }
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string
+          target_id: string
+          target_name: string
+          target_slug: string
+          type: string
+          updated_at: string
         }[]
       }
       admin_list_merchants: {
@@ -2809,6 +2963,10 @@ export type Database = {
         Args: { p_id: string; p_reason: string; p_verified: boolean }
         Returns: undefined
       }
+      admin_set_enquiry_status: {
+        Args: { p_id: string; p_reason?: string; p_status: string }
+        Returns: undefined
+      }
       admin_set_merchant_status: {
         Args: { p_id: string; p_reason: string; p_status: string }
         Returns: undefined
@@ -2837,6 +2995,21 @@ export type Database = {
         Args: { p_id: string; p_kind: string; p_status: string }
         Returns: undefined
       }
+      admin_traveller_analytics_report: {
+        Args: { p_window_end: string; p_window_start: string }
+        Returns: {
+          attribution_window_days: number
+          booking_state: string
+          denominator: number
+          entity_type: string | null
+          locale: string
+          metric_key: string
+          numerator: number
+          rate: number | null
+          sample_count: number
+          status: string
+        }[]
+      }
       admin_suspend_ops_member: {
         Args: { p_member_id: string; p_reason: string }
         Returns: undefined
@@ -2860,6 +3033,18 @@ export type Database = {
       }
       check_and_increment_rsvp_rate_limit: {
         Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      check_and_increment_traveller_analytics_ip_rate_limit: {
+        Args: { p_ip: string; p_max_requests: number; p_window_seconds: number }
+        Returns: boolean
+      }
+      check_and_increment_traveller_analytics_rate_limit: {
+        Args: {
+          p_journey_id: string
+          p_max_requests: number
+          p_window_seconds: number
+        }
         Returns: boolean
       }
       confirm_booking_from_webhook: {
@@ -2890,6 +3075,17 @@ export type Database = {
       }
       creator_insights: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
+      get_attributed_guides_for_merchant: {
+        Args: { p_limit?: number; p_merchant_id: string }
+        Returns: {
+          city: string
+          cover_url: string
+          creator_handle: string
+          saves_count: number
+          slug: string
+          title: string
+        }[]
+      }
       get_booking_by_checkout_session: {
         Args: { p_session_id: string }
         Returns: {
@@ -2958,6 +3154,7 @@ export type Database = {
         }
         Returns: string
       }
+      purge_traveller_analytics_events: { Args: never; Returns: undefined }
       platform_stats: {
         Args: never
         Returns: {
@@ -3057,6 +3254,20 @@ export type Database = {
         }[]
       }
       slugify: { Args: { input: string }; Returns: string }
+      submit_enquiry: {
+        Args: {
+          p_creator_id: string
+          p_email: string
+          p_ip: string
+          p_max_requests?: number
+          p_merchant_profile_id: string
+          p_message: string
+          p_name: string
+          p_type: string
+          p_window_seconds?: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
@@ -3185,9 +3396,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

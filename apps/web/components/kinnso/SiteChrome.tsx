@@ -3,6 +3,7 @@ import { usePathname } from 'next/navigation'
 import Navbar from '@/components/kinnso/Navbar'
 import Footer from '@/components/kinnso/Footer'
 import { useViewerRole } from '@/lib/auth/useViewerRole'
+import { AnalyticsConsentBanner } from '@/components/kinnso/analytics/AnalyticsConsentBanner'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -15,12 +16,15 @@ const BARE_SUFFIXES = ['/sign-in', '/sign-up', '/creator']
  * CTA may flip once after hydration. Chrome hides on auth/onboarding flows.
  */
 export function SiteChrome({
-  locale, sessionsLive, nav, footer, children,
+  locale, sessionsLive, bookingLive, dashboardLabel, nav, footer, analytics, children,
 }: {
   locale: Locale
   sessionsLive: boolean
+  bookingLive: boolean
+  dashboardLabel: string
   nav: Messages['nav']
   footer: Messages['footer']
+  analytics: Messages['analytics']
   children: React.ReactNode
 }) {
   const pathname = usePathname() || `/${locale}`
@@ -37,11 +41,12 @@ export function SiteChrome({
       >
         {nav.skipToContent}
       </a>
-      <Navbar locale={locale} role={role} sessionsLive={sessionsLive} t={nav} />
+      <Navbar locale={locale} role={role} sessionsLive={sessionsLive} dashboardLabel={dashboardLabel} t={nav} />
       <main id="main-content" className="flex-1" tabIndex={-1}>
         {children}
       </main>
-      <Footer locale={locale} t={footer} />
+      <Footer locale={locale} bookingLive={bookingLive} t={footer} />
+      <AnalyticsConsentBanner locale={locale} t={analytics} />
     </>
   )
 }

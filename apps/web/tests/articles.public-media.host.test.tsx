@@ -2,8 +2,9 @@
 import { cleanup, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { getArticleDetailMock, searchArticlesMock } = vi.hoisted(() => ({
+const { getArticleDetailMock, getIndexableArticleLocalesMock, searchArticlesMock } = vi.hoisted(() => ({
   getArticleDetailMock: vi.fn(),
+  getIndexableArticleLocalesMock: vi.fn(),
   searchArticlesMock: vi.fn(),
 }))
 
@@ -11,7 +12,8 @@ vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('notFound'
 vi.mock('@/lib/articles/queries', () => ({
   getArticleDetail: getArticleDetailMock,
   searchArticles: searchArticlesMock,
-  getPresentLocales: vi.fn(async () => ['en']),
+  getIndexableArticleLocales: getIndexableArticleLocalesMock,
+  getIndexableCategoryLocales: vi.fn(async () => ['en']),
   getYouMayLike: vi.fn(async () => []),
   getStaticArticleParams: vi.fn(async () => []),
 }))
@@ -67,11 +69,51 @@ const params = Promise.resolve({ locale: 'en', category: 'destinations', url: 'k
 
 beforeEach(() => {
   getArticleDetailMock.mockResolvedValue(baseArticle)
+  getIndexableArticleLocalesMock.mockResolvedValue(['en'])
   searchArticlesMock.mockResolvedValue({ items: [] })
 })
 afterEach(cleanup)
 
 describe('article route media behavior', () => {
+  it('withholds FAQ schema for a fallback translation while preserving visible FAQs and its language', async () => {
+    getArticleDetailMock.mockResolvedValue({
+      ...baseArticle,
+      translation: { ...baseArticle.translation, locale: 'ja' },
+      faqs: [{ question: 'Where?', answer: 'Kyoto.' }],
+    })
+    getIndexableArticleLocalesMock.mockResolvedValue(['ja'])
+
+    const { container, getByText } = render(await ArticleDetailPage({ params }))
+    const ld = container.querySelector('script[type="application/ld+json"]')?.innerHTML ?? ''
+
+    expect(ld).toContain('"inLanguage":"ja"')
+    expect(ld).not.toContain('"@type":"FAQPage"')
+    expect(getByText('Where?')).toBeTruthy()
+    expect(getByText('Kyoto.')).toBeTruthy()
+  })
+
+  it('keeps an indexable current canonical while x-default uses the first preferred genuine locale', async () => {
+    getArticleDetailMock.mockResolvedValue({
+      ...baseArticle,
+      translation: { ...baseArticle.translation, locale: 'ja' },
+    })
+    getIndexableArticleLocalesMock.mockResolvedValue(['ja', 'zh-tw'])
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({
+        locale: 'ja', category: 'destinations', url: 'kyoto-tea',
+      }),
+    })
+    expect(new URL(String(metadata.alternates?.canonical)).pathname).toBe(
+      '/ja/articles/destinations/kyoto-tea',
+    )
+    const languages = metadata.alternates?.languages as Record<string, string>
+    expect(Object.keys(languages).sort()).toEqual(['ja', 'x-default', 'zh-tw'])
+    expect(new URL(languages['x-default']).pathname).toBe(
+      '/zh-tw/articles/destinations/kyoto-tea',
+    )
+  })
+
   it('omits invalid media from metadata, JSON-LD, and rendered image src', async () => {
     getArticleDetailMock.mockResolvedValue({
       ...baseArticle,

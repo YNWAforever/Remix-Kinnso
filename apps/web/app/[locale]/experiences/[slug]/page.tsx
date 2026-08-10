@@ -16,6 +16,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { ExperiencePublicView } from '@/components/kinnso/pages/ExperiencePublicView'
 import { resolveConfiguredProductState } from '@/lib/product-state'
 import { isApprovedEntityMediaUrl } from '@/lib/media/entity-media'
+import { AnalyticsEntityView } from '@/components/kinnso/analytics/AnalyticsEntityView'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,21 +71,24 @@ export default async function ExperiencePublicPage({ params, searchParams }: {
       { name: messages.seo.merchants.title, url: `${SITE_URL}/${locale}/merchants` },
       { name: experience.title, url: canonical },
     ]),
-    ...(bookingLive && hasOpenAvailability
-      ? [experienceOfferJsonLd({
-          name: experience.title,
-          description: experience.summary ?? experience.description ?? `${experience.city} experience`,
-          url: canonical,
-          image: approvedCover,
-          priceAmount: experience.priceAmount,
-          currency: experience.currency,
-          rating: rating ?? undefined,
-        })]
-      : []),
+    experienceOfferJsonLd({
+      name: experience.title,
+      description:
+        experience.summary ??
+        experience.description ??
+        `${experience.city} experience`,
+      url: canonical,
+      image: approvedCover,
+      priceAmount: experience.priceAmount,
+      currency: experience.currency,
+      available: bookingLive && hasOpenAvailability,
+      rating: rating ?? undefined,
+    }),
   ], [])
   return (
     <>
       <JsonLd data={ld} />
+      <AnalyticsEntityView locale={locale as Locale} routeKey="experience_detail" entityType="experience" entityId={experience.id} />
       <ExperiencePublicView
         locale={locale as Locale}
         t={messages.experiencePublic}

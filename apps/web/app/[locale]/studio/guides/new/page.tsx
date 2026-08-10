@@ -21,6 +21,17 @@ export default async function StudioNewGuidePage({
   } = await supabase.auth.getUser()
   if (!user) redirect(`/${locale}/sign-in`)
 
+  // Active-creator gate, matching /studio: every sign-up gets a blank
+  // `creators` row, so a signed-in session alone is not a creator.
+  // `createGuideAction` enforces this too — this only avoids showing a form
+  // that could never submit.
+  const { data: creatorRow } = await supabase
+    .from('creators')
+    .select('status')
+    .eq('id', user.id)
+    .maybeSingle()
+  if (creatorRow?.status !== 'active') redirect(`/${locale}/creator`)
+
   async function submitGuide(input: GuideInput, opts: { publish: boolean }) {
     'use server'
     const result = await createGuideAction(input, { publish: opts.publish, locale })
