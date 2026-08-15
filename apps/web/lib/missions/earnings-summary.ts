@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
-import type { EarningsCurrencyTotal } from '@/lib/missions/earnings'
+import { bucketEarningsByCurrency, type EarningsCurrencyTotal } from '@/lib/missions/earnings'
 
 type Client = SupabaseClient<Database>
 
@@ -80,16 +80,7 @@ export function summarizeSettledEarnings(
   missions: MissionEarningItem[],
   bookings: BookingEarningItem[],
 ): EarningsCurrencyTotal[] {
-  const byCurrency = new Map<string, EarningsCurrencyTotal>()
-
-  for (const item of [...missions, ...bookings]) {
-    const entry = byCurrency.get(item.currency) ?? { currency: item.currency, paid: 0, pending: 0 }
-    if (item.payoutStatus === 'paid') entry.paid += item.amount
-    else entry.pending += item.amount
-    byCurrency.set(item.currency, entry)
-  }
-
-  return [...byCurrency.values()].sort((a, b) => a.currency.localeCompare(b.currency))
+  return bucketEarningsByCurrency([...missions, ...bookings])
 }
 
 export async function getCreatorEarningsSummary(supabase: Client): Promise<CreatorEarningsSummary> {
