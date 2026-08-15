@@ -44,10 +44,27 @@ export function toCreatorEarningItem(row: CreatorSettlementRow): CreatorEarningI
   }
 }
 
-export function summarizeCreatorEarnings(items: CreatorEarningItem[]): EarningsCurrencyTotal[] {
+/** The minimum an item needs to be bucketed. Every earnings item type satisfies it structurally. */
+export type EarningsBucketEntry = {
+  currency: string
+  amount: number
+  payoutStatus: 'paid' | 'pending'
+}
+
+/**
+ * The single per-currency reduction used by every earnings surface.
+ *
+ * This exists so the studio dashboard and /studio/earnings can never disagree about how much
+ * a creator has earned. Both used to carry their own copy of this loop; today that is invisible
+ * because nothing writes `mission_settlements`, but R10.1 mints settlement rows and from then on
+ * both surfaces render real, non-empty totals for the same creator. Two copies of the paid/pending
+ * rule would then be two places to change, and one missed change is a silent disagreement about
+ * money. Keep this the only implementation.
+ */
+export function bucketEarningsByCurrency(entries: EarningsBucketEntry[]): EarningsCurrencyTotal[] {
   const byCurrency = new Map<string, EarningsCurrencyTotal>()
 
-  for (const item of items) {
+  for (const item of entries) {
     const entry = byCurrency.get(item.currency) ?? { currency: item.currency, paid: 0, pending: 0 }
     if (item.payoutStatus === 'paid') entry.paid += item.amount
     else entry.pending += item.amount
@@ -55,4 +72,8 @@ export function summarizeCreatorEarnings(items: CreatorEarningItem[]): EarningsC
   }
 
   return [...byCurrency.values()].sort((a, b) => a.currency.localeCompare(b.currency))
+}
+
+export function summarizeCreatorEarnings(items: CreatorEarningItem[]): EarningsCurrencyTotal[] {
+  return bucketEarningsByCurrency(items)
 }

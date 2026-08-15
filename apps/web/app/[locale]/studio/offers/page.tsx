@@ -1,6 +1,6 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { StudioOffersView, type AffiliateOfferCard } from '@/components/kinnso/pages/StudioOffersView'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createPartnerLinkAction, joinMissionAction } from '@/lib/missions/actions'
@@ -53,11 +53,7 @@ export default async function StudioOffersPage({ params }: { params: Params }) {
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-
-  const role = await resolveViewerRole(supabase)
-  if (role !== 'creator') notFound()
+  const { user } = await requireCreatorPage(supabase, loc)
 
   const { data } = await listAffiliateOffers(supabase)
   const offers = ((data ?? []) as unknown as OfferRow[]).map((row) => mapOffer(row, user.id))

@@ -1,8 +1,7 @@
-import { redirect } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { getCreatorInsights } from '@/lib/insights/creator'
 import { CreatorInsightsView } from '@/components/kinnso/pages/CreatorInsightsView'
 
@@ -15,9 +14,7 @@ export default async function StudioInsightsPage({ params }: { params: Promise<{
   const loc: Locale = isLocale(locale) ? (locale as Locale) : 'en'
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'creator') redirect(`/${loc}/studio`)
+  await requireCreatorPage(supabase, loc, 'studio')
 
   const messages = await getDictionary(loc)
   const data = await getCreatorInsights(supabase)

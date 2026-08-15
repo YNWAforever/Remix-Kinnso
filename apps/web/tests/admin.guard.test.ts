@@ -92,16 +92,32 @@ describe('requireCreatorPage', () => {
     await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
   })
 
-  it('notFound for a non-creator viewer', async () => {
-    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant' }))
+  it('notFounds a non-creator by default', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('redirects a non-creator to the studio hub in studio mode', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'en', 'studio')).rejects.toThrow('NEXT_REDIRECT:/en/studio')
+  })
+
+  it('treats creator-pending as a non-creator', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'creator-pending' }))
     await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
   })
 
   it('returns the authenticated creator user', async () => {
     contextMock.mockResolvedValueOnce(contextFor({ user: { id: 'creator-1' }, role: 'creator' }))
-    await expect(requireCreatorPage(sb(), 'en')).resolves.toEqual({
-      user: { id: 'creator-1' },
-    })
+    await expect(requireCreatorPage(sb(), 'en')).resolves.toEqual({ user: { id: 'creator-1' } })
+  })
+
+  it('uses the locale it is given in both denial paths', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
+    await expect(requireCreatorPage(sb(), 'zh-hk')).rejects.toThrow('NEXT_REDIRECT:/zh-hk/sign-in')
+
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'ja', 'studio')).rejects.toThrow('NEXT_REDIRECT:/ja/studio')
   })
 })
 
