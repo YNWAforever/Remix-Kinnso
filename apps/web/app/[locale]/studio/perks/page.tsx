@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { getCreatorStoredTier } from '@/lib/contribution/queries'
 import { listActivePerks, listRedeemedPerkIds } from '@/lib/perks/queries'
 import { mapPerkCard } from '@/lib/perks/list'
@@ -20,9 +20,7 @@ export default async function StudioPerksPage({ params }: { params: Promise<{ lo
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'creator') notFound()
+  const { user } = await requireCreatorPage(supabase, loc)
 
   const creatorTier = await getCreatorStoredTier(supabase, user.id)
   const [perks, redeemedIds] = await Promise.all([
