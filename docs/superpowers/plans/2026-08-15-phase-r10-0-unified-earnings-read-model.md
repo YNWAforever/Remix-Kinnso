@@ -961,10 +961,15 @@ Two existing behaviours are also fixed here, both cheap and both correctness iss
 
 ~~~tsx
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, afterEach } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
 import { StudioEarningsView } from '@/components/kinnso/pages/StudioEarningsView'
 import en from '@/lib/i18n/messages/en'
+
+// Required, not optional: this repo's vitest.config.ts does not set `globals: true`, so RTL's
+// auto-cleanup never activates and DOM from one render leaks into the next test as
+// "multiple elements found". Every multi-render test file in the repo does this.
+afterEach(cleanup)
 
 const empty = { missions: [], bookings: [], tracked: [], totals: [] }
 
