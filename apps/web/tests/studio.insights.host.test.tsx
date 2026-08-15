@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { roleMock, getUserMock, insightsMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'creator'),
+const { creatorPageGateMock, getUserMock, insightsMock } = vi.hoisted(() => ({
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'u1' } })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
   insightsMock: vi.fn(async () => ({
     pointsTotal: 65,
@@ -21,7 +21,7 @@ const { roleMock, getUserMock, insightsMock } = vi.hoisted(() => ({
 vi.mock('next/navigation', () => ({
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorPage: creatorPageGateMock }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }),
 }))
@@ -31,7 +31,7 @@ import StudioInsightsPage from '@/app/[locale]/studio/insights/page'
 import en from '@/lib/i18n/messages/en'
 
 beforeEach(() => {
-  roleMock.mockResolvedValue('creator')
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'u1' } })
   getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
 })
 
@@ -43,14 +43,19 @@ describe('/[locale]/studio/insights host', () => {
   })
 
   it('redirects a non-creator to the studio hub', async () => {
-    roleMock.mockResolvedValueOnce('merchant')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_REDIRECT:/en/studio'))
     await expect(StudioInsightsPage({ params: Promise.resolve({ locale: 'en' }) }))
       .rejects.toThrow('NEXT_REDIRECT:/en/studio')
   })
 
   it('redirects an anonymous viewer to sign-in', async () => {
-    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_REDIRECT:/en/sign-in'))
     await expect(StudioInsightsPage({ params: Promise.resolve({ locale: 'en' }) }))
       .rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('asks the guard for hub-redirect denial, not notFound', async () => {
+    await StudioInsightsPage({ params: Promise.resolve({ locale: 'en' }) })
+    expect(creatorPageGateMock).toHaveBeenCalledWith(expect.anything(), 'en', 'studio')
   })
 })

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { listAffiliateOffersMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
+const { listAffiliateOffersMock, notFoundMock, creatorPageGateMock } = vi.hoisted(() => ({
   listAffiliateOffersMock: vi.fn(async () => ({
     data: [{
       id: 'offer-1',
@@ -23,7 +23,7 @@ const { listAffiliateOffersMock, notFoundMock, resolveViewerRoleMock } = vi.hois
     }],
   })),
   notFoundMock: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-  resolveViewerRoleMock: vi.fn(async () => 'creator'),
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'creator-user-1' } })),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -31,7 +31,7 @@ vi.mock('next/navigation', () => ({
   redirect: vi.fn((path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) }),
   useRouter: () => ({ refresh: vi.fn() }),
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: resolveViewerRoleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorPage: creatorPageGateMock }))
 vi.mock('@/lib/missions/queries', () => ({ listAffiliateOffers: listAffiliateOffersMock }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({
@@ -43,13 +43,13 @@ import StudioOffersPage from '@/app/[locale]/studio/offers/page'
 
 beforeEach(() => {
   listAffiliateOffersMock.mockClear()
-  resolveViewerRoleMock.mockReset()
-  resolveViewerRoleMock.mockResolvedValue('creator')
+  creatorPageGateMock.mockReset()
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-user-1' } })
 })
 
 describe('/[locale]/studio/offers host', () => {
   it('returns not found for non-creator viewers', async () => {
-    resolveViewerRoleMock.mockResolvedValueOnce('merchant')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
     await expect(StudioOffersPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
     expect(listAffiliateOffersMock).not.toHaveBeenCalled()
   })

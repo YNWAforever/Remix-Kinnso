@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { roleMock, getUserMock, tierMock, recentMock, countMock, configuredMock, dnaRow } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'creator'),
+const { creatorPageGateMock, getUserMock, tierMock, recentMock, countMock, configuredMock, dnaRow } = vi.hoisted(() => ({
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'creator-1' } })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'creator-1' } } })),
   tierMock: vi.fn(async () => 'rising'),
   recentMock: vi.fn(async () => []),
@@ -18,7 +18,7 @@ vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorPage: creatorPageGateMock }))
 vi.mock('@/lib/contribution/queries', () => ({ getCreatorStoredTier: tierMock }))
 vi.mock('@/lib/copilot/queries', () => ({ getRecentMessages: recentMock, countUserMessagesToday: countMock }))
 vi.mock('@/lib/copilot/config', () => ({ isCopilotConfigured: configuredMock }))
@@ -35,11 +35,11 @@ vi.mock('@/lib/supabase/server', () => ({
 
 import StudioCopilotPage from '@/app/[locale]/studio/copilot/page'
 
-beforeEach(() => { roleMock.mockResolvedValue('creator'); tierMock.mockResolvedValue('rising'); countMock.mockResolvedValue(0); configuredMock.mockReturnValue(true) })
+beforeEach(() => { creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-1' } }); tierMock.mockResolvedValue('rising'); countMock.mockResolvedValue(0); configuredMock.mockReturnValue(true) })
 
 describe('/[locale]/studio/copilot host', () => {
   it('notFound for non-creator viewers', async () => {
-    roleMock.mockResolvedValueOnce('merchant')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
     await expect(StudioCopilotPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
   })
 

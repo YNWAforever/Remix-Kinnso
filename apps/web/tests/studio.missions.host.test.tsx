@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { listCreatorMerchantMissionsMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
+const { listCreatorMerchantMissionsMock, notFoundMock, creatorPageGateMock } = vi.hoisted(() => ({
   listCreatorMerchantMissionsMock: vi.fn(async () => ({
     data: [{
       id: 'mission-1',
@@ -23,7 +23,7 @@ const { listCreatorMerchantMissionsMock, notFoundMock, resolveViewerRoleMock } =
     }],
   })),
   notFoundMock: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-  resolveViewerRoleMock: vi.fn(async () => 'creator'),
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'creator-user-1' } })),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -32,8 +32,8 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }))
 
-vi.mock('@/lib/auth/viewer-role', () => ({
-  resolveViewerRole: resolveViewerRoleMock,
+vi.mock('@/lib/admin/guard', () => ({
+  requireCreatorPage: creatorPageGateMock,
 }))
 
 vi.mock('@/lib/missions/queries', () => ({
@@ -56,13 +56,13 @@ import StudioMissionsPage from '@/app/[locale]/studio/missions/page'
 
 beforeEach(() => {
   listCreatorMerchantMissionsMock.mockClear()
-  resolveViewerRoleMock.mockReset()
-  resolveViewerRoleMock.mockResolvedValue('creator')
+  creatorPageGateMock.mockReset()
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-user-1' } })
 })
 
 describe('/[locale]/studio/missions host', () => {
   it('returns not found for authenticated non-creator viewers', async () => {
-    resolveViewerRoleMock.mockResolvedValueOnce('merchant')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
 
     await expect(
       StudioMissionsPage({ params: Promise.resolve({ locale: 'en' }) }),
