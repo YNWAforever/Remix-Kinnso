@@ -1471,10 +1471,10 @@ Ten new keys on the existing `studioEarnings` group. This is a **seven-file chan
 `apps/web/lib/i18n/messages/th.ts`:
 
 ~~~ts
-    missionsHeading: 'การชำระเงินจากภารกิจ',
-    missionsEmpty: 'ยังไม่มีการชำระเงินจากภารกิจ',
-    bookingsHeading: 'ค่าคอมมิชชั่นจากการจอง',
-    bookingsEmpty: 'ยังไม่มีค่าคอมมิชชั่นจากการจอง',
+    missionsHeading: 'ยอดจากภารกิจ',
+    missionsEmpty: 'ยังไม่มียอดจากภารกิจ',
+    bookingsHeading: 'ค่าคอมมิชชันจากการจอง',
+    bookingsEmpty: 'ยังไม่มีค่าคอมมิชชันจากการจอง',
     colExperience: 'ประสบการณ์',
     trackedHeading: 'บันทึกแล้ว ยังจ่ายไม่ได้',
     trackedNote: 'รายการแอฟฟิลิเอตเหล่านี้ถูกบันทึกไว้แล้วแต่ยังไม่ได้ชำระเงิน และไม่รวมอยู่ในยอดรวมของคุณ',
@@ -1500,11 +1500,24 @@ describe('studioEarnings tracked-volume honesty', () => {
     th: 'ยังไม่ได้ชำระเงิน',
   }
 
+  // The heading needs its own marker. A bare non-empty check would pass for ANY text,
+  // including a heading that implied the money was available — which is precisely the
+  // failure this block exists to prevent.
+  const HEADING_MARKER: Record<string, string> = {
+    en: 'not yet payable',
+    'zh-hk': '尚未可支付',
+    'zh-tw': '尚未可支付',
+    'zh-cn': '尚不可支付',
+    ja: '未精算',
+    ko: '지급 불가',
+    th: 'ยังจ่ายไม่ได้',
+  }
+
   for (const locale of LOCALES) {
     it(`${locale} states that tracked volume is not settled`, async () => {
       const dict = await getDictionary(locale)
       expect(dict.studioEarnings.trackedNote).toContain(NOT_PAYABLE_MARKER[locale])
-      expect(dict.studioEarnings.trackedHeading.length).toBeGreaterThan(0)
+      expect(dict.studioEarnings.trackedHeading).toContain(HEADING_MARKER[locale])
     })
   }
 })
