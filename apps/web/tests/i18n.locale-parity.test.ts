@@ -138,3 +138,26 @@ describe('i18n locale parity for new creator-profile groups', () => {
     })
   }
 })
+
+describe('studioEarnings tracked-volume honesty', () => {
+  // The tracked section reports affiliate volume that is recorded but NOT settled.
+  // Key parity cannot detect a translation that drops the negation and implies the
+  // money is payable, so each locale's disclaimer is pinned to a marker it must contain.
+  const NOT_PAYABLE_MARKER: Record<string, string> = {
+    en: 'not settled',
+    'zh-hk': '尚未結算',
+    'zh-tw': '尚未結算',
+    'zh-cn': '尚未结算',
+    ja: '精算されていません',
+    ko: '정산되지 않았습니다',
+    th: 'ยังไม่ได้ชำระเงิน',
+  }
+
+  for (const locale of LOCALES) {
+    it(`${locale} states that tracked volume is not settled`, async () => {
+      const dict = await getDictionary(locale)
+      expect(dict.studioEarnings.trackedNote).toContain(NOT_PAYABLE_MARKER[locale])
+      expect(dict.studioEarnings.trackedHeading.length).toBeGreaterThan(0)
+    })
+  }
+})

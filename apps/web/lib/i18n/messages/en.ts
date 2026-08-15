@@ -941,6 +941,16 @@ export interface Messages {
     colType: string
     colAmount: string
     colStatus: string
+    missionsHeading: string
+    missionsEmpty: string
+    bookingsHeading: string
+    bookingsEmpty: string
+    colExperience: string
+    trackedHeading: string
+    trackedNote: string
+    trackedEmpty: string
+    colGross: string
+    colState: string
   }
   tier: {
     cardTitle: string
@@ -2182,7 +2192,7 @@ const messages: Messages = {
   },
   studioEarnings: {
     heading: 'Earnings',
-    subtitle: 'Track payouts from missions and affiliate commissions.',
+    subtitle: 'Track payouts from missions, bookings and affiliate commissions.',
     paid: 'Paid',
     pending: 'Pending',
     empty: 'No earnings yet. Completed missions and settled commissions will appear here.',
@@ -2190,6 +2200,16 @@ const messages: Messages = {
     colType: 'Type',
     colAmount: 'Amount',
     colStatus: 'Status',
+    missionsHeading: 'Mission settlements',
+    missionsEmpty: 'No mission settlements yet.',
+    bookingsHeading: 'Booking commission',
+    bookingsEmpty: 'No booking commission yet.',
+    colExperience: 'Experience',
+    trackedHeading: 'Tracked, not yet payable',
+    trackedNote: 'These affiliate conversions are recorded but not settled. They are not included in your totals.',
+    trackedEmpty: 'No tracked conversions.',
+    colGross: 'Gross',
+    colState: 'State',
   },
   tier: {
     cardTitle: 'Your tier',
