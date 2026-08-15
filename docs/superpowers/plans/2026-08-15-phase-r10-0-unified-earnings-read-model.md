@@ -196,7 +196,9 @@ A single fixed-behaviour helper cannot express both: six pages `notFound()` a no
 ~~~ts
 describe('requireCreatorPage', () => {
   it('redirects an anonymous visitor to sign-in', async () => {
-    getUserMock.mockResolvedValue({ data: { user: null } })
+    // `as never` matches the cast the existing suite already uses: getUserMock's inferred
+    // type requires `user: { id: string }`, so a bare null fails tsc with TS2322.
+    getUserMock.mockResolvedValue({ data: { user: null } } as never)
     await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
   })
 
@@ -221,7 +223,9 @@ describe('requireCreatorPage', () => {
   })
 
   it('uses the locale it is given in both denial paths', async () => {
-    getUserMock.mockResolvedValue({ data: { user: null } })
+    // `as never` matches the cast the existing suite already uses: getUserMock's inferred
+    // type requires `user: { id: string }`, so a bare null fails tsc with TS2322.
+    getUserMock.mockResolvedValue({ data: { user: null } } as never)
     await expect(requireCreatorPage(sb(), 'zh-hk')).rejects.toThrow('NEXT_REDIRECT:/zh-hk/sign-in')
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
     roleMock.mockResolvedValue('merchant')
@@ -1261,7 +1265,9 @@ describe('/studio/earnings host', () => {
   })
 
   it('redirects an anonymous visitor to sign-in', async () => {
-    getUserMock.mockResolvedValue({ data: { user: null } })
+    // `as never` matches the cast the existing suite already uses: getUserMock's inferred
+    // type requires `user: { id: string }`, so a bare null fails tsc with TS2322.
+    getUserMock.mockResolvedValue({ data: { user: null } } as never)
     await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
     expect(summaryMock).not.toHaveBeenCalled()
   })
