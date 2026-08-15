@@ -34,6 +34,12 @@ describe('r10.0 creator_earnings_summary migration', () => {
     expect(sql).toContain('join public.mission_participants p on p.id = s.mission_participant_id')
     expect(sql).toContain('where p.creator_id = v_uid')
     expect(sql).not.toContain('mission_settlements.creator_id')
+    // Alias-qualified form too. Every table reference in this function uses a short alias, so
+    // the fully-qualified string above would NOT catch the bug it names — a naive attribution
+    // via a nonexistent `s.creator_id` column would slip straight past it. The lookbehind is
+    // required: a plain substring check also matches the harmless `bookings.creator_id` that
+    // appears in a comment.
+    expect(sql).not.toMatch(/(?<![a-z_])s\.creator_id/)
   })
 
   it('uses each table its own currency column', () => {
