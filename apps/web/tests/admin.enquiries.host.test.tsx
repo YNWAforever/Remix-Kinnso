@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { roleMock, getUserMock, listMock, viewMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'ops'),
+const { opsPageGateMock, getUserMock, listMock, viewMock } = vi.hoisted(() => ({
+  opsPageGateMock: vi.fn(async () => ({ user: { id: 'ops1' } })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'ops1' } } })),
   listMock: vi.fn<(...args: unknown[]) => Promise<unknown[]>>(async () => []), viewMock: vi.fn(() => <div data-testid="enquiries-view" />),
 }))
@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireOpsPage: opsPageGateMock }))
 vi.mock('@/lib/admin/enquiries-queries', () => ({ listAdminEnquiries: listMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
 vi.mock('@/components/kinnso/admin/AdminEnquiriesView', () => ({ AdminEnquiriesView: viewMock }))
@@ -18,7 +18,7 @@ vi.mock('@/components/kinnso/admin/AdminEnquiriesView', () => ({ AdminEnquiriesV
 import AdminEnquiriesPage from '@/app/[locale]/admin/enquiries/page'
 
 beforeEach(() => {
-  roleMock.mockResolvedValue('ops')
+  opsPageGateMock.mockResolvedValue({ user: { id: 'ops1' } })
   getUserMock.mockResolvedValue({ data: { user: { id: 'ops1' } } })
   listMock.mockResolvedValue([])
 })
@@ -26,9 +26,9 @@ afterEach(() => vi.clearAllMocks())
 
 describe('/admin/enquiries host', () => {
   it('redirects anonymous visitors and 404s authenticated non-ops before the PII queue query', async () => {
-    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
+    opsPageGateMock.mockRejectedValueOnce(new Error('NEXT_REDIRECT:/en/sign-in'))
     await expect(AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) })).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
-    roleMock.mockResolvedValueOnce('creator')
+    opsPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
     await expect(AdminEnquiriesPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) })).rejects.toThrow('NEXT_NOT_FOUND')
     expect(listMock).not.toHaveBeenCalled()
   })

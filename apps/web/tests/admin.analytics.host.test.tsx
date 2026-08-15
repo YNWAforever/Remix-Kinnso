@@ -2,8 +2,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TravellerAnalyticsReport } from '@/lib/admin/analytics-queries'
 
-const { roleMock, getUserMock, reportMock, viewMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'ops'),
+const { opsPageGateMock, getUserMock, reportMock, viewMock } = vi.hoisted(() => ({
+  opsPageGateMock: vi.fn(async () => ({ user: { id: 'ops1' } })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'ops1' } } })),
   reportMock: vi.fn<() => Promise<TravellerAnalyticsReport>>(async () => ({
     from: '2026-08-01T00:00:00.000Z',
@@ -22,7 +22,7 @@ vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireOpsPage: opsPageGateMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
 vi.mock('@/lib/admin/analytics-queries', () => ({ getTravellerAnalyticsReport: reportMock }))
 vi.mock('@/components/kinnso/admin/analytics/AdminAnalyticsView', () => ({ AdminAnalyticsView: viewMock }))
@@ -30,7 +30,7 @@ vi.mock('@/components/kinnso/admin/analytics/AdminAnalyticsView', () => ({ Admin
 import AdminAnalyticsPage from '@/app/[locale]/admin/analytics/page'
 
 beforeEach(() => {
-  roleMock.mockResolvedValue('ops')
+  opsPageGateMock.mockResolvedValue({ user: { id: 'ops1' } })
   getUserMock.mockResolvedValue({ data: { user: { id: 'ops1' } } })
   reportMock.mockResolvedValue({
     from: '2026-08-01T00:00:00.000Z', to: '2026-08-08T00:00:00.000Z', timezone: 'UTC', attributionWindowDays: 7, rows: [],
@@ -40,10 +40,10 @@ afterEach(() => vi.clearAllMocks())
 
 describe('/admin/analytics host', () => {
   it('redirects anonymous users and 404s non-ops before the report query', async () => {
-    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
+    opsPageGateMock.mockRejectedValueOnce(new Error('NEXT_REDIRECT:/en/sign-in'))
     await expect(AdminAnalyticsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) }))
       .rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
-    roleMock.mockResolvedValueOnce('creator')
+    opsPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
     await expect(AdminAnalyticsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) }))
       .rejects.toThrow('NEXT_NOT_FOUND')
     expect(reportMock).not.toHaveBeenCalled()
