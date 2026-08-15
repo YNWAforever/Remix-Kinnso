@@ -892,7 +892,6 @@ const messages: Messages = {
     subtitle: '追踪任务、预订及联盟佣金的收益。',
     paid: '已支付',
     pending: '待支付',
-    empty: '尚无收益，已完成的任务及已结算的佣金会在此显示。',
     colMission: '任务',
     colType: '类型',
     colAmount: '金额',

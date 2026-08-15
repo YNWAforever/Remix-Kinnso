@@ -936,7 +936,6 @@ export interface Messages {
     subtitle: string
     paid: string
     pending: string
-    empty: string
     colMission: string
     colType: string
     colAmount: string
@@ -2195,7 +2194,6 @@ const messages: Messages = {
     subtitle: 'Track payouts from missions, bookings and affiliate commissions.',
     paid: 'Paid',
     pending: 'Pending',
-    empty: 'No earnings yet. Completed missions and settled commissions will appear here.',
     colMission: 'Mission',
     colType: 'Type',
     colAmount: 'Amount',

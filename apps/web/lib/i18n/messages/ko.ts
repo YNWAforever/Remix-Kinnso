@@ -892,7 +892,6 @@ const messages: Messages = {
     subtitle: '미션, 예약, 제휴 커미션 수익을 확인하세요.',
     paid: '지급 완료',
     pending: '대기 중',
-    empty: '아직 수익이 없습니다. 완료된 미션과 정산된 커미션이 여기에 표시됩니다.',
     colMission: '미션',
     colType: '유형',
     colAmount: '금액',

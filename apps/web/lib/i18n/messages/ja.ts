@@ -892,7 +892,6 @@ const messages: Messages = {
     subtitle: 'ミッション、予約、アフィリエイトの報酬を確認できます。',
     paid: '支払済み',
     pending: '保留中',
-    empty: 'まだ収益はありません。完了したミッションと確定した報酬がここに表示されます。',
     colMission: 'ミッション',
     colType: 'タイプ',
     colAmount: '金額',

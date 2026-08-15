@@ -1779,6 +1779,56 @@ The migration is **not** applied to production by this plan. Applying `202608150
 
 ---
 
+## Errata
+
+Corrections made to this document **after** implementation began. The fenced code above is updated in
+place so the plan stays directly usable, but every change is recorded here so a later spec-fidelity
+check can tell what was originally specified from what was actually built. Raised by a reviewer who
+correctly noted that silently rewriting a plan's fences destroys its audit trail.
+
+1. **Tasks 2 and 6 — `as never` on the null-user mock.** The original snippets wrote
+   `getUserMock.mockResolvedValue({ data: { user: null } })`, which fails `tsc` with TS2322: the
+   hoisted mock's inferred type requires `user: { id: string }`. The existing suite already used
+   `as never` for exactly this.
+2. **Task 4 — the settlement-attribution assertion could never fail.**
+   `not.toContain('mission_settlements.creator_id')` was meant to catch attribution via a
+   non-existent column, but every table reference in the function uses a short alias, so that string
+   could not appear regardless. Replaced with a boundary-aware regex. The first replacement
+   (`not.toContain('s.creator_id')`) was itself wrong — it false-positived on `bookings.creator_id`
+   inside a comment.
+3. **Task 5 — no local Supabase stack.** The original Step 3 regenerated `packages/db/types.ts` from
+   a local stack. Replaced with a hand-added single line, so Tasks 1–7 are strictly database-free and
+   all DB interaction is confined to Task 8. `pnpm typecheck` still proves the line is correct,
+   because the `.rpc()` call does not compile without it.
+4. **Task 6 — `afterEach(cleanup)` is mandatory.** The view test omitted it. This repo's
+   `apps/web/vitest.config.ts` does not set `globals: true`, so RTL auto-cleanup never activates and
+   renders leak between tests as "multiple elements found". Most existing test files already do this.
+5. **Task 6 — `Rows` hardcoded `colSpan={4}`** while two of its three tables have three columns. Now
+   takes `colSpan` as a prop. Harmless at runtime (the row is `aria-hidden`, and browsers clamp an
+   excess colspan) but wrong markup and a trap for the next column change.
+6. **Task 7 — `subtitle` updated in all seven locales.** The original copy said "missions and
+   affiliate commissions", understating the page now that booking commission is a third section.
+7. **Task 7 — Thai overclaimed.** `missionsHeading` rendered "Mission settlements" as
+   "การชำระเงินจากภารกิจ" ("payment from missions"), asserting funds had moved when the section lists
+   both paid and pending rows. Changed to a neutral "ยอดจากภารกิจ" ("amounts from missions"). Three
+   new strings also used a commission spelling that disagreed with the file's 15 existing uses.
+8. **Task 7 — the `trackedHeading` honesty assertion guarded nothing.**
+   `expect(...trackedHeading.length).toBeGreaterThan(0)` passes for any text, including a heading
+   implying the money is available — the exact failure the block exists to prevent. Now pinned to a
+   per-locale marker.
+9. **Task 7 — the `empty` key was removed after all.** The plan said to keep it because other tests
+   referenced it; true when written, false once Task 6 replaced the view test. Verified unreferenced,
+   then dropped from the interface and all seven locales.
+10. **Task order — 7 ran before 6.** As written, Task 6 consumed locale keys Task 7 adds, so its test
+    would have been committed red. Swapping them keeps every commit on the branch green.
+
+Still open, deliberately not changed: `colGross` ("Gross") translates to a word meaning "Total" in
+five of six locales, which reads awkwardly directly beneath a disclaimer that these amounts are *not*
+included in your totals. Cosmetic rather than a false claim — flagged for a wording decision rather
+than guessed at across six languages.
+
+---
+
 ## Plan self-review checklist
 
 - The phase adds exactly one database object — a `stable`, owner-gated, `SECURITY DEFINER` read function — and zero write paths, so it cannot corrupt money data even if the logic is wrong.

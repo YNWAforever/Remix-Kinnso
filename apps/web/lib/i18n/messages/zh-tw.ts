@@ -892,7 +892,6 @@ const messages: Messages = {
     subtitle: '追蹤任務、預訂及聯盟佣金的收益。',
     paid: '已支付',
     pending: '待支付',
-    empty: '尚未有收益，已完成的任務及已結算的佣金會在此顯示。',
     colMission: '任務',
     colType: '類型',
     colAmount: '金額',

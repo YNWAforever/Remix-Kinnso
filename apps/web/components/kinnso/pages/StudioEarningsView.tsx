@@ -35,14 +35,15 @@ function Section({
   )
 }
 
-function Rows({ children }: { children: React.ReactNode[] }) {
+/** `colSpan` must match the table's real column count — the three tables differ (4 / 3 / 3). */
+function Rows({ colSpan, children }: { colSpan: number; children: React.ReactNode[] }) {
   return (
     <tbody>
       {children.map((row, i) => (
         <React.Fragment key={i}>
           {i > 0 && (
             <tr aria-hidden="true">
-              <td colSpan={4} className="p-0">
+              <td colSpan={colSpan} className="p-0">
                 <TicketDivider />
               </td>
             </tr>
@@ -86,7 +87,7 @@ export function StudioEarningsView({ t, data }: StudioEarningsViewProps) {
               <th scope="col" className="py-2 pr-5 font-semibold">{t.colStatus}</th>
             </tr>
           </thead>
-          <Rows>
+          <Rows colSpan={4}>
             {missions.map((item) => (
               <tr key={item.id}>
                 <td className="py-2 pr-4 pl-5 font-medium text-kinnso-ink">{item.missionTitle}</td>
@@ -110,7 +111,7 @@ export function StudioEarningsView({ t, data }: StudioEarningsViewProps) {
               <th scope="col" className="py-2 pr-5 font-semibold">{t.colStatus}</th>
             </tr>
           </thead>
-          <Rows>
+          <Rows colSpan={3}>
             {bookings.map((item) => (
               <tr key={item.id}>
                 <td className="py-2 pr-4 pl-5 font-medium text-kinnso-ink">{item.experienceTitle}</td>
@@ -138,7 +139,7 @@ export function StudioEarningsView({ t, data }: StudioEarningsViewProps) {
               <th scope="col" className="py-2 pr-5 font-semibold">{t.colState}</th>
             </tr>
           </thead>
-          <Rows>
+          <Rows colSpan={3}>
             {tracked.map((item) => (
               <tr key={item.id}>
                 <td className="py-2 pr-4 pl-5 font-medium text-kinnso-ink">{item.missionTitle}</td>
