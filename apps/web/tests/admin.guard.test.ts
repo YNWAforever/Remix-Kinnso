@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
 }))
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
 
-import { requireOpsPage, requireOpsAction, requireCreatorAction } from '@/lib/admin/guard'
+import { requireOpsPage, requireOpsAction, requireCreatorAction, requireCreatorPage } from '@/lib/admin/guard'
 const sb = () => ({ auth: { getUser: getUserMock } }) as never
 
 beforeEach(() => { roleMock.mockResolvedValue('ops'); getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } }) })
@@ -60,5 +60,40 @@ describe('requireCreatorAction', () => {
     const supabase = { auth: { getUser: async () => ({ data: { user: { id: 'creator-1' } } }) } }
     const result = await requireCreatorAction(supabase as never)
     expect(result).toEqual({ ok: true, user: { id: 'creator-1' } })
+  })
+})
+
+describe('requireCreatorPage', () => {
+  it('redirects an anonymous visitor to sign-in', async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } } as never)
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('notFounds a non-creator by default', async () => {
+    roleMock.mockResolvedValue('traveler')
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('redirects a non-creator to the studio hub in studio mode', async () => {
+    roleMock.mockResolvedValue('traveler')
+    await expect(requireCreatorPage(sb(), 'en', 'studio')).rejects.toThrow('NEXT_REDIRECT:/en/studio')
+  })
+
+  it('treats creator-pending as a non-creator', async () => {
+    roleMock.mockResolvedValue('creator-pending')
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('returns the user for an active creator', async () => {
+    roleMock.mockResolvedValue('creator')
+    await expect(requireCreatorPage(sb(), 'en')).resolves.toEqual({ user: { id: 'u1' } })
+  })
+
+  it('uses the locale it is given in both denial paths', async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } } as never)
+    await expect(requireCreatorPage(sb(), 'zh-hk')).rejects.toThrow('NEXT_REDIRECT:/zh-hk/sign-in')
+    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+    roleMock.mockResolvedValue('merchant')
+    await expect(requireCreatorPage(sb(), 'ja', 'studio')).rejects.toThrow('NEXT_REDIRECT:/ja/studio')
   })
 })
