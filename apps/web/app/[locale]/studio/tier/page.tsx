@@ -1,8 +1,7 @@
-import { redirect } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { getCreatorContribution, listContributionEvents } from '@/lib/contribution/queries'
 import { countGatedMissionsByTier } from '@/lib/missions/queries'
 import { listActivePerks } from '@/lib/perks/queries'
@@ -19,11 +18,7 @@ export default async function StudioTierPage({ params }: { params: Promise<{ loc
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-
-  const role = await resolveViewerRole(supabase)
-  if (role !== 'creator') redirect(`/${loc}/studio`)
+  const { user } = await requireCreatorPage(supabase, loc, 'studio')
 
   const [contribution, events, gatedCounts, perks] = await Promise.all([
     getCreatorContribution(supabase, user.id),

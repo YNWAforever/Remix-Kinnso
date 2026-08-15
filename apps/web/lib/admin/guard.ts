@@ -14,6 +14,31 @@ export async function requireOpsPage(supabase: Supabase, loc: Locale): Promise<{
   return { user }
 }
 
+/**
+ * Page gate: redirect anon to sign-in, then deny non-creators. Returns the creator user.
+ *
+ * `denied` exists because the studio's eight role-checking pages historically split into
+ * two behaviours and both are asserted by host tests: six `notFound()` (the default here),
+ * while /studio/insights and /studio/tier `redirect()` to the hub. This helper preserves
+ * each page's existing behaviour rather than silently unifying it.
+ *
+ * `creators.id` IS `auth.uid()`, so the returned `user.id` is directly usable as a
+ * creator id — same rule requireCreatorAction documents.
+ */
+export async function requireCreatorPage(
+  supabase: Supabase,
+  loc: Locale,
+  denied: 'not-found' | 'studio' = 'not-found',
+): Promise<{ user: { id: string } }> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect(`/${loc}/sign-in`)
+  if ((await resolveViewerRole(supabase)) !== 'creator') {
+    if (denied === 'studio') redirect(`/${loc}/studio`)
+    notFound()
+  }
+  return { user }
+}
+
 /** Action gate: typed failure for anon/non-ops; ok+user for ops. */
 export async function requireOpsAction(
   supabase: Supabase,

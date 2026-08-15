@@ -1,56 +1,56 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-afterEach(cleanup)
-
-const { listCreatorSettlementsMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
-  listCreatorSettlementsMock: vi.fn(async () => ({
-    data: [{
-      id: 'settle-1',
-      status: 'paid',
-      creator_payout_status: 'paid',
-      amount_currency: 'usd',
-      creator_commission_amount: 120,
-      paid_fee_amount: null,
-      missions: { title: 'Hotel program', mission_type: 'coupon_affiliate', mission_source: 'travelpayouts' },
-    }],
-  })),
-  notFoundMock: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-  resolveViewerRoleMock: vi.fn(async () => 'creator'),
+const { roleMock, getUserMock, summaryMock } = vi.hoisted(() => ({
+  roleMock: vi.fn(async () => 'creator'),
+  getUserMock: vi.fn(async () => ({ data: { user: { id: 'creator-1' } } })),
+  summaryMock: vi.fn(async () => ({ missions: [], bookings: [], tracked: [], totals: [] })),
 }))
 
 vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
-  redirect: vi.fn((path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) }),
+  notFound: () => { throw new Error('NEXT_NOT_FOUND') },
+  redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: resolveViewerRoleMock }))
-vi.mock('@/lib/missions/queries', () => ({ listCreatorSettlements: listCreatorSettlementsMock }))
+vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: { getUser: async () => ({ data: { user: { id: 'creator-user-1' } } }) },
-  }),
+  createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }),
 }))
+vi.mock('@/lib/missions/earnings-summary', () => ({ getCreatorEarningsSummary: summaryMock }))
 
 import StudioEarningsPage from '@/app/[locale]/studio/earnings/page'
 
 beforeEach(() => {
-  listCreatorSettlementsMock.mockClear()
-  resolveViewerRoleMock.mockReset()
-  resolveViewerRoleMock.mockResolvedValue('creator')
+  vi.clearAllMocks()
+  roleMock.mockResolvedValue('creator')
+  getUserMock.mockResolvedValue({ data: { user: { id: 'creator-1' } } })
+  summaryMock.mockResolvedValue({ missions: [], bookings: [], tracked: [], totals: [] })
 })
 
-describe('/[locale]/studio/earnings host', () => {
-  it('returns not found for non-creator viewers', async () => {
-    resolveViewerRoleMock.mockResolvedValueOnce('merchant')
-    await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
-    expect(listCreatorSettlementsMock).not.toHaveBeenCalled()
+describe('/studio/earnings host', () => {
+  it('notFounds an unknown locale', async () => {
+    await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'xx' }) })).rejects.toThrow('NEXT_NOT_FOUND')
+    expect(summaryMock).not.toHaveBeenCalled()
   })
 
-  it('renders the creator earnings breakdown', async () => {
-    const ui = await StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })
-    render(ui)
-    expect(screen.getByText('Hotel program')).toBeTruthy()
-    expect(screen.getByText('USD')).toBeTruthy()
+  it('redirects an anonymous visitor to sign-in', async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } } as never)
+    await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+    expect(summaryMock).not.toHaveBeenCalled()
+  })
+
+  it('notFounds a non-creator and never reads earnings', async () => {
+    roleMock.mockResolvedValue('traveler')
+    await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
+    expect(summaryMock).not.toHaveBeenCalled()
+  })
+
+  it('loads the summary for an active creator', async () => {
+    await StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })
+    expect(summaryMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('propagates an RPC failure instead of rendering an empty page', async () => {
+    summaryMock.mockRejectedValue(new Error('forbidden'))
+    await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('forbidden')
   })
 })

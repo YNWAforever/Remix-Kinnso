@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
 import { DnaSchema } from '@kinnso/scan'
 import { getCreatorStoredTier } from '@/lib/contribution/queries'
 import { policyForTier } from '@/lib/copilot/policy'
@@ -21,11 +21,7 @@ export default async function StudioCopilotPage({ params }: { params: Promise<{ 
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-
-  const role = await resolveViewerRole(supabase)
-  if (role !== 'creator') notFound()
+  const { user } = await requireCreatorPage(supabase, loc)
 
   const { data: dnaRow } = await supabase.from('creator_dna').select('final').eq('creator_id', user.id).single()
   if (!DnaSchema.safeParse((dnaRow as { final?: unknown } | null)?.final).success) redirect(`/${loc}/creator`)

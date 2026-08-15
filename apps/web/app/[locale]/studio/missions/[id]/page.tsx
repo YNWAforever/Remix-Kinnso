@@ -1,6 +1,6 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { CreatorMissionDetailView } from '@/components/kinnso/pages/CreatorMissionDetailView'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
@@ -25,13 +25,7 @@ export default async function StudioMissionDetailPage({ params }: { params: Para
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-
-  const role = await resolveViewerRole(supabase)
-  if (role !== 'creator') notFound()
+  const { user } = await requireCreatorPage(supabase, loc)
 
   const { data } = await getCreatorMissionDetail(supabase, id)
   if (!data) notFound()
