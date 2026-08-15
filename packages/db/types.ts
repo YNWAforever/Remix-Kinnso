@@ -3073,6 +3073,7 @@ export type Database = {
           partner_url: string
         }[]
       }
+      creator_earnings_summary: { Args: never; Returns: Json }
       creator_insights: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
       get_attributed_guides_for_merchant: {
