@@ -9,7 +9,12 @@ const SCAN_ROOTS = [
   'apps/web/lib',
 ] as const
 const FIXTURE_SOURCE_EXTENSIONS = new Set(['.cjs', '.js', '.jsx', '.mjs', '.ts', '.tsx'])
-const EXCLUDED_DIRECTORIES = new Set(['node_modules', '.next'])
+// `.worktrees` matters as much as `node_modules` here: collectFixtureSources() walks from the
+// repo ROOT, so a `git worktree` checked out under `.worktrees/` puts ANOTHER branch's files in
+// this branch's scan. That reports failures the working branch cannot fix and cannot reproduce in
+// CI (a fresh checkout has no worktrees), which teaches people to ignore a red gate — the exact
+// habit that lets a real placeholder token through. `.git` is excluded as pure waste avoidance.
+const EXCLUDED_DIRECTORIES = new Set(['node_modules', '.next', '.worktrees', '.git'])
 
 function portablePath(path: string) {
   return path.split(sep).join('/')
