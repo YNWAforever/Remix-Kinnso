@@ -117,7 +117,11 @@ describe('CreatorPayoutBatchesView', () => {
     fireEvent.click(screen.getByText(t.actApply))
     await waitFor(() => expect(createAction).toHaveBeenCalledTimes(1))
     // First attempt failed; the dialog stays open (confirm() only closes on res.ok). Retry
-    // without closing/reopening — this must reuse the same key, not mint a new one.
+    // without closing/reopening — this must reuse the same key, not mint a new one. The Apply
+    // button is disabled while isPending, and disabled buttons don't dispatch click events at
+    // all — waiting only on the call count races the button re-enabling after the first
+    // transition settles, so wait for it to be enabled again before the second click.
+    await waitFor(() => expect(screen.getByText(t.actApply)).not.toBeDisabled())
     fireEvent.click(screen.getByText(t.actApply))
     await waitFor(() => expect(createAction).toHaveBeenCalledTimes(2))
     const firstKey = createAction.mock.calls[0][1].idempotencyKey
