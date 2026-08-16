@@ -950,6 +950,10 @@ export interface Messages {
     trackedEmpty: string
     colGross: string
     colState: string
+    payoutBatchesHeading: string
+    payoutBatchesEmpty: string
+    colTarget: string
+    batchCancelled: string
   }
   tier: {
     cardTitle: string
@@ -1048,6 +1052,12 @@ export interface Messages {
     confirmMarkPaid: string; confirmMarkDisputed: string
     payoutsEmpty: string
     reasonRequired: string
+    batchesHeading: string; batchesSubtitle: string; batchesEmpty: string
+    colCreatorId: string; colCurrency: string; colTargetDate: string; colCreatedAt: string
+    batchStatusCancelled: string
+    actCreateBatch: string; actCancelBatch: string
+    formCreatorId: string; formCurrency: string; formAmount: string
+    confirmMarkBatchPaid: string; confirmCancelBatch: string
   }
   bookingsOps: BookingsOpsMessages
   merchantApply: MerchantApplyMessages
@@ -2208,6 +2218,10 @@ const messages: Messages = {
     trackedEmpty: 'No tracked conversions.',
     colGross: 'Gross',
     colState: 'State',
+    payoutBatchesHeading: 'Payout batches',
+    payoutBatchesEmpty: 'No payout batches yet.',
+    colTarget: 'Target date',
+    batchCancelled: 'Cancelled',
   },
   tier: {
     cardTitle: 'Your tier',
@@ -2318,6 +2332,15 @@ const messages: Messages = {
     confirmMarkDisputed: 'Flag this settlement as disputed?',
     payoutsEmpty: 'No settlements match this filter',
     reasonRequired: 'A reason is required.',
+    batchesHeading: 'Payout batches',
+    batchesSubtitle: 'Promise a payout to a creator and track it through to completion.',
+    batchesEmpty: 'No payout batches yet',
+    colCreatorId: 'Creator', colCurrency: 'Currency', colTargetDate: 'Target date', colCreatedAt: 'Created',
+    batchStatusCancelled: 'Cancelled',
+    actCreateBatch: 'Create batch', actCancelBatch: 'Cancel batch',
+    formCreatorId: 'Creator ID', formCurrency: 'Currency (e.g. HKD)', formAmount: 'Amount',
+    confirmMarkBatchPaid: 'Mark this payout batch as paid? This confirms the creator has been paid.',
+    confirmCancelBatch: 'Cancel this pending payout batch? This cannot be undone.',
   },
   bookingsOps: {
     title: 'Bookings & Settlements',

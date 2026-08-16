@@ -6,25 +6,7 @@ import { CreatorPayoutBatchesView } from '@/components/kinnso/admin/creators/Cre
 
 afterEach(cleanup)
 
-// Task 10 (a later task in this plan, not yet landed) adds these i18n keys to en.creators.
-// Until then they're `undefined` at runtime, and @testing-library/dom's getByText / queryByText /
-// getByPlaceholderText all throw synchronously on an undefined matcher ("It looks like undefined
-// was passed instead of a matcher") rather than treating it as "not found" — so every assertion
-// below that touches one of these keys would crash the test, not just fail it, and React itself
-// renders an undefined child as nothing (not the literal string "undefined"), so there is no DOM
-// text to query for regardless. Supply a stable placeholder string per pending key so this suite
-// can genuinely exercise the component now; spread order means real en.creators values always win
-// once Task 10 adds them, so this fallback becomes fully inert dead code at that point (safe to
-// delete then — reverting to `const t = en.creators` is the whole cleanup).
-const PENDING_I18N_FALLBACK = {
-  batchesHeading: 'batchesHeading', batchesSubtitle: 'batchesSubtitle', batchesEmpty: 'batchesEmpty',
-  actCreateBatch: 'actCreateBatch', actCancelBatch: 'actCancelBatch',
-  colCreatorId: 'colCreatorId', colCurrency: 'colCurrency', colTargetDate: 'colTargetDate', colCreatedAt: 'colCreatedAt',
-  formCreatorId: 'formCreatorId', formCurrency: 'formCurrency', formAmount: 'formAmount',
-  confirmMarkBatchPaid: 'confirmMarkBatchPaid', confirmCancelBatch: 'confirmCancelBatch',
-  batchStatusCancelled: 'batchStatusCancelled',
-}
-const t = { ...PENDING_I18N_FALLBACK, ...en.creators }
+const t = en.creators
 
 const batches = [
   {

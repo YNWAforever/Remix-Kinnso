@@ -57,15 +57,8 @@ describe('admin creators payouts host', () => {
   })
   it('renders the payout batches section', async () => {
     const ui = await CreatorsPayoutsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) })
-    // Task 10 (not yet landed) adds en.creators.batchesHeading and friends — until then this page's
-    // real (unmocked) getDictionary() call returns undefined for them, and getByText(undefined) throws
-    // rather than failing a normal "not found" query (see kinnso.CreatorPayoutBatchesView.test.tsx for
-    // the full explanation). CreatorPayoutBatchesView's root div carries a stable, non-i18n-dependent
-    // "mt-8" class (from its Step 3 source verbatim) that no other element on this page uses, so it's a
-    // safe stand-in for "the batches section mounted" today; swap to
-    // screen.getByText(en.creators.batchesHeading) once Task 10 lands, for a nicer text-based check.
-    const { container } = render(ui)
-    expect(container.querySelector('.mt-8')).toBeTruthy()
+    render(ui)
+    expect(screen.getByText(en.creators.batchesHeading)).toBeTruthy()
     expect(batchesMock).toHaveBeenCalled()
   })
 })

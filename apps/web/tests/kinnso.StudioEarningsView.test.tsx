@@ -26,21 +26,6 @@ const tracked = [
   { id: 'ev1', missionTitle: 'Flight deals', currency: 'USD', grossAmount: 15.25, eventState: 'processing' },
 ]
 
-// Task 10 (a later task in this plan, not yet landed) adds these i18n keys to en.studioEarnings.
-// Until then they're `undefined` at runtime, and @testing-library/dom's getByText throws
-// synchronously on an undefined matcher rather than treating it as "not found" (see
-// kinnso.CreatorPayoutBatchesView.test.tsx, Task 7, for the full explanation). Supply a stable
-// placeholder string per pending key so the two payout-batches tests below can genuinely
-// exercise the component now; spread order means real en.studioEarnings values always win once
-// Task 10 adds them, so this fallback becomes fully inert dead code at that point (safe to
-// delete then — reverting every `t={t}` in this describe block to `t={en.studioEarnings}` is
-// the whole cleanup, though the existing five tests never needed it in the first place).
-const PENDING_I18N_FALLBACK = {
-  payoutBatchesHeading: 'payoutBatchesHeading', payoutBatchesEmpty: 'payoutBatchesEmpty',
-  colTarget: 'colTarget', batchCancelled: 'batchCancelled',
-}
-const t = { ...PENDING_I18N_FALLBACK, ...en.studioEarnings }
-
 const payoutBatches = [
   {
     id: 'b1', currency: 'HKD', amount: 1500, status: 'pending' as const, targetAt: '2026-08-23T00:00:00Z',
@@ -103,16 +88,16 @@ describe('StudioEarningsView', () => {
   })
 
   it('renders a payout batches section when batches exist', () => {
-    render(<StudioEarningsView t={t} locale="en" data={empty} payoutBatches={payoutBatches} />)
-    expect(screen.getByText(t.payoutBatchesHeading)).toBeTruthy()
+    render(<StudioEarningsView t={en.studioEarnings} locale="en" data={empty} payoutBatches={payoutBatches} />)
+    expect(screen.getByText(en.studioEarnings.payoutBatchesHeading)).toBeTruthy()
     // Currency and amount render as adjacent text nodes within one cell ("HKD" then the
     // locale-formatted amount); match on the currency substring rather than the full text so
     // this doesn't depend on Number.prototype.toLocaleString()'s locale-dependent formatting.
     expect(screen.getByText(/HKD/)).toBeTruthy()
     // All three PayoutBatchStatus values render their own distinct badge label.
-    expect(screen.getByText(t.pending)).toBeTruthy()
-    expect(screen.getByText(t.paid)).toBeTruthy()
-    expect(screen.getByText(t.batchCancelled)).toBeTruthy()
+    expect(screen.getByText(en.studioEarnings.pending)).toBeTruthy()
+    expect(screen.getByText(en.studioEarnings.paid)).toBeTruthy()
+    expect(screen.getByText(en.studioEarnings.batchCancelled)).toBeTruthy()
   })
 
   it('renders the target date using the passed locale, not the runtime default', () => {
@@ -120,7 +105,7 @@ describe('StudioEarningsView', () => {
       id: 'bd', currency: 'HKD', amount: 100, status: 'pending' as const, targetAt: '2026-08-23T00:00:00Z',
       createdAt: '2026-08-16T00:00:00Z', paidAt: null, cancelledAt: null,
     }
-    render(<StudioEarningsView t={t} locale="ja" data={empty} payoutBatches={[batch]} />)
+    render(<StudioEarningsView t={en.studioEarnings} locale="ja" data={empty} payoutBatches={[batch]} />)
     // Deliberately a non-'en' locale: in this runtime 'en' happens to format identically to the
     // no-argument default ("8/23/2026" either way), so asserting with 'en' would pass even if the
     // component silently ignored the `locale` prop and called toLocaleDateString() bare — exactly
@@ -132,7 +117,7 @@ describe('StudioEarningsView', () => {
   })
 
   it('shows the empty state with no payout batches', () => {
-    render(<StudioEarningsView t={t} locale="en" data={empty} payoutBatches={[]} />)
-    expect(screen.getByText(t.payoutBatchesEmpty)).toBeTruthy()
+    render(<StudioEarningsView t={en.studioEarnings} locale="en" data={empty} payoutBatches={[]} />)
+    expect(screen.getByText(en.studioEarnings.payoutBatchesEmpty)).toBeTruthy()
   })
 })
