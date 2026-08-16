@@ -1,5 +1,6 @@
 'use client'
 import { useState, useTransition, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import type { PayoutBatchRow } from '@/lib/admin/payout-batches-queries'
 import type { CreatePayoutBatchInput, CancelPayoutBatchInput } from '@/lib/admin/payout-batches-actions'
 import type { ActionResult } from '@/lib/admin/result'
@@ -12,7 +13,7 @@ type MarkPaidFn = (locale: Locale, batchId: string, reason: string) => Promise<A
 type CancelFn = (locale: Locale, input: CancelPayoutBatchInput, reason: string) => Promise<ActionResult<{ id: string }>>
 
 const money = (n: number) => n.toFixed(2)
-const date = (iso: string) => new Date(iso).toLocaleDateString()
+const date = (iso: string, locale: Locale) => new Date(iso).toLocaleDateString(locale)
 
 function statusLabel(t: T, s: PayoutBatchRow['status']): string {
   if (s === 'paid') return t.setPaid
@@ -37,13 +38,21 @@ export function CreatorPayoutBatchesView({
   const [creatorId, setCreatorId] = useState('')
   const [currency, setCurrency] = useState('')
   const [amount, setAmount] = useState('')
+  // Generated once per dialog session (see openCreate), not per Apply click — a retried
+  // submission (dropped connection, perceived failure) must reuse the same key so the
+  // admin_create_payout_batch RPC recognizes it as a safe replay of the same intent
+  // rather than a new one. See Task 7 code-review Fix 1.
+  const [idempotencyKey, setIdempotencyKey] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const reasonRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => { if (dialog) reasonRef.current?.focus() }, [dialog])
 
-  const openCreate = () => { setDialog({ kind: 'create' }); setReason(''); setCreatorId(''); setCurrency(''); setAmount(''); setError(null) }
+  const openCreate = () => {
+    setDialog({ kind: 'create' }); setReason(''); setCreatorId(''); setCurrency(''); setAmount(''); setError(null)
+    setIdempotencyKey(crypto.randomUUID())
+  }
   const openPaid = (batch: PayoutBatchRow) => { setDialog({ kind: 'paid', batch }); setReason(''); setError(null) }
   const openCancel = (batch: PayoutBatchRow) => { setDialog({ kind: 'cancel', batch }); setReason(''); setError(null) }
   const close = () => { setDialog(null); setReason(''); setError(null) }
@@ -61,7 +70,7 @@ export function CreatorPayoutBatchesView({
       startTransition(async () => {
         const res = await createAction(locale, {
           creatorId: creatorId.trim(), currency: currency.trim(), amount: parsedAmount,
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey,
         }, reason.trim())
         if (res.ok) close()
         else setError(res.errors.form?.[0] ?? t.actionFailed)
@@ -79,7 +88,11 @@ export function CreatorPayoutBatchesView({
     }
 
     startTransition(async () => {
-      const res = await cancelAction(locale, { batchId: dialog.batch.id, idempotencyKey: crypto.randomUUID() }, reason.trim())
+      // Deterministic, not random: "cancel batch X" is one idempotent operation no matter
+      // how many times or how the user retries it — this key survives even a dialog
+      // close/reopen or page reload, unlike a state-stored UUID. Mirrors the pattern at
+      // apps/web/lib/bookings/actions.ts:107 (`booking-refund-${input.bookingId}`).
+      const res = await cancelAction(locale, { batchId: dialog.batch.id, idempotencyKey: `payout-cancel-${dialog.batch.id}` }, reason.trim())
       if (res.ok) close()
       else setError(res.errors.form?.[0] ?? t.actionFailed)
     })
@@ -113,12 +126,16 @@ export function CreatorPayoutBatchesView({
           <tbody>
             {batches.map((b) => (
               <tr key={b.id} className="border-b border-kinnso-line/60 align-top">
-                <td className="py-2 font-bold text-kinnso-ink">{b.creatorName ?? b.creatorId.slice(0, 8)}</td>
+                <td className="py-2 font-bold text-kinnso-ink">
+                  <Link href={`/${locale}/admin/creators/${b.creatorId}`} className="text-kinnso-orange hover:underline">
+                    {b.creatorName ?? b.creatorId.slice(0, 8)}
+                  </Link>
+                </td>
                 <td className="py-2 text-kinnso-muted">{b.currency}</td>
                 <td className="py-2 text-kinnso-muted">{money(b.amount)}</td>
                 <td className="py-2 text-kinnso-muted">{statusLabel(t, b.status)}</td>
-                <td className="py-2 text-kinnso-muted">{date(b.targetAt)}</td>
-                <td className="py-2 text-kinnso-muted">{date(b.createdAt)}</td>
+                <td className="py-2 text-kinnso-muted">{date(b.targetAt, locale)}</td>
+                <td className="py-2 text-kinnso-muted">{date(b.createdAt, locale)}</td>
                 <td className="py-2">
                   {b.status === 'pending' && (
                     <div className="flex flex-col gap-1">
@@ -144,6 +161,11 @@ export function CreatorPayoutBatchesView({
               {dialog.kind === 'paid' && t.confirmMarkBatchPaid}
               {dialog.kind === 'cancel' && t.confirmCancelBatch}
             </p>
+            {(dialog.kind === 'paid' || dialog.kind === 'cancel') && (
+              <p className="mb-2 text-xs text-kinnso-muted">
+                {dialog.batch.creatorName ?? dialog.batch.creatorId.slice(0, 8)} · {dialog.batch.amount.toFixed(2)} {dialog.batch.currency}
+              </p>
+            )}
             {dialog.kind === 'create' && (
               <div className="mb-2 flex flex-col gap-2">
                 <input value={creatorId} onChange={(e) => setCreatorId(e.target.value)} placeholder={t.formCreatorId}
