@@ -18,6 +18,12 @@ describe('r10.2 payout processing-window setting', () => {
     expect(sql).toContain('constraint creator_payout_settings_singleton check (id)')
   })
 
+  it('constrains processing_window_days to be positive', () => {
+    expect(sql).toContain(
+      'constraint creator_payout_settings_window_positive check (processing_window_days > 0)',
+    )
+  })
+
   it('seeds the singleton row', () => {
     expect(sql).toContain('insert into public.creator_payout_settings (id) values (true)')
   })
