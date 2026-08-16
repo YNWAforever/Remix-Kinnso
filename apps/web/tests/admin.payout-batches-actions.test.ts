@@ -86,3 +86,27 @@ describe('cancelPayoutBatch', () => {
     expect(rpcMock).not.toHaveBeenCalled()
   })
 })
+
+describe('role-gate (R10.2)', () => {
+  it('createPayoutBatch surfaces forbidden when the DB rejects an under-privileged caller', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await createPayoutBatch('en', { creatorId: 'c1', currency: 'HKD', amount: 1500, idempotencyKey: 'key-1' }, 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).toHaveBeenCalled()
+    if (!res.ok) expect(res.errors.form?.[0]).toMatch(/active ops access is required/i)
+  })
+  it('markPayoutBatchPaid surfaces forbidden when the DB rejects an under-privileged caller', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await markPayoutBatchPaid('en', 'b1', 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).toHaveBeenCalled()
+    if (!res.ok) expect(res.errors.form?.[0]).toMatch(/active ops access is required/i)
+  })
+  it('cancelPayoutBatch surfaces forbidden when the DB rejects an under-privileged caller', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'forbidden' } })
+    const res = await cancelPayoutBatch('en', { batchId: 'b1', idempotencyKey: 'key-2' }, 'reason')
+    expect(res.ok).toBe(false)
+    expect(rpcMock).toHaveBeenCalled()
+    if (!res.ok) expect(res.errors.form?.[0]).toMatch(/active ops access is required/i)
+  })
+})
