@@ -24,5 +24,5 @@ export default async function StudioEarningsPage({ params }: { params: Params })
   const data = await getCreatorEarningsSummary(supabase)
   const payoutBatches = await getCreatorPayoutBatches(supabase)
 
-  return <StudioEarningsView t={messages.studioEarnings} data={data} payoutBatches={payoutBatches} />
+  return <StudioEarningsView t={messages.studioEarnings} locale={loc} data={data} payoutBatches={payoutBatches} />
 }

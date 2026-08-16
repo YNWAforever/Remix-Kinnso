@@ -2,10 +2,12 @@ import React from 'react'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { ReceiptRow, TicketCard, TicketDivider } from '@/components/kinnso/MarketPassport'
 import type { Messages } from '@/lib/i18n/messages/en'
+import type { Locale } from '@/lib/i18n/config'
 import type { CreatorEarningsSummary, CreatorPayoutBatch } from '@/lib/missions/earnings-summary'
 
 type StudioEarningsViewProps = {
   t: Messages['studioEarnings']
+  locale: Locale
   data: CreatorEarningsSummary
   payoutBatches: CreatorPayoutBatch[]
 }
@@ -56,7 +58,7 @@ function Rows({ colSpan, children }: { colSpan: number; children: React.ReactNod
   )
 }
 
-export function StudioEarningsView({ t, data, payoutBatches }: StudioEarningsViewProps) {
+export function StudioEarningsView({ t, locale, data, payoutBatches }: StudioEarningsViewProps) {
   const { missions, bookings, tracked, totals } = data
 
   return (
@@ -172,7 +174,7 @@ export function StudioEarningsView({ t, data, payoutBatches }: StudioEarningsVie
                 <td className="py-2 pr-4">
                   <MissionStatusBadge status={b.status === 'paid' ? t.paid : b.status === 'cancelled' ? t.batchCancelled : t.pending} />
                 </td>
-                <td className="py-2 pr-5 text-kinnso-muted">{new Date(b.targetAt).toLocaleDateString()}</td>
+                <td className="py-2 pr-5 text-kinnso-muted">{new Date(b.targetAt).toLocaleDateString(locale)}</td>
               </tr>
             ))}
           </Rows>

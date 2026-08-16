@@ -50,14 +50,14 @@ const payoutBatches = [
 
 describe('StudioEarningsView', () => {
   it('shows a per-section empty state when the creator has nothing', () => {
-    render(<StudioEarningsView t={en.studioEarnings} data={empty} payoutBatches={[]} />)
+    render(<StudioEarningsView t={en.studioEarnings} locale="en" data={empty} payoutBatches={[]} />)
     expect(screen.getByText(en.studioEarnings.missionsEmpty)).toBeTruthy()
     expect(screen.getByText(en.studioEarnings.bookingsEmpty)).toBeTruthy()
     expect(screen.getByText(en.studioEarnings.trackedEmpty)).toBeTruthy()
   })
 
   it('renders booking commission even when there are no mission settlements', () => {
-    render(<StudioEarningsView t={en.studioEarnings} data={{ ...empty, bookings }} payoutBatches={[]} />)
+    render(<StudioEarningsView t={en.studioEarnings} locale="en" data={{ ...empty, bookings }} payoutBatches={[]} />)
     expect(screen.getByText('Sunset harbour walk')).toBeTruthy()
     expect(screen.getByText(en.studioEarnings.missionsEmpty)).toBeTruthy()
   })
@@ -66,6 +66,7 @@ describe('StudioEarningsView', () => {
     render(
       <StudioEarningsView
         t={en.studioEarnings}
+        locale="en"
         data={{ missions, bookings, tracked, totals: [{ currency: 'HKD', paid: 80.5, pending: 1200 }] }}
         payoutBatches={[]}
       />,
@@ -78,14 +79,14 @@ describe('StudioEarningsView', () => {
   })
 
   it('states that tracked volume is not payable', () => {
-    render(<StudioEarningsView t={en.studioEarnings} data={{ ...empty, tracked, totals: [] }} payoutBatches={[]} />)
+    render(<StudioEarningsView t={en.studioEarnings} locale="en" data={{ ...empty, tracked, totals: [] }} payoutBatches={[]} />)
     expect(screen.getByText(en.studioEarnings.trackedNote)).toBeTruthy()
     // The row itself IS shown — it is real, recorded volume.
     expect(screen.getByText('Flight deals')).toBeTruthy()
   })
 
   it('renders no totals card when the only money is tracked, not payable', () => {
-    render(<StudioEarningsView t={en.studioEarnings} data={{ ...empty, tracked, totals: [] }} payoutBatches={[]} />)
+    render(<StudioEarningsView t={en.studioEarnings} locale="en" data={{ ...empty, tracked, totals: [] }} payoutBatches={[]} />)
     // A totals card renders a ReceiptRow labelled t.paid; the mission/booking tables are
     // empty here, so no status badge can supply that text either. Its absence proves the
     // USD tracked row did not manufacture a USD totals card.
@@ -94,7 +95,7 @@ describe('StudioEarningsView', () => {
   })
 
   it('renders a payout batches section when batches exist', () => {
-    render(<StudioEarningsView t={t} data={empty} payoutBatches={payoutBatches} />)
+    render(<StudioEarningsView t={t} locale="en" data={empty} payoutBatches={payoutBatches} />)
     expect(screen.getByText(t.payoutBatchesHeading)).toBeTruthy()
     // Currency and amount render as adjacent text nodes within one cell ("HKD" then the
     // locale-formatted amount); match on the currency substring rather than the full text so
@@ -103,7 +104,7 @@ describe('StudioEarningsView', () => {
   })
 
   it('shows the empty state with no payout batches', () => {
-    render(<StudioEarningsView t={t} data={empty} payoutBatches={[]} />)
+    render(<StudioEarningsView t={t} locale="en" data={empty} payoutBatches={[]} />)
     expect(screen.getByText(t.payoutBatchesEmpty)).toBeTruthy()
   })
 })
