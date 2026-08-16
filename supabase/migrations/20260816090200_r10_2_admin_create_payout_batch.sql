@@ -40,6 +40,7 @@ begin
   if coalesce(btrim(p_currency), '') = '' then raise exception 'currency_required'; end if;
   if p_amount is null or p_amount <= 0 then raise exception 'bad_amount'; end if;
   if coalesce(btrim(p_idempotency_key), '') = '' then raise exception 'idempotency_key_required'; end if;
+  if p_target_at is not null and p_target_at < now() then raise exception 'target_at_in_past'; end if;
 
   select id into v_actor from public.kinnso_ops_members where user_id = auth.uid() and status = 'active';
 
@@ -67,14 +68,41 @@ begin
 
   v_target := coalesce(p_target_at, now() + make_interval(days => public.payout_processing_window_days()));
 
-  insert into public.creator_payout_batches (creator_id, currency, amount, target_at, created_by_ops_member_id)
-    values (p_creator_id, upper(p_currency), p_amount, v_target, v_actor)
-    returning id into v_batch_id;
+  -- A concurrent call carrying the same never-before-seen idempotency_key can still reach
+  -- this point (the `for update` lock above cannot lock a row that doesn't exist yet). This
+  -- begin/exception block is a PL/pgSQL subtransaction: if the decisions insert loses the
+  -- race on creator_payout_decisions_idempotency_key_uniq, everything inside this block --
+  -- including the batch row just inserted -- is rolled back automatically, and the handler
+  -- re-reads the winner's now-committed row to return the same replay/conflict result the
+  -- lookup above would have given had it simply run a moment later.
+  begin
+    insert into public.creator_payout_batches (creator_id, currency, amount, target_at, created_by_ops_member_id)
+      values (p_creator_id, upper(p_currency), p_amount, v_target, v_actor)
+      returning id into v_batch_id;
 
-  insert into public.creator_payout_decisions
-    (payout_batch_id, decision_kind, idempotency_key, request_hash, actor_ops_member_id, reason)
-    values (v_batch_id, 'approved', p_idempotency_key, v_hash, v_actor, btrim(p_reason))
-    returning id into v_decision_id;
+    insert into public.creator_payout_decisions
+      (payout_batch_id, decision_kind, idempotency_key, request_hash, actor_ops_member_id, reason)
+      values (v_batch_id, 'approved', p_idempotency_key, v_hash, v_actor, btrim(p_reason))
+      returning id into v_decision_id;
+  exception
+    when unique_violation then
+      select d.id as decision_id, d.request_hash, d.payout_batch_id
+        into v_existing
+        from public.creator_payout_decisions d
+        where d.idempotency_key = p_idempotency_key;
+
+      if not found then
+        -- The violation was on a different constraint (e.g. the creator+currency
+        -- pending-batch index) -- re-raise as-is rather than claiming a replay that isn't
+        -- real. That race is a separate, known, unhandled case -- out of scope for this fix.
+        raise;
+      end if;
+
+      if v_existing.request_hash <> v_hash then
+        raise exception 'idempotency_conflict';
+      end if;
+      return jsonb_build_object('batch_id', v_existing.payout_batch_id, 'decision_id', v_existing.decision_id, 'replayed', true);
+  end;
 
   perform public.ops_audit_log_append('payout_batch', v_batch_id, 'payout_batch.create', p_reason,
     jsonb_build_object('creator_id', p_creator_id, 'currency', upper(p_currency), 'amount', p_amount, 'target_at', v_target));

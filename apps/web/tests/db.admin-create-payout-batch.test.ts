@@ -24,6 +24,10 @@ describe('r10.2 admin_create_payout_batch RPC', () => {
     expect(sql).toContain("if coalesce(btrim(p_idempotency_key), '') = '' then raise exception 'idempotency_key_required'; end if")
   })
 
+  it('rejects a target date in the past', () => {
+    expect(sql).toContain("if p_target_at is not null and p_target_at < now() then raise exception 'target_at_in_past'; end if")
+  })
+
   it('computes a deterministic request hash from its own arguments with no extension dependency', () => {
     expect(sql).toContain('v_hash := md5(concat_ws')
   })
@@ -32,6 +36,12 @@ describe('r10.2 admin_create_payout_batch RPC', () => {
     expect(sql).toContain("if v_existing.request_hash <> v_hash then")
     expect(sql).toContain("raise exception 'idempotency_conflict'")
     expect(sql).toContain("'replayed', true")
+  })
+
+  it('resolves a concurrent double-first-submission by re-checking after a unique_violation, rather than leaking a raw DB error', () => {
+    expect(sql).toContain('exception when unique_violation then')
+    expect(sql).toContain('if not found then')
+    expect(sql).toContain('raise;')
   })
 
   it('refuses a second pending batch for the same creator and currency', () => {
