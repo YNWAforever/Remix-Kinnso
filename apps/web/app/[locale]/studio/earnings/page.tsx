@@ -21,8 +21,10 @@ export default async function StudioEarningsPage({ params }: { params: Params })
   const supabase = await createSupabaseServerClient()
   await requireCreatorPage(supabase, loc)
 
-  const data = await getCreatorEarningsSummary(supabase)
-  const payoutBatches = await getCreatorPayoutBatches(supabase)
+  const [data, payoutBatches] = await Promise.all([
+    getCreatorEarningsSummary(supabase),
+    getCreatorPayoutBatches(supabase),
+  ])
 
   return <StudioEarningsView t={messages.studioEarnings} locale={loc} data={data} payoutBatches={payoutBatches} />
 }

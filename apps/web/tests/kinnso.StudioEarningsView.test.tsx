@@ -46,6 +46,14 @@ const payoutBatches = [
     id: 'b1', currency: 'HKD', amount: 1500, status: 'pending' as const, targetAt: '2026-08-23T00:00:00Z',
     createdAt: '2026-08-16T00:00:00Z', paidAt: null, cancelledAt: null,
   },
+  {
+    id: 'b2', currency: 'TWD', amount: 900, status: 'paid' as const, targetAt: '2026-08-09T00:00:00Z',
+    createdAt: '2026-08-01T00:00:00Z', paidAt: '2026-08-10T00:00:00Z', cancelledAt: null,
+  },
+  {
+    id: 'b3', currency: 'USD', amount: 250, status: 'cancelled' as const, targetAt: '2026-07-30T00:00:00Z',
+    createdAt: '2026-07-20T00:00:00Z', paidAt: null, cancelledAt: '2026-07-25T00:00:00Z',
+  },
 ]
 
 describe('StudioEarningsView', () => {
@@ -101,6 +109,26 @@ describe('StudioEarningsView', () => {
     // locale-formatted amount); match on the currency substring rather than the full text so
     // this doesn't depend on Number.prototype.toLocaleString()'s locale-dependent formatting.
     expect(screen.getByText(/HKD/)).toBeTruthy()
+    // All three PayoutBatchStatus values render their own distinct badge label.
+    expect(screen.getByText(t.pending)).toBeTruthy()
+    expect(screen.getByText(t.paid)).toBeTruthy()
+    expect(screen.getByText(t.batchCancelled)).toBeTruthy()
+  })
+
+  it('renders the target date using the passed locale, not the runtime default', () => {
+    const batch = {
+      id: 'bd', currency: 'HKD', amount: 100, status: 'pending' as const, targetAt: '2026-08-23T00:00:00Z',
+      createdAt: '2026-08-16T00:00:00Z', paidAt: null, cancelledAt: null,
+    }
+    render(<StudioEarningsView t={t} locale="ja" data={empty} payoutBatches={[batch]} />)
+    // Deliberately a non-'en' locale: in this runtime 'en' happens to format identically to the
+    // no-argument default ("8/23/2026" either way), so asserting with 'en' would pass even if the
+    // component silently ignored the `locale` prop and called toLocaleDateString() bare — exactly
+    // the regression 27323f0 fixed. 'ja' renders this date as "2026/8/23", visibly different from
+    // the runtime default, so a match here proves `locale` actually reaches the date call.
+    // Computed via the same API rather than hardcoded, so this doesn't bit-rot if a future Node's
+    // ICU data formats 'ja' dates differently.
+    expect(screen.getByText(new Date(batch.targetAt).toLocaleDateString('ja'))).toBeTruthy()
   })
 
   it('shows the empty state with no payout batches', () => {
