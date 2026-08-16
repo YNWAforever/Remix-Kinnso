@@ -1,0 +1,117 @@
+// @vitest-environment jsdom
+import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import en from '@/lib/i18n/messages/en'
+import { CreatorPayoutBatchesView } from '@/components/kinnso/admin/creators/CreatorPayoutBatchesView'
+
+afterEach(cleanup)
+
+// Task 10 (a later task in this plan, not yet landed) adds these i18n keys to en.creators.
+// Until then they're `undefined` at runtime, and @testing-library/dom's getByText / queryByText /
+// getByPlaceholderText all throw synchronously on an undefined matcher ("It looks like undefined
+// was passed instead of a matcher") rather than treating it as "not found" — so every assertion
+// below that touches one of these keys would crash the test, not just fail it, and React itself
+// renders an undefined child as nothing (not the literal string "undefined"), so there is no DOM
+// text to query for regardless. Supply a stable placeholder string per pending key so this suite
+// can genuinely exercise the component now; spread order means real en.creators values always win
+// once Task 10 adds them, so this fallback becomes fully inert dead code at that point (safe to
+// delete then — reverting to `const t = en.creators` is the whole cleanup).
+const PENDING_I18N_FALLBACK = {
+  batchesHeading: 'batchesHeading', batchesSubtitle: 'batchesSubtitle', batchesEmpty: 'batchesEmpty',
+  actCreateBatch: 'actCreateBatch', actCancelBatch: 'actCancelBatch',
+  colCreatorId: 'colCreatorId', colCurrency: 'colCurrency', colTargetDate: 'colTargetDate', colCreatedAt: 'colCreatedAt',
+  formCreatorId: 'formCreatorId', formCurrency: 'formCurrency', formAmount: 'formAmount',
+  confirmMarkBatchPaid: 'confirmMarkBatchPaid', confirmCancelBatch: 'confirmCancelBatch',
+  batchStatusCancelled: 'batchStatusCancelled',
+}
+const t = { ...PENDING_I18N_FALLBACK, ...en.creators }
+
+const batches = [
+  {
+    id: 'b1', creatorId: 'c1', creatorName: 'May Chan', currency: 'HKD', amount: 1500,
+    status: 'pending' as const, targetAt: '2026-08-23T00:00:00Z', createdAt: '2026-08-16T00:00:00Z',
+    paidAt: null, cancelledAt: null,
+  },
+]
+
+describe('CreatorPayoutBatchesView', () => {
+  it('renders the batches table', () => {
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={batches}
+      createAction={vi.fn()} markPaidAction={vi.fn()} cancelAction={vi.fn()} />)
+    expect(screen.getByText(t.batchesHeading)).toBeTruthy()
+    expect(screen.getByText('May Chan')).toBeTruthy()
+    expect(screen.getByText(t.actMarkPaid)).toBeTruthy()
+    expect(screen.getByText(t.actCancelBatch)).toBeTruthy()
+  })
+
+  it('shows the empty state with no batches', () => {
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={[]}
+      createAction={vi.fn()} markPaidAction={vi.fn()} cancelAction={vi.fn()} />)
+    expect(screen.getByText(t.batchesEmpty)).toBeTruthy()
+  })
+
+  it('disables mark-paid and cancel for a batch that already left pending', () => {
+    const paid = { ...batches[0], id: 'b2', status: 'paid' as const, paidAt: '2026-08-17T00:00:00Z' }
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={[paid]}
+      createAction={vi.fn()} markPaidAction={vi.fn()} cancelAction={vi.fn()} />)
+    expect(screen.queryByText(t.actMarkPaid)).toBeNull()
+    expect(screen.queryByText(t.actCancelBatch)).toBeNull()
+  })
+
+  it('creating a batch requires a reason and submits the form fields', async () => {
+    const createAction = vi.fn().mockResolvedValue({ ok: true, batchId: 'b9' })
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={[]}
+      createAction={createAction} markPaidAction={vi.fn()} cancelAction={vi.fn()} />)
+    fireEvent.click(screen.getByText(t.actCreateBatch))
+    fireEvent.change(screen.getByPlaceholderText(t.formCreatorId), { target: { value: 'c9' } })
+    fireEvent.change(screen.getByPlaceholderText(t.formCurrency), { target: { value: 'usd' } })
+    fireEvent.change(screen.getByPlaceholderText(t.formAmount), { target: { value: '250' } })
+    fireEvent.change(screen.getByPlaceholderText(t.reasonPlaceholder), { target: { value: 'August payout run' } })
+    fireEvent.click(screen.getByText(t.actApply))
+    await waitFor(() => expect(createAction).toHaveBeenCalledTimes(1))
+    const [locale, input, reason] = createAction.mock.calls[0]
+    expect(locale).toBe('en')
+    expect(input).toMatchObject({ creatorId: 'c9', currency: 'usd', amount: 250 })
+    expect(typeof input.idempotencyKey).toBe('string')
+    expect(input.idempotencyKey.length).toBeGreaterThan(0)
+    expect(reason).toBe('August payout run')
+  })
+
+  it('blocks create-confirm when amount is not a valid positive number', () => {
+    const createAction = vi.fn()
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={[]}
+      createAction={createAction} markPaidAction={vi.fn()} cancelAction={vi.fn()} />)
+    fireEvent.click(screen.getByText(t.actCreateBatch))
+    fireEvent.change(screen.getByPlaceholderText(t.formCreatorId), { target: { value: 'c9' } })
+    fireEvent.change(screen.getByPlaceholderText(t.formCurrency), { target: { value: 'usd' } })
+    fireEvent.change(screen.getByPlaceholderText(t.formAmount), { target: { value: '0' } })
+    fireEvent.change(screen.getByPlaceholderText(t.reasonPlaceholder), { target: { value: 'reason' } })
+    fireEvent.click(screen.getByText(t.actApply))
+    expect(createAction).not.toHaveBeenCalled()
+  })
+
+  it('marking paid requires confirmation and a reason', async () => {
+    const markPaidAction = vi.fn().mockResolvedValue({ ok: true, id: 'b1' })
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={batches}
+      createAction={vi.fn()} markPaidAction={markPaidAction} cancelAction={vi.fn()} />)
+    fireEvent.click(screen.getByText(t.actMarkPaid))
+    fireEvent.change(screen.getByPlaceholderText(t.reasonPlaceholder), { target: { value: 'wired via FPS' } })
+    fireEvent.click(screen.getByText(t.actApply))
+    await waitFor(() => expect(markPaidAction).toHaveBeenCalledWith('en', 'b1', 'wired via FPS'))
+  })
+
+  it('cancelling passes a fresh idempotency key and reason', async () => {
+    const cancelAction = vi.fn().mockResolvedValue({ ok: true, id: 'b1' })
+    render(<CreatorPayoutBatchesView t={t} locale="en" batches={batches}
+      createAction={vi.fn()} markPaidAction={vi.fn()} cancelAction={cancelAction} />)
+    fireEvent.click(screen.getByText(t.actCancelBatch))
+    fireEvent.change(screen.getByPlaceholderText(t.reasonPlaceholder), { target: { value: 'wrong currency' } })
+    fireEvent.click(screen.getByText(t.actApply))
+    await waitFor(() => expect(cancelAction).toHaveBeenCalledTimes(1))
+    const [locale, input, reason] = cancelAction.mock.calls[0]
+    expect(locale).toBe('en')
+    expect(input.batchId).toBe('b1')
+    expect(typeof input.idempotencyKey).toBe('string')
+    expect(reason).toBe('wrong currency')
+  })
+})
