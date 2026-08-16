@@ -46,7 +46,7 @@ begin
   if length(btrim(p_reason)) > 500 then raise exception 'reason_too_long'; end if;
   if p_days is null or p_days <= 0 then raise exception 'bad_window'; end if;
 
-  select processing_window_days into v_old from public.creator_payout_settings where id = true;
+  select processing_window_days into v_old from public.creator_payout_settings where id = true for update;
 
   update public.creator_payout_settings
     set processing_window_days = p_days,
