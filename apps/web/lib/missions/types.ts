@@ -76,13 +76,3 @@ export type PartnerLinkRequest = {
   participantStatus: ParticipantStatus
   originalUrl: string
 }
-
-export type SettlementUpdateInput = {
-  actorIsOps: boolean
-  status: SettlementStatus
-  creatorPayoutStatus: SettlementPaymentStatus
-  kinnsoCommissionStatus: SettlementPaymentStatus
-  affiliateCommissionAmount?: number | null
-  creatorCommissionAmount?: number | null
-  kinnsoCommissionAmount?: number | null
-}

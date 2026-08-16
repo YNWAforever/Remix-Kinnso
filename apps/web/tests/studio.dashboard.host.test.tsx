@@ -106,7 +106,7 @@ describe('/[locale]/studio dashboard host', () => {
 
   it('redirects ops to their home', async () => {
     resolveViewerRoleMock.mockResolvedValue('ops')
-    await expect(run()).rejects.toThrow('NEXT_REDIRECT:/en/ops/settlements')
+    await expect(run()).rejects.toThrow('NEXT_REDIRECT:/en/admin/creators/payouts')
   })
 
   it('redirects onboarding creators to the wizard', async () => {

@@ -5,15 +5,14 @@ import type {
   MissionSource,
   MissionType,
   ParticipantReviewAction,
-  SettlementPaymentStatus,
-  SettlementStatus,
+  ParticipantStatus,
   SubmissionReviewAction,
   ValidationErrors,
 } from '@/lib/missions/types'
 import { nextJoinStatus, reviewParticipant, reviewSubmission } from '@/lib/missions/state'
 import {
   validateMissionDraft,
-  validateSettlementUpdate,
+  validatePartnerLinkRequest,
   validateSubmission,
 } from '@/lib/missions/validation'
 import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
@@ -25,7 +24,6 @@ import { createTravelpayoutsPartnerLinkProvider } from '@/lib/missions/partner-l
 type MissionInsert = Database['public']['Tables']['missions']['Insert']
 type MissionMilestoneInsert = Database['public']['Tables']['mission_milestones']['Insert']
 type ParticipantInsert = Database['public']['Tables']['mission_participants']['Insert']
-type SettlementUpdate = Database['public']['Tables']['mission_settlements']['Update']
 type Supabase = SupabaseClient<Database>
 
 type ActionFailure = { ok: false; errors: ValidationErrors }
@@ -73,18 +71,6 @@ type ReviewSubmissionInput = LocaleOption & {
   feedback?: string | null
 }
 
-type UpdateSettlementInput = LocaleOption & {
-  settlementId: string
-  status: SettlementStatus
-  creatorPayoutStatus: SettlementPaymentStatus
-  kinnsoCommissionStatus: SettlementPaymentStatus
-  affiliateCommissionAmount?: number | null
-  affiliateCommissionStatus?: SettlementPaymentStatus | null
-  creatorCommissionAmount?: number | null
-  kinnsoCommissionAmount?: number | null
-  opsNote?: string | null
-}
-
 export type CreatePartnerLinkInput = LocaleOption & {
   missionParticipantId: string
   originalUrl: string
@@ -92,7 +78,6 @@ export type CreatePartnerLinkInput = LocaleOption & {
 
 const merchantMissionsPath = '/merchants/dashboard/missions'
 const studioMissionsPath = '/studio/missions'
-const opsSettlementsPath = '/ops/settlements'
 const defaultLocale = 'en'
 const localePattern = /^[a-z]{2}(?:-[a-z]{2})?$/
 
@@ -461,63 +446,6 @@ export async function reviewSubmissionAction(
 
   await revalidate([localizedPath(input.locale, merchantMissionsPath)])
   return { ok: true, status: updatedSubmission.status }
-}
-
-export async function updateSettlementAction(
-  input: UpdateSettlementInput,
-): Promise<ActionResult<{ settlementId: string }>> {
-  'use server'
-
-  const supabase = await getSupabase()
-  const user = await getAuthenticatedUser(supabase)
-  if (!user) return formError('Sign in is required')
-
-  const opsMember = await getActiveOpsMember(supabase, user.id)
-  const validation = validateSettlementUpdate({
-    actorIsOps: Boolean(opsMember),
-    status: input.status,
-    creatorPayoutStatus: input.creatorPayoutStatus,
-    kinnsoCommissionStatus: input.kinnsoCommissionStatus,
-    affiliateCommissionAmount: input.affiliateCommissionAmount,
-    creatorCommissionAmount: input.creatorCommissionAmount,
-    kinnsoCommissionAmount: input.kinnsoCommissionAmount,
-  })
-  if (!validation.ok) return validation
-  if (!opsMember) return formError('Active ops member access is required')
-
-  const update: SettlementUpdate = {
-    status: input.status,
-    creator_payout_status: input.creatorPayoutStatus,
-    kinnso_commission_status: input.kinnsoCommissionStatus,
-    updated_by_ops_member_id: opsMember.id,
-  }
-  if (input.affiliateCommissionAmount !== undefined) {
-    update.affiliate_commission_amount = input.affiliateCommissionAmount
-  }
-  if (input.affiliateCommissionStatus !== undefined) {
-    update.affiliate_commission_status = input.affiliateCommissionStatus
-  }
-  if (input.creatorCommissionAmount !== undefined) {
-    update.creator_commission_amount = input.creatorCommissionAmount
-  }
-  if (input.kinnsoCommissionAmount !== undefined) {
-    update.kinnso_commission_amount = input.kinnsoCommissionAmount
-  }
-  if (input.opsNote !== undefined) {
-    update.ops_note = input.opsNote
-  }
-
-  const { data: settlement, error } = await supabase
-    .from('mission_settlements')
-    .update(update)
-    .eq('id', input.settlementId)
-    .select('id')
-    .maybeSingle()
-
-  if (error || !settlement) return formError('Settlement update could not be saved')
-
-  await revalidate([localizedPath(input.locale, opsSettlementsPath)])
-  return { ok: true, settlementId: settlement.id }
 }
 
 export type SubmitMilestoneInput = {
