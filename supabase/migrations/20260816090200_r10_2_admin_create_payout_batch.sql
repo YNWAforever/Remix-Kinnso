@@ -11,9 +11,12 @@
 -- md5() is used rather than pgcrypto's digest() because it needs no extension and this is
 -- an internal collision check, not a security boundary.
 --
--- The idempotency-key lookup takes `for update`, locking the matching decisions row (or,
--- via the unique index, blocking a concurrent insert of the same key) so two near-
--- simultaneous identical requests cannot both fall through to the insert branch.
+-- Concurrency: the idempotency-key lookup takes `for update`, but that only locks a row
+-- that already exists — it cannot protect against two never-before-seen keys racing each
+-- other, since Postgres has no gap locks. Two truly simultaneous first-time callers with the
+-- same key CAN both fall through to the insert branch below; the begin/exception block
+-- around those inserts is what makes that race safe, by catching the loser's unique_violation
+-- and reconciling it into the same replay/conflict result the lookup above would have given.
 
 create or replace function public.admin_create_payout_batch(
   p_creator_id      uuid,
