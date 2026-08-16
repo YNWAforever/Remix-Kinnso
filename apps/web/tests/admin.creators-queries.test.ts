@@ -54,6 +54,55 @@ describe('getSettlementsQueue', () => {
   })
 })
 
+describe('settlement source facet', () => {
+  const rows = [
+    {
+      id: 's-aff', status: 'pending', creator_payout_status: 'pending',
+      kinnso_commission_status: 'pending', affiliate_commission_status: 'pending',
+      amount_currency: 'USD', creator_commission_amount: 7, kinnso_commission_amount: 3,
+      affiliate_commission_amount: 10, paid_fee_amount: null, ops_note: null,
+      missions: { title: 'Flight deals' }, mission_participants: { creator_id: 'c1' },
+      affiliate_network_events: { id: 'ev1' },
+    },
+    {
+      id: 's-fee', status: 'pending', creator_payout_status: 'pending',
+      kinnso_commission_status: null, affiliate_commission_status: null,
+      amount_currency: 'HKD', creator_commission_amount: null, kinnso_commission_amount: null,
+      affiliate_commission_amount: null, paid_fee_amount: 1200, ops_note: null,
+      missions: { title: 'Ramen crawl' }, mission_participants: { creator_id: 'c2' },
+      affiliate_network_events: null,
+    },
+    {
+      id: 's-man', status: 'pending', creator_payout_status: 'pending',
+      kinnso_commission_status: null, affiliate_commission_status: null,
+      amount_currency: 'HKD', creator_commission_amount: null, kinnso_commission_amount: null,
+      affiliate_commission_amount: null, paid_fee_amount: null, ops_note: 'manual adjustment',
+      missions: { title: 'Legacy row' }, mission_participants: { creator_id: 'c3' },
+      affiliate_network_events: null,
+    },
+  ]
+
+  it('labels each settlement by where it came from', async () => {
+    const queue = await getSettlementsQueue(fakeSettlements(rows), {})
+    expect(queue.rows.map((r) => [r.id, r.source])).toEqual([
+      ['s-aff', 'affiliate'],
+      ['s-fee', 'mission_fee'],
+      ['s-man', 'manual'],
+    ])
+  })
+
+  it('filters rows by source while leaving the summary over the full queue', async () => {
+    const queue = await getSettlementsQueue(fakeSettlements(rows), { source: 'affiliate' })
+    expect(queue.rows.map((r) => r.id)).toEqual(['s-aff'])
+    expect(queue.summary.total).toBe(3)
+  })
+
+  it('combines the status and source facets', async () => {
+    const queue = await getSettlementsQueue(fakeSettlements(rows), { status: 'pending', source: 'mission_fee' })
+    expect(queue.rows.map((r) => r.id)).toEqual(['s-fee'])
+  })
+})
+
 const analytics = {
   kpis: { total: 12, by_status: { onboarding: 2, active: 8, suspended: 2 }, new_in_period: 3, new_prev_period: 1, payouts_pending: 4 },
   signups: [{ day: '2026-06-27', count: 2 }, { day: '2026-06-28', count: 1 }],

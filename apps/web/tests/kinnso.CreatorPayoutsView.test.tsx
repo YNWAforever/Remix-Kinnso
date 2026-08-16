@@ -10,7 +10,7 @@ afterEach(cleanup)
 const t = en.creators
 const queue = {
   rows: [
-    { id: 's1', missionTitle: 'Mission One', creatorId: 'c1', status: 'pending', creatorPayoutStatus: 'pending',
+    { id: 's1', missionTitle: 'Mission One', source: 'affiliate' as const, creatorId: 'c1', status: 'pending', creatorPayoutStatus: 'pending',
       kinnsoCommissionStatus: 'pending', affiliateCommissionStatus: null, currency: 'USD',
       creatorCommissionAmount: 100, kinnsoCommissionAmount: 10, affiliateCommissionAmount: null, opsNote: null },
   ],
