@@ -46,9 +46,27 @@ describe('r10.2 payout batches and decisions schema', () => {
     expect(sql).toContain('revoke all on public.creator_payout_decisions from public, anon, authenticated')
   })
 
+  it('scopes the access-denial claim to anon/authenticated, not service_role', () => {
+    expect(sql).toContain('authenticated have no access at all')
+    expect(sql).toContain('service_role bypasses rls entirely')
+    expect(sql).toContain('immutability triggers below, which are role-agnostic')
+  })
+
   it('blocks a batch update once it has left pending', () => {
     expect(sql).toContain("if old.status <> 'pending' then")
     expect(sql).toContain("raise exception 'batch_immutable'")
+  })
+
+  it('requires paid_at when transitioning to paid, and rejects a stray cancelled_at', () => {
+    expect(sql).toContain(
+      "if new.status = 'paid' and (new.paid_at is null or new.cancelled_at is not null) then",
+    )
+  })
+
+  it('requires cancelled_at when transitioning to cancelled, and rejects a stray paid_at', () => {
+    expect(sql).toContain(
+      "if new.status = 'cancelled' and (new.cancelled_at is null or new.paid_at is not null) then",
+    )
   })
 
   it('blocks any update or delete on a decision row', () => {

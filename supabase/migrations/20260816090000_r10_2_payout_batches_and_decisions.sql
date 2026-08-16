@@ -18,8 +18,13 @@
 -- makes create/cancel safe to replay (a double-submitted form, a retried request) without
 -- double-creating or double-cancelling; request_hash lets a same-key replay with a
 -- DIFFERENT payload be rejected rather than silently applied. Both tables follow the
--- ops_audit_log precedent: RLS enabled, zero policies, so every access — including
--- service_role under PostgREST — is denied except through a SECURITY DEFINER RPC.
+-- ops_audit_log precedent: RLS enabled, zero policies, explicit revoke, so anon and
+-- authenticated have no access at all. service_role bypasses RLS entirely — a role
+-- property, not something a policy can override — and already holds full DML here via
+-- 20260613000006_grants.sql's default-privileges grant, so none of this blocks it. What
+-- actually guards a misbehaving *trusted* caller (a bug in a future RPC, or a raw
+-- service_role script) is the immutability triggers below, which are role-agnostic and
+-- fire regardless of who the caller is.
 
 create table public.creator_payout_batches (
   id                        uuid primary key default gen_random_uuid(),
@@ -56,6 +61,12 @@ begin
     raise exception 'batch_immutable';
   end if;
   if new.status not in ('paid', 'cancelled') then
+    raise exception 'bad_transition';
+  end if;
+  if new.status = 'paid' and (new.paid_at is null or new.cancelled_at is not null) then
+    raise exception 'bad_transition';
+  end if;
+  if new.status = 'cancelled' and (new.cancelled_at is null or new.paid_at is not null) then
     raise exception 'bad_transition';
   end if;
   if new.creator_id is distinct from old.creator_id
