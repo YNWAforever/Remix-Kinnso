@@ -3,7 +3,7 @@ import { StudioEarningsView } from '@/components/kinnso/pages/StudioEarningsView
 import { requireCreatorPage } from '@/lib/admin/guard'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { getCreatorEarningsSummary } from '@/lib/missions/earnings-summary'
+import { getCreatorEarningsSummary, getCreatorPayoutBatches } from '@/lib/missions/earnings-summary'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export function generateStaticParams() {
@@ -22,6 +22,7 @@ export default async function StudioEarningsPage({ params }: { params: Params })
   await requireCreatorPage(supabase, loc)
 
   const data = await getCreatorEarningsSummary(supabase)
+  const payoutBatches = await getCreatorPayoutBatches(supabase)
 
-  return <StudioEarningsView t={messages.studioEarnings} data={data} />
+  return <StudioEarningsView t={messages.studioEarnings} data={data} payoutBatches={payoutBatches} />
 }

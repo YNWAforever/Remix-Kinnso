@@ -116,3 +116,43 @@ export async function getCreatorEarningsSummary(supabase: Client): Promise<Creat
 
   return { missions, bookings, tracked, totals: summarizeSettledEarnings(missions, bookings) }
 }
+
+export type PayoutBatchStatus = 'pending' | 'paid' | 'cancelled'
+
+export type CreatorPayoutBatch = {
+  id: string
+  currency: string
+  amount: number
+  status: PayoutBatchStatus
+  targetAt: string
+  createdAt: string
+  paidAt: string | null
+  cancelledAt: string | null
+}
+
+type RawCreatorPayoutBatch = {
+  id: string
+  currency: string
+  amount: number | string
+  status: PayoutBatchStatus
+  target_at: string
+  created_at: string
+  paid_at: string | null
+  cancelled_at: string | null
+}
+
+/** The caller's own payout batches (R10.2). Errors propagate — no silent empty result. */
+export async function getCreatorPayoutBatches(supabase: Client): Promise<CreatorPayoutBatch[]> {
+  const { data, error } = await supabase.rpc('creator_payout_batches_mine')
+  if (error) throw error
+  return ((data ?? []) as RawCreatorPayoutBatch[]).map((b) => ({
+    id: b.id,
+    currency: b.currency,
+    amount: num(b.amount),
+    status: b.status,
+    targetAt: b.target_at,
+    createdAt: b.created_at,
+    paidAt: b.paid_at,
+    cancelledAt: b.cancelled_at,
+  }))
+}
