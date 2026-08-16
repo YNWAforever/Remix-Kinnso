@@ -30,6 +30,219 @@ Next.js 16 App Router server actions · TypeScript · Vitest 4 · 7-locale i18n 
 *(Any post-hoc corrections discovered during execution are recorded here, appended — never
 by rewriting a task's original code block, per the R10.0 plan's own precedent.)*
 
+1. **Task 1, Step 4** says "Expected: PASS (11 tests)". The test code in Step 1 has 10
+   `it(...)` blocks, and 10 is what actually runs and passes. Off-by-one in this document's
+   prose only — the implementer correctly left the test code as specified rather than
+   padding it to match the miscounted expectation.
+
+2. **Task 1's code quality review** found two Important issues in the Step 3 migration text
+   as originally written: the header comment overclaimed that RLS blocks `service_role`
+   (it doesn't — `service_role` bypasses RLS and already has blanket grants via
+   `20260613000006_grants.sql`), and `creator_payout_batches_immutable()` didn't validate
+   `paid_at`/`cancelled_at` against the target status. Both were fixed in a follow-up commit
+   (`38b6044`) rather than by editing this document's original code block — the fixed SQL
+   differs from what Step 3 shows above. Read the migration file itself, not this document,
+   for Task 1's authoritative current text.
+
+3. **Task 2, Step 3 vs Step 1 mismatch:** the SQL block as originally written used plain
+   `create function` for `admin_set_payout_processing_window`; Step 1's test asserted
+   `create or replace function`, matching this codebase's exceptionless convention that
+   every `admin_*` mutation RPC uses `or replace` (plain `create function` is reserved for
+   trigger functions and simple read helpers, e.g. this same migration's
+   `payout_processing_window_days()`). The implementer corrected the migration to `create or
+   replace function` rather than weakening the test. Read the migration file itself for the
+   authoritative text.
+
+4. **Task 2's code quality review** found one Important issue: `admin_set_payout_processing_window`
+   read the old value without locking the row (`for update`), unlike this codebase's
+   established read-old-value-then-write pattern elsewhere. Fixed in a follow-up commit
+   (`635de33`).
+
+5. **Task 3, Step 4** says "Expected: PASS (9 tests)". The test code in Step 1 has 10
+   `it(...)` blocks, and 10 is what actually runs and passes — the same off-by-one pattern
+   as Task 1's Errata #1. No code impact.
+
+6. **Task 3's code quality review** found two Important issues in the Step 3 RPC as
+   originally written: `p_target_at` had no sanity bound (a past date was silently
+   accepted, and this value is creator-visible in a later task), and a genuine concurrent
+   double-first-submission with the same never-before-seen `idempotency_key` could surface
+   a raw Postgres `unique_violation` instead of a clean `idempotency_conflict`/replay
+   response (no data-integrity risk — the unique index still prevented a duplicate row —
+   purely a graceful-degradation gap). Fixed in commit `5aecf4f`, which wraps the two
+   inserts in a PL/pgSQL subtransaction (`begin ... exception when unique_violation then
+   ...`) that re-checks the idempotency key on conflict and re-raises unchanged for any
+   other constraint (e.g. the creator+currency pending-batch race, which remains
+   deliberately unhandled — a separate, out-of-scope race). The function's header comment
+   (unmodified, per explicit instruction to keep the fix narrowly scoped) is now slightly
+   stale on this point. The re-review that approved `5aecf4f` flagged this staleness as a
+   real risk (two sections of the same function disagreeing about the concurrency
+   mechanism could mislead a future maintainer into removing the exception-handling block),
+   so it was fixed in a follow-up commit `c126fe8`. Read the migration file itself for
+   Task 3's authoritative current text.
+
+7. **Task 4's Step 1 test had a genuinely unsatisfiable assertion**, not a prose-count slip:
+   `expect(sql).not.toContain('insert into public.creator_payout_decisions')` was written
+   against the whole file's text, but `admin_cancel_payout` — required to live in the same
+   migration file as `admin_mark_payout_paid` — legitimately performs exactly that insert
+   (it's the "cancel writes a decision row" requirement two tests later in the same file).
+   The assertion was unsatisfiable by construction, not fixable by changing the SQL. The
+   implementer scoped the check to `sql.split('create or replace function
+   public.admin_cancel_payout(')[0]` — everything before that function begins, which is
+   exactly `admin_mark_payout_paid`'s own text — preserving the original intent (mark-paid
+   itself never writes a decision row) while making the assertion actually satisfiable. Read
+   the test file itself for the authoritative current text; this document's Step 1 code
+   block above is what was originally asked for, not what shipped.
+
+8. **Task 4's code quality review** found one Important issue in `admin_cancel_payout`: a
+   narrower version of Task 3's pre-fix race — two concurrent calls reusing the same
+   never-before-seen `idempotency_key` across DIFFERENT batch ids don't serialize (they lock
+   different batch rows) and can both reach the decisions insert, surfacing a raw
+   `unique_violation` instead of `idempotency_conflict`. Fixed in `35ac24c`, wrapping the
+   batch `update` and the decision `insert` together in one subtransaction (not the insert
+   alone, unlike Task 3 — cancel's shape is update-then-insert against an existing row,
+   where wrapping only the insert risks stranding the update). One nuance surfaced during
+   the fix and independently verified by the controller: because `v_hash` includes
+   `p_batch_id`, two different batch ids always hash differently, so the exception handler's
+   `replayed: true` success branch is unreachable in practice for cancel — any race that
+   reaches this code always takes the `idempotency_conflict` re-raise branch, which aborts
+   the whole transaction and would roll back the update regardless of block boundaries. The
+   fix is still correct and worth keeping: it's what translates the raw Postgres error into
+   the app's `idempotency_conflict` vocabulary (the actual point, same as Task 3's own
+   framing — no data-integrity risk either way), and wrapping both statements together is
+   the more robust shape if the hash formula ever changes to stop including `p_batch_id`.
+   Read the migration file itself for Task 4's authoritative current text.
+
+9. **Task 5's code quality review** raised one Important finding: `admin_list_payout_batches`
+   has no pagination, unlike `admin_search_creators`/`admin_search_merchants` elsewhere in
+   this codebase, which both cap and cursor-paginate. Fixed instead as a documented decision
+   NOT to add it: the reviewer's comparison was to those two RPCs, but the more directly
+   relevant precedent — `listOpsSettlements` (`apps/web/lib/missions/queries.ts`), the
+   sibling data source already rendering unpaginated on the exact same `/admin/creators/
+   payouts` page since R10.0/R10.1 — has zero pagination itself (`select ... order by
+   updated_at desc`, no limit). Adding pagination to only the new batches list while its
+   sibling settlement queue stays unpaginated on the same page would be inconsistent UX and
+   premature complexity, not a clear improvement. Also added: a small test-coverage fix
+   (untested empty-array `coalesce`) from the same review's Minor findings, in `622cc06`.
+   If `listOpsSettlements` itself is ever paginated, revisit `admin_list_payout_batches`
+   alongside it — a joint upgrade, not a standalone one.
+
+10. **Task 6's given `admin.payout-batches-queries.test.ts` had a `tsc`-breaking cast
+    placement:** `client()` returned `{ rpc: vi.fn(...) } as never`, casting inside the
+    helper — which makes the `supabase` variable itself type `never`, so later
+    `expect(supabase.rpc).toHaveBeenCalledWith(...)` assertions fail to typecheck
+    (`TS2339`). Fixed by moving the cast to the four call sites
+    (`getPayoutBatches(supabase as never, ...)`), matching this codebase's own established
+    convention in `admin.creators-directory-queries.test.ts` /
+    `admin.creators-queries.test.ts`. Runtime behavior is unchanged (casts are erased); only
+    what typechecks changes. Read the test file itself for the authoritative current text.
+
+11. **Task 6's code quality review** found one Important, test-only gap: all three server
+    actions gate app-side via the coarse `requireOpsAction` (any `ops` role), but their
+    underlying RPCs gate on `is_active_ops_role('admin')` specifically — so a moderator/
+    analyst can pass the app gate and get rejected at the RPC, and that path had zero test
+    coverage (unlike the sibling `creators-actions.test.ts`, which tests this exact scenario
+    for its own admin-gated actions). Fixed in `d48988c`, adding a `role-gate (R10.2)` block
+    with one test per action — test-only, no production code change (`mapError` already
+    handled it correctly). Read the test file itself for the authoritative current text.
+
+12. **Task 7's Step 4 assumption was wrong**, discovered empirically rather than assumed:
+    the plan claimed `getByText(t.missingKey)`/`getByPlaceholderText(...)` would gracefully
+    treat an `undefined` matcher as "not found," since Task 10's i18n keys don't exist yet.
+    In fact `@testing-library/dom` throws synchronously on an `undefined` matcher ("It looks
+    like undefined was passed instead of a matcher"), and React renders an `undefined` child
+    as nothing (not the literal string `"undefined"`) — so the given test as written
+    crashed 6/7 cases, not passed 7/7 as claimed. Fixed in the TEST FILES ONLY (zero changes
+    to the component or to `en.ts`, per this task's explicit instruction not to add i18n
+    keys early): the component test merges a `PENDING_I18N_FALLBACK` object (each pending
+    key mapped to its own key name as a placeholder string) under the real `en.creators`, so
+    real Task 10 values automatically win once they land and the fallback becomes inert dead
+    code (documented inline, one-line revert to clean up); the host test's one new assertion
+    swaps to a `container.querySelector('.mt-8')` check against the component's stable root
+    class instead, with an inline note to switch back to a text-based check once Task 10
+    lands. Also corrected: the task text's context section said `CreatorPayoutsView` has "8
+    existing tests" — it has 4 (confirmed unaffected either way). Read the two test files
+    themselves for the authoritative current text.
+
+13. **Task 7's code quality review** found four Important issues (a fifth — `pnpm typecheck`
+    failing on the missing i18n keys — is the already-expected, tracked state per Errata #12,
+    not a new finding). Fixed in `32dcbe7`: (a) the create/cancel idempotency key was
+    generated fresh on every Apply click rather than per submission attempt, defeating the
+    replay-safety guarantee Tasks 3-4 were built for — create now generates the key once
+    when the dialog opens (state, reused across retries within that session), cancel now
+    uses a deterministic `payout-cancel-${batchId}` key (mirrors the existing
+    `apps/web/lib/bookings/actions.ts:107` `booking-refund-${id}` pattern); (b) the batches
+    table's creator cell wasn't a link, unlike the settlement queue directly above it on the
+    same page — now wrapped in the same `Link` pattern; (c) dates ignored the routed
+    `locale` prop, falling back to each viewer's OS locale — `date()` now takes `locale` and
+    both call sites pass it; (d) the paid/cancel confirm dialogs showed no batch-specific
+    context before a money-touching commit, unlike the sibling's own "money-touching →
+    required per spec §6" precedent — added a creator/amount/currency recap line to those
+    two dialog kinds only (deliberately NOT the create dialog, which needs Task 10's
+    not-yet-existing interpolated `confirmCreateBatch` copy — left as `t.actCreateBatch` for
+    now). Read the component file itself for the authoritative current text.
+
+14. **Task 8's Step 8 illustrative snippet was stale**: it showed a raw `<table>` shape, but
+    `StudioEarningsView.tsx`'s real, already-shipped three sections use shared
+    `Section`/`Rows`/`TicketCard`/`MissionStatusBadge` helpers the snippet didn't capture.
+    The shipped 4th section correctly follows the real file's pattern instead of the stale
+    snippet — a deliberate, correct deviation, not an implementer error (same class as Task
+    7's dialog-styling deviation). Its code review then found two Important issues: (a) the
+    target-date cell ignored the `locale` prop — a direct recurrence of the bug Task 7 (the
+    task immediately prior) had already fixed on the sibling admin component, from copying
+    the plan's own stale, unfixed snippet; (b) the two independent Supabase calls in
+    `page.tsx` ran sequentially instead of via `Promise.all`, unlike two sibling `/studio/*`
+    pages (`tier`, `perks`) that already parallelize the identical situation. Both fixed
+    (`27323f0`, `f8eb5f0`), the second commit also closing a test-coverage gap: the original
+    tests never asserted the 3-state status badge or that the date actually renders — the
+    implementer caught mid-fix that testing with `locale="en"` wouldn't have proven anything
+    (it formats identically to this runtime's bare default), and used `locale="ja"` instead
+    for a test that actually fails if the prop is silently ignored. Read the component/page
+    files themselves for the authoritative current text.
+
+15. **Task 9 execution note, not a correction:** this document's Task 9 text claimed
+    `settlementStatuses`/`SettlementStatus`/`SettlementPaymentStatus` are "not exclusively
+    tied to the deleted path." Verified true for `settlementStatuses`/`SettlementStatus`
+    (still used by `mission.state.test.ts`), but `SettlementPaymentStatus` specifically has
+    zero remaining consumers after this task's deletions — left in place anyway, per the
+    task's explicit "leave alone" instruction, rather than unilaterally removing something
+    outside the task's stated scope. Also newly orphaned and deliberately left untouched
+    (out of scope for this task, i18n files weren't in its file list): the `ops` message
+    namespace across all 7 locale files, which existed only to feed the now-deleted
+    `OpsSettlementView`. Both are legitimate small cleanup opportunities for a future task,
+    not bugs in this one.
+
+16. **Task 10 shipped 19 of the ~21 keys its own Steps 1-8 code blocks show** — deliberately
+    dropping `formTargetDate` and `confirmCreateBatch` after confirming, via three
+    independent sources (component source, both test files' now-removed fallback objects,
+    and the pre-fix `tsc` error list), that neither is referenced anywhere: the shipped
+    create-batch form has no target-date input, and its dialog title deliberately stayed as
+    `t.actCreateBatch` rather than an interpolated confirm string (Errata #13(d)). **This
+    document's Task 10 Steps 1-2 code blocks below still show both keys as if shipped — they
+    were not.** A future phase should not assume `confirmCreateBatch` exists; read the
+    locale files themselves for the authoritative current key set. Also noted by Task 10's
+    code review: the zh-hk/zh-tw values for all 19 new keys are byte-identical, whereas the
+    pre-existing surrounding `creators` block in both files already carries genuine HK/TW
+    lexical divergence (菁英/精英, 撥款/派付, 停權/停用, etc.) — not a correctness defect (every
+    term used is standard, correctly-understood Traditional Chinese in both regions), but a
+    departure from this file's own established convention, worth a Taiwan-fluent pass at a
+    future checkpoint rather than blocking this phase.
+
+17. **Task 11's live proof (`payout-batches.rls.test.ts`) discovered a genuine, unplanned
+    architectural fact**, verified independently by both the implementer and the controller
+    directly against the live database's FK/trigger definitions: because
+    `creator_payout_decisions` carries unconditional `BEFORE UPDATE`/`BEFORE DELETE` triggers
+    (blocking every caller including `service_role`), and every FK in this phase's schema
+    (`creator_payout_decisions.payout_batch_id`, `creator_payout_batches.creator_id`,
+    `.created_by_ops_member_id`) is plain `NO ACTION` with no cascade, **once a payout batch
+    gets its paired decision row, neither the batch nor the creator/ops-member rows it
+    references can ever be deleted again** — a consequence of the append-only-ledger design
+    (Task 1), not a bug. The live-proof test uses `randomUUID()`-generated seed ids per
+    process and has no `afterAll` cleanup (a fixed-id pattern, as used by R10.1's sibling
+    live proof, would make a second run collide with the first run's permanently-orphaned
+    rows). This has no bearing on the shipped RPCs' correctness, but is a real operational
+    fact worth knowing: there is currently no way to purge a wrongly-created payout batch
+    from any environment, including production, once it has been approved.
+
 ---
 
 ### Task 1: Payout batch + decision schema
