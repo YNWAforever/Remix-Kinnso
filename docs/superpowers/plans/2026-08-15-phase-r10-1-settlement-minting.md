@@ -707,6 +707,16 @@ const matches = readdirSync(dir).filter((f) => f.endsWith('_r10_1_backfill_affil
 expect(matches).toHaveLength(1)
 const sql = readFileSync(join(dir, matches[0]), 'utf8').toLowerCase().replaceAll(/\s+/gu, ' ')
 
+// Negative assertions run against comment-stripped SQL. A migration's comments explain what
+// it deliberately does NOT do, so naming those things is correct documentation — but a bare
+// substring check would read the explanation as the offence and fail on well-commented SQL.
+const sqlNoComments = readFileSync(join(dir, matches[0]), 'utf8')
+  .split('\n')
+  .filter((line) => !line.trim().startsWith('--'))
+  .join(' ')
+  .toLowerCase()
+  .replaceAll(/\s+/gu, ' ')
+
 describe('r10.1 affiliate settlement backfill', () => {
   it('applies after both minting triggers', () => {
     expect(matches[0] > '20260815100200').toBe(true)
@@ -730,12 +740,12 @@ describe('r10.1 affiliate settlement backfill', () => {
   })
 
   it('never updates or deletes an existing settlement', () => {
-    expect(sql).not.toContain('update public.mission_settlements')
-    expect(sql).not.toContain('delete from public.mission_settlements')
+    expect(sqlNoComments).not.toContain('update public.mission_settlements')
+    expect(sqlNoComments).not.toContain('delete from public.mission_settlements')
   })
 
   it('does not backfill mission-fee settlements', () => {
-    expect(sql).not.toContain('mission_milestone_submissions')
+    expect(sqlNoComments).not.toContain('mission_milestone_submissions')
   })
 })
 ~~~
