@@ -85,14 +85,58 @@ begin
     where payout_batch_id = p_batch_id and decision_kind = 'approved'
     order by created_at desc limit 1;
 
-  update public.creator_payout_batches
-    set status = 'cancelled', cancelled_at = now(), updated_at = now()
-    where id = p_batch_id;
+  -- Same-batch concurrent cancels are already safe without a subtransaction: the `for
+  -- update` lock taken above when reading v_status serializes them on that row, so a losing
+  -- call simply observes status <> 'pending' after the winner commits and raises the
+  -- ordinary 'bad_transition' error -- no raw DB error ever reaches the caller. What that
+  -- lock cannot prevent is two concurrent calls sharing the same never-before-seen
+  -- idempotency_key but targeting DIFFERENT batch ids (a client bug, not a legitimate
+  -- retry): they lock different batch rows, never contend with each other, and can both
+  -- reach the insert below, racing on creator_payout_decisions_idempotency_key_uniq.
+  --
+  -- The block below wraps the UPDATE together with the INSERT -- not the insert alone. If
+  -- only the insert were wrapped, a losing call's update (already executed outside the
+  -- block, and therefore not covered by the block's own savepoint) risks surviving while
+  -- its insert rolls back, leaving a batch permanently stuck at status = 'cancelled' with no
+  -- corresponding decision row -- and Task 1's immutability
+  -- trigger (`old.status <> 'pending' -> batch_immutable`) means no further update to that
+  -- row is ever possible again, which would be worse than the bug being fixed here.
+  -- Wrapping both together makes the transition atomic: on unique_violation, everything
+  -- inside this block -- including the update that already ran -- is rolled back
+  -- automatically, and the handler re-reads the winner's now-committed row to return the
+  -- same replay/conflict result the idempotency-key lookup above would have given had it
+  -- simply run a moment later.
+  begin
+    update public.creator_payout_batches
+      set status = 'cancelled', cancelled_at = now(), updated_at = now()
+      where id = p_batch_id;
 
-  insert into public.creator_payout_decisions
-    (payout_batch_id, decision_kind, idempotency_key, request_hash, supersedes_decision_id, actor_ops_member_id, reason)
-    values (p_batch_id, 'cancelled', p_idempotency_key, v_hash, v_approved_decision_id, v_actor, btrim(p_reason))
-    returning id into v_decision_id;
+    insert into public.creator_payout_decisions
+      (payout_batch_id, decision_kind, idempotency_key, request_hash, supersedes_decision_id, actor_ops_member_id, reason)
+      values (p_batch_id, 'cancelled', p_idempotency_key, v_hash, v_approved_decision_id, v_actor, btrim(p_reason))
+      returning id into v_decision_id;
+  exception
+    when unique_violation then
+      select d.id as decision_id, d.request_hash
+        into v_existing
+        from public.creator_payout_decisions d
+        where d.idempotency_key = p_idempotency_key;
+
+      if not found then
+        -- Unreachable in practice: creator_payout_decisions has exactly one unique
+        -- constraint (idempotency_key), and this UPDATE is exempt from
+        -- creator_payout_batches_one_pending_uniq once status leaves 'pending', so no other
+        -- constraint on either table can be the one that fired. Kept anyway for
+        -- forward-compatibility and consistency with admin_create_payout_batch's identical
+        -- guard.
+        raise;
+      end if;
+
+      if v_existing.request_hash <> v_hash then
+        raise exception 'idempotency_conflict';
+      end if;
+      return jsonb_build_object('decision_id', v_existing.decision_id, 'replayed', true);
+  end;
 
   perform public.ops_audit_log_append('payout_batch', p_batch_id, 'payout_batch.cancel', p_reason, '{}'::jsonb);
 

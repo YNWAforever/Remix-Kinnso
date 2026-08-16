@@ -37,6 +37,25 @@ describe('r10.2 admin_mark_payout_paid / admin_cancel_payout RPCs', () => {
     expect(sql).toContain("raise exception 'idempotency_conflict'")
   })
 
+  it('wraps the cancel UPDATE together with the decision INSERT in one subtransaction, not the insert alone', () => {
+    // A same-batch race is already handled by the earlier `for update` CAS (the losing call
+    // just sees status <> 'pending' and gets a clean bad_transition). This subtransaction
+    // exists for the narrower case: two concurrent calls sharing the same never-before-seen
+    // idempotency_key but targeting DIFFERENT batch ids, which don't contend for the same
+    // row lock and can both reach the insert, racing on the idempotency_key unique index.
+    // The update must be inside the SAME block as the insert -- wrapping only the insert
+    // (Task 3's shape) would let a losing call's update survive uncommitted-rollback while
+    // its insert rolled back, permanently stranding a batch at status = 'cancelled' with no
+    // decision row (unrecoverable once Task 1's immutability trigger applies). This
+    // assertion fails if a future edit moves the update back outside the block.
+    expect(sql).toContain(
+      "begin update public.creator_payout_batches set status = 'cancelled', cancelled_at = now(), updated_at = now() where id = p_batch_id; insert into public.creator_payout_decisions",
+    )
+    expect(sql).toContain('exception when unique_violation then')
+    expect(sql).toContain('if not found then')
+    expect(sql).toContain('raise;')
+  })
+
   it('cancel only accepts a pending batch and writes a cancelled decision that supersedes the approval', () => {
     expect(sql).toContain("if v_status <> 'pending' then raise exception 'bad_transition'; end if")
     expect(sql).toContain("set status = 'cancelled', cancelled_at = now(), updated_at = now()")
