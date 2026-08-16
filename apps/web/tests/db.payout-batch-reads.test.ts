@@ -22,6 +22,12 @@ describe('r10.2 payout batch read RPCs', () => {
     expect(sql).toContain('where b.creator_id = v_uid')
   })
 
+  it('creator_payout_batches_mine falls back to an empty array, not null, when the creator has no batches', () => {
+    // jsonb_agg(...) over zero rows returns SQL NULL, not [] — this coalesce is load-bearing,
+    // not decorative. Losing it would turn "no batches yet" into a null payload.
+    expect(sql).toContain("from public.creator_payout_batches b where b.creator_id = v_uid ), '[]'::jsonb)")
+  })
+
   it('admin_list_payout_batches is a read gated at the analyst level, not admin', () => {
     expect(sql).toContain('create or replace function public.admin_list_payout_batches(p_status text default null)')
     expect(sql).toContain("if not public.is_active_ops_role('analyst') then")
