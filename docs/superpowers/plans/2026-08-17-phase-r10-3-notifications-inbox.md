@@ -1,5 +1,19 @@
 # Phase R10.3 — Notifications Backbone + Honest Inbox Implementation Plan
 
+> **Amendment (2026-08-18, before Task 2 started):** this branch is deliberately rooted at
+> `main`, which does not yet have `creator_payout_batches` (that table only exists on R10.2's
+> still-open PR #111). Task 2 as originally written covers all three source tables in one
+> migration, including `creator_payout_batches` — a table that doesn't exist on this branch.
+> **Split, per user decision:** Task 2 below now covers ONLY the submission and settlement
+> triggers (4 of the 7 event types: `submission.approved/rejected/revision_requested`,
+> `settlement.created`) — both tables already exist on `main`, fully buildable and
+> live-verifiable today. A new **Task 2b** (inserted after Task 2, before Task 3) covers the
+> `payout_batch.created/paid/cancelled` trigger — written and text-tested now, exactly as
+> originally specified, but its live verification is explicitly deferred to Task 8 and gated
+> on R10.2 (PR #111) merging first. Task 8 itself must check this gate before attempting a
+> live `supabase start` that would otherwise fail outright trying to replay a trigger against
+> a nonexistent table.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace `/studio/inbox`'s "coming soon" stub with a real feed of honest,
