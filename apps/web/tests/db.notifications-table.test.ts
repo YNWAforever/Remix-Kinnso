@@ -41,6 +41,6 @@ describe('r10.3 notifications table', () => {
   })
 
   it('grants no insert to any client role', () => {
-    expect(sql).not.toContain('grant insert on public.notifications')
+    expect(sql).not.toContain('grant insert')
   })
 })

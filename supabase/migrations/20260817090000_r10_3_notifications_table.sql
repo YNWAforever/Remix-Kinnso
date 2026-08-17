@@ -15,7 +15,7 @@
 
 create table public.notifications (
   id                uuid primary key default gen_random_uuid(),
-  creator_id        uuid not null references public.creators(id),
+  creator_id        uuid not null references public.creators(id) on delete cascade,
   notification_type text not null,
   entity_type       text not null,
   entity_id         uuid not null,
