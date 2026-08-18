@@ -62,4 +62,16 @@ describe('StudioQuickLinks', () => {
     render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
     expect(screen.queryByText('0')).toBeNull()
   })
+
+  it('composes a single well-formed accessible name for the inbox link instead of gluing the badge onto it', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={3} />)
+    const expectedLabel = `${en.studioHome.inboxTitle}, ${en.studioHome.unreadBadgeLabel.replace('{count}', '3')}`
+    const link = screen.getByRole('link', { name: expectedLabel })
+    expect(link.getAttribute('href')).toBe('/en/studio/inbox')
+    // The visible numeral must not leak into the accessible name as a second,
+    // unseparated fragment (e.g. "Live3 unread Inbox...") — it's aria-hidden,
+    // and the link's own aria-label is the sole source of its accessible name.
+    const badge = screen.getByText('3')
+    expect(badge.getAttribute('aria-hidden')).toBe('true')
+  })
 })

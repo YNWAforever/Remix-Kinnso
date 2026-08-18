@@ -660,6 +660,7 @@ const messages: Messages = {
     perksTitle: '福利', perksDesc: '根據你的等級解鎖的合作夥伴優惠。',
     insightsTitle: '數據洞察', insightsDesc: '你的真實活動 — 積分、攻略、任務。',
     sessionsTitle: '場次', sessionsDesc: '安排並主持即時社群場次。',
+    unreadBadgeLabel: '{count} 則未讀',
   },
   studioDashboard: {
     greeting: '歡迎回來，{name}',

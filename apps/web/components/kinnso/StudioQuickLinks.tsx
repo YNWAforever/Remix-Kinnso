@@ -23,6 +23,9 @@ export function StudioQuickLinks({ locale, t, unreadNotificationCount }: { local
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => {
+        // Only the inbox tile ever carries a count, and only while it's positive —
+        // everything else keeps the browser's own flattened accessible name.
+        const hasUnreadBadge = tool.href === '/studio/inbox' && unreadNotificationCount > 0
         const header = (
           <>
             <div className="flex items-center justify-between">
@@ -30,9 +33,11 @@ export function StudioQuickLinks({ locale, t, unreadNotificationCount }: { local
               <RouteStamp className={tool.live ? 'bg-kinnso-orange/10 text-kinnso-orange' : 'bg-kinnso-cream2 text-kinnso-muted'}>
                 {tool.live ? t.liveBadge : t.soonBadge}
               </RouteStamp>
-              {tool.href === '/studio/inbox' && unreadNotificationCount > 0 && (
+              {hasUnreadBadge && (
+                // Visually shows the count, but contributes nothing to the link's
+                // accessible name — that's composed once, cleanly, on the link itself.
                 <span
-                  aria-label={`${unreadNotificationCount} unread`}
+                  aria-hidden="true"
                   className="ml-2 grid h-5 min-w-5 place-items-center rounded-full bg-kinnso-orange px-1.5 text-xs font-bold text-white"
                 >
                   {unreadNotificationCount}
@@ -52,7 +57,13 @@ export function StudioQuickLinks({ locale, t, unreadNotificationCount }: { local
           )
         }
         return (
-          <TicketCard key={tool.href} as={Link} href={p(tool.href)} className="group p-5 transition hover:border-kinnso-orange">
+          <TicketCard
+            key={tool.href}
+            as={Link}
+            href={p(tool.href)}
+            aria-label={hasUnreadBadge ? `${tool.title}, ${t.unreadBadgeLabel.replace('{count}', String(unreadNotificationCount))}` : undefined}
+            className="group p-5 transition hover:border-kinnso-orange"
+          >
             {header}
             <span className="mt-3 inline-flex items-center text-sm font-bold text-kinnso-orange">
               {t.open} <ArrowRight aria-hidden="true" className="ml-1 h-4 w-4 transition group-hover:translate-x-0.5" />

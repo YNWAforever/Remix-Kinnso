@@ -660,6 +660,7 @@ const messages: Messages = {
     perksTitle: '特典', perksDesc: 'あなたのティアで解放されるパートナー特典。',
     insightsTitle: 'インサイト', insightsDesc: 'あなたの実際の活動 — ポイント、ガイド、ミッション。',
     sessionsTitle: 'セッション', sessionsDesc: 'ライブコミュニティセッションを予定・開催。',
+    unreadBadgeLabel: '未読{count}件',
   },
   studioDashboard: {
     greeting: 'おかえりなさい、{name}さん',

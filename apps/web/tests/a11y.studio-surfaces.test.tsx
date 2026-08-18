@@ -87,6 +87,20 @@ describe('studio surfaces accessibility', () => {
     expect(await violations(container)).toEqual([])
   })
 
+  it('has no serious or critical violations on the dashboard with an unread notification badge', async () => {
+    // Exercises the inbox tile's unread-count badge markup — the composed
+    // aria-label on the link plus the aria-hidden numeral span.
+    const { container } = render(
+      <StudioDashboardView
+        {...dashboardProps}
+        unreadNotificationCount={3}
+        nextAction={{ kind: 'start_earning', path: '/studio/offers' }}
+        directory={{ listed: false, gaps: ['no_published_guide'] }}
+      />,
+    )
+    expect(await violations(container)).toEqual([])
+  })
+
   it('has no serious or critical violations on the dashboard with nothing outstanding', async () => {
     // The empty state renders different markup — no action link, listed copy —
     // so it is a distinct surface, not a variant of the one above.

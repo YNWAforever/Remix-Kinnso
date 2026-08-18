@@ -660,6 +660,7 @@ const messages: Messages = {
     perksTitle: '혜택', perksDesc: '나의 등급에 따라 해제되는 파트너 혜택.',
     insightsTitle: '인사이트', insightsDesc: '나의 실제 활동 — 포인트, 가이드, 미션.',
     sessionsTitle: '세션', sessionsDesc: '라이브 커뮤니티 세션을 예약하고 진행하세요.',
+    unreadBadgeLabel: '읽지 않음 {count}개',
   },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',

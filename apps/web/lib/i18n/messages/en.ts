@@ -848,6 +848,7 @@ export interface Messages {
     insightsDesc: string
     sessionsTitle: string
     sessionsDesc: string
+    unreadBadgeLabel: string
   }
   studioDashboard: {
     greeting: string
@@ -2031,6 +2032,7 @@ const messages: Messages = {
     perksTitle: 'Perks', perksDesc: 'Partner deals unlocked by your tier.',
     insightsTitle: 'Insights', insightsDesc: 'Your real activity — points, guides, and missions.',
     sessionsTitle: 'Sessions', sessionsDesc: 'Schedule and host live community sessions.',
+    unreadBadgeLabel: '{count} unread',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',

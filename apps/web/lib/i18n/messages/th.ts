@@ -660,6 +660,7 @@ const messages: Messages = {
     perksTitle: 'สิทธิพิเศษ', perksDesc: 'ดีลจากพาร์ทเนอร์ที่ปลดล็อกตามระดับของคุณ',
     insightsTitle: 'ข้อมูลเชิงลึก', insightsDesc: 'กิจกรรมจริงของคุณ — คะแนน, ไกด์, และภารกิจ',
     sessionsTitle: 'เซสชัน', sessionsDesc: 'จัดตารางและโฮสต์เซสชันชุมชนสด',
+    unreadBadgeLabel: 'ยังไม่อ่าน {count} รายการ',
   },
   studioDashboard: {
     greeting: 'ยินดีต้อนรับกลับมา {name}',
