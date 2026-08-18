@@ -7,27 +7,27 @@ import { StudioQuickLinks } from '@/components/kinnso/StudioQuickLinks'
 afterEach(cleanup)
 
 describe('StudioQuickLinks', () => {
-  it('renders the five live tools as locale-prefixed links and disables the inbox tile', () => {
-    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+  it('renders the live tools as locale-prefixed links, including the now-live inbox tile', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
     expect(hrefs).toContain('/en/studio/scan')
     expect(hrefs).toContain('/en/studio/missions')
     expect(hrefs).toContain('/en/studio/earnings')
     expect(hrefs).toContain('/en/studio/offers')
     expect(hrefs).toContain('/en/studio/guides')
-    // Inbox is backlog — shown but not clickable (no link to the stub).
-    expect(hrefs).not.toContain('/en/studio/inbox')
+    // Inbox is live — clickable, linking to the real feed.
+    expect(hrefs).toContain('/en/studio/inbox')
     expect(screen.getByText(en.studioHome.inboxTitle)).toBeTruthy()
   })
 
-  it('marks live tools Live and the inbox Soon', () => {
-    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+  it('marks every tool Live now that the inbox has shipped', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
     expect(screen.getAllByText(en.studioHome.liveBadge).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(en.studioHome.soonBadge).length).toBe(1)
+    expect(screen.queryAllByText(en.studioHome.soonBadge).length).toBe(0)
   })
 
   it('renders a live Tier tile linking to /studio/tier', () => {
-    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
     const tierDesc = screen.getByText('Your contribution points and tier.')
     expect(tierDesc).toBeTruthy()
     const link = tierDesc.closest('a')
@@ -36,14 +36,30 @@ describe('StudioQuickLinks', () => {
   })
 
   it('renders the Perks tile linking to /studio/perks', () => {
-    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
     const link = screen.getByText(en.studioHome.perksTitle).closest('a')
     expect(link?.getAttribute('href')).toBe('/en/studio/perks')
   })
 
   it('renders an Insights tile linking to /studio/insights', () => {
-    render(<StudioQuickLinks locale="en" t={en.studioHome} />)
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href'))
     expect(hrefs).toContain('/en/studio/insights')
+  })
+
+  it('flips the Inbox tile live and links it', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
+    const link = screen.getByRole('link', { name: new RegExp(en.studioHome.inboxTitle) })
+    expect(link.getAttribute('href')).toBe('/en/studio/inbox')
+  })
+
+  it('shows an unread count badge when there are unread notifications', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={3} />)
+    expect(screen.getByText('3')).toBeTruthy()
+  })
+
+  it('shows no badge when there are zero unread notifications', () => {
+    render(<StudioQuickLinks locale="en" t={en.studioHome} unreadNotificationCount={0} />)
+    expect(screen.queryByText('0')).toBeNull()
   })
 })

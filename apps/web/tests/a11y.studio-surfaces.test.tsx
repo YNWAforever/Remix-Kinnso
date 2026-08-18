@@ -60,6 +60,7 @@ const dashboardProps = {
   tierT: en.tier,
   opportunities: [],
   earnings: [],
+  unreadNotificationCount: 0,
 }
 
 /** Serious/critical only — the CI gate's threshold, so this cannot be stricter

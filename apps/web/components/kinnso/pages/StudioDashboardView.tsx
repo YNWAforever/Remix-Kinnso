@@ -40,10 +40,11 @@ export interface StudioDashboardViewProps {
   activeJobId: string | null
   contribution: CreatorContribution
   tierT: Messages['tier']
+  unreadNotificationCount: number
 }
 
 export function StudioDashboardView(props: StudioDashboardViewProps) {
-  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, nextAction, directory, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT } = props
+  const { locale, t, studioHomeT, progressT, creatorId, name, dna, lastScanned, readiness, nextAction, directory, opportunities, earnings, platforms, missingPlatforms, activeJobId, contribution, tierT, unreadNotificationCount } = props
   const p = (path: string) => `/${locale}${path}`
   const nextActionCopy = {
     await_scan: t.nextActionAwaitScan,
@@ -143,7 +144,7 @@ export function StudioDashboardView(props: StudioDashboardViewProps) {
         {/* 6. Quick links */}
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-kinnso-muted">{t.quickLinksTitle}</p>
-          <StudioQuickLinks locale={locale} t={studioHomeT} />
+          <StudioQuickLinks locale={locale} t={studioHomeT} unreadNotificationCount={unreadNotificationCount} />
         </div>
       </section>
     </main>

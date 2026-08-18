@@ -19,12 +19,14 @@ const {
   listMissionsMock,
   listOffersMock,
   listSettlementsMock,
+  getUnreadNotificationCountMock,
   state,
 } = vi.hoisted(() => ({
   resolveViewerRoleMock: vi.fn(async () => 'creator'),
   listMissionsMock: vi.fn(async () => ({ data: [] })),
   listOffersMock: vi.fn(async () => ({ data: [] })),
   listSettlementsMock: vi.fn(async () => ({ data: [] })),
+  getUnreadNotificationCountMock: vi.fn(async () => 0),
   state: {
     user: { id: 'creator-1' } as { id: string } | null,
     creator: { display_name: 'May', status: 'active' } as { display_name: string | null; status: string } | null,
@@ -48,6 +50,10 @@ vi.mock('@/lib/missions/queries', () => ({
   listCreatorMerchantMissions: listMissionsMock,
   listAffiliateOffers: listOffersMock,
   listCreatorSettlements: listSettlementsMock,
+}))
+
+vi.mock('@/lib/notifications/queries', () => ({
+  getUnreadNotificationCount: getUnreadNotificationCountMock,
 }))
 
 // Chainable supabase stub: builder is awaitable AND supports single/maybeSingle.
@@ -82,6 +88,7 @@ import StudioPage from '@/app/[locale]/studio/page'
 beforeEach(() => {
   resolveViewerRoleMock.mockReset(); resolveViewerRoleMock.mockResolvedValue('creator')
   listMissionsMock.mockClear(); listOffersMock.mockClear(); listSettlementsMock.mockClear()
+  getUnreadNotificationCountMock.mockClear(); getUnreadNotificationCountMock.mockResolvedValue(0)
   state.user = { id: 'creator-1' }
   state.creator = { display_name: 'May', status: 'active' }
   state.dnaFinal = validDna

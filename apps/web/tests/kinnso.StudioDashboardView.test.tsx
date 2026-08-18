@@ -44,6 +44,7 @@ const baseProps = {
   tierT: en.tier,
   nextAction: { kind: 'publish_guide' as const, path: '/studio/guides/new' },
   directory: { listed: true, gaps: [] },
+  unreadNotificationCount: 0,
 }
 
 describe('StudioDashboardView', () => {
