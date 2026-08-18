@@ -2,6 +2,18 @@
 
 **Status:** Approved by user 2026-08-19, pending implementation plan.
 
+> **Amendment (2026-08-19, during plan-writing research):** `reviewSubmission()`
+> (`apps/web/lib/missions/state.ts`) only permits transitions *from* `submitted` — never from
+> `revision_requested`. Once ops requests a revision, the creator must resubmit (which moves
+> status back to `submitted`) before ops can decide again; a `revision_requested` row is not
+> yet re-decidable. But `admin_mission_analytics`'s `submissions_awaiting_review` count
+> (which the queue's KPI card links from) includes both `submitted` and `revision_requested`.
+> **Resolved:** the queue shows both, so the KPI-to-queue row count stays coherent, but a
+> `revision_requested` row renders a "waiting on creator" badge instead of Approve/Reject
+> buttons — informational, not actionable. Only `submitted` rows get live action buttons.
+> `admin_review_submission`'s CAS still only accepts `status = 'submitted'`, matching
+> `reviewSubmission()` unchanged — no widening of the pure state-transition function.
+
 ## Goal
 
 Give ops two new surfaces — a mission detail drill-down and a submission review queue —
@@ -127,14 +139,17 @@ back.
 
 Table layout matching `CreatorPayoutsView.tsx`'s established convention exactly: status-filter
 pills (`All` / `Overdue` / `Needs Revision`, computed from `review_deadline` and current
-status), one row per submission in `submitted`/`revision_requested`, columns for mission,
-creator, submitted-at, deadline (highlighted when overdue), a display-only verification badge
-(✓ verified / ⚠ needs review / — unavailable, from `mission_verification_jobs.confidence_status`),
-and inline actions. Approve is a single click, no modal. Reject/Request-revision opens a
-centered modal — reason-category dropdown (required) + free-text field (optional) — mirroring
-`CreatorPayoutsView`'s reason-required confirm-dialog pattern for money/audit-sensitive actions.
-Default sort: `review_deadline` ascending (soonest-due first); no confidence-based reordering in
-this phase.
+status), one row per submission in `submitted`/`revision_requested` (matching
+`admin_mission_analytics`'s own count, per the amendment above), columns for mission, creator,
+submitted-at, deadline (highlighted when overdue), a display-only verification badge (✓
+verified / ⚠ needs review / — unavailable, from `mission_verification_jobs.confidence_status`),
+and actions. A `submitted` row gets live Approve (single click, no modal) and Reject/Request-
+revision (opens a centered modal — reason-category dropdown required + free-text optional,
+mirroring `CreatorPayoutsView`'s reason-required confirm-dialog pattern) buttons. A
+`revision_requested` row renders a "waiting on creator" badge in the actions column instead —
+not yet re-decidable until the creator resubmits and the row's status flips back to
+`submitted`. Default sort: `review_deadline` ascending (soonest-due first); no confidence-based
+reordering in this phase.
 
 ## i18n
 
