@@ -1,3 +1,5 @@
+import type { SettlementSource } from '@/lib/admin/creators-queries'
+
 const STATUSES = ['onboarding', 'active', 'suspended', 'banned'] as const
 export type CreatorStatus = (typeof STATUSES)[number]
 
@@ -50,6 +52,10 @@ export type LegStatus = (typeof LEG_STATUSES)[number]
 
 export function isSettlementStatus(s: string): s is SettlementStatus {
   return (SETTLEMENT_STATUSES as readonly string[]).includes(s)
+}
+
+export function isSettlementSource(v: string): v is SettlementSource {
+  return v === 'affiliate' || v === 'mission_fee' || v === 'manual'
 }
 
 export function isLegStatus(s: string): s is LegStatus {

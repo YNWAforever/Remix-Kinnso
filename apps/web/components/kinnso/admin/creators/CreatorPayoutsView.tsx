@@ -2,7 +2,7 @@
 import { useState, useTransition, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { CreatorsTabs } from '@/components/kinnso/admin/creators/CreatorsTabs'
-import type { PayoutRow, PayoutsQueue } from '@/lib/admin/creators-queries'
+import type { PayoutRow, PayoutsQueue, SettlementSource } from '@/lib/admin/creators-queries'
 import type { SettlementStatusInput } from '@/lib/admin/creators-actions'
 import type { ActionResult } from '@/lib/admin/result'
 import type { Messages } from '@/lib/i18n/messages/en'
@@ -12,6 +12,7 @@ type T = Messages['creators']
 type ActionFn = (locale: Locale, id: string, input: SettlementStatusInput, reason: string) => Promise<ActionResult<{ id: string }>>
 
 const STATUS_ORDER = ['not_started', 'pending', 'partially_paid', 'paid', 'disputed'] as const
+const SOURCE_ORDER: SettlementSource[] = ['affiliate', 'mission_fee', 'manual']
 
 const money = (n: number | null) => (n === null ? '—' : n.toFixed(2))
 
@@ -36,9 +37,9 @@ function legLabel(t: T, s: string | null): string {
 type PendingAction = { row: PayoutRow; kind: 'paid' | 'disputed' } | null
 
 export function CreatorPayoutsView({
-  t, locale, queue, status, action,
+  t, locale, queue, status, source, action,
 }: {
-  t: T; locale: Locale; queue: PayoutsQueue; status: string | undefined; action: ActionFn
+  t: T; locale: Locale; queue: PayoutsQueue; status: string | undefined; source?: SettlementSource; action: ActionFn
 }) {
   const [pending, setPending] = useState<PendingAction>(null)
   const [reason, setReason] = useState('')
@@ -65,8 +66,15 @@ export function CreatorPayoutsView({
     })
   }
 
-  const filterHref = (s?: string) =>
-    s ? `/${locale}/admin/creators/payouts?status=${s}` : `/${locale}/admin/creators/payouts`
+  // Builds a filter link that always carries BOTH facets forward — picking a status must
+  // not drop an active source filter, and picking a source must not drop an active status.
+  const filterHref = (next: { status?: string; source?: string }) => {
+    const params = new URLSearchParams()
+    if (next.status) params.set('status', next.status)
+    if (next.source) params.set('source', next.source)
+    const qs = params.toString()
+    return `/${locale}/admin/creators/payouts${qs ? `?${qs}` : ''}`
+  }
 
   return (
     <div>
@@ -101,15 +109,30 @@ export function CreatorPayoutsView({
       </div>
 
       {/* Status filter. */}
-      <nav className="mb-4 flex flex-wrap gap-2">
-        <Link href={filterHref()} aria-current={!status ? 'page' : undefined}
+      <nav className="mb-2 flex flex-wrap gap-2">
+        <Link href={filterHref({ source })} aria-current={!status ? 'page' : undefined}
           className={`rounded-full px-3 py-1 text-xs font-bold ${!status ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
           {t.dirAll}
         </Link>
         {STATUS_ORDER.map((s) => (
-          <Link key={s} href={filterHref(s)} aria-current={status === s ? 'page' : undefined}
+          <Link key={s} href={filterHref({ status: s, source })} aria-current={status === s ? 'page' : undefined}
             className={`rounded-full px-3 py-1 text-xs font-bold ${status === s ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
             {statusLabel(t, s)} {queue.summary.byStatus[s] ? `(${queue.summary.byStatus[s]})` : ''}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Source filter — same link pattern as the status filter above, carrying the
+          active status forward so switching source never clears it. */}
+      <nav className="mb-4 flex flex-wrap gap-2" aria-label={t.colSource}>
+        <Link href={filterHref({ status })} aria-current={!source ? 'page' : undefined}
+          className={`rounded-full px-3 py-1 text-xs font-bold ${!source ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
+          {t.dirAll}
+        </Link>
+        {SOURCE_ORDER.map((s) => (
+          <Link key={s} href={filterHref({ status, source: s })} aria-current={source === s ? 'page' : undefined}
+            className={`rounded-full px-3 py-1 text-xs font-bold ${source === s ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
+            {s}
           </Link>
         ))}
       </nav>
@@ -121,6 +144,7 @@ export function CreatorPayoutsView({
           <thead className="text-kinnso-muted">
             <tr className="border-b border-kinnso-line">
               <th className="py-2 font-bold">{t.colMission}</th>
+              <th className="py-2 font-bold">{t.colSource}</th>
               <th className="py-2 font-bold">{t.colName}</th>
               <th className="py-2 font-bold">{t.colAmount}</th>
               <th className="py-2 font-bold">{t.colPayout}</th>
@@ -133,6 +157,7 @@ export function CreatorPayoutsView({
             {queue.rows.map((r) => (
               <tr key={r.id} className="border-b border-kinnso-line/60 align-top">
                 <td className="py-2 font-bold text-kinnso-ink">{r.missionTitle}</td>
+                <td className="py-2 text-kinnso-muted">{r.source}</td>
                 <td className="py-2 text-kinnso-muted">
                   {r.creatorId
                     ? <Link href={`/${locale}/admin/creators/${r.creatorId}`} className="text-kinnso-orange hover:underline">{r.creatorId.slice(0, 8)}</Link>

@@ -6,9 +6,15 @@ import { type SettlementStatus } from '@/lib/admin/creators-validation'
 
 type Client = SupabaseClient<Database>
 
+/** Where a settlement row came from. Derived, never stored — the shape of the row is the
+ *  evidence: an affiliate event embed, a mission fee amount, or neither (a legacy or
+ *  hand-created row that predates R10.1's minting triggers). */
+export type SettlementSource = 'affiliate' | 'mission_fee' | 'manual'
+
 export interface PayoutRow {
   id: string
   missionTitle: string
+  source: SettlementSource
   creatorId: string | null
   status: string
   creatorPayoutStatus: string | null
@@ -45,9 +51,11 @@ type OpsSettlementJoinRow = {
   creator_commission_amount: number | null
   kinnso_commission_amount: number | null
   affiliate_commission_amount: number | null
+  paid_fee_amount: number | null
   ops_note: string | null
   missions?: { title?: string | null } | Array<{ title?: string | null }> | null
   mission_participants?: { creator_id?: string | null } | Array<{ creator_id?: string | null }> | null
+  affiliate_network_events?: { id?: string | null } | Array<{ id?: string | null }> | null
 }
 
 const oneJoin = <T>(v: T | T[] | null | undefined): T | null =>
@@ -56,9 +64,16 @@ const oneJoin = <T>(v: T | T[] | null | undefined): T | null =>
 const toPayoutRow = (r: OpsSettlementJoinRow): PayoutRow => {
   const mission = oneJoin(r.missions)
   const participant = oneJoin(r.mission_participants)
+  const affiliateEvent = oneJoin(r.affiliate_network_events)
+  const source: SettlementSource = affiliateEvent?.id
+    ? 'affiliate'
+    : r.paid_fee_amount !== null
+      ? 'mission_fee'
+      : 'manual'
   return {
     id: r.id,
     missionTitle: mission?.title ?? 'Untitled mission',
+    source,
     creatorId: participant?.creator_id ?? null,
     status: r.status ?? 'not_started',
     creatorPayoutStatus: r.creator_payout_status,
@@ -90,7 +105,7 @@ const sumByCurrency = (rows: PayoutRow[]): { currency: string; amount: number }[
  */
 export async function getSettlementsQueue(
   supabase: Client,
-  opts: { status?: SettlementStatus },
+  opts: { status?: SettlementStatus; source?: SettlementSource },
 ): Promise<PayoutsQueue> {
   const { data, error } = await listOpsSettlements(supabase)
   if (error) throw error
@@ -106,7 +121,11 @@ export async function getSettlementsQueue(
     settled: sumByCurrency(all.filter((r) => r.creatorPayoutStatus === 'paid')),
   }
 
-  const rows = opts.status ? all.filter((r) => r.status === opts.status) : all
+  // The summary stays over the FULL queue so the money-flow cards do not move while ops
+  // drills into a facet — the existing rule for `status`, extended to `source`.
+  const rows = all.filter(
+    (r) => (!opts.status || r.status === opts.status) && (!opts.source || r.source === opts.source),
+  )
   return { rows, summary }
 }
 
