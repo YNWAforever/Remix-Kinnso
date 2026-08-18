@@ -11,6 +11,12 @@ vi.mock('next/navigation', () => ({
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/auth/authorization-context', () => ({
+  getAuthorizationContext: async () => {
+    const { data: { user } } = await getUserMock()
+    return { user: user ? { id: user.id } : null, role: await roleMock(), merchantId: null }
+  },
+}))
 vi.mock('@/lib/admin/perks-queries', () => ({ listAllPerks: listMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
 vi.mock('@/components/kinnso/admin/AdminPerksView', () => ({ AdminPerksView: () => <div data-testid="perks-view" /> }))

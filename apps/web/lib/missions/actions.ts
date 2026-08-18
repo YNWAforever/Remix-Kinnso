@@ -1,12 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
 import type {
-  AffiliateProgramStatus,
   MissionDraftInput,
   MissionSource,
   MissionType,
   ParticipantReviewAction,
-  ParticipantStatus,
   SettlementPaymentStatus,
   SettlementStatus,
   SubmissionReviewAction,
@@ -15,12 +13,14 @@ import type {
 import { nextJoinStatus, reviewParticipant, reviewSubmission } from '@/lib/missions/state'
 import {
   validateMissionDraft,
-  validatePartnerLinkRequest,
   validateSettlementUpdate,
   validateSubmission,
 } from '@/lib/missions/validation'
 import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
 import { getCreatorStoredTier } from '@/lib/contribution/queries'
+import { createPartnerLinkCommand } from '@/lib/missions/partner-link-command'
+import { createPartnerLinkStore } from '@/lib/missions/partner-link-store'
+import { createTravelpayoutsPartnerLinkProvider } from '@/lib/missions/partner-link-provider'
 
 type MissionInsert = Database['public']['Tables']['missions']['Insert']
 type MissionMilestoneInsert = Database['public']['Tables']['mission_milestones']['Insert']
@@ -604,112 +604,54 @@ export async function createPartnerLinkAction(
   const user = await getAuthenticatedUser(supabase)
   if (!user) return formError('Sign in is required')
 
-  const { data: participant, error: participantError } = await supabase
-    .from('mission_participants')
-    .select('id, mission_id, creator_id, status')
-    .eq('id', input.missionParticipantId)
-    .eq('creator_id', user.id)
-    .maybeSingle()
+  const result = await createPartnerLinkCommand(
+    { id: user.id },
+    {
+      missionParticipantId: input.missionParticipantId,
+      originalUrl: input.originalUrl,
+    },
+    {
+      store: createPartnerLinkStore(supabase),
+      provider: createTravelpayoutsPartnerLinkProvider(),
+    },
+  )
 
-  if (participantError || !participant) return formError('Participant was not found')
-
-  const { data: mission, error: missionError } = await supabase
-    .from('missions')
-    .select('id, affiliate_network_program_id, mission_source, status')
-    .eq('id', participant.mission_id)
-    .maybeSingle()
-
-  if (
-    missionError ||
-    !mission ||
-    mission.status !== 'published' ||
-    mission.mission_source !== 'travelpayouts' ||
-    !mission.affiliate_network_program_id
-  ) {
-    return formError('Mission is not available')
+  if (result.kind === 'validation-failed') {
+    return { ok: false, errors: result.errors }
   }
 
-  const { data: program, error: programError } = await supabase
-    .from('affiliate_network_programs')
-    .select('id, network, status')
-    .eq('id', mission.affiliate_network_program_id)
-    .maybeSingle()
-
-  if (programError || !program || program.network !== 'travelpayouts') {
-    return formError('Affiliate program is not available')
-  }
-
-  const validation = validatePartnerLinkRequest({
-    programStatus: program.status as AffiliateProgramStatus,
-    participantStatus: participant.status as ParticipantStatus,
-    originalUrl: input.originalUrl,
-  })
-  if (!validation.ok) return validation
-
-  const { data: existingLink, error: existingLinkError } = await supabase
-    .from('affiliate_partner_links')
-    .select('id, partner_url')
-    .eq('network', 'travelpayouts')
-    .eq('mission_id', mission.id)
-    .eq('mission_participant_id', participant.id)
-    .eq('creator_id', user.id)
-    .eq('original_url', input.originalUrl)
-    .eq('external_status', 'success')
-    .maybeSingle()
-
-  if (existingLinkError) return formError('Partner link could not be loaded')
-  if (existingLink) return { ok: true, link: existingLink }
-
-  const {
-    buildSubId,
-    canonicalizeTravelpayoutsPartnerUrl,
-    createTravelpayoutsPartnerLinks,
-  } = await import('@/lib/missions/travelpayouts')
-  const subId = buildSubId({
-    missionId: mission.id,
-    participantId: participant.id,
-    creatorId: user.id,
-  })
-
-  let partnerUrl: string | null = null
-  let failureReason = 'no partner link returned'
-  try {
-    const [link] = await createTravelpayoutsPartnerLinks({
-      shorten: true,
-      links: [{ url: input.originalUrl, subId }],
-    })
-    if (link?.status === 'success' && link.partnerUrl) {
-      partnerUrl = canonicalizeTravelpayoutsPartnerUrl(link.partnerUrl, subId)
-    } else if (link?.message) {
-      failureReason = link.message
+  if (result.kind === 'failed') {
+    if (result.code === 'provider-failed') {
+      const reason = result.reason ?? 'no partner link returned'
+      console.error(
+        '[createPartnerLinkAction] Travelpayouts link generation failed:',
+        reason,
+      )
+      return formError(
+        'Travelpayouts partner link could not be generated: ' + reason,
+      )
     }
-  } catch (err) {
-    failureReason = err instanceof Error ? err.message : String(err)
+
+    const message = result.code === 'participant-not-found'
+      ? 'Participant was not found'
+      : result.code === 'mission-unavailable'
+        ? 'Mission is not available'
+        : result.code === 'program-unavailable'
+          ? 'Affiliate program is not available'
+          : result.code === 'partner-link-load-failed'
+            ? 'Partner link could not be loaded'
+            : 'Partner link could not be saved'
+    return formError(message)
   }
 
-  if (!partnerUrl) {
-    // Surface the real Travelpayouts reason (HTTP status / API message) rather than
-    // swallowing it. The access token is never present in these reasons, so it is safe
-    // to log and return.
-    console.error('[createPartnerLinkAction] Travelpayouts link generation failed:', failureReason)
-    return formError(`Travelpayouts partner link could not be generated: ${failureReason}`)
+  const link = {
+    id: result.link.id,
+    partner_url: result.link.partnerUrl,
   }
-
-  // Persist via the SECURITY DEFINER RPC (granted to `authenticated`). It re-validates
-  // ownership + active mission/program state and inserts as definer, so no service-role
-  // key is required in the app environment.
-  const { data, error } = await supabase.rpc('create_travelpayouts_partner_link', {
-    p_affiliate_network_program_id: mission.affiliate_network_program_id,
-    p_mission_id: mission.id,
-    p_mission_participant_id: participant.id,
-    p_original_url: input.originalUrl,
-    p_partner_url: partnerUrl,
-    p_sub_id: subId,
-  })
-
-  const saved = Array.isArray(data) ? data[0] : data
-  if (error || !saved) return formError('Partner link could not be saved')
+  if (result.kind === 'reused') {
+    return { ok: true, link }
+  }
 
   await revalidate([localizedPath(input.locale, studioMissionsPath)])
-  return { ok: true, link: saved }
+  return { ok: true, link }
 }

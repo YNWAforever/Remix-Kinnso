@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { searchPublicCreators, deriveFacets } from '@/lib/merchants/creator-search'
 import { rankCreators } from '@/lib/merchants/relevance'
 import { tierPolicy, type MerchantTier } from '@/lib/merchants/tier-policy'
@@ -38,20 +38,14 @@ export default async function MerchantsCreatorsPage({
   const loc = locale as Locale
 
   const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'merchant') notFound()
+  const { merchantId } = await requireMerchantPage(supabase, loc)
 
-  // Resolve the caller's own merchant profile (id + tier). RLS scopes the row.
   const { data: profile } = await supabase
     .from('merchant_profiles')
-    .select('id, tier')
-    .eq('user_id', user.id)
+    .select('tier')
+    .eq('id', merchantId)
     .maybeSingle()
   if (!profile) notFound()
-  const merchantId = profile.id as string
   const tier = (profile.tier as MerchantTier) ?? 'free'
 
   const messages = await getDictionary(loc)

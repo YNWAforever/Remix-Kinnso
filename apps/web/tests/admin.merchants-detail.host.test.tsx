@@ -18,6 +18,12 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
 vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/auth/authorization-context', () => ({
+  getAuthorizationContext: async () => {
+    const { data: { user } } = await getUserMock()
+    return { user: user ? { id: user.id } : null, role: await roleMock(), merchantId: null }
+  },
+}))
 vi.mock('@/lib/admin/merchants-queries', () => ({ getMerchantDetail: detailMock }))
 vi.mock('@/lib/admin/audit', () => ({ listAudit: auditMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))

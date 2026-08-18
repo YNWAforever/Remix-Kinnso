@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { getMyExperience } from '@/lib/experiences/queries'
 import { listExperienceAvailability } from '@/lib/experiences/availability-queries'
 import { noindexMetadata } from '@/lib/seo/metadata'
@@ -18,13 +18,8 @@ export default async function ExperienceAvailabilityPage({ params }: {
   if (!isLocale(locale)) notFound()
   const loc = locale as Locale
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'merchant') notFound()
-  const { data: profile } = await supabase
-    .from('merchant_profiles').select('id').eq('user_id', user.id).maybeSingle()
-  if (!profile) notFound()
-  const experience = await getMyExperience(supabase, profile.id as string, experienceId)
+  const { merchantId } = await requireMerchantPage(supabase, loc)
+  const experience = await getMyExperience(supabase, merchantId, experienceId)
   if (!experience) notFound()
   const availability = await listExperienceAvailability(supabase, experienceId)
   const messages = await getDictionary(loc)

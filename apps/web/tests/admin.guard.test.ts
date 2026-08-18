@@ -1,27 +1,59 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { roleMock, getUserMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'ops'),
+const { contextMock, getUserMock } = vi.hoisted(() => ({
+  contextMock: vi.fn(),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
 }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/auth/authorization-context', () => ({
+  getAuthorizationContext: contextMock,
+}))
 
-import { requireOpsPage, requireOpsAction, requireCreatorAction, requireCreatorPage } from '@/lib/admin/guard'
-const sb = () => ({ auth: { getUser: getUserMock } }) as never
+type TestContext = {
+  user: { id: string } | null
+  role: 'anon' | 'creator' | 'creator-pending' | 'merchant' | 'traveler' | 'ops'
+  merchantId: string | null
+}
 
-beforeEach(() => { roleMock.mockResolvedValue('ops'); getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } }) })
+const contextFor = (overrides: Partial<TestContext> = {}): TestContext => ({
+  user: { id: 'u1' },
+  role: 'ops',
+  merchantId: null,
+  ...overrides,
+})
+
+import {
+  requireOpsPage,
+  requireMerchantPage,
+  requireCreatorPage,
+  requireOpsAction,
+  requireCreatorAction,
+  requireMerchantAction,
+  requireTravelerAction,
+} from '@/lib/admin/guard'
+
+const sb = () => ({
+  auth: { getUser: getUserMock },
+  from: vi.fn(),
+}) as never
+
+beforeEach(() => {
+  contextMock.mockReset()
+  contextMock.mockResolvedValue(contextFor())
+  getUserMock.mockReset()
+  getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+})
 
 describe('requireOpsPage', () => {
   it('redirects anon to sign-in', async () => {
-    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
     await expect(requireOpsPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
   })
   it('notFound for non-ops', async () => {
-    roleMock.mockResolvedValueOnce('creator')
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'creator' }))
     await expect(requireOpsPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
   })
   it('returns the user for ops', async () => {
@@ -29,9 +61,69 @@ describe('requireOpsPage', () => {
   })
 })
 
+describe('requireMerchantPage', () => {
+  it('redirects anon to sign-in', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon', merchantId: null }))
+    await expect(requireMerchantPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('notFound for a non-merchant viewer', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'creator', merchantId: null }))
+    await expect(requireMerchantPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('notFound for a merchant context without a server-derived ID', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant', merchantId: null }))
+    await expect(requireMerchantPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('returns the authenticated user and server-derived merchant ID', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant', merchantId: 'merchant-1' }))
+    await expect(requireMerchantPage(sb(), 'en')).resolves.toEqual({
+      user: { id: 'u1' },
+      merchantId: 'merchant-1',
+    })
+  })
+})
+
+describe('requireCreatorPage', () => {
+  it('redirects anon to sign-in', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('notFounds a non-creator by default', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('redirects a non-creator to the studio hub in studio mode', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'en', 'studio')).rejects.toThrow('NEXT_REDIRECT:/en/studio')
+  })
+
+  it('treats creator-pending as a non-creator', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'creator-pending' }))
+    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('returns the authenticated creator user', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: { id: 'creator-1' }, role: 'creator' }))
+    await expect(requireCreatorPage(sb(), 'en')).resolves.toEqual({ user: { id: 'creator-1' } })
+  })
+
+  it('uses the locale it is given in both denial paths', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
+    await expect(requireCreatorPage(sb(), 'zh-hk')).rejects.toThrow('NEXT_REDIRECT:/zh-hk/sign-in')
+
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'ja', 'studio')).rejects.toThrow('NEXT_REDIRECT:/ja/studio')
+  })
+})
+
 describe('requireOpsAction', () => {
   it('formError for non-ops', async () => {
-    roleMock.mockResolvedValueOnce('merchant')
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant' }))
     const r = await requireOpsAction(sb())
     expect(r.ok).toBe(false)
   })
@@ -43,57 +135,56 @@ describe('requireOpsAction', () => {
 
 describe('requireCreatorAction', () => {
   it('fails for an anon caller', async () => {
-    const supabase = { auth: { getUser: async () => ({ data: { user: null } }) } }
-    const result = await requireCreatorAction(supabase as never)
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
+    const result = await requireCreatorAction(sb())
     expect(result.ok).toBe(false)
   })
 
   it('fails for a signed-in non-creator (e.g. a traveller)', async () => {
-    roleMock.mockResolvedValueOnce('traveler')
-    const supabase = { auth: { getUser: async () => ({ data: { user: { id: 'u1' } } }) } }
-    const result = await requireCreatorAction(supabase as never)
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    const result = await requireCreatorAction(sb())
     expect(result.ok).toBe(false)
   })
 
   it('succeeds for a signed-in creator, returning the user (id doubles as creators.id)', async () => {
-    roleMock.mockResolvedValueOnce('creator')
-    const supabase = { auth: { getUser: async () => ({ data: { user: { id: 'creator-1' } } }) } }
-    const result = await requireCreatorAction(supabase as never)
+    contextMock.mockResolvedValueOnce(contextFor({ user: { id: 'creator-1' }, role: 'creator' }))
+    const result = await requireCreatorAction(sb())
     expect(result).toEqual({ ok: true, user: { id: 'creator-1' } })
   })
 })
 
-describe('requireCreatorPage', () => {
-  it('redirects an anonymous visitor to sign-in', async () => {
-    getUserMock.mockResolvedValue({ data: { user: null } } as never)
-    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+describe('requireMerchantAction', () => {
+  it('returns the server-derived merchant ID without a second profile lookup', async () => {
+    const from = vi.fn()
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant', merchantId: 'merchant-1' }))
+
+    await expect(requireMerchantAction({ from } as never)).resolves.toEqual({
+      ok: true,
+      user: { id: 'u1' },
+      merchantId: 'merchant-1',
+    })
+    expect(from).not.toHaveBeenCalled()
   })
 
-  it('notFounds a non-creator by default', async () => {
-    roleMock.mockResolvedValue('traveler')
-    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
-  })
+  it('rejects a merchant context that has no server-derived merchant ID', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'merchant', merchantId: null }))
 
-  it('redirects a non-creator to the studio hub in studio mode', async () => {
-    roleMock.mockResolvedValue('traveler')
-    await expect(requireCreatorPage(sb(), 'en', 'studio')).rejects.toThrow('NEXT_REDIRECT:/en/studio')
-  })
+    const result = await requireMerchantAction(sb())
 
-  it('treats creator-pending as a non-creator', async () => {
-    roleMock.mockResolvedValue('creator-pending')
-    await expect(requireCreatorPage(sb(), 'en')).rejects.toThrow('NEXT_NOT_FOUND')
+    expect(result.ok).toBe(false)
   })
+})
 
-  it('returns the user for an active creator', async () => {
-    roleMock.mockResolvedValue('creator')
-    await expect(requireCreatorPage(sb(), 'en')).resolves.toEqual({ user: { id: 'u1' } })
-  })
+describe('requireTravelerAction', () => {
+  it('keeps traveler actions authentication-only', async () => {
+    const from = vi.fn()
+    const result = await requireTravelerAction({
+      auth: { getUser: async () => ({ data: { user: { id: 'traveler-1' } } }) },
+      from,
+    } as never)
 
-  it('uses the locale it is given in both denial paths', async () => {
-    getUserMock.mockResolvedValue({ data: { user: null } } as never)
-    await expect(requireCreatorPage(sb(), 'zh-hk')).rejects.toThrow('NEXT_REDIRECT:/zh-hk/sign-in')
-    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
-    roleMock.mockResolvedValue('merchant')
-    await expect(requireCreatorPage(sb(), 'ja', 'studio')).rejects.toThrow('NEXT_REDIRECT:/ja/studio')
+    expect(result).toEqual({ ok: true, user: { id: 'traveler-1' } })
+    expect(contextMock).not.toHaveBeenCalled()
+    expect(from).not.toHaveBeenCalled()
   })
 })

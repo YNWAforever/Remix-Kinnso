@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-const { roleMock, getUserMock, summaryMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'creator'),
+const { creatorPageGateMock, getUserMock, summaryMock } = vi.hoisted(() => ({
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'creator-1' } })),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'creator-1' } } })),
   summaryMock: vi.fn(async () => ({ missions: [], bookings: [], tracked: [], totals: [] })),
 }))
@@ -11,7 +11,7 @@ vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorPage: creatorPageGateMock }))
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }),
 }))
@@ -21,7 +21,7 @@ import StudioEarningsPage from '@/app/[locale]/studio/earnings/page'
 
 beforeEach(() => {
   vi.clearAllMocks()
-  roleMock.mockResolvedValue('creator')
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-1' } })
   getUserMock.mockResolvedValue({ data: { user: { id: 'creator-1' } } })
   summaryMock.mockResolvedValue({ missions: [], bookings: [], tracked: [], totals: [] })
 })
@@ -33,13 +33,13 @@ describe('/studio/earnings host', () => {
   })
 
   it('redirects an anonymous visitor to sign-in', async () => {
-    getUserMock.mockResolvedValue({ data: { user: null } } as never)
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_REDIRECT:/en/sign-in'))
     await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
     expect(summaryMock).not.toHaveBeenCalled()
   })
 
   it('notFounds a non-creator and never reads earnings', async () => {
-    roleMock.mockResolvedValue('traveler')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
     await expect(StudioEarningsPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
     expect(summaryMock).not.toHaveBeenCalled()
   })

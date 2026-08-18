@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
 const {
   getCreatorMissionDetailMock,
   notFoundMock,
-  resolveViewerRoleMock,
+  creatorPageGateMock,
   submitMilestoneActionMock,
 } = vi.hoisted(() => ({
   getCreatorMissionDetailMock: vi.fn(async () => ({
@@ -39,7 +39,7 @@ const {
     },
   })),
   notFoundMock: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-  resolveViewerRoleMock: vi.fn(async () => 'creator'),
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'creator-user-1' } })),
   submitMilestoneActionMock: vi.fn(async () => ({ ok: true as const, submissionId: 'sub-new' })),
 }))
 
@@ -49,8 +49,8 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }))
 
-vi.mock('@/lib/auth/viewer-role', () => ({
-  resolveViewerRole: resolveViewerRoleMock,
+vi.mock('@/lib/admin/guard', () => ({
+  requireCreatorPage: creatorPageGateMock,
 }))
 
 vi.mock('@/lib/missions/queries', () => ({
@@ -91,9 +91,13 @@ vi.mock('@/lib/missions/verify-client', () => ({
 
 import StudioMissionDetailPage from '@/app/[locale]/studio/missions/[id]/page'
 
+beforeEach(() => {
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-user-1' } })
+})
+
 describe('/[locale]/studio/missions/[id] host', () => {
   it('renders not found for non-creator viewers', async () => {
-    resolveViewerRoleMock.mockResolvedValueOnce('merchant')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_NOT_FOUND'))
     await expect(
       StudioMissionDetailPage({ params: Promise.resolve({ locale: 'en', id: 'm1' }) }),
     ).rejects.toThrow('NEXT_NOT_FOUND')

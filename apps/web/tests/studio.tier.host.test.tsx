@@ -4,19 +4,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { getContribMock, listEventsMock, listPerksMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
+const { getContribMock, listEventsMock, listPerksMock, notFoundMock, creatorPageGateMock } = vi.hoisted(() => ({
   getContribMock: vi.fn(),
   listEventsMock: vi.fn(async () => []),
   listPerksMock: vi.fn(async () => [] as unknown[]),
   notFoundMock: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-  resolveViewerRoleMock: vi.fn(async () => 'creator'),
+  creatorPageGateMock: vi.fn(async () => ({ user: { id: 'creator-user-1' } })),
 }))
 
 vi.mock('next/navigation', () => ({
   notFound: notFoundMock,
   redirect: vi.fn((path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) }),
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: resolveViewerRoleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorPage: creatorPageGateMock }))
 vi.mock('@/lib/contribution/queries', () => ({
   getCreatorContribution: getContribMock,
   listContributionEvents: listEventsMock,
@@ -35,8 +35,8 @@ import StudioTierPage from '@/app/[locale]/studio/tier/page'
 import { progressToNext } from '@/lib/contribution/tiers'
 
 beforeEach(() => {
-  resolveViewerRoleMock.mockReset()
-  resolveViewerRoleMock.mockResolvedValue('creator')
+  creatorPageGateMock.mockReset()
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-user-1' } })
   getContribMock.mockReset()
   getContribMock.mockResolvedValue(progressToNext(55))
   listEventsMock.mockReset()
@@ -55,7 +55,7 @@ function perkRow(min_tier: string | null, title: string, partner_name = 'Plaza P
 
 describe('/[locale]/studio/tier host', () => {
   it('redirects non-creator viewers', async () => {
-    resolveViewerRoleMock.mockResolvedValueOnce('merchant')
+    creatorPageGateMock.mockRejectedValueOnce(new Error('NEXT_REDIRECT:/en/studio'))
     await expect(StudioTierPage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow(/NEXT_REDIRECT/)
     expect(getContribMock).not.toHaveBeenCalled()
   })
@@ -65,6 +65,11 @@ describe('/[locale]/studio/tier host', () => {
     render(ui)
     expect(screen.getByText('Tier & contribution')).toBeTruthy()
     expect(getContribMock).toHaveBeenCalledWith(expect.anything(), 'creator-user-1')
+  })
+
+  it('asks the guard for hub-redirect denial, not notFound', async () => {
+    await StudioTierPage({ params: Promise.resolve({ locale: 'en' }) })
+    expect(creatorPageGateMock).toHaveBeenCalledWith(expect.anything(), 'en', 'studio')
   })
 
   // The ladder does pay off — partner_perks.min_tier is hard-gated by the

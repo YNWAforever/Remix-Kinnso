@@ -4,9 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { roleMock, getUserMock, insightsMock } = vi.hoisted(() => ({
-  roleMock: vi.fn(async () => 'merchant'),
-  getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
+const { merchantPageGateMock, insightsMock } = vi.hoisted(() => ({
+  merchantPageGateMock: vi.fn(async () => ({ user: { id: 'u1' }, merchantId: 'mp1' })),
   insightsMock: vi.fn(async () => ({
     missionsPublished: 1,
     perMission: [{ missionId: 'm1', title: 'Summer brief', status: 'published',
@@ -20,9 +19,9 @@ vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
   redirect: (p: string) => { throw new Error(`NEXT_REDIRECT:${p}`) },
 }))
-vi.mock('@/lib/auth/viewer-role', () => ({ resolveViewerRole: roleMock }))
+vi.mock('@/lib/admin/guard', () => ({ requireMerchantPage: merchantPageGateMock }))
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }),
+  createSupabaseServerClient: async () => ({}),
 }))
 vi.mock('@/lib/insights/merchant', () => ({ getMerchantInsights: insightsMock }))
 
@@ -30,8 +29,8 @@ import MerchantsInsightsPage from '@/app/[locale]/merchants/dashboard/insights/p
 import en from '@/lib/i18n/messages/en'
 
 beforeEach(() => {
-  roleMock.mockResolvedValue('merchant')
-  getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } })
+  merchantPageGateMock.mockReset()
+  merchantPageGateMock.mockResolvedValue({ user: { id: 'u1' }, merchantId: 'mp1' })
 })
 
 describe('/[locale]/merchants/dashboard/insights host', () => {
@@ -42,14 +41,14 @@ describe('/[locale]/merchants/dashboard/insights host', () => {
   })
 
   it('notFounds for a non-merchant', async () => {
-    roleMock.mockResolvedValueOnce('creator')
+    merchantPageGateMock.mockRejectedValueOnce(new Error('notFound'))
     await expect(MerchantsInsightsPage({ params: Promise.resolve({ locale: 'en' }) }))
-      .rejects.toThrow('NEXT_NOT_FOUND')
+      .rejects.toThrow('notFound')
   })
 
   it('redirects an anonymous viewer to sign-in', async () => {
-    getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
+    merchantPageGateMock.mockRejectedValueOnce(new Error('redirect:/en/sign-in'))
     await expect(MerchantsInsightsPage({ params: Promise.resolve({ locale: 'en' }) }))
-      .rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+      .rejects.toThrow('redirect:/en/sign-in')
   })
 })

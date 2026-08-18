@@ -12,6 +12,7 @@ function fakeSupabase(opts: {
   creator?: Row
   handle?: Row
   handleError?: Error
+  errors?: Record<string, unknown>
   getUser?: ReturnType<typeof vi.fn>
 }) {
   const from = (table: string) => {
@@ -26,7 +27,10 @@ function fakeSupabase(opts: {
           : table === 'creators' ? (opts.creator ?? null)
           : table === 'creator_social_handles' ? (opts.handle ?? null)
           : null,
-        error: table === 'creator_social_handles' ? (opts.handleError ?? null) : null,
+        error:
+          table === 'creator_social_handles'
+            ? (opts.handleError ?? opts.errors?.[table] ?? null)
+            : (opts.errors?.[table] ?? null),
       }),
     }
     return builder
@@ -52,15 +56,8 @@ describe('resolveViewerRole', () => {
     expect(role).toBe('ops')
   })
 
-  it('returns merchant before an onboarding creator with a saved handle', async () => {
-    const role = await resolveViewerRole(
-      fakeSupabase({
-        user: { id: 'u1' },
-        merchant: { id: 'm1' },
-        creator: { status: 'onboarding' },
-        handle: { id: 'handle-1' },
-      }),
-    )
+  it('returns merchant for a user with a merchant profile', async () => {
+    const role = await resolveViewerRole(fakeSupabase({ user: { id: 'u1' }, merchant: { id: 'm1' } }))
     expect(role).toBe('merchant')
   })
 
@@ -85,6 +82,13 @@ describe('resolveViewerRole', () => {
     expect(role).toBe('creator')
   })
 
+  it('returns traveler for a user whose creator profile is still onboarding', async () => {
+    const role = await resolveViewerRole(
+      fakeSupabase({ user: { id: 'u1' }, creator: { status: 'onboarding' } }),
+    )
+    expect(role).toBe('traveler')
+  })
+
   it('returns creator-pending for an onboarding creator with a saved handle', async () => {
     const role = await resolveViewerRole(
       fakeSupabase({
@@ -96,25 +100,31 @@ describe('resolveViewerRole', () => {
     expect(role).toBe('creator-pending')
   })
 
-  it('returns traveler for an onboarding creator with no saved handle', async () => {
-    const role = await resolveViewerRole(
-      fakeSupabase({ user: { id: 'u1' }, creator: { status: 'onboarding' } }),
-    )
-    expect(role).toBe('traveler')
-  })
-
-  it('throws an onboarding handle lookup error unchanged', async () => {
-    const handleError = new Error('handle lookup unavailable')
-
-    await expect(resolveViewerRole(fakeSupabase({
-      user: { id: 'u1' },
-      creator: { status: 'onboarding' },
-      handleError,
-    }))).rejects.toBe(handleError)
+  it('fails closed when the onboarding creator handle query errors', async () => {
+    await expect(
+      resolveViewerRole(
+        fakeSupabase({
+          user: { id: 'u1' },
+          creator: { status: 'onboarding' },
+          handleError: new Error('handle read failed'),
+        }),
+      ),
+    ).rejects.toThrow('Unable to determine authorization context')
   })
 
   it('returns traveler for a user with no creators row at all', async () => {
     const role = await resolveViewerRole(fakeSupabase({ user: { id: 'u1' } }))
     expect(role).toBe('traveler')
+  })
+
+  it('rejects with a generic authorization-context error when role facts are indeterminate', async () => {
+    await expect(
+      resolveViewerRole(
+        fakeSupabase({
+          user: { id: 'u1' },
+          errors: { creators: new Error('creator read failed') },
+        }),
+      ),
+    ).rejects.toThrow('Unable to determine authorization context')
   })
 })

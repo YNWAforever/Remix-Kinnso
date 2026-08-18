@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
-import type { ViewerRole } from './viewer-role'
-export type { ViewerRole } from './viewer-role'
+import { resolveViewerRoleFromFacts, type ViewerRole } from './viewer-role-policy'
+export type { ViewerRole } from './viewer-role-policy'
 
 /**
  * Thin viewer-role hook (replaces the redesign's MockAuthContext).
@@ -40,20 +40,27 @@ export function useViewerRole(override?: ViewerRole): ViewerRole {
           .eq('id', userId)
           .maybeSingle(),
       ])
-      if (ops) return 'ops'
-      if (merchant) return 'merchant'
-      if (creator?.status === 'active') return 'creator'
-      if (creator?.status === 'onboarding') {
+      let hasCreatorHandle = false
+
+      if (!ops && !merchant && creator?.status === 'onboarding') {
         const { data: handle, error: handleError } = await supabase
           .from('creator_social_handles')
           .select('id')
           .eq('creator_id', userId)
           .limit(1)
           .maybeSingle()
+
         if (handleError) throw handleError
-        if (handle) return 'creator-pending'
+        hasCreatorHandle = Boolean(handle)
       }
-      return 'traveler'
+
+      return resolveViewerRoleFromFacts({
+        authenticated: true,
+        hasActiveOps: Boolean(ops),
+        hasMerchantProfile: Boolean(merchant),
+        hasActiveCreator: creator?.status === 'active',
+        hasCreatorHandle,
+      })
     }
 
     const initialResolution = ++latestResolution

@@ -1,8 +1,11 @@
 name: CI
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'codex/**'
   # On-demand runs. Without this, CI is reachable only through a pull request or a
   # push to main, so work on a branch — including a change to CI itself — cannot be
   # exercised before it is proposed. Note GitHub only offers the Run workflow button
@@ -15,6 +18,10 @@ on:
 # repository default, which can be read/write for the whole GITHUB_TOKEN scope.
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.event_name }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   quality:
@@ -95,6 +102,50 @@ jobs:
             echo "SUPABASE_DB_CONTAINER=${SUPABASE_DB_CONTAINER}"
             echo 'RUN_R7_3_LOCAL_LIVE_TESTS=1'
           } >> apps/web/.env.test
+
+      - name: Export local Supabase env for web build
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tmp_env="$(mktemp)"
+          awk -F= '
+                index($0, "=") == 0 { exit 1 }
+                $1 == "SUPABASE_URL" {
+                  if (substr($0, index($0, "=") + 1) !~ /[^[:space:]]/) exit 1
+                  print "NEXT_PUBLIC_SUPABASE_URL=" substr($0, index($0, "=") + 1)
+                  seen_url = 1
+                  next
+                }
+                $1 == "SUPABASE_ANON_KEY" {
+                  if (substr($0, index($0, "=") + 1) !~ /[^[:space:]]/) exit 1
+                  print "NEXT_PUBLIC_SUPABASE_ANON_KEY=" substr($0, index($0, "=") + 1)
+                  seen_anon = 1
+                  next
+                }
+                $1 == "SUPABASE_SERVICE_ROLE_KEY" { next }
+                { next }
+                END { if (!seen_url || !seen_anon) exit 1 }
+              ' apps/web/.env.test > "$tmp_env"
+
+          test "$(wc -l < "$tmp_env")" -eq 2
+          grep -q '^NEXT_PUBLIC_SUPABASE_URL=' "$tmp_env"
+          grep -q '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' "$tmp_env"
+          mv "$tmp_env" apps/web/.env.local
+
+      - name: Check web build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s apps/web/.env.local
+          grep -q '^NEXT_PUBLIC_SUPABASE_URL=' apps/web/.env.local
+          grep -q '^NEXT_PUBLIC_SUPABASE_ANON_KEY=' apps/web/.env.local
+
+      - name: Build web with safe product flags
+        env:
+          AGENT_LIVE: 'false'
+          BOOKING_LIVE: 'false'
+        run: pnpm --filter web build
 
       - run: pnpm test
 

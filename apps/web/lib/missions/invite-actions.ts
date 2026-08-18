@@ -1,6 +1,6 @@
 import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireCreatorAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 import type { Locale } from '@/lib/i18n/config'
 
@@ -31,7 +31,8 @@ export async function acceptInviteAction(
 ): Promise<ActionResult<{ missionId: string }>> {
   'use server'
   const supabase = await createSupabaseServerClient()
-  if ((await resolveViewerRole(supabase)) !== 'creator') return formError('Creator access is required')
+  const gate = await requireCreatorAction(supabase)
+  if (!gate.ok) return gate
 
   const { error } = await supabase.rpc('accept_mission_invite', {
     p_mission_id: missionId,

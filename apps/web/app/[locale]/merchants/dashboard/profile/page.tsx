@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { resolveViewerRole } from '@/lib/auth/viewer-role'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { getMyMerchantProfile } from '@/lib/merchants/profile-queries'
 import { noindexMetadata } from '@/lib/seo/metadata'
 import { MerchantProfileView } from '@/components/kinnso/pages/MerchantProfileView'
@@ -15,9 +15,7 @@ export default async function MerchantProfilePage({ params }: { params: Promise<
   if (!isLocale(locale)) notFound()
   const loc = locale as Locale
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
-  if ((await resolveViewerRole(supabase)) !== 'merchant') notFound()
+  const { user } = await requireMerchantPage(supabase, loc)
   const profile = await getMyMerchantProfile(supabase, user.id)
   if (!profile) notFound()
   const messages = await getDictionary(loc)
