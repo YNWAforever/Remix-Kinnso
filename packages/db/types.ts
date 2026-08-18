@@ -2423,6 +2423,10 @@ export type Database = {
           },
         ]
       }
+      // Hand-maintained (not from `supabase gen types`) -- `pnpm --filter @kinnso/db gen`
+      // reads production via --linked and R10.3's notifications table only exists on this
+      // branch's unmerged migrations. Reconcile with a real `gen --local` run once R10.3 is
+      // testable against a full local stack.
       notifications: {
         Row: {
           created_at: string

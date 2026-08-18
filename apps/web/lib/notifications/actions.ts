@@ -18,14 +18,16 @@ export async function markNotificationReadAction(
   const gate = await requireCreatorAction(supabase)
   if (!gate.ok) return gate
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('notifications')
     .update({ read_at: new Date().toISOString() })
     .eq('id', notificationId)
     .eq('creator_id', gate.user.id)
+    .select('id')
+    .maybeSingle()
 
-  if (error) {
-    console.error('[notifications] markNotificationReadAction failed', error)
+  if (error || !data) {
+    if (error) console.error('[notifications] markNotificationReadAction failed', error)
     return formError('Could not mark this notification as read')
   }
   revalidatePath(`/${locale}/studio/inbox`)
