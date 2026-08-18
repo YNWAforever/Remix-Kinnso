@@ -6,23 +6,7 @@ import { StudioInboxView } from '@/components/kinnso/pages/StudioInboxView'
 
 afterEach(cleanup)
 
-// Task 7 (not yet landed) adds these keys to lib/i18n/messages/*.ts. This fallback lets the
-// component be built and tested now; real values will override it automatically once Task 7
-// ships (object spread — real en.notifications values win over these placeholders).
-const PENDING_I18N_FALLBACK = {
-  heading: 'heading', subtitle: 'subtitle', empty: 'empty',
-  'submission.approved': 'submission.approved',
-  'submission.rejected': 'submission.rejected',
-  'submission.revision_requested': 'submission.revision_requested',
-  'settlement.created': 'settlement.created',
-  'payout_batch.created': 'payout_batch.created',
-  'payout_batch.paid': 'Paid out {amount} {currency}',
-  'payout_batch.cancelled': 'payout_batch.cancelled',
-}
-const t = {
-  ...PENDING_I18N_FALLBACK,
-  ...(en as unknown as { notifications?: typeof PENDING_I18N_FALLBACK }).notifications,
-}
+const t = en.notifications
 
 const notifications = [
   {
@@ -36,7 +20,7 @@ describe('StudioInboxView', () => {
     render(<StudioInboxView t={t as never} locale="en" notifications={notifications} markReadAction={vi.fn()} />)
     const link = screen.getByRole('link')
     expect(link.getAttribute('href')).toBe('/en/studio/earnings')
-    expect(link.textContent).toContain('Paid out 1500 HKD')
+    expect(link.textContent).toContain('Your payout of 1500 HKD has been paid')
   })
 
   it('shows the empty state with no notifications', () => {

@@ -662,6 +662,18 @@ const messages: Messages = {
     sessionsTitle: '세션', sessionsDesc: '라이브 커뮤니티 세션을 예약하고 진행하세요.',
     unreadBadgeLabel: '읽지 않음 {count}개',
   },
+  notifications: {
+    heading: '받은함',
+    subtitle: '제출물, 정산, 지급에 대한 업데이트입니다.',
+    empty: '새 알림이 없습니다.',
+    'submission.approved': '"{mission_title}"에 대한 제출이 승인되었습니다',
+    'submission.rejected': '"{mission_title}"에 대한 제출이 거절되었습니다',
+    'submission.revision_requested': '"{mission_title}"에 대한 제출에 수정이 요청되었습니다',
+    'settlement.created': '"{mission_title}"에 새 정산이 기록되었습니다',
+    'payout_batch.created': '{amount} {currency} 지급이 약속되었습니다',
+    'payout_batch.paid': '{amount} {currency} 지급이 완료되었습니다',
+    'payout_batch.cancelled': '대기 중이던 {amount} {currency} 지급이 취소되었습니다',
+  },
   studioDashboard: {
     greeting: '다시 오신 것을 환영합니다, {name}님',
     statusActive: '활성 크리에이터',

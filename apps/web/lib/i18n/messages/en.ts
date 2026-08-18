@@ -850,6 +850,18 @@ export interface Messages {
     sessionsDesc: string
     unreadBadgeLabel: string
   }
+  notifications: {
+    heading: string
+    subtitle: string
+    empty: string
+    'submission.approved': string
+    'submission.rejected': string
+    'submission.revision_requested': string
+    'settlement.created': string
+    'payout_batch.created': string
+    'payout_batch.paid': string
+    'payout_batch.cancelled': string
+  }
   studioDashboard: {
     greeting: string
     statusActive: string
@@ -2033,6 +2045,18 @@ const messages: Messages = {
     insightsTitle: 'Insights', insightsDesc: 'Your real activity — points, guides, and missions.',
     sessionsTitle: 'Sessions', sessionsDesc: 'Schedule and host live community sessions.',
     unreadBadgeLabel: '{count} unread',
+  },
+  notifications: {
+    heading: 'Inbox',
+    subtitle: 'Updates on your submissions, settlements, and payouts.',
+    empty: "You're all caught up.",
+    'submission.approved': 'Your submission for {mission_title} was approved',
+    'submission.rejected': 'Your submission for {mission_title} was rejected',
+    'submission.revision_requested': 'Revisions requested for your submission on {mission_title}',
+    'settlement.created': 'A new settlement was recorded for {mission_title}',
+    'payout_batch.created': 'A payout of {amount} {currency} has been promised to you',
+    'payout_batch.paid': 'Your payout of {amount} {currency} has been paid',
+    'payout_batch.cancelled': 'A pending payout of {amount} {currency} was cancelled',
   },
   studioDashboard: {
     greeting: 'Welcome back, {name}',

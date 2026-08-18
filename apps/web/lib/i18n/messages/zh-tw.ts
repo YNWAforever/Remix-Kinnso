@@ -662,6 +662,18 @@ const messages: Messages = {
     sessionsTitle: '場次', sessionsDesc: '安排並主持即時社群場次。',
     unreadBadgeLabel: '{count} 則未讀',
   },
+  notifications: {
+    heading: '收件匣',
+    subtitle: '關於你的提交、結算及付款的更新。',
+    empty: '目前沒有新通知。',
+    'submission.approved': '你在「{mission_title}」的提交已獲核准',
+    'submission.rejected': '你在「{mission_title}」的提交已被拒絕',
+    'submission.revision_requested': '「{mission_title}」的提交需要修改',
+    'settlement.created': '「{mission_title}」已記錄一筆新結算',
+    'payout_batch.created': '已為你承諾一筆 {amount} {currency} 的付款',
+    'payout_batch.paid': '你的 {amount} {currency} 付款已支付',
+    'payout_batch.cancelled': '一筆待處理的 {amount} {currency} 付款已被取消',
+  },
   studioDashboard: {
     greeting: '歡迎回來，{name}',
     statusActive: '活躍創作者',
