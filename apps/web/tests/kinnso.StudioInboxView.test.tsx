@@ -16,7 +16,7 @@ const PENDING_I18N_FALLBACK = {
   'submission.revision_requested': 'submission.revision_requested',
   'settlement.created': 'settlement.created',
   'payout_batch.created': 'payout_batch.created',
-  'payout_batch.paid': 'payout_batch.paid',
+  'payout_batch.paid': 'Paid out {amount} {currency}',
   'payout_batch.cancelled': 'payout_batch.cancelled',
 }
 const t = {
@@ -32,10 +32,11 @@ const notifications = [
 ]
 
 describe('StudioInboxView', () => {
-  it('renders a notification and links it to the right page', () => {
+  it('renders a notification, links it to the right page, and interpolates the payload into the text', () => {
     render(<StudioInboxView t={t as never} locale="en" notifications={notifications} markReadAction={vi.fn()} />)
     const link = screen.getByRole('link')
     expect(link.getAttribute('href')).toBe('/en/studio/earnings')
+    expect(link.textContent).toContain('Paid out 1500 HKD')
   })
 
   it('shows the empty state with no notifications', () => {

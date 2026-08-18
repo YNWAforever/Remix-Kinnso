@@ -43,6 +43,7 @@ function NotificationRowItem({
         className={`block text-sm ${isUnread ? 'font-bold text-kinnso-ink' : 'text-kinnso-muted'}`}
       >
         {interpolate(template, notification.payload)}
+        {' · '}
         <span className="ml-2 text-xs text-kinnso-muted">
           {new Date(notification.createdAt).toLocaleDateString(locale)}
         </span>
