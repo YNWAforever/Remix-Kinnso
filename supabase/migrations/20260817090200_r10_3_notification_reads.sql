@@ -11,6 +11,12 @@
 -- commitment -- notification volume per creator is bounded by their own activity (mission
 -- decisions, settlements, payout batches), not an unbounded append-only ledger like
 -- creator_payout_batches.
+--
+-- Text-verified only as of this migration (a real bug -- a flat non-grouped aggregate with
+-- an invalid outer ORDER BY -- was caught and fixed here precisely because this file's own
+-- test is text-only and couldn't have caught it on its own; a scratch Postgres instance did).
+-- Live verification of the 50-row cap, ordering, and the active-creator gate on a running
+-- local stack is deferred to Task 8, matching the payout-batch trigger migration's precedent.
 
 create or replace function public.notifications_mine()
 returns jsonb language plpgsql stable security definer set search_path = public as $$
