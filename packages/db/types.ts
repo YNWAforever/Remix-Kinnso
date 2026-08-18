@@ -1810,6 +1810,7 @@ export type Database = {
           mission_participant_id: string
           notes: string | null
           proof_urls: string[]
+          review_deadline: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -1824,6 +1825,7 @@ export type Database = {
           mission_participant_id: string
           notes?: string | null
           proof_urls?: string[]
+          review_deadline?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -1838,6 +1840,7 @@ export type Database = {
           mission_participant_id?: string
           notes?: string | null
           proof_urls?: string[]
+          review_deadline?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -1952,6 +1955,38 @@ export type Database = {
             columns: ["mission_id"]
             isOneToOne: false
             referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_review_events: {
+        Row: {
+          id: string
+          submission_id: string
+          actor_type: string
+          actor_id: string | null
+          action: string
+          reason_category: string | null
+          reason_text: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          submission_id: string
+          actor_type: string
+          actor_id?: string | null
+          action: string
+          reason_category?: string | null
+          reason_text?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['mission_review_events']['Insert']>
+        Relationships: [
+          {
+            foreignKeyName: "mission_review_events_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "mission_milestone_submissions"
             referencedColumns: ["id"]
           },
         ]
@@ -2893,6 +2928,15 @@ export type Database = {
       }
       admin_reject_merchant_application: {
         Args: { p_id: string; p_reason: string }
+        Returns: undefined
+      }
+      admin_review_submission: {
+        Args: {
+          p_submission_id: string
+          p_action: string
+          p_reason_category: string | null
+          p_reason_text: string | null
+        }
         Returns: undefined
       }
       admin_revoke_ops_invite: {

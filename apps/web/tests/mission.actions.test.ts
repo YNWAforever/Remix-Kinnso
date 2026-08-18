@@ -468,6 +468,72 @@ describe('reviewSubmissionAction', () => {
     expect(submissionUpdateBuilder.eq).toHaveBeenCalledWith('status', 'submitted')
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
+
+  it('writes a mission_review_events row alongside the submission update', async () => {
+    const eventsBuilder = createBuilder({ insert: vi.fn(async () => ({ error: null })) })
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: { id: 'submission-1', status: 'submitted', mission_participant_id: 'participant-1' },
+            error: null,
+          })),
+        }),
+        createBuilder({
+          maybeSingle: vi.fn(async () => ({ data: { status: 'approved' }, error: null })),
+        }),
+      ],
+      mission_participants: createBuilder({
+        single: vi.fn(async () => ({ data: { mission_id: 'mission-1' }, error: null })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+      mission_review_events: eventsBuilder,
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })
+
+    expect(eventsBuilder.insert).toHaveBeenCalledWith(expect.objectContaining({
+      submission_id: 'submission-1', actor_type: 'merchant', action: 'approve',
+    }))
+  })
+
+  it('does not fail the review when the mission_review_events insert errors', async () => {
+    const eventsBuilder = createBuilder({ insert: vi.fn(async () => ({ error: { message: 'boom' } })) })
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: { id: 'submission-1', status: 'submitted', mission_participant_id: 'participant-1' },
+            error: null,
+          })),
+        }),
+        createBuilder({
+          maybeSingle: vi.fn(async () => ({ data: { status: 'approved' }, error: null })),
+        }),
+      ],
+      mission_participants: createBuilder({
+        single: vi.fn(async () => ({ data: { mission_id: 'mission-1' }, error: null })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+      mission_review_events: eventsBuilder,
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })
+
+    expect(result).toEqual({ ok: true, status: 'approved' })
+  })
 })
 
 describe('updateSettlementAction', () => {

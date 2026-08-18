@@ -459,6 +459,26 @@ export async function reviewSubmissionAction(
     return formError('Submission review could not be saved')
   }
 
+  // Best-effort audit trail: mirrors admin_review_submission's own insert into
+  // mission_review_events, but for the merchant-side path. A failure here must never
+  // fail the merchant's review action -- the update above has already succeeded --
+  // so the result is logged, not surfaced or awaited-with-a-guard.
+  try {
+    const { error: eventError } = await supabase.from('mission_review_events').insert({
+      submission_id: input.submissionId,
+      actor_type: 'merchant',
+      actor_id: user.id,
+      action: input.action,
+      reason_category: null,
+      reason_text: input.feedback ?? null,
+    })
+    if (eventError) {
+      console.error('[missions] mission_review_events insert failed', eventError)
+    }
+  } catch (error) {
+    console.error('[missions] mission_review_events insert failed', error)
+  }
+
   await revalidate([localizedPath(input.locale, merchantMissionsPath)])
   return { ok: true, status: updatedSubmission.status }
 }
