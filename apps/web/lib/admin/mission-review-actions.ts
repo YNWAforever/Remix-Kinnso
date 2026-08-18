@@ -6,6 +6,7 @@ import type { Locale } from '@/lib/i18n/config'
 import type { SubmissionReviewAction } from '@/lib/missions/types'
 
 const reviewQueuePath = (locale: Locale) => `/${locale}/admin/missions/review`
+const missionDetailPath = (locale: Locale, missionId: string) => `/${locale}/admin/missions/${missionId}`
 
 /** DB raise-message → friendly copy. admin_review_submission raises these bare messages. */
 const FRIENDLY: Record<string, string> = {
@@ -29,10 +30,9 @@ const mapError = (message: string, fallback: string): string => {
  * server-side with its own `reason_required` raise, so this check can never be bypassed
  * by skipping the action layer.
  *
- * Note: only the review-queue path is revalidated. Revalidating the mission detail page
- * would need the mission id, which this action does not receive (by the task's own
- * signature) -- adding one was out of scope for this task, so it is flagged here rather
- * than invented.
+ * The review-queue path is always revalidated. When `missionId` is supplied (the caller
+ * knows it, e.g. from the mission detail page), the mission detail page is revalidated
+ * too, so approving/rejecting from either surface keeps both caches fresh.
  */
 export async function reviewSubmissionOpsAction(
   locale: Locale,
@@ -40,6 +40,7 @@ export async function reviewSubmissionOpsAction(
   action: SubmissionReviewAction,
   reasonCategory: string | null,
   reasonText: string | null,
+  missionId: string | null = null,
 ): Promise<ActionResult<{ id: string }>> {
   'use server'
   const supabase = await createSupabaseServerClient()
@@ -59,5 +60,6 @@ export async function reviewSubmissionOpsAction(
     return formError(mapError(error.message, 'Submission could not be reviewed'))
   }
   revalidatePath(reviewQueuePath(locale))
+  if (missionId) revalidatePath(missionDetailPath(locale, missionId))
   return { ok: true, id: submissionId }
 }

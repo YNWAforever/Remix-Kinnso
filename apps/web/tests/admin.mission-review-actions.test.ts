@@ -34,6 +34,28 @@ describe('reviewSubmissionOpsAction', () => {
     expect(revalidateMock).toHaveBeenCalledWith('/en/admin/missions/review')
   })
 
+  it('revalidates only the queue path when no missionId is supplied', async () => {
+    const res = await reviewSubmissionOpsAction('en', 'sub-1', 'approve', null, null)
+    expect(res).toEqual({ ok: true, id: 'sub-1' })
+    expect(revalidateMock).toHaveBeenCalledTimes(1)
+    expect(revalidateMock).toHaveBeenCalledWith('/en/admin/missions/review')
+  })
+
+  it('revalidates only the queue path when missionId is explicitly null', async () => {
+    const res = await reviewSubmissionOpsAction('en', 'sub-1', 'approve', null, null, null)
+    expect(res).toEqual({ ok: true, id: 'sub-1' })
+    expect(revalidateMock).toHaveBeenCalledTimes(1)
+    expect(revalidateMock).toHaveBeenCalledWith('/en/admin/missions/review')
+  })
+
+  it('revalidates both the queue and mission detail paths when a missionId is supplied', async () => {
+    const res = await reviewSubmissionOpsAction('en', 'sub-1', 'approve', null, null, 'mission-1')
+    expect(res).toEqual({ ok: true, id: 'sub-1' })
+    expect(revalidateMock).toHaveBeenCalledTimes(2)
+    expect(revalidateMock).toHaveBeenCalledWith('/en/admin/missions/review')
+    expect(revalidateMock).toHaveBeenCalledWith('/en/admin/missions/mission-1')
+  })
+
   it('rejects a reject-action call missing a reason category before hitting the RPC', async () => {
     const res = await reviewSubmissionOpsAction('en', 'sub-1', 'reject', null, 'bad vibes')
     expect(res.ok).toBe(false)
