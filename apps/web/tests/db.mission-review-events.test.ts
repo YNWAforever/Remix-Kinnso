@@ -5,7 +5,8 @@ import { join } from 'node:path'
 const dir = join(process.cwd(), '../../supabase/migrations')
 const matches = readdirSync(dir).filter((f) => f.endsWith('_r11_0_mission_review_events.sql'))
 expect(matches).toHaveLength(1)
-const sql = readFileSync(join(dir, matches[0]), 'utf8').toLowerCase().replaceAll(/\s+/gu, ' ')
+const rawSql = readFileSync(join(dir, matches[0]), 'utf8')
+const sql = rawSql.toLowerCase().replaceAll(/\s+/gu, ' ')
 
 describe('r11.0 mission_review_events table + review_deadline column', () => {
   it('creates the events table with every required column', () => {
@@ -20,7 +21,7 @@ describe('r11.0 mission_review_events table + review_deadline column', () => {
   })
 
   it('requires a reason_category whenever the action is reject or request_revision', () => {
-    expect(sql).toContain("constraint mission_review_events_reason_required check (action not in ('reject', 'request_revision') or reason_category is not null)")
+    expect(sql).toContain("constraint mission_review_events_reason_required_check check (action not in ('reject', 'request_revision') or reason_category is not null)")
   })
 
   it('constrains reason_category to the five Adfocate categories when present', () => {
@@ -53,5 +54,34 @@ describe('r11.0 mission_review_events table + review_deadline column', () => {
     expect(sql).toContain("new.review_deadline := new.submitted_at + interval '48 hours'")
     expect(sql).toContain('create trigger set_submission_review_deadline_trg')
     expect(sql).toContain('before insert or update on public.mission_milestone_submissions')
+  })
+
+  it('branches on TG_OP as separate if/elsif paths, never referencing OLD inside the INSERT branch', () => {
+    // Checked against the RAW (non-lowercased) file -- `sql` above is lowercased for every
+    // other assertion in this file, which can't tell a correct uppercase `TG_OP = 'INSERT'`
+    // comparison from a broken lowercase `tg_op = 'insert'` one (Postgres's TG_OP is always
+    // uppercase; a lowercase literal would silently never match on a real INSERT).
+    expect(rawSql).toContain("TG_OP = 'INSERT'")
+
+    // Also checked structurally, not just for the string's presence: the INSERT and UPDATE
+    // paths must be separate if/elsif branches, never a single
+    // `TG_OP = 'INSERT' or new.x is distinct from old.x` boolean OR. That anti-pattern
+    // throws "record old is not assigned yet" on a real INSERT, because PL/pgSQL's OLD is
+    // unassigned there and Postgres does not guarantee left-to-right short-circuit of OR the
+    // way procedural languages do. A single-OR revert would still contain the substring
+    // `TG_OP = 'INSERT'` above, so that check alone can't catch it -- these assertions can.
+    expect(rawSql).toContain("if TG_OP = 'INSERT' then")
+    expect(rawSql).toContain('elsif')
+
+    const insertBranchStart = rawSql.indexOf("if TG_OP = 'INSERT' then")
+    expect(insertBranchStart).toBeGreaterThanOrEqual(0)
+    const elsifIndex = rawSql.indexOf('elsif', insertBranchStart)
+    expect(elsifIndex).toBeGreaterThan(insertBranchStart)
+
+    const insertBranchBody = rawSql.slice(insertBranchStart, elsifIndex).toLowerCase()
+    expect(insertBranchBody).not.toContain('old.')
+
+    const elsifBranchBody = rawSql.slice(elsifIndex).toLowerCase()
+    expect(elsifBranchBody).toContain('old.submitted_at')
   })
 })

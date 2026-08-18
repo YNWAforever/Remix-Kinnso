@@ -19,7 +19,7 @@ create table public.mission_review_events (
   reason_category text,
   reason_text     text,
   created_at      timestamptz not null default now(),
-  constraint mission_review_events_reason_required check (action not in ('reject', 'request_revision') or reason_category is not null),
+  constraint mission_review_events_reason_required_check check (action not in ('reject', 'request_revision') or reason_category is not null),
   constraint mission_review_events_reason_category_check check (reason_category is null or reason_category in ('format', 'key_message', 'compliance', 'quality', 'other'))
 );
 
