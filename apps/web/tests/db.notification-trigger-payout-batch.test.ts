@@ -5,11 +5,17 @@ import { join } from 'node:path'
 const dir = join(process.cwd(), '../../supabase/migrations')
 const matches = readdirSync(dir).filter((f) => f.endsWith('_r10_3_notification_trigger_payout_batch.sql'))
 expect(matches).toHaveLength(1)
-const sql = readFileSync(join(dir, matches[0]), 'utf8').toLowerCase().replaceAll(/\s+/gu, ' ')
+const rawSql = readFileSync(join(dir, matches[0]), 'utf8')
+const sql = rawSql.toLowerCase().replaceAll(/\s+/gu, ' ')
 
 describe('r10.3 payout-batch notification trigger (text contract only — creator_payout_batches does not exist on this branch; live verification deferred to Task 8 post-R10.2-merge)', () => {
   it('applies after the submission/settlement trigger migration', () => {
     expect(matches[0] > '20260817090100').toBe(true)
+  })
+
+  it('checks TG_OP against the uppercase value Postgres actually sets (case-sensitive check against the raw, non-lowercased file)', () => {
+    expect(rawSql).toContain("tg_op = 'INSERT'")
+    expect(rawSql).not.toContain("tg_op = 'insert'")
   })
 
   it('covers create, paid, and cancelled from one function', () => {

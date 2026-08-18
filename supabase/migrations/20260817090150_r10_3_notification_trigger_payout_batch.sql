@@ -20,7 +20,7 @@ language plpgsql security definer set search_path = public as $$
 declare
   v_type text;
 begin
-  if tg_op = 'insert' then
+  if tg_op = 'INSERT' then
     v_type := 'payout_batch.created';
   elsif new.status is distinct from old.status then
     v_type := case new.status
