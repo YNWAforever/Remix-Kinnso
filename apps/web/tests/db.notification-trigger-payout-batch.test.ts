@@ -14,6 +14,7 @@ describe('r10.3 payout-batch notification trigger (text contract only — creato
 
   it('covers create, paid, and cancelled from one function', () => {
     expect(sql).toContain('create or replace function public.notify_payout_batch_change()')
+    expect(sql).toContain('security definer')
     expect(sql).toContain('after insert or update on public.creator_payout_batches')
     expect(sql).toContain("if tg_op = 'insert' then")
     expect(sql).toContain("v_type := 'payout_batch.created'")
