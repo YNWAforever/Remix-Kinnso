@@ -469,8 +469,8 @@ describe('reviewSubmissionAction', () => {
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 
-  it('writes a mission_review_events row alongside the submission update', async () => {
-    const eventsBuilder = createBuilder({ insert: vi.fn(async () => ({ error: null })) })
+  it('calls mission_review_event_append alongside the submission update', async () => {
+    const rpcMock = vi.fn(async () => ({ data: null, error: null }))
     const supabase = createSupabaseMock({
       merchant_profiles: createBuilder({
         maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
@@ -492,19 +492,18 @@ describe('reviewSubmissionAction', () => {
       missions: createBuilder({
         maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
       }),
-      mission_review_events: eventsBuilder,
-    })
+    }, { rpc: rpcMock })
     createSupabaseServerClientMock.mockResolvedValue(supabase)
 
     await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })
 
-    expect(eventsBuilder.insert).toHaveBeenCalledWith(expect.objectContaining({
-      submission_id: 'submission-1', actor_type: 'merchant', action: 'approve',
-    }))
+    expect(rpcMock).toHaveBeenCalledWith('mission_review_event_append', {
+      p_submission_id: 'submission-1', p_action: 'approve', p_reason_text: null,
+    })
   })
 
-  it('does not fail the review when the mission_review_events insert errors', async () => {
-    const eventsBuilder = createBuilder({ insert: vi.fn(async () => ({ error: { message: 'boom' } })) })
+  it('does not fail the review when the mission_review_event_append RPC errors', async () => {
+    const rpcMock = vi.fn(async () => ({ data: null, error: { message: 'permission denied' } }))
     const supabase = createSupabaseMock({
       merchant_profiles: createBuilder({
         maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
@@ -526,8 +525,7 @@ describe('reviewSubmissionAction', () => {
       missions: createBuilder({
         maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
       }),
-      mission_review_events: eventsBuilder,
-    })
+    }, { rpc: rpcMock })
     createSupabaseServerClientMock.mockResolvedValue(supabase)
 
     const result = await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })

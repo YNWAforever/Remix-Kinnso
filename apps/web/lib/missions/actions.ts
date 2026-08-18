@@ -459,24 +459,25 @@ export async function reviewSubmissionAction(
     return formError('Submission review could not be saved')
   }
 
-  // Best-effort audit trail: mirrors admin_review_submission's own insert into
-  // mission_review_events, but for the merchant-side path. A failure here must never
-  // fail the merchant's review action -- the update above has already succeeded --
-  // so the result is logged, not surfaced or awaited-with-a-guard.
+  // Best-effort audit trail via the mission_review_event_append RPC -- the merchant-side
+  // equivalent of admin_review_submission's own insert into mission_review_events.
+  // mission_review_events has no direct insert grant to any client role (see
+  // supabase/migrations/20260819090000_r11_0_mission_review_events.sql's
+  // `revoke all ... from public, anon, authenticated`), so a plain `.insert()` here would
+  // always fail with a permission error -- this RPC is the only write path. A failure
+  // here must never fail the merchant's review action -- the update above has already
+  // succeeded -- so the result is logged, not surfaced or awaited-with-a-guard.
   try {
-    const { error: eventError } = await supabase.from('mission_review_events').insert({
-      submission_id: input.submissionId,
-      actor_type: 'merchant',
-      actor_id: user.id,
-      action: input.action,
-      reason_category: null,
-      reason_text: input.feedback ?? null,
+    const { error: eventError } = await supabase.rpc('mission_review_event_append', {
+      p_submission_id: input.submissionId,
+      p_action: input.action,
+      p_reason_text: input.feedback ?? null,
     })
     if (eventError) {
-      console.error('[missions] mission_review_events insert failed', eventError)
+      console.error('[missions] mission_review_event_append failed', eventError)
     }
   } catch (error) {
-    console.error('[missions] mission_review_events insert failed', error)
+    console.error('[missions] mission_review_event_append failed', error)
   }
 
   await revalidate([localizedPath(input.locale, merchantMissionsPath)])

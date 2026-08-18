@@ -3189,6 +3189,10 @@ export type Database = {
         Returns: string
       }
       merchant_slugify: { Args: { p_text: string }; Returns: string }
+      mission_review_event_append: {
+        Args: { p_submission_id: string; p_action: string; p_reason_text: string | null }
+        Returns: undefined
+      }
       ops_audit_log_append: {
         Args: {
           p_action: string
