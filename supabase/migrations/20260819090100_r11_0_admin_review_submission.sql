@@ -40,6 +40,10 @@ begin
     raise exception 'reason_required';
   end if;
 
+  if p_reason_category is not null and p_reason_category not in ('format', 'key_message', 'compliance', 'quality', 'other') then
+    raise exception 'bad_reason_category';
+  end if;
+
   select status into v_status from public.mission_milestone_submissions where id = p_submission_id for update;
   if not found then
     raise exception 'not_found';
