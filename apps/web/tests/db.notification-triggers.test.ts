@@ -37,11 +37,30 @@ describe('r10.3 notification triggers (submission + settlement)', () => {
     expect(sql).not.toContain('notify_payout_batch_change')
   })
 
-  it('every insert into notifications is wrapped so a failure cannot roll back the caller', () => {
-    const inserts = sql.split('insert into public.notifications').length - 1
-    expect(inserts).toBe(2)
-    const guarded = sql.split('exception when others then null').length - 1
-    expect(guarded).toBe(2)
+  it('every insert into notifications is tightly scoped: begin directly precedes it, and nothing but the insert sits inside the guard', () => {
+    // "begin" must be immediately followed by the insert (only whitespace between) — this is
+    // what proves the exception block wraps JUST the insert, not the creator-resolution select
+    // above it. A regression that widens the begin/exception block upward would break this.
+    const beginInsertMatches = sql.match(/begin insert into public\.notifications/gu) ?? []
+    expect(beginInsertMatches).toHaveLength(2)
+
+    // Split on that anchor: each fragment starts right after "begin insert into
+    // public.notifications" and should reach its own "exception when others then null" having
+    // seen exactly one values(...) clause and no select keyword (which would indicate
+    // creator-resolution logic leaking into the guarded block).
+    const guardedFragments = sql.split('begin insert into public.notifications').slice(1)
+    expect(guardedFragments).toHaveLength(2)
+
+    for (const fragment of guardedFragments) {
+      const exceptionIndex = fragment.indexOf('exception when others then null')
+      expect(exceptionIndex).toBeGreaterThan(-1)
+      const guarded = fragment.slice(0, exceptionIndex)
+
+      expect((guarded.match(/values \(/gu) ?? []).length).toBe(1)
+      expect(guarded).not.toContain('select ')
+      expect(guarded).not.toContain('insert into public.notifications')
+      expect(guarded.trim().endsWith(';')).toBe(true)
+    }
   })
 
   it('revokes execute from every client role on both trigger functions', () => {
