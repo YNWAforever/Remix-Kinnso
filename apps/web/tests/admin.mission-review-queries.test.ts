@@ -37,9 +37,13 @@ const SUBMISSION_ROWS = [
     submitted_at: '2026-08-17T00:00:00Z',
     review_deadline: '2026-08-19T00:00:00Z',
     mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Mission One' } },
+    // Deliberately NOT sorted ascending, and the max created_at is NOT last in array
+    // order -- proves latestConfidenceStatus() selects by max created_at rather than by
+    // array position (a naive jobs[jobs.length - 1] would wrongly return 'low' here).
     mission_verification_jobs: [
-      { confidence_status: 'low', created_at: '2026-08-17T01:00:00Z' },
       { confidence_status: 'high', created_at: '2026-08-17T02:00:00Z' },
+      { confidence_status: 'medium', created_at: '2026-08-17T01:30:00Z' },
+      { confidence_status: 'low', created_at: '2026-08-17T01:00:00Z' },
     ],
   },
   {
