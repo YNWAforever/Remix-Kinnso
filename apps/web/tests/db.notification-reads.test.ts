@@ -18,7 +18,7 @@ describe('r10.3 notification read RPCs', () => {
   })
 
   it('notifications_mine scopes to the caller, orders newest first, and caps at 50', () => {
-    expect(sql).toContain('where n.creator_id = v_uid')
+    expect(sql).toContain('where creator_id = v_uid')
     expect(sql).toContain('order by n.created_at desc')
     expect(sql).toContain('limit 50')
   })

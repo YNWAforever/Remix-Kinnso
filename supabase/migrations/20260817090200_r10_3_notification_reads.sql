@@ -31,10 +31,12 @@ begin
       'readAt',            n.read_at,
       'createdAt',         n.created_at
     ) order by n.created_at desc)
-    from public.notifications n
-    where n.creator_id = v_uid
-    order by n.created_at desc
-    limit 50
+    from (
+      select * from public.notifications
+      where creator_id = v_uid
+      order by created_at desc
+      limit 50
+    ) n
   ), '[]'::jsonb);
 end;
 $$;
