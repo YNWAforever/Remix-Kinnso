@@ -34,12 +34,19 @@ type PendingKind = 'reject' | 'request_revision' | null
  * row's badge reflects the new result on the next page load. */
 function RerunVerificationButton({ submissionId, t }: { submissionId: string; t: T }) {
   const [state, setState] = useState<'idle' | 'pending' | 'queued' | 'error'>('idle')
+  // Approving/rejecting this same row while a rerun is in flight drops the row out of
+  // getReviewQueue()'s result set on the next revalidation, unmounting this component before
+  // startVerification's promise resolves -- guard the late setState against that.
+  const mountedRef = useRef(true)
+  useEffect(() => () => { mountedRef.current = false }, [])
   const rerun = () => {
     setState('pending')
-    void startVerification(submissionId).then((res) => setState('jobId' in res ? 'queued' : 'error'))
+    void startVerification(submissionId).then((res) => {
+      if (mountedRef.current) setState('jobId' in res ? 'queued' : 'error')
+    })
   }
-  if (state === 'queued') return <p className="mt-1 text-xs text-kinnso-muted">{t.rerunQueued}</p>
-  if (state === 'error') return <p className="mt-1 text-xs text-red-600">{t.rerunFailed}</p>
+  if (state === 'queued') return <p role="status" className="mt-1 text-xs text-kinnso-muted">{t.rerunQueued}</p>
+  if (state === 'error') return <p role="status" className="mt-1 text-xs text-red-600">{t.rerunFailed}</p>
   return (
     <button
       type="button"
