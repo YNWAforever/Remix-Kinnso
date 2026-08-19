@@ -4,7 +4,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireOpsPage } from '@/lib/admin/guard'
 import { getMissionDetail } from '@/lib/admin/mission-review-queries'
-import { reviewSubmissionOpsAction } from '@/lib/admin/mission-review-actions'
+import { reviewSubmissionOpsAction, setMissionAutoApprovePolicyAction } from '@/lib/admin/mission-review-actions'
 import { MissionDetailView } from '@/components/kinnso/admin/missions/MissionDetailView'
 
 export function generateStaticParams() {
@@ -29,6 +29,7 @@ export default async function MissionDetailPage({
       locale={loc}
       detail={detail}
       reviewAction={reviewSubmissionOpsAction}
+      policyAction={setMissionAutoApprovePolicyAction}
     />
   )
 }

@@ -16,7 +16,7 @@ vi.mock('next/cache', () => ({ revalidatePath: revalidateMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ rpc: rpcMock }) }))
 vi.mock('@/lib/admin/guard', () => ({ requireOpsAction: gateMock }))
 
-import { reviewSubmissionOpsAction } from '@/lib/admin/mission-review-actions'
+import { reviewSubmissionOpsAction, setMissionAutoApprovePolicyAction } from '@/lib/admin/mission-review-actions'
 
 beforeEach(() => {
   rpcMock.mockReset().mockResolvedValue({ data: null, error: null })
@@ -97,5 +97,21 @@ describe('reviewSubmissionOpsAction', () => {
     const res = await reviewSubmissionOpsAction('en', 'sub-1', 'approve', null, null)
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.errors.form?.[0]).toMatch(/ops access/i)
+  })
+})
+
+describe('setMissionAutoApprovePolicyAction', () => {
+  it('calls admin_set_mission_auto_approve_policy and revalidates the mission detail page', async () => {
+    const result = await setMissionAutoApprovePolicyAction('en', 'mission-1', 'verified_signal_only')
+    expect(result.ok).toBe(true)
+    expect(rpcMock).toHaveBeenCalledWith('admin_set_mission_auto_approve_policy', {
+      p_mission_id: 'mission-1', p_policy: 'verified_signal_only',
+    })
+  })
+
+  it('maps a bad_policy error to friendly copy', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'bad_policy' } })
+    const result = await setMissionAutoApprovePolicyAction('en', 'mission-1', 'not_a_real_policy')
+    expect(result.ok).toBe(false)
   })
 })

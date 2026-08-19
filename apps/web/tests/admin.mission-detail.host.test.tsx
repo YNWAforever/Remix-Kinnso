@@ -7,7 +7,7 @@ const { roleMock, getUserMock, detailMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
   detailMock: vi.fn(async (): Promise<MissionDetail | null> => ({
-    mission: { id: 'mission-1', title: 'Summer Coupon Push', missionSource: 'travelpayouts', missionType: 'coupon_affiliate', status: 'published', merchantProfileId: null },
+    mission: { id: 'mission-1', title: 'Summer Coupon Push', missionSource: 'travelpayouts', missionType: 'coupon_affiliate', status: 'published', merchantProfileId: null, autoApprovePolicy: 'off' },
     participants: [], milestones: [], submissions: [],
   })),
 }))
@@ -46,5 +46,12 @@ describe('/[locale]/admin/missions/[missionId] host', () => {
   it('notFounds a non-ops user', async () => {
     roleMock.mockResolvedValueOnce('creator')
     await expect(MissionDetailPage({ params: Promise.resolve({ locale: 'en', missionId: 'mission-1' }) })).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('renders the auto-approve policy toggle at its current value', async () => {
+    const ui = await MissionDetailPage({ params: Promise.resolve({ locale: 'en', missionId: 'mission-1' }) })
+    render(ui)
+    const select = screen.getByLabelText('Auto-approve verified submissions') as HTMLSelectElement
+    expect(select.value).toBe('off')
   })
 })

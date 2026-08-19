@@ -39,6 +39,7 @@ export interface MissionDetail {
     missionType: string
     missionSource: string
     merchantProfileId: string | null
+    autoApprovePolicy: string
   }
   participants: MissionDetailParticipant[]
   milestones: MissionDetailMilestone[]
@@ -132,7 +133,7 @@ export async function getReviewQueue(supabase: Client): Promise<ReviewQueueRow[]
 export async function getMissionDetail(supabase: Client, missionId: string): Promise<MissionDetail | null> {
   const { data: mission, error: missionError } = await supabase
     .from('missions')
-    .select('id,title,status,mission_type,mission_source,merchant_profile_id')
+    .select('id,title,status,mission_type,mission_source,merchant_profile_id,auto_approve_policy')
     .eq('id', missionId)
     .maybeSingle()
   if (missionError) throw missionError
@@ -161,6 +162,7 @@ export async function getMissionDetail(supabase: Client, missionId: string): Pro
       missionType: mission.mission_type,
       missionSource: mission.mission_source,
       merchantProfileId: mission.merchant_profile_id,
+      autoApprovePolicy: mission.auto_approve_policy,
     },
     participants: (participantsData ?? []).map((p) => ({
       id: p.id,

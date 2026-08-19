@@ -142,7 +142,7 @@ describe('getMissionDetail', () => {
   it('assembles mission, participants, milestones, and the filtered review-queue subset', async () => {
     const supabase = fakeClient({
       missions: {
-        data: { id: 'm1', title: 'Mission One', status: 'published', mission_type: 'hybrid', mission_source: 'merchant', merchant_profile_id: 'merchant-1' },
+        data: { id: 'm1', title: 'Mission One', status: 'published', mission_type: 'hybrid', mission_source: 'merchant', merchant_profile_id: 'merchant-1', auto_approve_policy: 'off' },
         error: null,
       },
       mission_participants: {
@@ -159,7 +159,7 @@ describe('getMissionDetail', () => {
     const detail = await getMissionDetail(supabase, 'm1')
 
     expect(detail?.mission).toEqual({
-      id: 'm1', title: 'Mission One', status: 'published', missionType: 'hybrid', missionSource: 'merchant', merchantProfileId: 'merchant-1',
+      id: 'm1', title: 'Mission One', status: 'published', missionType: 'hybrid', missionSource: 'merchant', merchantProfileId: 'merchant-1', autoApprovePolicy: 'off',
     })
     expect(detail?.participants).toEqual([
       { id: 'p1', status: 'active', source: 'open_join', creatorId: 'c1', applicationNote: null, approvedAt: '2026-08-01T00:00:00Z' },
@@ -169,5 +169,19 @@ describe('getMissionDetail', () => {
     ])
     // Only sub-1 belongs to mission m1 (SUBMISSION_ROWS also contains sub-2 for m2).
     expect(detail?.submissions.map((s) => s.submissionId)).toEqual(['sub-1'])
+  })
+
+  it('includes autoApprovePolicy on the mission', async () => {
+    const supabase = fakeClient({
+      missions: {
+        data: { id: 'm1', title: 'Mission One', status: 'published', mission_type: 'hybrid', mission_source: 'merchant', merchant_profile_id: 'merchant-1', auto_approve_policy: 'verified_signal_only' },
+        error: null,
+      },
+      mission_participants: { data: [], error: null },
+      mission_milestones: { data: [], error: null },
+      mission_milestone_submissions: { data: [], error: null },
+    })
+    const detail = await getMissionDetail(supabase, 'm1')
+    expect(detail?.mission.autoApprovePolicy).toBe('verified_signal_only')
   })
 })

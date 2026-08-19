@@ -45,6 +45,11 @@ export interface MissionsOpsMessages {
   actRerunVerification: string
   rerunQueued: string
   rerunFailed: string
+  autoApprovePolicyLabel: string
+  autoApprovePolicyOff: string
+  autoApprovePolicyOn: string
+  autoApprovePolicySaved: string
+  autoApprovePolicyError: string
 }
 
 export interface MerchantApplyMessages {
@@ -2594,6 +2599,11 @@ const messages: Messages = {
     actRerunVerification: 'Re-run verification',
     rerunQueued: 'Verification re-queued — check back in a moment.',
     rerunFailed: 'Could not start verification. Please try again.',
+    autoApprovePolicyLabel: 'Auto-approve verified submissions',
+    autoApprovePolicyOff: 'Off',
+    autoApprovePolicyOn: 'On — verified signal only',
+    autoApprovePolicySaved: 'Saved.',
+    autoApprovePolicyError: 'Could not update the policy. Please try again.',
   },
   perks: {
     catalog: {
