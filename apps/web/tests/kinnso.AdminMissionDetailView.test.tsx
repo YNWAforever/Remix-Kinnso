@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, fireEvent } from '@testing-library/react'
+import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 import { MissionDetailView } from '@/components/kinnso/admin/missions/MissionDetailView'
@@ -59,5 +59,62 @@ describe('MissionDetailView', () => {
     render(<MissionDetailView t={t as never} locale="en" detail={revising} reviewAction={vi.fn()} />)
     expect(screen.getByText(t.waitingOnCreator)).toBeTruthy()
     expect(screen.queryByRole('button', { name: t.actApprove })).toBeNull()
+  })
+
+  it('opens the reject modal, submits a reason category and free text, and calls reviewAction', async () => {
+    const reviewAction = vi.fn().mockResolvedValue({ ok: true, id: 's1' })
+    render(<MissionDetailView t={t as never} locale="en" detail={detail} reviewAction={reviewAction} />)
+
+    fireEvent.click(screen.getByRole('button', { name: t.actReject }))
+    expect(screen.getByRole('dialog')).toBeTruthy()
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'quality' } })
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'blurry photo' } })
+    fireEvent.click(screen.getByRole('button', { name: t.actApply }))
+
+    await waitFor(() => {
+      expect(reviewAction).toHaveBeenCalledWith('en', 's1', 'reject', 'quality', 'blurry photo', 'mission-1')
+    })
+  })
+
+  it('opens the request-revision modal and submits with no free text (reason text optional)', async () => {
+    const reviewAction = vi.fn().mockResolvedValue({ ok: true, id: 's1' })
+    render(<MissionDetailView t={t as never} locale="en" detail={detail} reviewAction={reviewAction} />)
+
+    fireEvent.click(screen.getByRole('button', { name: t.actRequestRevision }))
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'format' } })
+    fireEvent.click(screen.getByRole('button', { name: t.actApply }))
+
+    await waitFor(() => {
+      expect(reviewAction).toHaveBeenCalledWith('en', 's1', 'request_revision', 'format', null, 'mission-1')
+    })
+  })
+
+  it('keeps the Apply button disabled until a reason category is selected', () => {
+    const reviewAction = vi.fn()
+    render(<MissionDetailView t={t as never} locale="en" detail={detail} reviewAction={reviewAction} />)
+
+    fireEvent.click(screen.getByRole('button', { name: t.actReject }))
+    const apply = screen.getByRole('button', { name: t.actApply })
+    expect(apply).toHaveProperty('disabled', true)
+
+    fireEvent.click(apply)
+    expect(reviewAction).not.toHaveBeenCalled()
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'other' } })
+    expect(apply).toHaveProperty('disabled', false)
+  })
+
+  it('surfaces the server-returned error message instead of swallowing it', async () => {
+    const reviewAction = vi.fn().mockResolvedValue({ ok: false, errors: { form: ['That submission no longer exists.'] } })
+    render(<MissionDetailView t={t as never} locale="en" detail={detail} reviewAction={reviewAction} />)
+
+    fireEvent.click(screen.getByRole('button', { name: t.actReject }))
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'quality' } })
+    fireEvent.click(screen.getByRole('button', { name: t.actApply }))
+
+    expect(await screen.findByText('That submission no longer exists.')).toBeTruthy()
+    // The modal stays open on failure so the ops user can retry or cancel.
+    expect(screen.getByRole('dialog')).toBeTruthy()
   })
 })
