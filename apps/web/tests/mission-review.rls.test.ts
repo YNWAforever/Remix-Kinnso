@@ -488,6 +488,12 @@ d('r11.0/r11.1 mission review: admin_review_submission, mission_review_event_app
 
   it('auto-approve trigger: policy off (the default) leaves an identical job transition untouched', async () => {
     const s = svc()
+    // Explicit, not just relying on the previous test's own reset to 'off' -- if that test
+    // throws before reaching its reset line, this test must still be a true off-policy proof,
+    // not an accidental pass/fail riding on leftover state from a different test.
+    const policyOff = await s.from('missions').update({ auto_approve_policy: 'off' }).eq('id', missionId)
+    if (policyOff.error) throw policyOff.error
+
     const freshSubmission = await s.from('mission_milestone_submissions').insert({
       mission_milestone_id: await freshMilestoneId(), mission_participant_id: participantAId, status: 'submitted',
       proof_urls: ['https://example.com/auto-approve-2'], submitted_at: new Date().toISOString(),
