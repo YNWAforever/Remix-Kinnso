@@ -55,19 +55,26 @@ const svc = () => createClient(url!, svcKey!, { auth: { persistSession: false, a
 // mission_participants/mission_milestones/mission_milestone_submissions/
 // mission_review_events, matching creator-earnings.rls.test.ts's pattern (not
 // payout-batches.rls.test.ts's no-cleanup one, which exists for an unrelated ledger table).
-const creatorA = '11111111-1111-4111-8111-111111111111'
-const creatorB = '22222222-2222-4222-8222-222222222222'
-const nonCreator = '33333333-3333-4333-8333-333333333333'
-const merchantUser = '44444444-4444-4444-8444-444444444444'
-const otherMerchantUser = '55555555-5555-4555-8555-555555555555'
-const opsAdminUser = '66666666-6666-4666-8666-666666666666'
-const opsOtherUser = '77777777-7777-4777-8777-777777777777'
+// This file's own fixed-UUID block (9999.../aaaa.../.../ffff...) is deliberately disjoint from
+// every other *.rls.test.ts file's block (creator-earnings/settlement-minting/payout-batches
+// claim 1111...-8888...) -- Vitest runs test files concurrently against the same live stack by
+// default, and a reused id here previously collided with settlement-minting's own creatorC
+// (5555...), risking both a unique-violation race on merchant_profiles.user_id and this file's
+// own afterAll cascading a delete into settlement-minting's in-flight fixtures.
+const creatorA = '99999999-9999-4999-8999-999999999999'
+const creatorB = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+const nonCreator = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
+const merchantUser = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'
+const otherMerchantUser = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd'
+const opsAdminUser = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'
+const opsOtherUser = 'ffffffff-ffff-4fff-8fff-ffffffffffff'
 
 d('r11.0 mission review: admin_review_submission, mission_review_event_append, RLS, and review_deadline', () => {
   let missionId = ''
   let milestoneId = ''
   let participantAId = ''
   let submissionAId = ''
+  let tpMissionId: string | null = null
 
   // mission_milestone_submissions has a unique (mission_milestone_id, mission_participant_id)
   // constraint, so every test that seeds a fresh submission for participantA needs its own
@@ -153,7 +160,7 @@ d('r11.0 mission review: admin_review_submission, mission_review_event_append, R
     // Not every environment has a seeded affiliate_network_program row this FK could point
     // at; if the insert fails because affiliate_network_program_id is required non-null in
     // this schema, that's fine -- this specific assertion is a bonus check, not core coverage.
-    const tpMissionId = tpMission.data?.id ?? null
+    tpMissionId = tpMission.data?.id ?? null
 
     const mission = await s.from('missions').insert({
       merchant_profile_id: merchantProfileId, mission_source: 'merchant', mission_type: 'coupon_affiliate',
@@ -175,8 +182,6 @@ d('r11.0 mission review: admin_review_submission, mission_review_event_append, R
     }).select('id').single()
     if (participantA.error) throw participantA.error
     participantAId = participantA.data!.id
-
-    ;(globalThis as Record<string, unknown>).__r11TpMissionId = tpMissionId
   }, hookTimeout)
 
   afterAll(async () => {
@@ -185,7 +190,14 @@ d('r11.0 mission review: admin_review_submission, mission_review_event_append, R
     // row (and therefore their auth.users row, since the delete would need to cascade through
     // it) becomes permanently undeletable, the same immutability shape as R10.2's payout
     // ledger. The upsert-ignore in beforeAll makes this safe to leave behind across runs.
+    //
+    // Because opsAdminUser is permanent, the travelpayouts mission (merchant_profile_id null,
+    // created_by_ops_member_id = opsAdminUser's row) is never reached by any cascade path
+    // either -- it would otherwise accumulate one permanent row per run of this file. Sweep it
+    // explicitly by its distinctive title prefix (not scoped to this run's own runId), so this
+    // also cleans up any prior run's leftover travelpayouts-mission rows, not just this one's.
     await runPsql(`
+      delete from public.missions where title like 'R11 Travelpayouts Mission %';
       delete from auth.users where id in ('${creatorA}', '${creatorB}', '${nonCreator}', '${merchantUser}', '${otherMerchantUser}');
     `)
   }, hookTimeout)
@@ -388,11 +400,14 @@ d('r11.0 mission review: admin_review_submission, mission_review_event_append, R
       submission_id: submissionAId, actor_type: 'ops', actor_id: opsAdminUser, action: 'reject', reason_category: null,
     })
     expect(bypassInsert.error).not.toBeNull()
-    expect(/check constraint|reason_required/i.test(`${bypassInsert.error?.message}`)).toBe(true)
+    // Tightened to just 'reason_required' (the constraint's own name,
+    // mission_review_events_reason_required_check) -- the generic 'check constraint'
+    // alternative would also match if some unrelated constraint on this table fired instead,
+    // which wouldn't actually prove the guarantee this test exists to verify.
+    expect(/reason_required/i.test(`${bypassInsert.error?.message}`)).toBe(true)
   }, testTimeout)
 
   it('admin_mission_analytics: a travelpayouts-sourced mission (no merchant_profile_id) is now visible, proving the widening', async () => {
-    const tpMissionId = (globalThis as Record<string, unknown>).__r11TpMissionId as string | null
     if (!tpMissionId) {
       // Environment couldn't seed a travelpayouts mission (see the beforeAll comment) --
       // skip this one assertion rather than fail the whole live-proof run over an unrelated
