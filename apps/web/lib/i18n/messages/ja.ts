@@ -1235,6 +1235,12 @@ const messages: Messages = {
     actApprove: '承認', actReject: '却下', actRequestRevision: '修正を依頼', actCancel: 'キャンセル', actApply: '適用',
     reasonCategoryPlaceholder: '理由のカテゴリを選択…', reasonFormat: '形式', reasonKeyMessage: '重要メッセージ', reasonCompliance: 'コンプライアンス', reasonQuality: '品質', reasonOther: 'その他',
     viewQueue: 'キューを見る',
+    confidenceVerified: '検証済み', confidenceNeedsReview: '要確認', confidenceUnavailable: '利用不可',
+    actRerunVerification: '検証を再実行',
+    rerunQueued: '検証を再度キューに追加しました。しばらくしてからご確認ください。', rerunFailed: '検証を開始できませんでした。もう一度お試しください。',
+    autoApprovePolicyLabel: '検証済みの提出物を自動承認', autoApprovePolicyOff: 'オフ', autoApprovePolicyOn: 'オン — 検証済みシグナルのみ',
+    autoApprovePolicySaved: '保存しました。', autoApprovePolicyError: 'ポリシーを更新できませんでした。もう一度お試しください。',
+    attentionOverdueTitle: '期限超過の審査', attentionOverdueEmpty: '現在、期限超過の項目はありません',
   },
   perks: {
     catalog: {

@@ -1235,6 +1235,12 @@ const messages: Messages = {
     actApprove: '批准', actReject: '拒絕', actRequestRevision: '要求修改', actCancel: '取消', actApply: '確認',
     reasonCategoryPlaceholder: '選擇原因類別…', reasonFormat: '格式', reasonKeyMessage: '核心訊息', reasonCompliance: '合規', reasonQuality: '質素', reasonOther: '其他',
     viewQueue: '查看隊列',
+    confidenceVerified: '已驗證', confidenceNeedsReview: '需要覆核', confidenceUnavailable: '未能取得',
+    actRerunVerification: '重新驗證',
+    rerunQueued: '已重新排入驗證隊列，請稍後查看。', rerunFailed: '無法開始驗證，請再試一次。',
+    autoApprovePolicyLabel: '自動批准已驗證的提交', autoApprovePolicyOff: '關閉', autoApprovePolicyOn: '開啟 — 僅限已驗證訊號',
+    autoApprovePolicySaved: '已儲存。', autoApprovePolicyError: '無法更新政策，請再試一次。',
+    attentionOverdueTitle: '逾期審核', attentionOverdueEmpty: '目前沒有逾期項目',
   },
   perks: {
     catalog: {

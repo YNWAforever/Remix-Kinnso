@@ -1235,6 +1235,12 @@ const messages: Messages = {
     actApprove: 'อนุมัติ', actReject: 'ปฏิเสธ', actRequestRevision: 'ขอให้แก้ไข', actCancel: 'ยกเลิก', actApply: 'ยืนยัน',
     reasonCategoryPlaceholder: 'เลือกหมวดหมู่เหตุผล…', reasonFormat: 'รูปแบบ', reasonKeyMessage: 'ข้อความหลัก', reasonCompliance: 'การปฏิบัติตามข้อกำหนด', reasonQuality: 'คุณภาพ', reasonOther: 'อื่น ๆ',
     viewQueue: 'ดูคิว',
+    confidenceVerified: 'ตรวจสอบแล้ว', confidenceNeedsReview: 'ต้องตรวจสอบเพิ่มเติม', confidenceUnavailable: 'ไม่สามารถใช้งานได้',
+    actRerunVerification: 'ตรวจสอบใหม่อีกครั้ง',
+    rerunQueued: 'เข้าคิวตรวจสอบใหม่แล้ว — โปรดตรวจสอบอีกครั้งในอีกสักครู่', rerunFailed: 'ไม่สามารถเริ่มการตรวจสอบได้ กรุณาลองใหม่อีกครั้ง',
+    autoApprovePolicyLabel: 'อนุมัติงานที่ตรวจสอบแล้วโดยอัตโนมัติ', autoApprovePolicyOff: 'ปิด', autoApprovePolicyOn: 'เปิด — เฉพาะสัญญาณที่ตรวจสอบแล้ว',
+    autoApprovePolicySaved: 'บันทึกแล้ว', autoApprovePolicyError: 'ไม่สามารถอัปเดตนโยบายได้ กรุณาลองใหม่อีกครั้ง',
+    attentionOverdueTitle: 'รายการตรวจสอบที่เกินกำหนด', attentionOverdueEmpty: 'ขณะนี้ไม่มีรายการที่เกินกำหนด',
   },
   perks: {
     catalog: {

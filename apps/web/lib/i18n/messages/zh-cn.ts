@@ -1235,6 +1235,12 @@ const messages: Messages = {
     actApprove: '批准', actReject: '拒绝', actRequestRevision: '要求修改', actCancel: '取消', actApply: '确认',
     reasonCategoryPlaceholder: '选择原因类别…', reasonFormat: '格式', reasonKeyMessage: '核心信息', reasonCompliance: '合规', reasonQuality: '质量', reasonOther: '其他',
     viewQueue: '查看队列',
+    confidenceVerified: '已验证', confidenceNeedsReview: '需要复核', confidenceUnavailable: '无法获取',
+    actRerunVerification: '重新验证',
+    rerunQueued: '已重新加入验证队列，请稍后查看。', rerunFailed: '无法启动验证，请重试。',
+    autoApprovePolicyLabel: '自动批准已验证的提交', autoApprovePolicyOff: '关闭', autoApprovePolicyOn: '开启 — 仅限已验证信号',
+    autoApprovePolicySaved: '已保存。', autoApprovePolicyError: '无法更新策略，请重试。',
+    attentionOverdueTitle: '逾期审核', attentionOverdueEmpty: '目前没有逾期项目',
   },
   perks: {
     catalog: {
