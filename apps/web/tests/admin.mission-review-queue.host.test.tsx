@@ -1,14 +1,17 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ReviewQueueRow } from '@/lib/admin/mission-review-queries'
 
 const { roleMock, getUserMock, queueMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
-  queueMock: vi.fn(async () => [{
+  // Explicitly typed as ReviewQueueRow[] (not inferred) so mockResolvedValueOnce below can
+  // supply a different confidenceStatus/status literal without TS narrowing to this row's.
+  queueMock: vi.fn(async (): Promise<ReviewQueueRow[]> => [{
     submissionId: 's1', missionId: 'mission-1', missionTitle: 'Summer Coupon Push',
-    creatorId: 'creator-1', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z',
-    reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal' as const,
+    creatorId: 'creator-1', status: 'submitted', submittedAt: '2026-08-19T00:00:00Z',
+    reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal',
   }]),
 }))
 vi.mock('next/navigation', () => ({
@@ -43,5 +46,24 @@ describe('/[locale]/admin/missions/review host', () => {
   it('notFounds a non-ops user', async () => {
     roleMock.mockResolvedValueOnce('creator')
     await expect(MissionReviewQueuePage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toThrow('NEXT_NOT_FOUND')
+  })
+
+  it('renders a confidence badge and hides the re-run button for a verified_signal row', async () => {
+    const ui = await MissionReviewQueuePage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.getByText('Verified')).toBeTruthy()
+    expect(screen.queryByText('Re-run verification')).toBeNull()
+  })
+
+  it('shows the re-run button for a needs_review row', async () => {
+    queueMock.mockResolvedValueOnce([{
+      submissionId: 's2', missionId: 'mission-2', missionTitle: 'Autumn Push',
+      creatorId: 'creator-2', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z',
+      reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'needs_review' as const,
+    }])
+    const ui = await MissionReviewQueuePage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+    expect(screen.getByText('Needs review')).toBeTruthy()
+    expect(screen.getByText('Re-run verification')).toBeTruthy()
   })
 })

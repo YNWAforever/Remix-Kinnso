@@ -39,6 +39,12 @@ export interface MissionsOpsMessages {
   reasonQuality: string
   reasonOther: string
   viewQueue: string
+  confidenceVerified: string
+  confidenceNeedsReview: string
+  confidenceUnavailable: string
+  actRerunVerification: string
+  rerunQueued: string
+  rerunFailed: string
 }
 
 export interface MerchantApplyMessages {
@@ -2582,6 +2588,12 @@ const messages: Messages = {
     reasonQuality: 'Quality',
     reasonOther: 'Other',
     viewQueue: 'View queue',
+    confidenceVerified: 'Verified',
+    confidenceNeedsReview: 'Needs review',
+    confidenceUnavailable: 'Unavailable',
+    actRerunVerification: 'Re-run verification',
+    rerunQueued: 'Verification re-queued — check back in a moment.',
+    rerunFailed: 'Could not start verification. Please try again.',
   },
   perks: {
     catalog: {

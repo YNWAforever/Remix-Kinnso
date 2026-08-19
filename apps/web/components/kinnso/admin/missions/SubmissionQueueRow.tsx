@@ -5,6 +5,8 @@ import type { Locale } from '@/lib/i18n/config'
 import type { ReviewQueueRow } from '@/lib/admin/mission-review-queries'
 import type { ActionResult } from '@/lib/admin/result'
 import type { SubmissionReviewAction } from '@/lib/missions/types'
+import { ConfidenceBadge } from '@/components/kinnso/admin/missions/badges'
+import { startVerification } from '@/lib/missions/verify-client'
 
 type T = Messages['missionsOps']
 type ReviewActionFn = (
@@ -26,6 +28,29 @@ const REASON_OPTIONS = (t: T): Array<{ value: string; label: string }> => [
 
 // Only reject/request_revision open the reason-capture modal; approve fires immediately.
 type PendingKind = 'reject' | 'request_revision' | null
+
+/** Fires the scan worker's existing POST /verify-submission with the ops caller's OWN
+ * session token. No polling/live-update here by design: this only re-queues the job, the
+ * row's badge reflects the new result on the next page load. */
+function RerunVerificationButton({ submissionId, t }: { submissionId: string; t: T }) {
+  const [state, setState] = useState<'idle' | 'pending' | 'queued' | 'error'>('idle')
+  const rerun = () => {
+    setState('pending')
+    void startVerification(submissionId).then((res) => setState('jobId' in res ? 'queued' : 'error'))
+  }
+  if (state === 'queued') return <p className="mt-1 text-xs text-kinnso-muted">{t.rerunQueued}</p>
+  if (state === 'error') return <p className="mt-1 text-xs text-red-600">{t.rerunFailed}</p>
+  return (
+    <button
+      type="button"
+      onClick={rerun}
+      disabled={state === 'pending'}
+      className="mt-1 rounded-md border border-kinnso-line px-2 py-0.5 text-xs font-bold text-kinnso-ink disabled:opacity-50"
+    >
+      {t.actRerunVerification}
+    </button>
+  )
+}
 
 /**
  * One row of the submission review queue -- extracted from MissionDetailView so it can be
@@ -102,7 +127,12 @@ export function SubmissionQueueRow({
       <tr className="border-b border-kinnso-line/60 align-top">
         <td className="py-2 font-bold text-kinnso-ink">{row.missionTitle}</td>
         <td className="py-2 text-kinnso-muted">{row.creatorId ? row.creatorId.slice(0, 8) : '—'}</td>
-        <td className="py-2 text-kinnso-muted">{row.confidenceStatus ?? '—'}</td>
+        <td className="py-2">
+          <ConfidenceBadge status={row.confidenceStatus} t={t} />
+          {row.status === 'submitted' && row.confidenceStatus !== 'verified_signal' && (
+            <RerunVerificationButton submissionId={row.submissionId} t={t} />
+          )}
+        </td>
         <td className="py-2">
           {row.status === 'revision_requested' ? (
             <span className="rounded-full bg-kinnso-line/40 px-2 py-1 text-xs font-bold text-kinnso-muted">
