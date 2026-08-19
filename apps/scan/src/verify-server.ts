@@ -58,6 +58,24 @@ async function countActiveVerifications(
 }
 
 /**
+ * True when userId is an active kinnso_ops_members row. Fails CLOSED (returns false) on a
+ * query error -- an ops-membership check that can't complete must never be treated as passing.
+ */
+async function isActiveOpsCaller(db: SupabaseClient<Database>, userId: string): Promise<boolean> {
+  const { data, error } = await db
+    .from('kinnso_ops_members')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle()
+  if (error) {
+    console.error('[scan] failed to check ops membership', error.message)
+    return false
+  }
+  return !!data
+}
+
+/**
  * Applies the per-creator verification limits.
  *
  * Both the submit and the retry path go through this: a verification run costs
@@ -101,12 +119,21 @@ export async function handleVerifySubmission(
 
   const ownerId = (submission as { mission_participants?: { creator_id?: string } } | null)
     ?.mission_participants?.creator_id
-  if (!submission || ownerId !== userId) {
+  if (!submission || !ownerId) {
+    return { status: 404, body: { error: 'submission not found' } }
+  }
+  // An ops caller may trigger re-verification on a submission they don't own -- checked only
+  // when the fast owner-match path fails, so a creator's own request never pays this extra
+  // round trip.
+  if (ownerId !== userId && !(await isActiveOpsCaller(db, userId))) {
     return { status: 404, body: { error: 'submission not found' } }
   }
 
-  // Throttle BEFORE inserting: a rejected run should leave no row behind.
-  const limited = await checkVerificationLimits(deps, now)
+  // Throttle BEFORE inserting: a rejected run should leave no row behind. Scoped to the
+  // submission's OWNER, never the caller -- an ops-initiated re-run must spend the SAME
+  // creator-owned quota a creator-initiated one would, not some separate (and likely
+  // nonexistent, since ops members aren't creators) bucket keyed by the ops member's own id.
+  const limited = await checkVerificationLimits({ ...deps, userId: ownerId }, now)
   if (limited) return limited
 
   const proofUrl = (submission as { proof_urls?: string[] }).proof_urls?.[0] ?? null
@@ -116,7 +143,7 @@ export async function handleVerifySubmission(
     .from('mission_verification_jobs')
     .insert({
       mission_milestone_submission_id: submissionId,
-      creator_id: userId,
+      creator_id: ownerId,
       platform: parsed?.platform ?? null,
       proof_url: proofUrl,
       status: 'queued',
@@ -133,7 +160,7 @@ export async function handleVerifySubmission(
   }
 
   const jobId = job.id
-  ledger.record(userId, now)
+  ledger.record(ownerId, now)
   // Fire-and-forget
   verifySubmission({ db, fetcher }, jobId).catch((err: unknown) => {
     console.error(`[scan] unhandled verification error for job ${jobId}`, err)
