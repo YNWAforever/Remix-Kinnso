@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
 import type { MissionsOverview } from '@/lib/admin/missions-queries'
@@ -23,7 +24,6 @@ export function MissionsOverviewView({ t, locale, overview }: { t: Messages['mis
     { label: t.kpiCompleted, value: kpis.byStatus.completed ?? 0 },
     { label: t.kpiCancelled, value: kpis.byStatus.cancelled ?? 0 },
     { label: t.kpiOpenForApplications, value: kpis.openForApplications },
-    { label: t.kpiSubmissionsAwaitingReview, value: kpis.submissionsAwaitingReview },
   ]
   return (
     <main>
@@ -35,6 +35,14 @@ export function MissionsOverviewView({ t, locale, overview }: { t: Messages['mis
         {kpiCards.map((c) => (
           <KpiCard key={c.label} label={c.label} value={c.value} />
         ))}
+        <TicketCard
+          as={Link}
+          href={`/${locale}/admin/missions/review`}
+          className="group p-5 transition hover:border-kinnso-orange"
+        >
+          <p className="text-3xl font-black text-kinnso-ink">{kpis.submissionsAwaitingReview}</p>
+          <p className="mt-1 text-sm text-kinnso-muted">{t.kpiSubmissionsAwaitingReview}</p>
+        </TicketCard>
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">

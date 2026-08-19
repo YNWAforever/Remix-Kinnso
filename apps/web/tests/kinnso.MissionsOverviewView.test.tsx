@@ -51,4 +51,19 @@ describe('MissionsOverviewView', () => {
     )
     expect(screen.getByText('Nothing at risk right now')).toBeTruthy()
   })
+
+  it('links the submissions-awaiting-review KPI card to the review queue', () => {
+    render(
+      <MissionsOverviewView
+        t={t}
+        locale="en"
+        overview={{
+          kpis: { total: 6, byStatus: { published: 4 }, byType: {}, byVisibility: {}, openForApplications: 4, submissionsAwaitingReview: 2 },
+          missionsCreated: [], submissionsReviewed: [], atRisk: [],
+        }}
+      />,
+    )
+    const link = screen.getByRole('link', { name: new RegExp(t.kpiSubmissionsAwaitingReview) })
+    expect(link.getAttribute('href')).toBe('/en/admin/missions/review')
+  })
 })
