@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
 import type { MissionsOverview } from '@/lib/admin/missions-queries'
@@ -42,6 +43,9 @@ export function MissionsOverviewView({ t, locale, overview }: { t: Messages['mis
         >
           <p className="text-3xl font-black text-kinnso-ink">{kpis.submissionsAwaitingReview}</p>
           <p className="mt-1 text-sm text-kinnso-muted">{t.kpiSubmissionsAwaitingReview}</p>
+          <span className="mt-3 inline-flex items-center text-sm font-bold text-kinnso-orange">
+            {t.viewQueue} <ArrowRight aria-hidden="true" className="ml-1 h-4 w-4 transition group-hover:translate-x-0.5" />
+          </span>
         </TicketCard>
       </div>
 

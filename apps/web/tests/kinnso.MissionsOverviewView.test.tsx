@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -13,7 +13,7 @@ const t = {
   tabOverview: 'Overview', tabDirectory: 'Directory',
   kpiTotal: 'Total missions', kpiPublished: 'Published', kpiDraft: 'Draft', kpiPaused: 'Paused',
   kpiCompleted: 'Completed', kpiCancelled: 'Cancelled', kpiOpenForApplications: 'Open for applications',
-  kpiSubmissionsAwaitingReview: 'Awaiting review',
+  kpiSubmissionsAwaitingReview: 'Awaiting review', viewQueue: 'View queue',
   trendMissionsCreated: 'Missions created', trendSubmissionsReviewed: 'Submissions reviewed', trendEmpty: 'No data yet',
   atRiskTitle: 'At risk', atRiskEmpty: 'Nothing at risk right now',
   reasonPublishedNoParticipants: 'Published, no participants', reasonStalledSubmissions: 'Stalled submission',
@@ -65,5 +65,7 @@ describe('MissionsOverviewView', () => {
     )
     const link = screen.getByRole('link', { name: new RegExp(t.kpiSubmissionsAwaitingReview) })
     expect(link.getAttribute('href')).toBe('/en/admin/missions/review')
+    expect(within(link).getByText('2')).toBeTruthy()
+    expect(within(link).getByText('View queue')).toBeTruthy()
   })
 })
