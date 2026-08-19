@@ -86,7 +86,7 @@ export function MissionsOverviewView({ t, locale, overview, attention }: { t: Me
             {attention.overdueReviews.map((r) => (
               <li key={r.submissionId} className="flex items-center justify-between gap-3">
                 <span className="min-w-0 flex-1 truncate font-bold text-kinnso-ink">{r.missionTitle}</span>
-                <span className="shrink-0 text-orange-700">{new Date(r.reviewDeadline).toLocaleDateString()}</span>
+                <span className="shrink-0 text-orange-700">{new Date(r.reviewDeadline).toLocaleDateString(locale)}</span>
               </li>
             ))}
           </ul>

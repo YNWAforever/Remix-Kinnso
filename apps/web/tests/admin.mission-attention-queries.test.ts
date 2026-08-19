@@ -18,8 +18,19 @@ describe('getMissionAttention', () => {
     })
   })
 
+  it('defaults missing arrays to empty when the RPC omits a key', async () => {
+    const supabase = fakeClient({})
+    const result = await getMissionAttention(supabase)
+    expect(result).toEqual({ overdueReviews: [], atRiskMissions: [] })
+  })
+
   it('propagates an RPC error rather than swallowing it', async () => {
     const supabase = fakeClient(null, { message: 'boom' })
     await expect(getMissionAttention(supabase)).rejects.toEqual({ message: 'boom' })
+  })
+
+  it('throws when the RPC returns no data and no error', async () => {
+    const supabase = fakeClient(null, null)
+    await expect(getMissionAttention(supabase)).rejects.toThrow('admin_mission_attention returned no data')
   })
 })
