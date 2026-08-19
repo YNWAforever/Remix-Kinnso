@@ -176,8 +176,12 @@ changes from `review_deadline`-only to confidence-bucket-first (`verified_signal
 `needs_review`, then `unavailable`/`null`), `review_deadline` ascending as the tiebreak within
 each bucket. The mission detail page (R11.0) gains a small ops-only `auto_approve_policy`
 toggle near the mission summary, wired to the new setter RPC. `admin_mission_attention()`'s
-two buckets render as two small lists on the existing `/admin/missions` overview page,
-visually matching the page's current `at_risk` list.
+`overdue_reviews` bucket renders as one small list on the existing `/admin/missions` overview
+page, visually matching the page's current `at_risk` list. Its `at_risk_missions` bucket is
+implemented, typed, and tested but deliberately NOT rendered a second time — that data already
+appears on the same page via `admin_mission_analytics`'s existing `at_risk`-backed card, and a
+second list would just duplicate it (a UI-only economy call made during implementation, not a
+scope cut — see the plan doc's Task 9 note).
 
 ## Testing
 

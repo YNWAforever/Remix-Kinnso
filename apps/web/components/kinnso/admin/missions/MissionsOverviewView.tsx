@@ -16,6 +16,9 @@ const REASON_LABEL = (t: Messages['missionsOps']): Record<string, string> => ({
 
 export function MissionsOverviewView({ t, locale, overview, attention }: { t: Messages['missionsOps']; locale: Locale; overview: MissionsOverview; attention: MissionAttention }) {
   const { kpis, missionsCreated, submissionsReviewed, atRisk } = overview
+  // attention.atRiskMissions is deliberately unused below: it's the same at-risk data already
+  // rendered from `overview.atRisk` above, via admin_mission_analytics -- a second list would
+  // just duplicate it. Only attention.overdueReviews is new, rendered further down.
   const reasons = REASON_LABEL(t)
   const kpiCards = [
     { label: t.kpiTotal, value: kpis.total },
