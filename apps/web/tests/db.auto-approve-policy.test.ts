@@ -45,11 +45,13 @@ describe('r11.1 auto_approve_policy column, trigger, and setter RPC', () => {
     expect(sql.slice(fnStart, fnEnd)).not.toContain('ops_audit_log_append')
   })
 
-  it('wraps both trigger side-effect writes so a failure there can never roll back the job status write', () => {
+  it('wraps the update+insert in one exception block, gates the insert on FOUND, and logs failures instead of swallowing them', () => {
     const fnStart = sql.indexOf('create or replace function public.notify_verification_auto_approve()')
     const fnEnd = sql.indexOf('create trigger notify_verification_auto_approve_trg')
     const fnBody = sql.slice(fnStart, fnEnd)
-    expect((fnBody.match(/exception when others then null/gu) ?? []).length).toBeGreaterThanOrEqual(2)
+    expect((fnBody.match(/exception when others then/gu) ?? []).length).toBe(1)
+    expect(fnBody).toContain("raise warning 'notify_verification_auto_approve failed: %', sqlerrm;")
+    expect(fnBody).toContain('if found then insert into public.mission_review_events')
   })
 
   it('admin_set_mission_auto_approve_policy gates on admin rank and validates the enum before any write', () => {

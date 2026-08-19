@@ -47,13 +47,13 @@ begin
         update public.mission_milestone_submissions
           set status = 'approved', reviewed_at = now()
           where id = v_submission_id and status = 'submitted';
-      exception when others then null;
-      end;
 
-      begin
-        insert into public.mission_review_events (submission_id, actor_type, actor_id, action, reason_category, reason_text)
-          values (v_submission_id, 'system', null, 'approve', null, null);
-      exception when others then null;
+        if found then
+          insert into public.mission_review_events (submission_id, actor_type, actor_id, action, reason_category, reason_text)
+            values (v_submission_id, 'system', null, 'approve', null, null);
+        end if;
+      exception when others then
+        raise warning 'notify_verification_auto_approve failed: %', sqlerrm;
       end;
     end if;
   end if;
