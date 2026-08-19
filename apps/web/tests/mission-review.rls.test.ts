@@ -69,7 +69,7 @@ const otherMerchantUser = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd'
 const opsAdminUser = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'
 const opsOtherUser = 'ffffffff-ffff-4fff-8fff-ffffffffffff'
 
-d('r11.0 mission review: admin_review_submission, mission_review_event_append, RLS, and review_deadline', () => {
+d('r11.0/r11.1 mission review: admin_review_submission, mission_review_event_append, auto-approve, admin_mission_attention, RLS, and review_deadline', () => {
   let missionId = ''
   let milestoneId = ''
   let participantAId = ''
@@ -422,5 +422,151 @@ d('r11.0 mission review: admin_review_submission, mission_review_event_append, R
     // return a number at least as large as what a merchant-only-filtered version could ever
     // report, and must not error out just because this mission has a null merchant_profile_id.
     expect(typeof total).toBe('number')
+  }, testTimeout)
+
+  it('mission_verification_jobs RLS: an active ops member can now read confidence_status directly; an unrelated creator cannot', async () => {
+    const s = svc()
+    const job = await s.from('mission_verification_jobs').insert({
+      mission_milestone_submission_id: submissionAId, creator_id: creatorA,
+      status: 'ready', confidence_status: 'verified_signal',
+    }).select('id').single()
+    if (job.error) throw job.error
+
+    const ops = clientFor(opsAdminUser)
+    const asOps = await ops.from('mission_verification_jobs').select('id, confidence_status').eq('id', job.data!.id)
+    expect(asOps.error).toBeNull()
+    expect(asOps.data).toHaveLength(1)
+    expect(asOps.data![0].confidence_status).toBe('verified_signal')
+
+    const creatorBClient = clientFor(creatorB)
+    const asUnrelated = await creatorBClient.from('mission_verification_jobs').select('id').eq('id', job.data!.id)
+    expect(asUnrelated.error).toBeNull()
+    expect(asUnrelated.data).toEqual([])
+  }, testTimeout)
+
+  it('auto-approve trigger: policy verified_signal_only approves with zero human action, writing a system-actor event and no ops_audit_log row', async () => {
+    const s = svc()
+    const policyOn = await s.from('missions').update({ auto_approve_policy: 'verified_signal_only' }).eq('id', missionId)
+    if (policyOn.error) throw policyOn.error
+
+    const freshSubmission = await s.from('mission_milestone_submissions').insert({
+      mission_milestone_id: await freshMilestoneId(), mission_participant_id: participantAId, status: 'submitted',
+      proof_urls: ['https://example.com/auto-approve-1'], submitted_at: new Date().toISOString(),
+    }).select('id').single()
+    if (freshSubmission.error) throw freshSubmission.error
+    const autoSubmissionId = freshSubmission.data!.id
+
+    const job = await s.from('mission_verification_jobs').insert({
+      mission_milestone_submission_id: autoSubmissionId, creator_id: creatorA, status: 'queued',
+    }).select('id').single()
+    if (job.error) throw job.error
+
+    const auditBefore = await s.from('ops_audit_log').select('id').eq('entity_id', autoSubmissionId)
+    if (auditBefore.error) throw auditBefore.error
+
+    const ready = await s.from('mission_verification_jobs')
+      .update({ status: 'ready', confidence_status: 'verified_signal' })
+      .eq('id', job.data!.id)
+    if (ready.error) throw ready.error
+
+    const submission = await s.from('mission_milestone_submissions').select('status, reviewed_by').eq('id', autoSubmissionId).single()
+    if (submission.error) throw submission.error
+    expect(submission.data!.status).toBe('approved')
+    expect(submission.data!.reviewed_by).toBeNull()
+
+    const events = await s.from('mission_review_events').select('actor_type, actor_id, action').eq('submission_id', autoSubmissionId)
+    if (events.error) throw events.error
+    expect(events.data).toHaveLength(1)
+    expect(events.data![0]).toMatchObject({ actor_type: 'system', actor_id: null, action: 'approve' })
+
+    const auditAfter = await s.from('ops_audit_log').select('id').eq('entity_id', autoSubmissionId)
+    if (auditAfter.error) throw auditAfter.error
+    expect(auditAfter.data!.length).toBe(auditBefore.data!.length)
+
+    await s.from('missions').update({ auto_approve_policy: 'off' }).eq('id', missionId)
+  }, testTimeout)
+
+  it('auto-approve trigger: policy off (the default) leaves an identical job transition untouched', async () => {
+    const s = svc()
+    const freshSubmission = await s.from('mission_milestone_submissions').insert({
+      mission_milestone_id: await freshMilestoneId(), mission_participant_id: participantAId, status: 'submitted',
+      proof_urls: ['https://example.com/auto-approve-2'], submitted_at: new Date().toISOString(),
+    }).select('id').single()
+    if (freshSubmission.error) throw freshSubmission.error
+    const offSubmissionId = freshSubmission.data!.id
+
+    const job = await s.from('mission_verification_jobs').insert({
+      mission_milestone_submission_id: offSubmissionId, creator_id: creatorA, status: 'queued',
+    }).select('id').single()
+    if (job.error) throw job.error
+
+    const ready = await s.from('mission_verification_jobs')
+      .update({ status: 'ready', confidence_status: 'verified_signal' })
+      .eq('id', job.data!.id)
+    if (ready.error) throw ready.error
+
+    const submission = await s.from('mission_milestone_submissions').select('status').eq('id', offSubmissionId).single()
+    if (submission.error) throw submission.error
+    expect(submission.data!.status).toBe('submitted')
+
+    const events = await s.from('mission_review_events').select('id').eq('submission_id', offSubmissionId)
+    if (events.error) throw events.error
+    expect(events.data).toEqual([])
+  }, testTimeout)
+
+  it('auto-approve trigger: does not fire on an unrelated update to an already-verified_signal row', async () => {
+    const s = svc()
+    const policyOn = await s.from('missions').update({ auto_approve_policy: 'verified_signal_only' }).eq('id', missionId)
+    if (policyOn.error) throw policyOn.error
+
+    const freshSubmission = await s.from('mission_milestone_submissions').insert({
+      mission_milestone_id: await freshMilestoneId(), mission_participant_id: participantAId, status: 'submitted',
+      proof_urls: ['https://example.com/auto-approve-3'], submitted_at: new Date().toISOString(),
+    }).select('id').single()
+    if (freshSubmission.error) throw freshSubmission.error
+    const noRefireSubmissionId = freshSubmission.data!.id
+
+    const job = await s.from('mission_verification_jobs').insert({
+      mission_milestone_submission_id: noRefireSubmissionId, creator_id: creatorA,
+      status: 'ready', confidence_status: 'verified_signal',
+    }).select('id').single()
+    if (job.error) throw job.error
+
+    const afterInsert = await s.from('mission_milestone_submissions').select('status').eq('id', noRefireSubmissionId).single()
+    if (afterInsert.error) throw afterInsert.error
+    expect(afterInsert.data!.status).toBe('submitted')
+
+    const unrelatedUpdate = await s.from('mission_verification_jobs').update({ error: 'unrelated note' }).eq('id', job.data!.id)
+    if (unrelatedUpdate.error) throw unrelatedUpdate.error
+
+    const afterUnrelated = await s.from('mission_milestone_submissions').select('status').eq('id', noRefireSubmissionId).single()
+    if (afterUnrelated.error) throw afterUnrelated.error
+    expect(afterUnrelated.data!.status).toBe('submitted')
+
+    await s.from('missions').update({ auto_approve_policy: 'off' }).eq('id', missionId)
+  }, testTimeout)
+
+  it('admin_mission_attention: surfaces an overdue submission and rejects a non-ops caller', async () => {
+    const s = svc()
+    const overdueSubmission = await s.from('mission_milestone_submissions').insert({
+      mission_milestone_id: await freshMilestoneId(), mission_participant_id: participantAId, status: 'submitted',
+      proof_urls: ['https://example.com/overdue-1'], submitted_at: new Date().toISOString(),
+    }).select('id').single()
+    if (overdueSubmission.error) throw overdueSubmission.error
+    const backdate = await s.from('mission_milestone_submissions')
+      .update({ review_deadline: new Date(Date.now() - 60 * 60 * 1000).toISOString() })
+      .eq('id', overdueSubmission.data!.id)
+    if (backdate.error) throw backdate.error
+
+    const ops = clientFor(opsAdminUser)
+    const { data, error } = await ops.rpc('admin_mission_attention')
+    expect(error).toBeNull()
+    const overdue = (data as { overdue_reviews: Array<{ submission_id: string }> }).overdue_reviews
+    expect(overdue.some((r) => r.submission_id === overdueSubmission.data!.id)).toBe(true)
+
+    const creator = clientFor(creatorA)
+    const denied = await creator.rpc('admin_mission_attention')
+    expect(denied.error).not.toBeNull()
+    expect(/forbidden|42501/i.test(`${denied.error?.message} ${denied.error?.code}`)).toBe(true)
   }, testTimeout)
 })
