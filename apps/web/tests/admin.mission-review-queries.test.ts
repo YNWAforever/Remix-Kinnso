@@ -93,6 +93,25 @@ describe('getReviewQueue', () => {
     const supabase = fakeClient({ mission_milestone_submissions: { data: null, error: { message: 'boom' } } })
     await expect(getReviewQueue(supabase)).rejects.toEqual({ message: 'boom' })
   })
+
+  it('sorts by confidence bucket first (verified_signal, needs_review, then unavailable/null), deadline as the tiebreak within a bucket', async () => {
+    const rows = [
+      { id: 'a', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-17T00:00:00Z',
+        mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Unavailable, earlier deadline' } },
+        mission_verification_jobs: [] },
+      { id: 'b', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-18T00:00:00Z',
+        mission_participants: { id: 'p2', creator_id: 'c2', mission_id: 'm2', missions: { id: 'm2', title: 'Verified, later deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'verified_signal', created_at: '2026-08-15T01:00:00Z' }] },
+      { id: 'c', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-16T00:00:00Z',
+        mission_participants: { id: 'p3', creator_id: 'c3', mission_id: 'm3', missions: { id: 'm3', title: 'Needs review, earliest deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'needs_review', created_at: '2026-08-15T01:00:00Z' }] },
+    ]
+    const supabase = fakeClient({ mission_milestone_submissions: { data: rows, error: null } })
+    const result = await getReviewQueue(supabase)
+    // verified_signal first regardless of its later deadline, then needs_review, then unavailable --
+    // NOT deadline order (which would put c, a, b).
+    expect(result.map((r) => r.submissionId)).toEqual(['b', 'c', 'a'])
+  })
 })
 
 describe('getMissionDetail', () => {

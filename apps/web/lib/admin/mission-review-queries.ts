@@ -83,6 +83,9 @@ const latestConfidenceStatus = (
   return latest?.confidence_status ?? null
 }
 
+const CONFIDENCE_BUCKET_RANK: Record<string, number> = { verified_signal: 0, needs_review: 1 }
+const confidenceBucketRank = (status: string | null): number => CONFIDENCE_BUCKET_RANK[status ?? ''] ?? 2
+
 const toReviewQueueRow = (r: ReviewQueueJoinRow): ReviewQueueRow => {
   const participant = oneJoin(r.mission_participants)
   const mission = oneJoin(participant?.missions)
@@ -100,9 +103,11 @@ const toReviewQueueRow = (r: ReviewQueueJoinRow): ReviewQueueRow => {
 
 /**
  * Every submission awaiting an ops decision (status in submitted/revision_requested),
- * newest deadline risk first. `confidenceStatus` comes from the most recent
- * mission_verification_jobs row for that submission (by created_at), or null when no
- * verification job has run yet. Errors propagate — no silent empty queue.
+ * sorted by confidence bucket first (verified_signal, then needs_review, then
+ * unavailable/null), with review deadline as the tiebreak within a bucket.
+ * `confidenceStatus` comes from the most recent mission_verification_jobs row for that
+ * submission (by created_at), or null when no verification job has run yet. Errors
+ * propagate — no silent empty queue.
  */
 export async function getReviewQueue(supabase: Client): Promise<ReviewQueueRow[]> {
   const { data, error } = await supabase
@@ -111,7 +116,10 @@ export async function getReviewQueue(supabase: Client): Promise<ReviewQueueRow[]
     .in('status', ['submitted', 'revision_requested'])
     .order('review_deadline', { ascending: true })
   if (error) throw error
-  return ((data ?? []) as unknown as ReviewQueueJoinRow[]).map(toReviewQueueRow)
+  const rows = ((data ?? []) as unknown as ReviewQueueJoinRow[]).map(toReviewQueueRow)
+  // Stable sort: rows already arrive deadline-ascending from the query above, so this only
+  // reorders BETWEEN buckets and never disturbs the deadline order WITHIN one.
+  return rows.sort((a, b) => confidenceBucketRank(a.confidenceStatus) - confidenceBucketRank(b.confidenceStatus))
 }
 
 /**
