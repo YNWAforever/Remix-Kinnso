@@ -83,8 +83,8 @@ const latestConfidenceStatus = (
   return latest?.confidence_status ?? null
 }
 
-const CONFIDENCE_BUCKET_RANK: Record<string, number> = { verified_signal: 0, needs_review: 1 }
-const confidenceBucketRank = (status: string | null): number => CONFIDENCE_BUCKET_RANK[status ?? ''] ?? 2
+const confidenceBucketRanks: Record<string, number> = { verified_signal: 0, needs_review: 1 }
+const confidenceBucketRank = (status: string | null): number => confidenceBucketRanks[status ?? ''] ?? 2
 
 const toReviewQueueRow = (r: ReviewQueueJoinRow): ReviewQueueRow => {
   const participant = oneJoin(r.mission_participants)
@@ -118,7 +118,8 @@ export async function getReviewQueue(supabase: Client): Promise<ReviewQueueRow[]
   if (error) throw error
   const rows = ((data ?? []) as unknown as ReviewQueueJoinRow[]).map(toReviewQueueRow)
   // Stable sort: rows already arrive deadline-ascending from the query above, so this only
-  // reorders BETWEEN buckets and never disturbs the deadline order WITHIN one.
+  // reorders BETWEEN buckets and never disturbs the deadline order WITHIN one. Array.prototype.sort
+  // has been a stable sort per the JS spec since ES2019 -- no additional deadline comparator needed.
   return rows.sort((a, b) => confidenceBucketRank(a.confidenceStatus) - confidenceBucketRank(b.confidenceStatus))
 }
 

@@ -112,6 +112,23 @@ describe('getReviewQueue', () => {
     // NOT deadline order (which would put c, a, b).
     expect(result.map((r) => r.submissionId)).toEqual(['b', 'c', 'a'])
   })
+
+  it('preserves deadline order for two rows in the SAME confidence bucket (proves the tiebreak, not just bucket priority)', async () => {
+    // Both rows are needs_review -- the only thing that could separate them is the deadline
+    // tiebreak. Input is already deadline-ascending, matching what the real DB query's own
+    // `.order('review_deadline', { ascending: true })` would hand to the JS-level bucket sort.
+    const rows = [
+      { id: 'earlier', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-16T00:00:00Z',
+        mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Earlier deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'needs_review', created_at: '2026-08-15T01:00:00Z' }] },
+      { id: 'later', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-19T00:00:00Z',
+        mission_participants: { id: 'p2', creator_id: 'c2', mission_id: 'm2', missions: { id: 'm2', title: 'Later deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'needs_review', created_at: '2026-08-15T01:00:00Z' }] },
+    ]
+    const supabase = fakeClient({ mission_milestone_submissions: { data: rows, error: null } })
+    const result = await getReviewQueue(supabase)
+    expect(result.map((r) => r.submissionId)).toEqual(['earlier', 'later'])
+  })
 })
 
 describe('getMissionDetail', () => {
