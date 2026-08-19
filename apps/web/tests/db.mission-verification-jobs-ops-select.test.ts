@@ -19,6 +19,13 @@ describe('r11.1 mission_verification_jobs ops SELECT policy', () => {
     expect(sql).toContain('exists ( select 1 from public.kinnso_ops_members ops where ops.user_id = (select auth.uid()) and ops.status = \'active\' )')
   })
 
+  it('is PERMISSIVE, not RESTRICTIVE -- a restrictive policy would AND with the existing owner policy instead of ORing, silently denying ops reads', () => {
+    // The four toContain() checks above are independent substrings, so an `as restrictive`
+    // inserted between `on public.mission_verification_jobs` and `for select` would still
+    // pass every one of them -- this is the one check that actually rules that out.
+    expect(sql).not.toContain('as restrictive')
+  })
+
   it('does not touch or drop the existing owner policy', () => {
     expect(sql).not.toContain('drop policy')
     expect(sql).not.toContain('mission_verification_jobs_owner_select')
