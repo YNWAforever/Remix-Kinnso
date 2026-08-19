@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
-import type { MissionsOverview } from '@/lib/admin/missions-queries'
+import type { MissionsOverview, MissionAttention } from '@/lib/admin/missions-queries'
 import { TicketCard } from '@/components/kinnso/MarketPassport'
 import { KpiCard } from '@/components/kinnso/admin/KpiCard'
 import { TrendChart } from '@/components/kinnso/admin/TrendChart'
@@ -14,7 +14,7 @@ const REASON_LABEL = (t: Messages['missionsOps']): Record<string, string> => ({
   verification_failed: t.reasonVerificationFailed,
 })
 
-export function MissionsOverviewView({ t, locale, overview }: { t: Messages['missionsOps']; locale: Locale; overview: MissionsOverview }) {
+export function MissionsOverviewView({ t, locale, overview, attention }: { t: Messages['missionsOps']; locale: Locale; overview: MissionsOverview; attention: MissionAttention }) {
   const { kpis, missionsCreated, submissionsReviewed, atRisk } = overview
   const reasons = REASON_LABEL(t)
   const kpiCards = [
@@ -71,6 +71,22 @@ export function MissionsOverviewView({ t, locale, overview }: { t: Messages['mis
                 <span className="min-w-0 flex-1 truncate font-bold text-kinnso-ink">{r.title}</span>
                 <span className="min-w-0 flex-1 truncate text-kinnso-muted">{r.merchantName ?? '—'}</span>
                 <span className="shrink-0 text-orange-700">{reasons[r.reason] ?? r.reason}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </TicketCard>
+
+      <TicketCard className="mt-8 p-5">
+        <p className="mb-3 text-sm font-bold text-kinnso-ink">{t.attentionOverdueTitle}</p>
+        {attention.overdueReviews.length === 0 ? (
+          <p className="py-6 text-sm text-kinnso-muted">{t.attentionOverdueEmpty}</p>
+        ) : (
+          <ul className="flex flex-col gap-2 text-sm">
+            {attention.overdueReviews.map((r) => (
+              <li key={r.submissionId} className="flex items-center justify-between gap-3">
+                <span className="min-w-0 flex-1 truncate font-bold text-kinnso-ink">{r.missionTitle}</span>
+                <span className="shrink-0 text-orange-700">{new Date(r.reviewDeadline).toLocaleDateString()}</span>
               </li>
             ))}
           </ul>

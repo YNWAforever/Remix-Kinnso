@@ -50,6 +50,8 @@ export interface MissionsOpsMessages {
   autoApprovePolicyOn: string
   autoApprovePolicySaved: string
   autoApprovePolicyError: string
+  attentionOverdueTitle: string
+  attentionOverdueEmpty: string
 }
 
 export interface MerchantApplyMessages {
@@ -2604,6 +2606,8 @@ const messages: Messages = {
     autoApprovePolicyOn: 'On — verified signal only',
     autoApprovePolicySaved: 'Saved.',
     autoApprovePolicyError: 'Could not update the policy. Please try again.',
+    attentionOverdueTitle: 'Overdue reviews',
+    attentionOverdueEmpty: 'Nothing overdue right now',
   },
   perks: {
     catalog: {
