@@ -1,6 +1,21 @@
 # Phase R11.1 — Verification-Gated Triage — Design
 
-**Status:** Approved by user 2026-08-20, pending implementation plan.
+**Status:** Approved by user 2026-08-20. Implementation plan written 2026-08-20
+(`docs/superpowers/plans/2026-08-20-phase-r11-1-verification-triage.md`), which surfaced two
+corrections to this doc, made without re-approval since both are factual/technical rather than
+product decisions (full reasoning in the plan's own "Spec deviations found while writing this
+plan" section):
+
+1. The queue's confidence sort/badges are NOT migration-free as the Architecture section below
+   claims — `getReviewQueue()` reads `mission_verification_jobs` via the ops user's own session,
+   not a `SECURITY DEFINER` RPC, and that table's only RLS policy scopes reads to
+   `creator_id = auth.uid()`. An ops session could never see this data at all until a new SELECT
+   policy is added.
+2. The auto-approval trigger (Schema section) does NOT call `ops_audit_log_append` — that
+   function itself requires a resolvable `auth.uid()` (raises `forbidden` otherwise) and
+   `ops_audit_log.actor_ops_member_id` has no representation for a non-ops actor.
+   `mission_review_events` (`actor_type='system'`) is this action's complete audit trail on its
+   own.
 
 ## Goal
 
