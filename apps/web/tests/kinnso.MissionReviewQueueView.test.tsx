@@ -6,17 +6,7 @@ import { MissionReviewQueueView } from '@/components/kinnso/admin/missions/Missi
 
 afterEach(cleanup)
 
-const PENDING_I18N_FALLBACK = {
-  colMission: 'colMission', colCreator: 'colCreator', colVerification: 'colVerification', colActions: 'colActions',
-  queueTitle: 'queueTitle', queueSubtitle: 'queueSubtitle', queueEmpty: 'queueEmpty',
-  waitingOnCreator: 'waitingOnCreator',
-  actApprove: 'actApprove', actReject: 'actReject', actRequestRevision: 'actRequestRevision',
-  actCancel: 'actCancel', actApply: 'actApply',
-  reasonCategoryPlaceholder: 'reasonCategoryPlaceholder',
-  reasonFormat: 'reasonFormat', reasonKeyMessage: 'reasonKeyMessage', reasonCompliance: 'reasonCompliance',
-  reasonQuality: 'reasonQuality', reasonOther: 'reasonOther',
-}
-const t = { ...PENDING_I18N_FALLBACK, ...en.missionsOps }
+const t = en.missionsOps
 
 const rows = [
   { submissionId: 's1', missionId: 'm1', missionTitle: 'Summer Coupon Push', creatorId: 'creator-1', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z', reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal' as const },

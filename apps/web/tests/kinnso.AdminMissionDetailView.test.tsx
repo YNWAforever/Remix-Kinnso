@@ -6,19 +6,7 @@ import { MissionDetailView } from '@/components/kinnso/admin/missions/MissionDet
 
 afterEach(cleanup)
 
-// Task 8 (not yet landed) adds these keys to lib/i18n/messages/*.ts. This fallback lets the
-// component be built and tested now; real values will override it automatically once Task 8
-// ships (object spread -- real en.missionsOps values win over these placeholders).
-const PENDING_I18N_FALLBACK = {
-  colMission: 'colMission', colCreator: 'colCreator', colVerification: 'colVerification', colActions: 'colActions',
-  waitingOnCreator: 'waitingOnCreator',
-  actApprove: 'actApprove', actReject: 'actReject', actRequestRevision: 'actRequestRevision',
-  actCancel: 'actCancel', actApply: 'actApply',
-  reasonCategoryPlaceholder: 'reasonCategoryPlaceholder',
-  reasonFormat: 'reasonFormat', reasonKeyMessage: 'reasonKeyMessage', reasonCompliance: 'reasonCompliance',
-  reasonQuality: 'reasonQuality', reasonOther: 'reasonOther',
-}
-const t = { ...PENDING_I18N_FALLBACK, ...en.missionsOps }
+const t = en.missionsOps
 
 const detail = {
   mission: { id: 'mission-1', title: 'Summer Coupon Push', missionSource: 'travelpayouts', missionType: 'coupon_affiliate', status: 'published', merchantProfileId: null },

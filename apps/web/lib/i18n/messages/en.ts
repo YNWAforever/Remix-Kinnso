@@ -19,6 +19,26 @@ export interface MissionsOpsMessages {
   reasonPublishedNoParticipants: string
   reasonStalledSubmissions: string
   reasonVerificationFailed: string
+  colMission: string
+  colCreator: string
+  colVerification: string
+  colActions: string
+  queueTitle: string
+  queueSubtitle: string
+  queueEmpty: string
+  waitingOnCreator: string
+  actApprove: string
+  actReject: string
+  actRequestRevision: string
+  actCancel: string
+  actApply: string
+  reasonCategoryPlaceholder: string
+  reasonFormat: string
+  reasonKeyMessage: string
+  reasonCompliance: string
+  reasonQuality: string
+  reasonOther: string
+  viewQueue: string
 }
 
 export interface MerchantApplyMessages {
@@ -2542,6 +2562,26 @@ const messages: Messages = {
     reasonPublishedNoParticipants: 'Published, no participants yet',
     reasonStalledSubmissions: 'Submission awaiting review >7 days',
     reasonVerificationFailed: 'Verification failed',
+    colMission: 'Mission',
+    colCreator: 'Creator',
+    colVerification: 'Verification',
+    colActions: 'Actions',
+    queueTitle: 'Review queue',
+    queueSubtitle: 'Submissions waiting on a decision, soonest deadline first.',
+    queueEmpty: "Nothing to review — you're caught up.",
+    waitingOnCreator: 'Waiting on creator',
+    actApprove: 'Approve',
+    actReject: 'Reject',
+    actRequestRevision: 'Request revision',
+    actCancel: 'Cancel',
+    actApply: 'Apply',
+    reasonCategoryPlaceholder: 'Reason category…',
+    reasonFormat: 'Format',
+    reasonKeyMessage: 'Key message',
+    reasonCompliance: 'Compliance',
+    reasonQuality: 'Quality',
+    reasonOther: 'Other',
+    viewQueue: 'View queue',
   },
   perks: {
     catalog: {

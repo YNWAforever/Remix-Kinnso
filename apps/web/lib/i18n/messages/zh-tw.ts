@@ -1229,6 +1229,12 @@ const messages: Messages = {
     atRiskTitle: '風險任務', atRiskEmpty: '目前沒有風險項目',
     reasonPublishedNoParticipants: '已發布但尚無參與者', reasonStalledSubmissions: '提交待審核超過7天',
     reasonVerificationFailed: '驗證失敗',
+    colMission: '任務', colCreator: '創作者', colVerification: '驗證', colActions: '操作',
+    queueTitle: '審核佇列', queueSubtitle: '等待決定的提交項目，依截止時間由近到遠排序。', queueEmpty: '目前沒有待審核項目，你已全部處理完畢。',
+    waitingOnCreator: '等待創作者回應',
+    actApprove: '核准', actReject: '拒絕', actRequestRevision: '要求修改', actCancel: '取消', actApply: '套用',
+    reasonCategoryPlaceholder: '選擇原因類別…', reasonFormat: '格式', reasonKeyMessage: '核心訊息', reasonCompliance: '合規性', reasonQuality: '品質', reasonOther: '其他',
+    viewQueue: '查看佇列',
   },
   perks: {
     catalog: {

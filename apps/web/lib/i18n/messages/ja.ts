@@ -1229,6 +1229,12 @@ const messages: Messages = {
     atRiskTitle: '要注意', atRiskEmpty: '現在、要注意の項目はありません',
     reasonPublishedNoParticipants: '公開済み・参加者なし', reasonStalledSubmissions: '提出物が7日以上未審査',
     reasonVerificationFailed: '検証に失敗',
+    colMission: 'ミッション', colCreator: 'クリエイター', colVerification: '検証', colActions: '操作',
+    queueTitle: '審査キュー', queueSubtitle: '判断待ちの提出物です。締め切りが近い順に表示しています。', queueEmpty: '審査待ちの項目はありません。対応済みです。',
+    waitingOnCreator: 'クリエイターの対応待ち',
+    actApprove: '承認', actReject: '却下', actRequestRevision: '修正を依頼', actCancel: 'キャンセル', actApply: '適用',
+    reasonCategoryPlaceholder: '理由のカテゴリを選択…', reasonFormat: '形式', reasonKeyMessage: '重要メッセージ', reasonCompliance: 'コンプライアンス', reasonQuality: '品質', reasonOther: 'その他',
+    viewQueue: 'キューを見る',
   },
   perks: {
     catalog: {

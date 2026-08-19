@@ -1229,6 +1229,12 @@ const messages: Messages = {
     atRiskTitle: 'มีความเสี่ยง', atRiskEmpty: 'ขณะนี้ไม่มีรายการที่มีความเสี่ยง',
     reasonPublishedNoParticipants: 'เผยแพร่แล้วแต่ยังไม่มีผู้เข้าร่วม', reasonStalledSubmissions: 'งานส่งรอตรวจสอบเกิน 7 วัน',
     reasonVerificationFailed: 'การตรวจสอบล้มเหลว',
+    colMission: 'ภารกิจ', colCreator: 'ครีเอเตอร์', colVerification: 'การตรวจสอบ', colActions: 'การดำเนินการ',
+    queueTitle: 'คิวตรวจสอบ', queueSubtitle: 'งานที่รอการตัดสินใจ เรียงตามกำหนดส่งที่ใกล้ที่สุดก่อน', queueEmpty: 'ไม่มีรายการรอตรวจสอบ คุณดำเนินการครบแล้ว',
+    waitingOnCreator: 'รอครีเอเตอร์',
+    actApprove: 'อนุมัติ', actReject: 'ปฏิเสธ', actRequestRevision: 'ขอให้แก้ไข', actCancel: 'ยกเลิก', actApply: 'ยืนยัน',
+    reasonCategoryPlaceholder: 'เลือกหมวดหมู่เหตุผล…', reasonFormat: 'รูปแบบ', reasonKeyMessage: 'ข้อความหลัก', reasonCompliance: 'การปฏิบัติตามข้อกำหนด', reasonQuality: 'คุณภาพ', reasonOther: 'อื่น ๆ',
+    viewQueue: 'ดูคิว',
   },
   perks: {
     catalog: {

@@ -1229,6 +1229,12 @@ const messages: Messages = {
     atRiskTitle: '위험 항목', atRiskEmpty: '현재 위험 항목이 없습니다',
     reasonPublishedNoParticipants: '게시되었지만 참여자 없음', reasonStalledSubmissions: '제출물이 7일 이상 미검토 상태',
     reasonVerificationFailed: '검증 실패',
+    colMission: '미션', colCreator: '크리에이터', colVerification: '검증', colActions: '작업',
+    queueTitle: '검토 대기열', queueSubtitle: '결정을 기다리는 제출물입니다. 마감이 임박한 순서로 표시됩니다.', queueEmpty: '검토할 항목이 없습니다. 모두 처리되었습니다.',
+    waitingOnCreator: '크리에이터 대기 중',
+    actApprove: '승인', actReject: '거절', actRequestRevision: '수정 요청', actCancel: '취소', actApply: '적용',
+    reasonCategoryPlaceholder: '사유 카테고리 선택…', reasonFormat: '형식', reasonKeyMessage: '핵심 메시지', reasonCompliance: '컴플라이언스', reasonQuality: '품질', reasonOther: '기타',
+    viewQueue: '대기열 보기',
   },
   perks: {
     catalog: {
