@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 import { MissionReviewQueueView } from '@/components/kinnso/admin/missions/MissionReviewQueueView'
@@ -48,5 +48,32 @@ describe('MissionReviewQueueView', () => {
     const approveBtn = summerRow.querySelector('button')!
     approveBtn.click()
     expect(reviewAction).toHaveBeenCalledWith('en', 's1', 'approve', null, null, 'm1')
+  })
+
+  it('keeps one row\'s reject modal isolated from a sibling submitted row', () => {
+    // Only one of the two fixture rows (Summer Coupon Push, 'submitted') can show action
+    // buttons -- HK Ramen Guide is 'revision_requested' and shows the waiting badge instead.
+    // Add a second 'submitted' row so there's a genuine sibling with its own live buttons
+    // to check for interference once the first row's modal opens.
+    const twoSubmittedRows = [
+      rows[0],
+      { ...rows[0], submissionId: 's3', missionId: 'm3', missionTitle: 'Kyoto Food Crawl' },
+    ]
+    render(<MissionReviewQueueView t={t as never} locale="en" rows={twoSubmittedRows} reviewAction={vi.fn()} />)
+
+    const summerRow = screen.getByText('Summer Coupon Push').closest('tr')!
+    fireEvent.click(within(summerRow).getByRole('button', { name: t.actReject }))
+
+    // Exactly one modal is open -- not zero, not one-per-row.
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+
+    // The sibling row's own action buttons are untouched: present, not hidden, not duplicated.
+    const kyotoRow = screen.getByText('Kyoto Food Crawl').closest('tr')!
+    expect(within(kyotoRow).getByRole('button', { name: t.actApprove })).toBeTruthy()
+    expect(within(kyotoRow).getByRole('button', { name: t.actReject })).toBeTruthy()
+    expect(within(kyotoRow).getByRole('button', { name: t.actRequestRevision })).toBeTruthy()
+    // Not duplicated: the sibling row shows exactly one of each action button, scoped to
+    // its own row (the reject modal opening on the other row didn't spill extra buttons in).
+    expect(within(kyotoRow).getAllByRole('button', { name: t.actApprove })).toHaveLength(1)
   })
 })

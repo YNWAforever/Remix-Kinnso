@@ -5,7 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const { roleMock, getUserMock, queueMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
-  queueMock: vi.fn(async () => []),
+  queueMock: vi.fn(async () => [{
+    submissionId: 's1', missionId: 'mission-1', missionTitle: 'Summer Coupon Push',
+    creatorId: 'creator-1', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z',
+    reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal' as const,
+  }]),
 }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
@@ -31,6 +35,9 @@ describe('/[locale]/admin/missions/review host', () => {
     const ui = await MissionReviewQueuePage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
     expect(queueMock).toHaveBeenCalled()
+    // Proves the resolved rows actually reach the rendered output, not just that the
+    // query was called (the page could silently drop the result before rendering).
+    expect(screen.getByText('Summer Coupon Push')).toBeTruthy()
   })
 
   it('notFounds a non-ops user', async () => {
