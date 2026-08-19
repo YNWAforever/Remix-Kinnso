@@ -32,11 +32,19 @@ function AutoApprovePolicyToggle({
   const [isPending, startTransition] = useTransition()
 
   const onChange = (next: string) => {
+    const previous = policy
     setPolicy(next)
     setStatus('idle')
     startTransition(async () => {
       const res = await policyAction(locale, missionId, next)
-      setStatus(res.ok ? 'saved' : 'error')
+      if (res.ok) {
+        setStatus('saved')
+      } else {
+        // Roll back the optimistic value -- the RPC never wrote, so leaving the select on
+        // `next` would show an ops user a policy that isn't actually in effect.
+        setPolicy(previous)
+        setStatus('error')
+      }
     })
   }
 
@@ -55,8 +63,8 @@ function AutoApprovePolicyToggle({
         <option value="off">{t.autoApprovePolicyOff}</option>
         <option value="verified_signal_only">{t.autoApprovePolicyOn}</option>
       </select>
-      {status === 'saved' && <span className="text-xs text-emerald-700">{t.autoApprovePolicySaved}</span>}
-      {status === 'error' && <span className="text-xs text-red-600">{t.autoApprovePolicyError}</span>}
+      {status === 'saved' && <span role="status" className="text-xs text-emerald-700">{t.autoApprovePolicySaved}</span>}
+      {status === 'error' && <span role="status" className="text-xs text-red-600">{t.autoApprovePolicyError}</span>}
     </div>
   )
 }

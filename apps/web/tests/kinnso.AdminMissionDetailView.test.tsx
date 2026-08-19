@@ -106,4 +106,16 @@ describe('MissionDetailView', () => {
     // The modal stays open on failure so the ops user can retry or cancel.
     expect(screen.getByRole('dialog')).toBeTruthy()
   })
+
+  it('rolls the auto-approve select back to its prior value when the save fails, instead of showing a policy that never actually took effect', async () => {
+    const policyAction = vi.fn().mockResolvedValue({ ok: false, errors: { form: ['Could not update the policy.'] } })
+    render(<MissionDetailView t={t as never} locale="en" detail={detail} reviewAction={vi.fn()} policyAction={policyAction} />)
+
+    const select = screen.getByLabelText(t.autoApprovePolicyLabel) as HTMLSelectElement
+    expect(select.value).toBe('off')
+
+    fireEvent.change(select, { target: { value: 'verified_signal_only' } })
+    await waitFor(() => expect(screen.getByText(t.autoApprovePolicyError)).toBeTruthy())
+    expect(select.value).toBe('off')
+  })
 })
