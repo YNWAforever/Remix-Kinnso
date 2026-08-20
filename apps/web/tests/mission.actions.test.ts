@@ -468,6 +468,70 @@ describe('reviewSubmissionAction', () => {
     expect(submissionUpdateBuilder.eq).toHaveBeenCalledWith('status', 'submitted')
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
+
+  it('calls mission_review_event_append alongside the submission update', async () => {
+    const rpcMock = vi.fn(async () => ({ data: null, error: null }))
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: { id: 'submission-1', status: 'submitted', mission_participant_id: 'participant-1' },
+            error: null,
+          })),
+        }),
+        createBuilder({
+          maybeSingle: vi.fn(async () => ({ data: { status: 'approved' }, error: null })),
+        }),
+      ],
+      mission_participants: createBuilder({
+        single: vi.fn(async () => ({ data: { mission_id: 'mission-1' }, error: null })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+    }, { rpc: rpcMock })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })
+
+    expect(rpcMock).toHaveBeenCalledWith('mission_review_event_append', {
+      p_submission_id: 'submission-1', p_action: 'approve', p_reason_text: null,
+    })
+  })
+
+  it('does not fail the review when the mission_review_event_append RPC errors', async () => {
+    const rpcMock = vi.fn(async () => ({ data: null, error: { message: 'permission denied' } }))
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: { id: 'submission-1', status: 'submitted', mission_participant_id: 'participant-1' },
+            error: null,
+          })),
+        }),
+        createBuilder({
+          maybeSingle: vi.fn(async () => ({ data: { status: 'approved' }, error: null })),
+        }),
+      ],
+      mission_participants: createBuilder({
+        single: vi.fn(async () => ({ data: { mission_id: 'mission-1' }, error: null })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+    }, { rpc: rpcMock })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })
+
+    expect(result).toEqual({ ok: true, status: 'approved' })
+  })
 })
 
 describe('updateSettlementAction', () => {

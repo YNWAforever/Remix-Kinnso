@@ -1229,6 +1229,12 @@ const messages: Messages = {
     atRiskTitle: '风险任务', atRiskEmpty: '目前没有风险项目',
     reasonPublishedNoParticipants: '已发布但尚无参与者', reasonStalledSubmissions: '提交待审核超过7天',
     reasonVerificationFailed: '验证失败',
+    colMission: '任务', colCreator: '创作者', colVerification: '验证', colActions: '操作',
+    queueTitle: '审核队列', queueSubtitle: '等待处理的提交，按截止时间由近到远排列。', queueEmpty: '暂无待审核项目，你已全部处理完毕。',
+    waitingOnCreator: '等待创作者',
+    actApprove: '批准', actReject: '拒绝', actRequestRevision: '要求修改', actCancel: '取消', actApply: '确认',
+    reasonCategoryPlaceholder: '选择原因类别…', reasonFormat: '格式', reasonKeyMessage: '核心信息', reasonCompliance: '合规', reasonQuality: '质量', reasonOther: '其他',
+    viewQueue: '查看队列',
   },
   perks: {
     catalog: {
