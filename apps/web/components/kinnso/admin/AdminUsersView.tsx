@@ -63,7 +63,7 @@ function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
                     <span className={suspended ? 'font-bold text-red-600' : 'font-bold text-kinnso-orange'}>
                       {statusLabel(t, row.status)}
                     </span>
-                    {' · '}{t.joined} {new Date(row.joined).toLocaleDateString(locale)}
+                    {' · '}{t.joined} {new Date(row.joined).toLocaleDateString(locale, { timeZone: 'UTC' })}
                   </p>
                   {errors[row.id] ? <p className="mt-1 text-sm text-red-600">{errors[row.id]}</p> : null}
                 </div>
@@ -110,7 +110,7 @@ export function AdminUsersView({ t, locale, users, onSetStatus }: {
                     {m.company_name}
                   </Link>
                   <p className="text-sm text-kinnso-muted">
-                    {statusLabel(t, m.status)}{' · '}{t.joined} {new Date(m.created_at).toLocaleDateString(locale)}
+                    {statusLabel(t, m.status)}{' · '}{t.joined} {new Date(m.created_at).toLocaleDateString(locale, { timeZone: 'UTC' })}
                   </p>
                 </div>
                 <Link href={`/${locale}/admin/merchants/${m.id}`} className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink">

@@ -1,15 +1,11 @@
 import { notFound } from 'next/navigation'
-import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
+import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireOpsPage } from '@/lib/admin/guard'
 import { getMissionDetail } from '@/lib/admin/mission-review-queries'
 import { reviewSubmissionOpsAction, setMissionAutoApprovePolicyAction } from '@/lib/admin/mission-review-actions'
 import { MissionDetailView } from '@/components/kinnso/admin/missions/MissionDetailView'
-
-export function generateStaticParams() {
-  return LOCALES.map((locale) => ({ locale }))
-}
 
 export default async function MissionDetailPage({
   params,

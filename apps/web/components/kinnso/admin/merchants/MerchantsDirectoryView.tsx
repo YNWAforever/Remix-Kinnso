@@ -172,7 +172,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
                       <MerchantStatusBadge status={row.status} t={t} />
                       <MerchantTierBadge tier={row.tier} t={t} />
-                      <span className="text-kinnso-muted">{t.colJoined} {new Date(row.createdAt).toLocaleDateString(locale)}</span>
+                      <span className="text-kinnso-muted">{t.colJoined} {new Date(row.createdAt).toLocaleDateString(locale, { timeZone: 'UTC' })}</span>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
