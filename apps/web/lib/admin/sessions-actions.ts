@@ -23,9 +23,9 @@ function revalidateSessionSurfaces(locale: Locale) {
 }
 
 export async function adminCreateSessionAction(
+  locale: Locale,
   hostCreatorId: string,
   rawInput: SessionInput,
-  options: { locale: Locale },
 ): Promise<ActionResult<{ id: string; slug: string }>> {
   const validation = validateSessionInput(rawInput)
   if (!validation.ok) return validation
@@ -51,14 +51,14 @@ export async function adminCreateSessionAction(
     return formError('Session could not be created')
   }
 
-  revalidateSessionSurfaces(options.locale)
+  revalidateSessionSurfaces(locale)
   return { ok: true, id: data.id as string, slug: data.slug as string }
 }
 
 export async function adminUpdateSessionAction(
+  locale: Locale,
   id: string,
   rawInput: SessionInput,
-  options: { locale: Locale },
 ): Promise<ActionResult<{ id: string }>> {
   const validation = validateSessionInput(rawInput)
   if (!validation.ok) return validation
@@ -83,15 +83,15 @@ export async function adminUpdateSessionAction(
     return formError('Session could not be saved')
   }
 
-  revalidateSessionSurfaces(options.locale)
+  revalidateSessionSurfaces(locale)
   return { ok: true, id: data.id as string }
 }
 
 /** No host scope (ops can act on any session) — otherwise identical to the Studio version. */
 export async function adminSetSessionStatusAction(
+  locale: Locale,
   id: string,
   status: 'live' | 'ended' | 'cancelled',
-  options: { locale: Locale },
 ): Promise<ActionResult<{ id: string; status: typeof status }>> {
   const supabase = await createSupabaseServerClient()
   const gate = await requireOpsAction(supabase)
@@ -116,13 +116,13 @@ export async function adminSetSessionStatusAction(
     return formError('Status could not be changed')
   }
 
-  revalidateSessionSurfaces(options.locale)
+  revalidateSessionSurfaces(locale)
   return { ok: true, id: data.id as string, status }
 }
 
 export async function adminDeleteSessionAction(
+  locale: Locale,
   id: string,
-  options: { locale: Locale },
 ): Promise<ActionResult<{ id: string }>> {
   const supabase = await createSupabaseServerClient()
   const gate = await requireOpsAction(supabase)
@@ -134,7 +134,7 @@ export async function adminDeleteSessionAction(
     return formError('Session could not be deleted')
   }
 
-  revalidateSessionSurfaces(options.locale)
+  revalidateSessionSurfaces(locale)
   return { ok: true, id: data.id as string }
 }
 

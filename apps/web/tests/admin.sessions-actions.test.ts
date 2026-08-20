@@ -32,13 +32,13 @@ beforeEach(() => { requireOpsActionMock.mockClear(); fromMock.mockReset() })
 describe('adminCreateSessionAction', () => {
   it('fails the gate for a non-ops caller', async () => {
     requireOpsActionMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Active ops access is required'] } })
-    const result = await adminCreateSessionAction('creator-9', validInput, { locale: 'en' })
+    const result = await adminCreateSessionAction('en', 'creator-9', validInput)
     expect(result.ok).toBe(false)
   })
 
   it('inserts with host_creator_id = the picked creator, not the ops caller', async () => {
     fromMock.mockReturnValue(chain({ data: { id: 'sess-1', slug: 'merchant-spotlight-abc' }, error: null }))
-    await adminCreateSessionAction('creator-9', validInput, { locale: 'en' })
+    await adminCreateSessionAction('en', 'creator-9', validInput)
     const insertedRow = (fromMock.mock.results[0].value.insert as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(insertedRow.host_creator_id).toBe('creator-9')
   })
@@ -47,13 +47,13 @@ describe('adminCreateSessionAction', () => {
 describe('adminSetSessionStatusAction', () => {
   it('can cancel any session regardless of host, without an embed_url check', async () => {
     fromMock.mockReturnValue(chain({ data: { id: 'sess-1' }, error: null }))
-    const result = await adminSetSessionStatusAction('sess-1', 'cancelled', { locale: 'en' })
+    const result = await adminSetSessionStatusAction('en', 'sess-1', 'cancelled')
     expect(result.ok).toBe(true)
   })
 
   it('still refuses to go live without an embed_url', async () => {
     fromMock.mockReturnValue(chain({ data: { embed_url: null }, error: null }))
-    const result = await adminSetSessionStatusAction('sess-1', 'live', { locale: 'en' })
+    const result = await adminSetSessionStatusAction('en', 'sess-1', 'live')
     expect(result.ok).toBe(false)
   })
 })
@@ -61,7 +61,7 @@ describe('adminSetSessionStatusAction', () => {
 describe('adminDeleteSessionAction', () => {
   it('deletes any session (no host scope)', async () => {
     fromMock.mockReturnValue(chain({ data: { id: 'sess-1' }, error: null }))
-    const result = await adminDeleteSessionAction('sess-1', { locale: 'en' })
+    const result = await adminDeleteSessionAction('en', 'sess-1')
     expect(result.ok).toBe(true)
   })
 })

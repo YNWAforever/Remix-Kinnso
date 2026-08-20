@@ -26,11 +26,11 @@ export default async function AdminSessionsPage({ params }: { params: Promise<{ 
       t={messages.sessionsAdmin}
       sessions={sessions}
       creators={creators}
-      onCreate={(hostCreatorId, input) => adminCreateSessionAction(hostCreatorId, input, { locale: loc })}
-      onUpdate={(id, input) => adminUpdateSessionAction(id, input, { locale: loc })}
-      onSetStatus={(id, status) => adminSetSessionStatusAction(id, status, { locale: loc })}
-      onDelete={(id) => adminDeleteSessionAction(id, { locale: loc })}
-      onListRsvps={(id) => listSessionRsvpsForAdminAction(id)}
+      onCreate={adminCreateSessionAction.bind(null, loc)}
+      onUpdate={adminUpdateSessionAction.bind(null, loc)}
+      onSetStatus={adminSetSessionStatusAction.bind(null, loc)}
+      onDelete={adminDeleteSessionAction.bind(null, loc)}
+      onListRsvps={listSessionRsvpsForAdminAction}
     />
   )
 }

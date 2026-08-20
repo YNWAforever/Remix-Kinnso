@@ -191,7 +191,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
                       {row.tier ? <TierBadge tier={row.tier} t={t} /> : null}
                       <VerifiedBadge verified={row.verified} t={t} />
                       <span className="text-kinnso-muted">{t.colDna}: {row.dnaStatus ? (row.dnaStatus === 'published' ? t.dnaPublished : t.dnaDraft) : t.dnaNone}</span>
-                      <span className="text-kinnso-muted">{t.colJoined} {new Date(row.createdAt).toLocaleDateString(locale)}</span>
+                      <span className="text-kinnso-muted">{t.colJoined} {new Date(row.createdAt).toLocaleDateString(locale, { timeZone: 'UTC' })}</span>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
