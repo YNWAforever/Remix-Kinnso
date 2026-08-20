@@ -1707,6 +1707,85 @@ export type Database = {
           },
         ]
       }
+      merchant_budget_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          id: string
+          kind: string
+          merchant_budget_id: string
+          reason: string | null
+          source_ref: string | null
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          id?: string
+          kind: string
+          merchant_budget_id: string
+          reason?: string | null
+          source_ref?: string | null
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          merchant_budget_id?: string
+          reason?: string | null
+          source_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_budget_transactions_merchant_budget_id_fkey"
+            columns: ["merchant_budget_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_budgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchant_budgets: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          enforced: boolean
+          id: string
+          merchant_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          enforced?: boolean
+          id?: string
+          merchant_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          enforced?: boolean
+          id?: string
+          merchant_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_budgets_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: true
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       merchant_profiles: {
         Row: {
           city: string | null
@@ -2849,6 +2928,10 @@ export type Database = {
       }
       admin_creator_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_creator_detail: { Args: { p_creator_id: string }; Returns: Json }
+      admin_credit_merchant_budget: {
+        Args: { p_merchant_profile_id: string; p_amount: number; p_reason: string }
+        Returns: undefined
+      }
       admin_invite_ops_member: {
         Args: { p_email: string; p_role: string }
         Returns: string
@@ -2999,6 +3082,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_set_budget_enforcement: {
+        Args: { p_merchant_profile_id: string; p_enforced: boolean; p_reason: string }
+        Returns: undefined
+      }
       admin_set_creator_listed: {
         Args: { p_id: string; p_is_listed: boolean; p_reason: string }
         Returns: undefined
@@ -3128,6 +3215,7 @@ export type Database = {
       creator_earnings_summary: { Args: never; Returns: Json }
       creator_insights: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
+      funded_merchant_profiles: { Args: never; Returns: string[] }
       get_attributed_guides_for_merchant: {
         Args: { p_limit?: number; p_merchant_id: string }
         Returns: {
