@@ -2233,6 +2233,7 @@ export type Database = {
           affiliate_commission_rate: number | null
           affiliate_network_program_id: string | null
           application_instructions: string | null
+          auto_approve_policy: string
           coupon_code: string | null
           coupon_description: string | null
           coupon_url: string | null
@@ -2260,6 +2261,7 @@ export type Database = {
           affiliate_commission_rate?: number | null
           affiliate_network_program_id?: string | null
           application_instructions?: string | null
+          auto_approve_policy?: string
           coupon_code?: string | null
           coupon_description?: string | null
           coupon_url?: string | null
@@ -2287,6 +2289,7 @@ export type Database = {
           affiliate_commission_rate?: number | null
           affiliate_network_program_id?: string | null
           application_instructions?: string | null
+          auto_approve_policy?: string
           coupon_code?: string | null
           coupon_description?: string | null
           coupon_url?: string | null
@@ -2907,6 +2910,7 @@ export type Database = {
       admin_merchant_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_merchant_detail: { Args: { p_merchant_id: string }; Returns: Json }
       admin_mission_analytics: { Args: { p_days?: number }; Returns: Json }
+      admin_mission_attention: { Args: never; Returns: Json }
       admin_overview_counts: {
         Args: never
         Returns: {
@@ -3017,6 +3021,10 @@ export type Database = {
       }
       admin_set_merchant_tier: {
         Args: { p_id: string; p_reason: string; p_tier: string }
+        Returns: undefined
+      }
+      admin_set_mission_auto_approve_policy: {
+        Args: { p_mission_id: string; p_policy: string }
         Returns: undefined
       }
       admin_set_ops_member_role: {

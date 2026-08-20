@@ -16,6 +16,7 @@ const FRIENDLY: Record<string, string> = {
   bad_reason_category: 'Invalid reason category.',
   not_found: 'That submission no longer exists. Refresh and try again.',
   stale_status: 'This submission has already been reviewed. Refresh and try again.',
+  bad_policy: 'Invalid auto-approve policy.',
 }
 
 const mapError = (message: string, fallback: string): string => {
@@ -62,4 +63,31 @@ export async function reviewSubmissionOpsAction(
   revalidatePath(reviewQueuePath(locale))
   if (missionId) revalidatePath(missionDetailPath(locale, missionId))
   return { ok: true, id: submissionId }
+}
+
+/**
+ * Ops-only setter for a mission's auto_approve_policy, via the audited
+ * admin_set_mission_auto_approve_policy RPC. Revalidates only the mission detail page --
+ * this never shows up in the review queue itself.
+ */
+export async function setMissionAutoApprovePolicyAction(
+  locale: Locale,
+  missionId: string,
+  policy: string,
+): Promise<ActionResult<{ id: string }>> {
+  'use server'
+  const supabase = await createSupabaseServerClient()
+  const gate = await requireOpsAction(supabase)
+  if (!gate.ok) return gate
+
+  const { error } = await supabase.rpc('admin_set_mission_auto_approve_policy', {
+    p_mission_id: missionId,
+    p_policy: policy,
+  })
+  if (error) {
+    console.error('[admin:missions] setMissionAutoApprovePolicyAction failed', error)
+    return formError(mapError(error.message, 'Could not update the policy'))
+  }
+  revalidatePath(missionDetailPath(locale, missionId))
+  return { ok: true, id: missionId }
 }

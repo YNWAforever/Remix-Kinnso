@@ -93,6 +93,42 @@ describe('getReviewQueue', () => {
     const supabase = fakeClient({ mission_milestone_submissions: { data: null, error: { message: 'boom' } } })
     await expect(getReviewQueue(supabase)).rejects.toEqual({ message: 'boom' })
   })
+
+  it('sorts by confidence bucket first (verified_signal, needs_review, then unavailable/null), deadline as the tiebreak within a bucket', async () => {
+    const rows = [
+      { id: 'a', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-17T00:00:00Z',
+        mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Unavailable, earlier deadline' } },
+        mission_verification_jobs: [] },
+      { id: 'b', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-18T00:00:00Z',
+        mission_participants: { id: 'p2', creator_id: 'c2', mission_id: 'm2', missions: { id: 'm2', title: 'Verified, later deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'verified_signal', created_at: '2026-08-15T01:00:00Z' }] },
+      { id: 'c', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-16T00:00:00Z',
+        mission_participants: { id: 'p3', creator_id: 'c3', mission_id: 'm3', missions: { id: 'm3', title: 'Needs review, earliest deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'needs_review', created_at: '2026-08-15T01:00:00Z' }] },
+    ]
+    const supabase = fakeClient({ mission_milestone_submissions: { data: rows, error: null } })
+    const result = await getReviewQueue(supabase)
+    // verified_signal first regardless of its later deadline, then needs_review, then unavailable --
+    // NOT deadline order (which would put c, a, b).
+    expect(result.map((r) => r.submissionId)).toEqual(['b', 'c', 'a'])
+  })
+
+  it('preserves deadline order for two rows in the SAME confidence bucket (proves the tiebreak, not just bucket priority)', async () => {
+    // Both rows are needs_review -- the only thing that could separate them is the deadline
+    // tiebreak. Input is already deadline-ascending, matching what the real DB query's own
+    // `.order('review_deadline', { ascending: true })` would hand to the JS-level bucket sort.
+    const rows = [
+      { id: 'earlier', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-16T00:00:00Z',
+        mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Earlier deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'needs_review', created_at: '2026-08-15T01:00:00Z' }] },
+      { id: 'later', status: 'submitted', submitted_at: '2026-08-15T00:00:00Z', review_deadline: '2026-08-19T00:00:00Z',
+        mission_participants: { id: 'p2', creator_id: 'c2', mission_id: 'm2', missions: { id: 'm2', title: 'Later deadline' } },
+        mission_verification_jobs: [{ confidence_status: 'needs_review', created_at: '2026-08-15T01:00:00Z' }] },
+    ]
+    const supabase = fakeClient({ mission_milestone_submissions: { data: rows, error: null } })
+    const result = await getReviewQueue(supabase)
+    expect(result.map((r) => r.submissionId)).toEqual(['earlier', 'later'])
+  })
 })
 
 describe('getMissionDetail', () => {
@@ -106,7 +142,7 @@ describe('getMissionDetail', () => {
   it('assembles mission, participants, milestones, and the filtered review-queue subset', async () => {
     const supabase = fakeClient({
       missions: {
-        data: { id: 'm1', title: 'Mission One', status: 'published', mission_type: 'hybrid', mission_source: 'merchant', merchant_profile_id: 'merchant-1' },
+        data: { id: 'm1', title: 'Mission One', status: 'published', mission_type: 'hybrid', mission_source: 'merchant', merchant_profile_id: 'merchant-1', auto_approve_policy: 'off' },
         error: null,
       },
       mission_participants: {
@@ -123,7 +159,7 @@ describe('getMissionDetail', () => {
     const detail = await getMissionDetail(supabase, 'm1')
 
     expect(detail?.mission).toEqual({
-      id: 'm1', title: 'Mission One', status: 'published', missionType: 'hybrid', missionSource: 'merchant', merchantProfileId: 'merchant-1',
+      id: 'm1', title: 'Mission One', status: 'published', missionType: 'hybrid', missionSource: 'merchant', merchantProfileId: 'merchant-1', autoApprovePolicy: 'off',
     })
     expect(detail?.participants).toEqual([
       { id: 'p1', status: 'active', source: 'open_join', creatorId: 'c1', applicationNote: null, approvedAt: '2026-08-01T00:00:00Z' },
@@ -133,5 +169,19 @@ describe('getMissionDetail', () => {
     ])
     // Only sub-1 belongs to mission m1 (SUBMISSION_ROWS also contains sub-2 for m2).
     expect(detail?.submissions.map((s) => s.submissionId)).toEqual(['sub-1'])
+  })
+
+  it('includes autoApprovePolicy on the mission', async () => {
+    const supabase = fakeClient({
+      missions: {
+        data: { id: 'm1', title: 'Mission One', status: 'published', mission_type: 'hybrid', mission_source: 'merchant', merchant_profile_id: 'merchant-1', auto_approve_policy: 'verified_signal_only' },
+        error: null,
+      },
+      mission_participants: { data: [], error: null },
+      mission_milestones: { data: [], error: null },
+      mission_milestone_submissions: { data: [], error: null },
+    })
+    const detail = await getMissionDetail(supabase, 'm1')
+    expect(detail?.mission.autoApprovePolicy).toBe('verified_signal_only')
   })
 })

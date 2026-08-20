@@ -39,6 +39,19 @@ export interface MissionsOpsMessages {
   reasonQuality: string
   reasonOther: string
   viewQueue: string
+  confidenceVerified: string
+  confidenceNeedsReview: string
+  confidenceUnavailable: string
+  actRerunVerification: string
+  rerunQueued: string
+  rerunFailed: string
+  autoApprovePolicyLabel: string
+  autoApprovePolicyOff: string
+  autoApprovePolicyOn: string
+  autoApprovePolicySaved: string
+  autoApprovePolicyError: string
+  attentionOverdueTitle: string
+  attentionOverdueEmpty: string
 }
 
 export interface MerchantApplyMessages {
@@ -2582,6 +2595,19 @@ const messages: Messages = {
     reasonQuality: 'Quality',
     reasonOther: 'Other',
     viewQueue: 'View queue',
+    confidenceVerified: 'Verified',
+    confidenceNeedsReview: 'Needs review',
+    confidenceUnavailable: 'Unavailable',
+    actRerunVerification: 'Re-run verification',
+    rerunQueued: 'Verification re-queued — check back in a moment.',
+    rerunFailed: 'Could not start verification. Please try again.',
+    autoApprovePolicyLabel: 'Auto-approve verified submissions',
+    autoApprovePolicyOff: 'Off',
+    autoApprovePolicyOn: 'On — verified signal only',
+    autoApprovePolicySaved: 'Saved.',
+    autoApprovePolicyError: 'Could not update the policy. Please try again.',
+    attentionOverdueTitle: 'Overdue reviews',
+    attentionOverdueEmpty: 'Nothing overdue right now',
   },
   perks: {
     catalog: {

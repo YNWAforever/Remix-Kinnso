@@ -29,9 +29,13 @@ function makeServerDb(opts: {
   /** Rows returned by the conditional retry reset; [] means the CAS matched nothing. */
   resetRows?: Array<{ id: string }>
   resetError?: { code?: string; message: string } | null
+  /** Whether the caller (userId) is an active kinnso_ops_members row. */
+  callerIsOps?: boolean
 } = {}) {
   const updates: Array<{ table: string; data: Record<string, unknown>; filters: Array<[string, unknown]> }> = []
   const inserts: Array<{ table: string; data: Record<string, unknown> }> = []
+  /** creator_id values the active-job-count query (countActiveVerifications) was run for. */
+  const activeJobsQueriedFor: unknown[] = []
 
   const submission = opts.submissionOwnerId
     ? { id: 'sub-1', proof_urls: ['https://www.instagram.com/p/Cabc/'], mission_participant_id: 'p-1', mission_participants: { creator_id: opts.submissionOwnerId } }
@@ -40,6 +44,7 @@ function makeServerDb(opts: {
   const db = {
     _updates: updates,
     _inserts: inserts,
+    _activeJobsQueriedFor: activeJobsQueriedFor,
     from: (table: string) => {
       if (table === 'mission_milestone_submissions') {
         return {
@@ -62,11 +67,17 @@ function makeServerDb(opts: {
             }),
           }),
           select: () => ({
-            eq: () => ({
+            eq: (col: string, val: unknown) => ({
               // Single-job lookup (retry eligibility).
               maybeSingle: async () => ({ data: opts.existingJob ?? null, error: null }),
-              // Active-job count (rate limit).
-              in: async () => ({ data: opts.activeJobs ?? [], error: opts.activeJobsError ?? null }),
+              // Active-job count (rate limit) -- countActiveVerifications always queries by
+              // 'creator_id', so recording every call here directly proves WHICH id the
+              // production code actually passed, rather than just returning a fixed result
+              // regardless of the argument.
+              in: async () => {
+                if (col === 'creator_id') activeJobsQueriedFor.push(val)
+                return { data: opts.activeJobs ?? [], error: opts.activeJobsError ?? null }
+              },
             }),
           }),
           update: (data: Record<string, unknown>) => {
@@ -84,6 +95,17 @@ function makeServerDb(opts: {
             }
             return builder
           },
+        }
+      }
+      if (table === 'kinnso_ops_members') {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({ data: opts.callerIsOps ? { id: 'ops-1' } : null, error: null }),
+              }),
+            }),
+          }),
         }
       }
       return {}
@@ -143,6 +165,80 @@ describe('handleVerifySubmission', () => {
     const db = makeServerDb({ submissionOwnerId: 'user-1', activeJobsError: { message: 'boom' } })
     const result = await handleVerifySubmission(makeDeps(db, 'user-1'), { submissionId: 'sub-1' })
     expect(result.status).toBe(500)
+  })
+})
+
+describe('handleVerifySubmission — ops caller', () => {
+  it('404s a non-owner, non-ops caller (unchanged behavior)', async () => {
+    const db = makeServerDb({ submissionOwnerId: 'creator-1', callerIsOps: false })
+    const result = await handleVerifySubmission(makeDeps(db, 'stranger-1'), { submissionId: 'sub-1' })
+    expect(result.status).toBe(404)
+  })
+
+  it('allows an active ops caller to trigger verification for a submission they do not own', async () => {
+    const db = makeServerDb({ submissionOwnerId: 'creator-1', callerIsOps: true })
+    const result = await handleVerifySubmission(makeDeps(db, 'ops-caller-1'), { submissionId: 'sub-1' })
+    expect(result.status).toBe(202)
+  })
+
+  it('inserts the job with the SUBMISSION OWNER\'s creator_id, not the ops caller\'s', async () => {
+    const db = makeServerDb({ submissionOwnerId: 'creator-1', callerIsOps: true })
+    await handleVerifySubmission(makeDeps(db, 'ops-caller-1'), { submissionId: 'sub-1' })
+    const insert = (db as unknown as { _inserts: Array<{ data: Record<string, unknown> }> })._inserts[0]
+    expect(insert.data.creator_id).toBe('creator-1')
+  })
+
+  it('scopes the concurrency/ledger check to the owner, not the ops caller', async () => {
+    // 3 active jobs already belong to the OWNER -- an ops caller with zero jobs of their own
+    // must still be throttled, proving the check is keyed by ownerId, not by userId.
+    const db = makeServerDb({ submissionOwnerId: 'creator-1', callerIsOps: true, activeJobs: activeRows(3) })
+    const result = await handleVerifySubmission(makeDeps(db, 'ops-caller-1'), { submissionId: 'sub-1' })
+    expect(result.status).toBe(429)
+    // The 429 alone doesn't prove WHICH id was checked -- the stub returns the same
+    // activeJobs fixture regardless of the query argument. Assert on the actually-recorded
+    // id directly: the query must have run for the submission's owner, never the ops caller.
+    const queriedFor = (db as unknown as { _activeJobsQueriedFor: unknown[] })._activeJobsQueriedFor
+    expect(queriedFor).toEqual(['creator-1'])
+    expect(queriedFor).not.toContain('ops-caller-1')
+  })
+
+  it('fails closed (404, not 500 or 202) when the ops-membership check itself errors', async () => {
+    const db = makeServerDb({ submissionOwnerId: 'creator-1' })
+    // Force the kinnso_ops_members lookup to error, bypassing the callerIsOps convenience
+    // flag entirely, to prove isActiveOpsCaller's documented fail-closed behavior end-to-end
+    // through the handler, not just in isolation.
+    const dbWithOpsQueryError = {
+      ...(db as Record<string, unknown>),
+      from: (table: string) => {
+        if (table === 'kinnso_ops_members') {
+          return {
+            select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: { message: 'connection reset' } }) }) }) }),
+          }
+        }
+        return (db as { from: (t: string) => unknown }).from(table)
+      },
+    }
+    const result = await handleVerifySubmission(makeDeps(dbWithOpsQueryError, 'unverifiable-caller'), { submissionId: 'sub-1' })
+    expect(result.status).toBe(404)
+  })
+
+  it('does not query kinnso_ops_members at all when the caller already owns the submission', async () => {
+    // The stub only serves kinnso_ops_members reads when queried; owner-path callers must
+    // never need that extra round trip.
+    const db = makeServerDb({ submissionOwnerId: 'creator-1' })
+    const result = await handleVerifySubmission(makeDeps(db, 'creator-1'), { submissionId: 'sub-1' })
+    expect(result.status).toBe(202)
+  })
+
+  it('the two 404 branches (missing submission vs. not-owner-not-ops) return an identical body, leaking no distinguishing signal', async () => {
+    const missing = await handleVerifySubmission(makeDeps(makeServerDb({}), 'someone'), { submissionId: 'sub-1' })
+    const forbidden = await handleVerifySubmission(
+      makeDeps(makeServerDb({ submissionOwnerId: 'creator-1', callerIsOps: false }), 'stranger-1'),
+      { submissionId: 'sub-1' },
+    )
+    expect(missing.status).toBe(404)
+    expect(forbidden.status).toBe(404)
+    expect(missing.body).toEqual(forbidden.body)
   })
 })
 

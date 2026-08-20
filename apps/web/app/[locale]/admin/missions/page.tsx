@@ -3,7 +3,7 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireOpsPage } from '@/lib/admin/guard'
-import { getMissionsOverview } from '@/lib/admin/missions-queries'
+import { getMissionsOverview, getMissionAttention } from '@/lib/admin/missions-queries'
 import { MissionsOverviewView } from '@/components/kinnso/admin/missions/MissionsOverviewView'
 
 export function generateStaticParams() {
@@ -17,6 +17,9 @@ export default async function MissionsOverviewPage({ params }: { params: Promise
   const supabase = await createSupabaseServerClient()
   await requireOpsPage(supabase, loc)
   const messages = await getDictionary(loc)
-  const overview = await getMissionsOverview(supabase)
-  return <MissionsOverviewView t={messages.missionsOps} locale={loc} overview={overview} />
+  const [overview, attention] = await Promise.all([
+    getMissionsOverview(supabase),
+    getMissionAttention(supabase),
+  ])
+  return <MissionsOverviewView t={messages.missionsOps} locale={loc} overview={overview} attention={attention} />
 }

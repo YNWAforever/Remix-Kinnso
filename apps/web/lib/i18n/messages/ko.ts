@@ -1235,6 +1235,12 @@ const messages: Messages = {
     actApprove: '승인', actReject: '거절', actRequestRevision: '수정 요청', actCancel: '취소', actApply: '적용',
     reasonCategoryPlaceholder: '사유 카테고리 선택…', reasonFormat: '형식', reasonKeyMessage: '핵심 메시지', reasonCompliance: '컴플라이언스', reasonQuality: '품질', reasonOther: '기타',
     viewQueue: '대기열 보기',
+    confidenceVerified: '검증됨', confidenceNeedsReview: '검토 필요', confidenceUnavailable: '확인 불가',
+    actRerunVerification: '검증 다시 실행',
+    rerunQueued: '검증이 다시 대기열에 추가되었습니다. 잠시 후 확인해 주세요.', rerunFailed: '검증을 시작할 수 없습니다. 다시 시도해 주세요.',
+    autoApprovePolicyLabel: '검증된 제출물 자동 승인', autoApprovePolicyOff: '꺼짐', autoApprovePolicyOn: '켜짐 — 검증된 신호만',
+    autoApprovePolicySaved: '저장되었습니다.', autoApprovePolicyError: '정책을 업데이트할 수 없습니다. 다시 시도해 주세요.',
+    attentionOverdueTitle: '기한 초과 검토', attentionOverdueEmpty: '현재 기한 초과 항목이 없습니다',
   },
   perks: {
     catalog: {

@@ -21,6 +21,7 @@ describe('MissionsOverviewView', () => {
           missionsCreated: [], submissionsReviewed: [],
           atRisk: [{ id: 'm1', title: 'Tokyo Winter Stays Showcase', merchantName: 'Sunrise Stays HK', reason: 'stalled_submissions' }],
         }}
+        attention={{ overdueReviews: [], atRiskMissions: [] }}
       />,
     )
     expect(screen.getByText('6')).toBeTruthy()
@@ -37,6 +38,7 @@ describe('MissionsOverviewView', () => {
           kpis: { total: 0, byStatus: {}, byType: {}, byVisibility: {}, openForApplications: 0, submissionsAwaitingReview: 0 },
           missionsCreated: [], submissionsReviewed: [], atRisk: [],
         }}
+        attention={{ overdueReviews: [], atRiskMissions: [] }}
       />,
     )
     expect(screen.getByText('Nothing at risk right now')).toBeTruthy()
@@ -51,11 +53,38 @@ describe('MissionsOverviewView', () => {
           kpis: { total: 6, byStatus: { published: 4 }, byType: {}, byVisibility: {}, openForApplications: 4, submissionsAwaitingReview: 2 },
           missionsCreated: [], submissionsReviewed: [], atRisk: [],
         }}
+        attention={{ overdueReviews: [], atRiskMissions: [] }}
       />,
     )
     const link = screen.getByRole('link', { name: new RegExp(t.kpiSubmissionsAwaitingReview) })
     expect(link.getAttribute('href')).toBe('/en/admin/missions/review')
     expect(within(link).getByText('2')).toBeTruthy()
     expect(within(link).getByText(t.viewQueue)).toBeTruthy()
+  })
+
+  it('renders the overdue-reviews list, or its empty state when nothing is overdue', () => {
+    const base = {
+      t, locale: 'en' as const,
+      overview: {
+        kpis: { total: 0, byStatus: {}, byType: {}, byVisibility: {}, openForApplications: 0, submissionsAwaitingReview: 0 },
+        missionsCreated: [], submissionsReviewed: [], atRisk: [],
+      },
+    }
+    const { rerender } = render(
+      <MissionsOverviewView {...base} attention={{ overdueReviews: [], atRiskMissions: [] }} />,
+    )
+    expect(screen.getByText(t.attentionOverdueEmpty)).toBeTruthy()
+
+    rerender(
+      <MissionsOverviewView
+        {...base}
+        attention={{
+          overdueReviews: [{ submissionId: 's1', missionId: 'm1', missionTitle: 'Overdue Kyoto Push', creatorId: 'c1', reviewDeadline: '2026-08-01T00:00:00Z' }],
+          atRiskMissions: [],
+        }}
+      />,
+    )
+    expect(screen.getByText('Overdue Kyoto Push')).toBeTruthy()
+    expect(screen.queryByText(t.attentionOverdueEmpty)).toBeNull()
   })
 })

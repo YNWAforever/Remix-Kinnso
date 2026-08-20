@@ -55,3 +55,29 @@ export async function getMissionsOverview(supabase: Client, days = 30): Promise<
     atRisk: (a.at_risk ?? []).map((r) => ({ id: r.id, title: r.title, merchantName: r.merchant_name, reason: r.reason })),
   }
 }
+
+export interface MissionAttention {
+  overdueReviews: { submissionId: string; missionId: string; missionTitle: string; creatorId: string; reviewDeadline: string }[]
+  atRiskMissions: { id: string; title: string; merchantName: string | null; reason: string }[]
+}
+
+type AttentionPayload = {
+  overdue_reviews?: { submission_id: string; mission_id: string; mission_title: string; creator_id: string; review_deadline: string }[]
+  at_risk_missions?: { id: string; title: string; merchant_name: string | null; reason: string }[]
+}
+
+/** Backed by the SECURITY DEFINER admin_mission_attention() RPC (gated on is_active_ops()). */
+export async function getMissionAttention(supabase: Client): Promise<MissionAttention> {
+  const { data, error } = await supabase.rpc('admin_mission_attention')
+  if (error || !data) throw error ?? new Error('admin_mission_attention returned no data')
+  const a = data as unknown as AttentionPayload
+  return {
+    overdueReviews: (a.overdue_reviews ?? []).map((r) => ({
+      submissionId: r.submission_id, missionId: r.mission_id, missionTitle: r.mission_title,
+      creatorId: r.creator_id, reviewDeadline: r.review_deadline,
+    })),
+    atRiskMissions: (a.at_risk_missions ?? []).map((r) => ({
+      id: r.id, title: r.title, merchantName: r.merchant_name, reason: r.reason,
+    })),
+  }
+}
