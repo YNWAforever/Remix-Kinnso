@@ -27,6 +27,7 @@ export type CreatorMissionCard = {
   submittedCount: number
   locked: boolean
   requiredTier: GatedTier | null
+  funded: boolean
 }
 
 type CreatorMissionsViewProps = {
@@ -85,7 +86,14 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                     <p className="text-sm text-kinnso-muted">{mission.summary}</p>
                     <MissionCompensationSummary text={mission.compensation} />
                   </div>
-                  <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
+                    {mission.funded && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
+                        {t.fundedBadge}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
                   <Link href={detailHref(mission.id)} className="k-btn-ghost text-sm">
@@ -120,7 +128,14 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                     <p className="text-sm text-kinnso-muted">{mission.summary}</p>
                     <MissionCompensationSummary text={mission.compensation} />
                   </div>
-                  <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <MissionStatusBadge status={mission.participant?.status ?? mission.status} />
+                    {mission.funded && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
+                        {t.fundedBadge}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {mission.milestoneCount > 0 && (
                   <div className="mt-4 flex items-center gap-3">
@@ -160,7 +175,14 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                     <p className="text-sm text-kinnso-muted">{mission.summary}</p>
                     <MissionCompensationSummary text={mission.compensation} />
                   </div>
-                  <MissionStatusBadge status={mission.status} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <MissionStatusBadge status={mission.status} />
+                    {mission.funded && (
+                      <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
+                        {t.fundedBadge}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
                   <Link href={detailHref(mission.id)} className="k-btn-ghost text-sm">

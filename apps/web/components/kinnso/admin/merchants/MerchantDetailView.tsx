@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Messages } from '@/lib/i18n/messages/en'
 import type { Locale } from '@/lib/i18n/config'
-import type { MerchantDetail } from '@/lib/admin/merchants-queries'
+import type { MerchantDetail, OpsMerchantBudget } from '@/lib/admin/merchants-queries'
 import type { AuditEntry } from '@/lib/admin/audit'
 import type { ActionResult } from '@/lib/admin/result'
 import type { MerchantStatus, MerchantTier } from '@/lib/admin/merchants-validation'
@@ -14,6 +14,7 @@ import { MissionsTab } from '@/components/kinnso/admin/merchants/detail/Missions
 import { CreatorsTab } from '@/components/kinnso/admin/merchants/detail/CreatorsTab'
 import { BillingTab } from '@/components/kinnso/admin/merchants/detail/BillingTab'
 import { ModerationTab } from '@/components/kinnso/admin/merchants/detail/ModerationTab'
+import { MerchantBudgetPanel, type CreditFn, type EnforceFn } from '@/components/kinnso/admin/merchants/MerchantBudgetPanel'
 
 type T = Messages['merchantsOps']
 
@@ -23,14 +24,19 @@ export interface MerchantDetailActions {
   addMerchantNote: (locale: Locale, id: string, note: string) => Promise<ActionResult<{ id: string }>>
 }
 
+export interface MerchantBudgetActions {
+  credit: CreditFn
+  enforce: EnforceFn
+}
+
 type TabKey = 'profile' | 'missions' | 'creators' | 'billing' | 'moderation'
 type Pending = { kind: 'status'; status: MerchantStatus } | { kind: 'tier'; tier: MerchantTier } | null
 
 const day = (s: string) => s.slice(0, 10)
 
 export function MerchantDetailView({
-  t, locale, detail, audit, actions,
-}: { t: T; locale: Locale; detail: MerchantDetail; audit: AuditEntry[]; actions: MerchantDetailActions }) {
+  t, locale, detail, audit, actions, budget, budgetActions,
+}: { t: T; locale: Locale; detail: MerchantDetail; audit: AuditEntry[]; actions: MerchantDetailActions; budget: OpsMerchantBudget | null; budgetActions: MerchantBudgetActions }) {
   const router = useRouter()
   const { profile } = detail
   const [tab, setTab] = useState<TabKey>('profile')
@@ -161,6 +167,15 @@ export function MerchantDetailView({
           </div>
         )}
       </div>
+
+      <MerchantBudgetPanel
+        t={t}
+        locale={locale}
+        merchantId={profile.id}
+        budget={budget}
+        credit={budgetActions.credit}
+        enforce={budgetActions.enforce}
+      />
     </main>
   )
 }

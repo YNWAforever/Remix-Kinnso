@@ -24,6 +24,7 @@ type CreatorMissionRow = {
   mission_type: string | null
   status: string | null
   min_tier: string | null
+  merchant_profile_id: string | null
   affiliate_commission_rate: number | null
   creator_commission_rate: number | null
   kinnso_commission_rate: number | null
@@ -89,7 +90,12 @@ const formatCompensation = (row: CreatorMissionRow) => {
   return paid ?? affiliate
 }
 
-function mapCreatorMission(row: CreatorMissionRow, creatorId: string, creatorTier: Tier): CreatorMissionCard {
+function mapCreatorMission(
+  row: CreatorMissionRow,
+  creatorId: string,
+  creatorTier: Tier,
+  funded: Set<string>,
+): CreatorMissionCard {
   const participant = row.mission_participants?.find((item) => item.creator_id === creatorId) ?? null
   const { milestoneCount, submittedCount } = creatorMissionProgress(
     row.mission_milestones,
@@ -118,6 +124,10 @@ function mapCreatorMission(row: CreatorMissionRow, creatorId: string, creatorTie
     submittedCount,
     locked,
     requiredTier,
+    funded:
+      (row.mission_type === 'paid' || row.mission_type === 'hybrid') &&
+      row.merchant_profile_id !== null &&
+      funded.has(row.merchant_profile_id),
   }
 }
 
@@ -133,8 +143,14 @@ export default async function StudioMissionsPage({ params }: { params: Params })
   const creatorTier = await getCreatorStoredTier(supabase, user.id)
 
   const { data } = await listCreatorMerchantMissions(supabase)
+  // Best-effort decorative read: a failure here degrades to no badges, never a crashed
+  // page -- but it must still leave a trace (the log-then-degrade stance of
+  // lib/home/queries.ts's getPlatformStats), not vanish silently.
+  const { data: fundedIds, error: fundedError } = await supabase.rpc('funded_merchant_profiles')
+  if (fundedError) console.warn('studio-missions-funded-query-failed', fundedError)
+  const funded = new Set<string>((fundedIds as string[] | null) ?? [])
   const missions = ((data ?? []) as unknown as CreatorMissionRow[]).map((row) =>
-    mapCreatorMission(row, user.id, creatorTier),
+    mapCreatorMission(row, user.id, creatorTier, funded),
   )
 
   async function join(missionId: string) {

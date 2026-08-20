@@ -456,6 +456,15 @@ export async function reviewSubmissionAction(
     .maybeSingle()
 
   if (updateError || !updatedSubmission) {
+    // The budget-gate trigger (R11.2) aborts the whole approval when the merchant's
+    // enforced budget can't cover the fee -- surface that specifically instead of the
+    // generic save failure.
+    if (updateError?.message.includes('insufficient_budget')) {
+      return formError('This approval needs more budget — top up before approving.')
+    }
+    if (updateError?.message.includes('currency_mismatch')) {
+      return formError('Budget currency does not match this mission — contact KINNSO ops.')
+    }
     return formError('Submission review could not be saved')
   }
 

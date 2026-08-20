@@ -230,3 +230,20 @@ export async function getMerchantDetail(supabase: Client, merchantId: string): P
     },
   }
 }
+
+export interface OpsMerchantBudget {
+  balance: number
+  currency: string
+  enforced: boolean
+}
+
+/** Ops read of any merchant's budget (RLS ops branch). Null when no row exists yet. */
+export async function getMerchantBudgetOps(supabase: Client, merchantProfileId: string): Promise<OpsMerchantBudget | null> {
+  const { data, error } = await supabase
+    .from('merchant_budgets')
+    .select('balance, currency, enforced')
+    .eq('merchant_profile_id', merchantProfileId)
+    .maybeSingle()
+  if (error) throw error
+  return data ? { balance: data.balance, currency: data.currency, enforced: data.enforced } : null
+}

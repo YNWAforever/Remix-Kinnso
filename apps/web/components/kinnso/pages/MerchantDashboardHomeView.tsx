@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CalendarCheck, FileText, LineChart, MapPin, Store, Users, Briefcase } from 'lucide-react'
+import { CalendarCheck, FileText, LineChart, MapPin, Store, Users, Briefcase, Wallet } from 'lucide-react'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
@@ -16,6 +16,7 @@ export function MerchantDashboardHomeView({ locale, t }: { locale: Locale; t: Me
     { title: t.cardExperiencesTitle, body: t.cardExperiencesBody, href: p('/merchants/dashboard/experiences'), icon: <MapPin aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardBookingsTitle, body: t.cardBookingsBody, href: p('/merchants/dashboard/bookings'), icon: <CalendarCheck aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardProfileTitle, body: t.cardProfileBody, href: p('/merchants/dashboard/profile'), icon: <Store aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardBudgetTitle, body: t.cardBudgetBody, href: p('/merchants/dashboard/budget'), icon: <Wallet aria-hidden="true" className="h-5 w-5" /> },
   ]
   return (
     <main className="bg-kinnso-cream font-sans">

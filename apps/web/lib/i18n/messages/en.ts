@@ -137,6 +137,19 @@ export interface MerchantDashboardMessages {
   cardBookingsBody: string
   cardProfileTitle: string
   cardProfileBody: string
+  cardBudgetTitle: string
+  cardBudgetBody: string
+  budgetTitle: string
+  budgetSubtitle: string
+  budgetBalance: string
+  budgetEnforcedOn: string
+  budgetEnforcedOff: string
+  budgetLedgerTitle: string
+  budgetLedgerEmpty: string
+  budgetNoBudget: string
+  kindTopup: string
+  kindDebit: string
+  kindAdjust: string
   profileTitle: string
   profileSubtitle: string
   slugLabel: string
@@ -680,6 +693,7 @@ export interface Messages {
     invitationsTitle: string
     acceptInvite: string
     acceptInviteFailed: string
+    fundedBadge: string
   }
   missionDetail: {
     back: string
@@ -1118,6 +1132,18 @@ export interface Messages {
     colAmount: string; colCurrency: string; settlementsEmpty: string; owedTitle: string; settledTitle: string; moneyEmpty: string
     secAudit: string; auditEmpty: string; addNote: string; saveNote: string
     viewDetail: string
+    budgetPanelTitle: string
+    budgetBalance: string
+    budgetEnforced: string
+    budgetNotEnforced: string
+    budgetNoRow: string
+    budgetCreditLabel: string
+    budgetCreditAmountPlaceholder: string
+    budgetReasonPlaceholder: string
+    budgetCreditSubmit: string
+    budgetEnforceOn: string
+    budgetEnforceOff: string
+    budgetSaved: string
   }
   missionsOps: MissionsOpsMessages
   perks: {
@@ -1752,6 +1778,7 @@ const messages: Messages = {
     invitationsTitle: 'Invitations',
     acceptInvite: 'Accept invitation',
     acceptInviteFailed: 'Could not accept this invitation. Please try again.',
+    fundedBadge: 'Funded',
   },
   missionDetail: {
     back: 'Missions',
@@ -2421,6 +2448,19 @@ const messages: Messages = {
     cardBookingsBody: 'Track who booked your experiences and mark completed stays.',
     cardProfileTitle: 'Public profile',
     cardProfileBody: 'Control how your business appears across KINNSO.',
+    cardBudgetTitle: 'Budget',
+    cardBudgetBody: 'Your mission funding balance and history.',
+    budgetTitle: 'Budget',
+    budgetSubtitle: 'Funding that backs your paid mission approvals.',
+    budgetBalance: 'Balance',
+    budgetEnforcedOn: 'Enforced — approvals require funding',
+    budgetEnforcedOff: 'Not enforced',
+    budgetLedgerTitle: 'History',
+    budgetLedgerEmpty: 'No transactions yet.',
+    budgetNoBudget: 'No budget set up yet — contact KINNSO ops to fund missions.',
+    kindTopup: 'Top-up',
+    kindDebit: 'Debit',
+    kindAdjust: 'Adjustment',
     profileTitle: 'Public profile',
     profileSubtitle: 'These details appear on your public merchant page.',
     slugLabel: 'Profile URL',
@@ -2553,6 +2593,18 @@ const messages: Messages = {
     colAmount: 'Amount', colCurrency: 'Currency', settlementsEmpty: 'No settlements yet', owedTitle: 'Owed', settledTitle: 'Settled', moneyEmpty: 'None',
     secAudit: 'Moderation history', auditEmpty: 'No moderation activity yet', addNote: 'Add a note', saveNote: 'Save note',
     viewDetail: 'View 360',
+    budgetPanelTitle: 'Budget',
+    budgetBalance: 'Balance',
+    budgetEnforced: 'Enforced',
+    budgetNotEnforced: 'Not enforced',
+    budgetNoRow: 'No budget yet — the first credit creates it.',
+    budgetCreditLabel: 'Credit budget',
+    budgetCreditAmountPlaceholder: 'Amount (negative to adjust down)',
+    budgetReasonPlaceholder: 'Reason…',
+    budgetCreditSubmit: 'Apply credit',
+    budgetEnforceOn: 'Turn enforcement on',
+    budgetEnforceOff: 'Turn enforcement off',
+    budgetSaved: 'Saved.',
   },
   missionsOps: {
     title: 'Missions',

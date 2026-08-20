@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const { refreshMock } = vi.hoisted(() => ({
@@ -33,6 +33,7 @@ const baseAvailable: CreatorMissionCard = {
   submittedCount: 0,
   locked: false,
   requiredTier: null,
+  funded: false,
 }
 
 const baseMine: CreatorMissionCard = {
@@ -176,6 +177,36 @@ describe('CreatorMissionsView', () => {
     fireEvent.click(screen.getByRole('button', { name: en.missions.acceptInvite }))
     expect(onAccept).toHaveBeenCalledWith('m-inv')
     await waitFor(() => expect(refreshMock).toHaveBeenCalledTimes(1))
+  })
+
+  it('shows a Funded badge only on funded missions', () => {
+    const fundedMission: CreatorMissionCard = {
+      ...baseAvailable,
+      id: 'm-funded',
+      title: 'Funded paid mission',
+      missionType: 'paid',
+      funded: true,
+    }
+    const unfundedMission: CreatorMissionCard = {
+      ...baseAvailable,
+      id: 'm-unfunded',
+      title: 'Unfunded paid mission',
+      missionType: 'paid',
+      funded: false,
+    }
+    render(
+      <CreatorMissionsView
+        locale="en"
+        t={en.missions}
+        missions={[fundedMission, unfundedMission]}
+        onJoin={vi.fn()}
+        onAccept={vi.fn()}
+      />,
+    )
+    const fundedCard = screen.getByText('Funded paid mission').closest('article')!
+    const unfundedCard = screen.getByText('Unfunded paid mission').closest('article')!
+    expect(within(fundedCard).getByText(en.missions.fundedBadge)).toBeTruthy()
+    expect(within(unfundedCard).queryByText(en.missions.fundedBadge)).toBeNull()
   })
 
   it('keeps a normal open mission in the available band, not Invitations', () => {

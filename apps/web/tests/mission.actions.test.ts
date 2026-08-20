@@ -469,6 +469,52 @@ describe('reviewSubmissionAction', () => {
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 
+  it('surfaces the budget-gate insufficient_budget abort as actionable copy', async () => {
+    const submissionUpdateBuilder = createBuilder({
+      maybeSingle: vi.fn(async () => ({
+        data: null,
+        error: { message: 'update failed: insufficient_budget' },
+      })),
+    })
+    const supabase = createSupabaseMock({
+      merchant_profiles: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'merchant-profile-1' }, error: null })),
+      }),
+      mission_milestone_submissions: [
+        createBuilder({
+          single: vi.fn(async () => ({
+            data: {
+              id: 'submission-1',
+              status: 'submitted',
+              mission_participant_id: 'participant-1',
+            },
+            error: null,
+          })),
+        }),
+        submissionUpdateBuilder,
+      ],
+      mission_participants: createBuilder({
+        single: vi.fn(async () => ({ data: { mission_id: 'mission-1' }, error: null })),
+      }),
+      missions: createBuilder({
+        maybeSingle: vi.fn(async () => ({ data: { id: 'mission-1' }, error: null })),
+      }),
+    })
+    createSupabaseServerClientMock.mockResolvedValue(supabase)
+
+    const result = await reviewSubmissionAction({
+      submissionId: 'submission-1',
+      action: 'approve',
+      locale: 'en',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      errors: { form: ['This approval needs more budget — top up before approving.'] },
+    })
+    expect(revalidatePathMock).not.toHaveBeenCalled()
+  })
+
   it('calls mission_review_event_append alongside the submission update', async () => {
     const rpcMock = vi.fn(async () => ({ data: null, error: null }))
     const supabase = createSupabaseMock({
