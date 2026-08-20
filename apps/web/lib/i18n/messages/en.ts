@@ -693,6 +693,7 @@ export interface Messages {
     invitationsTitle: string
     acceptInvite: string
     acceptInviteFailed: string
+    fundedBadge: string
   }
   missionDetail: {
     back: string
@@ -1777,6 +1778,7 @@ const messages: Messages = {
     invitationsTitle: 'Invitations',
     acceptInvite: 'Accept invitation',
     acceptInviteFailed: 'Could not accept this invitation. Please try again.',
+    fundedBadge: 'Funded',
   },
   missionDetail: {
     back: 'Missions',

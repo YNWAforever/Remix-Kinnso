@@ -13,6 +13,7 @@ const { listCreatorMerchantMissionsMock, notFoundMock, creatorPageGateMock } = v
       mission_source: 'merchant',
       mission_type: 'hybrid',
       status: 'published',
+      merchant_profile_id: 'merchant-1',
       paid_fee_amount: 500,
       paid_fee_currency: 'HKD',
       affiliate_commission_rate: 12,
@@ -49,6 +50,7 @@ vi.mock('@/lib/supabase/server', () => ({
     auth: {
       getUser: async () => ({ data: { user: { id: 'creator-user-1' } } }),
     },
+    rpc: async () => ({ data: ['merchant-1'] }),
   }),
 }))
 
@@ -78,5 +80,7 @@ describe('/[locale]/studio/missions host', () => {
 
     expect(screen.getByText('Hybrid stay mission')).toBeTruthy()
     expect(screen.getByText('HKD 500 + Affiliate commission 8% creator / 12% total')).toBeTruthy()
+    // merchant-1 is in the funded set returned by the rpc stub
+    expect(screen.getByText('Funded')).toBeTruthy()
   })
 })
