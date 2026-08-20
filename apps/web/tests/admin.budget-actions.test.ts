@@ -60,6 +60,20 @@ describe('creditMerchantBudget', () => {
     expect(rpcMock).not.toHaveBeenCalled()
   })
 
+  it('accepts genuine two-decimal amounts that are not exact in IEEE-754 (regression)', async () => {
+    // amount * 100 for these values lands off-integer in floating point (e.g.
+    // 19.99 * 100 === 1998.9999999999998) -- an exact-equality precision check would have
+    // wrongly rejected every one of these as sub-cent, even though they're valid currency.
+    for (const amount of [19.99, 0.29, 1.15, 0.07, 1234567.89]) {
+      rpcMock.mockClear()
+      const result = await creditMerchantBudget('en', 'merchant-1', amount, 'reason')
+      expect(result.ok).toBe(true)
+      expect(rpcMock).toHaveBeenCalledWith('admin_credit_merchant_budget', {
+        p_merchant_profile_id: 'merchant-1', p_amount: amount, p_reason: 'reason',
+      })
+    }
+  })
+
   it('maps insufficient_budget to friendly copy', async () => {
     rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'insufficient_budget' } })
     const result = await creditMerchantBudget('en', 'merchant-1', -500, 'clawback')

@@ -30,7 +30,14 @@ export async function creditMerchantBudget(
   const gate = await requireOpsAction(supabase)
   if (!gate.ok) return gate
   if (!Number.isFinite(amount) || amount === 0) return formError(FRIENDLY.bad_amount)
-  if (Math.round(amount * 100) !== amount * 100 || Math.abs(amount) > 9999999999.99) {
+  // amount * 100 is an IEEE-754 double, not exact decimal arithmetic -- a genuine two-decimal
+  // value like 19.99 lands at 1998.9999999999998, not 1999. Comparing against the ROUNDED
+  // cents with a tight tolerance (not an exact equality check) correctly accepts every real
+  // 2dp value while still rejecting genuine sub-cent input like 0.001. The DB's own check
+  // (`p_amount <> round(p_amount, 2)` on exact Postgres numeric) remains the source of truth
+  // either way -- this is purely a client-side pre-check for a faster error.
+  const cents = amount * 100
+  if (Math.abs(cents - Math.round(cents)) > 1e-6 || Math.abs(amount) > 9999999999.99) {
     return formError(FRIENDLY.bad_amount_precision)
   }
   const rErr = validateReason(reason)
