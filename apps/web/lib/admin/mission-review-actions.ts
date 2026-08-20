@@ -17,6 +17,8 @@ const FRIENDLY: Record<string, string> = {
   not_found: 'That submission no longer exists. Refresh and try again.',
   stale_status: 'This submission has already been reviewed. Refresh and try again.',
   bad_policy: 'Invalid auto-approve policy.',
+  insufficient_budget: 'The merchant budget cannot cover this fee — fund it before approving.',
+  currency_mismatch: 'Budget currency does not match this mission.',
 }
 
 const mapError = (message: string, fallback: string): string => {

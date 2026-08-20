@@ -98,6 +98,19 @@ describe('reviewSubmissionOpsAction', () => {
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.errors.form?.[0]).toMatch(/ops access/i)
   })
+
+  it('maps insufficient_budget to friendly copy', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'insufficient_budget' } })
+    const result = await reviewSubmissionOpsAction('en', 's1', 'approve', null, null, null)
+    expect(result).toEqual({ ok: false, errors: { form: ['The merchant budget cannot cover this fee — fund it before approving.'] } })
+    expect(revalidateMock).not.toHaveBeenCalled()
+  })
+
+  it('maps currency_mismatch to friendly copy', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'currency_mismatch' } })
+    const result = await reviewSubmissionOpsAction('en', 's1', 'approve', null, null, null)
+    expect(result).toEqual({ ok: false, errors: { form: ['Budget currency does not match this mission.'] } })
+  })
 })
 
 describe('setMissionAutoApprovePolicyAction', () => {
