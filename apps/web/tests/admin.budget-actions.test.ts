@@ -46,6 +46,20 @@ describe('creditMerchantBudget', () => {
     expect(rpcMock).not.toHaveBeenCalled()
   })
 
+  it('rejects a sub-cent amount with the precision message before calling the RPC', async () => {
+    const result = await creditMerchantBudget('en', 'merchant-1', 0.001, 'reason')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.errors.form?.[0]).toMatch(/2 decimal places/i)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects an over-magnitude amount with the precision message before calling the RPC', async () => {
+    const result = await creditMerchantBudget('en', 'merchant-1', 99999999999.99, 'reason')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.errors.form?.[0]).toMatch(/2 decimal places/i)
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+
   it('maps insufficient_budget to friendly copy', async () => {
     rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'insufficient_budget' } })
     const result = await creditMerchantBudget('en', 'merchant-1', -500, 'clawback')

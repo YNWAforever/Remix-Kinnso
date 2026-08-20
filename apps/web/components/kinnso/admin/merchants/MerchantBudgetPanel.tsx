@@ -40,7 +40,7 @@ export function MerchantBudgetPanel({
       <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.budgetPanelTitle}</p>
       {budget ? (
         <p className="mb-3 text-sm text-kinnso-muted">
-          {t.budgetBalance}: <span className="font-bold text-kinnso-ink">{budget.currency} {budget.balance}</span>
+          {t.budgetBalance}: <span className="font-bold text-kinnso-ink">{budget.currency} {budget.balance.toFixed(2)}</span>
           {' · '}{budget.enforced ? t.budgetEnforced : t.budgetNotEnforced}
         </p>
       ) : (
@@ -52,12 +52,15 @@ export function MerchantBudgetPanel({
         <input
           id="budget-credit-amount"
           type="number"
+          step="0.01"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder={t.budgetCreditAmountPlaceholder}
           className="rounded-md border border-kinnso-line p-2 text-sm"
         />
+        <label className="text-xs font-bold text-kinnso-ink" htmlFor="budget-credit-reason">{t.budgetReasonPlaceholder}</label>
         <textarea
+          id="budget-credit-reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder={t.budgetReasonPlaceholder}

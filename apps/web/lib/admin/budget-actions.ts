@@ -12,6 +12,7 @@ const FRIENDLY: Record<string, string> = {
   reason_required: 'A reason is required.',
   reason_too_long: 'The reason is too long (max 500 characters).',
   bad_amount: 'The amount must be a non-zero number.',
+  bad_amount_precision: 'Amounts must have at most 2 decimal places and fit within the budget range.',
   bad_enforced: 'Invalid enforcement value.',
   insufficient_budget: 'That adjustment would take the balance below zero.',
   not_found: 'No budget exists for this merchant yet — credit it first.',
@@ -29,6 +30,9 @@ export async function creditMerchantBudget(
   const gate = await requireOpsAction(supabase)
   if (!gate.ok) return gate
   if (!Number.isFinite(amount) || amount === 0) return formError(FRIENDLY.bad_amount)
+  if (Math.round(amount * 100) !== amount * 100 || Math.abs(amount) > 9999999999.99) {
+    return formError(FRIENDLY.bad_amount_precision)
+  }
   const rErr = validateReason(reason)
   if (rErr) return formError(FRIENDLY[rErr])
   const { error } = await supabase.rpc('admin_credit_merchant_budget', {
