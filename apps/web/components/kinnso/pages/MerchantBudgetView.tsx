@@ -22,7 +22,7 @@ export function MerchantBudgetView({ t, budget }: { t: T; budget: MerchantBudget
         <>
           <TicketCard className="mt-8 p-5">
             <p className="text-sm text-kinnso-muted">{t.budgetBalance}</p>
-            <p className="text-3xl font-black text-kinnso-ink">{budget.currency} {budget.balance}</p>
+            <p className="text-3xl font-black text-kinnso-ink">{budget.currency} {budget.balance.toFixed(2)}</p>
             <p className="mt-2 text-xs font-bold text-kinnso-muted">
               {budget.enforced ? t.budgetEnforcedOn : t.budgetEnforcedOff}
             </p>
@@ -39,9 +39,10 @@ export function MerchantBudgetView({ t, budget }: { t: T; budget: MerchantBudget
                     <span className="shrink-0 font-bold text-kinnso-ink">{KIND_LABEL(t)[row.kind] ?? row.kind}</span>
                     <span className="min-w-0 flex-1 truncate text-kinnso-muted">{row.reason ?? '—'}</span>
                     <span className={`shrink-0 font-bold ${row.amount < 0 ? 'text-orange-700' : 'text-emerald-700'}`}>
-                      {row.amount > 0 ? '+' : ''}{row.amount}
+                      {row.amount > 0 ? '+' : ''}{row.amount.toFixed(2)}
                     </span>
-                    <span className="shrink-0 text-kinnso-muted">{budget.currency} {row.balanceAfter}</span>
+                    <span className="shrink-0 text-kinnso-muted">{budget.currency} {row.balanceAfter.toFixed(2)}</span>
+                    <span className="shrink-0 text-kinnso-muted">{row.createdAt.slice(0, 10)}</span>
                   </li>
                 ))}
               </ul>

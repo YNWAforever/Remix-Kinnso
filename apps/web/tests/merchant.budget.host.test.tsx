@@ -6,8 +6,8 @@ import type { MerchantBudget } from '@/lib/merchants/budget-queries'
 const { merchantPageGateMock, budgetMock } = vi.hoisted(() => ({
   merchantPageGateMock: vi.fn(async () => ({ user: { id: 'u1' }, merchantId: 'merchant-1' })),
   budgetMock: vi.fn(async (): Promise<MerchantBudget | null> => ({
-    balance: 250, currency: 'HKD', enforced: true,
-    ledger: [{ id: 't1', kind: 'topup', amount: 250, balanceAfter: 250, reason: 'Pilot funding', createdAt: '2026-08-20T00:00:00Z' }],
+    balance: 250.5, currency: 'HKD', enforced: true,
+    ledger: [{ id: 't1', kind: 'topup', amount: 250.5, balanceAfter: 250.5, reason: 'Pilot funding', createdAt: '2026-08-20T00:00:00Z' }],
   })),
 }))
 
@@ -33,9 +33,11 @@ describe('/[locale]/merchants/dashboard/budget host', () => {
     const ui = await MerchantBudgetPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
     expect(budgetMock).toHaveBeenCalledWith(expect.anything(), 'merchant-1')
-    // 'HKD 250' appears twice by design: the balance headline and the ledger row's balance-after.
-    expect(screen.getAllByText('HKD 250').length).toBe(2)
+    // 'HKD 250.50' appears twice by design: the balance headline and the ledger row's
+    // balance-after — and the non-round fixture locks in the .toFixed(2) formatting.
+    expect(screen.getAllByText('HKD 250.50').length).toBe(2)
     expect(screen.getByText('Pilot funding')).toBeTruthy()
+    expect(screen.getByText('2026-08-20')).toBeTruthy()
   })
 
   it('shows the no-budget state', async () => {
