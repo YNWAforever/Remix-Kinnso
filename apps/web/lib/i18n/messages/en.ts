@@ -137,6 +137,19 @@ export interface MerchantDashboardMessages {
   cardBookingsBody: string
   cardProfileTitle: string
   cardProfileBody: string
+  cardBudgetTitle: string
+  cardBudgetBody: string
+  budgetTitle: string
+  budgetSubtitle: string
+  budgetBalance: string
+  budgetEnforcedOn: string
+  budgetEnforcedOff: string
+  budgetLedgerTitle: string
+  budgetLedgerEmpty: string
+  budgetNoBudget: string
+  kindTopup: string
+  kindDebit: string
+  kindAdjust: string
   profileTitle: string
   profileSubtitle: string
   slugLabel: string
@@ -2421,6 +2434,19 @@ const messages: Messages = {
     cardBookingsBody: 'Track who booked your experiences and mark completed stays.',
     cardProfileTitle: 'Public profile',
     cardProfileBody: 'Control how your business appears across KINNSO.',
+    cardBudgetTitle: 'Budget',
+    cardBudgetBody: 'Your mission funding balance and history.',
+    budgetTitle: 'Budget',
+    budgetSubtitle: 'Funding that backs your paid mission approvals.',
+    budgetBalance: 'Balance',
+    budgetEnforcedOn: 'Enforced — approvals require funding',
+    budgetEnforcedOff: 'Not enforced',
+    budgetLedgerTitle: 'History',
+    budgetLedgerEmpty: 'No transactions yet.',
+    budgetNoBudget: 'No budget set up yet — contact KINNSO ops to fund missions.',
+    kindTopup: 'Top-up',
+    kindDebit: 'Debit',
+    kindAdjust: 'Adjustment',
     profileTitle: 'Public profile',
     profileSubtitle: 'These details appear on your public merchant page.',
     slugLabel: 'Profile URL',
