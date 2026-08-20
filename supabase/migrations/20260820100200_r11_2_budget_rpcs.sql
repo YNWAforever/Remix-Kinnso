@@ -17,7 +17,16 @@ begin
   end if;
   if coalesce(btrim(p_reason), '') = '' then raise exception 'reason_required'; end if;
   if length(btrim(p_reason)) > 500 then raise exception 'reason_too_long'; end if;
-  if p_amount is null or p_amount = 0 then raise exception 'bad_amount'; end if;
+  -- Rejects: null/zero; NaN (Postgres numeric NaN equals itself and sorts above all
+  -- values, so it would pass every other check here AND the trigger's floor check,
+  -- permanently poisoning the balance); sub-cent precision (the 12,2 columns would
+  -- round it while the jsonb audit metadata kept the raw value -- a permanent audit
+  -- divergence); and over-magnitude values that would otherwise surface as a raw
+  -- numeric-overflow error instead of this RPC's clean-exception convention.
+  if p_amount is null or p_amount = 0 or p_amount = 'NaN'::numeric
+     or p_amount <> round(p_amount, 2) or abs(p_amount) > 9999999999.99 then
+    raise exception 'bad_amount';
+  end if;
   if not exists (select 1 from public.merchant_profiles where id = p_merchant_profile_id) then
     raise exception 'not_found';
   end if;

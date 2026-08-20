@@ -12,7 +12,9 @@ describe('r11.2 budget RPCs', () => {
     expect(sql).toContain('create or replace function public.admin_credit_merchant_budget(p_merchant_profile_id uuid, p_amount numeric, p_reason text)')
     expect(sql).toContain("if not public.is_active_ops_role('admin') then raise exception 'forbidden' using errcode = '42501'; end if;")
     expect(sql).toContain("if coalesce(btrim(p_reason), '') = '' then raise exception 'reason_required'; end if;")
-    expect(sql).toContain("if p_amount is null or p_amount = 0 then raise exception 'bad_amount'; end if;")
+    expect(sql).toContain(
+      "if p_amount is null or p_amount = 0 or p_amount = 'nan'::numeric or p_amount <> round(p_amount, 2) or abs(p_amount) > 9999999999.99 then raise exception 'bad_amount'; end if;"
+    )
   })
 
   it('admin_credit_merchant_budget upserts the budget row, floor-checks negative adjustments, and ledgers with balance_after', () => {
