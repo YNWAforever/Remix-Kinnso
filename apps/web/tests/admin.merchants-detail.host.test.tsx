@@ -24,7 +24,7 @@ vi.mock('@/lib/auth/authorization-context', () => ({
     return { user: user ? { id: user.id } : null, role: await roleMock(), merchantId: null }
   },
 }))
-vi.mock('@/lib/admin/merchants-queries', () => ({ getMerchantDetail: detailMock }))
+vi.mock('@/lib/admin/merchants-queries', () => ({ getMerchantDetail: detailMock, getMerchantBudgetOps: vi.fn(async () => null) }))
 vi.mock('@/lib/admin/audit', () => ({ listAudit: auditMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
 vi.mock('@/lib/admin/merchants-actions', () => ({ setMerchantStatus: vi.fn(), setMerchantTier: vi.fn(), addMerchantNote: vi.fn() }))
