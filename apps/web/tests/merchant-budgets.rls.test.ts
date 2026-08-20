@@ -418,6 +418,14 @@ d('r11.2 merchant budgets: funding gate, ledger idempotency, ops RPCs, and RLS',
   }, testTimeout)
 
   it('RLS: the owning merchant reads their budget and ledger; an unrelated merchant reads neither; both write RPCs reject a non-admin caller', async () => {
+    // Capture state up front rather than asserting a hardcoded literal afterward -- this
+    // test only cares that the denied calls below wrote NOTHING, not what the incoming
+    // state happens to be (which the prior test in this file already left as enforced=false;
+    // asserting that literal here would silently start passing for the wrong reason if this
+    // file's test order or an earlier test's cleanup ever changed).
+    const before = await svc().from('merchant_budgets').select('balance, enforced').eq('id', merchantBudgetId).single()
+    if (before.error) throw before.error
+
     const merchantClient = clientFor(merchantUser)
     const ownBudget = await merchantClient.from('merchant_budgets').select('id').eq('id', merchantBudgetId)
     expect(ownBudget.error).toBeNull()
@@ -449,11 +457,12 @@ d('r11.2 merchant budgets: funding gate, ledger idempotency, ops RPCs, and RLS',
     expect(deniedEnforce.error).not.toBeNull()
     expect(/forbidden|42501/i.test(`${deniedEnforce.error?.message} ${deniedEnforce.error?.code}`)).toBe(true)
 
-    // Neither denied call should have written anything.
+    // Neither denied call should have written anything -- compare against the state
+    // captured at the start of this test, not a hardcoded literal.
     const budget = await svc().from('merchant_budgets').select('balance, enforced').eq('id', merchantBudgetId).single()
     if (budget.error) throw budget.error
-    expect(Number(budget.data!.balance)).toBe(50)
-    expect(budget.data!.enforced).toBe(false)
+    expect(Number(budget.data!.balance)).toBe(Number(before.data!.balance))
+    expect(budget.data!.enforced).toBe(before.data!.enforced)
   }, testTimeout)
 
   it('funded_merchant_profiles: reflects enforcement toggling, and is readable from a plain creator session', async () => {
