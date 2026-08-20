@@ -10,7 +10,6 @@ import {
   reviewParticipantAction,
   reviewSubmissionAction,
   submitMilestoneAction,
-  updateSettlementAction,
 } from '@/lib/missions/actions'
 
 const {
@@ -577,70 +576,6 @@ describe('reviewSubmissionAction', () => {
     const result = await reviewSubmissionAction({ submissionId: 'submission-1', action: 'approve', locale: 'en' })
 
     expect(result).toEqual({ ok: true, status: 'approved' })
-  })
-})
-
-describe('updateSettlementAction', () => {
-  it('preserves financial fields that the caller does not include', async () => {
-    const settlementUpdateBuilder = createBuilder({
-      maybeSingle: vi.fn(async () => ({ data: { id: 'settlement-1' }, error: null })),
-    })
-    const supabase = createSupabaseMock({
-      kinnso_ops_members: createBuilder({
-        maybeSingle: vi.fn(async () => ({ data: { id: 'ops-member-1' }, error: null })),
-      }),
-      mission_settlements: settlementUpdateBuilder,
-    })
-    createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await updateSettlementAction({
-      settlementId: 'settlement-1',
-      status: 'paid',
-      creatorPayoutStatus: 'paid',
-      kinnsoCommissionStatus: 'paid',
-      locale: 'en',
-    })
-
-    expect(result).toEqual({ ok: true, settlementId: 'settlement-1' })
-    const updatePayload = settlementUpdateBuilder.update.mock.calls[0]?.[0]
-    expect(updatePayload).toEqual({
-      status: 'paid',
-      creator_payout_status: 'paid',
-      kinnso_commission_status: 'paid',
-      updated_by_ops_member_id: 'ops-member-1',
-    })
-    expect(updatePayload).not.toHaveProperty('affiliate_commission_amount')
-    expect(updatePayload).not.toHaveProperty('affiliate_commission_status')
-    expect(updatePayload).not.toHaveProperty('creator_commission_amount')
-    expect(updatePayload).not.toHaveProperty('kinnso_commission_amount')
-    expect(updatePayload).not.toHaveProperty('ops_note')
-  })
-
-  it('returns a form error when no settlement row is updated', async () => {
-    const supabase = createSupabaseMock({
-      kinnso_ops_members: createBuilder({
-        maybeSingle: vi.fn(async () => ({ data: { id: 'ops-member-1' }, error: null })),
-      }),
-      mission_settlements: createBuilder({
-        maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-      }),
-    })
-    createSupabaseServerClientMock.mockResolvedValue(supabase)
-
-    const result = await updateSettlementAction({
-      settlementId: 'settlement-1',
-      status: 'pending',
-      creatorPayoutStatus: 'pending',
-      kinnsoCommissionStatus: 'pending',
-      affiliateCommissionAmount: null,
-      locale: 'en',
-    })
-
-    expect(result).toEqual({
-      ok: false,
-      errors: { form: ['Settlement update could not be saved'] },
-    })
-    expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 })
 

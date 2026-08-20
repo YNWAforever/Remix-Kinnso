@@ -2,13 +2,11 @@ import { describe, expect, it } from 'vitest'
 import {
   validateMissionDraft,
   validatePartnerLinkRequest,
-  validateSettlementUpdate,
   validateSubmission,
 } from '@/lib/missions/validation'
 import type {
   MissionDraftInput,
   PartnerLinkRequest,
-  SettlementUpdateInput,
 } from '@/lib/missions/types'
 
 const base: MissionDraftInput = {
@@ -142,75 +140,6 @@ describe('mission validation', () => {
       expect(result.ok).toBe(false)
       expect(result.errors.originalUrl).toContain('https')
     }
-  })
-
-  it('allows ops settlement updates with non-negative amounts', () => {
-    const input: SettlementUpdateInput = {
-      actorIsOps: true,
-      status: 'partially_paid',
-      creatorPayoutStatus: 'pending',
-      kinnsoCommissionStatus: 'paid',
-      affiliateCommissionAmount: 130.25,
-    }
-    expect(validateSettlementUpdate(input)).toEqual({ ok: true, errors: {} })
-  })
-
-  it('rejects negative settlement amounts', () => {
-    const result = validateSettlementUpdate({
-      actorIsOps: true,
-      status: 'partially_paid',
-      creatorPayoutStatus: 'pending',
-      kinnsoCommissionStatus: 'paid',
-      affiliateCommissionAmount: -1,
-    })
-    expect(result.ok).toBe(false)
-    expect(result.errors.affiliateCommissionAmount).toContain('non-negative')
-  })
-
-  it('rejects non-ops settlement updates', () => {
-    const result = validateSettlementUpdate({
-      actorIsOps: false,
-      status: 'partially_paid',
-      creatorPayoutStatus: 'pending',
-      kinnsoCommissionStatus: 'paid',
-      affiliateCommissionAmount: 130.25,
-    })
-    expect(result.ok).toBe(false)
-    expect(result.errors.actorIsOps).toContain('ops')
-  })
-
-  it('rejects negative creator commission amounts', () => {
-    const result = validateSettlementUpdate({
-      actorIsOps: true,
-      status: 'partially_paid',
-      creatorPayoutStatus: 'pending',
-      kinnsoCommissionStatus: 'paid',
-      creatorCommissionAmount: -5,
-    })
-    expect(result.ok).toBe(false)
-    expect(result.errors.creatorCommissionAmount).toContain('non-negative')
-  })
-
-  it('rejects unknown settlement statuses', () => {
-    const result = validateSettlementUpdate({
-      actorIsOps: true,
-      status: 'bogus' as SettlementUpdateInput['status'],
-      creatorPayoutStatus: 'pending',
-      kinnsoCommissionStatus: 'paid',
-    })
-    expect(result.ok).toBe(false)
-    expect(result.errors.status).toContain('invalid')
-  })
-
-  it('rejects unknown creator payout statuses', () => {
-    const result = validateSettlementUpdate({
-      actorIsOps: true,
-      status: 'partially_paid',
-      creatorPayoutStatus: 'frozen' as SettlementUpdateInput['creatorPayoutStatus'],
-      kinnsoCommissionStatus: 'paid',
-    })
-    expect(result.ok).toBe(false)
-    expect(result.errors.creatorPayoutStatus).toContain('invalid')
   })
 })
 

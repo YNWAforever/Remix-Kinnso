@@ -2926,6 +2926,21 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_cancel_payout: {
+        Args: { p_batch_id: string; p_idempotency_key: string; p_reason: string }
+        Returns: Json
+      }
+      admin_create_payout_batch: {
+        Args: {
+          p_amount: number
+          p_creator_id: string
+          p_currency: string
+          p_idempotency_key: string
+          p_reason: string
+          p_target_at?: string | null
+        }
+        Returns: Json
+      }
       admin_creator_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_creator_detail: { Args: { p_creator_id: string }; Returns: Json }
       admin_credit_merchant_budget: {
@@ -2990,6 +3005,8 @@ export type Database = {
         }[]
       }
       admin_list_ops_members: { Args: never; Returns: Json }
+      admin_list_payout_batches: { Args: { p_status?: string | null }; Returns: Json }
+      admin_mark_payout_paid: { Args: { p_batch_id: string; p_reason: string }; Returns: undefined }
       admin_merchant_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_merchant_detail: { Args: { p_merchant_id: string }; Returns: Json }
       admin_mission_analytics: { Args: { p_days?: number }; Returns: Json }
@@ -3118,6 +3135,10 @@ export type Database = {
         Args: { p_member_id: string; p_reason: string; p_role: string }
         Returns: undefined
       }
+      admin_set_payout_processing_window: {
+        Args: { p_days: number; p_reason: string }
+        Returns: undefined
+      }
       admin_set_settlement_status: {
         Args: {
           p_affiliate_commission_status?: string
@@ -3214,6 +3235,7 @@ export type Database = {
       }
       creator_earnings_summary: { Args: never; Returns: Json }
       creator_insights: { Args: never; Returns: Json }
+      creator_payout_batches_mine: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
       funded_merchant_profiles: { Args: never; Returns: string[] }
       get_attributed_guides_for_merchant: {

@@ -2,11 +2,14 @@ import React from 'react'
 import { MissionStatusBadge } from '@/components/kinnso/MissionStatusBadge'
 import { ReceiptRow, TicketCard, TicketDivider } from '@/components/kinnso/MarketPassport'
 import type { Messages } from '@/lib/i18n/messages/en'
-import type { CreatorEarningsSummary } from '@/lib/missions/earnings-summary'
+import type { Locale } from '@/lib/i18n/config'
+import type { CreatorEarningsSummary, CreatorPayoutBatch } from '@/lib/missions/earnings-summary'
 
 type StudioEarningsViewProps = {
   t: Messages['studioEarnings']
+  locale: Locale
   data: CreatorEarningsSummary
+  payoutBatches: CreatorPayoutBatch[]
 }
 
 function Section({
@@ -35,7 +38,7 @@ function Section({
   )
 }
 
-/** `colSpan` must match the table's real column count — the three tables differ (4 / 3 / 3). */
+/** `colSpan` must match the table's real column count — the four tables differ (4 / 3 / 3 / 3). */
 function Rows({ colSpan, children }: { colSpan: number; children: React.ReactNode[] }) {
   return (
     <tbody>
@@ -55,7 +58,7 @@ function Rows({ colSpan, children }: { colSpan: number; children: React.ReactNod
   )
 }
 
-export function StudioEarningsView({ t, data }: StudioEarningsViewProps) {
+export function StudioEarningsView({ t, locale, data, payoutBatches }: StudioEarningsViewProps) {
   const { missions, bookings, tracked, totals } = data
 
   return (
@@ -145,6 +148,33 @@ export function StudioEarningsView({ t, data }: StudioEarningsViewProps) {
                 <td className="py-2 pr-4 pl-5 font-medium text-kinnso-ink">{item.missionTitle}</td>
                 <td className="py-2 pr-4 tabular-nums text-kinnso-ink">{item.currency} {item.grossAmount.toLocaleString()}</td>
                 <td className="py-2 pr-5 capitalize text-kinnso-muted">{item.eventState.replaceAll('_', ' ')}</td>
+              </tr>
+            ))}
+          </Rows>
+        </table>
+      </Section>
+
+      <Section
+        heading={t.payoutBatchesHeading}
+        isEmpty={payoutBatches.length === 0}
+        emptyLabel={t.payoutBatchesEmpty}
+      >
+        <table className="w-full text-left text-sm">
+          <thead className="text-xs uppercase text-kinnso-muted">
+            <tr>
+              <th scope="col" className="py-2 pr-4 pl-5 font-semibold">{t.colAmount}</th>
+              <th scope="col" className="py-2 pr-4 font-semibold">{t.colStatus}</th>
+              <th scope="col" className="py-2 pr-5 font-semibold">{t.colTarget}</th>
+            </tr>
+          </thead>
+          <Rows colSpan={3}>
+            {payoutBatches.map((b) => (
+              <tr key={b.id}>
+                <td className="py-2 pr-4 pl-5 tabular-nums text-kinnso-ink">{b.currency} {b.amount.toLocaleString()}</td>
+                <td className="py-2 pr-4">
+                  <MissionStatusBadge status={b.status === 'paid' ? t.paid : b.status === 'cancelled' ? t.batchCancelled : t.pending} />
+                </td>
+                <td className="py-2 pr-5 text-kinnso-muted">{new Date(b.targetAt).toLocaleDateString(locale)}</td>
               </tr>
             ))}
           </Rows>

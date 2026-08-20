@@ -1,11 +1,9 @@
 import type {
   MissionDraftInput,
   PartnerLinkRequest,
-  SettlementUpdateInput,
   ValidationErrors,
   ValidationResult,
 } from '@/lib/missions/types'
-import { settlementStatuses } from '@/lib/missions/types'
 import { parseProofUrl } from '@/lib/missions/proof-url'
 
 const isBlank = (value: string | null | undefined) => value == null || value.trim() === ''
@@ -101,26 +99,6 @@ export const validateSubmission = (input: { proofUrl: string; notes?: string | n
   if ((input.notes ?? '').length > 1000) {
     addError(errors, 'notes', 'too_long')
   }
-
-  return resultFrom(errors)
-}
-
-export const validateSettlementUpdate = (input: SettlementUpdateInput): ValidationResult => {
-  const errors: ValidationErrors = {}
-
-  if (!input.actorIsOps) addError(errors, 'actorIsOps', 'ops')
-  if (!(settlementStatuses as readonly string[]).includes(input.status)) {
-    addError(errors, 'status', 'invalid')
-  }
-  if (input.creatorPayoutStatus !== 'pending' && input.creatorPayoutStatus !== 'paid') {
-    addError(errors, 'creatorPayoutStatus', 'invalid')
-  }
-  if (input.kinnsoCommissionStatus !== 'pending' && input.kinnsoCommissionStatus !== 'paid') {
-    addError(errors, 'kinnsoCommissionStatus', 'invalid')
-  }
-  validateNonNegative(errors, 'affiliateCommissionAmount', input.affiliateCommissionAmount)
-  validateNonNegative(errors, 'creatorCommissionAmount', input.creatorCommissionAmount)
-  validateNonNegative(errors, 'kinnsoCommissionAmount', input.kinnsoCommissionAmount)
 
   return resultFrom(errors)
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getCreatorEarningsSummary, summarizeSettledEarnings } from '@/lib/missions/earnings-summary'
+import { getCreatorEarningsSummary, getCreatorPayoutBatches, summarizeSettledEarnings } from '@/lib/missions/earnings-summary'
 
 function client(raw: unknown, error: unknown = null) {
   return { rpc: vi.fn(async () => ({ data: raw, error })) } as never
@@ -89,6 +89,36 @@ describe('getCreatorEarningsSummary', () => {
 
   it('throws when the RPC returns no data', async () => {
     await expect(getCreatorEarningsSummary(client(null))).rejects.toThrow('creator_earnings_summary returned no data')
+  })
+})
+
+describe('getCreatorPayoutBatches', () => {
+  it('maps every field and coerces the numeric amount', async () => {
+    const raw = [
+      { id: 'b1', currency: 'HKD', amount: '1500.00', status: 'pending', target_at: '2026-08-23T00:00:00Z',
+        created_at: '2026-08-16T00:00:00Z', paid_at: null, cancelled_at: null },
+    ]
+    // `client()` above casts its return to `never` internally, which makes `.rpc` fail to
+    // typecheck on assertion (TS2339) — same trap Errata #10 documents for Task 6's original
+    // admin.payout-batches-queries.test.ts. Keep this object un-cast and cast at the call site
+    // instead, matching that file's now-established fix.
+    const supabase = { rpc: vi.fn(async () => ({ data: raw, error: null })) }
+    const result = await getCreatorPayoutBatches(supabase as never)
+    expect(result).toEqual([
+      { id: 'b1', currency: 'HKD', amount: 1500, status: 'pending', targetAt: '2026-08-23T00:00:00Z',
+        createdAt: '2026-08-16T00:00:00Z', paidAt: null, cancelledAt: null },
+    ])
+    expect(supabase.rpc).toHaveBeenCalledWith('creator_payout_batches_mine')
+  })
+
+  it('returns an empty array for null data', async () => {
+    const supabase = { rpc: vi.fn(async () => ({ data: null, error: null })) }
+    expect(await getCreatorPayoutBatches(supabase as never)).toEqual([])
+  })
+
+  it('propagates an RPC error', async () => {
+    const supabase = { rpc: vi.fn(async () => ({ data: null, error: { message: 'forbidden' } })) }
+    await expect(getCreatorPayoutBatches(supabase as never)).rejects.toEqual({ message: 'forbidden' })
   })
 })
 

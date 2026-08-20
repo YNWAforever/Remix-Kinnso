@@ -1,43 +1,23 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
 
-const { listOpsSettlementsMock, notFoundMock, resolveViewerRoleMock } = vi.hoisted(() => ({
-  listOpsSettlementsMock: vi.fn(async () => ({ data: [] })),
-  notFoundMock: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
-  resolveViewerRoleMock: vi.fn(async () => 'merchant'),
-}))
-
 vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
   redirect: vi.fn((path: string) => { throw new Error(`NEXT_REDIRECT:${path}`) }),
-}))
-
-vi.mock('@/lib/auth/viewer-role', () => ({
-  resolveViewerRole: resolveViewerRoleMock,
-}))
-
-vi.mock('@/lib/missions/queries', () => ({
-  listOpsSettlements: listOpsSettlementsMock,
-}))
-
-vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: {
-      getUser: async () => ({ data: { user: { id: 'user-1' } } }),
-    },
-  }),
+  notFound: vi.fn(() => { throw new Error('NEXT_NOT_FOUND') }),
 }))
 
 import OpsSettlementsPage from '@/app/[locale]/ops/settlements/page'
 
-describe('/[locale]/ops/settlements host', () => {
-  it('returns not found for authenticated non-ops viewers', async () => {
-    resolveViewerRoleMock.mockResolvedValueOnce('merchant')
-
+describe('/[locale]/ops/settlements legacy redirect', () => {
+  it('redirects to the current payouts home, preserving locale', async () => {
     await expect(
-      OpsSettlementsPage({ params: Promise.resolve({ locale: 'en' }) }),
-    ).rejects.toThrow('NEXT_NOT_FOUND')
+      OpsSettlementsPage({ params: Promise.resolve({ locale: 'zh-hk' }) }),
+    ).rejects.toThrow('NEXT_REDIRECT:/zh-hk/admin/creators/payouts')
+  })
 
-    expect(listOpsSettlementsMock).not.toHaveBeenCalled()
+  it('404s for an unrecognised locale', async () => {
+    await expect(
+      OpsSettlementsPage({ params: Promise.resolve({ locale: 'xx' }) }),
+    ).rejects.toThrow('NEXT_NOT_FOUND')
   })
 })

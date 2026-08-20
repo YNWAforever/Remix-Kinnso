@@ -4,10 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 
 afterEach(cleanup)
-const { roleMock, getUserMock, queueMock } = vi.hoisted(() => ({
+const { roleMock, getUserMock, queueMock, batchesMock } = vi.hoisted(() => ({
   roleMock: vi.fn(async () => 'ops'),
   getUserMock: vi.fn(async () => ({ data: { user: { id: 'u1' } } })),
   queueMock: vi.fn(async () => ({ rows: [], summary: { total: 0, byStatus: {}, owed: [], settled: [] } })),
+  batchesMock: vi.fn(async () => []),
 }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
@@ -24,11 +25,12 @@ vi.mock('@/lib/auth/authorization-context', () => ({
   },
 }))
 vi.mock('@/lib/admin/creators-queries', () => ({ getSettlementsQueue: queueMock }))
+vi.mock('@/lib/admin/payout-batches-queries', () => ({ getPayoutBatches: batchesMock }))
 vi.mock('@/lib/supabase/server', () => ({ createSupabaseServerClient: async () => ({ auth: { getUser: getUserMock } }) }))
 
 import CreatorsPayoutsPage from '@/app/[locale]/admin/creators/payouts/page'
 
-beforeEach(() => { roleMock.mockResolvedValue('ops'); getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } }); queueMock.mockClear() })
+beforeEach(() => { roleMock.mockResolvedValue('ops'); getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } } }); queueMock.mockClear(); batchesMock.mockClear() })
 
 describe('admin creators payouts host', () => {
   it('renders the payouts queue for ops', async () => {
@@ -52,5 +54,11 @@ describe('admin creators payouts host', () => {
   it('redirects an anonymous user', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: null } } as never)
     await expect(CreatorsPayoutsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) })).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+  it('renders the payout batches section', async () => {
+    const ui = await CreatorsPayoutsPage({ params: Promise.resolve({ locale: 'en' }), searchParams: Promise.resolve({}) })
+    render(ui)
+    expect(screen.getByText(en.creators.batchesHeading)).toBeTruthy()
+    expect(batchesMock).toHaveBeenCalled()
   })
 })

@@ -33,7 +33,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
 
   const role = await resolveViewerRole(supabase)
   if (role === 'merchant') redirect(`/${loc}/merchants/dashboard/post`)
-  if (role === 'ops') redirect(`/${loc}/ops/settlements`)
+  if (role === 'ops') redirect(`/${loc}/admin/creators/payouts`)
 
   // Active-creator gate. resolveViewerRole returns 'creator' for onboarding users
   // too, so status is the real check.
