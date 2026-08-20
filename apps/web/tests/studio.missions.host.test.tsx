@@ -83,4 +83,34 @@ describe('/[locale]/studio/missions host', () => {
     // merchant-1 is in the funded set returned by the rpc stub
     expect(screen.getByText('Funded')).toBeTruthy()
   })
+
+  it('never badges a funded merchant\'s coupon mission — there is no fee to fund', async () => {
+    // Same funded merchant (merchant-1 is in the rpc stub's set), but a coupon_affiliate
+    // mission type: the badge gate in mapCreatorMission must reject it on mission_type
+    // alone, so a refactor dropping the paid/hybrid clause fails this test.
+    listCreatorMerchantMissionsMock.mockResolvedValueOnce({
+      data: [{
+        id: 'mission-2',
+        title: 'Coupon push',
+        summary: 'Share the code.',
+        mission_source: 'merchant',
+        mission_type: 'coupon_affiliate',
+        status: 'published',
+        merchant_profile_id: 'merchant-1',
+        paid_fee_amount: null,
+        paid_fee_currency: null,
+        affiliate_commission_rate: 12,
+        creator_commission_rate: 8,
+        affiliate_network_programs: null,
+        mission_participants: [],
+        affiliate_partner_links: [],
+      }],
+    } as never)
+
+    const ui = await StudioMissionsPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+
+    expect(screen.getByText('Coupon push')).toBeTruthy()
+    expect(screen.queryByText('Funded')).toBeNull()
+  })
 })

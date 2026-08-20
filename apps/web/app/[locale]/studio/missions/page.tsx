@@ -143,7 +143,11 @@ export default async function StudioMissionsPage({ params }: { params: Params })
   const creatorTier = await getCreatorStoredTier(supabase, user.id)
 
   const { data } = await listCreatorMerchantMissions(supabase)
-  const { data: fundedIds } = await supabase.rpc('funded_merchant_profiles')
+  // Best-effort decorative read: a failure here degrades to no badges, never a crashed
+  // page -- but it must still leave a trace (the log-then-degrade stance of
+  // lib/home/queries.ts's getPlatformStats), not vanish silently.
+  const { data: fundedIds, error: fundedError } = await supabase.rpc('funded_merchant_profiles')
+  if (fundedError) console.warn('studio-missions-funded-query-failed', fundedError)
   const funded = new Set<string>((fundedIds as string[] | null) ?? [])
   const missions = ((data ?? []) as unknown as CreatorMissionRow[]).map((row) =>
     mapCreatorMission(row, user.id, creatorTier, funded),
