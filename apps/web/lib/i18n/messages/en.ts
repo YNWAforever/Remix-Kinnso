@@ -1131,6 +1131,18 @@ export interface Messages {
     colAmount: string; colCurrency: string; settlementsEmpty: string; owedTitle: string; settledTitle: string; moneyEmpty: string
     secAudit: string; auditEmpty: string; addNote: string; saveNote: string
     viewDetail: string
+    budgetPanelTitle: string
+    budgetBalance: string
+    budgetEnforced: string
+    budgetNotEnforced: string
+    budgetNoRow: string
+    budgetCreditLabel: string
+    budgetCreditAmountPlaceholder: string
+    budgetReasonPlaceholder: string
+    budgetCreditSubmit: string
+    budgetEnforceOn: string
+    budgetEnforceOff: string
+    budgetSaved: string
   }
   missionsOps: MissionsOpsMessages
   perks: {
@@ -2579,6 +2591,18 @@ const messages: Messages = {
     colAmount: 'Amount', colCurrency: 'Currency', settlementsEmpty: 'No settlements yet', owedTitle: 'Owed', settledTitle: 'Settled', moneyEmpty: 'None',
     secAudit: 'Moderation history', auditEmpty: 'No moderation activity yet', addNote: 'Add a note', saveNote: 'Save note',
     viewDetail: 'View 360',
+    budgetPanelTitle: 'Budget',
+    budgetBalance: 'Balance',
+    budgetEnforced: 'Enforced',
+    budgetNotEnforced: 'Not enforced',
+    budgetNoRow: 'No budget yet — the first credit creates it.',
+    budgetCreditLabel: 'Credit budget',
+    budgetCreditAmountPlaceholder: 'Amount (negative to adjust down)',
+    budgetReasonPlaceholder: 'Reason…',
+    budgetCreditSubmit: 'Apply credit',
+    budgetEnforceOn: 'Turn enforcement on',
+    budgetEnforceOff: 'Turn enforcement off',
+    budgetSaved: 'Saved.',
   },
   missionsOps: {
     title: 'Missions',

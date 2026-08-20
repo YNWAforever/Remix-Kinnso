@@ -28,7 +28,7 @@ function makeActions() {
 }
 
 function renderView(actions = makeActions()) {
-  render(<MerchantDetailView t={en.merchantsOps} locale="en" detail={detail} audit={audit} actions={actions} />)
+  render(<MerchantDetailView t={en.merchantsOps} locale="en" detail={detail} audit={audit} actions={actions} budget={null} budgetActions={{ credit: vi.fn(), enforce: vi.fn() }} />)
   return actions
 }
 
