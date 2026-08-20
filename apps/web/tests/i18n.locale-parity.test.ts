@@ -107,6 +107,33 @@ describe('i18n locale parity for new creator-profile groups', () => {
     }
   })
 
+  // Key parity proves the templated notification strings EXIST in every locale, but a
+  // translation can drop an interpolation placeholder (e.g. {amount}) and still be a
+  // non-empty string, which key parity cannot see. That silently breaks the notification —
+  // e.g. "A payout of  has been promised to you" with no amount or currency substituted.
+  it('keeps the same set of interpolation placeholders as en for every templated notification key in each locale', async () => {
+    const templatedKeys = [
+      'submission.approved',
+      'submission.rejected',
+      'submission.revision_requested',
+      'settlement.created',
+      'payout_batch.created',
+      'payout_batch.paid',
+      'payout_batch.cancelled',
+    ] as const
+
+    const placeholders = (s: string) => new Set(s.match(/\{\w+\}/g) ?? [])
+
+    const dictionaries = await Promise.all(LOCALES.map(async (l) => [l, await getDictionary(l)] as const))
+    for (const [locale, dict] of dictionaries) {
+      for (const key of templatedKeys) {
+        const enPlaceholders = placeholders(en.notifications[key])
+        const localePlaceholders = placeholders(dict.notifications[key])
+        expect([...localePlaceholders].sort(), `${locale} notifications['${key}']`).toEqual([...enPlaceholders].sort())
+      }
+    }
+  })
+
   // The directory rule is one a creator acts on, so each locale must actually name
   // the published-guide requirement rather than a vaguer "finish your profile".
   it('names the published-guide requirement for the directory in every locale', async () => {

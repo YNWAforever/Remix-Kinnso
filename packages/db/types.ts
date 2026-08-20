@@ -2423,6 +2423,51 @@ export type Database = {
           },
         ]
       }
+      // Hand-maintained (not from `supabase gen types`) -- `pnpm --filter @kinnso/db gen`
+      // reads production via --linked and R10.3's notifications table only exists on this
+      // branch's unmerged migrations. Reconcile with a real `gen --local` run once R10.3 is
+      // testable against a full local stack.
+      notifications: {
+        Row: {
+          created_at: string
+          creator_id: string
+          entity_id: string
+          entity_type: string
+          id: string
+          notification_type: string
+          payload: Json
+          read_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          notification_type: string
+          payload?: Json
+          read_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          notification_type?: string
+          payload?: Json
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ops_audit_log: {
         Row: {
           action: string
@@ -3311,6 +3356,8 @@ export type Database = {
         Args: { p_submission_id: string; p_action: string; p_reason_text: string | null }
         Returns: undefined
       }
+      notifications_mine: { Args: never; Returns: Json }
+      notifications_unread_count: { Args: never; Returns: number }
       ops_audit_log_append: {
         Args: {
           p_action: string

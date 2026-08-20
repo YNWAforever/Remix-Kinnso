@@ -10,6 +10,7 @@ import { deriveStudioNextAction } from '@/lib/studio/next-action'
 import { directoryGaps, isDirectoryListed } from '@/lib/creators/eligibility'
 import { listCreatorMerchantMissions, listAffiliateOffers, listCreatorSettlements } from '@/lib/missions/queries'
 import { getCreatorContribution } from '@/lib/contribution/queries'
+import { getUnreadNotificationCount } from '@/lib/notifications/queries'
 import { summarizeCreatorEarnings, toCreatorEarningItem, type CreatorSettlementRow } from '@/lib/missions/earnings'
 import { StudioDashboardView, type OpportunityPreview } from '@/components/kinnso/pages/StudioDashboardView'
 
@@ -56,7 +57,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
   const dna: Dna = parsed.data
   const updatedAt = (dnaRow?.updated_at as string | null) ?? new Date().toISOString()
 
-  const [handleRes, guidesRes, activeJobRes, missionsRes, offersRes, settlementsRes, contribution] = await Promise.all([
+  const [handleRes, guidesRes, activeJobRes, missionsRes, offersRes, settlementsRes, contribution, unreadCountRes] = await Promise.all([
     supabase.from('creator_social_handles').select('platform, handle, url').eq('creator_id', user.id),
     supabase.from('guides').select('id, status').eq('creator_id', user.id),
     supabase.from('creator_scan_jobs').select('id, status').eq('creator_id', user.id).in('status', ['queued', 'fetching', 'analyzing']).limit(1).maybeSingle(),
@@ -64,6 +65,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
     listAffiliateOffers(supabase),
     listCreatorSettlements(supabase),
     getCreatorContribution(supabase, user.id),
+    getUnreadNotificationCount(supabase),
   ])
 
   const handles: HandleRow[] = (handleRes.data ?? []).map((h) => ({
@@ -145,6 +147,7 @@ export default async function StudioPage({ params }: { params: Promise<{ locale:
       activeJobId={activeJobRes.data?.id ?? null}
       contribution={contribution}
       tierT={messages.tier}
+      unreadNotificationCount={unreadCountRes}
     />
   )
 }
