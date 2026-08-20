@@ -27,3 +27,4 @@ out/
 # vercel
 .vercel
 .superpowers/
+.env*
