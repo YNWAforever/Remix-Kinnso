@@ -3529,6 +3529,10 @@ export type Database = {
           traveler_user_id: string
         }[]
       }
+      get_my_offer_claim: {
+        Args: { p_claim_id: string }
+        Returns: { offer_title: string; merchant_name: string }[]
+      }
       get_you_may_like: {
         Args: { p_article_id: string; p_limit?: number; p_locale: string }
         Returns: {

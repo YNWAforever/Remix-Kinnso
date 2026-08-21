@@ -5,6 +5,17 @@ import { requireTravelerAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
+const FRIENDLY: Record<string, string> = {
+  offer_cap_reached: 'This offer is fully claimed',
+  visitor_limit_reached: "You've already claimed this offer",
+  offer_not_live: 'This offer is no longer available',
+}
+
+const mapError = (message: string, fallback: string): string => {
+  const key = Object.keys(FRIENDLY).find((k) => message.includes(k))
+  return key ? FRIENDLY[key] : fallback
+}
+
 export async function claimOfferAction(
   offerId: string,
   creatorId: string,
@@ -20,7 +31,7 @@ export async function claimOfferAction(
   })
   if (error || !data) {
     if (error) console.error('[offers] claim failed', error)
-    return formError('This offer could not be claimed')
+    return formError(mapError(error?.message ?? '', 'This offer could not be claimed'))
   }
 
   const result = data as { claim_id: string; raw_token: string; expires_at: string }

@@ -18,23 +18,21 @@ export default async function OfferClaimConfirmationPage({
 
   const cookieStore = await cookies()
   const rawToken = cookieStore.get(`offer-token-${claimId}`)?.value
+  // cookie expired or this claim isn't this visitor's -- no retrieval path exists yet, known gap
   if (!rawToken) notFound()
 
   const { data: claim, error } = await supabase
-    .from('offer_claims')
-    .select('offer_id, merchant_offers(title, merchant_profiles(company_name)), visitor_user_id')
-    .eq('id', claimId)
+    .rpc('get_my_offer_claim', { p_claim_id: claimId })
     .maybeSingle()
-  if (error || !claim || claim.visitor_user_id !== gate.user.id) notFound()
+  if (error || !claim) notFound()
 
   const messages = await getDictionary(loc)
-  const offer = claim.merchant_offers as { title: string; merchant_profiles: { company_name: string } | null } | null
 
   return (
     <OfferClaimConfirmationView
       t={messages.offerClaim}
-      offerTitle={offer?.title ?? ''}
-      merchantName={offer?.merchant_profiles?.company_name ?? ''}
+      offerTitle={claim.offer_title}
+      merchantName={claim.merchant_name ?? ''}
       rawToken={rawToken}
     />
   )
