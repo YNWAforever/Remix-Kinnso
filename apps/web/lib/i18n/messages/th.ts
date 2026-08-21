@@ -1574,5 +1574,14 @@ const messages: Messages = {
     hostPickerPlaceholder: 'เลือกครีเอเตอร์',
     hostRequiredError: 'กรุณาเลือกโฮสต์ก่อนสร้างเซสชันนี้',
   },
+  merchantOffers: {
+    title: 'Offers',
+    newButton: 'New offer',
+    emptyState: 'No offers yet',
+  },
+  offerClaim: {
+    claimButton: 'Claim',
+    validThrough: 'Valid through',
+  },
 }
 export default messages

@@ -3563,7 +3563,7 @@ export type Database = {
       }
       list_offers_for_creator: {
         Args: { p_creator_id: string }
-        Returns: unknown
+        Returns: { id: string; title: string; terms: string; discount_kind: string; discount_value: number; merchant_name: string; valid_to: string }[]
       }
       lowercase_text_array: { Args: { arr: string[] }; Returns: string[] }
       mark_booking_completed: {

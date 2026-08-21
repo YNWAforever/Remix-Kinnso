@@ -1574,5 +1574,14 @@ const messages: Messages = {
     hostPickerPlaceholder: '選擇一位創作者',
     hostRequiredError: '請先選擇主持人才能建立此場次',
   },
+  merchantOffers: {
+    title: 'Offers',
+    newButton: 'New offer',
+    emptyState: 'No offers yet',
+  },
+  offerClaim: {
+    claimButton: 'Claim',
+    validThrough: 'Valid through',
+  },
 }
 export default messages

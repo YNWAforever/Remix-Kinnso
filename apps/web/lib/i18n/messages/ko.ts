@@ -1574,5 +1574,14 @@ const messages: Messages = {
     hostPickerPlaceholder: '크리에이터 선택',
     hostRequiredError: '세션을 생성하기 전에 호스트를 선택하세요',
   },
+  merchantOffers: {
+    title: 'Offers',
+    newButton: 'New offer',
+    emptyState: 'No offers yet',
+  },
+  offerClaim: {
+    claimButton: 'Claim',
+    validThrough: 'Valid through',
+  },
 }
 export default messages

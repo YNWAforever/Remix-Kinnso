@@ -1381,6 +1381,15 @@ export interface Messages {
     saveButton: string
     hostPickerLabel: string; hostPickerPlaceholder: string; hostRequiredError: string
   }
+  merchantOffers: {
+    title: string
+    newButton: string
+    emptyState: string
+  }
+  offerClaim: {
+    claimButton: string
+    validThrough: string
+  }
 }
 
 const messages: Messages = {
@@ -2991,6 +3000,15 @@ const messages: Messages = {
     hostPickerLabel: 'Host creator',
     hostPickerPlaceholder: 'Select a creator',
     hostRequiredError: 'Select a host before creating this session',
+  },
+  merchantOffers: {
+    title: 'Offers',
+    newButton: 'New offer',
+    emptyState: 'No offers yet',
+  },
+  offerClaim: {
+    claimButton: 'Claim',
+    validThrough: 'Valid through',
   },
 }
 export default messages

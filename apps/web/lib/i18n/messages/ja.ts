@@ -1574,5 +1574,14 @@ const messages: Messages = {
     hostPickerPlaceholder: 'クリエイターを選択',
     hostRequiredError: 'セッションを作成する前にホストを選択してください',
   },
+  merchantOffers: {
+    title: 'Offers',
+    newButton: 'New offer',
+    emptyState: 'No offers yet',
+  },
+  offerClaim: {
+    claimButton: 'Claim',
+    validThrough: 'Valid through',
+  },
 }
 export default messages
