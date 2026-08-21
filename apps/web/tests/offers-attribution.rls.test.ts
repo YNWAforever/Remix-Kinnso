@@ -134,6 +134,73 @@ describe('R12.1 journey attribution + visits_driven live proof', () => {
     const row = payload.visits_driven.find((r) => r.creator_id === creatorId)
     expect(row).toBeDefined()
     expect(row!.redemptions).toBeGreaterThan(0)
+
+    // The redemptions channel above comes entirely from offer_claims/offer_redemptions
+    // (the two earlier `it`s in this file). attributed_bookings must come from an
+    // independent channel: public.bookings joined to public.experiences, using
+    // bookings.creator_id/guide_id directly -- NOT gated behind offer_claims at all (see
+    // 2449ac8, which fixed a real undercount where a booking whose visitor never claimed
+    // a merchant offer was silently dropped). Capture the pre-booking baseline first so
+    // this assertion holds regardless of how many redemptions the earlier tests produced.
+    const baselineRedemptions = row!.redemptions
+    const baselineAttributedBookings = row!.attributed_bookings
+
+    const { data: experience, error: experienceError } = await admin
+      .from('experiences')
+      .insert({
+        merchant_profile_id: merchantAId,
+        slug: `visits-driven-rls-${randomUUID()}`,
+        title: 'Visits Driven RLS Experience',
+        city: 'Hong Kong',
+        price_amount: 500,
+        currency: 'USD',
+        status: 'published',
+        published_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single()
+    expect(experienceError).toBeNull()
+    const experienceId = experience!.id as string
+
+    const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const { data: availability, error: availabilityError } = await admin
+      .from('experience_availability')
+      .insert({ experience_id: experienceId, date: futureDate, capacity: 10, booked_count: 0, status: 'open' })
+      .select('id')
+      .single()
+    expect(availabilityError).toBeNull()
+    const availabilityId = availability!.id as string
+
+    // Exactly two bookings, attributed to the same creator, with status = 'confirmed' --
+    // and no offer_claims row in sight -- to specifically prove the "no offer_claims
+    // gating" fix holds and that the FULL OUTER JOIN in merchant_insights() does not
+    // cross-multiply the two channels.
+    for (let i = 0; i < 2; i += 1) {
+      const { error: bookingError } = await admin.from('bookings').insert({
+        experience_id: experienceId,
+        availability_id: availabilityId,
+        guest_email: `visits-driven-guest-${randomUUID()}@example.test`,
+        qty: 1,
+        unit_amount: 500,
+        total_amount: 500,
+        currency: 'USD',
+        status: 'confirmed',
+        creator_id: creatorId,
+      })
+      expect(bookingError).toBeNull()
+    }
+
+    const { data: data2, error: error2 } = await staffA.rpc('merchant_insights')
+    expect(error2).toBeNull()
+    const payload2 = data2 as { visits_driven: { creator_id: string; redemptions: number; attributed_bookings: number }[] }
+    const row2 = payload2.visits_driven.find((r) => r.creator_id === creatorId)
+    expect(row2).toBeDefined()
+
+    // Not cross-multiplied: adding two independent bookings changes attributed_bookings
+    // by exactly 2 and leaves redemptions completely untouched.
+    expect(row2!.redemptions).toBe(baselineRedemptions)
+    expect(row2!.attributed_bookings).toBe(baselineAttributedBookings + 2)
+    expect(row2!.attributed_bookings).toBeGreaterThan(0)
   })
 
   it("creator_insights visits_driven total counts this creator's own redemptions", async () => {
