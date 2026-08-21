@@ -7,6 +7,18 @@
 alter table public.mission_settlements
   add column source text not null default 'mission_fee' check (source in ('mission_fee', 'visit_redemption'));
 
+-- R10.1's mission_settlements_participant_fee_uniq predates the source column and enforces
+-- "one non-affiliate settlement per participant, ever" -- correct for the one-time mission-fee
+-- case it was designed for, but wrong for visit redemptions, where a participant can and
+-- should earn many separate settlements over time. Narrow it to source = 'mission_fee' only,
+-- leaving visit_redemption rows completely unconstrained by it. R10.1's own trigger
+-- (20260815100200_r10_1_mint_settlement_on_approval.sql) always inserts with the new column's
+-- default ('mission_fee'), so its behavior is completely unchanged by this.
+drop index public.mission_settlements_participant_fee_uniq;
+create unique index mission_settlements_participant_fee_uniq
+  on public.mission_settlements (mission_participant_id)
+  where affiliate_network_event_id is null and mission_participant_id is not null and source = 'mission_fee';
+
 -- AFTER INSERT on offer_redemptions, not on offer_claims -- the settlement obligation is
 -- created at the moment of redemption (the in-store event), not at claim time.
 --

@@ -37,4 +37,9 @@ describe('settlement-on-redemption trigger', () => {
   it('writes the settlement id back onto the redemption row', () => {
     expect(sql).toContain('update public.offer_redemptions set settlement_id = v_settlement_id where id = new.id')
   })
+
+  it('narrows the R10.1 participant-fee unique index to mission_fee only, so visit_redemption rows are unconstrained', () => {
+    expect(sql).toContain('drop index public.mission_settlements_participant_fee_uniq')
+    expect(sql).toContain("where affiliate_network_event_id is null and mission_participant_id is not null and source = 'mission_fee'")
+  })
 })
