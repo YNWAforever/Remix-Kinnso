@@ -1270,6 +1270,7 @@ export interface Messages {
     creatorTitle: string
     creatorSubtitle: string
     pointsTotal: string
+    visitsDriven: string
     pointsTrajectory: string
     pointsByType: string
     typeGuide: string
@@ -1303,6 +1304,13 @@ export interface Messages {
     colDelivered: string
     merchantEmpty: string
     notApplicable: string
+    visitsDrivenTitle: string
+    visitsDrivenEmpty: string
+    colCreator: string
+    colGuide: string
+    colRedemptions: string
+    colAttributedBookings: string
+    unnamed: string
   }
   guideSave: {
     save: string
@@ -2870,6 +2878,7 @@ const messages: Messages = {
     creatorTitle: 'Your insights',
     creatorSubtitle: 'Your real activity on KINNSO. These are contribution points from your work — not money.',
     pointsTotal: 'Contribution points',
+    visitsDriven: 'Visits driven',
     pointsTrajectory: 'Points over the last 12 weeks',
     pointsByType: 'Where your points come from',
     typeGuide: 'Published guides',
@@ -2903,6 +2912,13 @@ const messages: Messages = {
     colDelivered: 'Delivered',
     merchantEmpty: 'Post a mission to start seeing campaign activity.',
     notApplicable: '—',
+    visitsDrivenTitle: 'Visits driven',
+    visitsDrivenEmpty: 'No redemptions or attributed bookings yet.',
+    colCreator: 'Creator',
+    colGuide: 'Guide',
+    colRedemptions: 'Redemptions',
+    colAttributedBookings: 'Attributed bookings',
+    unnamed: 'Unnamed',
   },
   guideSave: {
     save: 'Save',

@@ -58,6 +58,34 @@ export function MerchantInsightsView({
           <p className="text-sm text-muted-foreground">{t.merchantEmpty}</p>
         )}
       </section>
+
+      <section className="rounded-lg border p-5">
+        <h2 className="mb-3 text-sm font-medium">{t.visitsDrivenTitle}</h2>
+        {data.visitsDriven.length > 0 ? (
+          <table className="w-full text-left text-sm">
+            <thead className="text-muted-foreground">
+              <tr>
+                <th className="py-2 pr-2 font-medium">{t.colCreator}</th>
+                <th className="py-2 px-2 font-medium">{t.colGuide}</th>
+                <th className="py-2 px-2 text-right font-medium">{t.colRedemptions}</th>
+                <th className="py-2 pl-2 text-right font-medium">{t.colAttributedBookings}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.visitsDriven.map((r, i) => (
+                <tr key={`${r.creatorId}-${r.guideId ?? i}`} className="border-t">
+                  <td className="py-2 pr-2">{r.creatorName ?? t.unnamed}</td>
+                  <td className="py-2 px-2">{r.guideTitle ?? t.notApplicable}</td>
+                  <td className="py-2 px-2 text-right tabular-nums">{r.redemptions}</td>
+                  <td className="py-2 pl-2 text-right tabular-nums">{r.attributedBookings}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-sm text-muted-foreground">{t.visitsDrivenEmpty}</p>
+        )}
+      </section>
     </main>
   )
 }
