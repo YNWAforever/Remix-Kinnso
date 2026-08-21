@@ -7,6 +7,7 @@ const relatedQueries = vi.hoisted(() => ({
   guides: vi.fn(async () => { throw { code: 'PGRST205', message: 'guides schema unavailable' } }),
   articles: vi.fn(async () => { throw { code: 'PGRST205', message: 'articles schema unavailable' } }),
   sessions: vi.fn(async () => { throw { code: 'PGRST000', message: 'sessions connection unavailable' } }),
+  offers: vi.fn(async () => { throw { code: 'PGRST205', message: 'offers schema unavailable' } }),
 }))
 
 const creator = {
@@ -21,6 +22,7 @@ vi.mock('@/lib/creators/queries', () => ({
 }))
 vi.mock('@/lib/articles/queries', () => ({ getPublishedArticlesForCreator: relatedQueries.articles }))
 vi.mock('@/lib/sessions/public-queries', () => ({ getPublicSessionsForCreator: relatedQueries.sessions }))
+vi.mock('@/lib/offers/public-queries', () => ({ listOffersForCreator: relatedQueries.offers }))
 
 const notFoundError = new Error('NEXT_NOT_FOUND')
 vi.mock('next/navigation', () => ({ notFound: () => { throw notFoundError } }))
@@ -37,7 +39,8 @@ describe('/[locale]/c/[handle] optional query boundaries', () => {
     expect(relatedQueries.guides).toHaveBeenCalledWith('creator-1')
     expect(relatedQueries.articles).toHaveBeenCalledWith('maya', 'en')
     expect(relatedQueries.sessions).toHaveBeenCalledWith('creator-1')
-    expect(log).toHaveBeenCalledTimes(3)
+    expect(relatedQueries.offers).toHaveBeenCalledWith(expect.any(Object), 'creator-1')
+    expect(log).toHaveBeenCalledTimes(4)
     log.mockRestore()
   })
 })

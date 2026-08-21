@@ -15,13 +15,14 @@ describe('getMissionAttention', () => {
     expect(result).toEqual({
       overdueReviews: [{ submissionId: 's1', missionId: 'm1', missionTitle: 'Mission One', creatorId: 'c1', reviewDeadline: '2026-08-19T00:00:00Z' }],
       atRiskMissions: [{ id: 'm2', title: 'Mission Two', merchantName: 'Acme', reason: 'stalled_submissions' }],
+      redemptionVelocity: [],
     })
   })
 
   it('defaults missing arrays to empty when the RPC omits a key', async () => {
     const supabase = fakeClient({})
     const result = await getMissionAttention(supabase)
-    expect(result).toEqual({ overdueReviews: [], atRiskMissions: [] })
+    expect(result).toEqual({ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] })
   })
 
   it('propagates an RPC error rather than swallowing it', async () => {
