@@ -368,6 +368,20 @@ export interface Messages {
     errorGeneric: string
     creatorDashboard: string
     onboardingPlaceholder: string
+    forgotPassword: string
+    resetPasswordTitle: string
+    resetPasswordRequestDesc: string
+    resetPasswordSubmit: string
+    resetPasswordEmailSentDesc: string
+    newPasswordTitle: string
+    newPasswordLabel: string
+    confirmPasswordLabel: string
+    newPasswordSubmit: string
+    errorPasswordMismatch: string
+    errorPasswordTooShort: string
+    resetLinkInvalidTitle: string
+    resetLinkInvalidDesc: string
+    backToSignIn: string
   }
   onboarding: {
     title: string
@@ -1518,6 +1532,20 @@ const messages: Messages = {
     errorGeneric: 'Something went wrong. Please try again.',
     creatorDashboard: 'Creator Dashboard',
     onboardingPlaceholder: 'Onboarding wizard coming in Plan 4.',
+    forgotPassword: 'Forgot password?',
+    resetPasswordTitle: 'Reset your password',
+    resetPasswordRequestDesc: "Enter your email and we'll send you a link to reset your password.",
+    resetPasswordSubmit: 'Send reset link',
+    resetPasswordEmailSentDesc: "If an account exists for that email, we've sent a link to reset your password.",
+    newPasswordTitle: 'Choose a new password',
+    newPasswordLabel: 'New password',
+    confirmPasswordLabel: 'Confirm password',
+    newPasswordSubmit: 'Reset password',
+    errorPasswordMismatch: "Passwords don't match.",
+    errorPasswordTooShort: 'Password must be at least 8 characters.',
+    resetLinkInvalidTitle: 'This link is invalid or has expired',
+    resetLinkInvalidDesc: 'Request a new password reset link.',
+    backToSignIn: 'Back to sign in',
   },
   onboarding: {
     title: 'Set up your creator profile',
