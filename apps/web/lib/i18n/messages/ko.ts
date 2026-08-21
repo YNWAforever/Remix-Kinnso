@@ -1451,7 +1451,7 @@ const messages: Messages = {
     merchantEmpty: '미션을 게시하여 캠페인 활동을 확인하세요.',
     notApplicable: '—',
     visitsDrivenTitle: '유입 방문수',
-    visitsDrivenEmpty: '아직 사용 내역이나 관련 예약이 없습니다.',
+    visitsDrivenEmpty: '아직 사용 내역이나 귀속된 예약이 없습니다.',
     colCreator: '크리에이터',
     colGuide: '가이드',
     colRedemptions: '사용',
