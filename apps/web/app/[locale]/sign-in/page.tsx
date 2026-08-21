@@ -61,6 +61,12 @@ export default async function SignInPage({
         </div>
 
         <p className="mt-4 text-sm text-kinnso-muted">
+          <Link href={`/${locale}/forgot-password`} className="underline text-kinnso-ink">
+            {dict.auth.forgotPassword}
+          </Link>
+        </p>
+
+        <p className="mt-2 text-sm text-kinnso-muted">
           {dict.auth.noAccount}{' '}
           <Link href={`/${locale}/sign-up`} className="underline text-kinnso-ink">
             {dict.auth.signUp}
