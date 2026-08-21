@@ -26,8 +26,14 @@ describe('redeem_offer_claim RPC', () => {
     expect(sql).toContain("if v_offer.commission_kind = 'percent' and p_amount_spent is null then")
   })
 
-  it('rejects an expired claim', () => {
-    expect(sql).toContain("raise exception 'claim_expired'")
+  it('marks an expired claim expired and returns a soft-fail result instead of raising (so the status update actually commits)', () => {
+    expect(sql).toContain("update public.offer_claims set status = 'expired' where id = v_claim.id and status = 'active'")
+    expect(sql).toContain("return jsonb_build_object('expired', true)")
+  })
+
+  it('rejects a NaN amount_spent before any writes', () => {
+    expect(sql).toContain("if p_amount_spent is not null and p_amount_spent = 'NaN'::numeric then")
+    expect(sql).toContain("raise exception 'bad_amount_spent'")
   })
 
   it('revokes public/anon and grants only authenticated', () => {

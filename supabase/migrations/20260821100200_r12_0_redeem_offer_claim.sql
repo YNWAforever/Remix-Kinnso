@@ -48,7 +48,11 @@ begin
 
   if v_claim.status = 'expired' or now() > v_claim.expires_at then
     update public.offer_claims set status = 'expired' where id = v_claim.id and status = 'active';
-    raise exception 'claim_expired';
+    return jsonb_build_object('expired', true);
+  end if;
+
+  if p_amount_spent is not null and p_amount_spent = 'NaN'::numeric then
+    raise exception 'bad_amount_spent';
   end if;
 
   if v_offer.commission_kind = 'percent' and p_amount_spent is null then
