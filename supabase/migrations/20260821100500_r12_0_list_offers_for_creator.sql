@@ -16,6 +16,7 @@ language sql stable security definer set search_path = public as $$
   where mo.status = 'live'
     and now() between mo.valid_from and mo.valid_to
     and (mo.total_cap is null or mo.claimed_count < mo.total_cap)
+    and app_private.merchant_is_active(mo.merchant_profile_id)
     and exists (
       select 1 from public.mission_participants part
       where part.mission_id = mo.mission_id
@@ -27,4 +28,4 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 revoke all on function public.list_offers_for_creator(uuid) from public, anon;
-grant execute on function public.list_offers_for_creator(uuid) to authenticated, anon;
+grant execute on function public.list_offers_for_creator(uuid) to anon, authenticated;

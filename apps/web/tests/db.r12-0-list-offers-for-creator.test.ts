@@ -23,6 +23,10 @@ describe('list_offers_for_creator RPC', () => {
   })
 
   it('is readable by anon (public browsing) but writes stay authenticated-only elsewhere', () => {
-    expect(sql).toContain('grant execute on function public.list_offers_for_creator(uuid) to authenticated, anon')
+    expect(sql).toContain('grant execute on function public.list_offers_for_creator(uuid) to anon, authenticated')
+  })
+
+  it('excludes offers from paused/archived merchants, matching the codebase-wide merchant_is_active pattern', () => {
+    expect(sql).toContain('and app_private.merchant_is_active(mo.merchant_profile_id)')
   })
 })
