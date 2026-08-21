@@ -17,6 +17,7 @@ const base: CreatorInsights = {
   guideSavesTotal: 7,
   missionsByStatus: { applied: 1, active: 1, invited: 0, rejected: 0 },
   submissionsApproved: 1,
+  visitsDriven: 0,
 }
 
 describe('CreatorInsightsView', () => {

@@ -31,6 +31,12 @@ describe('getCreatorInsights', () => {
     expect(res.missionsByStatus.active).toBe(1)
     expect(res.missionsByStatus.rejected).toBe(0) // missing key defaults to 0
     expect(res.submissionsApproved).toBe(1)
+    expect(res.visitsDriven).toBe(0) // RAW has no visits_driven key -- defaults to 0
+  })
+
+  it('maps visits_driven through when present', async () => {
+    const res = await getCreatorInsights(client({ ...RAW, visits_driven: 12 }))
+    expect(res.visitsDriven).toBe(12)
   })
 
   it('throws when the RPC errors', async () => {
