@@ -11,7 +11,7 @@ const { roleMock, getUserMock, overviewMock, attentionMock } = vi.hoisted(() => 
     kpis: { total: 6, byStatus: { published: 4 }, byType: {}, byVisibility: {}, openForApplications: 4, submissionsAwaitingReview: 2 },
     missionsCreated: [], submissionsReviewed: [], atRisk: [],
   })),
-  attentionMock: vi.fn(async (): Promise<MissionAttention> => ({ overdueReviews: [], atRiskMissions: [] })),
+  attentionMock: vi.fn(async (): Promise<MissionAttention> => ({ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] })),
 }))
 vi.mock('next/navigation', () => ({
   notFound: () => { throw new Error('NEXT_NOT_FOUND') },
@@ -53,6 +53,7 @@ describe('admin missions overview host', () => {
     attentionMock.mockResolvedValueOnce({
       overdueReviews: [{ submissionId: 's1', missionId: 'm1', missionTitle: 'Overdue Mission', creatorId: 'c1', reviewDeadline: '2026-08-01T00:00:00Z' }],
       atRiskMissions: [],
+      redemptionVelocity: [],
     })
     const ui = await MissionsOverviewPage({ params: Promise.resolve({ locale: 'en' }) })
     render(ui)
