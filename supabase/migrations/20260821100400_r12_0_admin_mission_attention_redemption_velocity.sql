@@ -94,7 +94,8 @@ begin
           count(orr.id) as redemptions_last_hour
         from public.merchant_offers mo
         join public.merchant_profiles mp on mp.id = mo.merchant_profile_id
-        join public.offer_redemptions orr on orr.merchant_profile_id = mo.merchant_profile_id
+        join public.offer_claims oc on oc.offer_id = mo.id
+        join public.offer_redemptions orr on orr.offer_claim_id = oc.id
           and orr.redeemed_at > now() - interval '1 hour'
         group by mo.id, mo.title, mp.company_name
         having count(orr.id) >= 10

@@ -83,7 +83,7 @@ export async function getMissionAttention(supabase: Client): Promise<MissionAtte
     })),
     redemptionVelocity: (a.redemption_velocity ?? []).map((v) => ({
       offerId: v.offer_id, offerTitle: v.offer_title, merchantName: v.merchant_name,
-      redemptionsLastHour: v.redemptions_last_hour,
+      redemptionsLastHour: Number(v.redemptions_last_hour),
     })),
   }
 }

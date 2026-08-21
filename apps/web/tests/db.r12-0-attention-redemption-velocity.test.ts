@@ -23,4 +23,9 @@ describe('admin_mission_attention redemption_velocity widening', () => {
   it('keeps the is_active_ops gate unchanged', () => {
     expect(sql).toContain('if not public.is_active_ops() then')
   })
+
+  it('correlates redemptions to a specific offer via offer_claims, not merchant-wide', () => {
+    expect(sql).toContain('join public.offer_claims oc on oc.offer_id = mo.id')
+    expect(sql).toContain('join public.offer_redemptions orr on orr.offer_claim_id = oc.id')
+  })
 })
