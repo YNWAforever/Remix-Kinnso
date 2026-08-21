@@ -1,5 +1,6 @@
-import type { Messages } from '@/lib/i18n/dictionaries'
 'use client'
+
+import type { Messages } from '@/lib/i18n/dictionaries'
 
 import { useState, useTransition } from 'react'
 import { summarizeOffers } from '@/lib/merchants/offers-queries'
