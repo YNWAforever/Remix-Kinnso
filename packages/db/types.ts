@@ -1786,6 +1786,84 @@ export type Database = {
           },
         ]
       }
+      merchant_offers: {
+        Row: {
+          claimed_count: number
+          commission_kind: string
+          commission_value: number
+          created_at: string
+          discount_kind: string
+          discount_value: number
+          id: string
+          merchant_profile_id: string
+          mission_id: string | null
+          per_visitor_limit: number
+          redeemed_count: number
+          status: string
+          terms: string
+          title: string
+          total_cap: number | null
+          updated_at: string
+          valid_from: string
+          valid_to: string
+        }
+        Insert: {
+          claimed_count?: number
+          commission_kind: string
+          commission_value: number
+          created_at?: string
+          discount_kind: string
+          discount_value: number
+          id?: string
+          merchant_profile_id: string
+          mission_id?: string | null
+          per_visitor_limit?: number
+          redeemed_count?: number
+          status?: string
+          terms: string
+          title: string
+          total_cap?: number | null
+          updated_at?: string
+          valid_from: string
+          valid_to: string
+        }
+        Update: {
+          claimed_count?: number
+          commission_kind?: string
+          commission_value?: number
+          created_at?: string
+          discount_kind?: string
+          discount_value?: number
+          id?: string
+          merchant_profile_id?: string
+          mission_id?: string | null
+          per_visitor_limit?: number
+          redeemed_count?: number
+          status?: string
+          terms?: string
+          title?: string
+          total_cap?: number | null
+          updated_at?: string
+          valid_from?: string
+          valid_to?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_offers_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchant_offers_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       merchant_profiles: {
         Row: {
           city: string | null
@@ -2088,6 +2166,7 @@ export type Database = {
           mission_participant_id: string | null
           ops_note: string | null
           paid_fee_amount: number | null
+          source: string
           status: string
           updated_at: string
           updated_by_ops_member_id: string | null
@@ -2109,6 +2188,7 @@ export type Database = {
           mission_participant_id?: string | null
           ops_note?: string | null
           paid_fee_amount?: number | null
+          source?: string
           status?: string
           updated_at?: string
           updated_by_ops_member_id?: string | null
@@ -2130,6 +2210,7 @@ export type Database = {
           mission_participant_id?: string | null
           ops_note?: string | null
           paid_fee_amount?: number | null
+          source?: string
           status?: string
           updated_at?: string
           updated_by_ops_member_id?: string | null
@@ -2464,6 +2545,136 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_claims: {
+        Row: {
+          claim_token_hash: string
+          created_at: string
+          creator_id: string
+          expires_at: string
+          guide_id: string | null
+          id: string
+          offer_id: string
+          source_surface: string
+          status: string
+          visitor_user_id: string
+        }
+        Insert: {
+          claim_token_hash: string
+          created_at?: string
+          creator_id: string
+          expires_at: string
+          guide_id?: string | null
+          id?: string
+          offer_id: string
+          source_surface: string
+          status?: string
+          visitor_user_id: string
+        }
+        Update: {
+          claim_token_hash?: string
+          created_at?: string
+          creator_id?: string
+          expires_at?: string
+          guide_id?: string | null
+          id?: string
+          offer_id?: string
+          source_surface?: string
+          status?: string
+          visitor_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_claims_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_claims_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_claims_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_claims_visitor_user_id_fkey"
+            columns: ["visitor_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_redemptions: {
+        Row: {
+          amount_spent: number | null
+          created_at: string
+          id: string
+          merchant_profile_id: string
+          offer_claim_id: string
+          redeemed_at: string
+          redeemed_by_merchant_user_id: string
+          settlement_id: string | null
+        }
+        Insert: {
+          amount_spent?: number | null
+          created_at?: string
+          id?: string
+          merchant_profile_id: string
+          offer_claim_id: string
+          redeemed_at?: string
+          redeemed_by_merchant_user_id: string
+          settlement_id?: string | null
+        }
+        Update: {
+          amount_spent?: number | null
+          created_at?: string
+          id?: string
+          merchant_profile_id?: string
+          offer_claim_id?: string
+          redeemed_at?: string
+          redeemed_by_merchant_user_id?: string
+          settlement_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_redemptions_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_redemptions_offer_claim_id_fkey"
+            columns: ["offer_claim_id"]
+            isOneToOne: true
+            referencedRelation: "offer_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_redemptions_redeemed_by_merchant_user_id_fkey"
+            columns: ["redeemed_by_merchant_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_redemptions_settlement_id_fkey"
+            columns: ["settlement_id"]
+            isOneToOne: false
+            referencedRelation: "mission_settlements"
             referencedColumns: ["id"]
           },
         ]
@@ -3252,6 +3463,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_offer: {
+        Args: {
+          p_creator_id: string
+          p_guide_id: string | null
+          p_offer_id: string
+          p_source: string
+        }
+        Returns: Json
+      }
       confirm_booking_from_webhook: {
         Args: {
           p_stripe_checkout_session_id: string
@@ -3341,6 +3561,10 @@ export type Database = {
           title: string
         }[]
       }
+      list_offers_for_creator: {
+        Args: { p_creator_id: string }
+        Returns: unknown
+      }
       lowercase_text_array: { Args: { arr: string[] }; Returns: string[] }
       mark_booking_completed: {
         Args: { p_booking_id: string }
@@ -3390,6 +3614,10 @@ export type Database = {
       recompute_creator_contribution: {
         Args: { p_creator_id: string }
         Returns: undefined
+      }
+      redeem_offer_claim: {
+        Args: { p_raw_token: string; p_amount_spent: number | null }
+        Returns: Json
       }
       redeem_perk: {
         Args: { p_perk_id: string }
