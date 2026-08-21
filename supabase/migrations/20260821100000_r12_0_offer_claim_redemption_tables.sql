@@ -19,9 +19,9 @@ create table public.merchant_offers (
   title text not null check (char_length(btrim(title)) between 1 and 120),
   terms text not null check (char_length(btrim(terms)) between 1 and 1000),
   discount_kind text not null check (discount_kind in ('percent', 'amount', 'item')),
-  discount_value numeric not null check (discount_value > 0),
+  discount_value numeric(10,2) not null check (discount_value > 0 and discount_value <> 'NaN'::numeric),
   commission_kind text not null check (commission_kind in ('flat', 'percent')),
-  commission_value numeric not null check (commission_value > 0),
+  commission_value numeric(10,2) not null check (commission_value > 0 and commission_value <> 'NaN'::numeric),
   valid_from timestamptz not null,
   valid_to timestamptz not null check (valid_to > valid_from),
   per_visitor_limit integer not null default 1 check (per_visitor_limit > 0),
@@ -30,7 +30,9 @@ create table public.merchant_offers (
   redeemed_count integer not null default 0 check (redeemed_count >= 0),
   status text not null default 'draft' check (status in ('draft', 'live', 'paused', 'ended')),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint merchant_offers_discount_percent_bounded check (discount_kind <> 'percent' or discount_value <= 100),
+  constraint merchant_offers_commission_percent_bounded check (commission_kind <> 'percent' or commission_value <= 100)
 );
 
 create index merchant_offers_merchant_idx on public.merchant_offers (merchant_profile_id, created_at desc);
@@ -68,14 +70,19 @@ create policy merchant_offers_owner_all on public.merchant_offers
     )
   );
 
-grant select, insert, update, delete on public.merchant_offers to authenticated;
+grant select, insert, delete on public.merchant_offers to authenticated;
+grant update (title, terms, discount_kind, discount_value, commission_kind, commission_value, valid_from, valid_to, per_visitor_limit, total_cap, status, updated_at) on public.merchant_offers to authenticated;
+
+create trigger merchant_offers_set_updated_at
+  before update on public.merchant_offers
+  for each row execute procedure public.set_updated_at();
 
 create table public.offer_claims (
   id uuid primary key default gen_random_uuid(),
   offer_id uuid not null references public.merchant_offers(id) on delete cascade,
   creator_id uuid not null references public.creators(id),
   guide_id uuid references public.guides(id),
-  visitor_user_id  uuid not null,
+  visitor_user_id  uuid not null references auth.users(id),
   claim_token_hash text not null unique,
   source_surface text not null check (source_surface in ('guide', 'profile')),
   expires_at timestamptz not null,
@@ -118,7 +125,7 @@ create table public.offer_redemptions (
   id                            uuid primary key default gen_random_uuid(),
   offer_claim_id                uuid not null unique references public.offer_claims(id),
   merchant_profile_id           uuid not null references public.merchant_profiles(id),
-  redeemed_by_merchant_user_id  uuid not null,
+  redeemed_by_merchant_user_id  uuid not null references auth.users(id),
   redeemed_at                   timestamptz not null default now(),
   amount_spent                  numeric check (amount_spent >= 0),
   settlement_id                 uuid references public.mission_settlements(id),

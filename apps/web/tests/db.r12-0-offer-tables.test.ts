@@ -15,7 +15,7 @@ describe('R12.0 offer/claim/redemption tables', () => {
   })
 
   it('creates offer_claims with visitor_user_id not-null (no anonymous claim path)', () => {
-    expect(sql).toContain('visitor_user_id  uuid not null,')
+    expect(sql).toContain('visitor_user_id  uuid not null references auth.users(id)')
   })
 
   it('creates offer_redemptions referencing mission_settlements for the payout link', () => {
@@ -35,6 +35,7 @@ describe('R12.0 offer/claim/redemption tables', () => {
   })
 
   it('grants merchant_offers full CRUD for owner self-service', () => {
-    expect(sql).toContain('grant select, insert, update, delete on public.merchant_offers to authenticated')
+    expect(sql).toContain('grant select, insert, delete on public.merchant_offers to authenticated')
+    expect(sql).toContain('grant update (title, terms, discount_kind, discount_value, commission_kind, commission_value, valid_from, valid_to, per_visitor_limit, total_cap, status, updated_at) on public.merchant_offers to authenticated')
   })
 })
