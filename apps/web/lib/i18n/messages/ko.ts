@@ -1455,7 +1455,7 @@ const messages: Messages = {
     colCreator: '크리에이터',
     colGuide: '가이드',
     colRedemptions: '사용',
-    colAttributedBookings: '관련 예약',
+    colAttributedBookings: '귀속된 예약',
     unnamed: '이름 없음',
   },
   guideSave: {
