@@ -29,12 +29,18 @@ describe('claim_offer RPC', () => {
 
   it('never persists the raw token, only its sha256 hash', () => {
     expect(sql).toContain("v_token_hash := encode(extensions.digest(v_raw_token, 'sha256'), 'hex')")
-    expect(sql).toContain('claim_token_hash')
-    expect(sql).not.toContain('v_raw_token,\n        p_source')
+    expect(sql).toContain('values (p_offer_id, p_creator_id, p_guide_id, v_visitor, v_token_hash, p_source, v_offer.valid_to)')
   })
 
   it('revokes public/anon and grants only authenticated', () => {
     expect(sql).toContain('revoke all on function public.claim_offer(uuid, uuid, uuid, text) from public, anon')
     expect(sql).toContain('grant execute on function public.claim_offer(uuid, uuid, uuid, text) to authenticated')
+  })
+
+  it('rejects a signed-out caller and validates the source argument', () => {
+    expect(sql).toContain("raise exception 'unauthorized' using errcode = '42501'")
+    expect(sql).toContain("raise exception 'bad_source'")
+    expect(sql).toContain("raise exception 'guide_id_required'")
+    expect(sql).toContain("raise exception 'guide_mismatch' using errcode = '42501'")
   })
 })

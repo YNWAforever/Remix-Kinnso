@@ -42,6 +42,12 @@ begin
     raise exception 'creator_not_eligible' using errcode = '42501';
   end if;
 
+  if p_guide_id is not null and not exists (
+    select 1 from public.guides g where g.id = p_guide_id and g.creator_id = p_creator_id
+  ) then
+    raise exception 'guide_mismatch' using errcode = '42501';
+  end if;
+
   if v_offer.total_cap is not null and v_offer.claimed_count >= v_offer.total_cap then
     raise exception 'offer_cap_reached';
   end if;
