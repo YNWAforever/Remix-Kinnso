@@ -1383,12 +1383,41 @@ export interface Messages {
   }
   merchantOffers: {
     title: string
-    newButton: string
-    emptyState: string
+    fieldTitle: string
+    fieldTerms: string
+    fieldValue: string
+    fieldPerVisitorLimit: string
+    fieldTotalCap: string
+    discountItem: string
+    discountPercent: string
+    discountAmount: string
+    commissionFlat: string
+    commissionPercent: string
+    publish: string
+    yourOffers: string
+    claimed: string
+    redeemed: string
+    totalClaimed: string
+    totalRedeemed: string
+    actPublish: string
+    actPause: string
+    actEnd: string
   }
   offerClaim: {
     claimButton: string
     validThrough: string
+    heading: string
+    showAt: string
+  }
+  offerRedeem: {
+    title: string
+    scanning: string
+    manualPlaceholder: string
+    manualSubmit: string
+    amountSpentPrompt: string
+    amountSpentSubmit: string
+    success: string
+    alreadyRedeemed: string
   }
 }
 
@@ -3003,12 +3032,41 @@ const messages: Messages = {
   },
   merchantOffers: {
     title: 'Offers',
-    newButton: 'New offer',
-    emptyState: 'No offers yet',
+    fieldTitle: 'Title — e.g. Free dessert with any main',
+    fieldTerms: 'Terms',
+    fieldValue: 'Value',
+    fieldPerVisitorLimit: 'Per-visitor limit',
+    fieldTotalCap: 'Total cap',
+    discountItem: 'Free item',
+    discountPercent: 'Percent off',
+    discountAmount: 'Amount off',
+    commissionFlat: 'Flat fee',
+    commissionPercent: 'Percent of spend',
+    publish: 'Publish offer',
+    yourOffers: 'Your offers',
+    claimed: 'claimed',
+    redeemed: 'redeemed',
+    totalClaimed: 'total claims',
+    totalRedeemed: 'total redemptions',
+    actPublish: 'Publish',
+    actPause: 'Pause',
+    actEnd: 'End',
   },
   offerClaim: {
-    claimButton: 'Claim',
+    claimButton: 'Claim this offer',
     validThrough: 'Valid through',
+    heading: 'Show this at the venue',
+    showAt: 'Show this at',
+  },
+  offerRedeem: {
+    title: 'Redeem',
+    scanning: 'Point the camera at the visitor\'s QR code',
+    manualPlaceholder: 'Enter code manually',
+    manualSubmit: 'Look up',
+    amountSpentPrompt: 'Amount spent (optional unless required)',
+    amountSpentSubmit: 'Redeem',
+    success: 'Redeemed!',
+    alreadyRedeemed: 'Already redeemed',
   },
 }
 export default messages

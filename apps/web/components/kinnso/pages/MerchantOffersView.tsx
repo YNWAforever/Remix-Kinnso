@@ -1,3 +1,4 @@
+import type { Messages } from '@/lib/i18n/dictionaries'
 'use client'
 
 import { useState, useTransition } from 'react'
@@ -16,7 +17,7 @@ const emptyInput: OfferInput = {
 export function MerchantOffersView({
   t, offers, onCreate, onSetStatus,
 }: {
-  t: Record<string, string>
+  t: Messages['merchantOffers']
   offers: MerchantOfferRow[]
   onCreate: CreateOffer
   onSetStatus: SetStatus
