@@ -43,6 +43,9 @@ export function validateOfferInput(input: OfferInput): OfferValidationResult {
   const commissionValue = Number(input.commissionValue)
   if (!Number.isFinite(commissionValue) || commissionValue <= 0) return formError('Commission value must be a positive number')
 
+  if (input.discountKind === 'percent' && discountValue > 100) return formError('Percent discount cannot exceed 100')
+  if (input.commissionKind === 'percent' && commissionValue > 100) return formError('Percent commission cannot exceed 100')
+
   const validFrom = new Date(input.validFrom)
   const validTo = new Date(input.validTo)
   if (Number.isNaN(validFrom.getTime()) || Number.isNaN(validTo.getTime())) return formError('Valid dates are required')

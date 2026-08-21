@@ -49,10 +49,29 @@ describe('createMerchantOfferAction', () => {
     const insertedRow = (fromMock.mock.results[0].value.insert as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(insertedRow.merchant_profile_id).toBe('merchant-1')
   })
+
+  it('rejects a mission_id the caller does not own', async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === 'missions') return chain({ data: null, error: null })
+      return chain({ data: { id: 'offer-1' }, error: null })
+    })
+    const result = await createMerchantOfferAction({ ...validInput, missionId: 'someone-elses-mission' })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects a percent discount over 100', async () => {
+    const result = await createMerchantOfferAction({ ...validInput, discountKind: 'percent', discountValue: '150' })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects a percent commission over 100', async () => {
+    const result = await createMerchantOfferAction({ ...validInput, commissionKind: 'percent', commissionValue: '150' })
+    expect(result.ok).toBe(false)
+  })
 })
 
 describe('setMerchantOfferStatusAction', () => {
-  it('scopes the update to the caller\'s own merchant_profile_id', async () => {
+  it("scopes the update to the caller's own merchant_profile_id", async () => {
     fromMock.mockReturnValue(chain({ data: { id: 'offer-1' }, error: null }))
     await setMerchantOfferStatusAction('offer-1', 'live')
     const eqCalls = (fromMock.mock.results[0].value.eq as ReturnType<typeof vi.fn>).mock.calls

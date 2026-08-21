@@ -15,6 +15,17 @@ export async function createMerchantOfferAction(input: OfferInput): Promise<Acti
   if (!gate.ok) return gate
 
   const p = validation.parsed
+
+  if (p.missionId !== null) {
+    const { data: mission, error: missionError } = await supabase
+      .from('missions')
+      .select('id')
+      .eq('id', p.missionId)
+      .eq('merchant_profile_id', gate.merchantId)
+      .maybeSingle()
+    if (missionError || !mission) return formError('Mission not found or not yours')
+  }
+
   const { data, error } = await supabase
     .from('merchant_offers')
     .insert({
