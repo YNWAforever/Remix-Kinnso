@@ -81,6 +81,20 @@ describe('parseAnalyticsRequest', () => {
     checkout_started: validPayload(),
     signup_started: { ...base, event: 'signup_started', routeKey: 'sign_up' },
     signup_completed: { ...base, event: 'signup_completed', routeKey: 'sign_up', outcome: 'success' },
+    offer_viewed: {
+      ...base,
+      event: 'offer_viewed',
+      routeKey: 'guide_detail',
+      entityType: 'offer',
+      entityId: 'offer_1',
+    },
+    offer_claimed: {
+      ...base,
+      event: 'offer_claimed',
+      routeKey: 'creator_profile',
+      entityType: 'offer',
+      entityId: 'offer_1',
+    },
   }
 
   it.each(Object.values(validEventPayloads))('accepts the approved event taxonomy', async (payload) => {
@@ -116,6 +130,12 @@ describe('parseAnalyticsRequest', () => {
     ['a non-error outcome with an error category', { ...validEventPayloads.checkout_started, errorCategory: 'unknown' }],
     ['signup_started with an outcome', { ...validEventPayloads.signup_started, outcome: 'success' }],
     ['signup_completed error without an error category', { ...validEventPayloads.signup_completed, outcome: 'error' }],
+    ['offer_viewed with a mismatched entity type', { ...validEventPayloads.offer_viewed, entityType: 'guide' }],
+    ['offer_viewed without an entity id', (() => {
+      const { entityId: _entityId, ...payload } = validEventPayloads.offer_viewed
+      return payload
+    })()],
+    ['offer_claimed with a route key outside the offer taxonomy', { ...validEventPayloads.offer_claimed, routeKey: 'experience_detail' }],
   ])('rejects %s', async (_description, payload) => {
     await expect(
       parseAnalyticsRequest(

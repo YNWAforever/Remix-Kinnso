@@ -85,6 +85,20 @@ function hasValidEventSemantics(payload: TravellerAnalyticsPayload) {
         hasNoBookingMetadata(payload) &&
         hasNoOutcomeMetadata(payload)
       )
+    case 'offer_viewed':
+    case 'offer_claimed': {
+      const offerRouteEntityTypes = {
+        guide_detail: 'offer',
+        creator_profile: 'offer',
+      } as const
+      return (
+        payload.routeKey in offerRouteEntityTypes &&
+        payload.entityType === offerRouteEntityTypes[payload.routeKey as keyof typeof offerRouteEntityTypes] &&
+        payload.entityId !== undefined &&
+        hasNoBookingMetadata(payload) &&
+        hasNoOutcomeMetadata(payload)
+      )
+    }
     case 'booking_cta_clicked':
       return (
         payload.routeKey === 'experience_detail' &&
