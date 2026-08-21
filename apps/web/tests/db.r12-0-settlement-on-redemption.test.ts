@@ -42,4 +42,9 @@ describe('settlement-on-redemption trigger', () => {
     expect(sql).toContain('drop index public.mission_settlements_participant_fee_uniq')
     expect(sql).toContain("where affiliate_network_event_id is null and mission_participant_id is not null and source = 'mission_fee'")
   })
+
+  it('compensates R10.1\'s mint-on-approval trigger so its ON CONFLICT arbiter still matches the narrowed index', () => {
+    expect(sql).toContain('create or replace function public.create_mission_settlement_on_approval()')
+    expect(sql).toContain("on conflict (mission_participant_id) where affiliate_network_event_id is null and mission_participant_id is not null and source = 'mission_fee'")
+  })
 })

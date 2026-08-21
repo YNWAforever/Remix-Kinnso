@@ -76,3 +76,59 @@ $$;
 create trigger create_settlement_on_offer_redemption_trg
   after insert on public.offer_redemptions
   for each row execute function public.create_settlement_on_offer_redemption();
+
+-- Compensating update for create_mission_settlement_on_approval() (R10.1,
+-- 20260815100200_r10_1_mint_settlement_on_approval.sql): the ON CONFLICT arbiter above must
+-- exactly match mission_settlements_participant_fee_uniq's predicate, which this migration
+-- just narrowed to `and source = 'mission_fee'`. Without this update, every mission-fee
+-- approval would hard-error with "no unique or exclusion constraint matching the ON CONFLICT
+-- specification" -- Postgres requires an exact predicate match to resolve the arbiter, and
+-- an insert with no matching arbiter fails regardless of whether a real conflict exists.
+-- Everything else in this function is byte-identical to the shipped R10.1 version.
+create or replace function public.create_mission_settlement_on_approval()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  v_mission_id   uuid;
+  v_mission_type text;
+  v_source       text;
+  v_fee          numeric;
+  v_currency     text;
+begin
+  if new.status <> 'approved' then return new; end if;
+  if tg_op = 'update' and coalesce(old.status, '') = 'approved' then return new; end if;
+
+  select mp.mission_id, m.mission_type, m.mission_source, m.paid_fee_amount, m.paid_fee_currency
+    into v_mission_id, v_mission_type, v_source, v_fee, v_currency
+    from public.mission_participants mp
+    join public.missions m on m.id = mp.mission_id
+    where mp.id = new.mission_participant_id;
+
+  if v_mission_id is null then return new; end if;
+
+  if v_source <> 'merchant' then return new; end if;
+
+  if v_mission_type not in ('paid','hybrid') then return new; end if;
+
+  if v_fee is null or v_fee <= 0 then return new; end if;
+
+  insert into public.mission_settlements (
+    mission_id,
+    mission_participant_id,
+    status,
+    amount_currency,
+    paid_fee_amount,
+    creator_payout_status
+  ) values (
+    v_mission_id,
+    new.mission_participant_id,
+    'pending',
+    upper(coalesce(v_currency, 'HKD')),
+    v_fee,
+    'pending'
+  )
+  on conflict (mission_participant_id) where affiliate_network_event_id is null and mission_participant_id is not null and source = 'mission_fee'
+  do nothing;
+
+  return new;
+end $$;
+
