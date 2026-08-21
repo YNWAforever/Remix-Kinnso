@@ -129,6 +129,11 @@ is byte-identical to the shipped version.
 
 ```sql
 -- supabase/migrations/20260821120100_r12_1_claim_offer_journey_capture.sql
+-- CREATE OR REPLACE with appended trailing-default params creates a second, coexisting
+-- overload rather than replacing the original signature -- drop the old 4-arg version first
+-- so existing 4-arg named-argument calls don't become ambiguous.
+drop function if exists public.claim_offer(uuid, uuid, uuid, text);
+
 create or replace function public.claim_offer(
   p_offer_id uuid,
   p_creator_id uuid,

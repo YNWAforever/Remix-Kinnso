@@ -13,6 +13,10 @@ describe('claim_offer journey/locale capture', () => {
     expect(sql).toContain('p_locale text default null')
   })
 
+  it('drops the old 4-arg overload before recreating claim_offer, so the two signatures do not coexist', () => {
+    expect(sql).toContain('drop function if exists public.claim_offer(uuid, uuid, uuid, text);')
+  })
+
   it('keeps the original params (order and defaults) unchanged ahead of the new trailing ones', () => {
     expect(sql).toContain(
       'create or replace function public.claim_offer(\n' +

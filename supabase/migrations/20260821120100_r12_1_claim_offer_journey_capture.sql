@@ -8,6 +8,11 @@
 -- until Task 8) keep working unchanged. Every other line of the function body is unchanged
 -- from the shipped R12.0 version -- validate -> lock -> write, same shape as
 -- admin_create_payout_batch (R10.2).
+-- CREATE OR REPLACE with appended trailing-default params creates a second, coexisting
+-- overload rather than replacing the original signature -- drop the old 4-arg version first
+-- so existing 4-arg named-argument calls don't become ambiguous.
+drop function if exists public.claim_offer(uuid, uuid, uuid, text);
+
 create or replace function public.claim_offer(
   p_offer_id uuid,
   p_creator_id uuid,
