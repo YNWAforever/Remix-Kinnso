@@ -442,30 +442,61 @@ unchanged):
 
 ```sql
     'visits_driven', coalesce((
-      select jsonb_agg(jsonb_build_object(
-        'creator_id', r.creator_id, 'creator_name', r.creator_name,
-        'guide_id', r.guide_id, 'guide_title', r.guide_title,
-        'redemptions', r.redemptions, 'attributed_bookings', r.attributed_bookings
-      ) order by (r.redemptions + r.attributed_bookings) desc)
-      from (
+      with redemption_counts as (
+        -- redemptions: offer commission channel. A redemption only counts once its
+        -- offer_redemptions row is scoped to THIS merchant -- merchant_profile_id is
+        -- independently stored on offer_redemptions (set at redemption time), so this
+        -- does not need a join through merchant_offers to be correctly scoped (see the
+        -- removed mo join, above).
+        select oc.creator_id, oc.guide_id, count(distinct orr.id) as redemptions
+        from public.offer_claims oc
+        join public.offer_redemptions orr
+          on orr.offer_claim_id = oc.id and orr.merchant_profile_id = v_merchant
+        group by oc.creator_id, oc.guide_id
+      ),
+      booking_counts as (
+        -- attributed_bookings: booking commission channel, independent of offer_claims.
+        -- Uses bookings.creator_id/guide_id directly -- the same signal
+        -- create_booking_settlement_on_confirm() uses to trigger a creator commission --
+        -- scoped to this merchant via experiences.merchant_profile_id.
+        select b.creator_id, b.guide_id, count(distinct b.id) as attributed_bookings
+        from public.bookings b
+        join public.experiences e
+          on e.id = b.experience_id and e.merchant_profile_id = v_merchant
+        where b.status in ('confirmed', 'completed')
+          and b.creator_id is not null
+        group by b.creator_id, b.guide_id
+      ),
+      combined as (
+        -- FULL OUTER JOIN, not a plain join: a creator/guide pairing may appear in only
+        -- one of the two channels, and each channel's count must survive even when the
+        -- other channel has zero rows for that pairing. Matching on (creator_id,
+        -- guide_id) keeps the two counts as independent scalars per pairing -- no
+        -- fan-out, no cross-multiplication between redemptions and attributed_bookings.
+        -- guide_id is matched with IS NOT DISTINCT FROM so two NULL-guide pairings for
+        -- the same creator (e.g. a profile-surface claim and a guide-less booking) merge
+        -- into one combined row instead of splitting spuriously on NULL <> NULL.
         select
-          c.id as creator_id, c.display_name as creator_name,
-          g.id as guide_id, g.title as guide_title,
-          count(distinct orr.id) filter (where orr.id is not null) as redemptions,
-          count(distinct b.id) filter (where b.id is not null) as attributed_bookings
-        from public.creators c
-        left join public.offer_claims oc on oc.creator_id = c.id
-        left join public.merchant_offers mo on mo.id = oc.offer_id and mo.merchant_profile_id = p_merchant_id
-        left join public.offer_redemptions orr on orr.offer_claim_id = oc.id and orr.merchant_profile_id = p_merchant_id
-        left join public.guides g on g.id = oc.guide_id
-        left join public.experiences e on e.merchant_profile_id = p_merchant_id
-        left join public.bookings b on b.guide_id = g.id and b.experience_id = e.id and b.status in ('confirmed','completed')
-        where oc.id is not null or b.id is not null
-        group by c.id, c.display_name, g.id, g.title
-        having count(distinct orr.id) filter (where orr.id is not null) > 0
-            or count(distinct b.id) filter (where b.id is not null) > 0
+          coalesce(rc.creator_id, bc.creator_id) as creator_id,
+          coalesce(rc.guide_id, bc.guide_id) as guide_id,
+          coalesce(rc.redemptions, 0) as redemptions,
+          coalesce(bc.attributed_bookings, 0) as attributed_bookings
+        from redemption_counts rc
+        full outer join booking_counts bc
+          on bc.creator_id = rc.creator_id and bc.guide_id is not distinct from rc.guide_id
+      )
+      select jsonb_agg(jsonb_build_object(
+        'creator_id', c.id, 'creator_name', c.display_name,
+        'guide_id', g.id, 'guide_title', g.title,
+        'redemptions', top50.redemptions, 'attributed_bookings', top50.attributed_bookings
+      ) order by (top50.redemptions + top50.attributed_bookings) desc)
+      from (
+        select * from combined
+        order by (redemptions + attributed_bookings) desc
         limit 50
-      ) r
+      ) top50
+      join public.creators c on c.id = top50.creator_id
+      left join public.guides g on g.id = top50.guide_id
     ), '[]'::jsonb)
 ```
 
@@ -489,17 +520,72 @@ const sql = readFileSync(
 describe('merchant_insights visits_driven widening', () => {
   it('adds a visits_driven key with separate redemptions and attributed_bookings counts', () => {
     expect(sql).toContain("'visits_driven', coalesce((")
-    expect(sql).toContain("'redemptions', r.redemptions")
-    expect(sql).toContain("'attributed_bookings', r.attributed_bookings")
+    expect(sql).toContain("'redemptions', top50.redemptions")
+    expect(sql).toContain("'attributed_bookings', top50.attributed_bookings")
   })
 
-  it('scopes both counts to the calling merchant', () => {
-    expect(sql).toContain('mo.merchant_profile_id = p_merchant_id')
-    expect(sql).toContain('orr.merchant_profile_id = p_merchant_id')
+  it('keeps merchant_insights a zero-arg function (pure additive change, no signature change)', () => {
+    expect(sql).toContain('create or replace function public.merchant_insights()')
+    expect(sql).not.toContain('drop function public.merchant_insights')
+  })
+
+  it('scopes both counts to the calling merchant via v_merchant, not another merchant_id', () => {
+    // merchant_insights() takes no parameters -- it resolves the caller's own merchant
+    // into v_merchant from auth.uid() against merchant_profiles, same as every other
+    // key in this function. Both CTEs must reuse that same variable rather than
+    // trusting a caller-supplied merchant id. The redemption channel scopes via
+    // offer_redemptions.merchant_profile_id directly (no merchant_offers join is needed
+    // -- see the CTE's own comment); the booking channel scopes via
+    // experiences.merchant_profile_id.
+    expect(sql).toContain('orr.merchant_profile_id = v_merchant')
+    expect(sql).toContain('e.merchant_profile_id = v_merchant')
   })
 
   it('does not merge the two counts into one number', () => {
     expect(sql).not.toContain('redemptions + attributed_bookings as')
+    expect(sql).not.toMatch(/'visits',\s*r\.redemptions\s*\+\s*r\.attributed_bookings/)
+  })
+
+  it('leaves the existing missions_published, per_mission, and totals keys untouched', () => {
+    expect(sql).toContain("'missions_published', (")
+    expect(sql).toContain("'per_mission', coalesce((")
+    expect(sql).toContain("'totals', (")
+  })
+
+  it('orders the top-50 truncation subquery before limiting, so LIMIT does not pick an arbitrary/unstable row set', () => {
+    // Postgres LIMIT without ORDER BY has no defined row selection. The inner subquery
+    // that truncates `combined` to 50 rows must sort by combined activity (redemptions +
+    // attributed_bookings) descending immediately before its LIMIT 50, so a merchant with
+    // more than 50 qualifying creator/guide rows reliably keeps its actual top performers.
+    expect(sql).toContain('order by (redemptions + attributed_bookings) desc\n        limit 50')
+  })
+
+  it('computes attributed_bookings independently of offer_claims, from two separately-grouped CTEs combined via FULL OUTER JOIN', () => {
+    // The bug this migration fixes: attributed_bookings was previously only reachable
+    // through offer_claims, so a booking attributed to a creator/guide who never had a
+    // merchant offer claimed was silently dropped. booking_counts must select straight
+    // from public.bookings using b.creator_id/b.guide_id, with no join to offer_claims
+    // (or to guides, which would only be reachable via offer_claims in the old shape)
+    // gating which bookings are visible.
+    // Strip `--` comment lines before asserting: the CTE's own explanatory comment
+    // mentions "offer_claims" by name (to explain the independence it provides), which
+    // would false-positive a raw not.toContain check against the full text.
+    const bookingCountsCte = sql
+      .slice(sql.indexOf('booking_counts as ('), sql.indexOf('combined as ('))
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('--'))
+      .join('\n')
+    expect(bookingCountsCte).toContain('from public.bookings b')
+    expect(bookingCountsCte).toContain('b.creator_id')
+    expect(bookingCountsCte).not.toContain('offer_claims')
+    expect(bookingCountsCte).not.toContain('join public.guides')
+
+    // redemptions and attributed_bookings must come from two independently-computed
+    // CTEs (redemption_counts, booking_counts) joined via FULL OUTER JOIN, so neither
+    // channel's presence gates the other's count.
+    expect(sql).toContain('redemption_counts as (')
+    expect(sql).toContain('booking_counts as (')
+    expect(sql).toContain('full outer join booking_counts bc')
   })
 })
 ```
