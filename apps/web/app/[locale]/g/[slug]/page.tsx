@@ -7,6 +7,9 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getGuideBySlug } from '@/lib/guides/queries'
 import { isGuideSaved } from '@/lib/saves/guide-queries'
 import { getGuideRatingAggregate, listPublishedReviewsForGuide } from '@/lib/reviews/queries'
+import { listOffersForCreator } from '@/lib/offers/public-queries'
+import { OfferClaimCard } from '@/components/kinnso/OfferClaimCard'
+import { claimOfferAction } from '@/lib/offers/actions'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabasePublicClient } from '@/lib/supabase/public'
 import { optionalQuery, optionalValue } from '@/lib/resilience/optional'
@@ -63,9 +66,10 @@ export default async function GuidePage({
     return { user, isSaved }
   }, { user: null, isSaved: false })
 
-  const [rating, reviews] = await Promise.all([
+  const [rating, reviews, offers] = await Promise.all([
     optionalQuery('guide-rating', () => getGuideRatingAggregate(createSupabasePublicClient(), guide.id), null),
     optionalQuery('guide-reviews', () => listPublishedReviewsForGuide(createSupabasePublicClient(), guide.id), []),
+    optionalQuery('guide-offers', () => (guide.creatorId ? listOffersForCreator(createSupabasePublicClient(), guide.creatorId) : Promise.resolve([])), []),
   ])
 
   const canonical = `${SITE_URL}/${locale}/g/${slug}`
@@ -154,6 +158,26 @@ export default async function GuidePage({
           </div>
         </aside>
       </section>
+
+      {offers.length > 0 && guide.creatorId && (
+        <section className="mt-6">
+          <h2 className="text-base font-bold text-kinnso-ink mb-4">Featured Offers</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {offers.map((offer) => (
+              <OfferClaimCard
+                key={offer.id}
+                t={messages.offerClaim}
+                locale={locale as Locale}
+                offer={offer}
+                creatorId={guide.creatorId!}
+                guideId={guide.id}
+                source="guide"
+                onClaim={claimOfferAction}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mt-6 rounded-lg bg-white p-6">
         <h2 className="text-base font-bold text-kinnso-ink">

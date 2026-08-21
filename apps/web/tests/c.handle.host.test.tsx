@@ -3,11 +3,12 @@ import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import type { PublicCreator } from '@/lib/creators/queries'
 
-const { getCreatorMock, guidesMock, articlesMock, sessionsMock } = vi.hoisted(() => ({
+const { getCreatorMock, guidesMock, articlesMock, sessionsMock, offersMock } = vi.hoisted(() => ({
   getCreatorMock: vi.fn(),
   guidesMock: vi.fn(),
   articlesMock: vi.fn(),
   sessionsMock: vi.fn(),
+  offersMock: vi.fn(),
 }))
 
 const creator: PublicCreator = {
@@ -26,6 +27,7 @@ vi.mock('@/lib/creators/queries', () => ({
 }))
 vi.mock('@/lib/articles/queries', () => ({ getPublishedArticlesForCreator: articlesMock }))
 vi.mock('@/lib/sessions/public-queries', () => ({ getPublicSessionsForCreator: sessionsMock }))
+vi.mock('@/lib/offers/public-queries', () => ({ listOffersForCreator: offersMock }))
 
 const notFoundError = new Error('NEXT_NOT_FOUND')
 vi.mock('next/navigation', () => ({ notFound: () => { throw notFoundError } }))
@@ -37,6 +39,7 @@ beforeEach(() => {
   guidesMock.mockResolvedValue([])
   articlesMock.mockResolvedValue([])
   sessionsMock.mockResolvedValue([])
+  offersMock.mockResolvedValue([])
   cleanup()
   vi.clearAllMocks()
 })

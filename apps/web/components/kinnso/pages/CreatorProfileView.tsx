@@ -1,7 +1,9 @@
+import type { PublicOffer } from '@/lib/offers/public-queries'
 import GuideCard from '@/components/kinnso/GuideCard'
 import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import { ArticleCard } from '@/components/ArticleCard'
 import SessionCard from '@/components/kinnso/SessionCard'
+import { OfferClaimCard } from '@/components/kinnso/OfferClaimCard'
 import { EnquiryDialog } from '@/components/kinnso/enquiries/EnquiryDialog'
 import type { CreatorArticleCard } from '@/lib/articles/queries'
 import type { PublicSession } from '@/lib/sessions/public-queries'
@@ -20,6 +22,8 @@ interface Props {
   related?: Pick<Messages['destinations'], 'articlesHeading' | 'sessionsHeading'>
   articles?: CreatorArticleCard[]
   sessions?: PublicSession[]
+  offers?: PublicOffer[]
+  offerClaim?: { onClaim: (offerId: string, creatorId: string, guideId: string | null, source: 'guide' | 'profile') => Promise<{ ok: boolean; claimId?: string; errors?: Record<string, string[]> }>; messages: Messages['offerClaim'] }
 
 }
 function hueFromHandle(handle: string): number {
@@ -38,7 +42,7 @@ function Chips({ items }: { items: string[] }) {
   )
 }
 
-export function CreatorProfileView({ creator, locale, embedded, t, enquiry, related, articles = [], sessions = [] }: Props) {
+export function CreatorProfileView({ creator, locale, embedded, t, enquiry, related, articles = [], sessions = [], offers = [], offerClaim }: Props) {
   const wrap = embedded ? '' : 'k2-container py-8 md:py-12'
   const hue = hueFromHandle(creator.handle)
   const pr = creator.profile
@@ -125,6 +129,25 @@ export function CreatorProfileView({ creator, locale, embedded, t, enquiry, rela
           {sessions.map((session) => <SessionCard key={session.id} session={session} locale={locale} />)}
         </div>
       </section>}
+      {offers && offers.length > 0 && offerClaim && (
+        <section className="mt-8">
+          <h2 className="text-xl font-bold text-kinnso-ink">Featured Offers</h2>
+          <div className="mt-4 flex gap-4 overflow-x-auto pb-4">
+            {offers.map((offer) => (
+              <OfferClaimCard
+                key={offer.id}
+                t={offerClaim.messages}
+                locale={locale}
+                offer={offer}
+                creatorId={creator.id}
+                guideId={null}
+                source="profile"
+                onClaim={offerClaim.onClaim}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   )
 }

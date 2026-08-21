@@ -21,7 +21,7 @@ describe('MissionsOverviewView', () => {
           missionsCreated: [], submissionsReviewed: [],
           atRisk: [{ id: 'm1', title: 'Tokyo Winter Stays Showcase', merchantName: 'Sunrise Stays HK', reason: 'stalled_submissions' }],
         }}
-        attention={{ overdueReviews: [], atRiskMissions: [] }}
+        attention={{ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] }}
       />,
     )
     expect(screen.getByText('6')).toBeTruthy()
@@ -38,7 +38,7 @@ describe('MissionsOverviewView', () => {
           kpis: { total: 0, byStatus: {}, byType: {}, byVisibility: {}, openForApplications: 0, submissionsAwaitingReview: 0 },
           missionsCreated: [], submissionsReviewed: [], atRisk: [],
         }}
-        attention={{ overdueReviews: [], atRiskMissions: [] }}
+        attention={{ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] }}
       />,
     )
     expect(screen.getByText('Nothing at risk right now')).toBeTruthy()
@@ -53,7 +53,7 @@ describe('MissionsOverviewView', () => {
           kpis: { total: 6, byStatus: { published: 4 }, byType: {}, byVisibility: {}, openForApplications: 4, submissionsAwaitingReview: 2 },
           missionsCreated: [], submissionsReviewed: [], atRisk: [],
         }}
-        attention={{ overdueReviews: [], atRiskMissions: [] }}
+        attention={{ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] }}
       />,
     )
     const link = screen.getByRole('link', { name: new RegExp(t.kpiSubmissionsAwaitingReview) })
@@ -71,7 +71,7 @@ describe('MissionsOverviewView', () => {
       },
     }
     const { rerender } = render(
-      <MissionsOverviewView {...base} attention={{ overdueReviews: [], atRiskMissions: [] }} />,
+      <MissionsOverviewView {...base} attention={{ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] }} />,
     )
     expect(screen.getByText(t.attentionOverdueEmpty)).toBeTruthy()
 
@@ -81,6 +81,7 @@ describe('MissionsOverviewView', () => {
         attention={{
           overdueReviews: [{ submissionId: 's1', missionId: 'm1', missionTitle: 'Overdue Kyoto Push', creatorId: 'c1', reviewDeadline: '2026-08-01T00:00:00Z' }],
           atRiskMissions: [],
+          redemptionVelocity: [],
         }}
       />,
     )

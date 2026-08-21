@@ -59,11 +59,13 @@ export async function getMissionsOverview(supabase: Client, days = 30): Promise<
 export interface MissionAttention {
   overdueReviews: { submissionId: string; missionId: string; missionTitle: string; creatorId: string; reviewDeadline: string }[]
   atRiskMissions: { id: string; title: string; merchantName: string | null; reason: string }[]
+  redemptionVelocity: { offerId: string; offerTitle: string; merchantName: string | null; redemptionsLastHour: number }[]
 }
 
 type AttentionPayload = {
   overdue_reviews?: { submission_id: string; mission_id: string; mission_title: string; creator_id: string; review_deadline: string }[]
   at_risk_missions?: { id: string; title: string; merchant_name: string | null; reason: string }[]
+  redemption_velocity?: { offer_id: string; offer_title: string; merchant_name: string | null; redemptions_last_hour: number }[]
 }
 
 /** Backed by the SECURITY DEFINER admin_mission_attention() RPC (gated on is_active_ops()). */
@@ -78,6 +80,10 @@ export async function getMissionAttention(supabase: Client): Promise<MissionAtte
     })),
     atRiskMissions: (a.at_risk_missions ?? []).map((r) => ({
       id: r.id, title: r.title, merchantName: r.merchant_name, reason: r.reason,
+    })),
+    redemptionVelocity: (a.redemption_velocity ?? []).map((v) => ({
+      offerId: v.offer_id, offerTitle: v.offer_title, merchantName: v.merchant_name,
+      redemptionsLastHour: Number(v.redemptions_last_hour),
     })),
   }
 }

@@ -4,9 +4,13 @@ import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { CreatorProfileView } from '@/components/kinnso/pages/CreatorProfileView'
 import { getCreatorByHandle, getPublishedGuidesForCreator } from '@/lib/creators/queries'
+import { listOffersForCreator } from '@/lib/offers/public-queries'
+import { OfferClaimCard } from '@/components/kinnso/OfferClaimCard'
+import { claimOfferAction } from '@/lib/offers/actions'
 import { buildCreatorMetadata, SITE_URL } from '@/lib/seo/metadata'
 import { getPublishedArticlesForCreator } from '@/lib/articles/queries'
 import { getPublicSessionsForCreator } from '@/lib/sessions/public-queries'
+import { createSupabasePublicClient } from '@/lib/supabase/public'
 import { optionalEnrichmentQuery } from '@/lib/resilience/optional'
 import { creatorProfileJsonLd, breadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { JsonLd } from '@/components/JsonLd'
@@ -45,10 +49,11 @@ export default async function CreatorPublicPage({
   const creator = await getCreatorByHandle(handle)
   if (!creator) notFound()
   const canonical = `${SITE_URL}/${locale}/c/${handle}`
-  const [guides, articles, sessions] = await Promise.all([
+  const [guides, articles, sessions, offers] = await Promise.all([
     optionalEnrichmentQuery('creator-profile-guides', () => getPublishedGuidesForCreator(creator.id), []),
     optionalEnrichmentQuery('creator-profile-articles', () => getPublishedArticlesForCreator(creator.handle, locale as Locale), []),
     optionalEnrichmentQuery('creator-profile-sessions', () => getPublicSessionsForCreator(creator.id), []),
+    optionalEnrichmentQuery('creator-profile-offers', () => listOffersForCreator(createSupabasePublicClient(), creator.id), []),
   ])
   const ld = [
     creatorProfileJsonLd({
@@ -70,6 +75,8 @@ export default async function CreatorPublicPage({
         related={messages.destinations}
         articles={articles}
         sessions={sessions}
+        offers={offers}
+        offerClaim={{ onClaim: claimOfferAction, messages: messages.offerClaim }}
       />
     </>
   )
