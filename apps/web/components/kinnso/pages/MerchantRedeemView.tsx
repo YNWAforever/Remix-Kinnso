@@ -116,7 +116,14 @@ export function MerchantRedeemView({ t, onRedeem }: {
           />
           <button
             className="mt-2 rounded-full bg-kinnso-orange px-4 py-2 text-sm font-bold text-white"
-            onClick={() => redeem(pendingToken, amountSpent.trim() === '' ? null : Number(amountSpent))}
+            onClick={() => {
+              const trimmed = amountSpent.trim()
+              if (trimmed !== '' && Number.isNaN(Number(trimmed))) {
+                setError('Enter a valid number')
+                return
+              }
+              redeem(pendingToken, trimmed === '' ? null : Number(trimmed))
+            }}
           >
             {t.amountSpentSubmit}
           </button>

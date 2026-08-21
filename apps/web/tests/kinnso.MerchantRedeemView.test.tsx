@@ -52,4 +52,14 @@ describe('MerchantRedeemView', () => {
     fireEvent.click(redeemButtons[redeemButtons.length - 1])
     await waitFor(() => expect(screen.getByText('Code not recognized')).toBeInTheDocument())
   })
+
+  it('rejects a non-numeric amount instead of silently discarding it', async () => {
+    const onRedeem = vi.fn()
+    render(<MerchantRedeemView t={t} onRedeem={onRedeem} />)
+    fireEvent.change(screen.getByPlaceholderText('Enter code manually'), { target: { value: 'abc123' } })
+    fireEvent.click(screen.getByText('Look up'))
+    fireEvent.change(screen.getByPlaceholderText('0.00'), { target: { value: 'abc' } })
+    fireEvent.click(screen.getAllByText('Redeem').at(-1)!)
+    expect(onRedeem).not.toHaveBeenCalled()
+  })
 })

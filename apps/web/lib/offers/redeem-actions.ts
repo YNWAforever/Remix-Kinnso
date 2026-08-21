@@ -31,12 +31,14 @@ export async function redeemOfferClaimAction(
     return formError('Could not redeem this offer')
   }
 
-  const result = data as { redemption_id: string; redeemed_at: string; already_redeemed: boolean }
+  const result = data as { redemption_id?: string; redeemed_at?: string; already_redeemed?: boolean; expired?: boolean }
+  if (result.expired) return formError('This offer has expired')
+
   revalidatePath('/merchants/dashboard/offers')
   return {
     ok: true,
-    redemptionId: result.redemption_id,
-    redeemedAt: result.redeemed_at,
-    alreadyRedeemed: result.already_redeemed,
+    redemptionId: result.redemption_id as string,
+    redeemedAt: result.redeemed_at as string,
+    alreadyRedeemed: result.already_redeemed as boolean,
   }
 }

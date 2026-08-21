@@ -33,4 +33,11 @@ describe('redeemOfferClaimAction', () => {
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.errors.form[0]).toBe('This offer has expired')
   })
+
+  it('reports a friendly error when the claim has expired, not a false success', async () => {
+    rpcMock.mockResolvedValue({ data: { expired: true }, error: null })
+    const result = await redeemOfferClaimAction('rawtoken', null)
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.errors.form[0]).toBe('This offer has expired')
+  })
 })
