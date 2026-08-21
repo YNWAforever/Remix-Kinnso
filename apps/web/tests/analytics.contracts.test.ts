@@ -31,7 +31,13 @@ describe('traveller analytics contract', () => {
       'checkout_started',
       'signup_started',
       'signup_completed',
+      'offer_viewed',
+      'offer_claimed',
     ])
+  })
+
+  it('does not include offer_redeemed, which is server-emitted only via redeem_offer_claim', () => {
+    expect(TRAVELLER_ANALYTICS_EVENTS).not.toContain('offer_redeemed')
   })
 
   it('accepts a valid payload with supported enums', () => {
