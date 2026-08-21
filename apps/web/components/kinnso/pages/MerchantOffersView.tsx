@@ -2,6 +2,7 @@ import type { Messages } from '@/lib/i18n/dictionaries'
 'use client'
 
 import { useState, useTransition } from 'react'
+import { summarizeOffers } from '@/lib/merchants/offers-queries'
 import type { MerchantOfferRow } from '@/lib/merchants/offers-queries'
 import type { OfferInput } from '@/lib/merchants/offers-validation'
 
@@ -38,9 +39,14 @@ export function MerchantOffersView({
     })
   }
 
+  const summary = summarizeOffers(offers)
+
   return (
     <main>
       <h1 className="k-display">{t.title}</h1>
+      <p className="mt-1 text-kinnso-muted">
+        {summary.totalClaimed} {t.totalClaimed} · {summary.totalRedeemed} {t.totalRedeemed}
+      </p>
       <section className="mt-6 max-w-lg">
         <input className="w-full rounded border border-kinnso-line p-2" placeholder={t.fieldTitle}
           value={input.title} onChange={(e) => setInput({ ...input, title: e.target.value })} />

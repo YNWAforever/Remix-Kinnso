@@ -38,3 +38,15 @@ export async function listMerchantOffers(supabase: Client, merchantProfileId: st
     status: row.status,
   }))
 }
+
+export interface OffersSummary {
+  totalClaimed: number
+  totalRedeemed: number
+}
+
+export function summarizeOffers(offers: MerchantOfferRow[]): OffersSummary {
+  return {
+    totalClaimed: offers.reduce((sum, o) => sum + o.claimedCount, 0),
+    totalRedeemed: offers.reduce((sum, o) => sum + o.redeemedCount, 0),
+  }
+}
