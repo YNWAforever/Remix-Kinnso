@@ -46,6 +46,8 @@ export type TravellerAnalyticsMetadataByEvent = {
     outcome: 'error'
     errorCategory: 'invalid' | 'rate_limited' | 'unavailable' | 'unknown'
   })
+  offer_viewed: CommonMetadata & { routeKey: 'guide_detail' | 'creator_profile'; entityType: 'offer'; entityId: string }
+  offer_claimed: CommonMetadata & { routeKey: 'guide_detail' | 'creator_profile'; entityType: 'offer'; entityId: string }
   signup_started: CommonMetadata & { routeKey: 'sign_up' }
   signup_completed: CommonMetadata & {
     routeKey: 'sign_up'
@@ -119,6 +121,14 @@ export function hasAnalyticsConsent(): boolean {
     return false
   }
   return true
+}
+
+/** The visitor's current consented journey id, or null if unconsented/no journey yet. */
+export function getCurrentJourneyId(): string | null {
+  if (!hasAnalyticsConsent()) return null
+  const storage = getStorage()
+  const journeyId = getStorageValue(storage, JOURNEY_KEY)
+  return isJourneyId(journeyId) ? journeyId : null
 }
 
 export function subscribeToAnalyticsConsent(callback: ConsentSubscriber): () => void {
