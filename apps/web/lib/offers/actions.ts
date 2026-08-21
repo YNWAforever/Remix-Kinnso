@@ -25,9 +25,9 @@ export async function claimOfferAction(
   // `locale`/`journeyId` are captured client-side (getCurrentJourneyId reads
   // localStorage, which is unavailable in this server action) and threaded
   // through by the caller -- see OfferClaimCard's claim().
-  locale?: Locale,
-  journeyId?: string | null,
+  options?: { locale?: Locale; journeyId?: string | null },
 ): Promise<ActionResult<{ claimId: string }>> {
+  const { locale, journeyId } = options ?? {}
   const supabase = await createSupabaseServerClient()
   const gate = await requireTravelerAction(supabase)
   if (!gate.ok) return gate

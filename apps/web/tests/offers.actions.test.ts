@@ -38,7 +38,16 @@ describe('claimOfferAction', () => {
 
   it('passes null journey_id/locale when no journey id is supplied (unconsented)', async () => {
     rpcMock.mockResolvedValue({ data: { claim_id: 'claim-1', raw_token: 'rawtoken123', expires_at: '2027-06-01T00:00:00.000Z' }, error: null })
-    await claimOfferAction('offer-1', 'creator-1', 'guide-1', 'guide', 'en', null)
+    await claimOfferAction('offer-1', 'creator-1', 'guide-1', 'guide', { locale: 'en', journeyId: null })
+    expect(rpcMock).toHaveBeenCalledWith('claim_offer', {
+      p_offer_id: 'offer-1', p_creator_id: 'creator-1', p_guide_id: 'guide-1', p_source: 'guide',
+      p_journey_id: null, p_locale: null,
+    })
+  })
+
+  it('passes null journey_id/locale when no options are supplied at all', async () => {
+    rpcMock.mockResolvedValue({ data: { claim_id: 'claim-1', raw_token: 'rawtoken123', expires_at: '2027-06-01T00:00:00.000Z' }, error: null })
+    await claimOfferAction('offer-1', 'creator-1', 'guide-1', 'guide')
     expect(rpcMock).toHaveBeenCalledWith('claim_offer', {
       p_offer_id: 'offer-1', p_creator_id: 'creator-1', p_guide_id: 'guide-1', p_source: 'guide',
       p_journey_id: null, p_locale: null,
@@ -47,7 +56,7 @@ describe('claimOfferAction', () => {
 
   it('passes the real journey id and locale when a journey id is supplied (consented)', async () => {
     rpcMock.mockResolvedValue({ data: { claim_id: 'claim-1', raw_token: 'rawtoken123', expires_at: '2027-06-01T00:00:00.000Z' }, error: null })
-    await claimOfferAction('offer-1', 'creator-1', 'guide-1', 'guide', 'en', '11111111-1111-4111-8111-111111111111')
+    await claimOfferAction('offer-1', 'creator-1', 'guide-1', 'guide', { locale: 'en', journeyId: '11111111-1111-4111-8111-111111111111' })
     expect(rpcMock).toHaveBeenCalledWith('claim_offer', {
       p_offer_id: 'offer-1', p_creator_id: 'creator-1', p_guide_id: 'guide-1', p_source: 'guide',
       p_journey_id: '11111111-1111-4111-8111-111111111111', p_locale: 'en',

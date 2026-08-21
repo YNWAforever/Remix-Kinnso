@@ -1,14 +1,19 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useTransition } from 'react'
+import { useEffect, useRef, useTransition, useSyncExternalStore } from 'react'
 import type { Locale } from '@/lib/i18n/config'
 import type { PublicOffer } from '@/lib/offers/public-queries'
-import { getCurrentJourneyId, trackTravellerEvent } from '@/lib/analytics/client'
+import {
+  getCurrentJourneyId,
+  hasAnalyticsConsent,
+  subscribeToAnalyticsConsent,
+  trackTravellerEvent,
+} from '@/lib/analytics/client'
 
-type ClaimOffer = (
+export type ClaimOffer = (
   offerId: string, creatorId: string, guideId: string | null, source: 'guide' | 'profile',
-  locale?: Locale, journeyId?: string | null,
+  options?: { locale?: Locale; journeyId?: string | null },
 ) => Promise<{ ok: boolean; claimId?: string; errors?: Record<string, string[]> }>
 
 export function OfferClaimCard({
@@ -24,19 +29,23 @@ export function OfferClaimCard({
 }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const consented = useSyncExternalStore(subscribeToAnalyticsConsent, hasAnalyticsConsent, () => false)
+  const tracked = useRef(false)
+  const viewedMetadata = useRef({
+    locale, routeKey: source === 'guide' ? 'guide_detail' as const : 'creator_profile' as const,
+    entityType: 'offer' as const, entityId: offer.id,
+  })
 
   useEffect(() => {
-    trackTravellerEvent('offer_viewed', {
-      locale, routeKey: source === 'guide' ? 'guide_detail' : 'creator_profile',
-      entityType: 'offer', entityId: offer.id,
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (!consented || tracked.current) return
+    tracked.current = true
+    trackTravellerEvent('offer_viewed', viewedMetadata.current)
+  }, [consented])
 
   function claim() {
     startTransition(async () => {
       const journeyId = getCurrentJourneyId()
-      const result = await onClaim(offer.id, creatorId, guideId, source, locale, journeyId)
+      const result = await onClaim(offer.id, creatorId, guideId, source, { locale, journeyId })
       if (result.ok && result.claimId) {
         trackTravellerEvent('offer_claimed', {
           locale, routeKey: source === 'guide' ? 'guide_detail' : 'creator_profile',
