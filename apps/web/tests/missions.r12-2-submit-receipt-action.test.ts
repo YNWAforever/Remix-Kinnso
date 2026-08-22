@@ -25,6 +25,19 @@ beforeEach(() => {
 })
 
 describe('submitReceiptAction', () => {
+  it.each([
+    ['a whitespace-only proof URL', '   '],
+    ['plain non-URL text', 'not a url'],
+  ])('rejects %s client-side, before the gate or the RPC are ever reached', async (_label, proofUrl) => {
+    const result = await submitReceiptAction({ missionId: 'm1', proofUrl })
+    expect(result.ok).toBe(false)
+    if (!result.ok) {
+      expect(Object.values(result.errors).flat().length).toBeGreaterThan(0)
+    }
+    expect(gateMock).not.toHaveBeenCalled()
+    expect(rpcMock).not.toHaveBeenCalled()
+  })
+
   it('rejects a signed-out / non-creator caller before ever calling the RPC', async () => {
     gateMock.mockResolvedValueOnce({ ok: false, errors: { form: ['Sign in is required'] } })
     const result = await submitReceiptAction({ missionId: 'm1', proofUrl: 'https://x/receipt.jpg' })

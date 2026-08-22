@@ -13,6 +13,7 @@ import { nextJoinStatus, reviewParticipant, reviewSubmission } from '@/lib/missi
 import {
   validateMissionDraft,
   validatePartnerLinkRequest,
+  validateReceiptProof,
   validateSubmission,
 } from '@/lib/missions/validation'
 import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
@@ -587,6 +588,9 @@ export async function submitReceiptAction(
   input: SubmitReceiptInput,
 ): Promise<ActionResult<{ submissionId: string }>> {
   'use server'
+
+  const validation = validateReceiptProof({ proofUrl: input.proofUrl })
+  if (!validation.ok) return { ok: false, errors: validation.errors }
 
   const supabase = await getSupabase()
   const gate = await requireCreatorAction(supabase)
