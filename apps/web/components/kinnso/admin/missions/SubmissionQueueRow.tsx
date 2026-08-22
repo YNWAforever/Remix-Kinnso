@@ -18,13 +18,32 @@ type ReviewActionFn = (
   missionId: string | null,
 ) => Promise<ActionResult<{ id: string }>>
 
-const REASON_OPTIONS = (t: T): Array<{ value: string; label: string }> => [
+// R11.0's original taxonomy -- used by every mission type except receipt_cashback.
+const STANDARD_REASON_OPTIONS = (t: T): Array<{ value: string; label: string }> => [
   { value: 'format', label: t.reasonFormat },
   { value: 'key_message', label: t.reasonKeyMessage },
   { value: 'compliance', label: t.reasonCompliance },
   { value: 'quality', label: t.reasonQuality },
   { value: 'other', label: t.reasonOther },
 ]
+
+// R12.2 Task 4's receipt-specific taxonomy -- used only for receipt_cashback submissions.
+// Values must exactly match admin_review_submission's / the mission_review_events
+// trigger's own receipt_cashback branch (supabase/migrations/20260822090300_r12_2_receipt_reason_taxonomy.sql),
+// so the UI never offers an option the DB would reject.
+const RECEIPT_REASON_OPTIONS = (t: T): Array<{ value: string; label: string }> => [
+  { value: 'unreadable', label: t.reasonUnreadable },
+  { value: 'wrong_venue', label: t.reasonWrongVenue },
+  { value: 'duplicate', label: t.reasonDuplicate },
+  { value: 'amount_unclear', label: t.reasonAmountUnclear },
+  { value: 'other', label: t.reasonOther },
+]
+
+/** Mission-type-aware reason-category options, matching the DB's own enforcement exactly
+ * (see RECEIPT_REASON_OPTIONS above). Any mission type other than receipt_cashback --
+ * including null/unknown, which defaults to the original taxonomy -- keeps the R11.0 set. */
+const reasonOptionsFor = (missionType: string | null, t: T): Array<{ value: string; label: string }> =>
+  missionType === 'receipt_cashback' ? RECEIPT_REASON_OPTIONS(t) : STANDARD_REASON_OPTIONS(t)
 
 // Only reject/request_revision open the reason-capture modal; approve fires immediately.
 type PendingKind = 'reject' | 'request_revision' | null
@@ -200,7 +219,7 @@ export function SubmissionQueueRow({
                   className="mb-2 w-full rounded-md border border-kinnso-line p-2 text-sm"
                 >
                   <option value="">{t.reasonCategoryPlaceholder}</option>
-                  {REASON_OPTIONS(t).map((o) => (
+                  {reasonOptionsFor(row.missionType, t).map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
                   ))}
                 </select>

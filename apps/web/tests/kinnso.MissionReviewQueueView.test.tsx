@@ -9,8 +9,8 @@ afterEach(cleanup)
 const t = en.missionsOps
 
 const rows = [
-  { submissionId: 's1', missionId: 'm1', missionTitle: 'Summer Coupon Push', creatorId: 'creator-1', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z', reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal' as const },
-  { submissionId: 's2', missionId: 'm2', missionTitle: 'HK Ramen Guide', creatorId: 'creator-2', status: 'revision_requested' as const, submittedAt: '2026-08-18T00:00:00Z', reviewDeadline: '2026-08-20T00:00:00Z', confidenceStatus: null },
+  { submissionId: 's1', missionId: 'm1', missionTitle: 'Summer Coupon Push', missionType: 'coupon_affiliate', creatorId: 'creator-1', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z', reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal' as const },
+  { submissionId: 's2', missionId: 'm2', missionTitle: 'HK Ramen Guide', missionType: 'coupon_affiliate', creatorId: 'creator-2', status: 'revision_requested' as const, submittedAt: '2026-08-18T00:00:00Z', reviewDeadline: '2026-08-20T00:00:00Z', confidenceStatus: null },
 ]
 
 describe('MissionReviewQueueView', () => {

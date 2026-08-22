@@ -38,6 +38,10 @@ export interface MissionsOpsMessages {
   reasonCompliance: string
   reasonQuality: string
   reasonOther: string
+  reasonUnreadable: string
+  reasonWrongVenue: string
+  reasonDuplicate: string
+  reasonAmountUnclear: string
   viewQueue: string
   confidenceVerified: string
   confidenceNeedsReview: string
@@ -2793,6 +2797,10 @@ const messages: Messages = {
     reasonCompliance: 'Compliance',
     reasonQuality: 'Quality',
     reasonOther: 'Other',
+    reasonUnreadable: 'Unreadable',
+    reasonWrongVenue: 'Wrong venue',
+    reasonDuplicate: 'Duplicate',
+    reasonAmountUnclear: 'Amount unclear',
     viewQueue: 'View queue',
     confidenceVerified: 'Verified',
     confidenceNeedsReview: 'Needs review',

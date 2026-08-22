@@ -1315,7 +1315,7 @@ const messages: Messages = {
     queueTitle: '審査キュー', queueSubtitle: '判断待ちの提出物です。締め切りが近い順に表示しています。', queueEmpty: '審査待ちの項目はありません。対応済みです。',
     waitingOnCreator: 'クリエイターの対応待ち',
     actApprove: '承認', actReject: '却下', actRequestRevision: '修正を依頼', actCancel: 'キャンセル', actApply: '適用',
-    reasonCategoryPlaceholder: '理由のカテゴリを選択…', reasonFormat: '形式', reasonKeyMessage: '重要メッセージ', reasonCompliance: 'コンプライアンス', reasonQuality: '品質', reasonOther: 'その他',
+    reasonCategoryPlaceholder: '理由のカテゴリを選択…', reasonFormat: '形式', reasonKeyMessage: '重要メッセージ', reasonCompliance: 'コンプライアンス', reasonQuality: '品質', reasonOther: 'その他', reasonUnreadable: '判読不能', reasonWrongVenue: '店舗不一致', reasonDuplicate: '重複', reasonAmountUnclear: '金額不明瞭',
     viewQueue: 'キューを見る',
     confidenceVerified: '検証済み', confidenceNeedsReview: '要確認', confidenceUnavailable: '利用不可',
     actRerunVerification: '検証を再実行',

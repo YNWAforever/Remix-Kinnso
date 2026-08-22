@@ -1315,7 +1315,7 @@ const messages: Messages = {
     queueTitle: '審核隊列', queueSubtitle: '待決定的提交，最早截止的排在最前。', queueEmpty: '沒有待審核項目，你已全部處理完畢。',
     waitingOnCreator: '等待創作者',
     actApprove: '批准', actReject: '拒絕', actRequestRevision: '要求修改', actCancel: '取消', actApply: '確認',
-    reasonCategoryPlaceholder: '選擇原因類別…', reasonFormat: '格式', reasonKeyMessage: '核心訊息', reasonCompliance: '合規', reasonQuality: '質素', reasonOther: '其他',
+    reasonCategoryPlaceholder: '選擇原因類別…', reasonFormat: '格式', reasonKeyMessage: '核心訊息', reasonCompliance: '合規', reasonQuality: '質素', reasonOther: '其他', reasonUnreadable: '影像不清', reasonWrongVenue: '商戶唔啱', reasonDuplicate: '重複', reasonAmountUnclear: '金額不清',
     viewQueue: '查看隊列',
     confidenceVerified: '已驗證', confidenceNeedsReview: '需要覆核', confidenceUnavailable: '未能取得',
     actRerunVerification: '重新驗證',

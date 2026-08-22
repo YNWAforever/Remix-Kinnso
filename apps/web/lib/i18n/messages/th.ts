@@ -1315,7 +1315,7 @@ const messages: Messages = {
     queueTitle: 'คิวตรวจสอบ', queueSubtitle: 'งานที่รอการตัดสินใจ เรียงตามกำหนดส่งที่ใกล้ที่สุดก่อน', queueEmpty: 'ไม่มีรายการรอตรวจสอบ คุณดำเนินการครบแล้ว',
     waitingOnCreator: 'รอครีเอเตอร์',
     actApprove: 'อนุมัติ', actReject: 'ปฏิเสธ', actRequestRevision: 'ขอให้แก้ไข', actCancel: 'ยกเลิก', actApply: 'ยืนยัน',
-    reasonCategoryPlaceholder: 'เลือกหมวดหมู่เหตุผล…', reasonFormat: 'รูปแบบ', reasonKeyMessage: 'ข้อความหลัก', reasonCompliance: 'การปฏิบัติตามข้อกำหนด', reasonQuality: 'คุณภาพ', reasonOther: 'อื่น ๆ',
+    reasonCategoryPlaceholder: 'เลือกหมวดหมู่เหตุผล…', reasonFormat: 'รูปแบบ', reasonKeyMessage: 'ข้อความหลัก', reasonCompliance: 'การปฏิบัติตามข้อกำหนด', reasonQuality: 'คุณภาพ', reasonOther: 'อื่น ๆ', reasonUnreadable: 'ภาพไม่ชัดเจน', reasonWrongVenue: 'ร้านค้าไม่ตรง', reasonDuplicate: 'ซ้ำ', reasonAmountUnclear: 'จำนวนเงินไม่ชัดเจน',
     viewQueue: 'ดูคิว',
     confidenceVerified: 'ตรวจสอบแล้ว', confidenceNeedsReview: 'ต้องตรวจสอบเพิ่มเติม', confidenceUnavailable: 'ไม่สามารถใช้งานได้',
     actRerunVerification: 'ตรวจสอบใหม่อีกครั้ง',

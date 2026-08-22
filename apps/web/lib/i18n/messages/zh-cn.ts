@@ -1315,7 +1315,7 @@ const messages: Messages = {
     queueTitle: '审核队列', queueSubtitle: '等待处理的提交，按截止时间由近到远排列。', queueEmpty: '暂无待审核项目，你已全部处理完毕。',
     waitingOnCreator: '等待创作者',
     actApprove: '批准', actReject: '拒绝', actRequestRevision: '要求修改', actCancel: '取消', actApply: '确认',
-    reasonCategoryPlaceholder: '选择原因类别…', reasonFormat: '格式', reasonKeyMessage: '核心信息', reasonCompliance: '合规', reasonQuality: '质量', reasonOther: '其他',
+    reasonCategoryPlaceholder: '选择原因类别…', reasonFormat: '格式', reasonKeyMessage: '核心信息', reasonCompliance: '合规', reasonQuality: '质量', reasonOther: '其他', reasonUnreadable: '图像不清', reasonWrongVenue: '商家不符', reasonDuplicate: '重复', reasonAmountUnclear: '金额不清',
     viewQueue: '查看队列',
     confidenceVerified: '已验证', confidenceNeedsReview: '需要复核', confidenceUnavailable: '无法获取',
     actRerunVerification: '重新验证',

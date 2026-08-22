@@ -1315,7 +1315,7 @@ const messages: Messages = {
     queueTitle: '검토 대기열', queueSubtitle: '결정을 기다리는 제출물입니다. 마감이 임박한 순서로 표시됩니다.', queueEmpty: '검토할 항목이 없습니다. 모두 처리되었습니다.',
     waitingOnCreator: '크리에이터 대기 중',
     actApprove: '승인', actReject: '거절', actRequestRevision: '수정 요청', actCancel: '취소', actApply: '적용',
-    reasonCategoryPlaceholder: '사유 카테고리 선택…', reasonFormat: '형식', reasonKeyMessage: '핵심 메시지', reasonCompliance: '컴플라이언스', reasonQuality: '품질', reasonOther: '기타',
+    reasonCategoryPlaceholder: '사유 카테고리 선택…', reasonFormat: '형식', reasonKeyMessage: '핵심 메시지', reasonCompliance: '컴플라이언스', reasonQuality: '품질', reasonOther: '기타', reasonUnreadable: '판독 불가', reasonWrongVenue: '매장 불일치', reasonDuplicate: '중복', reasonAmountUnclear: '금액 불명확',
     viewQueue: '대기열 보기',
     confidenceVerified: '검증됨', confidenceNeedsReview: '검토 필요', confidenceUnavailable: '확인 불가',
     actRerunVerification: '검증 다시 실행',
