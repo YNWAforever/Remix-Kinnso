@@ -11,13 +11,14 @@ import TierBadge from '@/components/kinnso/TierBadge'
 import { segmentMissions } from '@/lib/missions/list'
 import type { GatedTier } from '@/lib/contribution/tiers'
 import type { Messages } from '@/lib/i18n/messages/en'
+import type { MissionType } from '@/lib/missions/types'
 
 export type CreatorMissionCard = {
   id: string
   title: string
   summary: string
   missionSource: 'merchant' | 'travelpayouts'
-  missionType: 'coupon_affiliate' | 'hybrid' | 'paid' | 'receipt_cashback'
+  missionType: MissionType
   status: string
   participant: { id: string; status: string; source: string } | null
   partnerLinks: Array<{ id: string; partnerUrl: string }>

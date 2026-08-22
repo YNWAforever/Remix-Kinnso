@@ -1,6 +1,7 @@
 import { canSubmitMilestone } from '@/lib/missions/submission-state'
+import { missionTypes, type MissionType } from '@/lib/missions/types'
 
-export type MissionType = 'coupon_affiliate' | 'hybrid' | 'paid' | 'receipt_cashback'
+export type { MissionType }
 export type ParticipationCta = 'join' | 'apply' | 'awaiting' | 'rejected' | 'active'
 export type MilestoneState = 'none' | 'submitted' | 'approved' | 'revision_requested' | 'rejected'
 export type SocialSignalStatus = 'verified_signal' | 'needs_review' | 'unavailable'
@@ -107,8 +108,12 @@ export type CreatorMissionDetail = {
   receiptSubmissions: ReceiptSubmissionRow[]
 }
 
+// Derives from the canonical missionTypes array rather than enumerating members inline, so a
+// future mission type is recognized automatically the moment it's added to types.ts -- no
+// second site to remember and update by hand (the exact bug class that let receipt_cashback
+// get silently miscategorized as coupon_affiliate here before it was fixed one-off).
 const toMissionType = (type: string | null): MissionType =>
-  type === 'hybrid' || type === 'paid' || type === 'receipt_cashback' ? type : 'coupon_affiliate'
+  (missionTypes as readonly string[]).includes(type ?? '') ? (type as MissionType) : 'coupon_affiliate'
 
 export function resolveParticipationCta(
   participantStatus: string | null,
