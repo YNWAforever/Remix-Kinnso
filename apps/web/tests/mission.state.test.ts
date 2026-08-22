@@ -18,7 +18,7 @@ import {
 
 describe('mission state transitions', () => {
   it('exports the requested mission domain sets', () => {
-    expect(missionTypes).toEqual(['coupon_affiliate', 'hybrid', 'paid'])
+    expect(missionTypes).toEqual(['coupon_affiliate', 'hybrid', 'paid', 'receipt_cashback'])
     expect(missionSources).toEqual(['merchant', 'travelpayouts'])
     expect(missionVisibilities).toEqual(['open', 'targeted'])
     expect(missionStatuses).toEqual(['draft', 'published', 'paused', 'completed', 'cancelled'])

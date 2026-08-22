@@ -12,7 +12,7 @@ import { TicketCard } from '@/components/kinnso/MarketPassport'
 import TierBadge from '@/components/kinnso/TierBadge'
 import type { GatedTier } from '@/lib/contribution/tiers'
 import { startVerification } from '@/lib/missions/verify-client'
-import type { CreatorMissionDetail, MilestoneRow } from '@/lib/missions/detail'
+import type { CreatorMissionDetail, MilestoneRow, ReceiptSubmissionRow } from '@/lib/missions/detail'
 import type { Messages } from '@/lib/i18n/messages/en'
 
 type SubmitResult = { ok: true; submissionId: string } | { ok: false; errors?: Record<string, string[]> }
@@ -24,6 +24,10 @@ type CreatorMissionDetailViewProps = {
   onJoin: () => KinnsoActionResult | Promise<KinnsoActionResult>
   onApply: (note: string) => KinnsoActionResult | Promise<KinnsoActionResult>
   onSubmitMilestone: (input: { milestoneId: string; proofUrl: string; notes: string }) => Promise<SubmitResult>
+  // Optional: only receipt_cashback missions render the repeatable receipt-submission
+  // panel below (see mission.cta === 'active' && mission.missionType === 'receipt_cashback'),
+  // so callers rendering any other mission type never need to supply this.
+  onSubmitReceipt?: (input: { proofUrl: string }) => Promise<SubmitResult>
   lockedTier?: GatedTier | null
   gating?: { locked: string; lockedHelp: string }
 }
@@ -90,7 +94,105 @@ function MilestoneSubmit({
   )
 }
 
-export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, onSubmitMilestone, lockedTier, gating }: CreatorMissionDetailViewProps) {
+function receiptReasonLabel(t: Messages['missionDetail'], reason: string): string {
+  switch (reason) {
+    case 'unreadable': return t.receiptReasonUnreadable
+    case 'wrong_venue': return t.receiptReasonWrongVenue
+    case 'duplicate': return t.receiptReasonDuplicate
+    case 'amount_unclear': return t.receiptReasonAmountUnclear
+    default: return t.receiptReasonOther
+  }
+}
+
+// Renders the repeatable-receipt submission flow for a receipt_cashback mission in place
+// of the fixed-milestone-checklist section: a "Submit a receipt" form (reusing the same
+// plain proof-URL field pattern MilestoneSubmit above uses -- this codebase has no actual
+// file-upload widget anywhere to reuse instead), a running count against
+// max_receipts_per_creator when set, and the full submission history (every submission
+// against the one repeatable milestone, not just the latest) with each rejected/
+// revision-requested entry's reason from mission_review_events.
+function ReceiptSubmissions({
+  mission, t, onSubmitReceipt,
+}: {
+  mission: CreatorMissionDetail
+  t: Messages['missionDetail']
+  onSubmitReceipt?: CreatorMissionDetailViewProps['onSubmitReceipt']
+}) {
+  const [proofUrl, setProofUrl] = useState('')
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [submissions, setSubmissions] = useState<ReceiptSubmissionRow[]>(mission.receiptSubmissions)
+
+  const activeCount = submissions.filter((s) => s.status === 'submitted' || s.status === 'approved').length
+  const capReached = mission.maxReceiptsPerCreator != null && activeCount >= mission.maxReceiptsPerCreator
+
+  async function submit() {
+    if (!onSubmitReceipt) return
+    setPending(true)
+    setError(null)
+    try {
+      const result = await onSubmitReceipt({ proofUrl })
+      if (!result.ok) {
+        setError(Object.values(result.errors ?? {}).flat()[0] ?? t.submitError)
+        return
+      }
+      setSubmissions((prev) => [
+        { id: result.submissionId, status: 'submitted', proofUrls: [proofUrl.trim()], notes: null, submittedAt: new Date().toISOString(), rejectionReason: null },
+        ...prev,
+      ])
+      setProofUrl('')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <section className="mt-8">
+      <h2 className="text-lg font-bold text-kinnso-ink">{t.receiptsHeading}</h2>
+      {mission.maxReceiptsPerCreator != null && (
+        <p className="mt-1 text-sm text-kinnso-muted">{t.receiptCountLabel(activeCount, mission.maxReceiptsPerCreator)}</p>
+      )}
+
+      {capReached ? (
+        <p role="status" className="mt-3 text-sm font-semibold text-kinnso-ink">{t.receiptCapReached}</p>
+      ) : (
+        <div className="mt-3 space-y-2">
+          <label className="block text-xs font-semibold text-kinnso-ink" htmlFor="receipt-proof-url">{t.receiptProofUrlLabel}</label>
+          <input
+            id="receipt-proof-url" className="k-input w-full" value={proofUrl}
+            placeholder={t.receiptProofUrlPlaceholder} onChange={(e) => setProofUrl(e.target.value)}
+          />
+          {error && <p role="alert" className="text-xs font-semibold text-red-700">{error}</p>}
+          <button type="button" className="k-btn-primary text-sm" disabled={pending || !proofUrl.trim()} onClick={() => void submit()}>
+            {t.submitReceipt}
+          </button>
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-3">
+        {submissions.length === 0 ? (
+          <p className="text-sm text-kinnso-muted">{t.receiptSubmissionsEmpty}</p>
+        ) : (
+          submissions.map((submission) => (
+            <TicketCard key={submission.id} as="article" className="p-4">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs text-kinnso-muted">{submission.submittedAt?.slice(0, 10)}</span>
+                <MissionStatusBadge status={submission.status} />
+              </div>
+              {submission.rejectionReason && (
+                <p className="mt-2 text-xs text-red-700">
+                  <span className="font-semibold">{t.rejectionReasonLabel}:</span> {receiptReasonLabel(t, submission.rejectionReason)}
+                </p>
+              )}
+            </TicketCard>
+          ))
+        )}
+      </div>
+    </section>
+  )
+}
+
+export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, onSubmitMilestone, onSubmitReceipt, lockedTier, gating }: CreatorMissionDetailViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
@@ -210,7 +312,11 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, 
         </section>
       )}
 
-      {mission.cta === 'active' && (
+      {mission.cta === 'active' && mission.missionType === 'receipt_cashback' && (
+        <ReceiptSubmissions mission={mission} t={t} onSubmitReceipt={onSubmitReceipt} />
+      )}
+
+      {mission.cta === 'active' && mission.missionType !== 'receipt_cashback' && (
         <section className="mt-8">
           <h2 className="text-lg font-bold text-kinnso-ink">{t.milestonesHeading}</h2>
           {mission.milestones.length === 0 ? (

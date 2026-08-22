@@ -46,7 +46,11 @@ export const validateMissionDraft = (input: MissionDraftInput): ValidationResult
   if (isBlank(input.title)) addError(errors, 'title', 'required')
   if (isBlank(input.summary)) addError(errors, 'summary', 'required')
 
-  if (input.missionSource === 'merchant' && input.missionType !== 'paid') {
+  if (
+    input.missionSource === 'merchant' &&
+    input.missionType !== 'paid' &&
+    input.missionType !== 'receipt_cashback'
+  ) {
     if (isBlank(input.couponCode)) addError(errors, 'couponCode', 'required')
     if (isBlank(input.couponUrl)) addError(errors, 'couponUrl', 'required')
     validateNonNegative(errors, 'affiliateCommissionRate', input.affiliateCommissionRate, true)
@@ -61,10 +65,27 @@ export const validateMissionDraft = (input: MissionDraftInput): ValidationResult
     }
   }
 
-  if (input.missionType === 'paid' || input.missionType === 'hybrid') {
+  if (
+    input.missionType === 'paid' ||
+    input.missionType === 'hybrid' ||
+    input.missionType === 'receipt_cashback'
+  ) {
     validateNonNegative(errors, 'paidFeeAmount', input.paidFeeAmount, true)
     if (isBlank(input.paidFeeCurrency)) addError(errors, 'paidFeeCurrency', 'required')
+  }
+
+  // receipt_cashback missions get their single repeatable milestone auto-created by a DB
+  // trigger at mission-insert time (see
+  // supabase/migrations/20260822090000_r12_2_receipt_cashback_schema.sql), so unlike
+  // paid/hybrid missions the merchant is never asked to enter one here.
+  if (input.missionType === 'paid' || input.missionType === 'hybrid') {
     if (input.milestones.length === 0) addError(errors, 'milestones', 'at least one')
+  }
+
+  if (input.missionType === 'receipt_cashback' && input.maxReceiptsPerCreator != null) {
+    if (!Number.isInteger(input.maxReceiptsPerCreator) || input.maxReceiptsPerCreator < 1) {
+      addError(errors, 'maxReceiptsPerCreator', 'positive-integer')
+    }
   }
 
   return resultFrom(errors)
@@ -98,6 +119,28 @@ export const validateSubmission = (input: { proofUrl: string; notes?: string | n
 
   if ((input.notes ?? '').length > 1000) {
     addError(errors, 'notes', 'too_long')
+  }
+
+  return resultFrom(errors)
+}
+
+// Receipt-cashback proof is a photo of a purchase receipt (see
+// receiptProofUrlLabel/Placeholder, 'Receipt photo URL' / 'https://...', in
+// lib/i18n/messages) -- unlike a milestone's content-post proof, it is never a link to an
+// Instagram/Threads/YouTube post, so it deliberately does NOT reuse validateSubmission's
+// parseProofUrl shape check: that check would reject every legitimate receipt-photo host
+// (camera-roll upload services, image CDNs, etc.) since none of them are social platforms.
+// It keeps the same non-blank + https?:// scheme checks validateSubmission applies before
+// its parseProofUrl step, which is exactly what's needed to catch a whitespace-only or
+// plain-garbage-text "proof" before it reaches the submit_receipt RPC.
+export const validateReceiptProof = (input: { proofUrl: string }): ValidationResult => {
+  const errors: ValidationErrors = {}
+  const url = (input.proofUrl ?? '').trim()
+
+  if (isBlank(url)) {
+    addError(errors, 'proofUrl', 'required')
+  } else if (!/^https?:\/\//i.test(url)) {
+    addError(errors, 'proofUrl', 'url')
   }
 
   return resultFrom(errors)

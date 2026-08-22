@@ -7,6 +7,7 @@ export interface ReviewQueueRow {
   submissionId: string
   missionId: string
   missionTitle: string
+  missionType: string | null
   creatorId: string
   status: string
   submittedAt: string | null
@@ -54,7 +55,7 @@ export interface MissionDetail {
 // mission_milestone_submissions instead of missions.
 const reviewQueueSelect = `
   id,status,submitted_at,review_deadline,
-  mission_participants(id,creator_id,mission_id,missions(id,title)),
+  mission_participants(id,creator_id,mission_id,missions(id,title,mission_type)),
   mission_verification_jobs(confidence_status,created_at)
 `
 
@@ -69,7 +70,7 @@ type ReviewQueueJoinRow = {
     id: string
     creator_id: string | null
     mission_id: string
-    missions: OneOrMany<{ id: string; title: string }>
+    missions: OneOrMany<{ id: string; title: string; mission_type: string | null }>
   }>
   mission_verification_jobs: Array<{ confidence_status: string | null; created_at: string }> | null
 }
@@ -94,6 +95,7 @@ const toReviewQueueRow = (r: ReviewQueueJoinRow): ReviewQueueRow => {
     submissionId: r.id,
     missionId: mission?.id ?? '',
     missionTitle: mission?.title ?? 'Untitled mission',
+    missionType: mission?.mission_type ?? null,
     creatorId: participant?.creator_id ?? '',
     status: r.status,
     submittedAt: r.submitted_at,

@@ -88,13 +88,14 @@ export async function listCreatorMerchantMissions(
 export const creatorMissionDetailSelect = `
   id,title,summary,mission_source,mission_type,visibility,status,published_at,min_tier,
   coupon_code,coupon_url,affiliate_commission_rate,creator_commission_rate,kinnso_commission_rate,
-  paid_fee_amount,paid_fee_currency,affiliate_network_program_id,
+  paid_fee_amount,paid_fee_currency,affiliate_network_program_id,max_receipts_per_creator,
   affiliate_network_programs(id,program_name,program_url,default_commission_description,status),
-  mission_milestones(id,title,description,due_at,sort_order),
+  mission_milestones(id,title,description,due_at,sort_order,repeatable),
   mission_participants(id,status,source,creator_id,application_note,
     mission_milestone_submissions(id,mission_milestone_id,status,proof_urls,notes,merchant_feedback,submitted_at,
       mission_social_snapshots(confidence_status),
-      mission_verification_jobs(id,status,confidence_status,created_at))),
+      mission_verification_jobs(id,status,confidence_status,created_at),
+      mission_review_events(reason_category,reason_text,action,created_at))),
   affiliate_partner_links(id,partner_url,original_url,sub_id)
 `
 

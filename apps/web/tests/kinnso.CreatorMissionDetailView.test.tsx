@@ -34,7 +34,7 @@ const base: CreatorMissionDetail = {
   id: 'm1', title: 'Summer in Shibuya', summary: 'Make a reel.', missionSource: 'merchant',
   missionType: 'paid', status: 'published', compensation: 'HKD 5000', couponCode: null, couponUrl: null,
   partnerLinks: [], participantId: null, participantStatus: null, cta: 'apply',
-  milestones: [baseMilestone],
+  milestones: [baseMilestone], maxReceiptsPerCreator: null, receiptSubmissions: [],
 }
 
 function activeMissionWithMilestone(
@@ -55,6 +55,21 @@ function activeMissionWithMilestone(
       state: 'none',
       ...milestoneOverrides,
     }],
+  }
+}
+
+function activeReceiptMission(overrides: Partial<CreatorMissionDetail> = {}): CreatorMissionDetail {
+  return {
+    ...base,
+    id: 'm1',
+    missionType: 'receipt_cashback',
+    cta: 'active',
+    participantId: 'p1',
+    participantStatus: 'active',
+    milestones: [],
+    maxReceiptsPerCreator: null,
+    receiptSubmissions: [],
+    ...overrides,
   }
 }
 
@@ -147,6 +162,106 @@ describe('CreatorMissionDetailView', () => {
     const mission = activeMissionWithMilestone({ canSubmit: false, state: 'approved' })
     render(<CreatorMissionDetailView locale="en" t={en.missionDetail} mission={mission} onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} />)
     expect(screen.queryByLabelText(en.missionDetail.proofUrlLabel)).toBeNull()
+  })
+})
+
+describe('CreatorMissionDetailView — receipt_cashback repeatable submissions', () => {
+  it('shows the receipt-submission view (not the fixed checklist) for a receipt_cashback mission', () => {
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail} mission={activeReceiptMission()}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} onSubmitReceipt={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(en.missionDetail.receiptsHeading)).toBeTruthy()
+    expect(screen.queryByText(en.missionDetail.milestonesHeading)).toBeNull()
+  })
+
+  it('shows the ORIGINAL fixed-checklist view unchanged for every other mission type', () => {
+    for (const missionType of ['coupon_affiliate', 'hybrid', 'paid'] as const) {
+      const mission = { ...activeMissionWithMilestone({ canSubmit: true, state: 'none' }), missionType }
+      const { unmount } = render(
+        <CreatorMissionDetailView
+          locale="en" t={en.missionDetail} mission={mission}
+          onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} onSubmitReceipt={vi.fn()}
+        />,
+      )
+      expect(screen.getByText(en.missionDetail.milestonesHeading)).toBeTruthy()
+      expect(screen.getByText('Post a reel')).toBeTruthy()
+      expect(screen.queryByText(en.missionDetail.receiptsHeading)).toBeNull()
+      unmount()
+    }
+  })
+
+  it('shows a clear cap-reached message and disables further submission once the cap is hit', () => {
+    const mission = activeReceiptMission({
+      maxReceiptsPerCreator: 2,
+      receiptSubmissions: [
+        { id: 's1', status: 'approved', proofUrls: ['u1'], notes: null, submittedAt: '2026-08-01T00:00:00Z', rejectionReason: null },
+        { id: 's2', status: 'submitted', proofUrls: ['u2'], notes: null, submittedAt: '2026-08-02T00:00:00Z', rejectionReason: null },
+      ],
+    })
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail} mission={mission}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} onSubmitReceipt={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(en.missionDetail.receiptCapReached)).toBeTruthy()
+    expect(screen.queryByLabelText(en.missionDetail.receiptProofUrlLabel)).toBeNull()
+    expect(screen.queryByRole('button', { name: en.missionDetail.submitReceipt })).toBeNull()
+  })
+
+  it("shows a rejected receipt's reason from the receipt-specific taxonomy", () => {
+    const mission = activeReceiptMission({
+      receiptSubmissions: [
+        { id: 's1', status: 'rejected', proofUrls: ['u1'], notes: null, submittedAt: '2026-08-01T00:00:00Z', rejectionReason: 'wrong_venue' },
+      ],
+    })
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail} mission={mission}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} onSubmitReceipt={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(en.missionDetail.receiptReasonWrongVenue)).toBeTruthy()
+  })
+
+  it('clears the upload form and appends to the submission history on a successful submission', async () => {
+    const onSubmitReceipt = vi.fn(async () => ({ ok: true as const, submissionId: 'new-sub' }))
+    const mission = activeReceiptMission({ receiptSubmissions: [] })
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail} mission={mission}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} onSubmitReceipt={onSubmitReceipt}
+      />,
+    )
+    expect(screen.getByText(en.missionDetail.receiptSubmissionsEmpty)).toBeTruthy()
+
+    const input = screen.getByLabelText(en.missionDetail.receiptProofUrlLabel) as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'https://example.com/receipt.jpg' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missionDetail.submitReceipt }))
+
+    await waitFor(() => expect(onSubmitReceipt).toHaveBeenCalledWith({ proofUrl: 'https://example.com/receipt.jpg' }))
+    await waitFor(() => expect(input.value).toBe(''))
+    expect(screen.queryByText(en.missionDetail.receiptSubmissionsEmpty)).toBeNull()
+  })
+
+  it('shows a friendly error and does not clear the form when submission fails', async () => {
+    const onSubmitReceipt = vi.fn(async () => ({ ok: false as const, errors: { form: ["You've reached the receipt limit for this mission"] } }))
+    const mission = activeReceiptMission({ receiptSubmissions: [] })
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail} mission={mission}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()} onSubmitReceipt={onSubmitReceipt}
+      />,
+    )
+    const input = screen.getByLabelText(en.missionDetail.receiptProofUrlLabel) as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'https://example.com/receipt.jpg' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missionDetail.submitReceipt }))
+
+    await waitFor(() => expect(screen.getByText("You've reached the receipt limit for this mission")).toBeTruthy())
+    expect(input.value).toBe('https://example.com/receipt.jpg')
   })
 })
 

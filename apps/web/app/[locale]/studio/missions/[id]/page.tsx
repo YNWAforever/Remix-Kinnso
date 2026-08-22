@@ -5,7 +5,7 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
 import { getCreatorStoredTier } from '@/lib/contribution/queries'
-import { joinMissionAction, submitMilestoneAction } from '@/lib/missions/actions'
+import { joinMissionAction, submitMilestoneAction, submitReceiptAction } from '@/lib/missions/actions'
 import { toCreatorMissionDetail, type MissionDetailRow } from '@/lib/missions/detail'
 import { getCreatorMissionDetail } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -58,6 +58,11 @@ export default async function StudioMissionDetailPage({ params }: { params: Para
     })
   }
 
+  async function submitReceipt(input: { proofUrl: string }) {
+    'use server'
+    return submitReceiptAction({ missionId: id, proofUrl: input.proofUrl, locale: loc })
+  }
+
   return (
     <CreatorMissionDetailView
       locale={loc}
@@ -66,6 +71,7 @@ export default async function StudioMissionDetailPage({ params }: { params: Para
       onJoin={join}
       onApply={apply}
       onSubmitMilestone={submitMilestone}
+      onSubmitReceipt={submitReceipt}
       lockedTier={lockedTier}
       gating={{ locked: messages.missions.locked, lockedHelp: messages.missions.lockedHelp }}
     />

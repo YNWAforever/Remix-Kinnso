@@ -38,6 +38,10 @@ export interface MissionsOpsMessages {
   reasonCompliance: string
   reasonQuality: string
   reasonOther: string
+  reasonUnreadable: string
+  reasonWrongVenue: string
+  reasonDuplicate: string
+  reasonAmountUnclear: string
   viewQueue: string
   confidenceVerified: string
   confidenceNeedsReview: string
@@ -668,6 +672,7 @@ export interface Messages {
     typeCoupon: string
     typeHybrid: string
     typePaid: string
+    typeReceiptCashback: string
     title: string
     summary: string
     couponCode: string
@@ -677,6 +682,8 @@ export interface Messages {
     creatorCommissionRate: string
     paidFeeAmount: string
     paidFeeCurrency: string
+    receiptCashbackAmount: string
+    maxReceiptsPerCreator: string
     milestoneTitle: string
     milestoneDescription: string
     saveDraft: string
@@ -741,6 +748,19 @@ export interface Messages {
     couldntVerify: string
     verificationFailed: string
     retry: string
+    receiptsHeading: string
+    receiptProofUrlLabel: string
+    receiptProofUrlPlaceholder: string
+    submitReceipt: string
+    receiptCountLabel: (count: number, max: number) => string
+    receiptCapReached: string
+    receiptSubmissionsEmpty: string
+    rejectionReasonLabel: string
+    receiptReasonUnreadable: string
+    receiptReasonWrongVenue: string
+    receiptReasonDuplicate: string
+    receiptReasonAmountUnclear: string
+    receiptReasonOther: string
   }
   ops: {
     backHome: string
@@ -1836,6 +1856,7 @@ const messages: Messages = {
     typeCoupon: 'Coupon affiliate',
     typeHybrid: 'Affiliate + paid mission',
     typePaid: 'Paid mission only',
+    typeReceiptCashback: 'Receipt cashback',
     title: 'Mission title',
     summary: 'Mission summary',
     couponCode: 'Coupon code',
@@ -1845,6 +1866,8 @@ const messages: Messages = {
     creatorCommissionRate: 'Creator commission rate',
     paidFeeAmount: 'Paid mission fee',
     paidFeeCurrency: 'Currency',
+    receiptCashbackAmount: 'Cashback per receipt',
+    maxReceiptsPerCreator: 'Max receipts per creator (optional)',
     milestoneTitle: 'Milestone title',
     milestoneDescription: 'Milestone description',
     saveDraft: 'Save draft',
@@ -1909,6 +1932,19 @@ const messages: Messages = {
     couldntVerify: "Couldn’t verify",
     verificationFailed: 'Verification failed',
     retry: 'Retry',
+    receiptsHeading: 'Submit a receipt',
+    receiptProofUrlLabel: 'Receipt photo URL',
+    receiptProofUrlPlaceholder: 'https://...',
+    submitReceipt: 'Submit receipt',
+    receiptCountLabel: (count, max) => `${count} of ${max} receipts submitted`,
+    receiptCapReached: "You've reached the receipt limit for this mission",
+    receiptSubmissionsEmpty: 'No receipts submitted yet',
+    rejectionReasonLabel: 'Reason',
+    receiptReasonUnreadable: 'Receipt image is unreadable',
+    receiptReasonWrongVenue: 'Wrong venue',
+    receiptReasonDuplicate: 'Duplicate receipt',
+    receiptReasonAmountUnclear: 'Amount is unclear',
+    receiptReasonOther: 'Other',
   },
   ops: {
     settlementHeading: 'Settlement queue', backHome: 'Back to home',
@@ -2769,6 +2805,10 @@ const messages: Messages = {
     reasonCompliance: 'Compliance',
     reasonQuality: 'Quality',
     reasonOther: 'Other',
+    reasonUnreadable: 'Unreadable',
+    reasonWrongVenue: 'Wrong venue',
+    reasonDuplicate: 'Duplicate',
+    reasonAmountUnclear: 'Amount unclear',
     viewQueue: 'View queue',
     confidenceVerified: 'Verified',
     confidenceNeedsReview: 'Needs review',

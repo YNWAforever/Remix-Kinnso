@@ -118,6 +118,22 @@ describe('CreatorMissionsView', () => {
     expect(onJoin).toHaveBeenCalledWith('m2')
   })
 
+  it('uses apply copy (not join) for receipt_cashback missions', () => {
+    const onJoin = vi.fn()
+    render(
+      <CreatorMissionsView
+        locale="en"
+        t={en.missions}
+        missions={[{ ...baseAvailable, id: 'm3', missionType: 'receipt_cashback' }]}
+        onJoin={onJoin}
+        onAccept={vi.fn()}
+      />,
+    )
+    expect(screen.queryByRole('button', { name: en.missions.joinMission })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: en.missions.applyMission }))
+    expect(onJoin).toHaveBeenCalledWith('m3')
+  })
+
   it('renders joined missions under My missions with progress and no join button', () => {
     render(<CreatorMissionsView locale="en" t={en.missions} missions={[baseMine]} onJoin={vi.fn()} onAccept={vi.fn()} />)
     expect(screen.getByText('Summer in Shibuya')).toBeTruthy()

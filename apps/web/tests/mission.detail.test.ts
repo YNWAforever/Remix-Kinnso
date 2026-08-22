@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildMilestoneRows,
+  buildReceiptSubmissions,
   missionCompensation,
   resolveParticipationCta,
   toCreatorMissionDetail,
@@ -29,10 +30,11 @@ const activeRow = (overrides: Partial<MissionDetailRow> = {}): MissionDetailRow 
 })
 
 describe('resolveParticipationCta', () => {
-  it('maps no participant to join for coupon and apply for paid/hybrid', () => {
+  it('maps no participant to join for coupon and apply for paid/hybrid/receipt_cashback', () => {
     expect(resolveParticipationCta(null, 'coupon_affiliate')).toBe('join')
     expect(resolveParticipationCta(null, 'paid')).toBe('apply')
     expect(resolveParticipationCta(null, 'hybrid')).toBe('apply')
+    expect(resolveParticipationCta(null, 'receipt_cashback')).toBe('apply')
   })
   it('maps participant statuses to ctas', () => {
     expect(resolveParticipationCta('applied', 'paid')).toBe('awaiting')
@@ -104,6 +106,11 @@ describe('toCreatorMissionDetail', () => {
     expect(detail).toMatchObject({ cta: 'active', participantStatus: 'active' })
     expect(detail.milestones[0]).toMatchObject({ state: 'submitted', signal: 'unavailable' })
   })
+
+  it('resolves a receipt_cashback mission to the apply cta, not join — it is not coerced to coupon_affiliate', () => {
+    const detail = toCreatorMissionDetail({ ...base, mission_type: 'receipt_cashback' }, 'creator-1')
+    expect(detail).toMatchObject({ missionType: 'receipt_cashback', cta: 'apply', participantStatus: null })
+  })
 })
 
 describe('toCreatorMissionDetail — submission + verification', () => {
@@ -130,5 +137,84 @@ describe('toCreatorMissionDetail — submission + verification', () => {
     const row = activeRow()
     row.mission_participants![0].mission_milestone_submissions![0].status = 'approved'
     expect(toCreatorMissionDetail(row, 'creator-1').milestones[0].canSubmit).toBe(false)
+  })
+})
+
+describe('buildMilestoneRows — repeatable exclusion', () => {
+  it('excludes a repeatable milestone from the fixed-checklist rows (it has its own receipt-submission UI instead)', () => {
+    const milestones = [
+      { id: 'a', title: 'Fixed', description: '', due_at: null, sort_order: 0, repeatable: false },
+      { id: 'r', title: 'Submit a receipt', description: '', due_at: null, sort_order: 1, repeatable: true },
+    ]
+    const rows = buildMilestoneRows(milestones, [])
+    expect(rows.map((r) => r.id)).toEqual(['a'])
+  })
+})
+
+describe('buildReceiptSubmissions', () => {
+  const receiptMilestones = [
+    { id: 'r', title: 'Submit a receipt', description: '', due_at: null, sort_order: 0, repeatable: true },
+  ]
+
+  it('returns every submission against the repeatable milestone, newest first (not just the latest)', () => {
+    const submissions = [
+      { id: 's1', mission_milestone_id: 'r', status: 'approved', proof_urls: ['u1'], notes: null, merchant_feedback: null, submitted_at: '2026-08-01T00:00:00Z' },
+      { id: 's2', mission_milestone_id: 'r', status: 'submitted', proof_urls: ['u2'], notes: null, merchant_feedback: null, submitted_at: '2026-08-10T00:00:00Z' },
+    ]
+    const rows = buildReceiptSubmissions(receiptMilestones, submissions)
+    expect(rows.map((r) => r.id)).toEqual(['s2', 's1'])
+    expect(rows[1]).toMatchObject({ status: 'approved', proofUrls: ['u1'] })
+  })
+
+  it('surfaces the latest rejection reason from mission_review_events for a rejected receipt', () => {
+    const submissions = [{
+      id: 's1', mission_milestone_id: 'r', status: 'rejected', proof_urls: ['u1'], notes: null, merchant_feedback: 'blurry', submitted_at: '2026-08-01T00:00:00Z',
+      mission_review_events: [
+        { reason_category: 'wrong_venue', reason_text: 'stale', action: 'reject', created_at: '2026-08-01T09:00:00Z' },
+        { reason_category: 'unreadable', reason_text: 'blurry', action: 'reject', created_at: '2026-08-02T00:00:00Z' },
+      ],
+    }]
+    const rows = buildReceiptSubmissions(receiptMilestones, submissions)
+    expect(rows[0]).toMatchObject({ status: 'rejected', rejectionReason: 'unreadable' })
+  })
+
+  it('has no rejection reason for a submitted or approved receipt', () => {
+    const submissions = [{ id: 's1', mission_milestone_id: 'r', status: 'submitted', proof_urls: ['u1'], notes: null, merchant_feedback: null, submitted_at: '2026-08-01T00:00:00Z' }]
+    expect(buildReceiptSubmissions(receiptMilestones, submissions)[0].rejectionReason).toBeNull()
+  })
+
+  it('returns an empty list when the mission has no repeatable milestone', () => {
+    const milestones = [{ id: 'a', title: 'Fixed', description: '', due_at: null, sort_order: 0, repeatable: false }]
+    expect(buildReceiptSubmissions(milestones, [{ id: 's1', mission_milestone_id: 'a', status: 'submitted', proof_urls: [], notes: null, merchant_feedback: null, submitted_at: null }])).toEqual([])
+  })
+})
+
+describe('toCreatorMissionDetail — receipt_cashback', () => {
+  const receiptRow: MissionDetailRow = {
+    id: 'm1', title: 'Receipt mission', summary: 'S', mission_source: 'merchant', mission_type: 'receipt_cashback', status: 'published',
+    coupon_code: null, coupon_url: null, paid_fee_amount: 50, paid_fee_currency: 'HKD',
+    affiliate_commission_rate: null, creator_commission_rate: null, kinnso_commission_rate: null,
+    affiliate_network_programs: null, max_receipts_per_creator: 5,
+    mission_milestones: [{ id: 'r', title: 'Submit a receipt', description: '', due_at: null, sort_order: 0, repeatable: true }],
+    mission_participants: [{
+      id: 'p1', status: 'active', source: 'application', creator_id: 'creator-1', application_note: null,
+      mission_milestone_submissions: [
+        { id: 's1', mission_milestone_id: 'r', status: 'submitted', proof_urls: ['u1'], notes: null, merchant_feedback: null, submitted_at: '2026-08-01T00:00:00Z' },
+      ],
+    }],
+    affiliate_partner_links: [],
+  }
+
+  it('exposes maxReceiptsPerCreator and every receipt submission, and excludes the repeatable milestone from the fixed checklist', () => {
+    const detail = toCreatorMissionDetail(receiptRow, 'creator-1')
+    expect(detail.maxReceiptsPerCreator).toBe(5)
+    expect(detail.receiptSubmissions).toHaveLength(1)
+    expect(detail.receiptSubmissions[0]).toMatchObject({ id: 's1', status: 'submitted' })
+    expect(detail.milestones).toHaveLength(0)
+  })
+
+  it('defaults maxReceiptsPerCreator to null when unset', () => {
+    const detail = toCreatorMissionDetail({ ...receiptRow, max_receipts_per_creator: null }, 'creator-1')
+    expect(detail.maxReceiptsPerCreator).toBeNull()
   })
 })

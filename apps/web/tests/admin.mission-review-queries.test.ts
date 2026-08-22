@@ -36,7 +36,7 @@ const SUBMISSION_ROWS = [
     status: 'submitted',
     submitted_at: '2026-08-17T00:00:00Z',
     review_deadline: '2026-08-19T00:00:00Z',
-    mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Mission One' } },
+    mission_participants: { id: 'p1', creator_id: 'c1', mission_id: 'm1', missions: { id: 'm1', title: 'Mission One', mission_type: 'coupon_affiliate' } },
     // Deliberately NOT sorted ascending, and the max created_at is NOT last in array
     // order -- proves latestConfidenceStatus() selects by max created_at rather than by
     // array position (a naive jobs[jobs.length - 1] would wrongly return 'low' here).
@@ -51,7 +51,7 @@ const SUBMISSION_ROWS = [
     status: 'revision_requested',
     submitted_at: '2026-08-16T00:00:00Z',
     review_deadline: '2026-08-18T00:00:00Z',
-    mission_participants: { id: 'p2', creator_id: 'c2', mission_id: 'm2', missions: { id: 'm2', title: 'Mission Two' } },
+    mission_participants: { id: 'p2', creator_id: 'c2', mission_id: 'm2', missions: { id: 'm2', title: 'Mission Two', mission_type: 'receipt_cashback' } },
     mission_verification_jobs: [],
   },
 ]
@@ -65,6 +65,7 @@ describe('getReviewQueue', () => {
         submissionId: 'sub-1',
         missionId: 'm1',
         missionTitle: 'Mission One',
+        missionType: 'coupon_affiliate',
         creatorId: 'c1',
         status: 'submitted',
         submittedAt: '2026-08-17T00:00:00Z',
@@ -75,6 +76,7 @@ describe('getReviewQueue', () => {
         submissionId: 'sub-2',
         missionId: 'm2',
         missionTitle: 'Mission Two',
+        missionType: 'receipt_cashback',
         creatorId: 'c2',
         status: 'revision_requested',
         submittedAt: '2026-08-16T00:00:00Z',

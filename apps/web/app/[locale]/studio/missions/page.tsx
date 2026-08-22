@@ -9,6 +9,7 @@ import { creatorMissionProgress } from '@/lib/missions/list'
 import { joinMissionAction } from '@/lib/missions/actions'
 import { acceptInviteAction } from '@/lib/missions/invite-actions'
 import { listCreatorMerchantMissions } from '@/lib/missions/queries'
+import { missionTypes } from '@/lib/missions/types'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export function generateStaticParams() {
@@ -51,10 +52,13 @@ type CreatorMissionRow = {
 const missionSource = (source: string | null): CreatorMissionCard['missionSource'] =>
   source === 'travelpayouts' ? 'travelpayouts' : 'merchant'
 
-const missionType = (type: string | null): CreatorMissionCard['missionType'] => {
-  if (type === 'hybrid' || type === 'paid') return type
-  return 'coupon_affiliate'
-}
+// Derives from the canonical missionTypes array rather than enumerating members inline, so a
+// future mission type is recognized automatically the moment it's added to types.ts -- the
+// same fix applied to lib/missions/detail.ts's toMissionType, closing the exact bug class
+// that let receipt_cashback get silently miscategorized as coupon_affiliate here before it
+// was fixed one-off (commit 3c23911).
+const missionType = (type: string | null): CreatorMissionCard['missionType'] =>
+  (missionTypes as readonly string[]).includes(type ?? '') ? (type as CreatorMissionCard['missionType']) : 'coupon_affiliate'
 
 const programCompensation = (program: CreatorMissionRow['affiliate_network_programs']) => {
   const row = Array.isArray(program) ? program[0] : program
@@ -125,7 +129,7 @@ function mapCreatorMission(
     locked,
     requiredTier,
     funded:
-      (row.mission_type === 'paid' || row.mission_type === 'hybrid') &&
+      (row.mission_type === 'paid' || row.mission_type === 'hybrid' || row.mission_type === 'receipt_cashback') &&
       row.merchant_profile_id !== null &&
       funded.has(row.merchant_profile_id),
   }

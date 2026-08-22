@@ -113,4 +113,37 @@ describe('/[locale]/studio/missions host', () => {
     expect(screen.getByText('Coupon push')).toBeTruthy()
     expect(screen.queryByText('Funded')).toBeNull()
   })
+
+  it('shows Apply (not Join) and the Funded badge for a receipt_cashback mission', async () => {
+    // receipt_cashback is a new mission_type (R12.2) that must NOT be silently coerced
+    // to coupon_affiliate by the page's own mission-type mapper: it needs the same
+    // "Apply" cta and funded-badge eligibility as paid/hybrid missions, since it is
+    // budget-enforced via the same paid_fee_amount field.
+    listCreatorMerchantMissionsMock.mockResolvedValueOnce({
+      data: [{
+        id: 'mission-3',
+        title: 'Upload your receipt',
+        summary: 'Snap a photo, get cashback.',
+        mission_source: 'merchant',
+        mission_type: 'receipt_cashback',
+        status: 'published',
+        merchant_profile_id: 'merchant-1',
+        paid_fee_amount: 200,
+        paid_fee_currency: 'HKD',
+        affiliate_commission_rate: null,
+        creator_commission_rate: null,
+        affiliate_network_programs: null,
+        mission_participants: [],
+        affiliate_partner_links: [],
+      }],
+    } as never)
+
+    const ui = await StudioMissionsPage({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+
+    expect(screen.getByText('Upload your receipt')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Apply mission' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Join mission' })).toBeNull()
+    expect(screen.getByText('Funded')).toBeTruthy()
+  })
 })

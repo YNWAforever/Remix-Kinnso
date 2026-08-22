@@ -13,10 +13,12 @@ import { nextJoinStatus, reviewParticipant, reviewSubmission } from '@/lib/missi
 import {
   validateMissionDraft,
   validatePartnerLinkRequest,
+  validateReceiptProof,
   validateSubmission,
 } from '@/lib/missions/validation'
 import { meetsTier, type GatedTier } from '@/lib/contribution/tiers'
 import { getCreatorStoredTier } from '@/lib/contribution/queries'
+import { requireCreatorAction } from '@/lib/admin/guard'
 import { createPartnerLinkCommand } from '@/lib/missions/partner-link-command'
 import { createPartnerLinkStore } from '@/lib/missions/partner-link-store'
 import { createTravelpayoutsPartnerLinkProvider } from '@/lib/missions/partner-link-provider'
@@ -180,6 +182,7 @@ export function buildMissionInsert({
     paid_fee_currency: draft.paidFeeCurrency,
     affiliate_network_program_id: draft.affiliateNetworkProgramId,
     min_tier: draft.minTier,
+    max_receipts_per_creator: draft.maxReceiptsPerCreator,
   }
 }
 
@@ -551,6 +554,61 @@ export async function submitMilestoneAction(
   if (insertError || !inserted) return formError('Submission could not be saved')
   await revalidate([localizedPath(input.locale, studioMissionsPath)])
   return { ok: true, submissionId: inserted.id }
+}
+
+export type SubmitReceiptInput = {
+  missionId: string
+  proofUrl: string
+  locale?: string
+}
+
+// Friendly-message mapping for submit_receipt's raised error codes, following the same
+// FRIENDLY-table convention as claimOfferAction (apps/web/lib/offers/actions.ts) --
+// submit_receipt is a SECURITY DEFINER RPC that owns every validation itself (auth,
+// mission lookup, active-participant check, the repeatable-milestone guard, and the
+// per-creator cap), so this action's only job is to gate + call it and translate its
+// short error codes into copy a creator can act on, the same shape claim_offer's
+// offer_cap_reached/visitor_limit_reached/offer_not_live already get.
+const RECEIPT_FRIENDLY: Record<string, string> = {
+  unauthorized: 'Sign in is required',
+  proof_required: 'Add a photo of your receipt before submitting',
+  mission_not_found: 'Mission is not available',
+  wrong_mission_type: 'This mission does not accept receipt submissions',
+  not_active_participant: 'You need to join this mission before submitting a receipt',
+  no_repeatable_milestone: 'This mission is not set up for receipt submissions yet — contact support',
+  receipt_cap_reached: "You've reached the receipt limit for this mission",
+}
+
+const mapReceiptError = (message: string, fallback: string): string => {
+  const key = Object.keys(RECEIPT_FRIENDLY).find((k) => message.includes(k))
+  return key ? RECEIPT_FRIENDLY[key] : fallback
+}
+
+export async function submitReceiptAction(
+  input: SubmitReceiptInput,
+): Promise<ActionResult<{ submissionId: string }>> {
+  'use server'
+
+  const validation = validateReceiptProof({ proofUrl: input.proofUrl })
+  if (!validation.ok) return { ok: false, errors: validation.errors }
+
+  const supabase = await getSupabase()
+  const gate = await requireCreatorAction(supabase)
+  if (!gate.ok) return gate
+
+  const { data, error } = await supabase.rpc('submit_receipt', {
+    p_mission_id: input.missionId,
+    p_proof_urls: [input.proofUrl.trim()],
+  })
+
+  if (error || !data) {
+    if (error) console.error('[missions] submit_receipt failed', error)
+    return formError(mapReceiptError(error?.message ?? '', 'Receipt could not be submitted'))
+  }
+
+  const result = data as { submission_id: string }
+  await revalidate([localizedPath(input.locale, studioMissionsPath)])
+  return { ok: true, submissionId: result.submission_id }
 }
 
 export async function createPartnerLinkAction(

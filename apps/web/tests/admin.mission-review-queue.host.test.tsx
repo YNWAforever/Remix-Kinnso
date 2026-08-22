@@ -9,7 +9,7 @@ const { roleMock, getUserMock, queueMock } = vi.hoisted(() => ({
   // Explicitly typed as ReviewQueueRow[] (not inferred) so mockResolvedValueOnce below can
   // supply a different confidenceStatus/status literal without TS narrowing to this row's.
   queueMock: vi.fn(async (): Promise<ReviewQueueRow[]> => [{
-    submissionId: 's1', missionId: 'mission-1', missionTitle: 'Summer Coupon Push',
+    submissionId: 's1', missionId: 'mission-1', missionTitle: 'Summer Coupon Push', missionType: 'coupon_affiliate',
     creatorId: 'creator-1', status: 'submitted', submittedAt: '2026-08-19T00:00:00Z',
     reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal',
   }]),
@@ -57,7 +57,7 @@ describe('/[locale]/admin/missions/review host', () => {
 
   it('shows the re-run button for a needs_review row', async () => {
     queueMock.mockResolvedValueOnce([{
-      submissionId: 's2', missionId: 'mission-2', missionTitle: 'Autumn Push',
+      submissionId: 's2', missionId: 'mission-2', missionTitle: 'Autumn Push', missionType: 'coupon_affiliate',
       creatorId: 'creator-2', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z',
       reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'needs_review' as const,
     }])

@@ -13,7 +13,7 @@ const detail = {
   participants: [{ id: 'p1', creatorId: 'creator-1', status: 'active', source: 'application', applicationNote: null, approvedAt: null }],
   milestones: [{ id: 'm1', title: 'Post proof', description: '', dueAt: null, sortOrder: 0 }],
   submissions: [{
-    submissionId: 's1', missionId: 'mission-1', missionTitle: 'Summer Coupon Push',
+    submissionId: 's1', missionId: 'mission-1', missionTitle: 'Summer Coupon Push', missionType: 'coupon_affiliate',
     creatorId: 'creator-1', status: 'submitted' as const, submittedAt: '2026-08-19T00:00:00Z',
     reviewDeadline: '2026-08-21T00:00:00Z', confidenceStatus: 'verified_signal' as const,
   }],
