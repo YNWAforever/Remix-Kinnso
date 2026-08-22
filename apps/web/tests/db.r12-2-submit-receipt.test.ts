@@ -32,4 +32,29 @@ describe('submit_receipt RPC', () => {
     expect(sql).toContain('revoke all on function public.submit_receipt(uuid, text[]) from public, anon')
     expect(sql).toContain('grant execute on function public.submit_receipt(uuid, text[]) to authenticated')
   })
+
+  it('rejects a signed-out caller', () => {
+    expect(sql).toContain('v_creator_id uuid := auth.uid()')
+    expect(sql).toContain("if v_creator_id is null then raise exception 'unauthorized' using errcode = '42501'")
+  })
+
+  it('requires at least one proof url', () => {
+    expect(sql).toContain("if coalesce(array_length(p_proof_urls, 1), 0) = 0 then raise exception 'proof_required'")
+  })
+
+  it('raises mission_not_found when the mission id does not resolve', () => {
+    expect(sql).toContain('where id = p_mission_id')
+    expect(sql).toContain("if not found then raise exception 'mission_not_found' using errcode = 'P0002'")
+  })
+
+  it('raises no_repeatable_milestone when the mission has no repeatable milestone row', () => {
+    expect(sql).toContain('from public.mission_milestones')
+    expect(sql).toContain('where mission_id = p_mission_id and repeatable = true')
+    expect(sql).toContain("if v_milestone_id is null then raise exception 'no_repeatable_milestone' using errcode = 'P0002'")
+  })
+
+  it('returns the new submission id as jsonb', () => {
+    expect(sql).toContain('returning id into v_submission_id')
+    expect(sql).toContain("return jsonb_build_object('submission_id', v_submission_id)")
+  })
 })
