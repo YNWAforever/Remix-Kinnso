@@ -195,6 +195,43 @@ describe('mission actions builders', () => {
     })
     expect(payload.min_tier).toBeNull()
   })
+
+  it('builds a receipt_cashback mission insert payload with the per-receipt fee and cap', () => {
+    const payload = buildMissionInsert({
+      input: {
+        ...missionDraftFixture,
+        missionType: 'receipt_cashback',
+        couponCode: null,
+        couponUrl: null,
+        affiliateCommissionRate: null,
+        kinnsoCommissionRate: null,
+        creatorCommissionRate: null,
+        paidFeeAmount: 50,
+        paidFeeCurrency: 'HKD',
+        maxReceiptsPerCreator: 3,
+        milestones: [],
+      },
+      merchantProfileId: 'merchant-profile-1',
+      opsMemberId: null,
+      publish: true,
+    })
+    expect(payload).toMatchObject({
+      mission_type: 'receipt_cashback',
+      paid_fee_amount: 50,
+      paid_fee_currency: 'HKD',
+      max_receipts_per_creator: 3,
+    })
+  })
+
+  it('defaults max_receipts_per_creator to null when the draft leaves it unset', () => {
+    const payload = buildMissionInsert({
+      input: { ...missionDraftFixture, maxReceiptsPerCreator: null },
+      merchantProfileId: 'merchant-profile-1',
+      opsMemberId: null,
+      publish: false,
+    })
+    expect(payload.max_receipts_per_creator).toBeNull()
+  })
 })
 
 describe('createMissionAction', () => {

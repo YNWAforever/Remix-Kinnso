@@ -56,6 +56,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [creatorCommissionRate, setCreatorCommissionRate] = useState('6')
   const [paidFeeAmount, setPaidFeeAmount] = useState('')
   const [paidFeeCurrency, setPaidFeeCurrency] = useState('HKD')
+  const [maxReceiptsPerCreator, setMaxReceiptsPerCreator] = useState('')
   const [milestoneTitle, setMilestoneTitle] = useState('')
   const [milestoneDescription, setMilestoneDescription] = useState('')
   const [error, setError] = useState('')
@@ -66,6 +67,8 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
 
   const includesCoupon = missionType === 'coupon_affiliate' || missionType === 'hybrid'
   const includesPaid = missionType === 'paid' || missionType === 'hybrid'
+  const isReceiptCashback = missionType === 'receipt_cashback'
+  const includesFeeAmount = includesPaid || isReceiptCashback
 
   const buildInput = (): MissionDraftInput => ({
     missionSource: 'merchant',
@@ -78,10 +81,13 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
     affiliateCommissionRate: includesCoupon ? numberOrNull(affiliateCommissionRate) : null,
     kinnsoCommissionRate: includesCoupon ? numberOrNull(kinnsoCommissionRate) : null,
     creatorCommissionRate: includesCoupon ? numberOrNull(creatorCommissionRate) : null,
-    paidFeeAmount: includesPaid ? numberOrNull(paidFeeAmount) : null,
-    paidFeeCurrency: includesPaid ? textOrNull(paidFeeCurrency) : null,
+    paidFeeAmount: includesFeeAmount ? numberOrNull(paidFeeAmount) : null,
+    paidFeeCurrency: includesFeeAmount ? textOrNull(paidFeeCurrency) : null,
     affiliateNetworkProgramId: null,
     minTier: minTier === 'open' ? null : minTier,
+    maxReceiptsPerCreator: isReceiptCashback ? numberOrNull(maxReceiptsPerCreator) : null,
+    // receipt_cashback missions get their single repeatable milestone auto-created by a DB
+    // trigger at mission-insert time, so no milestone is collected here for that type.
     milestones: includesPaid && milestoneTitle.trim() !== ''
       ? [{ title: milestoneTitle, description: milestoneDescription.trim() || milestoneTitle }]
       : [],
@@ -154,6 +160,7 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
               ['coupon_affiliate', t.typeCoupon],
               ['hybrid', t.typeHybrid],
               ['paid', t.typePaid],
+              ['receipt_cashback', t.typeReceiptCashback],
             ].map(([value, label]) => (
               <label
                 key={value}
@@ -279,10 +286,10 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
           </section>
         )}
 
-        {includesPaid && (
+        {includesFeeAmount && (
           <section className="grid gap-3 rounded-lg bg-kinnso-cream px-4 py-4 sm:grid-cols-2">
             <label className={fieldShell}>
-              {t.paidFeeAmount}
+              {isReceiptCashback ? t.receiptCashbackAmount : t.paidFeeAmount}
               <input
                 className={inputShell}
                 inputMode="decimal"
@@ -294,14 +301,29 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
               {t.paidFeeCurrency}
               <input className={inputShell} value={paidFeeCurrency} onChange={(event) => setPaidFeeCurrency(event.target.value)} />
             </label>
-            <label className={fieldShell}>
-              {t.milestoneTitle}
-              <input className={inputShell} value={milestoneTitle} onChange={(event) => setMilestoneTitle(event.target.value)} />
-            </label>
-            <label className={fieldShell}>
-              {t.milestoneDescription}
-              <input className={inputShell} value={milestoneDescription} onChange={(event) => setMilestoneDescription(event.target.value)} />
-            </label>
+            {includesPaid && (
+              <>
+                <label className={fieldShell}>
+                  {t.milestoneTitle}
+                  <input className={inputShell} value={milestoneTitle} onChange={(event) => setMilestoneTitle(event.target.value)} />
+                </label>
+                <label className={fieldShell}>
+                  {t.milestoneDescription}
+                  <input className={inputShell} value={milestoneDescription} onChange={(event) => setMilestoneDescription(event.target.value)} />
+                </label>
+              </>
+            )}
+            {isReceiptCashback && (
+              <label className={fieldShell}>
+                {t.maxReceiptsPerCreator}
+                <input
+                  className={inputShell}
+                  inputMode="numeric"
+                  value={maxReceiptsPerCreator}
+                  onChange={(event) => setMaxReceiptsPerCreator(event.target.value)}
+                />
+              </label>
+            )}
           </section>
         )}
 

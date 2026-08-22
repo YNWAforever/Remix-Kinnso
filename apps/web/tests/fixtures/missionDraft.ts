@@ -15,5 +15,6 @@ export const missionDraftFixture: MissionDraftInput = {
   paidFeeCurrency: null,
   affiliateNetworkProgramId: null,
   minTier: null,
+  maxReceiptsPerCreator: null,
   milestones: [{ title: 'Publish post', description: 'Share one post with the tracked link.' }],
 }

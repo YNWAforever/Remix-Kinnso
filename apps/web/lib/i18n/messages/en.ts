@@ -668,6 +668,7 @@ export interface Messages {
     typeCoupon: string
     typeHybrid: string
     typePaid: string
+    typeReceiptCashback: string
     title: string
     summary: string
     couponCode: string
@@ -677,6 +678,8 @@ export interface Messages {
     creatorCommissionRate: string
     paidFeeAmount: string
     paidFeeCurrency: string
+    receiptCashbackAmount: string
+    maxReceiptsPerCreator: string
     milestoneTitle: string
     milestoneDescription: string
     saveDraft: string
@@ -1828,6 +1831,7 @@ const messages: Messages = {
     typeCoupon: 'Coupon affiliate',
     typeHybrid: 'Affiliate + paid mission',
     typePaid: 'Paid mission only',
+    typeReceiptCashback: 'Receipt cashback',
     title: 'Mission title',
     summary: 'Mission summary',
     couponCode: 'Coupon code',
@@ -1837,6 +1841,8 @@ const messages: Messages = {
     creatorCommissionRate: 'Creator commission rate',
     paidFeeAmount: 'Paid mission fee',
     paidFeeCurrency: 'Currency',
+    receiptCashbackAmount: 'Cashback per receipt',
+    maxReceiptsPerCreator: 'Max receipts per creator (optional)',
     milestoneTitle: 'Milestone title',
     milestoneDescription: 'Milestone description',
     saveDraft: 'Save draft',

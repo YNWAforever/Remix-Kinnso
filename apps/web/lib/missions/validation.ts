@@ -46,7 +46,11 @@ export const validateMissionDraft = (input: MissionDraftInput): ValidationResult
   if (isBlank(input.title)) addError(errors, 'title', 'required')
   if (isBlank(input.summary)) addError(errors, 'summary', 'required')
 
-  if (input.missionSource === 'merchant' && input.missionType !== 'paid') {
+  if (
+    input.missionSource === 'merchant' &&
+    input.missionType !== 'paid' &&
+    input.missionType !== 'receipt_cashback'
+  ) {
     if (isBlank(input.couponCode)) addError(errors, 'couponCode', 'required')
     if (isBlank(input.couponUrl)) addError(errors, 'couponUrl', 'required')
     validateNonNegative(errors, 'affiliateCommissionRate', input.affiliateCommissionRate, true)
@@ -61,10 +65,27 @@ export const validateMissionDraft = (input: MissionDraftInput): ValidationResult
     }
   }
 
-  if (input.missionType === 'paid' || input.missionType === 'hybrid') {
+  if (
+    input.missionType === 'paid' ||
+    input.missionType === 'hybrid' ||
+    input.missionType === 'receipt_cashback'
+  ) {
     validateNonNegative(errors, 'paidFeeAmount', input.paidFeeAmount, true)
     if (isBlank(input.paidFeeCurrency)) addError(errors, 'paidFeeCurrency', 'required')
+  }
+
+  // receipt_cashback missions get their single repeatable milestone auto-created by a DB
+  // trigger at mission-insert time (see
+  // supabase/migrations/20260822090000_r12_2_receipt_cashback_schema.sql), so unlike
+  // paid/hybrid missions the merchant is never asked to enter one here.
+  if (input.missionType === 'paid' || input.missionType === 'hybrid') {
     if (input.milestones.length === 0) addError(errors, 'milestones', 'at least one')
+  }
+
+  if (input.missionType === 'receipt_cashback' && input.maxReceiptsPerCreator != null) {
+    if (!Number.isInteger(input.maxReceiptsPerCreator) || input.maxReceiptsPerCreator < 1) {
+      addError(errors, 'maxReceiptsPerCreator', 'positive-integer')
+    }
   }
 
   return resultFrom(errors)

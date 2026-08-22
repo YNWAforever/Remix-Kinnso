@@ -180,6 +180,7 @@ export function buildMissionInsert({
     paid_fee_currency: draft.paidFeeCurrency,
     affiliate_network_program_id: draft.affiliateNetworkProgramId,
     min_tier: draft.minTier,
+    max_receipts_per_creator: draft.maxReceiptsPerCreator,
   }
 }
 

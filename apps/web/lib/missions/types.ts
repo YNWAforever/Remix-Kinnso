@@ -1,6 +1,6 @@
 import type { GatedTier } from '@/lib/contribution/tiers'
 
-export const missionTypes = ['coupon_affiliate', 'hybrid', 'paid'] as const
+export const missionTypes = ['coupon_affiliate', 'hybrid', 'paid', 'receipt_cashback'] as const
 
 export type MissionType = (typeof missionTypes)[number]
 
@@ -68,6 +68,7 @@ export type MissionDraftInput = {
   paidFeeCurrency: string | null
   affiliateNetworkProgramId: string | null
   minTier: GatedTier | null
+  maxReceiptsPerCreator: number | null
   milestones: MissionMilestoneInput[]
 }
 

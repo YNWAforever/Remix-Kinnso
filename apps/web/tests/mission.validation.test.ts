@@ -24,6 +24,7 @@ const base: MissionDraftInput = {
   paidFeeCurrency: null,
   affiliateNetworkProgramId: null,
   minTier: null,
+  maxReceiptsPerCreator: null,
   milestones: [{ title: 'Share coupon post', description: 'Post one IG reel or Threads post.' }],
 }
 
@@ -104,6 +105,77 @@ describe('mission validation', () => {
     })
     expect(result.ok).toBe(false)
     expect(result.errors.paidFeeAmount).toContain('non-negative')
+  })
+
+  it('accepts a receipt_cashback mission with a valid per-receipt amount and no milestone', () => {
+    const result = validateMissionDraft({
+      ...base,
+      missionType: 'receipt_cashback',
+      couponCode: null,
+      couponUrl: null,
+      affiliateCommissionRate: null,
+      kinnsoCommissionRate: null,
+      creatorCommissionRate: null,
+      paidFeeAmount: 50,
+      paidFeeCurrency: 'HKD',
+      maxReceiptsPerCreator: 3,
+      milestones: [],
+    })
+    expect(result).toEqual({ ok: true, errors: {} })
+  })
+
+  it('rejects a receipt_cashback mission with no per-receipt amount', () => {
+    const result = validateMissionDraft({
+      ...base,
+      missionType: 'receipt_cashback',
+      couponCode: null,
+      couponUrl: null,
+      affiliateCommissionRate: null,
+      kinnsoCommissionRate: null,
+      creatorCommissionRate: null,
+      paidFeeAmount: null,
+      paidFeeCurrency: null,
+      milestones: [],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.paidFeeAmount).toContain('required')
+    // receipt_cashback's milestone is auto-created by a DB trigger at insert time, so unlike
+    // paid/hybrid missions an empty milestones array must not be rejected.
+    expect(result.errors.milestones).toBeUndefined()
+  })
+
+  it('does not require coupon or commission fields for receipt_cashback missions', () => {
+    const result = validateMissionDraft({
+      ...base,
+      missionType: 'receipt_cashback',
+      couponCode: null,
+      couponUrl: null,
+      affiliateCommissionRate: null,
+      kinnsoCommissionRate: null,
+      creatorCommissionRate: null,
+      paidFeeAmount: 50,
+      paidFeeCurrency: 'HKD',
+      milestones: [],
+    })
+    expect(result).toEqual({ ok: true, errors: {} })
+  })
+
+  it('rejects a non-positive-integer max_receipts_per_creator on a receipt_cashback mission', () => {
+    const result = validateMissionDraft({
+      ...base,
+      missionType: 'receipt_cashback',
+      couponCode: null,
+      couponUrl: null,
+      affiliateCommissionRate: null,
+      kinnsoCommissionRate: null,
+      creatorCommissionRate: null,
+      paidFeeAmount: 50,
+      paidFeeCurrency: 'HKD',
+      maxReceiptsPerCreator: 0,
+      milestones: [],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.maxReceiptsPerCreator).toContain('positive-integer')
   })
 
   it('rejects Travelpayouts missions without an affiliate network program ID', () => {

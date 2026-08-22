@@ -26,6 +26,49 @@ describe('MissionPostWizard', () => {
     expect(screen.getByLabelText(en.missions.milestoneTitle)).toBeTruthy()
   })
 
+  it('shows per-receipt amount and cap fields for receipt_cashback missions, and hides coupon/milestone fields', () => {
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={vi.fn()} />)
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeReceiptCashback }))
+    expect(screen.getByLabelText(en.missions.receiptCashbackAmount)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.paidFeeCurrency)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.maxReceiptsPerCreator)).toBeTruthy()
+    expect(screen.queryByLabelText(en.missions.couponCode)).toBeNull()
+    expect(screen.queryByLabelText(en.missions.creatorCommissionRate)).toBeNull()
+    expect(screen.queryByLabelText(en.missions.milestoneTitle)).toBeNull()
+  })
+
+  it('submits a valid receipt_cashback draft payload', () => {
+    const onSubmit = vi.fn()
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeReceiptCashback }))
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Cafe receipt cashback' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Get cashback for every receipt.' } })
+    fireEvent.change(screen.getByLabelText(en.missions.receiptCashbackAmount), { target: { value: '50' } })
+    fireEvent.change(screen.getByLabelText(en.missions.maxReceiptsPerCreator), { target: { value: '3' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missions.saveDraft }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        missionType: 'receipt_cashback',
+        paidFeeAmount: 50,
+        paidFeeCurrency: 'HKD',
+        maxReceiptsPerCreator: 3,
+        milestones: [],
+      }),
+      { publish: false },
+    )
+  })
+
+  it('blocks a receipt_cashback draft with no per-receipt amount', () => {
+    const onSubmit = vi.fn()
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeReceiptCashback }))
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Cafe receipt cashback' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Get cashback for every receipt.' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missions.saveDraft }))
+    expect(screen.getByRole('alert')).toHaveTextContent(en.missions.validationError)
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it('submits a draft payload', () => {
     const onSubmit = vi.fn()
     render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
