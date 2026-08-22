@@ -19,6 +19,11 @@ type ExperienceMetadata = CommonMetadata & {
   entityType: 'experience'
   entityId: string
 }
+type OfferMetadata = CommonMetadata & {
+  routeKey: 'guide_detail' | 'creator_profile'
+  entityType: 'offer'
+  entityId: string
+}
 
 export type TravellerAnalyticsMetadataByEvent = {
   journey_started: CommonMetadata & { routeKey: 'journey' }
@@ -46,6 +51,8 @@ export type TravellerAnalyticsMetadataByEvent = {
     outcome: 'error'
     errorCategory: 'invalid' | 'rate_limited' | 'unavailable' | 'unknown'
   })
+  offer_viewed: OfferMetadata
+  offer_claimed: OfferMetadata
   signup_started: CommonMetadata & { routeKey: 'sign_up' }
   signup_completed: CommonMetadata & {
     routeKey: 'sign_up'
@@ -119,6 +126,20 @@ export function hasAnalyticsConsent(): boolean {
     return false
   }
   return true
+}
+
+/**
+ * Returns the journey id currently in storage, or null if there is no active
+ * consent. Near TTL expiry this may return a stale id that trackTravellerEvent
+ * will rotate on its next call (via ensureJourney) -- do not cache this value
+ * across an event boundary or assume it matches the id the next tracked event
+ * actually gets tagged with.
+ */
+export function getCurrentJourneyId(): string | null {
+  if (!hasAnalyticsConsent()) return null
+  const storage = getStorage()
+  const journeyId = getStorageValue(storage, JOURNEY_KEY)
+  return isJourneyId(journeyId) ? journeyId : null
 }
 
 export function subscribeToAnalyticsConsent(callback: ConsentSubscriber): () => void {

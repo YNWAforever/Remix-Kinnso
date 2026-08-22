@@ -15,6 +15,7 @@ const base: MerchantInsights = {
   ],
   totals: { participants: 5, invited: 4, accepted: 2, approvedSubmissions: 2 },
   inviteAcceptRate: 0.5,
+  visitsDriven: [],
 }
 
 describe('MerchantInsightsView', () => {

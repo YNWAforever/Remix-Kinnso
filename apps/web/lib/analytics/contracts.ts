@@ -9,6 +9,8 @@ export const TRAVELLER_ANALYTICS_EVENTS = [
   'checkout_started',
   'signup_started',
   'signup_completed',
+  'offer_viewed',
+  'offer_claimed',
 ] as const
 
 export type TravellerAnalyticsEventName = (typeof TRAVELLER_ANALYTICS_EVENTS)[number]
@@ -21,7 +23,7 @@ export const travellerAnalyticsPayloadSchema = z.object({
   occurredAt: z.string().datetime({ offset: true }),
   locale: z.enum(['en', 'zh-hk', 'zh-tw', 'ja', 'ko', 'th', 'zh-cn']),
   routeKey: z.string().regex(/^[a-z0-9_/-]{1,80}$/),
-  entityType: z.enum(['guide', 'experience', 'creator', 'article']).optional(),
+  entityType: z.enum(['guide', 'experience', 'creator', 'article', 'offer']).optional(),
   entityId: z.string().regex(/^[A-Za-z0-9_-]{1,120}$/).optional(),
   bookingState: z.enum(['off', 'on']).optional(),
   outcome: z.enum(['created', 'submitted', 'success', 'error']).optional(),

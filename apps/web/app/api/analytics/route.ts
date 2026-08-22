@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { isAuthSessionMissingError } from '@supabase/supabase-js'
 
 import {
   AnalyticsRequestError,
@@ -77,7 +78,14 @@ export async function POST(request: Request) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    if (authError) return unavailableResponse()
+    // No cookie-backed session is the expected, common case for this route: most
+    // analytics events (journey_started, entity_viewed, offer_viewed, ...) fire
+    // before the visitor ever signs in, and this app never mints an anonymous
+    // Supabase session. getUser() surfaces that as AuthSessionMissingError, not
+    // `user: null` with no error -- treating it as a fatal 503 here silently
+    // discarded every unauthenticated event. Only a genuine auth-server failure
+    // (any other error) should abort the request.
+    if (authError && !isAuthSessionMissingError(authError)) return unavailableResponse()
 
     await persistTravellerAnalyticsEvent(payload, user?.id ?? null)
     return NextResponse.json({ accepted: true }, { status: 202 })

@@ -3,7 +3,7 @@ import GuideCard from '@/components/kinnso/GuideCard'
 import { EntityMedia } from '@/components/kinnso/media/EntityMedia'
 import { ArticleCard } from '@/components/ArticleCard'
 import SessionCard from '@/components/kinnso/SessionCard'
-import { OfferClaimCard } from '@/components/kinnso/OfferClaimCard'
+import { OfferClaimCard, type ClaimOffer } from '@/components/kinnso/OfferClaimCard'
 import { EnquiryDialog } from '@/components/kinnso/enquiries/EnquiryDialog'
 import type { CreatorArticleCard } from '@/lib/articles/queries'
 import type { PublicSession } from '@/lib/sessions/public-queries'
@@ -23,7 +23,7 @@ interface Props {
   articles?: CreatorArticleCard[]
   sessions?: PublicSession[]
   offers?: PublicOffer[]
-  offerClaim?: { onClaim: (offerId: string, creatorId: string, guideId: string | null, source: 'guide' | 'profile') => Promise<{ ok: boolean; claimId?: string; errors?: Record<string, string[]> }>; messages: Messages['offerClaim'] }
+  offerClaim?: { onClaim: ClaimOffer; messages: Messages['offerClaim'] }
 
 }
 function hueFromHandle(handle: string): number {

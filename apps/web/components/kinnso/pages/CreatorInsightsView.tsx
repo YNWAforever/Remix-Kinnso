@@ -34,6 +34,11 @@ export function CreatorInsightsView({
         <p className="mt-1 text-sm text-muted-foreground">{nextLabel}</p>
       </section>
 
+      <section className="rounded-lg border p-5">
+        <p className="text-sm text-muted-foreground">{t.visitsDriven}</p>
+        <p className="text-3xl font-semibold tabular-nums">{data.visitsDriven}</p>
+      </section>
+
       {hasPoints ? (
         <>
           <section className="rounded-lg border p-5">

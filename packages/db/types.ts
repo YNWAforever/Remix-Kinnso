@@ -2551,6 +2551,8 @@ export type Database = {
       }
       offer_claims: {
         Row: {
+          analytics_journey_id: string | null
+          analytics_locale: string | null
           claim_token_hash: string
           created_at: string
           creator_id: string
@@ -2563,6 +2565,8 @@ export type Database = {
           visitor_user_id: string
         }
         Insert: {
+          analytics_journey_id?: string | null
+          analytics_locale?: string | null
           claim_token_hash: string
           created_at?: string
           creator_id: string
@@ -2575,6 +2579,8 @@ export type Database = {
           visitor_user_id: string
         }
         Update: {
+          analytics_journey_id?: string | null
+          analytics_locale?: string | null
           claim_token_hash?: string
           created_at?: string
           creator_id?: string
@@ -3467,6 +3473,8 @@ export type Database = {
         Args: {
           p_creator_id: string
           p_guide_id: string | null
+          p_journey_id?: string | null
+          p_locale?: string | null
           p_offer_id: string
           p_source: string
         }

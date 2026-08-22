@@ -12,6 +12,8 @@ const { merchantPageGateMock, insightsMock } = vi.hoisted(() => ({
       invited: 4, applied: 1, active: 2, rejected: 1, approvedSubmissions: 2 }],
     totals: { participants: 5, invited: 4, accepted: 2, approvedSubmissions: 2 },
     inviteAcceptRate: 0.5,
+    visitsDriven: [{ creatorId: 'c1', creatorName: 'Amy Lee', guideId: 'g1', guideTitle: 'Taipei Night Market Crawl',
+      redemptions: 3, attributedBookings: 2 }],
   })),
 }))
 

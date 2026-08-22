@@ -69,6 +69,53 @@ describe('POST /api/analytics', () => {
     expect(serverClientMock).not.toHaveBeenCalled()
   })
 
+  it('returns 400 for an offer event with a mismatched entity type', async () => {
+    const response = await POST(
+      request(
+        payload({
+          event: 'offer_claimed',
+          routeKey: 'guide_detail',
+          entityType: 'guide',
+          entityId: 'offer_1',
+        }),
+      ),
+    )
+
+    expect(response.status).toBe(400)
+    await expect(response.json()).resolves.toEqual({ accepted: false, error: 'invalid_request' })
+    expect(serverClientMock).not.toHaveBeenCalled()
+  })
+
+  it.each(['offer_viewed', 'offer_claimed'])(
+    'acknowledges a valid %s event through the full ingest path',
+    async (event) => {
+      process.env.ANALYTICS_INGEST_MODE = 'production'
+      allowJourney()
+      serviceSelectMock.mockResolvedValue({ data: [{ id: 'ledger-row-1' }], error: null })
+      serviceUpsertMock.mockReturnValue({ select: serviceSelectMock })
+      serviceFromMock.mockReturnValue({ upsert: serviceUpsertMock })
+      serviceClientMock.mockReturnValue({ from: serviceFromMock })
+
+      const response = await POST(
+        request(
+          payload({
+            event,
+            routeKey: 'creator_profile',
+            entityType: 'offer',
+            entityId: 'offer_1',
+          }),
+        ),
+      )
+
+      expect(response.status).toBe(202)
+      await expect(response.json()).resolves.toEqual({ accepted: true })
+      expect(serviceUpsertMock).toHaveBeenCalledWith(
+        expect.objectContaining({ event_name: event, entity_type: 'offer', entity_id: 'offer_1' }),
+        { onConflict: 'journey_id,client_event_id', ignoreDuplicates: true },
+      )
+    },
+  )
+
   it('returns 413 for an oversized raw request without opening a client', async () => {
     const response = await POST(request(`${JSON.stringify(payload())}${' '.repeat(8_193)}`))
 

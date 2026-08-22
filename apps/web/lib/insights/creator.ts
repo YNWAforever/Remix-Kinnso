@@ -13,6 +13,7 @@ export interface CreatorInsights {
   guideSavesTotal: number
   missionsByStatus: { applied: number; active: number; invited: number; rejected: number }
   submissionsApproved: number
+  visitsDriven: number
 }
 
 interface RawCreatorInsights {
@@ -24,6 +25,7 @@ interface RawCreatorInsights {
   guide_saves_total: number
   missions_by_status: Partial<Record<string, number>>
   submissions_approved: number
+  visits_driven: number
 }
 
 const num = (v: unknown): number => (typeof v === 'number' ? v : Number(v ?? 0))
@@ -62,5 +64,6 @@ export async function getCreatorInsights(supabase: Client): Promise<CreatorInsig
       rejected: num(status.rejected),
     },
     submissionsApproved: num(raw.submissions_approved),
+    visitsDriven: num(raw.visits_driven),
   }
 }
