@@ -73,3 +73,83 @@ $$;
 create trigger create_repeatable_milestone_for_receipt_mission_trg
   after insert on public.missions
   for each row execute function public.create_repeatable_milestone_for_receipt_mission();
+
+-- Code review finding: mission_milestones.repeatable and
+-- mission_milestone_submissions.milestone_repeatable are both meant to be set once at
+-- creation and never change -- repeatable is set once at milestone-INSERT time (either by
+-- application code creating a normal milestone with the default false, or by
+-- create_repeatable_milestone_for_receipt_mission_trg above explicitly inserting true for a
+-- receipt-cashback mission), and milestone_repeatable is set once at submission-INSERT time
+-- purely by set_submission_milestone_repeatable_trg above. Nothing in this codebase ever
+-- needs to UPDATE either column. If either flag were flipped on an existing row after
+-- creation, already-denormalized mission_milestone_submissions.milestone_repeatable copies
+-- for that milestone would silently desync from mission_milestones.repeatable, and the
+-- partial unique index mission_milestone_submissions_unique_non_repeatable (`where not
+-- milestone_repeatable`) would stop meaning what its name implies for that milestone.
+--
+-- Both tables carry pre-existing blanket `grant select, insert, update on ... to
+-- authenticated` (20260617173941_mission_grants.sql), and their RLS UPDATE policies
+-- (mission_milestones_merchant_ops_update, mission_submissions_creator_merchant_ops_update)
+-- restrict which rows an owning merchant or active ops member may touch, never which
+-- columns -- so today any such actor can run `update mission_milestones set repeatable = ...`
+-- (or the submissions equivalent) and it succeeds at the DB layer.
+--
+-- The obvious-looking fix -- a column-level REVOKE UPDATE targeting just the repeatable /
+-- milestone_repeatable column, layered on top of the existing table-level grant -- was
+-- tried and rejected after verifying against Postgres's actual ACL semantics (confirmed
+-- empirically against a real Postgres 16 instance, not just from memory): a column-level
+-- REVOKE only removes column-level ACL entries. Access is granted if EITHER the table-level
+-- ACL permits the privilege OR the column-level ACL does (they're additive, not one
+-- overriding the other) -- see the PostgreSQL GRANT documentation's description of
+-- column-level privileges as supplementing, not narrowing, a table-level grant. Since both
+-- tables already carry a blanket table-level `grant update` covering all columns including
+-- these two, a column-level revoke on top of that grant is a silent no-op: it does not
+-- appear in \dp's "Column privileges" (nothing was ever granted at the column level to
+-- revoke), and `update mission_milestones set repeatable = ...` continues to succeed
+-- unchanged for any authenticated role. Shipping that revoke would look like a fix in the
+-- migration diff while leaving the actual gap wide open.
+--
+-- Enforcing this at the row level via BEFORE UPDATE triggers -- the same technique this
+-- migration set (app_private.enforce_mission_submission_integrity(),
+-- 20260617173932_mission_tables.sql:195-249) already uses for other per-actor field
+-- restrictions on mission_milestone_submissions -- correctly blocks the mutation regardless
+-- of which role or RLS-permitted row is doing the UPDATE, and needs no column enumeration
+-- that would go stale as columns are added.
+create or replace function app_private.enforce_mission_milestone_repeatable_immutable()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if new.repeatable is distinct from old.repeatable then
+    raise exception 'mission_milestones.repeatable is immutable after creation';
+  end if;
+
+  return new;
+end;
+$$;
+
+create trigger mission_milestones_repeatable_immutable_trg
+  before update on public.mission_milestones
+  for each row execute function app_private.enforce_mission_milestone_repeatable_immutable();
+
+create or replace function app_private.enforce_submission_milestone_repeatable_immutable()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if new.milestone_repeatable is distinct from old.milestone_repeatable then
+    raise exception 'mission_milestone_submissions.milestone_repeatable is immutable after creation';
+  end if;
+
+  return new;
+end;
+$$;
+
+create trigger mission_milestone_submissions_repeatable_immutable_trg
+  before update on public.mission_milestone_submissions
+  for each row execute function app_private.enforce_submission_milestone_repeatable_immutable();
+
+revoke all on function app_private.enforce_mission_milestone_repeatable_immutable() from public;
+revoke all on function app_private.enforce_submission_milestone_repeatable_immutable() from public;
