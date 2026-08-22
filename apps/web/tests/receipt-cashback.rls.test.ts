@@ -399,4 +399,34 @@ d('r12.2 receipt-cashback live proof: repeatable settlements, cap enforcement, t
     if (nowRejected.error) throw nowRejected.error
     expect(nowRejected.data!.status).toBe('rejected')
   }, testTimeout)
+
+  it('at most one repeatable milestone is ever allowed per mission, and repeatable can only attach to a receipt_cashback mission', async () => {
+    const s = svc()
+
+    // Mission A already has exactly one repeatable milestone (auto-created by Task 1's
+    // trigger). A second repeatable=true insert on the SAME mission must be rejected by the
+    // partial unique index -- this is the guard submit_receipt's unordered `limit 1` lookup
+    // actually depends on.
+    const second = await s.from('mission_milestones').insert({
+      mission_id: missionAId, title: 'Duplicate repeatable milestone', description: 'Should be rejected', repeatable: true,
+    })
+    expect(second.error).not.toBeNull()
+    expect(/duplicate key value violates unique constraint|mission_milestones_one_repeatable_per_mission/i.test(`${second.error?.message}`)).toBe(true)
+
+    const countA = await s.from('mission_milestones').select('id', { count: 'exact', head: true }).eq('mission_id', missionAId).eq('repeatable', true)
+    expect(countA.count).toBe(1)
+
+    // A merchant inserting a repeatable=true milestone on a NON-receipt_cashback mission
+    // (Mission C, 'paid') must be rejected by the tightened RLS policy, independent of the
+    // uniqueness index above -- defense in depth so a repeatable milestone can never attach to
+    // the wrong mission type at all.
+    const merchant = clientFor(merchantUser)
+    const wrongType = await merchant.from('mission_milestones').insert({
+      mission_id: missionCId, title: 'Repeatable on a paid mission', description: 'Should be rejected', repeatable: true,
+    })
+    expect(wrongType.error).not.toBeNull()
+
+    const countC = await s.from('mission_milestones').select('id', { count: 'exact', head: true }).eq('mission_id', missionCId).eq('repeatable', true)
+    expect(countC.count).toBe(0)
+  }, testTimeout)
 })
