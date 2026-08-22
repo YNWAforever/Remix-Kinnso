@@ -1963,6 +1963,7 @@ export type Database = {
           created_at: string
           id: string
           merchant_feedback: string | null
+          milestone_repeatable: boolean
           mission_milestone_id: string
           mission_participant_id: string
           notes: string | null
@@ -1978,6 +1979,7 @@ export type Database = {
           created_at?: string
           id?: string
           merchant_feedback?: string | null
+          milestone_repeatable?: boolean
           mission_milestone_id: string
           mission_participant_id: string
           notes?: string | null
@@ -1993,6 +1995,7 @@ export type Database = {
           created_at?: string
           id?: string
           merchant_feedback?: string | null
+          milestone_repeatable?: boolean
           mission_milestone_id?: string
           mission_participant_id?: string
           notes?: string | null
@@ -2028,6 +2031,7 @@ export type Database = {
           due_at: string | null
           id: string
           mission_id: string
+          repeatable: boolean
           sort_order: number
           title: string
           updated_at: string
@@ -2038,6 +2042,7 @@ export type Database = {
           due_at?: string | null
           id?: string
           mission_id: string
+          repeatable?: boolean
           sort_order?: number
           title: string
           updated_at?: string
@@ -2048,6 +2053,7 @@ export type Database = {
           due_at?: string | null
           id?: string
           mission_id?: string
+          repeatable?: boolean
           sort_order?: number
           title?: string
           updated_at?: string
@@ -2163,6 +2169,7 @@ export type Database = {
           merchant_invoice_status: string | null
           merchant_payment_status: string | null
           mission_id: string
+          mission_milestone_submission_id: string | null
           mission_participant_id: string | null
           ops_note: string | null
           paid_fee_amount: number | null
@@ -2185,6 +2192,7 @@ export type Database = {
           merchant_invoice_status?: string | null
           merchant_payment_status?: string | null
           mission_id: string
+          mission_milestone_submission_id?: string | null
           mission_participant_id?: string | null
           ops_note?: string | null
           paid_fee_amount?: number | null
@@ -2207,6 +2215,7 @@ export type Database = {
           merchant_invoice_status?: string | null
           merchant_payment_status?: string | null
           mission_id?: string
+          mission_milestone_submission_id?: string | null
           mission_participant_id?: string | null
           ops_note?: string | null
           paid_fee_amount?: number | null
@@ -2228,6 +2237,13 @@ export type Database = {
             columns: ["mission_id"]
             isOneToOne: false
             referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_settlements_mission_milestone_submission_id_fkey"
+            columns: ["mission_milestone_submission_id"]
+            isOneToOne: false
+            referencedRelation: "mission_milestone_submissions"
             referencedColumns: ["id"]
           },
           {
@@ -2403,6 +2419,7 @@ export type Database = {
           ends_at: string | null
           id: string
           kinnso_commission_rate: number | null
+          max_receipts_per_creator: number | null
           merchant_profile_id: string | null
           min_tier: string | null
           mission_source: string
@@ -2431,6 +2448,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           kinnso_commission_rate?: number | null
+          max_receipts_per_creator?: number | null
           merchant_profile_id?: string | null
           min_tier?: string | null
           mission_source?: string
@@ -2459,6 +2477,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           kinnso_commission_rate?: number | null
+          max_receipts_per_creator?: number | null
           merchant_profile_id?: string | null
           min_tier?: string | null
           mission_source?: string
@@ -3713,6 +3732,13 @@ export type Database = {
           p_window_seconds?: number
         }
         Returns: string
+      }
+      submit_receipt: {
+        Args: {
+          p_mission_id: string
+          p_proof_urls: string[]
+        }
+        Returns: Json
       }
     }
     Enums: {
