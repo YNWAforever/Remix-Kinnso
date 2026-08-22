@@ -46,8 +46,17 @@ create trigger set_submission_milestone_repeatable_trg
   before insert on public.mission_milestone_submissions
   for each row execute function public.set_submission_milestone_repeatable();
 
+-- Postgres truncates auto-generated constraint names to NAMEDATALEN-1 (63) bytes; the naive
+-- un-truncated name (…mission_participant_id_key) is NOT what got created for the inline
+-- `unique (mission_milestone_id, mission_participant_id)` in 20260617173932_mission_tables.sql
+-- -- confirmed against a real local Postgres 16 instance via
+-- `select conname from pg_constraint where conrelid = 'public.mission_milestone_submissions'::regclass`,
+-- which returned …mission_milestone_id_mission__key (double underscore before "key" from the
+-- truncation point landing mid-word). Live-proof (Task 10) caught this: the guessed name below
+-- made this migration fail outright on a real `db reset`, before any RPC in this phase could
+-- even be exercised.
 alter table public.mission_milestone_submissions
-  drop constraint mission_milestone_submissions_mission_milestone_id_mission_key;
+  drop constraint mission_milestone_submissions_mission_milestone_id_mission__key;
 
 create unique index mission_milestone_submissions_unique_non_repeatable
   on public.mission_milestone_submissions (mission_milestone_id, mission_participant_id)
