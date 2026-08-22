@@ -48,6 +48,8 @@ test('R7.10 local booking config pins runner booking state', () => {
   })
 })
 test('Booking OFF submits interest capture entirely by keyboard', async ({ page }) => {
+  test.skip(process.env.R7_10_BOOKING_STATE === 'on', 'Interest-capture form only renders when booking is off')
+
   await page.goto(FIXTURES.seoEntities.experiencePath)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
