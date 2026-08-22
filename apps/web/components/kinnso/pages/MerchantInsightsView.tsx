@@ -30,30 +30,32 @@ export function MerchantInsightsView({
       <section className="rounded-lg border p-5">
         <h2 className="mb-3 text-sm font-medium">{t.perMissionTitle}</h2>
         {data.perMission.length > 0 ? (
-          <table className="w-full text-left text-sm">
-            <thead className="text-muted-foreground">
-              <tr>
-                <th className="py-2 pr-2 font-medium">{t.colMission}</th>
-                <th className="py-2 px-2 text-right font-medium">{t.colInvited}</th>
-                <th className="py-2 px-2 text-right font-medium">{t.colApplied}</th>
-                <th className="py-2 px-2 text-right font-medium">{t.colActive}</th>
-                <th className="py-2 px-2 text-right font-medium">{t.colRejected}</th>
-                <th className="py-2 pl-2 text-right font-medium">{t.colDelivered}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.perMission.map((r) => (
-                <tr key={r.missionId} className="border-t">
-                  <td className="py-2 pr-2">{r.title}</td>
-                  <td className="py-2 px-2 text-right tabular-nums">{r.invited}</td>
-                  <td className="py-2 px-2 text-right tabular-nums">{r.applied}</td>
-                  <td className="py-2 px-2 text-right tabular-nums">{r.active}</td>
-                  <td className="py-2 px-2 text-right tabular-nums">{r.rejected}</td>
-                  <td className="py-2 pl-2 text-right tabular-nums">{r.approvedSubmissions}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th scope="col" className="py-2 pr-2 font-medium">{t.colMission}</th>
+                  <th scope="col" className="py-2 px-2 text-right font-medium">{t.colInvited}</th>
+                  <th scope="col" className="py-2 px-2 text-right font-medium">{t.colApplied}</th>
+                  <th scope="col" className="py-2 px-2 text-right font-medium">{t.colActive}</th>
+                  <th scope="col" className="py-2 px-2 text-right font-medium">{t.colRejected}</th>
+                  <th scope="col" className="py-2 pl-2 text-right font-medium">{t.colDelivered}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.perMission.map((r) => (
+                  <tr key={r.missionId} className="border-t">
+                    <td className="py-2 pr-2">{r.title}</td>
+                    <td className="py-2 px-2 text-right tabular-nums">{r.invited}</td>
+                    <td className="py-2 px-2 text-right tabular-nums">{r.applied}</td>
+                    <td className="py-2 px-2 text-right tabular-nums">{r.active}</td>
+                    <td className="py-2 px-2 text-right tabular-nums">{r.rejected}</td>
+                    <td className="py-2 pl-2 text-right tabular-nums">{r.approvedSubmissions}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className="text-sm text-muted-foreground">{t.merchantEmpty}</p>
         )}
@@ -62,26 +64,28 @@ export function MerchantInsightsView({
       <section className="rounded-lg border p-5">
         <h2 className="mb-3 text-sm font-medium">{t.visitsDrivenTitle}</h2>
         {data.visitsDriven.length > 0 ? (
-          <table className="w-full text-left text-sm">
-            <thead className="text-muted-foreground">
-              <tr>
-                <th className="py-2 pr-2 font-medium">{t.colCreator}</th>
-                <th className="py-2 px-2 font-medium">{t.colGuide}</th>
-                <th className="py-2 px-2 text-right font-medium">{t.colRedemptions}</th>
-                <th className="py-2 pl-2 text-right font-medium">{t.colAttributedBookings}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.visitsDriven.map((r, i) => (
-                <tr key={`${r.creatorId}-${r.guideId ?? i}`} className="border-t">
-                  <td className="py-2 pr-2">{r.creatorName ?? t.unnamed}</td>
-                  <td className="py-2 px-2">{r.guideTitle ?? t.notApplicable}</td>
-                  <td className="py-2 px-2 text-right tabular-nums">{r.redemptions}</td>
-                  <td className="py-2 pl-2 text-right tabular-nums">{r.attributedBookings}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th scope="col" className="py-2 pr-2 font-medium">{t.colCreator}</th>
+                  <th scope="col" className="py-2 px-2 font-medium">{t.colGuide}</th>
+                  <th scope="col" className="py-2 px-2 text-right font-medium">{t.colRedemptions}</th>
+                  <th scope="col" className="py-2 pl-2 text-right font-medium">{t.colAttributedBookings}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.visitsDriven.map((r, i) => (
+                  <tr key={`${r.creatorId}-${r.guideId ?? i}`} className="border-t">
+                    <td className="py-2 pr-2">{r.creatorName ?? t.unnamed}</td>
+                    <td className="py-2 px-2">{r.guideTitle ?? t.notApplicable}</td>
+                    <td className="py-2 px-2 text-right tabular-nums">{r.redemptions}</td>
+                    <td className="py-2 pl-2 text-right tabular-nums">{r.attributedBookings}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className="text-sm text-muted-foreground">{t.visitsDrivenEmpty}</p>
         )}
