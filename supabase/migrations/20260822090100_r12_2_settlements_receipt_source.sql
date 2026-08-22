@@ -8,6 +8,15 @@
 -- produce many settlements for the same participant over time, but the SAME approved
 -- submission must never mint two settlements (e.g. a stale re-review retry).
 
+-- Deliberately "on delete set null", NOT "on delete cascade" like the same-named
+-- mission_milestone_submission_id / submission_id columns on mission_social_snapshots,
+-- mission_verification_jobs, and mission_review_events.submission_id. Those three are
+-- subordinate evidence records that rightly disappear along with the submission they
+-- document. mission_settlements is different: it's ledger/financial data that must survive
+-- even if the submission explaining how it was minted is ever deleted. This matches this
+-- same table's own existing convention -- affiliate_network_event_id and
+-- updated_by_ops_member_id are also "set null" for the same reason -- while its true
+-- ownership FKs, mission_id and mission_participant_id, correctly "cascade".
 alter table public.mission_settlements
   add column mission_milestone_submission_id uuid references public.mission_milestone_submissions(id) on delete set null;
 

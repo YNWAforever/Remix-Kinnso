@@ -34,4 +34,10 @@ describe('R12.2 mission_settlements receipt_cashback source', () => {
   it('does not touch the existing participant-scoped mission_fee index', () => {
     expect(sqlNoComments).not.toContain('mission_settlements_participant_fee_uniq')
   })
+
+  it('sets the submission FK to ON DELETE SET NULL, not CASCADE, matching this table\'s own ledger-preserving convention', () => {
+    expect(sql).toContain(
+      'references public.mission_milestone_submissions(id) on delete set null',
+    )
+  })
 })
