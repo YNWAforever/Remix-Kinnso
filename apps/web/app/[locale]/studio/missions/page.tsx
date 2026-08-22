@@ -52,7 +52,7 @@ const missionSource = (source: string | null): CreatorMissionCard['missionSource
   source === 'travelpayouts' ? 'travelpayouts' : 'merchant'
 
 const missionType = (type: string | null): CreatorMissionCard['missionType'] => {
-  if (type === 'hybrid' || type === 'paid') return type
+  if (type === 'hybrid' || type === 'paid' || type === 'receipt_cashback') return type
   return 'coupon_affiliate'
 }
 
@@ -125,7 +125,7 @@ function mapCreatorMission(
     locked,
     requiredTier,
     funded:
-      (row.mission_type === 'paid' || row.mission_type === 'hybrid') &&
+      (row.mission_type === 'paid' || row.mission_type === 'hybrid' || row.mission_type === 'receipt_cashback') &&
       row.merchant_profile_id !== null &&
       funded.has(row.merchant_profile_id),
   }

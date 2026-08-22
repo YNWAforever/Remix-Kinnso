@@ -1,6 +1,6 @@
 import { canSubmitMilestone } from '@/lib/missions/submission-state'
 
-export type MissionType = 'coupon_affiliate' | 'hybrid' | 'paid'
+export type MissionType = 'coupon_affiliate' | 'hybrid' | 'paid' | 'receipt_cashback'
 export type ParticipationCta = 'join' | 'apply' | 'awaiting' | 'rejected' | 'active'
 export type MilestoneState = 'none' | 'submitted' | 'approved' | 'revision_requested' | 'rejected'
 export type SocialSignalStatus = 'verified_signal' | 'needs_review' | 'unavailable'
@@ -86,7 +86,7 @@ export type CreatorMissionDetail = {
 }
 
 const toMissionType = (type: string | null): MissionType =>
-  type === 'hybrid' || type === 'paid' ? type : 'coupon_affiliate'
+  type === 'hybrid' || type === 'paid' || type === 'receipt_cashback' ? type : 'coupon_affiliate'
 
 export function resolveParticipationCta(
   participantStatus: string | null,

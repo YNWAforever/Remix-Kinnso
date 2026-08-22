@@ -17,7 +17,7 @@ export type CreatorMissionCard = {
   title: string
   summary: string
   missionSource: 'merchant' | 'travelpayouts'
-  missionType: 'coupon_affiliate' | 'hybrid' | 'paid'
+  missionType: 'coupon_affiliate' | 'hybrid' | 'paid' | 'receipt_cashback'
   status: string
   participant: { id: string; status: string; source: string } | null
   partnerLinks: Array<{ id: string; partnerUrl: string }>

@@ -29,10 +29,11 @@ const activeRow = (overrides: Partial<MissionDetailRow> = {}): MissionDetailRow 
 })
 
 describe('resolveParticipationCta', () => {
-  it('maps no participant to join for coupon and apply for paid/hybrid', () => {
+  it('maps no participant to join for coupon and apply for paid/hybrid/receipt_cashback', () => {
     expect(resolveParticipationCta(null, 'coupon_affiliate')).toBe('join')
     expect(resolveParticipationCta(null, 'paid')).toBe('apply')
     expect(resolveParticipationCta(null, 'hybrid')).toBe('apply')
+    expect(resolveParticipationCta(null, 'receipt_cashback')).toBe('apply')
   })
   it('maps participant statuses to ctas', () => {
     expect(resolveParticipationCta('applied', 'paid')).toBe('awaiting')
@@ -103,6 +104,11 @@ describe('toCreatorMissionDetail', () => {
     )
     expect(detail).toMatchObject({ cta: 'active', participantStatus: 'active' })
     expect(detail.milestones[0]).toMatchObject({ state: 'submitted', signal: 'unavailable' })
+  })
+
+  it('resolves a receipt_cashback mission to the apply cta, not join — it is not coerced to coupon_affiliate', () => {
+    const detail = toCreatorMissionDetail({ ...base, mission_type: 'receipt_cashback' }, 'creator-1')
+    expect(detail).toMatchObject({ missionType: 'receipt_cashback', cta: 'apply', participantStatus: null })
   })
 })
 
