@@ -1,7 +1,24 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest'
 import { randomUUID } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@kinnso/db'
+// Real route handler under test for the client-emitted-analytics live proof
+// below -- imported statically like `api.analytics.test.ts` does, but here
+// with `@/lib/supabase/server` and `@/lib/supabase/service` left unmocked so
+// it exercises the real Supabase clients against the real local stack.
+import { POST } from '@/app/api/analytics/route'
+
+// Only `next/headers` is stubbed here, and only because `cookies()`/`headers()`
+// require Next's request-scoped AsyncLocalStorage, which does not exist when a
+// route handler is invoked directly from a test (outside real Next.js request
+// handling) -- this throws even for a plain anonymous request. Nothing about
+// Supabase or the analytics business logic is mocked: `@/lib/supabase/server`,
+// `@/lib/supabase/service`, and `@/lib/analytics/server` all run for real
+// against the live local stack below, exactly like the rest of this file.
+vi.mock('next/headers', () => ({
+  cookies: async () => ({ getAll: () => [], set: () => {} }),
+  headers: async () => new Headers({ 'x-forwarded-for': '127.0.0.1' }),
+}))
 
 const url = process.env.SUPABASE_URL!
 const anonKey = process.env.SUPABASE_ANON_KEY!
@@ -208,5 +225,73 @@ describe('R12.1 journey attribution + visits_driven live proof', () => {
     expect(error).toBeNull()
     const payload = data as { visits_driven: number }
     expect(payload.visits_driven).toBeGreaterThan(0)
+  })
+
+  describe('client-emitted analytics ingest (offer_viewed) -- real route handler, real DB', () => {
+    // This block proves the CLIENT-emitted half of journey attribution end-to-end:
+    // a real POST body, through the real `POST` handler exported by
+    // app/api/analytics/route.ts, through the real `parseAnalyticsRequest` /
+    // `persistTravellerAnalyticsEvent` in lib/analytics/server.ts, landing a real
+    // row in `traveller_analytics_events` via a real local Postgres. The `it`s
+    // above already prove the SERVER-emitted half (claim_offer ->
+    // redeem_offer_claim -> offer_redeemed) the same way. Together they close
+    // the gap the R12.1 final review flagged: 6ce0603's regression tests for
+    // the offer_viewed/offer_claimed 400 bug run the same route handler but
+    // against a MOCKED Supabase client, which proves request/response shape,
+    // not that a row actually lands in a real database.
+    const originalMode = process.env.ANALYTICS_INGEST_MODE
+
+    afterEach(() => {
+      if (originalMode === undefined) delete process.env.ANALYTICS_INGEST_MODE
+      else process.env.ANALYTICS_INGEST_MODE = originalMode
+    })
+
+    function analyticsRequest(body: unknown) {
+      return new Request('http://kinnso.test/api/analytics', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    }
+
+    it('POSTing a real offer_viewed payload persists a matching traveller_analytics_events row', async () => {
+      process.env.ANALYTICS_INGEST_MODE = 'production'
+
+      const journeyId = randomUUID()
+      const clientEventId = randomUUID()
+
+      const response = await POST(
+        analyticsRequest({
+          clientEventId,
+          journeyId,
+          consentVersion: 'v1',
+          event: 'offer_viewed',
+          occurredAt: new Date().toISOString(),
+          locale: 'en',
+          routeKey: 'creator_profile',
+          entityType: 'offer',
+          // Reuses the `offerId` fixture created in the outer beforeAll -- a
+          // real merchant_offers row, not a synthetic id -- so this exercises
+          // the ingest path with realistic data instead of duplicating the
+          // creator/merchant/offer setup boilerplate.
+          entityId: offerId,
+        }),
+      )
+
+      expect(response.status).toBe(202)
+      await expect(response.json()).resolves.toEqual({ accepted: true })
+
+      const { data: events, error } = await admin
+        .from('traveller_analytics_events')
+        .select('event_name, journey_id, entity_type, entity_id, route_key')
+        .eq('journey_id', journeyId)
+        .eq('client_event_id', clientEventId)
+      expect(error).toBeNull()
+      expect(events ?? []).toHaveLength(1)
+      expect(events![0].event_name).toBe('offer_viewed')
+      expect(events![0].entity_type).toBe('offer')
+      expect(events![0].entity_id).toBe(offerId)
+      expect(events![0].route_key).toBe('creator_profile')
+    })
   })
 })
