@@ -744,6 +744,19 @@ export interface Messages {
     couldntVerify: string
     verificationFailed: string
     retry: string
+    receiptsHeading: string
+    receiptProofUrlLabel: string
+    receiptProofUrlPlaceholder: string
+    submitReceipt: string
+    receiptCountLabel: (count: number, max: number) => string
+    receiptCapReached: string
+    receiptSubmissionsEmpty: string
+    rejectionReasonLabel: string
+    receiptReasonUnreadable: string
+    receiptReasonWrongVenue: string
+    receiptReasonDuplicate: string
+    receiptReasonAmountUnclear: string
+    receiptReasonOther: string
   }
   ops: {
     backHome: string
@@ -1907,6 +1920,19 @@ const messages: Messages = {
     couldntVerify: "Couldn’t verify",
     verificationFailed: 'Verification failed',
     retry: 'Retry',
+    receiptsHeading: 'Submit a receipt',
+    receiptProofUrlLabel: 'Receipt photo URL',
+    receiptProofUrlPlaceholder: 'https://...',
+    submitReceipt: 'Submit receipt',
+    receiptCountLabel: (count, max) => `${count} of ${max} receipts submitted`,
+    receiptCapReached: "You've reached the receipt limit for this mission",
+    receiptSubmissionsEmpty: 'No receipts submitted yet',
+    rejectionReasonLabel: 'Reason',
+    receiptReasonUnreadable: 'Receipt image is unreadable',
+    receiptReasonWrongVenue: 'Wrong venue',
+    receiptReasonDuplicate: 'Duplicate receipt',
+    receiptReasonAmountUnclear: 'Amount is unclear',
+    receiptReasonOther: 'Other',
   },
   ops: {
     settlementHeading: 'Settlement queue', backHome: 'Back to home',
