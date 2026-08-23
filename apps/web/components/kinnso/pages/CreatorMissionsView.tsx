@@ -43,8 +43,6 @@ type CreatorMissionsViewProps = {
 const isMerchantInvitation = (mission: CreatorMissionCard) =>
   mission.participant?.status === 'invited' && mission.participant.source === 'merchant_invite'
 
-const effortBadgeLabel = (t: Messages['missions'], effort: MissionEffort) => t.effortBadgeLabel[effort]
-
 export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: CreatorMissionsViewProps) {
   const router = useRouter()
   const [actionError, setActionError] = useState<string | null>(null)
@@ -140,8 +138,8 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                       </span>
                     )}
                     {mission.effort && (
-                      <span className="inline-flex items-center rounded-full bg-kinnso-cream2 px-2 py-0.5 text-xs font-bold text-kinnso-ink">
-                        {effortBadgeLabel(t, mission.effort)}
+                      <span className="inline-flex rounded-pill bg-kinnso-orange/15 px-2.5 py-1 text-xs font-semibold text-kinnso-orange">
+                        {t.effortBadgeLabel[mission.effort]}
                       </span>
                     )}
                   </div>
@@ -192,8 +190,8 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                       </span>
                     )}
                     {mission.effort && (
-                      <span className="inline-flex items-center rounded-full bg-kinnso-cream2 px-2 py-0.5 text-xs font-bold text-kinnso-ink">
-                        {effortBadgeLabel(t, mission.effort)}
+                      <span className="inline-flex rounded-pill bg-kinnso-orange/15 px-2.5 py-1 text-xs font-semibold text-kinnso-orange">
+                        {t.effortBadgeLabel[mission.effort]}
                       </span>
                     )}
                   </div>
