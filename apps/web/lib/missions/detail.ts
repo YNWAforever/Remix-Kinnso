@@ -1,5 +1,5 @@
 import { canSubmitMilestone } from '@/lib/missions/submission-state'
-import { missionTypes, type MissionType } from '@/lib/missions/types'
+import { missionEfforts, missionTypes, type MissionEffort, type MissionType } from '@/lib/missions/types'
 
 export type { MissionType }
 export type ParticipationCta = 'join' | 'apply' | 'awaiting' | 'rejected' | 'active'
@@ -119,7 +119,7 @@ export type CreatorMissionDetail = {
   donts: string[]
   keyMessages: string[]
   referenceLinks: string[]
-  effort: 'low' | 'medium' | 'high' | null
+  effort: MissionEffort | null
 }
 
 // Derives from the canonical missionTypes array rather than enumerating members inline, so a
@@ -270,10 +270,10 @@ export function missionCompensation(row: CompensationRow): string {
   return paid ?? affiliate
 }
 
-const MISSION_EFFORTS = new Set(['low', 'medium', 'high'])
+const MISSION_EFFORTS = new Set<MissionEffort>(missionEfforts)
 
-const narrowEffort = (effort: string | null | undefined): 'low' | 'medium' | 'high' | null =>
-  effort != null && MISSION_EFFORTS.has(effort) ? (effort as 'low' | 'medium' | 'high') : null
+const narrowEffort = (effort: string | null | undefined): MissionEffort | null =>
+  effort != null && MISSION_EFFORTS.has(effort as MissionEffort) ? (effort as MissionEffort) : null
 
 export function toCreatorMissionDetail(row: MissionDetailRow, creatorId: string): CreatorMissionDetail {
   const participant = row.mission_participants?.find((p) => p.creator_id === creatorId) ?? null
