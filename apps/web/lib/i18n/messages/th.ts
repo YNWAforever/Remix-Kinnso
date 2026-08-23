@@ -449,7 +449,7 @@ const messages: Messages = {
     effortLow: 'น้อย',
     effortMedium: 'ปานกลาง',
     effortHigh: 'มาก',
-    effortBadgeLabel: (level) => (level === 'low' ? 'ความพยายาม: น้อย' : level === 'medium' ? 'ความพยายาม: ปานกลาง' : 'ความพยายาม: มาก'),
+    effortBadgeLabel: { low: 'ความพยายาม: น้อย', medium: 'ความพยายาม: ปานกลาง', high: 'ความพยายาม: มาก' },
   },
   missionDetail: {
     back: 'ภารกิจ',

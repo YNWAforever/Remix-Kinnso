@@ -43,7 +43,7 @@ type CreatorMissionsViewProps = {
 const isMerchantInvitation = (mission: CreatorMissionCard) =>
   mission.participant?.status === 'invited' && mission.participant.source === 'merchant_invite'
 
-const effortBadgeLabel = (t: Messages['missions'], effort: MissionEffort) => t.effortBadgeLabel(effort)
+const effortBadgeLabel = (t: Messages['missions'], effort: MissionEffort) => t.effortBadgeLabel[effort]
 
 export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: CreatorMissionsViewProps) {
   const router = useRouter()
