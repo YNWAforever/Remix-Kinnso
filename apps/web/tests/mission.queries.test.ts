@@ -118,4 +118,8 @@ describe('creator mission selects', () => {
     expect(creatorMissionDetailSelect).toContain('reference_links')
     expect(creatorMissionDetailSelect).toContain('effort')
   })
+
+  it('creatorMissionSelect selects effort for the list view', () => {
+    expect(creatorMissionSelect).toContain('effort')
+  })
 })
