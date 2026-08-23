@@ -91,6 +91,13 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
     milestones: includesPaid && milestoneTitle.trim() !== ''
       ? [{ title: milestoneTitle, description: milestoneDescription.trim() || milestoneTitle }]
       : [],
+    deliverables: [],
+    requirements: [],
+    dos: [],
+    donts: [],
+    keyMessages: [],
+    referenceLinks: [],
+    effort: null,
   })
 
   const submit = async (publish: boolean) => {

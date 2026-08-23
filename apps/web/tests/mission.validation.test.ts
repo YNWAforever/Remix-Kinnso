@@ -26,6 +26,13 @@ const base: MissionDraftInput = {
   minTier: null,
   maxReceiptsPerCreator: null,
   milestones: [{ title: 'Share coupon post', description: 'Post one IG reel or Threads post.' }],
+  deliverables: [],
+  requirements: [],
+  dos: [],
+  donts: [],
+  keyMessages: [],
+  referenceLinks: [],
+  effort: null,
 }
 
 describe('mission validation', () => {
