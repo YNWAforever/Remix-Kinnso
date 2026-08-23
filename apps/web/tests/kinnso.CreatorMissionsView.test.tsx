@@ -34,6 +34,7 @@ const baseAvailable: CreatorMissionCard = {
   locked: false,
   requiredTier: null,
   funded: false,
+  effort: null,
 }
 
 const baseMine: CreatorMissionCard = {
@@ -237,5 +238,38 @@ describe('CreatorMissionsView', () => {
     )
     expect(screen.queryByText(en.missions.invitationsTitle)).toBeNull()
     expect(screen.getByRole('button', { name: en.missions.joinMission })).toBeTruthy()
+  })
+
+  it('shows an effort badge on an available mission card when effort is set', () => {
+    render(
+      <CreatorMissionsView
+        locale="en" t={en.missions}
+        missions={[{ ...baseAvailable, effort: 'low' }]}
+        onJoin={vi.fn()} onAccept={vi.fn()}
+      />,
+    )
+    expect(screen.getByText('Low effort')).toBeTruthy()
+  })
+
+  it('shows an effort badge on a "my missions" card when effort is set', () => {
+    render(
+      <CreatorMissionsView
+        locale="en" t={en.missions}
+        missions={[{ ...baseMine, effort: 'high' }]}
+        onJoin={vi.fn()} onAccept={vi.fn()}
+      />,
+    )
+    expect(screen.getByText('High effort')).toBeTruthy()
+  })
+
+  it('shows no effort badge when a mission has no effort set', () => {
+    render(
+      <CreatorMissionsView
+        locale="en" t={en.missions}
+        missions={[baseAvailable, baseMine]}
+        onJoin={vi.fn()} onAccept={vi.fn()}
+      />,
+    )
+    expect(screen.queryByText(/effort$/i)).toBeNull()
   })
 })

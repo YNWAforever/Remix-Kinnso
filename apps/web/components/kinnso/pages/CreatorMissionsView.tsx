@@ -11,7 +11,7 @@ import TierBadge from '@/components/kinnso/TierBadge'
 import { segmentMissions } from '@/lib/missions/list'
 import type { GatedTier } from '@/lib/contribution/tiers'
 import type { Messages } from '@/lib/i18n/messages/en'
-import type { MissionType } from '@/lib/missions/types'
+import type { MissionEffort, MissionType } from '@/lib/missions/types'
 
 export type CreatorMissionCard = {
   id: string
@@ -29,6 +29,7 @@ export type CreatorMissionCard = {
   locked: boolean
   requiredTier: GatedTier | null
   funded: boolean
+  effort: MissionEffort | null
 }
 
 type CreatorMissionsViewProps = {
@@ -41,6 +42,8 @@ type CreatorMissionsViewProps = {
 
 const isMerchantInvitation = (mission: CreatorMissionCard) =>
   mission.participant?.status === 'invited' && mission.participant.source === 'merchant_invite'
+
+const effortBadgeLabel = (t: Messages['missions'], effort: MissionEffort) => t.effortBadgeLabel(effort)
 
 export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: CreatorMissionsViewProps) {
   const router = useRouter()
@@ -136,6 +139,11 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                         {t.fundedBadge}
                       </span>
                     )}
+                    {mission.effort && (
+                      <span className="inline-flex items-center rounded-full bg-kinnso-cream2 px-2 py-0.5 text-xs font-bold text-kinnso-ink">
+                        {effortBadgeLabel(t, mission.effort)}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {mission.milestoneCount > 0 && (
@@ -181,6 +189,11 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                     {mission.funded && (
                       <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
                         {t.fundedBadge}
+                      </span>
+                    )}
+                    {mission.effort && (
+                      <span className="inline-flex items-center rounded-full bg-kinnso-cream2 px-2 py-0.5 text-xs font-bold text-kinnso-ink">
+                        {effortBadgeLabel(t, mission.effort)}
                       </span>
                     )}
                   </div>
