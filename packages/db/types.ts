@@ -2416,8 +2416,13 @@ export type Database = {
           created_at: string
           created_by_ops_member_id: string | null
           creator_commission_rate: number | null
+          deliverables: string[]
+          donts: string[]
+          dos: string[]
+          effort: string | null
           ends_at: string | null
           id: string
+          key_messages: string[]
           kinnso_commission_rate: number | null
           max_receipts_per_creator: number | null
           merchant_profile_id: string | null
@@ -2427,6 +2432,8 @@ export type Database = {
           paid_fee_amount: number | null
           paid_fee_currency: string | null
           published_at: string | null
+          reference_links: string[]
+          requirements: string[]
           starts_at: string | null
           status: string
           summary: string
@@ -2445,8 +2452,13 @@ export type Database = {
           created_at?: string
           created_by_ops_member_id?: string | null
           creator_commission_rate?: number | null
+          deliverables?: string[]
+          donts?: string[]
+          dos?: string[]
+          effort?: string | null
           ends_at?: string | null
           id?: string
+          key_messages?: string[]
           kinnso_commission_rate?: number | null
           max_receipts_per_creator?: number | null
           merchant_profile_id?: string | null
@@ -2456,6 +2468,8 @@ export type Database = {
           paid_fee_amount?: number | null
           paid_fee_currency?: string | null
           published_at?: string | null
+          reference_links?: string[]
+          requirements?: string[]
           starts_at?: string | null
           status?: string
           summary: string
@@ -2474,8 +2488,13 @@ export type Database = {
           created_at?: string
           created_by_ops_member_id?: string | null
           creator_commission_rate?: number | null
+          deliverables?: string[]
+          donts?: string[]
+          dos?: string[]
+          effort?: string | null
           ends_at?: string | null
           id?: string
+          key_messages?: string[]
           kinnso_commission_rate?: number | null
           max_receipts_per_creator?: number | null
           merchant_profile_id?: string | null
@@ -2485,6 +2504,8 @@ export type Database = {
           paid_fee_amount?: number | null
           paid_fee_currency?: string | null
           published_at?: string | null
+          reference_links?: string[]
+          requirements?: string[]
           starts_at?: string | null
           status?: string
           summary?: string
