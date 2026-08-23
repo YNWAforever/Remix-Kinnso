@@ -40,6 +40,15 @@ const isAbsoluteHttpsUrl = (value: string) => {
   }
 }
 
+const isAbsoluteHttpUrl = (value: string) => {
+  try {
+    const protocol = new URL(value).protocol
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 export const validateMissionDraft = (input: MissionDraftInput): ValidationResult => {
   const errors: ValidationErrors = {}
 
@@ -80,6 +89,10 @@ export const validateMissionDraft = (input: MissionDraftInput): ValidationResult
   // paid/hybrid missions the merchant is never asked to enter one here.
   if (input.missionType === 'paid' || input.missionType === 'hybrid') {
     if (input.milestones.length === 0) addError(errors, 'milestones', 'at least one')
+  }
+
+  if (input.referenceLinks.some((link) => !isAbsoluteHttpUrl(link))) {
+    addError(errors, 'referenceLinks', 'url')
   }
 
   if (input.missionType === 'receipt_cashback' && input.maxReceiptsPerCreator != null) {

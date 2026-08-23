@@ -17,4 +17,11 @@ export const missionDraftFixture: MissionDraftInput = {
   minTier: null,
   maxReceiptsPerCreator: null,
   milestones: [{ title: 'Publish post', description: 'Share one post with the tracked link.' }],
+  deliverables: [],
+  requirements: [],
+  dos: [],
+  donts: [],
+  keyMessages: [],
+  referenceLinks: [],
+  effort: null,
 }

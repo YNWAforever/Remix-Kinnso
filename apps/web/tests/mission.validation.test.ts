@@ -26,6 +26,13 @@ const base: MissionDraftInput = {
   minTier: null,
   maxReceiptsPerCreator: null,
   milestones: [{ title: 'Share coupon post', description: 'Post one IG reel or Threads post.' }],
+  deliverables: [],
+  requirements: [],
+  dos: [],
+  donts: [],
+  keyMessages: [],
+  referenceLinks: [],
+  effort: null,
 }
 
 describe('mission validation', () => {
@@ -212,6 +219,36 @@ describe('mission validation', () => {
       expect(result.ok).toBe(false)
       expect(result.errors.originalUrl).toContain('https')
     }
+  })
+
+  it('accepts a draft with valid http(s) reference links', () => {
+    const result = validateMissionDraft({
+      ...base,
+      referenceLinks: ['https://example.com/brand-guide', 'http://example.com/logo.png'],
+    })
+    expect(result).toEqual({ ok: true, errors: {} })
+  })
+
+  it('accepts a draft with no reference links at all', () => {
+    expect(validateMissionDraft({ ...base, referenceLinks: [] })).toEqual({ ok: true, errors: {} })
+  })
+
+  it('rejects a draft with a non-URL reference link', () => {
+    const result = validateMissionDraft({
+      ...base,
+      referenceLinks: ['https://example.com/brand-guide', 'not a url'],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.referenceLinks).toContain('url')
+  })
+
+  it('rejects a reference link with a non-http(s) scheme', () => {
+    const result = validateMissionDraft({
+      ...base,
+      referenceLinks: ['ftp://example.com/file'],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errors.referenceLinks).toContain('url')
   })
 })
 

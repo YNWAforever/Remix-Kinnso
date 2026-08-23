@@ -6,6 +6,7 @@ import type { Messages } from '@/lib/i18n/messages/en'
 import type { GatedTier } from '@/lib/contribution/tiers'
 import type {
   MissionDraftInput,
+  MissionEffort,
   MissionType,
   MissionVisibility,
 } from '@/lib/missions/types'
@@ -35,6 +36,12 @@ const textOrNull = (value: string) => {
   return next === '' ? null : next
 }
 
+const linesToArray = (value: string): string[] =>
+  value
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+
 const isFailureResult = (result: SubmitResult): result is Extract<SubmitResult, { ok: false }> =>
   typeof result === 'object' && result !== null && 'ok' in result && result.ok === false
 
@@ -59,6 +66,13 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
   const [maxReceiptsPerCreator, setMaxReceiptsPerCreator] = useState('')
   const [milestoneTitle, setMilestoneTitle] = useState('')
   const [milestoneDescription, setMilestoneDescription] = useState('')
+  const [deliverables, setDeliverables] = useState('')
+  const [requirements, setRequirements] = useState('')
+  const [dos, setDos] = useState('')
+  const [donts, setDonts] = useState('')
+  const [keyMessages, setKeyMessages] = useState('')
+  const [referenceLinks, setReferenceLinks] = useState('')
+  const [effort, setEffort] = useState<'' | MissionEffort>('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -91,6 +105,13 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
     milestones: includesPaid && milestoneTitle.trim() !== ''
       ? [{ title: milestoneTitle, description: milestoneDescription.trim() || milestoneTitle }]
       : [],
+    deliverables: linesToArray(deliverables),
+    requirements: linesToArray(requirements),
+    dos: linesToArray(dos),
+    donts: linesToArray(donts),
+    keyMessages: linesToArray(keyMessages),
+    referenceLinks: linesToArray(referenceLinks),
+    effort: effort === '' ? null : effort,
   })
 
   const submit = async (publish: boolean) => {
@@ -244,6 +265,72 @@ export function MissionPostWizard({ locale, t, onSubmit }: Props) {
               </label>
             ))}
           </div>
+        </fieldset>
+
+        <fieldset className="grid gap-3 rounded-lg bg-kinnso-cream px-4 py-4">
+          <legend className="text-sm font-semibold text-kinnso-ink">{t.briefDetailsHeading}</legend>
+          <p className="text-xs text-kinnso-muted">{t.briefListHint}</p>
+          <label className={fieldShell}>
+            {t.deliverablesLabel}
+            <textarea
+              className={`${inputShell} min-h-20 resize-y`}
+              value={deliverables}
+              onChange={(event) => setDeliverables(event.target.value)}
+            />
+          </label>
+          <label className={fieldShell}>
+            {t.requirementsLabel}
+            <textarea
+              className={`${inputShell} min-h-20 resize-y`}
+              value={requirements}
+              onChange={(event) => setRequirements(event.target.value)}
+            />
+          </label>
+          <label className={fieldShell}>
+            {t.dosLabel}
+            <textarea
+              className={`${inputShell} min-h-20 resize-y`}
+              value={dos}
+              onChange={(event) => setDos(event.target.value)}
+            />
+          </label>
+          <label className={fieldShell}>
+            {t.dontsLabel}
+            <textarea
+              className={`${inputShell} min-h-20 resize-y`}
+              value={donts}
+              onChange={(event) => setDonts(event.target.value)}
+            />
+          </label>
+          <label className={fieldShell}>
+            {t.keyMessagesLabel}
+            <textarea
+              className={`${inputShell} min-h-20 resize-y`}
+              value={keyMessages}
+              onChange={(event) => setKeyMessages(event.target.value)}
+            />
+          </label>
+          <label className={fieldShell}>
+            {t.referenceLinksLabel}
+            <textarea
+              className={`${inputShell} min-h-20 resize-y`}
+              value={referenceLinks}
+              onChange={(event) => setReferenceLinks(event.target.value)}
+            />
+          </label>
+          <label className={fieldShell}>
+            {t.effortLabel}
+            <select
+              className={inputShell}
+              value={effort}
+              onChange={(event) => setEffort(event.target.value as '' | MissionEffort)}
+            >
+              <option value="">{t.effortUnset}</option>
+              <option value="low">{t.effortLow}</option>
+              <option value="medium">{t.effortMedium}</option>
+              <option value="high">{t.effortHigh}</option>
+            </select>
+          </label>
         </fieldset>
 
         {includesCoupon && (

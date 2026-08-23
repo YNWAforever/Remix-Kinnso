@@ -157,6 +157,51 @@ describe('mission actions builders', () => {
     expect(payload.published_at).toEqual(expect.any(String))
   })
 
+  it('carries the brief richness fields into the mission insert payload', () => {
+    const payload = buildMissionInsert({
+      input: {
+        ...missionDraftFixture,
+        deliverables: ['Instagram Reel', 'Blog post'],
+        requirements: ['Tag @merchant'],
+        dos: ['Show the storefront'],
+        donts: ['Do not disparage competitors'],
+        keyMessages: ['Family-friendly staycation'],
+        referenceLinks: ['https://merchant.test/brand-guide'],
+        effort: 'medium',
+      },
+      merchantProfileId: 'merchant-profile-1',
+      opsMemberId: null,
+      publish: false,
+    })
+    expect(payload).toMatchObject({
+      deliverables: ['Instagram Reel', 'Blog post'],
+      requirements: ['Tag @merchant'],
+      dos: ['Show the storefront'],
+      donts: ['Do not disparage competitors'],
+      key_messages: ['Family-friendly staycation'],
+      reference_links: ['https://merchant.test/brand-guide'],
+      effort: 'medium',
+    })
+  })
+
+  it('carries empty brief richness arrays and a null effort through unchanged', () => {
+    const payload = buildMissionInsert({
+      input: missionDraftFixture,
+      merchantProfileId: 'merchant-profile-1',
+      opsMemberId: null,
+      publish: false,
+    })
+    expect(payload).toMatchObject({
+      deliverables: [],
+      requirements: [],
+      dos: [],
+      donts: [],
+      key_messages: [],
+      reference_links: [],
+      effort: null,
+    })
+  })
+
   it('builds an active participant for coupon auto-join', () => {
     expect(buildParticipantInsert({
       missionId: 'mission-1',

@@ -715,6 +715,20 @@ export interface Messages {
     acceptInvite: string
     acceptInviteFailed: string
     fundedBadge: string
+    briefDetailsHeading: string
+    briefListHint: string
+    deliverablesLabel: string
+    requirementsLabel: string
+    dosLabel: string
+    dontsLabel: string
+    keyMessagesLabel: string
+    referenceLinksLabel: string
+    referenceLinksInvalidError: string
+    effortLabel: string
+    effortUnset: string
+    effortLow: string
+    effortMedium: string
+    effortHigh: string
   }
   missionDetail: {
     back: string
@@ -761,6 +775,13 @@ export interface Messages {
     receiptReasonDuplicate: string
     receiptReasonAmountUnclear: string
     receiptReasonOther: string
+    deliverablesHeading: string
+    requirementsHeading: string
+    dosHeading: string
+    dontsHeading: string
+    keyMessagesHeading: string
+    referenceLinksHeading: string
+    effortBadgeLabel: (level: 'low' | 'medium' | 'high') => string
   }
   ops: {
     backHome: string
@@ -1899,6 +1920,20 @@ const messages: Messages = {
     acceptInvite: 'Accept invitation',
     acceptInviteFailed: 'Could not accept this invitation. Please try again.',
     fundedBadge: 'Funded',
+    briefDetailsHeading: 'Brief details (optional)',
+    briefListHint: 'One item per line',
+    deliverablesLabel: 'Deliverables',
+    requirementsLabel: 'Requirements',
+    dosLabel: "Do's",
+    dontsLabel: "Don'ts",
+    keyMessagesLabel: 'Key messages',
+    referenceLinksLabel: 'Reference links',
+    referenceLinksInvalidError: 'Each reference link must be a valid web address (starting with http:// or https://).',
+    effortLabel: 'Effort',
+    effortUnset: 'Not specified',
+    effortLow: 'Low',
+    effortMedium: 'Medium',
+    effortHigh: 'High',
   },
   missionDetail: {
     back: 'Missions',
@@ -1945,6 +1980,13 @@ const messages: Messages = {
     receiptReasonDuplicate: 'Duplicate receipt',
     receiptReasonAmountUnclear: 'Amount is unclear',
     receiptReasonOther: 'Other',
+    deliverablesHeading: 'Deliverables',
+    requirementsHeading: 'Requirements',
+    dosHeading: "Do's",
+    dontsHeading: "Don'ts",
+    keyMessagesHeading: 'Key messages',
+    referenceLinksHeading: 'Reference links',
+    effortBadgeLabel: (level) => (level === 'low' ? 'Low effort' : level === 'medium' ? 'Medium effort' : 'High effort'),
   },
   ops: {
     settlementHeading: 'Settlement queue', backHome: 'Back to home',

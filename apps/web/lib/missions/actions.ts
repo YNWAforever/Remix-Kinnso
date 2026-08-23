@@ -183,6 +183,13 @@ export function buildMissionInsert({
     affiliate_network_program_id: draft.affiliateNetworkProgramId,
     min_tier: draft.minTier,
     max_receipts_per_creator: draft.maxReceiptsPerCreator,
+    deliverables: draft.deliverables,
+    requirements: draft.requirements,
+    dos: draft.dos,
+    donts: draft.donts,
+    key_messages: draft.keyMessages,
+    reference_links: draft.referenceLinks,
+    effort: draft.effort,
   }
 }
 

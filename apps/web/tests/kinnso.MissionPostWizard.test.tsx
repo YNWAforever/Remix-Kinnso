@@ -155,6 +155,80 @@ describe('MissionPostWizard', () => {
     expect((await screen.findByRole('link', { name: en.missions.viewMission })).getAttribute('href')).toBe('/en/merchants/dashboard/missions/m1')
     expect(screen.getByRole('link', { name: en.missions.backToQueue }).getAttribute('href')).toBe('/en/merchants/dashboard/missions')
   })
+
+  it('shows the brief details section for every mission type', () => {
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={vi.fn()} />)
+    expect(screen.getByLabelText(en.missions.deliverablesLabel)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.requirementsLabel)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.dosLabel)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.dontsLabel)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.keyMessagesLabel)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.referenceLinksLabel)).toBeTruthy()
+    expect(screen.getByLabelText(en.missions.effortLabel)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeReceiptCashback }))
+    expect(screen.getByLabelText(en.missions.deliverablesLabel)).toBeTruthy()
+  })
+
+  it('splits one-item-per-line brief textareas into arrays on submit, dropping blank lines', () => {
+    const onSubmit = vi.fn()
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeCoupon }))
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Ramen coupon' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Promote the ramen coupon.' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponCode), { target: { value: 'RAMEN10' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponUrl), { target: { value: 'https://example.com' } })
+    fireEvent.change(
+      screen.getByLabelText(en.missions.deliverablesLabel),
+      { target: { value: 'Instagram Reel\n\nBlog post\n' } },
+    )
+    fireEvent.change(
+      screen.getByLabelText(en.missions.referenceLinksLabel),
+      { target: { value: 'https://merchant.test/brand-guide' } },
+    )
+    fireEvent.change(screen.getByLabelText(en.missions.effortLabel), { target: { value: 'medium' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missions.saveDraft }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deliverables: ['Instagram Reel', 'Blog post'],
+        referenceLinks: ['https://merchant.test/brand-guide'],
+        effort: 'medium',
+      }),
+      { publish: false },
+    )
+  })
+
+  it('defaults brief richness fields to empty arrays and a null effort when left blank', () => {
+    const onSubmit = vi.fn()
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeCoupon }))
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Ramen coupon' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Promote the ramen coupon.' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponCode), { target: { value: 'RAMEN10' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponUrl), { target: { value: 'https://example.com' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missions.saveDraft }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        deliverables: [], requirements: [], dos: [], donts: [], keyMessages: [], referenceLinks: [],
+        effort: null,
+      }),
+      { publish: false },
+    )
+  })
+
+  it('blocks submit with an invalid reference link', () => {
+    const onSubmit = vi.fn()
+    render(<MissionPostWizard locale="en" t={en.missions} onSubmit={onSubmit} />)
+    fireEvent.click(screen.getByRole('radio', { name: en.missions.typeCoupon }))
+    fireEvent.change(screen.getByLabelText(en.missions.title), { target: { value: 'Ramen coupon' } })
+    fireEvent.change(screen.getByLabelText(en.missions.summary), { target: { value: 'Promote the ramen coupon.' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponCode), { target: { value: 'RAMEN10' } })
+    fireEvent.change(screen.getByLabelText(en.missions.couponUrl), { target: { value: 'https://example.com' } })
+    fireEvent.change(screen.getByLabelText(en.missions.referenceLinksLabel), { target: { value: 'not a url' } })
+    fireEvent.click(screen.getByRole('button', { name: en.missions.saveDraft }))
+    expect(screen.getByRole('alert')).toHaveTextContent(en.missions.validationError)
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
 })
 
 describe('MissionPostWizard minimum-tier selector', () => {

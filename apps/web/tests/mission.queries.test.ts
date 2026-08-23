@@ -108,4 +108,14 @@ describe('creator mission selects', () => {
     expect(creatorMissionSelect).toContain('min_tier')
     expect(creatorMissionDetailSelect).toContain('min_tier')
   })
+
+  it('selects the brief richness columns', () => {
+    expect(creatorMissionDetailSelect).toContain('deliverables')
+    expect(creatorMissionDetailSelect).toContain('requirements')
+    expect(creatorMissionDetailSelect).toContain('dos')
+    expect(creatorMissionDetailSelect).toContain('donts')
+    expect(creatorMissionDetailSelect).toContain('key_messages')
+    expect(creatorMissionDetailSelect).toContain('reference_links')
+    expect(creatorMissionDetailSelect).toContain('effort')
+  })
 })

@@ -12,6 +12,10 @@ export const missionVisibilities = ['open', 'targeted'] as const
 
 export type MissionVisibility = (typeof missionVisibilities)[number]
 
+export const missionEfforts = ['low', 'medium', 'high'] as const
+
+export type MissionEffort = (typeof missionEfforts)[number]
+
 export const missionStatuses = ['draft', 'published', 'paused', 'completed', 'cancelled'] as const
 
 export type MissionStatus = (typeof missionStatuses)[number]
@@ -70,6 +74,13 @@ export type MissionDraftInput = {
   minTier: GatedTier | null
   maxReceiptsPerCreator: number | null
   milestones: MissionMilestoneInput[]
+  deliverables: string[]
+  requirements: string[]
+  dos: string[]
+  donts: string[]
+  keyMessages: string[]
+  referenceLinks: string[]
+  effort: MissionEffort | null
 }
 
 export type PartnerLinkRequest = {

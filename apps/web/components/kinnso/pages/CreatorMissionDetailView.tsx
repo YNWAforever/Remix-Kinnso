@@ -218,7 +218,14 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, 
 
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <h1 className="text-3xl font-black text-kinnso-ink">{mission.title}</h1>
-        <MissionStatusBadge status={mission.participantStatus ?? mission.status} />
+        <div className="flex flex-none items-center gap-2">
+          <MissionStatusBadge status={mission.participantStatus ?? mission.status} />
+          {mission.effort && (
+            <span className="inline-flex rounded-pill bg-kinnso-cream2 px-2.5 py-1 text-xs font-semibold text-kinnso-ink">
+              {t.effortBadgeLabel(mission.effort)}
+            </span>
+          )}
+        </div>
       </div>
       <div className="mt-2">
         <MissionCompensationSummary text={mission.compensation} />
@@ -234,6 +241,66 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, 
         <h2 className="text-lg font-bold text-kinnso-ink">{t.briefHeading}</h2>
         <p className="mt-2 text-sm leading-relaxed text-kinnso-muted">{mission.summary}</p>
       </section>
+
+      {mission.deliverables.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.deliverablesHeading}</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-kinnso-muted">
+            {mission.deliverables.map((item, index) => <li key={index}>{item}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {mission.requirements.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.requirementsHeading}</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-kinnso-muted">
+            {mission.requirements.map((item, index) => <li key={index}>{item}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {mission.dos.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.dosHeading}</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-kinnso-muted">
+            {mission.dos.map((item, index) => <li key={index}>{item}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {mission.donts.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.dontsHeading}</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-kinnso-muted">
+            {mission.donts.map((item, index) => <li key={index}>{item}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {mission.keyMessages.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.keyMessagesHeading}</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-kinnso-muted">
+            {mission.keyMessages.map((item, index) => <li key={index}>{item}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {mission.referenceLinks.length > 0 && (
+        <section className="mt-6">
+          <h2 className="text-lg font-bold text-kinnso-ink">{t.referenceLinksHeading}</h2>
+          <ul className="mt-2 space-y-1">
+            {mission.referenceLinks.map((link, index) => (
+              <li key={index} className="truncate text-sm">
+                <a href={link} className="text-kinnso-blue underline" target="_blank" rel="noreferrer">
+                  {link}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {lockedTier && (mission.cta === 'join' || mission.cta === 'apply') && (
         <div className="mt-6 flex flex-col gap-2">
