@@ -35,6 +35,7 @@ const base: CreatorMissionDetail = {
   missionType: 'paid', status: 'published', compensation: 'HKD 5000', couponCode: null, couponUrl: null,
   partnerLinks: [], participantId: null, participantStatus: null, cta: 'apply',
   milestones: [baseMilestone], maxReceiptsPerCreator: null, receiptSubmissions: [],
+  deliverables: [], requirements: [], dos: [], donts: [], keyMessages: [], referenceLinks: [], effort: null,
 }
 
 function activeMissionWithMilestone(
@@ -284,5 +285,54 @@ describe('CreatorMissionDetailView tier lock', () => {
     expect(screen.getByText('Pro')).toBeTruthy()
     expect(screen.queryByRole('button', { name: en.missionDetail.join })).toBeNull()
     expect(onJoin).not.toHaveBeenCalled()
+  })
+})
+
+describe('CreatorMissionDetailView — brief richness sections', () => {
+  it('renders each populated brief richness section with a heading', () => {
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail}
+        mission={{
+          ...base,
+          deliverables: ['Instagram Reel', 'Blog post'],
+          requirements: ['Tag @merchant'],
+          dos: ['Show the storefront'],
+          donts: ['Do not disparage competitors'],
+          keyMessages: ['Family-friendly staycation'],
+          referenceLinks: ['https://merchant.test/brand-guide'],
+          effort: 'medium',
+        }}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(en.missionDetail.deliverablesHeading)).toBeTruthy()
+    expect(screen.getByText('Instagram Reel')).toBeTruthy()
+    expect(screen.getByText('Blog post')).toBeTruthy()
+    expect(screen.getByText(en.missionDetail.requirementsHeading)).toBeTruthy()
+    expect(screen.getByText(en.missionDetail.dosHeading)).toBeTruthy()
+    expect(screen.getByText(en.missionDetail.dontsHeading)).toBeTruthy()
+    expect(screen.getByText(en.missionDetail.keyMessagesHeading)).toBeTruthy()
+    expect(screen.getByText(en.missionDetail.referenceLinksHeading)).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'https://merchant.test/brand-guide' })).toHaveAttribute(
+      'href', 'https://merchant.test/brand-guide',
+    )
+    expect(screen.getByText(en.missionDetail.effortBadgeLabel('medium'))).toBeTruthy()
+  })
+
+  it('renders no brief richness sections when every field is empty', () => {
+    render(
+      <CreatorMissionDetailView
+        locale="en" t={en.missionDetail}
+        mission={base}
+        onJoin={vi.fn()} onApply={vi.fn()} onSubmitMilestone={vi.fn()}
+      />,
+    )
+    expect(screen.queryByText(en.missionDetail.deliverablesHeading)).toBeNull()
+    expect(screen.queryByText(en.missionDetail.requirementsHeading)).toBeNull()
+    expect(screen.queryByText(en.missionDetail.dosHeading)).toBeNull()
+    expect(screen.queryByText(en.missionDetail.dontsHeading)).toBeNull()
+    expect(screen.queryByText(en.missionDetail.keyMessagesHeading)).toBeNull()
+    expect(screen.queryByText(en.missionDetail.referenceLinksHeading)).toBeNull()
   })
 })
