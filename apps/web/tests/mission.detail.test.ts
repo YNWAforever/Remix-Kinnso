@@ -72,6 +72,52 @@ describe('buildMilestoneRows', () => {
   })
 })
 
+describe('toCreatorMissionDetail brief richness mapping', () => {
+  const rowWithBrief: MissionDetailRow = {
+    id: 'm1', title: 'T', summary: 'S',
+    mission_source: 'merchant', mission_type: 'paid', status: 'published',
+    coupon_code: null, coupon_url: null,
+    paid_fee_amount: 5000, paid_fee_currency: 'HKD',
+    affiliate_commission_rate: null, creator_commission_rate: null, kinnso_commission_rate: null,
+    deliverables: ['Instagram Reel'], requirements: ['Tag @merchant'],
+    dos: ['Show the storefront'], donts: ['Do not disparage competitors'],
+    key_messages: ['Family-friendly staycation'], reference_links: ['https://merchant.test/brand-guide'],
+    effort: 'medium',
+    mission_milestones: [], mission_participants: [], affiliate_partner_links: [],
+  }
+
+  it('maps populated brief richness fields straight through', () => {
+    const detail = toCreatorMissionDetail(rowWithBrief, 'creator-1')
+    expect(detail.deliverables).toEqual(['Instagram Reel'])
+    expect(detail.requirements).toEqual(['Tag @merchant'])
+    expect(detail.dos).toEqual(['Show the storefront'])
+    expect(detail.donts).toEqual(['Do not disparage competitors'])
+    expect(detail.keyMessages).toEqual(['Family-friendly staycation'])
+    expect(detail.referenceLinks).toEqual(['https://merchant.test/brand-guide'])
+    expect(detail.effort).toBe('medium')
+  })
+
+  it('defaults missing/null brief richness fields to empty arrays and a null effort', () => {
+    const { deliverables, requirements, dos, donts, key_messages, reference_links, effort, ...rest } = rowWithBrief
+    const detail = toCreatorMissionDetail(
+      { ...rest, deliverables: null, requirements: null, dos: null, donts: null, key_messages: null, reference_links: null, effort: null },
+      'creator-1',
+    )
+    expect(detail.deliverables).toEqual([])
+    expect(detail.requirements).toEqual([])
+    expect(detail.dos).toEqual([])
+    expect(detail.donts).toEqual([])
+    expect(detail.keyMessages).toEqual([])
+    expect(detail.referenceLinks).toEqual([])
+    expect(detail.effort).toBeNull()
+  })
+
+  it('treats an unrecognized effort value as null rather than passing it through', () => {
+    const detail = toCreatorMissionDetail({ ...rowWithBrief, effort: 'urgent' }, 'creator-1')
+    expect(detail.effort).toBeNull()
+  })
+})
+
 describe('missionCompensation', () => {
   it('formats paid, affiliate, and hybrid combinations', () => {
     expect(missionCompensation({ mission_source: 'merchant', mission_type: 'paid', paid_fee_amount: 5000, paid_fee_currency: 'HKD', affiliate_commission_rate: null, creator_commission_rate: null, affiliate_network_programs: null })).toBe('HKD 5000')

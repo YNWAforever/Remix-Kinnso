@@ -50,6 +50,13 @@ export type MissionDetailRow = {
   creator_commission_rate: number | null
   kinnso_commission_rate: number | null
   max_receipts_per_creator?: number | null
+  deliverables?: string[] | null
+  requirements?: string[] | null
+  dos?: string[] | null
+  donts?: string[] | null
+  key_messages?: string[] | null
+  reference_links?: string[] | null
+  effort?: string | null
   affiliate_network_programs?: ProgramRef | ProgramRef[] | null
   mission_milestones?: Array<{ id: string; title: string | null; description: string | null; due_at: string | null; sort_order: number | null; repeatable?: boolean | null }> | null
   mission_participants?: Array<{
@@ -106,6 +113,13 @@ export type CreatorMissionDetail = {
   milestones: MilestoneRow[]
   maxReceiptsPerCreator: number | null
   receiptSubmissions: ReceiptSubmissionRow[]
+  deliverables: string[]
+  requirements: string[]
+  dos: string[]
+  donts: string[]
+  keyMessages: string[]
+  referenceLinks: string[]
+  effort: 'low' | 'medium' | 'high' | null
 }
 
 // Derives from the canonical missionTypes array rather than enumerating members inline, so a
@@ -256,6 +270,11 @@ export function missionCompensation(row: CompensationRow): string {
   return paid ?? affiliate
 }
 
+const MISSION_EFFORTS = new Set(['low', 'medium', 'high'])
+
+const narrowEffort = (effort: string | null | undefined): 'low' | 'medium' | 'high' | null =>
+  effort != null && MISSION_EFFORTS.has(effort) ? (effort as 'low' | 'medium' | 'high') : null
+
 export function toCreatorMissionDetail(row: MissionDetailRow, creatorId: string): CreatorMissionDetail {
   const participant = row.mission_participants?.find((p) => p.creator_id === creatorId) ?? null
   const missionType = toMissionType(row.mission_type)
@@ -283,5 +302,12 @@ export function toCreatorMissionDetail(row: MissionDetailRow, creatorId: string)
       row.mission_milestones,
       participant?.mission_milestone_submissions ?? null,
     ),
+    deliverables: row.deliverables ?? [],
+    requirements: row.requirements ?? [],
+    dos: row.dos ?? [],
+    donts: row.donts ?? [],
+    keyMessages: row.key_messages ?? [],
+    referenceLinks: row.reference_links ?? [],
+    effort: narrowEffort(row.effort),
   }
 }
