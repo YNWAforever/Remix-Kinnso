@@ -449,6 +449,7 @@ const messages: Messages = {
     effortLow: '低',
     effortMedium: '中',
     effortHigh: '高',
+    effortBadgeLabel: { low: '所需心機：低', medium: '所需心機：中', high: '所需心機：高' },
   },
   missionDetail: {
     back: '任務',

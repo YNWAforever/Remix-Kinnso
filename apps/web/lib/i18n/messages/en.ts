@@ -729,6 +729,7 @@ export interface Messages {
     effortLow: string
     effortMedium: string
     effortHigh: string
+    effortBadgeLabel: Record<'low' | 'medium' | 'high', string>
   }
   missionDetail: {
     back: string
@@ -1934,6 +1935,7 @@ const messages: Messages = {
     effortLow: 'Low',
     effortMedium: 'Medium',
     effortHigh: 'High',
+    effortBadgeLabel: { low: 'Low effort', medium: 'Medium effort', high: 'High effort' },
   },
   missionDetail: {
     back: 'Missions',

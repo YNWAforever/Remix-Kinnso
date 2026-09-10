@@ -221,7 +221,7 @@ export function CreatorMissionDetailView({ locale, t, mission, onJoin, onApply, 
         <div className="flex flex-none items-center gap-2">
           <MissionStatusBadge status={mission.participantStatus ?? mission.status} />
           {mission.effort && (
-            <span className="inline-flex rounded-pill bg-kinnso-cream2 px-2.5 py-1 text-xs font-semibold text-kinnso-ink">
+            <span className="inline-flex rounded-pill bg-kinnso-orange/15 px-2.5 py-1 text-xs font-semibold text-kinnso-orange">
               {t.effortBadgeLabel(mission.effort)}
             </span>
           )}

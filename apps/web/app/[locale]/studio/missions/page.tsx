@@ -9,7 +9,7 @@ import { creatorMissionProgress } from '@/lib/missions/list'
 import { joinMissionAction } from '@/lib/missions/actions'
 import { acceptInviteAction } from '@/lib/missions/invite-actions'
 import { listCreatorMerchantMissions } from '@/lib/missions/queries'
-import { missionTypes } from '@/lib/missions/types'
+import { missionEfforts, missionTypes, type MissionEffort } from '@/lib/missions/types'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export function generateStaticParams() {
@@ -47,6 +47,7 @@ type CreatorMissionRow = {
     mission_milestone_submissions?: Array<{ status: string | null; mission_milestone_id: string }> | null
   }> | null
   affiliate_partner_links?: Array<{ id: string; partner_url: string | null }> | null
+  effort?: string | null
 }
 
 const missionSource = (source: string | null): CreatorMissionCard['missionSource'] =>
@@ -59,6 +60,11 @@ const missionSource = (source: string | null): CreatorMissionCard['missionSource
 // was fixed one-off (commit 3c23911).
 const missionType = (type: string | null): CreatorMissionCard['missionType'] =>
   (missionTypes as readonly string[]).includes(type ?? '') ? (type as CreatorMissionCard['missionType']) : 'coupon_affiliate'
+
+const MISSION_EFFORTS = new Set<MissionEffort>(missionEfforts)
+
+const narrowEffort = (effort: string | null | undefined): MissionEffort | null =>
+  effort != null && MISSION_EFFORTS.has(effort as MissionEffort) ? (effort as MissionEffort) : null
 
 const programCompensation = (program: CreatorMissionRow['affiliate_network_programs']) => {
   const row = Array.isArray(program) ? program[0] : program
@@ -132,6 +138,7 @@ function mapCreatorMission(
       (row.mission_type === 'paid' || row.mission_type === 'hybrid' || row.mission_type === 'receipt_cashback') &&
       row.merchant_profile_id !== null &&
       funded.has(row.merchant_profile_id),
+    effort: narrowEffort(row.effort),
   }
 }
 

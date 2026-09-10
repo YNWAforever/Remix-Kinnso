@@ -11,7 +11,7 @@ import TierBadge from '@/components/kinnso/TierBadge'
 import { segmentMissions } from '@/lib/missions/list'
 import type { GatedTier } from '@/lib/contribution/tiers'
 import type { Messages } from '@/lib/i18n/messages/en'
-import type { MissionType } from '@/lib/missions/types'
+import type { MissionEffort, MissionType } from '@/lib/missions/types'
 
 export type CreatorMissionCard = {
   id: string
@@ -29,6 +29,7 @@ export type CreatorMissionCard = {
   locked: boolean
   requiredTier: GatedTier | null
   funded: boolean
+  effort: MissionEffort | null
 }
 
 type CreatorMissionsViewProps = {
@@ -136,6 +137,11 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                         {t.fundedBadge}
                       </span>
                     )}
+                    {mission.effort && (
+                      <span className="inline-flex rounded-pill bg-kinnso-orange/15 px-2.5 py-1 text-xs font-semibold text-kinnso-orange">
+                        {t.effortBadgeLabel[mission.effort]}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {mission.milestoneCount > 0 && (
@@ -181,6 +187,11 @@ export function CreatorMissionsView({ locale, t, missions, onJoin, onAccept }: C
                     {mission.funded && (
                       <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">
                         {t.fundedBadge}
+                      </span>
+                    )}
+                    {mission.effort && (
+                      <span className="inline-flex rounded-pill bg-kinnso-orange/15 px-2.5 py-1 text-xs font-semibold text-kinnso-orange">
+                        {t.effortBadgeLabel[mission.effort]}
                       </span>
                     )}
                   </div>
