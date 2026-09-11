@@ -158,6 +158,17 @@ describe('getGuidesForSitemap', () => {
     state.list = []
     expect(await getGuidesForSitemap()).toEqual([])
   })
+
+  it('surfaces a query failure rather than emitting a sitemap with no guides', async () => {
+    // A sitemap that silently drops a whole content type is worse than one that
+    // fails: a failed generation makes a crawler retry and keep the last known
+    // good, whereas a successful-but-empty section tells it those URLs are gone.
+    const failure = { code: '57P01', message: 'terminating connection' }
+    state.list = []
+    state.error = failure
+
+    await expect(getGuidesForSitemap()).rejects.toBe(failure)
+  })
 })
 
 describe('getAttributedGuidesForMerchant', () => {

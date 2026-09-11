@@ -78,14 +78,23 @@ function normalizeAttributedGuidesLimit(limit: number | undefined): number {
 }
 }
 
+/**
+ * Surfaces a query failure rather than emitting a sitemap with every guide
+ * missing. A sitemap that silently drops a whole content type is worse than one
+ * that fails: a failed generation makes a crawler retry and keep the last known
+ * good, whereas a successful-but-empty section actively tells it those URLs are
+ * gone. Every sibling here already throws -- merchants, experiences, sessions
+ * and destinations -- so this was the lone outlier.
+ */
 export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: string | null }[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('guides')
     .select('slug, published_at')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .order('slug') // stable tie-break so sitemap sharding partitions a deterministic order
+  if (error) throw error
   return (data ?? []).map((r) => ({
     slug: r.slug as string,
     lastmod: (r.published_at as string | null) ?? null,
