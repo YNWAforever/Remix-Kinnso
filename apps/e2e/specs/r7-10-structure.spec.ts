@@ -60,6 +60,18 @@ test.describe('R7.10 accessibility tree structure', () => {
           if (labelledBy?.split(/\s+/).some((id) => document.getElementById(id)?.textContent?.trim())) return false
           if (element.textContent?.trim()) return false
           if (element.getAttribute('title')?.trim()) return false
+
+          // HTMLInputElement.labels resolves BOTH implicit (<label>wraps</label>) and
+          // explicit (label[for] + id) association — the same rule the browser and AT
+          // use. Without this, every correctly-labelled input is a false positive,
+          // because <input> is a void element whose textContent is always empty.
+          const labels = (element as HTMLInputElement).labels
+          if (labels && Array.from(labels).some((label) => label.textContent?.trim())) return false
+
+          // A submit/button input takes its accessible name from `value`.
+          const input = element as HTMLInputElement
+          if ((input.type === 'submit' || input.type === 'button') && input.value?.trim()) return false
+
           return !element.querySelector('img[alt]')?.getAttribute('alt')?.trim()
         })
         .map((element) => {
