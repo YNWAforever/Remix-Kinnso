@@ -23,13 +23,20 @@ export const R7_10_OFF_SPECS = [
   // default config, which nothing runs any more, so it executed nowhere.
   'r7-10-accessibility-review.spec.ts',
   'r7-10-booking.spec.ts',
+  // The story 21 suites. Registered ahead of being written, deliberately: the guard
+  // checks that disk is a SUBSET of this list, so naming a file early is harmless,
+  // whereas forgetting to add it later is the exact failure this module exists to
+  // prevent. Absent from disk until tasks 6-8 of
+  // docs/superpowers/plans/2026-09-12-story-21-accessibility-verification.md land.
   'r7-10-keyboard.spec.ts',
   'r7-10-reflow.spec.ts',
   'r7-10-structure.spec.ts',
 ] as const
 
 /**
- * Selected by the preview config for the read-only smoke in verify.yml. Listed here
- * only so the registration guard knows it is not orphaned.
+ * Selected by the preview config for the read-only smoke in verify.yml, NOT by
+ * playwright.r7-10.config.ts — which is why this is a separate list rather than a
+ * forgotten entry in the one above. Nothing reads it except the registration guard,
+ * which needs it to know the file is not orphaned.
  */
 export const R7_10_PREVIEW_SPECS = ['r7-10-preview-smoke.spec.ts'] as const
