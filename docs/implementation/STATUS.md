@@ -256,6 +256,30 @@ it and stages nothing. A fresh clone never sees this.
 
 ## Phase 1 exit gate - where it actually stands
 
+> **Updated after the completion pass.** Four of the five items were already met; the fifth
+> (a real signed-out journey) now has browser evidence, and the navigation item has an audit
+> behind it instead of an impression. See `VERIFICATION.md` and `ROUTE-CONTINUITY.md`.
+
+| Exit-gate item | State after the completion pass |
+|---|---|
+| Hong Kong / absent searches remain truthful | **Met** - and now browser-confirmed: the catalogue rendered a true empty state before seeding, real cards after. |
+| merchant/creator/ops routes reject unauthorized actors | **Met** - ten gates converged; `privacy.merchant-scoping.test.ts` now also pins that queries scope by the guard's server-derived id, never a browser value. |
+| saves persist across sessions | **Met**; failures are visible and an expired session re-authenticates back to the saved item. |
+| all retained navigation has an explicit destination | **Met for the audited set.** `ROUTE-CONTINUITY.md` covers every route pattern with actor, gate, link source and disposition. It found one real gap (F1, `/admin/missions/[missionId]` reachable by nothing) which is now fixed and pinned. |
+| signed-out and signed-in journeys work against the authorized test backend | **Signed-out: met** (browser). **Signed-in: still host/component tests only** - no authenticated browser session was established. |
+
+### Story 21
+
+Three viewports (390x844, 768x1024, 1440x900) **PASS** at 100% zoom, anonymous, on
+`/explore`. Native 200% zoom, keyboard-only, screen reader, reduced motion, mobile safe
+areas and real iOS/Android remain **NOT RUN** - CSS emulation does not establish them.
+
+---
+
+## Original assessment (kept for the record)
+
+
+
 Plan section 6's exit gate, item by item, with evidence rather than a verdict.
 
 | Exit-gate item | State |
