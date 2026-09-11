@@ -2,6 +2,7 @@ import { readdir } from 'node:fs/promises'
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import {
+  A11Y_EXCEPTIONS,
   AXE_EXCEPTIONS,
   formatAxeViolations,
   unapprovedViolations,
@@ -66,6 +67,20 @@ test('R7.10 axe helpers accept direct axe results', () => {
   const axeViolations = [] as AxeViolations
 
   expect(unapprovedViolations('home', axeViolations)).toEqual([])
+})
+
+// Exact contents, not merely shape: a suppression must appear in a diff and be argued
+// for in review, the same standard AXE_EXCEPTIONS is held to.
+test('R7.10 a11y exception ledger has exactly the approved entries', () => {
+  expect(A11Y_EXCEPTIONS).toEqual([])
+})
+
+test('every a11y exception carries a reason, an owner and a review date', () => {
+  for (const entry of A11Y_EXCEPTIONS) {
+    expect(entry.reason.trim(), `${entry.routeId}/${entry.check} needs a reason`).not.toBe('')
+    expect(entry.owner.trim(), `${entry.routeId}/${entry.check} needs an owner`).not.toBe('')
+    expect(entry.reviewWhen.trim(), `${entry.routeId}/${entry.check} needs a review date`).not.toBe('')
+  }
 })
 
 // A spec file that no config selects runs nowhere and protects nothing. That has

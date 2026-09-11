@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test'
 import {
+  A11Y_EXCEPTIONS,
   calculateCLS,
   formatAxeViolations,
   hasMeaningfulFocusIndicator,
   installLayoutShiftObserver,
+  isExcepted,
   readCLS,
   type FocusStyleSnapshot,
 } from '../r7-10-accessibility'
@@ -74,4 +76,25 @@ test('focus indicator requires a focus-induced visible outline or ring', async (
   for (const { name, baseline, focused, expected } of cases) {
     expect(hasMeaningfulFocusIndicator(baseline, focused), name).toBe(expected)
   }
+})
+
+test('a11y exceptions match on both route and check, never one alone', () => {
+  const exceptions = [{
+    routeId: 'guide' as const,
+    check: 'reflow-320' as const,
+    reason: 'Itinerary table needs a real responsive rewrite',
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  }]
+
+  expect(isExcepted('guide', 'reflow-320', exceptions)).toBe(true)
+  expect(isExcepted('guide', 'text-200', exceptions)).toBe(false)
+  expect(isExcepted('home', 'reflow-320', exceptions)).toBe(false)
+  expect(isExcepted('home', 'text-200', exceptions)).toBe(false)
+})
+
+test('a11y ledger defaults to the real list when none is passed', () => {
+  expect(isExcepted('home', 'reflow-320')).toBe(A11Y_EXCEPTIONS.some(
+    (entry) => entry.routeId === 'home' && entry.check === 'reflow-320',
+  ))
 })

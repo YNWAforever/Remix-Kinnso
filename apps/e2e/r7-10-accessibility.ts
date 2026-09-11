@@ -263,3 +263,50 @@ export async function waitForVisualSettlement(page: Page): Promise<void> {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
   }))
 }
+
+/**
+ * Checks the story 21 suites assert. A closed union so a suppression cannot name a
+ * check that does not exist: a typo is a compile error rather than a silently inert
+ * entry that suppresses nothing while looking like it does.
+ */
+export type A11yCheck =
+  | 'viewport-overflow'
+  | 'viewport-cls'
+  | 'text-200'
+  | 'reflow-320'
+  | 'skip-link'
+  | 'keyboard-reachable'
+  | 'focus-visible'
+  | 'focus-trap'
+  | 'dialog-focus'
+  | 'landmarks'
+  | 'heading-order'
+  | 'accessible-name'
+  | 'html-lang'
+
+/**
+ * A known, accepted failure. Separate from AXE_EXCEPTIONS because that one is keyed by
+ * rule id and CSS target and filters individual violation nodes, while this suppresses
+ * a whole assertion for one route. Merging them would give one type where half the
+ * fields are meaningless in each case.
+ *
+ * r7-10-contract.spec.ts asserts this list's EXACT contents, so an entry cannot be
+ * added without showing up in a diff.
+ */
+export interface A11yException {
+  routeId: R710RouteId
+  check: A11yCheck
+  reason: string
+  owner: string
+  reviewWhen: string
+}
+
+export const A11Y_EXCEPTIONS: readonly A11yException[] = []
+
+export function isExcepted(
+  routeId: R710RouteId,
+  check: A11yCheck,
+  exceptions: readonly A11yException[] = A11Y_EXCEPTIONS,
+): boolean {
+  return exceptions.some((entry) => entry.routeId === routeId && entry.check === check)
+}
