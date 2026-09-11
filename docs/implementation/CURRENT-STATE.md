@@ -104,10 +104,17 @@ Reproducing `.github/workflows/ci.yml:45-135` exactly:
    the same statement CI runs at `ci.yml:75-81`.
 3. `supabase status -o env` → `apps/web/.env.test`, `packages/sync/.env.test`,
    `apps/scan/.env.test`.
-4. Append `SUPABASE_DB_CONTAINER=<id>` and `RUN_R7_3_LOCAL_LIVE_TESTS=1` to
-   `apps/web/.env.test`. **Without these two the RLS and production-honesty suites
-   `describe.skip` themselves and report green while untested** (CI comments this
-   explicitly at `ci.yml:154-163`).
+4. Append `SUPABASE_DB_CONTAINER=supabase_db_<project_id>` and
+   `RUN_R7_3_LOCAL_LIVE_TESTS=1` to `apps/web/.env.test`. **Without these two the RLS and
+   production-honesty suites `describe.skip` themselves and report green while untested**
+   (CI comments this explicitly at `ci.yml:154-163`).
+
+   **Use the container *name*, not its id.** `supabase db reset` restarts the containers
+   and issues a new id, so a pinned id silently goes stale — and a stale value fails the
+   same way an absent one does: the suites skip and report green. Observed directly: after
+   a reset, repinning from the old id to the name `supabase_db_kinnso-v3` turned 13 silently
+   skipped tests back into running ones. The name is stable across restarts and satisfies
+   the resolver's character check in `tests/helpers/r7-3-local-live-config.ts`.
 5. Derive `apps/web/.env.local` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` only).
 
 All `.env*` files are gitignored (`apps/web/.gitignore:34`), confirmed with
