@@ -254,6 +254,39 @@ it and stages nothing. A fresh clone never sees this.
 
 ---
 
+## Phase 1 exit gate - where it actually stands
+
+Plan section 6's exit gate, item by item, with evidence rather than a verdict.
+
+| Exit-gate item | State |
+|---|---|
+| Hong Kong / absent searches remain truthful | **Met** - S2. A failed read is an error with retry, a true empty renders empty, and the two are distinguishable. |
+| merchant/creator/ops routes reject unauthorized actors | **Met** - S3. Ten ad-hoc gates converged on the central guards; the ungated route is gated. |
+| saves persist across sessions | **Met** (pre-existing); S5 made failures visible instead of silent. |
+| all retained navigation has an explicit destination | **Improved, not audited.** S4 surfaced the two dark visit-loop routes. A route-by-route audit has **not** been done. |
+| signed-out and signed-in journeys work against the authorized test backend | **Partially.** Verified at unit and component level against a local stack. **No browser run exists**, so this is not evidence of a working journey. |
+
+### Genuinely still open in Phase 1
+
+1. **Section 6.1 - port the three shells, compact home and mobile Explore/Trips/Record/Me
+   nav.** The largest remaining item and a design-led change, not a refactor. It depends on
+   the approved Site source, which was **never downloaded** this session
+   (`CURRENT-STATE.md` section 7). Nothing here should be improvised from memory.
+2. **Section 6.5 - typed live/demo/unavailable capability adapters.** Deliberately not
+   built. The app already has `product-state-config`, `optionalQuery` and honest error
+   states; an adapter framework on top risks exactly the duplication the Phase 0 synthesis
+   ranked as the number-one Phase 1 risk. Worth an explicit decision first.
+3. **Section 6.6 / story 16 - prove private server rendering leaks nothing.** No test
+   asserts that a merchant cannot reach another merchant's data through serialized props,
+   JSON or a shared cache. That verification is missing.
+4. **Story 21 - viewports, native 200% zoom, keyboard, screen reader.** NOT RUN.
+
+**So Phase 1 is not complete.** Four of five exit-gate items are met; the fifth needs a
+browser, and three implementation items remain, two of which want an owner decision before
+any code is written.
+
+---
+
 ## Next task (concrete)
 
 **Slice S7 — B9: `--color-kinnso-line` is used but never defined.** `border-kinnso-line`
