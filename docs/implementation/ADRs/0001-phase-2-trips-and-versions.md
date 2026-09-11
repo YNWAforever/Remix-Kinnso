@@ -55,7 +55,7 @@ already depend on. In slice 0 every one is `NULL` and `origin` is always `'autho
 | **`start_date` nullable, not a sentinel** | Undated trips are first-class; "Day 1" renders with `starts_at = NULL`. | **Tested.** |
 | **`dst_anomaly` in `trip_stops_resolved`** | A spring-forward 01:30 surfaces as an anomaly instead of being silently shifted an hour. | **Tested:** 01:30 Europe/London on 2030-03-31 → `dst_anomaly = true`. |
 | **Timezone validated by BEFORE trigger** | A `CHECK` cannot call `pg_timezone_names` (not IMMUTABLE). Fails at write time, not at read time when it would break a page. | **Tested:** `Mars/Olympus` → `invalid_time_zone`. |
-| **`trip_revisions` is metadata-only, append-only** | A jsonb content snapshot would duplicate live rows and become a second place where withdrawn creator text hides from redaction. | **Tested:** `UPDATE` → `trip_revisions_append_only`. |
+| **`trip_revisions` is metadata-only, append-only** | A jsonb content snapshot would duplicate live rows and become a second place where withdrawn creator text hides from redaction. | **Tested**, and **narrowed in slice 1** — the original guard also blocked referential actions and made trips and accounts undeletable. See §4b. |
 | **No anon grant *and* no anon policy on any `trip_*` table** | The privilege layer refuses before RLS is consulted. | **Tested:** all five relations answer anon with an *error*, not an empty set. |
 | **`trip_stops_resolved` uses `security_invoker`** | The view is filtered by the caller's own RLS, not the view owner's privileges. | **Tested:** traveller B reads nothing through the view. |
 
@@ -96,6 +96,43 @@ does not tell you which one is holding.** Any assertion whose value depends on a
 layer must be mutation-verified by removing that layer. Where both layers genuinely should
 hold (ownership reassignment is refused by the missing grant *and* by the RLS `with check`),
 the test asserts the property rather than claiming a mechanism.
+
+## 4b. Slice 1, and the defect it exposed
+
+Slice 1 (`20260911120000_p2_1_trip_write_path.sql`) adds `create_trip`, `update_trip` and
+`delete_trip`. They exist because `head_revision_no` is ungrantable: only a definer function
+can mint a revision, which makes these the one place optimistic concurrency can live.
+`update_trip`/`delete_trip` compare-and-set on an expected revision behind
+`select … for update`, so the losing editor gets `trip_revision_conflict` rather than a
+silent last-write-wins. Ownership is taken from `auth.uid()` inside the function, never from
+an argument, and "not yours" and "does not exist" return the same error so responses cannot
+be used to probe which ids exist.
+
+**Writing `delete_trip`'s test showed that no trip could be deleted at all.** The slice 0
+append-only trigger raised on *every* UPDATE and DELETE — including the ones Postgres issues
+itself to maintain referential integrity:
+
+1. `trip_revisions.trip_id` is `ON DELETE CASCADE`, so deleting a trip cascaded into the log
+   and was refused. Since `create_trip` mints revision 1, that is every trip.
+2. `trip_revisions.author_user_id` is `ON DELETE SET NULL`, so deleting an **account** made
+   Postgres issue `UPDATE trip_revisions SET author_user_id = NULL` — refused as well.
+   **An account could not be deleted once its owner had created a trip.** That is a
+   data-deletion problem, not merely a broken feature.
+
+Two things are worth carrying forward from this:
+
+- **A guard written as "never" will also forbid the database's own bookkeeping.** Cascades
+  and `SET NULL` are ordinary DML and hit ordinary triggers. Any future append-only or
+  immutability guard — public versions especially — must state which referential actions it
+  permits, not just what users may not do.
+- **The account-deletion half was invisible because the tests did not check their own
+  cleanup.** Both suites called `deleteUser` without inspecting the error; eight stranded
+  users were the only symptom, and nothing was asserting on them. Teardown now asserts.
+
+The fix narrows rather than removes: the only permitted mutations are the two the database
+performs itself, each matched by exact shape — an authorship nulling in which every other
+column is unchanged, and a delete whose parent trip is already gone. Mutation-verified by
+replacing the trigger with a permissive one and watching the history test fail.
 
 ## 5. Deferred — these need an owner decision, not an invented rule
 

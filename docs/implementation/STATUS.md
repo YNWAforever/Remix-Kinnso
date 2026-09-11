@@ -333,13 +333,38 @@ summary-only, so structured adoption has nothing to adopt (ADR §2).
 
 ---
 
+## Phase 2 — slice 1 (trip write path)
+
+**Landed.** `20260911120000_p2_1_trip_write_path.sql` adds `create_trip`, `update_trip` and
+`delete_trip` as definer functions with compare-and-set concurrency. Functions only — it
+alters no table, changes no grant on an existing table, and rewrites no policy.
+`apps/web/tests/trips.write-path.test.ts` covers it: 15 tests, including two concurrent
+editors where exactly one wins.
+
+**It exposed a real defect in slice 0, now fixed.** The append-only trigger raised on every
+UPDATE and DELETE, including Postgres's own referential actions, so **no trip could be
+deleted, and no account could be deleted once its owner had created a trip.** The second is
+a data-deletion problem. It was invisible because both suites' teardown called `deleteUser`
+without checking the error; eight stranded users were the only symptom. Teardown now
+asserts, and the guard is narrowed to permit exactly the two mutations the database performs
+itself. Full reasoning in ADR §4b.
+
+**Still not built:** journals, immutable public versions, the adoption RPC, and any trip UI.
+
+---
+
 ## Next task (concrete)
 
-**Phase 2 slice 1 — the trip write path.** Slice 0 is schema and proof; nothing in the app
-can create a trip yet. The next reviewable vertical slice is the definer RPCs that mint
-revisions (`head_revision_no` is ungrantable precisely so they must exist), plus a minimal
-authenticated trip page. That is the smallest change that turns a proven schema into
-something a traveller can use.
+**A minimal authenticated trip page.** The schema is proven and the write path exists, but
+nothing in the app calls it — a traveller still cannot create a trip. The smallest useful
+slice is a server action wrapping `create_trip`/`update_trip` plus a list-and-detail page
+under the existing locale and auth gating, carrying the revision number so a conflict
+surfaces as a real message rather than a lost edit.
+
+Worth deciding first, because it shapes that page: **ADR §5.3, trip history depth.** If
+restore-to-prior-state is wanted, revisions need content snapshots and the redaction story
+grows; if a change log is enough, what exists is sufficient. Everything built so far works
+under either answer, which is why it has not blocked anything yet.
 
 That prerequisite is **now cleared**: the `trip_*` definitions are in `packages/db`, and the
 isolation suite uses typed clients, which is what proves the types are usable rather than
@@ -391,7 +416,7 @@ See `PHASE-BACKLOG.md` for the ranked remainder.
 
 ### Before extending the branch further
 
-**Thirty-two commits are unpushed.** The GitHub connector is not authenticated in this
+**Thirty-six commits are unpushed.** The GitHub connector is not authenticated in this
 session, so opening a PR needs either explicit authorization to push or the owner doing it.
 The branch now spans identity, discovery, role gates, the visit loop, saves, the build and a
 new Phase 2 schema — review before it grows further is the cheaper order, and the Phase 2
