@@ -136,7 +136,7 @@ export function StudioReadinessChecklist({
       {/* Static explanatory text, not a live region: the page already has one
           role=status for the next step, and competing live regions make a screen
           reader announce both on every update. */}
-      <p className="mt-4 border-t border-kinnso-line pt-3 text-xs text-kinnso-muted">
+      <p className="mt-4 border-t border-kinnso-edge pt-3 text-xs text-kinnso-muted">
         {directory.listed
           ? t.directoryListed
           : directory.gaps.includes('no_published_guide')

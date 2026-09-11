@@ -84,23 +84,23 @@ export function CreatorPayoutsView({
 
       {/* Money-flow summary cards (always reflect the full queue). */}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <div className="rounded-xl border border-kinnso-line p-4">
+        <div className="rounded-xl border border-kinnso-edge p-4">
           <p className="text-xs font-bold uppercase text-kinnso-muted">{t.payoutsQueue}</p>
           <p className="mt-1 text-2xl font-black text-kinnso-ink">{queue.summary.total}</p>
         </div>
-        <div className="rounded-xl border border-kinnso-line p-4">
+        <div className="rounded-xl border border-kinnso-edge p-4">
           <p className="text-xs font-bold uppercase text-kinnso-muted">{t.kpiPayoutsPending}</p>
           <p className="mt-1 text-2xl font-black text-kinnso-ink">
             {(queue.summary.byStatus.pending ?? 0) + (queue.summary.byStatus.partially_paid ?? 0)}
           </p>
         </div>
-        <div className="rounded-xl border border-kinnso-line p-4">
+        <div className="rounded-xl border border-kinnso-edge p-4">
           <p className="text-xs font-bold uppercase text-kinnso-muted">{t.payoutsOwed}</p>
           <p className="mt-1 text-sm font-black text-kinnso-ink">
             {queue.summary.owed.length === 0 ? '—' : queue.summary.owed.map((o) => `${money(o.amount)} ${o.currency}`).join(' · ')}
           </p>
         </div>
-        <div className="rounded-xl border border-kinnso-line p-4">
+        <div className="rounded-xl border border-kinnso-edge p-4">
           <p className="text-xs font-bold uppercase text-kinnso-muted">{t.payoutsSettled}</p>
           <p className="mt-1 text-sm font-black text-kinnso-ink">
             {queue.summary.settled.length === 0 ? '—' : queue.summary.settled.map((o) => `${money(o.amount)} ${o.currency}`).join(' · ')}
@@ -111,12 +111,12 @@ export function CreatorPayoutsView({
       {/* Status filter. */}
       <nav className="mb-2 flex flex-wrap gap-2">
         <Link href={filterHref({ source })} aria-current={!status ? 'page' : undefined}
-          className={`rounded-full px-3 py-1 text-xs font-bold ${!status ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
+          className={`rounded-full px-3 py-1 text-xs font-bold ${!status ? 'bg-kinnso-orange text-white' : 'bg-kinnso-edge/40 text-kinnso-muted'}`}>
           {t.dirAll}
         </Link>
         {STATUS_ORDER.map((s) => (
           <Link key={s} href={filterHref({ status: s, source })} aria-current={status === s ? 'page' : undefined}
-            className={`rounded-full px-3 py-1 text-xs font-bold ${status === s ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
+            className={`rounded-full px-3 py-1 text-xs font-bold ${status === s ? 'bg-kinnso-orange text-white' : 'bg-kinnso-edge/40 text-kinnso-muted'}`}>
             {statusLabel(t, s)} {queue.summary.byStatus[s] ? `(${queue.summary.byStatus[s]})` : ''}
           </Link>
         ))}
@@ -126,12 +126,12 @@ export function CreatorPayoutsView({
           active status forward so switching source never clears it. */}
       <nav className="mb-4 flex flex-wrap gap-2" aria-label={t.colSource}>
         <Link href={filterHref({ status })} aria-current={!source ? 'page' : undefined}
-          className={`rounded-full px-3 py-1 text-xs font-bold ${!source ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
+          className={`rounded-full px-3 py-1 text-xs font-bold ${!source ? 'bg-kinnso-orange text-white' : 'bg-kinnso-edge/40 text-kinnso-muted'}`}>
           {t.dirAll}
         </Link>
         {SOURCE_ORDER.map((s) => (
           <Link key={s} href={filterHref({ status, source: s })} aria-current={source === s ? 'page' : undefined}
-            className={`rounded-full px-3 py-1 text-xs font-bold ${source === s ? 'bg-kinnso-orange text-white' : 'bg-kinnso-line/40 text-kinnso-muted'}`}>
+            className={`rounded-full px-3 py-1 text-xs font-bold ${source === s ? 'bg-kinnso-orange text-white' : 'bg-kinnso-edge/40 text-kinnso-muted'}`}>
             {s}
           </Link>
         ))}
@@ -142,7 +142,7 @@ export function CreatorPayoutsView({
       ) : (
         <table className="w-full text-left text-sm">
           <thead className="text-kinnso-muted">
-            <tr className="border-b border-kinnso-line">
+            <tr className="border-b border-kinnso-edge">
               <th className="py-2 font-bold">{t.colMission}</th>
               <th className="py-2 font-bold">{t.colSource}</th>
               <th className="py-2 font-bold">{t.colName}</th>
@@ -155,7 +155,7 @@ export function CreatorPayoutsView({
           </thead>
           <tbody>
             {queue.rows.map((r) => (
-              <tr key={r.id} className="border-b border-kinnso-line/60 align-top">
+              <tr key={r.id} className="border-b border-kinnso-edge/60 align-top">
                 <td className="py-2 font-bold text-kinnso-ink">{r.missionTitle}</td>
                 <td className="py-2 text-kinnso-muted">{r.source}</td>
                 <td className="py-2 text-kinnso-muted">
@@ -173,7 +173,7 @@ export function CreatorPayoutsView({
                       className="rounded-md bg-kinnso-orange px-2 py-1 text-xs font-bold text-white disabled:opacity-50"
                       disabled={r.status === 'paid'}>{t.actMarkPaid}</button>
                     <button type="button" onClick={() => open(r, 'disputed')}
-                      className="rounded-md border border-kinnso-line px-2 py-1 text-xs font-bold text-kinnso-ink disabled:opacity-50"
+                      className="rounded-md border border-kinnso-edge px-2 py-1 text-xs font-bold text-kinnso-ink disabled:opacity-50"
                       disabled={r.status === 'disputed'}>{t.actMarkDisputed}</button>
                   </div>
                 </td>
@@ -194,11 +194,11 @@ export function CreatorPayoutsView({
             <p className="mb-2 text-xs text-kinnso-muted">{pending.row.missionTitle}</p>
             <textarea ref={reasonRef} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t.reasonPlaceholder}
               aria-label={t.reasonPlaceholder}
-              className="mb-2 w-full rounded-md border border-kinnso-line p-2 text-sm" rows={3} />
+              className="mb-2 w-full rounded-md border border-kinnso-edge p-2 text-sm" rows={3} />
             {error && <p className="mb-2 text-xs font-bold text-red-600">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={cancel} disabled={isPending}
-                className="rounded-md border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink">{t.actCancel}</button>
+                className="rounded-md border border-kinnso-edge px-3 py-1 text-sm font-bold text-kinnso-ink">{t.actCancel}</button>
               <button type="button" onClick={confirm} disabled={isPending || !reason.trim()}
                 className="rounded-md bg-kinnso-orange px-3 py-1 text-sm font-bold text-white disabled:opacity-50">{t.actApply}</button>
             </div>

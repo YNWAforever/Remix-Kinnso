@@ -15,7 +15,7 @@ export function TextBlock({
           <span>{title}</span>
         </h2>
       )}
-      {subtitle && <p className="text-muted mb-3">{subtitle}</p>}
+      {subtitle && <p className="text-kinnso-muted mb-3">{subtitle}</p>}
       {image && <img src={image} alt={title ?? ''} loading="lazy" className="rounded-card mb-4 w-full" />}
       {content && (
         <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: cleanHtml(content) }} />

@@ -1,8 +1,9 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { MerchantMissionsView, type MerchantMissionRow } from '@/components/kinnso/pages/MerchantMissionsView'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { getMerchantProfile, listMerchantMissions } from '@/lib/missions/queries'
+import { listMerchantMissions } from '@/lib/missions/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export function generateStaticParams() {
@@ -38,15 +39,12 @@ export default async function MerchantMissionsPage({ params }: { params: Params 
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
+  // Previously a signed-in non-merchant was served the merchant mission UI with
+  // an empty list, which reads as "you have no missions" rather than "this is
+  // not your dashboard". The guard 404s them, matching every sibling route.
+  const { merchantId } = await requireMerchantPage(supabase, loc)
 
-  const { data: merchantProfile } = await getMerchantProfile(supabase, user.id)
-  if (!merchantProfile) return <MerchantMissionsView locale={loc} t={messages.missions} missions={[]} />
-
-  const { data } = await listMerchantMissions(supabase, merchantProfile.id)
+  const { data } = await listMerchantMissions(supabase, merchantId)
   const missions = ((data ?? []) as unknown as MerchantMissionData[]).map(mapMerchantMission)
 
   return <MerchantMissionsView locale={loc} t={messages.missions} missions={missions} />

@@ -2,8 +2,8 @@ import type { ReactElement } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { GuideInput } from '@/lib/guides/types'
 
-const { getUserMock, maybeSingleMock, notFoundMock, redirectMock } = vi.hoisted(() => ({
-  getUserMock: vi.fn(),
+const { creatorPageGateMock, maybeSingleMock, notFoundMock, redirectMock } = vi.hoisted(() => ({
+  creatorPageGateMock: vi.fn(),
   maybeSingleMock: vi.fn(),
   notFoundMock: vi.fn(),
   redirectMock: vi.fn(),
@@ -13,6 +13,12 @@ vi.mock('next/navigation', () => ({
   notFound: notFoundMock,
   redirect: redirectMock,
 }))
+
+// The page delegates its role check to the central guard, so the guard is
+// mocked rather than the raw client. Mocking the client alone would feed the
+// guard's own role lookups from this file's single `maybeSingle` stub and make
+// the page's gate depend on the guide fixture.
+vi.mock('@/lib/admin/guard', () => ({ requireCreatorPage: creatorPageGateMock }))
 
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: async () => {
@@ -24,7 +30,6 @@ vi.mock('@/lib/supabase/server', () => ({
     query.select.mockReturnValue(query)
     query.eq.mockReturnValue(query)
     return {
-      auth: { getUser: getUserMock },
       from: vi.fn(() => query),
     }
   },
@@ -34,7 +39,7 @@ import StudioEditGuidePage from '@/app/[locale]/studio/guides/[id]/edit/page'
 
 beforeEach(() => {
   vi.clearAllMocks()
-  getUserMock.mockResolvedValue({ data: { user: { id: 'creator-1' } } })
+  creatorPageGateMock.mockResolvedValue({ user: { id: 'creator-1' } })
 })
 
 describe('StudioEditGuidePage', () => {
@@ -56,5 +61,14 @@ describe('StudioEditGuidePage', () => {
     expect(result.props.initial.coverUrl).toBe('')
     expect(notFoundMock).not.toHaveBeenCalled()
     expect(redirectMock).not.toHaveBeenCalled()
+  })
+
+  it('gates on an active creator, sending anyone else to onboarding', async () => {
+    expect(creatorPageGateMock).not.toHaveBeenCalled()
+    maybeSingleMock.mockResolvedValue({ data: { id: 'guide-1', title: 't', city: 'c', cover_url: null, summary: 's' } })
+
+    await StudioEditGuidePage({ params: Promise.resolve({ locale: 'en', id: 'guide-1' }) })
+
+    expect(creatorPageGateMock).toHaveBeenCalledWith(expect.anything(), 'en', 'creator')
   })
 })

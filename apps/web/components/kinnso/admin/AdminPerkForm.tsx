@@ -61,45 +61,45 @@ export function AdminPerkForm({
     <form onSubmit={submit} className="space-y-4">
       <label className="block">
         <span className="text-sm font-bold text-kinnso-ink">{t.fieldPartner}</span>
-        <input className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.partnerName}
+        <input className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.partnerName}
           onChange={(e) => set('partnerName', e.target.value)} />
         {errors.partnerName && <span className="text-sm text-red-600">{errors.partnerName[0]}</span>}
       </label>
       <label className="block">
         <span className="text-sm font-bold text-kinnso-ink">{t.fieldTitle}</span>
-        <input className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.title}
+        <input className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.title}
           onChange={(e) => set('title', e.target.value)} />
         {errors.title && <span className="text-sm text-red-600">{errors.title[0]}</span>}
       </label>
       <label className="block">
         <span className="text-sm font-bold text-kinnso-ink">{t.fieldSummary}</span>
-        <textarea className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.summary}
+        <textarea className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.summary}
           onChange={(e) => set('summary', e.target.value)} />
         {errors.summary && <span className="text-sm text-red-600">{errors.summary[0]}</span>}
       </label>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldCategory}</span>
-          <input className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.category}
+          <input className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.category}
             onChange={(e) => set('category', e.target.value)} />
           {errors.category && <span className="text-sm text-red-600">{errors.category[0]}</span>}
         </label>
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldDiscount}</span>
-          <input className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.discountLabel}
+          <input className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.discountLabel}
             onChange={(e) => set('discountLabel', e.target.value)} />
           {errors.discountLabel && <span className="text-sm text-red-600">{errors.discountLabel[0]}</span>}
         </label>
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldMinTier}</span>
-          <select className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.minTier ?? ''}
+          <select className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.minTier ?? ''}
             onChange={(e) => set('minTier', (e.target.value || null) as PerkInput['minTier'])}>
             {TIER_OPTIONS.map((v) => <option key={v} value={v}>{tierLabel(v)}</option>)}
           </select>
         </label>
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldRedemptionType}</span>
-          <select className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.redemptionType}
+          <select className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.redemptionType}
             onChange={(e) => set('redemptionType', e.target.value as PerkInput['redemptionType'])}>
             <option value="code">{t.typeCode}</option>
             <option value="link">{t.typeLink}</option>
@@ -107,13 +107,13 @@ export function AdminPerkForm({
         </label>
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldRedemptionValue}</span>
-          <input className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.redemptionValue}
+          <input className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.redemptionValue}
             onChange={(e) => set('redemptionValue', e.target.value)} />
           {errors.redemptionValue && <span className="text-sm text-red-600">{errors.redemptionValue[0]}</span>}
         </label>
         <label className="block">
           <span className="text-sm font-bold text-kinnso-ink">{t.fieldSortOrder}</span>
-          <input type="number" step="1" className="mt-1 w-full rounded-lg border border-kinnso-line px-3 py-2" value={form.sortOrder}
+          <input type="number" step="1" className="mt-1 w-full rounded-lg border border-kinnso-edge px-3 py-2" value={form.sortOrder}
             onChange={(e) => set('sortOrder', Math.trunc(Number(e.target.value)) || 0)} />
           {errors.sortOrder && <span className="text-sm text-red-600">{errors.sortOrder[0]}</span>}
         </label>
@@ -127,7 +127,7 @@ export function AdminPerkForm({
         <button type="submit" disabled={pending}
           className="rounded-full bg-kinnso-orange px-5 py-2 font-bold text-white disabled:opacity-60">{t.save}</button>
         <button type="button" onClick={onCancel}
-          className="rounded-full border border-kinnso-line px-5 py-2 font-bold text-kinnso-ink">{t.cancel}</button>
+          className="rounded-full border border-kinnso-edge px-5 py-2 font-bold text-kinnso-ink">{t.cancel}</button>
       </div>
     </form>
   )

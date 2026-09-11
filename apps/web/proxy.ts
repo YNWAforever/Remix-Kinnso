@@ -37,11 +37,13 @@ export async function proxy(req: NextRequest) {
 
   // 2. Auth gate — must run BEFORE the locale guard so that
   //    /en/creator (already locale-prefixed) is caught here.
-  const gate = gateDecision(pathname, user !== null)
+  const gate = gateDecision(pathname, user !== null, req.nextUrl.search)
   if (gate.type === 'redirect') {
-    const url = req.nextUrl.clone()
-    url.pathname = gate.location
-    url.search = ''
+    // gate.location is a path *plus* an encoded `?next=`, so it is resolved as a
+    // relative URL rather than assigned to `url.pathname` — assigning a string
+    // containing "?" to pathname would percent-escape it into a 404 path.
+    // The original query is not dropped here; it is carried inside `next`.
+    const url = new URL(gate.location, req.nextUrl)
     const res = NextResponse.redirect(url, 307)
     // Copy the refreshed Supabase auth cookies from updateSession onto the
     // redirect response. @supabase/ssr middleware requires these Set-Cookie

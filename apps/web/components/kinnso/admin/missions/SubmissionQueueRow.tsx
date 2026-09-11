@@ -71,7 +71,7 @@ function RerunVerificationButton({ submissionId, t }: { submissionId: string; t:
       type="button"
       onClick={rerun}
       disabled={state === 'pending'}
-      className="mt-1 rounded-md border border-kinnso-line px-2 py-0.5 text-xs font-bold text-kinnso-ink disabled:opacity-50"
+      className="mt-1 rounded-md border border-kinnso-edge px-2 py-0.5 text-xs font-bold text-kinnso-ink disabled:opacity-50"
     >
       {t.actRerunVerification}
     </button>
@@ -150,7 +150,7 @@ export function SubmissionQueueRow({
 
   return (
     <>
-      <tr className="border-b border-kinnso-line/60 align-top">
+      <tr className="border-b border-kinnso-edge/60 align-top">
         <td className="py-2 font-bold text-kinnso-ink">{row.missionTitle}</td>
         <td className="py-2 text-kinnso-muted">{row.creatorId ? row.creatorId.slice(0, 8) : '—'}</td>
         <td className="py-2">
@@ -161,7 +161,7 @@ export function SubmissionQueueRow({
         </td>
         <td className="py-2">
           {row.status === 'revision_requested' ? (
-            <span className="rounded-full bg-kinnso-line/40 px-2 py-1 text-xs font-bold text-kinnso-muted">
+            <span className="rounded-full bg-kinnso-edge/40 px-2 py-1 text-xs font-bold text-kinnso-muted">
               {t.waitingOnCreator}
             </span>
           ) : (
@@ -178,7 +178,7 @@ export function SubmissionQueueRow({
                 type="button"
                 onClick={() => open('reject')}
                 disabled={isPending}
-                className="rounded-md border border-kinnso-line px-2 py-1 text-xs font-bold text-kinnso-ink disabled:opacity-50"
+                className="rounded-md border border-kinnso-edge px-2 py-1 text-xs font-bold text-kinnso-ink disabled:opacity-50"
               >
                 {t.actReject}
               </button>
@@ -186,7 +186,7 @@ export function SubmissionQueueRow({
                 type="button"
                 onClick={() => open('request_revision')}
                 disabled={isPending}
-                className="rounded-md border border-kinnso-line px-2 py-1 text-xs font-bold text-kinnso-ink disabled:opacity-50"
+                className="rounded-md border border-kinnso-edge px-2 py-1 text-xs font-bold text-kinnso-ink disabled:opacity-50"
               >
                 {t.actRequestRevision}
               </button>
@@ -216,7 +216,7 @@ export function SubmissionQueueRow({
                   value={reasonCategory}
                   onChange={(e) => setReasonCategory(e.target.value)}
                   aria-label={t.reasonCategoryPlaceholder}
-                  className="mb-2 w-full rounded-md border border-kinnso-line p-2 text-sm"
+                  className="mb-2 w-full rounded-md border border-kinnso-edge p-2 text-sm"
                 >
                   <option value="">{t.reasonCategoryPlaceholder}</option>
                   {reasonOptionsFor(row.missionType, t).map((o) => (
@@ -226,7 +226,7 @@ export function SubmissionQueueRow({
                 <textarea
                   value={reasonText}
                   onChange={(e) => setReasonText(e.target.value)}
-                  className="mb-2 w-full rounded-md border border-kinnso-line p-2 text-sm"
+                  className="mb-2 w-full rounded-md border border-kinnso-edge p-2 text-sm"
                   rows={3}
                 />
                 {error && <p className="mb-2 text-xs font-bold text-red-600">{error}</p>}
@@ -235,7 +235,7 @@ export function SubmissionQueueRow({
                     type="button"
                     onClick={cancel}
                     disabled={isPending}
-                    className="rounded-md border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink"
+                    className="rounded-md border border-kinnso-edge px-3 py-1 text-sm font-bold text-kinnso-ink"
                   >
                     {t.actCancel}
                   </button>

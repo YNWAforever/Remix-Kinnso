@@ -73,7 +73,7 @@ function UserSection({ t, locale, heading, kind, rows, onSetStatus }: {
                     disabled={busyId === row.id}
                     aria-busy={busyId === row.id}
                     aria-label={`${suspended ? t.activate : t.suspend} ${row.name}`}
-                    className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50"
+                    className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50"
                   >
                     {suspended ? t.activate : t.suspend}
                   </button>
@@ -113,7 +113,7 @@ export function AdminUsersView({ t, locale, users, onSetStatus }: {
                     {statusLabel(t, m.status)}{' · '}{t.joined} {new Date(m.created_at).toLocaleDateString(locale, { timeZone: 'UTC' })}
                   </p>
                 </div>
-                <Link href={`/${locale}/admin/merchants/${m.id}`} className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink">
+                <Link href={`/${locale}/admin/merchants/${m.id}`} className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink">
                   {t.manageInConsole}
                 </Link>
               </TicketCard>

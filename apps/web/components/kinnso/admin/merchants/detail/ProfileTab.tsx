@@ -11,7 +11,7 @@ export function ProfileTab({ t, profile }: { t: T; profile: MerchantDetailProfil
   const hasContact = profile.contactName || profile.contactEmail
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.secContact}</p>
         {hasContact ? (
           <dl className="text-sm text-kinnso-muted">
@@ -20,7 +20,7 @@ export function ProfileTab({ t, profile }: { t: T; profile: MerchantDetailProfil
           </dl>
         ) : <p className="text-sm text-kinnso-muted">{t.noContact}</p>}
       </section>
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.secWebsite}</p>
         {profile.websiteUrl
           ? (isHttpUrl(profile.websiteUrl)

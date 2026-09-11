@@ -8,11 +8,11 @@ export function ProfileDnaTab({ t, detail }: { t: T; detail: CreatorDetail }) {
   const { dna, scan, socials, creator } = detail
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.detailBio}</p>
         <p className="text-sm text-kinnso-muted">{creator.bio ?? t.detailNoBio}</p>
       </section>
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.secDna}</p>
         {dna ? (
           <dl className="text-sm text-kinnso-muted">
@@ -21,7 +21,7 @@ export function ProfileDnaTab({ t, detail }: { t: T; detail: CreatorDetail }) {
           </dl>
         ) : <p className="text-sm text-kinnso-muted">{t.dnaNoData}</p>}
       </section>
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.secScan}</p>
         {scan ? (
           <dl className="text-sm text-kinnso-muted">
@@ -31,7 +31,7 @@ export function ProfileDnaTab({ t, detail }: { t: T; detail: CreatorDetail }) {
           </dl>
         ) : <p className="text-sm text-kinnso-muted">{t.scanNoData}</p>}
       </section>
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.secSocials}</p>
         {socials.length === 0 ? (
           <p className="text-sm text-kinnso-muted">{t.socialsNoData}</p>

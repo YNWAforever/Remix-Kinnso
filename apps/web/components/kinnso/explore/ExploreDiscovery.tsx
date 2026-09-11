@@ -41,17 +41,28 @@ export function ExploreDiscovery({ locale, t, guides, destinations }: ExploreDis
   const stateRef = useRef<ExploreState>(DEFAULT_STATE)
   const didHydrate = useRef(false)
 
-  const replaceUrl = useCallback((next: ExploreState) => {
+  /**
+   * Next.js 16 integrates the native History API with its router, so pushState
+   * here participates in normal back/forward navigation (see the "Shallow
+   * routing on the client" guide).
+   *
+   * Discrete choices push, so Back undoes them one at a time. Typing replaces,
+   * because a history entry per keystroke would make Back feel broken in the
+   * other direction -- a viewer would have to press it a dozen times to leave
+   * a search they typed once.
+   */
+  const writeUrl = useCallback((next: ExploreState, mode: 'push' | 'replace') => {
     const query = serializeExploreState(next).toString()
     const url = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`
-    window.history.replaceState(window.history.state, '', url)
+    if (mode === 'push') window.history.pushState(window.history.state, '', url)
+    else window.history.replaceState(window.history.state, '', url)
   }, [])
 
-  const commit = useCallback((next: ExploreState) => {
+  const commit = useCallback((next: ExploreState, mode: 'push' | 'replace' = 'push') => {
     stateRef.current = next
     setState(next)
-    replaceUrl(next)
-  }, [replaceUrl])
+    writeUrl(next, mode)
+  }, [writeUrl])
 
   useEffect(() => {
     if (didHydrate.current) return
@@ -67,12 +78,33 @@ export function ExploreDiscovery({ locale, t, guides, destinations }: ExploreDis
     setHydrated(true)
   }, [allowMostSaved, destinationSlugs])
 
+  // Back/forward rewrites the URL without remounting this component, so the
+  // grid has to be re-derived from the restored query or the two silently
+  // disagree -- the visible filters would describe a result set that is no
+  // longer on screen.
+  useEffect(() => {
+    const onPopState = () => {
+      const restored = parseExploreState(
+        new URLSearchParams(window.location.search),
+        destinationSlugs,
+        allowMostSaved,
+      )
+      stateRef.current = restored
+      setState(restored)
+      // Also resets the input, otherwise the debounce below sees a stale value
+      // and immediately re-commits the search the viewer just navigated away from.
+      setSearchValue(restored.q)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [allowMostSaved, destinationSlugs])
+
   useEffect(() => {
     if (!hydrated || searchValue === stateRef.current.q) return
     const timeout = window.setTimeout(() => {
       const q = normalizeSearch(searchValue)
       if (q === stateRef.current.q) return
-      commit({ ...stateRef.current, q, page: 1 })
+      commit({ ...stateRef.current, q, page: 1 }, 'replace')
     }, EXPLORE_SEARCH_DEBOUNCE_MS)
     return () => window.clearTimeout(timeout)
   }, [commit, hydrated, searchValue])

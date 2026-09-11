@@ -46,7 +46,7 @@ export function TeamOverviewView({ t, locale, overview, onInvite }: {
         ))}
       </div>
 
-      <div className="space-y-3 rounded-xl border border-kinnso-border p-4">
+      <div className="space-y-3 rounded-xl border border-kinnso-edge p-4">
         <h2 className="text-sm font-bold text-kinnso-ink">{t.invitePanelTitle}</h2>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
@@ -54,12 +54,12 @@ export function TeamOverviewView({ t, locale, overview, onInvite }: {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t.inviteEmailLabel}
-            className="flex-1 rounded-lg border border-kinnso-border px-3 py-2 text-sm"
+            className="flex-1 rounded-lg border border-kinnso-edge px-3 py-2 text-sm"
           />
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="rounded-lg border border-kinnso-border px-3 py-2 text-sm"
+            className="rounded-lg border border-kinnso-edge px-3 py-2 text-sm"
           >
             {ROLES.map((r) => (
               <option key={r} value={r}>{roleLabel[r]}</option>

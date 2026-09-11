@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { LOCALES } from '@/lib/i18n/config'
 import { requireMerchantAction } from '@/lib/admin/guard'
 import { formError, type ActionResult } from '@/lib/admin/result'
 import { validateOfferInput, type OfferInput } from '@/lib/merchants/offers-validation'
@@ -44,7 +45,7 @@ export async function createMerchantOfferAction(input: OfferInput): Promise<Acti
     return formError('Offer could not be created')
   }
 
-  revalidatePath('/merchants/dashboard/offers')
+  for (const l of LOCALES) revalidatePath(`/${l}/merchants/dashboard/offers`)
   return { ok: true, id: data.id as string }
 }
 
@@ -68,6 +69,6 @@ export async function setMerchantOfferStatusAction(
     return formError('Offer status could not be changed')
   }
 
-  revalidatePath('/merchants/dashboard/offers')
+  for (const l of LOCALES) revalidatePath(`/${l}/merchants/dashboard/offers`)
   return { ok: true, id: data.id as string }
 }

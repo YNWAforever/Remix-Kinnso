@@ -31,7 +31,7 @@ describe('saveGuideAction', () => {
   it('requires sign-in', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: null } })
     const result = await saveGuideAction('en', 'g1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Sign in is required'] } })
+    expect(result).toEqual({ ok: false, reason: 'auth', errors: { form: ['Sign in is required'] } })
   })
 
   it('upserts the save for a signed-in traveller and revalidates /trips', async () => {
@@ -49,7 +49,7 @@ describe('saveGuideAction', () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     upsertMock.mockResolvedValueOnce({ error: { message: 'permission denied for table guide_saves' } })
     const result = await saveGuideAction('en', 'g1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Guide could not be saved'] } })
+    expect(result).toEqual({ ok: false, reason: 'failed', errors: { form: ['Guide could not be saved'] } })
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 
@@ -74,7 +74,7 @@ describe('unsaveGuideAction', () => {
   it('requires sign-in', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: null } })
     const result = await unsaveGuideAction('en', 'g1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Sign in is required'] } })
+    expect(result).toEqual({ ok: false, reason: 'auth', errors: { form: ['Sign in is required'] } })
   })
 
   it('deletes the save for a signed-in traveller', async () => {
@@ -87,7 +87,7 @@ describe('unsaveGuideAction', () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     deleteEqMock.mockResolvedValueOnce({ error: { message: 'permission denied for table guide_saves' } })
     const result = await unsaveGuideAction('en', 'g1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Guide could not be removed'] } })
+    expect(result).toEqual({ ok: false, reason: 'failed', errors: { form: ['Guide could not be removed'] } })
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 })

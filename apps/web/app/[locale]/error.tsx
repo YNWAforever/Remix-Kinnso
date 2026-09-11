@@ -19,7 +19,7 @@ export default function LocaleError({
   return (
     <main className="mx-auto max-w-2xl px-4 py-24 text-center">
       <h1 className="text-3xl font-bold mb-3">Something went wrong</h1>
-      <p className="text-muted mb-6">
+      <p className="text-kinnso-muted mb-6">
         We hit a temporary problem loading this page. Please try again.
       </p>
       <button

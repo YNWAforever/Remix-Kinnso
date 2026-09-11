@@ -8,7 +8,7 @@ export function MissionsTabs({ t, locale }: { t: Messages['missionsOps']; locale
   const pathname = usePathname()
   const tabs = [{ href: `/${locale}/admin/missions`, label: t.tabOverview }]
   return (
-    <nav className="mb-6 flex gap-2 border-b border-kinnso-line">
+    <nav className="mb-6 flex gap-2 border-b border-kinnso-edge">
       {tabs.map((tab) => {
         const active = pathname === tab.href
         return (

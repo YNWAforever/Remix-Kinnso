@@ -58,7 +58,7 @@ function AutoApprovePolicyToggle({
         value={policy}
         disabled={isPending}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-md border border-kinnso-line p-1 text-sm"
+        className="rounded-md border border-kinnso-edge p-1 text-sm"
       >
         <option value="off">{t.autoApprovePolicyOff}</option>
         <option value="verified_signal_only">{t.autoApprovePolicyOn}</option>
@@ -98,7 +98,7 @@ export function MissionDetailView({
       ) : (
         <table className="w-full text-left text-sm">
           <thead className="text-kinnso-muted">
-            <tr className="border-b border-kinnso-line">
+            <tr className="border-b border-kinnso-edge">
               <th className="py-2 font-bold">{t.colMission}</th>
               <th className="py-2 font-bold">{t.colCreator}</th>
               <th className="py-2 font-bold">{t.colVerification}</th>

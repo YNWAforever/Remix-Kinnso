@@ -92,7 +92,7 @@ export function MerchantRedeemView({ t, onRedeem }: {
 
       <div className="mt-4 max-w-sm">
         <input
-          className="w-full rounded border border-kinnso-line p-2"
+          className="w-full rounded border border-kinnso-edge p-2"
           placeholder={t.manualPlaceholder}
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
@@ -106,10 +106,10 @@ export function MerchantRedeemView({ t, onRedeem }: {
       </div>
 
       {pendingToken ? (
-        <div className="mt-4 max-w-sm rounded-lg border border-kinnso-line p-4">
+        <div className="mt-4 max-w-sm rounded-lg border border-kinnso-edge p-4">
           <p>{t.amountSpentPrompt}</p>
           <input
-            className="mt-2 w-full rounded border border-kinnso-line p-2"
+            className="mt-2 w-full rounded border border-kinnso-edge p-2"
             placeholder="0.00"
             value={amountSpent}
             onChange={(e) => setAmountSpent(e.target.value)}

@@ -71,7 +71,19 @@ export function MissionsOverviewView({ t, locale, overview, attention }: { t: Me
           <ul className="flex flex-col gap-2 text-sm">
             {atRisk.map((r) => (
               <li key={r.id} className="flex items-center justify-between gap-3">
-                <span className="min-w-0 flex-1 truncate font-bold text-kinnso-ink">{r.title}</span>
+                {/*
+                  /admin/missions/[missionId] was reachable by no link anywhere in the
+                  product, yet mission-review-actions revalidates it after every decision
+                  -- ops could act on a submission but never open the mission it belonged
+                  to. The at-risk list already carries the mission id, so this is the
+                  natural way in.
+                */}
+                <Link
+                  href={`/${locale}/admin/missions/${r.id}`}
+                  className="min-w-0 flex-1 truncate font-bold text-kinnso-ink underline decoration-kinnso-edge underline-offset-4 hover:decoration-kinnso-orange focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange"
+                >
+                  {r.title}
+                </Link>
                 <span className="min-w-0 flex-1 truncate text-kinnso-muted">{r.merchantName ?? '—'}</span>
                 <span className="shrink-0 text-orange-700">{reasons[r.reason] ?? r.reason}</span>
               </li>

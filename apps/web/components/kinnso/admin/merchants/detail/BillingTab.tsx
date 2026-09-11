@@ -25,11 +25,11 @@ export function BillingTab({ t, billing }: { t: T; billing: MerchantDetail['bill
       <p className="rounded-lg bg-kinnso-cream2 px-3 py-2 text-sm text-kinnso-muted">{t.billingReadonly}</p>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <section className="rounded-xl border border-kinnso-line p-4">
+        <section className="rounded-xl border border-kinnso-edge p-4">
           <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.owedTitle}</p>
           <MoneyList rows={billing.owed} empty={t.moneyEmpty} />
         </section>
-        <section className="rounded-xl border border-kinnso-line p-4">
+        <section className="rounded-xl border border-kinnso-edge p-4">
           <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.settledTitle}</p>
           <MoneyList rows={billing.settled} empty={t.moneyEmpty} />
         </section>
@@ -42,7 +42,7 @@ export function BillingTab({ t, billing }: { t: T; billing: MerchantDetail['bill
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="text-kinnso-muted">
-              <tr className="border-b border-kinnso-line">
+              <tr className="border-b border-kinnso-edge">
                 <th className="py-2 font-bold">{t.colMission}</th>
                 <th className="py-2 font-bold">{t.colAmount}</th>
                 <th className="py-2 font-bold">{t.colCurrency}</th>
@@ -55,7 +55,7 @@ export function BillingTab({ t, billing }: { t: T; billing: MerchantDetail['bill
             </thead>
             <tbody>
               {billing.settlements.map((s) => (
-                <tr key={s.id} className="border-b border-kinnso-line/60">
+                <tr key={s.id} className="border-b border-kinnso-edge/60">
                   <td className="py-2 font-bold text-kinnso-ink">{s.missionTitle}</td>
                   <td className="py-2 text-kinnso-muted">{money(s.creatorPayoutAmount)}</td>
                   <td className="py-2 text-kinnso-muted">{s.currency ?? '—'}</td>

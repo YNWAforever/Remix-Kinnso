@@ -83,7 +83,7 @@ export function CreatorDetailView({
     { key: 'moderation', label: t.tabModeration },
   ]
 
-  const btn = 'rounded-lg border border-kinnso-line px-3 py-1.5 text-sm font-bold text-kinnso-ink hover:bg-kinnso-cream2 disabled:opacity-50'
+  const btn = 'rounded-lg border border-kinnso-edge px-3 py-1.5 text-sm font-bold text-kinnso-ink hover:bg-kinnso-cream2 disabled:opacity-50'
 
   return (
     <main>
@@ -119,9 +119,9 @@ export function CreatorDetailView({
       </div>
 
       {pending && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-kinnso-line bg-kinnso-cream2 p-3">
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-kinnso-edge bg-kinnso-cream2 p-3">
           <input
-            className="min-w-[16rem] flex-1 rounded-lg border border-kinnso-line px-3 py-1.5 text-sm"
+            className="min-w-[16rem] flex-1 rounded-lg border border-kinnso-edge px-3 py-1.5 text-sm"
             placeholder={t.reasonPlaceholder} value={reason} onChange={(e) => setReason(e.target.value)}
           />
           <button type="button" className={btn} disabled={busy || reason.trim() === ''} onClick={apply}>{t.actApply}</button>
@@ -130,7 +130,7 @@ export function CreatorDetailView({
         </div>
       )}
 
-      <nav className="mt-6 flex gap-2 border-b border-kinnso-line">
+      <nav className="mt-6 flex gap-2 border-b border-kinnso-edge">
         {tabs.map((x) => (
           <button
             key={x.key} type="button" aria-current={tab === x.key ? 'page' : undefined}
@@ -147,7 +147,7 @@ export function CreatorDetailView({
         {tab === 'content' && <ContentTab t={t} content={detail.content} />}
         {tab === 'moderation' && (
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-kinnso-line p-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-kinnso-edge p-3">
               <p className="text-sm font-bold text-kinnso-ink">
                 {creator.isListed ? t.listingOverrideOn : t.listingGuideBased}
               </p>
@@ -157,7 +157,7 @@ export function CreatorDetailView({
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <input
-                className="min-w-[16rem] flex-1 rounded-lg border border-kinnso-line px-3 py-1.5 text-sm"
+                className="min-w-[16rem] flex-1 rounded-lg border border-kinnso-edge px-3 py-1.5 text-sm"
                 placeholder={t.notePlaceholder} value={note} onChange={(e) => setNote(e.target.value)}
               />
               <button type="button" className={btn} disabled={busy || note.trim() === ''} onClick={saveNote}>{t.saveNote}</button>
