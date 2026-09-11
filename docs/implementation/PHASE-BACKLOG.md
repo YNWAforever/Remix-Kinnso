@@ -192,7 +192,24 @@ injecting a phantom token and watching it fail. Original description follows.
 `border-kinnso-line` is used in ~20 places; the token does not exist, so under Tailwind v4
 those borders render as nothing. Either define it or sweep the usages.
 
-### B10. 13 of 18 `components/ui` primitives are dead source — **STILL OPEN**
+### B10. `components/ui` primitives — ✅ **FIXED**, and the finding was backwards
+
+Filed as "13 of 18 are dead source, delete them". Verifying first showed the opposite:
+the interesting half is the **five that are NOT dead**. All ten shadcn tokens they style
+themselves through (`primary`, `secondary`, `muted`, `accent`, `destructive`, `popover`,
+`card`, `input`, `ring`, `border`) were undefined, so every primitive the app actually
+imports rendered unstyled — most visibly `EnquiryDialog`'s `<Button>`, which takes no
+className override and therefore had **no background colour** on the contact flow.
+
+Deleting the 13 would have left that live bug untouched. Fixed by defining the ten tokens
+as aliases onto canonical kinnso values, with a test pinning them so they cannot drift.
+
+The 13 unreferenced primitives are now *correctly styled* dead code rather than a trap,
+so removing them is cosmetic and deliberately left alone.
+
+---
+
+### B10 (original, mis-scoped). 13 of 18 `components/ui` primitives are dead source
 
 Untouched by slice S7, which swept `kinnso-*` tokens only. These primitives reference
 *shadcn* CSS variables (`--border`, `--input`, `--ring`…), a separate namespace the new
