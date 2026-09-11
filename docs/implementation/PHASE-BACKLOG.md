@@ -260,7 +260,22 @@ settlement. `/studio/earnings` can therefore show a batch "Paid" beside settleme
 All background work is unawaited in-process promises in a single Hono worker; a redeploy
 strands the row until a 15-minute sweeper marks it failed. Plan §8 (phase 3) depends on this.
 
-### B15. Whole-tree source scans flake in full runs — ⚠️ **PARTIALLY FIXED, root cause NOT addressed**
+### B15. Whole-tree source scans flake in full runs — ✅ **FIXED at the root**
+
+> **Resolved.** The four scanners are now one file, `apps/web/tests/source-contracts.test.ts`,
+> sharing a single walk and a single read of the tree: **~11s of test time down to 253ms**.
+> `media.source-contract`, `product-state.copy-guard` and `design.kinnso-token-coverage` are
+> absorbed; `r7-6-navigation-footer` keeps its locale tests and loses only its scan.
+>
+> Verified non-vacuous: injecting a bad `<img>` and a phantom token fails with
+> `CityChip.tsx:26 native img with empty alt requires aria-hidden` and
+> `kinnso-ghost (e.g. components/kinnso/CityChip.tsx)`, and the restore left zero diff.
+>
+> Known consequence: the twelve absorbed tests changed file path, so their vitest ids
+> changed. Anything keyed on the old ids (a CI retry list, a stored JSON report) needs
+> updating.
+
+#### The original diagnosis, kept because the reasoning matters
 
 **Corrected after measurement.** This was marked FIXED twice and was wrong both times.
 The final full run still failed **four** scans, including `r7-6-navigation-footer` at the

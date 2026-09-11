@@ -243,7 +243,7 @@ supplies the 12-item sidebar; anything not in the sidebar must be linked from a 
 | `/[locale]/admin/merchants/[merchantId]` | ops | proxy + layout + page + `notFound()` on missing detail | `MerchantsDirectoryView.tsx:168`, `AdminUsersView.tsx:109,116` | keep |
 | `/[locale]/admin/missions` | ops | proxy + layout + page | `AdminShell.tsx:14`, `MissionsTabs.tsx:9` | keep |
 | `/[locale]/admin/missions/review` | ops | proxy + layout + page | `MissionsOverviewView.tsx:44` | keep |
-| `/[locale]/admin/missions/[missionId]` | ops | proxy + layout + page + `notFound()` on missing detail | **nothing** | **UNLINKED — gap (F1)** |
+| `/[locale]/admin/missions/[missionId]` | ops | proxy + layout + page + `notFound()` on missing detail | **nothing** | **was UNLINKED (F1) — ✅ fixed**, now linked from `MissionsOverviewView.tsx:82` |
 | `/[locale]/admin/bookings` | ops | proxy + layout + page | `AdminShell.tsx:15` | keep |
 | `/[locale]/admin/perks` | ops | proxy + layout + page | `AdminShell.tsx:16` | keep |
 | `/[locale]/admin/testimonials` | ops | proxy + layout + page | `AdminShell.tsx:17` | keep |
@@ -260,7 +260,15 @@ supplies the 12-item sidebar; anything not in the sidebar must be linked from a 
 
 ## 9. Findings
 
-### F1 — `/[locale]/admin/missions/[missionId]` is reachable by no link
+### F1 — `/[locale]/admin/missions/[missionId]` was reachable by no link — ✅ **FIXED**
+
+> **Resolved after this audit was written.** The at-risk mission title in
+> `MissionsOverviewView.tsx:82` now links to `/{locale}/admin/missions/{id}`, pinned by two
+> assertions in `kinnso.MissionsOverviewView.test.tsx` including the locale prefix. The
+> original finding is kept below because it is what the audit was for, and because the same
+> failure mode (B7) had already occurred twice elsewhere.
+
+#### The original finding
 
 The only references to this path anywhere in `apps/web` are:
 
