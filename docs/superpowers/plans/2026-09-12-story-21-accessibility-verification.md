@@ -18,9 +18,25 @@
 
 All Playwright commands below assume a local Supabase stack is up and `apps/web/.env.local` exists (see `docs/implementation/CURRENT-STATE.md` §4.1). The R7.10 config starts its own `next dev` on port 3100.
 
+**Always pass `--workers=1 --timeout=120000` locally:**
+
 ```bash
-pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts specs/<file>
+cd apps/e2e && npx playwright test --config playwright.r7-10.config.ts specs/<file> --workers=1 --timeout=120000
 ```
+
+This is not optional tuning — without it the results are not readable. `playwright.config.ts`
+sets `fullyParallel: true` with no worker cap, `retries: CI ? 1 : 0` and
+`timeout: CI ? 120_000 : 30_000`. So a local run puts ~6 workers against a single `next dev`
+that compiles routes on demand, with a 30s cap and no retry, while CI gets a dedicated runner,
+120s and one retry.
+
+Measured on this machine: `specs/r7-10-accessibility.spec.ts` fails **5 of 24** at the default
+settings — HTTP 500s on `/en/explore`, `/en/for-merchants`, `/en/creators` and a navigation
+timeout on the article route — and passes **24 of 24 in 46s** with `--workers=1
+--timeout=120000`. None of those five were real defects. Triage in Task 9 is meaningless
+unless the runs are quiet, so use the flags everywhere.
+
+If a new failure appears, re-run that single test with the flags before believing it.
 
 Unit-style tests (no browser) live in Playwright spec files too — they simply never take a `page` fixture. That is the existing convention in `r7-10-accessibility-review.spec.ts`.
 
