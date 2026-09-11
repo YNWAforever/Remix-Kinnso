@@ -141,7 +141,32 @@ redemption scanner from the product.
 
 ## P2 — reproducibility and design-system integrity
 
-### B8. The test suite is not reproducible on Windows — **UNBLOCKED**
+### B8. The test suite is not reproducible on Windows — ✅ **FIXED** (slice S6)
+
+Fixed by adding `.gitattributes` with `* text=auto eol=lf` plus explicit `binary` for the
+3 binary assets. **Zero committed content changed** — all 1566 index entries were already
+`i/lf`; only the *working tree* was CRLF. Verified by all three git comparisons
+(worktree↔index, index↔HEAD, worktree↔HEAD) being empty, and the single staged file being
+`.gitattributes` itself.
+
+**Result: the 11 affected files now pass — 97 tests, 14 failures eliminated.**
+
+Two things worth knowing for anyone repeating this:
+
+- `core.autocrlf=true` here comes from **system** config (the Git-for-Windows installer
+  default), not the user's global or repo config. The `.gitattributes` overrides it for
+  this repository without touching a machine-wide setting, which is why that was the right
+  fix rather than changing config.
+- Converting an *existing* working tree in place leaves the index stat cache stale, so
+  `git status` reports every file modified while `git diff` shows nothing. `git add .`
+  clears it and stages nothing, because there is no content difference. A fresh clone
+  never sees this — checkout applies the attribute directly.
+
+Original description follows.
+
+---
+
+### B8 (original). The test suite is not reproducible on Windows
 
 No `.gitattributes`; with `core.autocrlf=true` the working tree is CRLF while the tests
 assert LF, failing 14 tests across 11 files. Fix: pin `*.sql`, `*.yml`, `*.ts`, `*.tsx` to

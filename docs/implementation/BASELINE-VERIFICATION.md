@@ -13,6 +13,9 @@ exists and not that a build succeeded.
 
 ## 1. Gate results
 
+> **Update after slice S6.** The CRLF class of failure below is resolved; see §3.1.
+> The live-DB class in §3.2 is unchanged and remains unmeasurable on this host.
+
 | Gate | Result | Notes |
 |---|---|---|
 | `pnpm install --frozen-lockfile` | **PASS** | 40.4s |
@@ -68,7 +71,17 @@ production-honesty suites `describe.skip` themselves and **report green while un
 
 ## 3. The 17 pre-existing failures, classified
 
-### 3.1 CRLF line endings — 14 tests across 11 files (environment, Windows-only)
+### 3.1 CRLF line endings — 14 tests across 11 files — ✅ **RESOLVED** (slice S6)
+
+> Resolved by adding `.gitattributes` with `* text=auto eol=lf`. All 11 files now pass
+> (97 tests). No committed content changed — every index entry was already `i/lf`; only
+> the working tree was CRLF. `core.autocrlf=true` turned out to come from **system**
+> config (the Git-for-Windows default) rather than user or repo config, which is exactly
+> why a repository-level `.gitattributes` was the correct fix rather than a config change.
+> The original diagnosis is kept below because the failure mode will recur for anyone
+> checking out on a platform whose defaults differ.
+
+### 3.1 (original diagnosis) CRLF line endings — environment, Windows-only
 
 **Root cause, verified:** `core.autocrlf = true` on this machine and the repository has
 **no `.gitattributes`**. Git blobs are LF; the working tree is CRLF
