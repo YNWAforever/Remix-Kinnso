@@ -64,13 +64,32 @@ test.describe('R7.10 viewports and zoom', () => {
       test.skip(isExcepted(route.id, 'text-200'), 'recorded in A11Y_EXCEPTIONS')
       await page.setViewportSize({ width: 1280, height: 900 })
       await waitForRoute(page, route)
+      await waitForVisualSettlement(page)
+
+      // Baseline first. Some elements are deliberately truncated at EVERY size --
+      // `line-clamp` on card summaries, for instance -- and reporting those would bury
+      // the real signal under intentional design. WCAG 1.4.4 concerns content lost BY
+      // resizing, so only an element that becomes clipped when the text scales counts.
+      const before = await measureTextBoxes(page)
+
       // Models browser text zoom. Applied after load so it cannot affect hydration.
       await page.addStyleTag({ content: 'html { font-size: 200% !important; }' })
       await waitForVisualSettlement(page)
+      const after = await measureTextBoxes(page)
 
-      const boxes = await measureTextBoxes(page)
-      expect(boxes.length, `${route.id} measured no text — selector or route is wrong`).toBeGreaterThan(0)
-      expect(clippedElements(boxes).map((box) => box.label), `${route.id} clips text at 200%`).toEqual([])
+      expect(before.length, `${route.id} measured no text — selector or route is wrong`).toBeGreaterThan(0)
+      // Compared index-by-index, so repeated labels (six `h2.k2-display`, say) cannot
+      // mask each other the way a label set would.
+      expect(after.length, `${route.id} element set changed under zoom; indexes cannot be compared`)
+        .toBe(before.length)
+
+      const clipped = (box: ElementBox) => clippedElements([box]).length > 0
+      const newlyClipped = after
+        .map((box, index) => ({ box, index }))
+        .filter(({ box, index }) => clipped(box) && !clipped(before[index]))
+        .map(({ box }) => box.label)
+
+      expect(newlyClipped, `${route.id} clips text at 200% that was intact at 100%`).toEqual([])
       await assertNoHorizontalOverflow(page)
     })
 
