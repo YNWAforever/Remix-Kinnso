@@ -85,7 +85,11 @@ trustworthy for a task-first UI. This is **slice S2**, the next task in `STATUS.
 save renders nothing at all. The action's message is also untranslated English
 (`formError('Guide could not be saved')`), so even once surfaced it would not be localized.
 
-### B5. A claim's QR is unrecoverable after 5 minutes — **UNBLOCKED (UI part)**
+### B5. A claim's QR is unrecoverable after 5 minutes — **STILL OPEN**
+
+Not addressed by slice S4, which fixed the *claim* failure path, not the
+*post-claim* recovery path. The cookie is still `path: '/'` with a 300s life and
+the raw token is still unrecoverable afterwards.
 
 The raw claim token lives only in a 300-second cookie (`lib/offers/actions.ts:45-52`,
 `path: '/'`), while the claim stays valid until the offer's `valid_to` — possibly weeks.
@@ -95,13 +99,30 @@ Immediately shippable: render the token as selectable text so manual entry works
 scope the cookie to the claim path rather than `/`. The underlying recovery/reissue policy
 needs a schema decision (plan §10.1.2) and is **BLOCKED on a product decision**, not access.
 
-### B6. Broken cache invalidation after redemption — **UNBLOCKED**
+### B6. Broken cache invalidation after redemption — ✅ **FIXED** (slice S4)
+
+Fixed in `fix(web): make the visit loop reachable and stop swallowing claim failures`.
+It was wrong in **three** places, not one: `redeem-actions.ts` plus two in
+`merchants/offers-actions.ts`. All now loop `LOCALES` and revalidate the real
+locale-prefixed routes. Original description follows.
+
+---
+
+### B6 (original). Broken cache invalidation after redemption
 
 `lib/offers/redeem-actions.ts:37` calls `revalidatePath('/merchants/dashboard/offers')`,
 but every real route is `/[locale]/merchants/dashboard/offers`. The revalidated path does
 not exist, so merchants see stale offers.
 
-### B7. `/merchants/dashboard/redeem` and `/offers` are unreachable — **UNBLOCKED**
+### B7. `/merchants/dashboard/redeem` and `/offers` are unreachable — ✅ **FIXED** (slice S4)
+
+Both are now cards on the merchant dashboard home, pinned by a new
+`kinnso.MerchantDashboardHomeView.test.tsx` (the view had no test at all).
+Original description follows.
+
+---
+
+### B7 (original). `/merchants/dashboard/redeem` and `/offers` are unreachable
 
 Neither route is linked from any navigation surface. Merchant staff cannot reach the
 redemption scanner from the product.

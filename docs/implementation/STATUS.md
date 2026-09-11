@@ -153,6 +153,32 @@ mock `@/lib/admin/guard`, matching the `studio.perks` precedent.
 
 **Proof.** 152 files / 870 tests pass across studio, merchant, admin, auth and a11y.
 
+### Phase 1 — slice S4: make the visit loop reachable and honest
+
+Three defects in the R12.0 visit loop.
+
+1. **`/merchants/dashboard/offers` and `/merchants/dashboard/redeem` were linked from no
+   navigation surface at all.** The dashboard home renders a fixed eight-card grid and
+   neither route was in it, so merchant staff could not reach the in-store redemption
+   scanner from the product — the visit loop was completable only by typing the URL.
+2. **`OfferClaimCard` silently swallowed every failed claim.** The handler had no `else`
+   branch: cap reached, already claimed and no-longer-live all rendered nothing, so the
+   button appeared to stop responding. It now states the outcome in a `role="alert"`.
+   The *reason* stays server-side — it would leak another visitor's claim state and the
+   merchant's remaining capacity — and a failed claim still records no `offer_claimed`
+   event, which is asserted.
+3. **`revalidatePath` was unlocalized in three places**, not one (`redeem-actions.ts`
+   plus two in `merchants/offers-actions.ts`). Every real route is
+   `/[locale]/merchants/dashboard/offers`, so it matched no cache entry and merchants saw
+   a stale offer list after a redemption or an offer edit.
+
+**i18n cost, as predicted by B14.** Five keys × 7 locales. They are inserted after a
+stable anchor because `i18n.locale-parity.test.ts` compares key-path **arrays** with
+`toEqual` — position matters, not just presence.
+
+**Proof.** 58 tests across `OfferClaimCard`, the new `MerchantDashboardHomeView` suite
+(the view had none), locale parity, offers actions and the merchant post host.
+
 ---
 
 ## Not done / explicitly out of scope this session
@@ -172,22 +198,19 @@ mock `@/lib/admin/guard`, matching the `studio.perks` precedent.
 
 ## Next task (concrete)
 
-**Slice S4 — surface the two dark visit-loop routes and stop swallowing failures.**
-`/merchants/dashboard/redeem` and `/merchants/dashboard/offers` are **not linked from any
-navigation surface**, so merchant staff cannot reach the redemption scanner from the
-product at all. In the same area, `OfferClaimCard` renders nothing when a claim fails
-(cap reached / already claimed / not live all look identical), and
-`lib/offers/redeem-actions.ts:37` revalidates the unlocalized
-`/merchants/dashboard/offers`, which is not a real route — so merchants see stale offers
-after a redemption.
+**Slice S5 — B4: stop swallowing save failures.** `GuideSaveButton` and
+`ExperienceSaveButton` only mutate state when `result.ok`, so a failed save renders
+nothing at all — the same class of defect S4 just fixed on the claim path, and it pairs
+directly with the S1 work already landed on those two components. The action's message is
+also untranslated English (`formError('Guide could not be saved')`), so surfacing it
+as-is would show English to every locale; budget the 7-locale key cost.
 
-All three are local, bounded and testable, and the live offer suites
-(`offers.rls.test.ts`, `offers-attribution.rls.test.ts`) already exist to verify against —
-though see `BASELINE-VERIFICATION.md` §3.2 before trusting a live-DB run on this machine.
+After that, **B8** (`.gitattributes`, `eol=lf`) is the highest-leverage remaining item,
+because it is what makes the test suite reproducible on Windows at all — 14 of the
+remaining failures are line-ending artifacts. It **must be its own PR**: it rewrites line
+endings repo-wide and would otherwise bury a feature diff.
 
-Then **B4** (save failures are silently swallowed and untranslated), which pairs naturally
-with the S1 work already landed.
-
-See `PHASE-BACKLOG.md` for the ranked remainder. The highest-severity finding overall
-remains the **ops-member deletion bug** (`BASELINE-VERIFICATION.md` §3.3) — it needs a
-migration and a product decision about mission ownership, and is *not* a frontend concern.
+The highest-severity finding overall remains the **ops-member deletion bug**
+(`BASELINE-VERIFICATION.md` §3.3) — it needs a migration and a product decision about
+mission ownership, and is *not* a frontend concern. See `PHASE-BACKLOG.md` for the ranked
+remainder.
