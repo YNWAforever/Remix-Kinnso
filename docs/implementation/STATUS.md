@@ -115,6 +115,44 @@ so this is also a small localization improvement.
 New cases assert `/explore` propagates **both** read failures, that a genuinely empty
 catalogue still renders as empty, and that the homepage still degrades *and logs*.
 
+### Phase 1 — slice S3: converge role gates on the central guards
+
+**The defect.** 43 role-scoped pages already used
+`requireOpsPage` / `requireMerchantPage` / `requireCreatorPage`. **Ten
+re-implemented the check** with a bare `auth.getUser()`, so what a route meant by
+"creator" or "merchant" varied per file — and a task-first UI cannot be built on a role it
+cannot trust.
+
+| Route | Was | Now |
+|---|---|---|
+| `merchants/dashboard/post` | **no gate at all** beyond `isLocale`, and **no test** | `requireMerchantPage` + 6 host tests |
+| `merchants/dashboard/missions` | non-merchant saw the merchant UI with an empty list | 404, like every sibling |
+| `merchants/dashboard/bookings`, `missions/[missionId]` | extra `getMerchantProfile` round trip | id taken from the authorization context |
+| `studio/guides/{,new,[id]/edit}`, `studio/sessions/{,new,[id]/edit}` | any signed-in user | active creator, else → `/creator` |
+
+**Scope the `post` finding accurately: it was never privilege escalation.** The proxy
+gates the `/merchants/dashboard` prefix for anonymous visitors, and
+`createMissionAction` (`lib/missions/actions.ts:225-239`) independently re-derives
+authority. The real defect was role consistency — a traveller or creator was served the
+merchant brief wizard and only discovered it was not for them at submit time.
+
+`requireCreatorPage` gained a third denial mode, `'creator'` → redirect to `/creator`.
+That **preserves** `studio/guides/new`'s existing behaviour rather than flattening it to a
+404: every sign-up gets a blank `creators` row, so a session alone is not a creator, and
+404ing someone mid-application strands them behind a page they are entitled to reach. The
+guard's own docblock says it exists to preserve per-page behaviour rather than unify it.
+
+**Deliberately not changed** — these are intentional, not holes:
+`studio/scan` (documented anon→demo path behind a `demoBanner`, pinned by a test);
+`studio/page.tsx` (a role-routing hub); `creator/page.tsx` and `ops/accept-invite`
+(reached by people legitimately not yet that role).
+
+Three host tests mocked the raw Supabase client, which fed the guard's role lookups from a
+single `maybeSingle` stub and made each page's gate depend on its content fixture. They now
+mock `@/lib/admin/guard`, matching the `studio.perks` precedent.
+
+**Proof.** 152 files / 870 tests pass across studio, merchant, admin, auth and a11y.
+
 ---
 
 ## Not done / explicitly out of scope this session
@@ -134,19 +172,22 @@ catalogue still renders as empty, and that the homepage still degrades *and logs
 
 ## Next task (concrete)
 
-**Slice S2 — close the page-gate holes**, so any task-first UI can trust the role it is
-handed. Verified during inventory:
+**Slice S4 — surface the two dark visit-loop routes and stop swallowing failures.**
+`/merchants/dashboard/redeem` and `/merchants/dashboard/offers` are **not linked from any
+navigation surface**, so merchant staff cannot reach the redemption scanner from the
+product at all. In the same area, `OfferClaimCard` renders nothing when a claim fails
+(cap reached / already claimed / not live all look identical), and
+`lib/offers/redeem-actions.ts:37` revalidates the unlocalized
+`/merchants/dashboard/offers`, which is not a real route — so merchants see stale offers
+after a redemption.
 
-- `app/[locale]/merchants/dashboard/post/page.tsx` has **no page-level gate at all** and
-  is reachable by any signed-in user.
-- Five further role-scoped routes use ad-hoc `supabase.auth.getUser()` instead of the
-  central guards: `studio/guides`, `studio/sessions`, `studio/scan`,
-  `merchants/dashboard/missions`, `merchants/dashboard/bookings`.
+All three are local, bounded and testable, and the live offer suites
+(`offers.rls.test.ts`, `offers-attribution.rls.test.ts`) already exist to verify against —
+though see `BASELINE-VERIFICATION.md` §3.2 before trusting a live-DB run on this machine.
 
-Bind them to `requireMerchantPage` / `requireCreatorPage` in `lib/admin/guard.ts`, using
-`tests/admin.guard.test.ts` as the established mocking pattern. Small, fully local,
-directly testable.
+Then **B4** (save failures are silently swallowed and untranslated), which pairs naturally
+with the S1 work already landed.
 
-See `PHASE-BACKLOG.md` for the ranked remainder, including the **ops-member deletion
-bug** (`BASELINE-VERIFICATION.md` §3.3), which is the highest-severity finding of Phase 0
-and is *not* a frontend concern.
+See `PHASE-BACKLOG.md` for the ranked remainder. The highest-severity finding overall
+remains the **ops-member deletion bug** (`BASELINE-VERIFICATION.md` §3.3) — it needs a
+migration and a product decision about mission ownership, and is *not* a frontend concern.

@@ -48,7 +48,15 @@ rethrow-except-`PGRST205` contract to converge on.
 Directly contradicts plan stories **#2** (absent destination → true empty, distinguish an
 API failure) and **#18** (a failed live search stays an error, never a false empty).
 
-### B3. `merchants/dashboard/post` has no page gate — **UNBLOCKED**
+### B3. `merchants/dashboard/post` has no page gate — ✅ **FIXED** (slice S3)
+
+Fixed in `refactor(web): converge role-scoped pages on the central page guards`, together
+with the nine other role-scoped routes that re-implemented their own check. Original
+description follows.
+
+---
+
+### B3 (original). `merchants/dashboard/post` has no page gate
 
 `app/[locale]/merchants/dashboard/post/page.tsx:12-23` checks only `isLocale`. There is no
 `requireMerchantPage` call.
