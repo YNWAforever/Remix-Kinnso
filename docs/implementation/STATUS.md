@@ -341,9 +341,46 @@ revisions (`head_revision_no` is ungrantable precisely so they must exist), plus
 authenticated trip page. That is the smallest change that turns a proven schema into
 something a traveller can use.
 
-Before it, one blocking prerequisite: **`packages/db` types do not know the `trip_*`
-tables**, which is why the new suite uses untyped clients. Regeneration must use `--local`,
-not the `--linked` script — this session has no production access.
+That prerequisite is **now cleared**: the `trip_*` definitions are in `packages/db`, and the
+isolation suite uses typed clients, which is what proves the types are usable rather than
+merely well-formed.
+
+### How the types got there, and a finding worth acting on
+
+`packages/db`'s own `gen` script is `supabase gen types typescript --linked` — it reads
+**production**. A full regeneration was run against the local stack (`--db-url`) and then
+**rejected**, for two separate reasons found by diffing rather than by assuming:
+
+1. **The current CLI changed how it emits function arguments.** It writes optional args
+   (`p_reason_category?: string`) where the committed file has nullable ones
+   (`p_reason_category: string | null`). That is not cosmetic: over PostgREST an *omitted*
+   argument takes the SQL `DEFAULT`, while a *null* argument passes NULL. Adopting it broke
+   28 call sites across payouts, missions and offers, each of which would have had to swap
+   `null` for `undefined`. That is a change to backend business rules, not a type refresh.
+2. **The committed types lag the repo's own migrations.** The local-generated file gained
+   `creator_payout_batches`, `creator_payout_decisions`, `creator_payout_settings` and
+   `traveller_analytics_ip_rate_limits`. All four are created by migrations in this repo
+   (`20260816090000_r10_2_*`, `20260805120000_analytics_ip_rate_limit`), yet the committed
+   file — which is generated from production — does not contain them.
+
+   **What that means was not determined, and should not be guessed:** either production is
+   behind these migrations, or `types.ts` was simply generated before they landed. This
+   session has no production access, so it cannot tell which, and did not try. The one
+   related fact already in the repo is the committed file's own hand-maintained
+   `notifications` block, whose comment states R10.3's table "only exists on this branch's
+   unmerged migrations" — evidence for the first reading in that one case, not proof for the
+   other four.
+
+So only the eight Phase 2 definitions were grafted in, verified by set-comparison before and
+after: **71 tables, 3 views, 98 functions, zero lost.** The graft is commented at its
+insertion point.
+
+**Open item for the owner (not actionable here):** whichever reading is right, running
+`pnpm --filter @kinnso/db gen` today would *remove* type definitions for tables this repo's
+migrations create, and would rewrite every RPC argument from nullable to optional. The
+script is therefore not safe to run casually. Whether it should target a local stack, or
+only be run after production is migrated, depends on which schema is canonical — a decision
+for the owner, not one to invent here.
 
 The highest-severity finding overall remains the **ops-member deletion bug**
 (`BASELINE-VERIFICATION.md` §3.3) — a `DELETE` on `kinnso_ops_members` aborts with a check

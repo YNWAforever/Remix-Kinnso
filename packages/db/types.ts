@@ -3144,6 +3144,291 @@ export type Database = {
         }
         Relationships: []
       }
+      // --- Phase 2 slice 0 (personal trips) -------------------------------
+      // Hand-grafted from `supabase gen types typescript --db-url <local>`.
+      // NOT from the package `gen` script: that reads production via --linked,
+      // which does not have these tables. A full regeneration was attempted and
+      // rejected -- the current CLI emits optional args (`p_x?: string`) where
+      // this file has nullable ones (`p_x: string | null`), which would force 28
+      // call sites across payouts/missions/offers to swap `null` for `undefined`.
+      // Those are not equivalent over PostgREST: an omitted arg takes the SQL
+      // DEFAULT, a null arg passes NULL. See docs/implementation/STATUS.md.
+      places: {
+        Row: {
+          country_code: string | null
+          created_at: string
+          created_by_user_id: string | null
+          destination_id: string | null
+          formatted_address: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          provider: string
+          provider_place_id: string | null
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          destination_id?: string | null
+          formatted_address?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          provider?: string
+          provider_place_id?: string | null
+          status?: string
+          timezone: string
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          destination_id?: string | null
+          formatted_address?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          provider?: string
+          provider_place_id?: string | null
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "places_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          created_at: string
+          destination_id: string | null
+          head_revision_no: number
+          id: string
+          owner_user_id: string
+          start_date: string | null
+          status: string
+          timezone: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          destination_id?: string | null
+          head_revision_no?: number
+          id?: string
+          owner_user_id: string
+          start_date?: string | null
+          status?: string
+          timezone?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          destination_id?: string | null
+          head_revision_no?: number
+          id?: string
+          owner_user_id?: string
+          start_date?: string | null
+          status?: string
+          timezone?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_days: {
+        Row: {
+          created_at: string
+          day_offset: number
+          id: string
+          title: string | null
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_offset: number
+          id?: string
+          title?: string | null
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_offset?: number
+          id?: string
+          title?: string | null
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_days_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_stops: {
+        Row: {
+          adopted_at: string | null
+          copied_note: string | null
+          copied_title: string | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          origin: string
+          place_id: string | null
+          position: number
+          source_creator_handle: string | null
+          source_creator_id: string | null
+          source_creator_name: string | null
+          source_guide_id: string | null
+          source_guide_slug: string | null
+          source_withdrawn_at: string | null
+          start_minute_of_day: number | null
+          title: string
+          traveller_note: string | null
+          trip_day_id: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          adopted_at?: string | null
+          copied_note?: string | null
+          copied_title?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          origin?: string
+          place_id?: string | null
+          position: number
+          source_creator_handle?: string | null
+          source_creator_id?: string | null
+          source_creator_name?: string | null
+          source_guide_id?: string | null
+          source_guide_slug?: string | null
+          source_withdrawn_at?: string | null
+          start_minute_of_day?: number | null
+          title: string
+          traveller_note?: string | null
+          trip_day_id: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          adopted_at?: string | null
+          copied_note?: string | null
+          copied_title?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          origin?: string
+          place_id?: string | null
+          position?: number
+          source_creator_handle?: string | null
+          source_creator_id?: string | null
+          source_creator_name?: string | null
+          source_guide_id?: string | null
+          source_guide_slug?: string | null
+          source_withdrawn_at?: string | null
+          start_minute_of_day?: number | null
+          title?: string
+          traveller_note?: string | null
+          trip_day_id?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_stops_day_same_trip"
+            columns: ["trip_day_id", "trip_id"]
+            isOneToOne: false
+            referencedRelation: "trip_days"
+            referencedColumns: ["id", "trip_id"]
+          },
+          {
+            foreignKeyName: "trip_stops_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_stops_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_revisions: {
+        Row: {
+          author_user_id: string | null
+          change_kind: string
+          created_at: string
+          id: string
+          parent_revision_no: number | null
+          revision_no: number
+          summary: Json
+          trip_id: string
+        }
+        Insert: {
+          author_user_id?: string | null
+          change_kind: string
+          created_at?: string
+          id?: string
+          parent_revision_no?: number | null
+          revision_no: number
+          summary?: Json
+          trip_id: string
+        }
+        Update: {
+          author_user_id?: string | null
+          change_kind?: string
+          created_at?: string
+          id?: string
+          parent_revision_no?: number | null
+          revision_no?: number
+          summary?: Json
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_revisions_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       destination_index: {
@@ -3192,6 +3477,54 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      trip_stops_resolved: {
+        Row: {
+          day_offset: number | null
+          dst_anomaly: boolean | null
+          duration_minutes: number | null
+          ends_at: string | null
+          id: string | null
+          origin: string | null
+          place_id: string | null
+          position: number | null
+          source_creator_handle: string | null
+          source_creator_name: string | null
+          source_guide_id: string | null
+          source_guide_slug: string | null
+          source_withdrawn_at: string | null
+          start_date: string | null
+          start_minute_of_day: number | null
+          starts_at: string | null
+          timezone: string | null
+          title: string | null
+          traveller_note: string | null
+          trip_day_id: string | null
+          trip_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_stops_day_same_trip"
+            columns: ["trip_day_id", "trip_id"]
+            isOneToOne: false
+            referencedRelation: "trip_days"
+            referencedColumns: ["id", "trip_id"]
+          },
+          {
+            foreignKeyName: "trip_stops_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_stops_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -3768,6 +4101,29 @@ export type Database = {
           p_proof_urls: string[]
         }
         Returns: Json
+      }
+      trip_stop_starts_at: {
+        Args: {
+          p_day_offset: number
+          p_start_date: string
+          p_start_minute: number
+          p_timezone: string
+        }
+        Returns: string
+      }
+      upsert_place: {
+        Args: {
+          p_country_code?: string
+          p_destination_id?: string
+          p_formatted_address?: string
+          p_lat?: number
+          p_lng?: number
+          p_name: string
+          p_provider?: string
+          p_provider_place_id?: string
+          p_timezone: string
+        }
+        Returns: string
       }
     }
     Enums: {

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@kinnso/db'
 import { resolveR73LocalLiveConfig } from './helpers/r7-3-local-live-config'
 
 /**
@@ -19,17 +20,19 @@ import { resolveR73LocalLiveConfig } from './helpers/r7-3-local-live-config'
  * generic Supabase credentials never construct a client, and the resolver
  * requires a loopback URL, so this can never point at a hosted project.
  *
- * The @kinnso/db generated types do not know these tables yet (regeneration
- * needs a linked remote this session cannot reach), so the clients here are
- * deliberately untyped -- a typing gap, not a coverage gap.
+ * The clients are typed: the trip_* definitions were grafted into @kinnso/db
+ * from a local `gen types --db-url` run, because the package's own `gen` script
+ * reads production via --linked and production does not have these tables.
+ * Typing this suite is what proves the graft is usable rather than merely
+ * well-formed.
  */
 
 const liveConfig = resolveR73LocalLiveConfig(process.env)
 const d = liveConfig ? describe : describe.skip
 const hookTimeout = 60000
 
-const svc = liveConfig ? createClient(liveConfig.url, liveConfig.serviceRoleKey) : null
-const anon = liveConfig ? createClient(liveConfig.url, liveConfig.anonKey) : null
+const svc = liveConfig ? createClient<Database>(liveConfig.url, liveConfig.serviceRoleKey) : null
+const anon = liveConfig ? createClient<Database>(liveConfig.url, liveConfig.anonKey) : null
 
 const password = 'Test1234!p20'
 
@@ -37,7 +40,7 @@ async function signedInClient(email: string) {
   if (!liveConfig || !svc) throw new Error('local live-test config is not enabled')
   const { error: createError } = await svc.auth.admin.createUser({ email, password, email_confirm: true })
   expect(createError, `createUser failed for ${email}: ${createError?.message}`).toBeNull()
-  const client = createClient(liveConfig.url, liveConfig.anonKey)
+  const client = createClient<Database>(liveConfig.url, liveConfig.anonKey)
   const { error } = await client.auth.signInWithPassword({ email, password })
   expect(error, `sign-in failed for ${email}: ${error?.message}`).toBeNull()
   return client
@@ -120,12 +123,24 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
   })
 
   it('refuses an anonymous caller at the privilege layer, not merely with an empty set', async () => {
-    // No anon GRANT and no anon POLICY on any trip_* table: PostgREST fails
+    // No anon GRANT and no anon POLICY on any trip_* relation: PostgREST fails
     // before RLS is ever consulted, which is why this is an error and not [].
-    for (const table of ['trips', 'trip_days', 'trip_stops', 'trip_revisions', 'trip_stops_resolved']) {
-      const { data, error } = await anon!.from(table).select('id').limit(1)
-      expect(data ?? [], `${table} leaked rows to anon`).toEqual([])
-      expect(error, `${table} answered anon without an error`).not.toBeNull()
+    //
+    // Written as closures rather than a loop over relation names: `from()` over
+    // a union widens the query builder past any single overload, and casting
+    // the client back to `any` to get a loop would discard the typing this
+    // suite exists to exercise.
+    const probes = [
+      { name: 'trips', run: () => anon!.from('trips').select('id').limit(1) },
+      { name: 'trip_days', run: () => anon!.from('trip_days').select('id').limit(1) },
+      { name: 'trip_stops', run: () => anon!.from('trip_stops').select('id').limit(1) },
+      { name: 'trip_revisions', run: () => anon!.from('trip_revisions').select('id').limit(1) },
+      { name: 'trip_stops_resolved', run: () => anon!.from('trip_stops_resolved').select('id').limit(1) },
+    ]
+    for (const probe of probes) {
+      const { data, error } = await probe.run()
+      expect(data ?? [], `${probe.name} leaked rows to anon`).toEqual([])
+      expect(error, `${probe.name} answered anon without an error`).not.toBeNull()
     }
   })
 
