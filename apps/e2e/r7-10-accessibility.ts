@@ -330,3 +330,41 @@ export function firstHeadingOrderViolation(levels: readonly number[]): string | 
 
   return undefined
 }
+
+export interface ElementBox {
+  label: string
+  scrollWidth: number
+  clientWidth: number
+  scrollHeight: number
+  clientHeight: number
+}
+
+/**
+ * Elements whose content is cut off by their own box. The 1px tolerance absorbs
+ * sub-pixel layout rounding, which otherwise flags every second text node at scaled
+ * font sizes and makes the check useless.
+ */
+export function clippedElements(boxes: readonly ElementBox[], tolerance = 1): ElementBox[] {
+  return boxes.filter((box) => (
+    box.scrollWidth > box.clientWidth + tolerance
+    || box.scrollHeight > box.clientHeight + tolerance
+  ))
+}
+
+/**
+ * Interactive elements a keyboard user must be able to reach. Excludes disabled and
+ * aria-hidden nodes; the specs additionally drop anything with a zero-area box, which
+ * cannot be expressed in a selector.
+ */
+export const INTERACTIVE_SELECTOR = [
+  'a[href]',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  '[tabindex]:not([tabindex="-1"])',
+  '[role="button"]',
+  '[role="link"]',
+]
+  .map((selector) => `${selector}:not([disabled]):not([aria-hidden="true"])`)
+  .join(', ')

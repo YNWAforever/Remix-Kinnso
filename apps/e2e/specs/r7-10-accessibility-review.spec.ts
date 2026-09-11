@@ -2,12 +2,14 @@ import { expect, test } from '@playwright/test'
 import {
   A11Y_EXCEPTIONS,
   calculateCLS,
+  clippedElements,
   firstHeadingOrderViolation,
   formatAxeViolations,
   hasMeaningfulFocusIndicator,
   installLayoutShiftObserver,
   isExcepted,
   readCLS,
+  type ElementBox,
   type FocusStyleSnapshot,
 } from '../r7-10-accessibility'
 
@@ -107,4 +109,15 @@ test('heading order rejects a skipped level and accepts a legal descent', () => 
   // Descending by more than one is legal: a section ending returns to any shallower level.
   expect(firstHeadingOrderViolation([1, 2, 3, 1])).toBeUndefined()
   expect(firstHeadingOrderViolation([])).toBeUndefined()
+})
+
+test('clipping tolerates one sub-pixel rounding pixel but not real overflow', () => {
+  const boxes: ElementBox[] = [
+    { label: 'p.fits', scrollWidth: 300, clientWidth: 300, scrollHeight: 40, clientHeight: 40 },
+    { label: 'p.rounding', scrollWidth: 301, clientWidth: 300, scrollHeight: 40, clientHeight: 40 },
+    { label: 'p.cut-horizontally', scrollWidth: 420, clientWidth: 300, scrollHeight: 40, clientHeight: 40 },
+    { label: 'p.cut-vertically', scrollWidth: 300, clientWidth: 300, scrollHeight: 96, clientHeight: 40 },
+  ]
+
+  expect(clippedElements(boxes).map((box) => box.label)).toEqual(['p.cut-horizontally', 'p.cut-vertically'])
 })
