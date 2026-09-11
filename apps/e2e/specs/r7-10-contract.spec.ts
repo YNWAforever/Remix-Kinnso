@@ -1,3 +1,4 @@
+import { readdir } from 'node:fs/promises'
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import {
@@ -5,6 +6,7 @@ import {
   formatAxeViolations,
   unapprovedViolations,
 } from '../r7-10-accessibility'
+import { R7_10_OFF_SPECS, R7_10_PREVIEW_SPECS } from '../r7-10-specs'
 import { R7_10_ROUTES } from '../r7-10-routes'
 
 test('R7.10 route manifest declares the exact browser coverage contract', () => {
@@ -64,4 +66,18 @@ test('R7.10 axe helpers accept direct axe results', () => {
   const axeViolations = [] as AxeViolations
 
   expect(unapprovedViolations('home', axeViolations)).toEqual([])
+})
+
+// A spec file that no config selects runs nowhere and protects nothing. That has
+// already happened here once: r7-10-accessibility-review.spec.ts matched only the
+// default config, which nothing runs any more. This makes it a failure, not a silence.
+test('every R7.10 spec on disk is selected by a config', async () => {
+  const names = (await readdir(new URL('.', import.meta.url)))
+    .filter((name) => /^r7-10-.*\.spec\.ts$/.test(name))
+    .sort()
+
+  expect(names.length, 'scan matched nothing — glob or path is wrong').toBeGreaterThan(3)
+
+  const registered = new Set<string>([...R7_10_OFF_SPECS, ...R7_10_PREVIEW_SPECS])
+  expect(names.filter((name) => !registered.has(name))).toEqual([])
 })
