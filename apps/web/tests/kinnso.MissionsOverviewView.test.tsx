@@ -88,4 +88,44 @@ describe('MissionsOverviewView', () => {
     expect(screen.getByText('Overdue Kyoto Push')).toBeTruthy()
     expect(screen.queryByText(t.attentionOverdueEmpty)).toBeNull()
   })
+
+  // /admin/missions/[missionId] was reachable by no link anywhere in the product,
+  // even though mission-review-actions revalidates it after every decision: ops
+  // could act on a submission but never open the mission it belonged to. The
+  // at-risk list is the way in, so the link is pinned here.
+  it('links each at-risk mission to its own detail page', () => {
+    render(
+      <MissionsOverviewView
+        t={t}
+        locale="en"
+        overview={{
+          kpis: { total: 6, byStatus: { published: 4 }, byType: {}, byVisibility: {}, openForApplications: 4, submissionsAwaitingReview: 2 },
+          missionsCreated: [], submissionsReviewed: [],
+          atRisk: [{ id: 'm1', title: 'Tokyo Winter Stays Showcase', merchantName: 'Sunrise Stays HK', reason: 'stalled_submissions' }],
+        }}
+        attention={{ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] }}
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Tokyo Winter Stays Showcase' })
+    expect(link.getAttribute('href')).toBe('/en/admin/missions/m1')
+  })
+
+  it('prefixes the at-risk detail link with the active locale', () => {
+    render(
+      <MissionsOverviewView
+        t={t}
+        locale="zh-hk"
+        overview={{
+          kpis: { total: 1, byStatus: {}, byType: {}, byVisibility: {}, openForApplications: 0, submissionsAwaitingReview: 0 },
+          missionsCreated: [], submissionsReviewed: [],
+          atRisk: [{ id: 'm2', title: 'Osaka Ramen Trail', merchantName: null, reason: 'stalled_submissions' }],
+        }}
+        attention={{ overdueReviews: [], atRiskMissions: [], redemptionVelocity: [] }}
+      />,
+    )
+
+    expect(screen.getByRole('link', { name: 'Osaka Ramen Trail' }).getAttribute('href'))
+      .toBe('/zh-hk/admin/missions/m2')
+  })
 })
