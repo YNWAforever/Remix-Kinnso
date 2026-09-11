@@ -310,3 +310,23 @@ export function isExcepted(
 ): boolean {
   return exceptions.some((entry) => entry.routeId === routeId && entry.check === check)
 }
+
+/**
+ * Returns a description of the first heading-order violation, or undefined if the
+ * sequence is legal. Skipping DOWN a level (h2 -> h4) hides structure from a screen
+ * reader; jumping back UP any distance (h3 -> h1) is a section ending and is fine.
+ */
+export function firstHeadingOrderViolation(levels: readonly number[]): string | undefined {
+  let previous = 0
+
+  for (const [index, level] of levels.entries()) {
+    if (previous === 0) {
+      if (level !== 1) return `first heading is h${level} at position ${index + 1}; the page must start at h1`
+    } else if (level > previous + 1) {
+      return `h${previous} is followed by h${level} at position ${index + 1}; levels must not skip`
+    }
+    previous = level
+  }
+
+  return undefined
+}

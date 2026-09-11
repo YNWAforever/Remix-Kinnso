@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import {
   A11Y_EXCEPTIONS,
   calculateCLS,
+  firstHeadingOrderViolation,
   formatAxeViolations,
   hasMeaningfulFocusIndicator,
   installLayoutShiftObserver,
@@ -97,4 +98,13 @@ test('a11y ledger defaults to the real list when none is passed', () => {
   expect(isExcepted('home', 'reflow-320')).toBe(A11Y_EXCEPTIONS.some(
     (entry) => entry.routeId === 'home' && entry.check === 'reflow-320',
   ))
+})
+
+test('heading order rejects a skipped level and accepts a legal descent', () => {
+  expect(firstHeadingOrderViolation([1, 2, 3, 2, 3])).toBeUndefined()
+  expect(firstHeadingOrderViolation([1, 2, 4])).toBe('h2 is followed by h4 at position 3; levels must not skip')
+  expect(firstHeadingOrderViolation([2, 3])).toBe('first heading is h2 at position 1; the page must start at h1')
+  // Descending by more than one is legal: a section ending returns to any shallower level.
+  expect(firstHeadingOrderViolation([1, 2, 3, 1])).toBeUndefined()
+  expect(firstHeadingOrderViolation([])).toBeUndefined()
 })
