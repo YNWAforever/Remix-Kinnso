@@ -75,7 +75,7 @@ export function StudioDashboardView(props: StudioDashboardViewProps) {
         {/* 2b. The single next step. The checklist below says what is outstanding;
             this says which one to do first — and ranks earning above the rest,
             because that is what the contribution weights already imply. */}
-        <section aria-labelledby="studio-next-step" className="rounded-2xl border border-kinnso-line bg-white p-5">
+        <section aria-labelledby="studio-next-step" className="rounded-2xl border border-kinnso-edge bg-white p-5">
           <h2 id="studio-next-step" className="text-sm font-bold uppercase tracking-wide text-kinnso-muted">
             {t.nextActionHeading}
           </h2>

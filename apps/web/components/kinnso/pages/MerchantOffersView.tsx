@@ -49,39 +49,39 @@ export function MerchantOffersView({
         {summary.totalClaimed} {t.totalClaimed} · {summary.totalRedeemed} {t.totalRedeemed}
       </p>
       <section className="mt-6 max-w-lg">
-        <input className="w-full rounded border border-kinnso-line p-2" placeholder={t.fieldTitle}
+        <input className="w-full rounded border border-kinnso-edge p-2" placeholder={t.fieldTitle}
           value={input.title} onChange={(e) => setInput({ ...input, title: e.target.value })} />
-        <input className="mt-2 w-full rounded border border-kinnso-line p-2" placeholder={t.fieldTerms}
+        <input className="mt-2 w-full rounded border border-kinnso-edge p-2" placeholder={t.fieldTerms}
           value={input.terms} onChange={(e) => setInput({ ...input, terms: e.target.value })} />
         <div className="mt-2 flex gap-2">
-          <select className="rounded border border-kinnso-line p-2" value={input.discountKind}
+          <select className="rounded border border-kinnso-edge p-2" value={input.discountKind}
             onChange={(e) => setInput({ ...input, discountKind: e.target.value as OfferInput['discountKind'] })}>
             <option value="item">{t.discountItem}</option>
             <option value="percent">{t.discountPercent}</option>
             <option value="amount">{t.discountAmount}</option>
           </select>
-          <input className="w-24 rounded border border-kinnso-line p-2" placeholder={t.fieldValue}
+          <input className="w-24 rounded border border-kinnso-edge p-2" placeholder={t.fieldValue}
             value={input.discountValue} onChange={(e) => setInput({ ...input, discountValue: e.target.value })} />
         </div>
         <div className="mt-2 flex gap-2">
-          <select className="rounded border border-kinnso-line p-2" value={input.commissionKind}
+          <select className="rounded border border-kinnso-edge p-2" value={input.commissionKind}
             onChange={(e) => setInput({ ...input, commissionKind: e.target.value as OfferInput['commissionKind'] })}>
             <option value="flat">{t.commissionFlat}</option>
             <option value="percent">{t.commissionPercent}</option>
           </select>
-          <input className="w-24 rounded border border-kinnso-line p-2" placeholder={t.fieldValue}
+          <input className="w-24 rounded border border-kinnso-edge p-2" placeholder={t.fieldValue}
             value={input.commissionValue} onChange={(e) => setInput({ ...input, commissionValue: e.target.value })} />
         </div>
         <div className="mt-2 flex gap-2">
-          <input type="datetime-local" className="rounded border border-kinnso-line p-2"
+          <input type="datetime-local" className="rounded border border-kinnso-edge p-2"
             value={input.validFrom} onChange={(e) => setInput({ ...input, validFrom: e.target.value })} />
-          <input type="datetime-local" className="rounded border border-kinnso-line p-2"
+          <input type="datetime-local" className="rounded border border-kinnso-edge p-2"
             value={input.validTo} onChange={(e) => setInput({ ...input, validTo: e.target.value })} />
         </div>
         <div className="mt-2 flex gap-2">
-          <input className="w-32 rounded border border-kinnso-line p-2" placeholder={t.fieldPerVisitorLimit}
+          <input className="w-32 rounded border border-kinnso-edge p-2" placeholder={t.fieldPerVisitorLimit}
             value={input.perVisitorLimit} onChange={(e) => setInput({ ...input, perVisitorLimit: e.target.value })} />
-          <input className="w-32 rounded border border-kinnso-line p-2" placeholder={t.fieldTotalCap}
+          <input className="w-32 rounded border border-kinnso-edge p-2" placeholder={t.fieldTotalCap}
             value={input.totalCap} onChange={(e) => setInput({ ...input, totalCap: e.target.value })} />
         </div>
         {formError ? <p className="mt-2 text-sm text-red-600">{formError}</p> : null}
@@ -95,7 +95,7 @@ export function MerchantOffersView({
         <h2 className="text-lg font-bold text-kinnso-ink">{t.yourOffers}</h2>
         <div className="mt-3 grid gap-3">
           {offers.map((offer) => (
-            <div key={offer.id} className="rounded-lg border border-kinnso-line p-4">
+            <div key={offer.id} className="rounded-lg border border-kinnso-edge p-4">
               <p className="font-bold text-kinnso-ink">{offer.title}</p>
               <p className="text-sm text-kinnso-muted">{offer.status} · {offer.claimedCount} {t.claimed} · {offer.redeemedCount} {t.redeemed}</p>
               <div className="mt-2 flex gap-2 text-sm">

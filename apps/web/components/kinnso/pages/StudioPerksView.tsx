@@ -36,7 +36,7 @@ function Reveal({ t, value, type }: { t: Messages['perks']['catalog']; value: st
   return (
     <div className="mt-3 flex items-center gap-2">
       <code className="rounded bg-kinnso-cream2 px-3 py-1 font-mono text-kinnso-ink">{value}</code>
-      <button onClick={copy} className="rounded-full border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink">
+      <button onClick={copy} className="rounded-full border border-kinnso-edge px-3 py-1 text-sm font-bold text-kinnso-ink">
         {copied ? t.copied : t.copyCode}
       </button>
     </div>

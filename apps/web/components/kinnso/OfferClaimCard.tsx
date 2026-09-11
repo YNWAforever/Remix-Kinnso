@@ -66,7 +66,7 @@ export function OfferClaimCard({
   }
 
   return (
-    <div className="rounded-lg border border-kinnso-line p-4 max-w-md">
+    <div className="rounded-lg border border-kinnso-edge p-4 max-w-md">
       <p className="font-bold text-kinnso-ink">{offer.title}</p>
       <p className="mt-1 text-sm text-kinnso-muted">
         {offer.merchantName} · {t.validThrough} {new Date(offer.validTo).toLocaleDateString(locale, { timeZone: 'UTC' })}

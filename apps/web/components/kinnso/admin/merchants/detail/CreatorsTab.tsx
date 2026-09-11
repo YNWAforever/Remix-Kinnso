@@ -17,7 +17,7 @@ export function CreatorsTab({ t, creators }: { t: T; creators: MerchantDetail['c
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="text-kinnso-muted">
-              <tr className="border-b border-kinnso-line">
+              <tr className="border-b border-kinnso-edge">
                 <th className="py-2 font-bold">{t.colCreator}</th>
                 <th className="py-2 font-bold">{t.colHandle}</th>
                 <th className="py-2 font-bold">{t.colParticipantStatus}</th>
@@ -25,7 +25,7 @@ export function CreatorsTab({ t, creators }: { t: T; creators: MerchantDetail['c
             </thead>
             <tbody>
               {creators.engaged.map((e) => (
-                <tr key={e.creatorId} className="border-b border-kinnso-line/60">
+                <tr key={e.creatorId} className="border-b border-kinnso-edge/60">
                   <td className="py-2 font-bold text-kinnso-ink">{e.displayName ?? e.handle ?? e.creatorId}</td>
                   <td className="py-2 text-kinnso-muted">{e.handle ? `@${e.handle}` : '—'}</td>
                   <td className="py-2 text-kinnso-muted">{e.participantStatus}</td>

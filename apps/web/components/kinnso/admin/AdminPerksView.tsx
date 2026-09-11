@@ -87,11 +87,11 @@ export function AdminPerksView({
               </div>
               <div className="flex gap-2">
                 <button onClick={() => setEditing(perk)}
-                  className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink">{t.admin.editPerk}</button>
+                  className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink">{t.admin.editPerk}</button>
                 <button onClick={() => toggle(perk)}
                   disabled={busyId === perk.id}
                   aria-busy={busyId === perk.id}
-                  className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
+                  className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
                   {perk.active ? t.admin.deactivate : t.admin.activate}
                 </button>
               </div>

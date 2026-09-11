@@ -36,7 +36,7 @@ function NotificationRowItem({
   }
 
   return (
-    <li className="border-b border-kinnso-line/60 py-3">
+    <li className="border-b border-kinnso-edge/60 py-3">
       <Link
         href={targetHref(locale, notification.entityType, notification.entityId)}
         onClick={onClick}

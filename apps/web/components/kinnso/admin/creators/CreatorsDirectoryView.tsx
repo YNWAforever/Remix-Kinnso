@@ -113,7 +113,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <select aria-label={t.dirStatus} defaultValue={params.get('status') ?? ''}
           onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('status', e.target.value); else sp.delete('status') })}
-          className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+          className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirStatus}: {t.dirAll}</option>
           <option value="onboarding">{t.dirStatus}: {t.statusOnboarding}</option>
           <option value="active">{t.dirStatus}: {t.statusActive}</option>
@@ -122,7 +122,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
         </select>
         <select aria-label={t.dirTier} defaultValue={params.get('tier') ?? ''}
           onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('tier', e.target.value); else sp.delete('tier') })}
-          className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+          className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirTier}: {t.dirAll}</option>
           <option value="seed">{t.tierSeed}</option>
           <option value="rising">{t.tierRising}</option>
@@ -131,7 +131,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
         </select>
         <select aria-label={t.dirDna} defaultValue={params.get('dna') ?? ''}
           onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('dna', e.target.value); else sp.delete('dna') })}
-          className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+          className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirDna}: {t.dirAll}</option>
           <option value="published">{t.dnaPublished}</option>
           <option value="draft">{t.dnaDraft}</option>
@@ -150,7 +150,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
           <select data-testid="bulk-action-select" value={bulkStatus}
             onChange={(e) => setBulkStatus(e.target.value as '' | CreatorStatus)}
             aria-label={t.bulkChooseAction}
-            className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+            className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
             <option value="">{t.bulkChooseAction}</option>
             <option value="active">{t.actActivate}</option>
             <option value="suspended">{t.actSuspend}</option>
@@ -159,7 +159,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
           <input data-testid="bulk-reason" value={bulkReason} onChange={(e) => setBulkReason(e.target.value)}
             placeholder={t.reasonPlaceholder} className="k-input max-w-xs" aria-label={t.reasonPlaceholder} />
           <button onClick={applyBulk} disabled={busy || !bulkStatus || bulkReason.trim().length === 0}
-            className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
+            className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
             {t.bulkApply}
           </button>
           {bulkError ? <p className="w-full text-sm text-red-600">{bulkError}</p> : null}
@@ -213,7 +213,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
                 </div>
 
                 {pending?.id === row.id && (
-                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-kinnso-line pt-3">
+                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-kinnso-edge pt-3">
                     {pending.kind === 'status' && pending.status === 'banned' ? <p className="w-full text-sm text-red-600">{t.confirmBan}</p> : null}
                     {pending.kind === 'reinstate' ? <p className="w-full text-sm text-kinnso-ink">{t.confirmReinstate}</p> : null}
                     <input value={reason} onChange={(e) => setReason(e.target.value)}
@@ -221,7 +221,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
                       aria-label={isNote ? t.notePlaceholder : t.reasonPlaceholder}
                       className="k-input max-w-sm" />
                     <button onClick={applyPending} disabled={busy || !reasonValid}
-                      className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">{t.actApply}</button>
+                      className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">{t.actApply}</button>
                     <button onClick={() => setPending(null)} disabled={busy}
                       className="rounded-full px-4 py-2 text-sm font-bold text-kinnso-muted">{t.actCancel}</button>
                   </div>
@@ -237,7 +237,7 @@ export function CreatorsDirectoryView({ t, locale, data, actions }: { t: T; loca
         <div className="mt-6 flex justify-center">
           <button
             onClick={() => setQuery((sp) => { sp.set('cursor_at', data.nextCursor!.createdAt); sp.set('cursor_id', data.nextCursor!.id) })}
-            className="rounded-full border border-kinnso-line px-5 py-2.5 text-sm font-bold text-kinnso-ink">{t.dirLoadMore}</button>
+            className="rounded-full border border-kinnso-edge px-5 py-2.5 text-sm font-bold text-kinnso-ink">{t.dirLoadMore}</button>
         </div>
       )}
     </main>

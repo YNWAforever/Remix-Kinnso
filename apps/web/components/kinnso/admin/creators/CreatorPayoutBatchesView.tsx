@@ -113,7 +113,7 @@ export function CreatorPayoutBatchesView({
       ) : (
         <table className="w-full text-left text-sm">
           <thead className="text-kinnso-muted">
-            <tr className="border-b border-kinnso-line">
+            <tr className="border-b border-kinnso-edge">
               <th className="py-2 font-bold">{t.colCreatorId}</th>
               <th className="py-2 font-bold">{t.colCurrency}</th>
               <th className="py-2 font-bold">{t.colAmount}</th>
@@ -125,7 +125,7 @@ export function CreatorPayoutBatchesView({
           </thead>
           <tbody>
             {batches.map((b) => (
-              <tr key={b.id} className="border-b border-kinnso-line/60 align-top">
+              <tr key={b.id} className="border-b border-kinnso-edge/60 align-top">
                 <td className="py-2 font-bold text-kinnso-ink">
                   <Link href={`/${locale}/admin/creators/${b.creatorId}`} className="text-kinnso-orange hover:underline">
                     {b.creatorName ?? b.creatorId.slice(0, 8)}
@@ -142,7 +142,7 @@ export function CreatorPayoutBatchesView({
                       <button type="button" onClick={() => openPaid(b)}
                         className="rounded-md bg-kinnso-orange px-2 py-1 text-xs font-bold text-white">{t.actMarkPaid}</button>
                       <button type="button" onClick={() => openCancel(b)}
-                        className="rounded-md border border-kinnso-line px-2 py-1 text-xs font-bold text-kinnso-ink">{t.actCancelBatch}</button>
+                        className="rounded-md border border-kinnso-edge px-2 py-1 text-xs font-bold text-kinnso-ink">{t.actCancelBatch}</button>
                     </div>
                   )}
                 </td>
@@ -169,20 +169,20 @@ export function CreatorPayoutBatchesView({
             {dialog.kind === 'create' && (
               <div className="mb-2 flex flex-col gap-2">
                 <input value={creatorId} onChange={(e) => setCreatorId(e.target.value)} placeholder={t.formCreatorId}
-                  aria-label={t.formCreatorId} className="rounded-md border border-kinnso-line p-2 text-sm" />
+                  aria-label={t.formCreatorId} className="rounded-md border border-kinnso-edge p-2 text-sm" />
                 <input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder={t.formCurrency}
-                  aria-label={t.formCurrency} className="rounded-md border border-kinnso-line p-2 text-sm" />
+                  aria-label={t.formCurrency} className="rounded-md border border-kinnso-edge p-2 text-sm" />
                 <input value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t.formAmount}
-                  aria-label={t.formAmount} inputMode="decimal" className="rounded-md border border-kinnso-line p-2 text-sm" />
+                  aria-label={t.formAmount} inputMode="decimal" className="rounded-md border border-kinnso-edge p-2 text-sm" />
               </div>
             )}
             <textarea ref={reasonRef} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t.reasonPlaceholder}
               aria-label={t.reasonPlaceholder}
-              className="mb-2 w-full rounded-md border border-kinnso-line p-2 text-sm" rows={3} />
+              className="mb-2 w-full rounded-md border border-kinnso-edge p-2 text-sm" rows={3} />
             {error && <p className="mb-2 text-xs font-bold text-red-600">{error}</p>}
             <div className="flex justify-end gap-2">
               <button type="button" onClick={close} disabled={isPending}
-                className="rounded-md border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink">{t.actCancel}</button>
+                className="rounded-md border border-kinnso-edge px-3 py-1 text-sm font-bold text-kinnso-ink">{t.actCancel}</button>
               <button type="button" onClick={confirm} disabled={isPending || !reason.trim()}
                 className="rounded-md bg-kinnso-orange px-3 py-1 text-sm font-bold text-white disabled:opacity-50">{t.actApply}</button>
             </div>

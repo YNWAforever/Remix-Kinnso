@@ -15,7 +15,7 @@ export function EarningsTab({
 }) {
   return (
     <div className="flex flex-col gap-6">
-      <section className="rounded-xl border border-kinnso-line p-4">
+      <section className="rounded-xl border border-kinnso-edge p-4">
         <p className="text-xs font-bold uppercase text-kinnso-muted">{t.secContribution}</p>
         <p className="text-sm font-bold text-kinnso-ink">{t.totalPoints}</p>
         <p className="mt-1 text-2xl font-black text-kinnso-ink">{contribution?.points ?? 0}</p>
@@ -28,7 +28,7 @@ export function EarningsTab({
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="text-kinnso-muted">
-              <tr className="border-b border-kinnso-line">
+              <tr className="border-b border-kinnso-edge">
                 <th className="py-2 font-bold">{t.colMission}</th>
                 <th className="py-2 font-bold">{t.colAmount}</th>
                 <th className="py-2 font-bold">{t.colPayout}</th>
@@ -38,7 +38,7 @@ export function EarningsTab({
             </thead>
             <tbody>
               {settlements.map((s) => (
-                <tr key={s.id} className="border-b border-kinnso-line/60">
+                <tr key={s.id} className="border-b border-kinnso-edge/60">
                   <td className="py-2 font-bold text-kinnso-ink">{s.missionTitle}</td>
                   <td className="py-2 text-kinnso-muted">{money(s.creatorCommissionAmount)} <span className="text-kinnso-ink">{s.currency ?? ''}</span></td>
                   <td className="py-2 text-kinnso-muted">{s.creatorPayoutStatus ?? '—'}</td>
@@ -58,7 +58,7 @@ export function EarningsTab({
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="text-kinnso-muted">
-              <tr className="border-b border-kinnso-line">
+              <tr className="border-b border-kinnso-edge">
                 <th className="py-2 font-bold">{t.colEvent}</th>
                 <th className="py-2 font-bold">{t.colPoints}</th>
                 <th className="py-2 font-bold">{t.colJoined}</th>
@@ -66,7 +66,7 @@ export function EarningsTab({
             </thead>
             <tbody>
               {pointsEvents.map((e) => (
-                <tr key={e.id} className="border-b border-kinnso-line/60">
+                <tr key={e.id} className="border-b border-kinnso-edge/60">
                   <td className="py-2 font-bold text-kinnso-ink">{e.eventType}</td>
                   <td className="py-2 text-kinnso-muted">{e.points}</td>
                   <td className="py-2 text-kinnso-muted">{day(e.createdAt)}</td>

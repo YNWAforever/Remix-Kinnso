@@ -78,12 +78,12 @@ export function MerchantApplicationsView({ t, tabsT, locale, pending, decided, o
               </div>
 
               {action?.id === app.id && (
-                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-kinnso-line pt-3">
+                <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-kinnso-edge pt-3">
                   <input value={reason} onChange={(e) => setReason(e.target.value)}
                     placeholder={t.reasonPlaceholder} aria-label={t.reasonPlaceholder}
                     className="k-input max-w-sm" />
                   <button onClick={confirm} disabled={busy || reason.trim().length === 0}
-                    className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">{t.actConfirm}</button>
+                    className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">{t.actConfirm}</button>
                   <button onClick={() => setAction(null)} disabled={busy}
                     className="rounded-full px-4 py-2 text-sm font-bold text-kinnso-muted">{t.actCancel}</button>
                 </div>

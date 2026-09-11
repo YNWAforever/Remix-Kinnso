@@ -9,7 +9,7 @@ export function ContentTab({ t, content }: { t: T; content: CreatorDetailContent
   return (
     <table className="w-full text-left text-sm">
       <thead className="text-kinnso-muted">
-        <tr className="border-b border-kinnso-line">
+        <tr className="border-b border-kinnso-edge">
           <th className="py-2 font-bold">{t.colTitle}</th>
           <th className="py-2 font-bold">{t.colStatusContent}</th>
           <th className="py-2 font-bold">{t.colSaves}</th>
@@ -18,7 +18,7 @@ export function ContentTab({ t, content }: { t: T; content: CreatorDetailContent
       </thead>
       <tbody>
         {content.map((g) => (
-          <tr key={g.id} className="border-b border-kinnso-line/60">
+          <tr key={g.id} className="border-b border-kinnso-edge/60">
             <td className="py-2 font-bold text-kinnso-ink">{g.title}</td>
             <td className="py-2 text-kinnso-muted">{g.status}</td>
             <td className="py-2 text-kinnso-muted">{g.savesCount}</td>

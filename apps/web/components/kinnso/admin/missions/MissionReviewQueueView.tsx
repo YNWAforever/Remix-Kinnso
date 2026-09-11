@@ -38,7 +38,7 @@ export function MissionReviewQueueView({
       ) : (
         <table className="w-full text-left text-sm">
           <thead className="text-kinnso-muted">
-            <tr className="border-b border-kinnso-line">
+            <tr className="border-b border-kinnso-edge">
               <th className="py-2 font-bold">{t.colMission}</th>
               <th className="py-2 font-bold">{t.colCreator}</th>
               <th className="py-2 font-bold">{t.colVerification}</th>

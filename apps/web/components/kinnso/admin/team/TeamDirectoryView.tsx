@@ -51,16 +51,16 @@ export function TeamDirectoryView({ t, locale, members, onSetRole, onSuspend, on
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold text-kinnso-ink">{t.directoryTitle}</h2>
-      <div className="overflow-x-auto rounded-xl border border-kinnso-border">
-        <table className="min-w-full divide-y divide-kinnso-border text-sm">
-          <thead className="bg-kinnso-bg-muted">
+      <div className="overflow-x-auto rounded-xl border border-kinnso-edge">
+        <table className="min-w-full divide-y divide-kinnso-edge text-sm">
+          <thead className="bg-kinnso-cream2">
             <tr>
               {[t.colName, t.colRole, t.colStatus, t.colJoined, ''].map((h, i) => (
                 <th key={i} className="px-4 py-3 text-left text-xs font-semibold text-kinnso-muted uppercase tracking-wide">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-kinnso-border bg-white">
+          <tbody className="divide-y divide-kinnso-edge bg-white">
             {members.map((m) => (
               <tr key={m.id}>
                 <td className="px-4 py-3 font-medium text-kinnso-ink">{m.displayName}</td>
@@ -83,7 +83,7 @@ export function TeamDirectoryView({ t, locale, members, onSetRole, onSuspend, on
                           e.target.value = ''
                         }
                       }}
-                      className="rounded border border-kinnso-border px-2 py-1 text-xs"
+                      className="rounded border border-kinnso-edge px-2 py-1 text-xs"
                     >
                       <option value="" disabled>{t.actionSetRole}</option>
                       {ROLES.map((r) => <option key={r} value={r}>{roleLabel[r]}</option>)}
@@ -112,13 +112,13 @@ export function TeamDirectoryView({ t, locale, members, onSetRole, onSuspend, on
       </div>
 
       {pendingRole && (
-        <div className="space-y-2 rounded-xl border border-kinnso-border p-4">
+        <div className="space-y-2 rounded-xl border border-kinnso-edge p-4">
           <p className="text-sm font-semibold">{t.actionSetRole}: {roleLabel[pendingRole.role]}</p>
           <input
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder={t.reasonPlaceholder}
-            className="w-full rounded border border-kinnso-border px-3 py-2 text-sm"
+            className="w-full rounded border border-kinnso-edge px-3 py-2 text-sm"
           />
           {err && <p className="text-xs text-red-600">{err}</p>}
           <div className="flex gap-2">
@@ -133,13 +133,13 @@ export function TeamDirectoryView({ t, locale, members, onSetRole, onSuspend, on
       )}
 
       {pendingSuspend && (
-        <div className="space-y-2 rounded-xl border border-kinnso-border p-4">
+        <div className="space-y-2 rounded-xl border border-kinnso-edge p-4">
           <p className="text-sm font-semibold">{t.actionSuspend}</p>
           <input
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder={t.reasonPlaceholder}
-            className="w-full rounded border border-kinnso-border px-3 py-2 text-sm"
+            className="w-full rounded border border-kinnso-edge px-3 py-2 text-sm"
           />
           {err && <p className="text-xs text-red-600">{err}</p>}
           <div className="flex gap-2">
