@@ -57,15 +57,20 @@ describe('R7.6 navigation and footer acceptance', () => {
     }
   })
 
+  // Whole-tree scan: reads every source file, so the 5s default is the wrong
+  // budget and this timed out in full runs while passing alone -- flakiness in
+  // appearance, a too-slow test in fact. Searching file by file with an early
+  // exit also avoids concatenating ~1200 files into one string to search once,
+  // and names the offending file instead of just failing.
   it('removes the pre-pivot English product line from app source', () => {
     const forbidden = ['AI Travel', 'Content Studio'].join(' ')
     const webRoot = resolve(process.cwd())
-    const source = sourceFiles(webRoot)
-      .map((file) => readFileSync(file, 'utf8'))
-      .join('\n')
+    const offender = sourceFiles(webRoot).find((file) =>
+      readFileSync(file, 'utf8').includes(forbidden),
+    )
 
-    expect(source).not.toContain(forbidden)
-  })
+    expect(offender, `pre-pivot product line still present in ${offender}`).toBeUndefined()
+  }, 15_000)
 
   it.each([
     ['en', en, 'For Creators', 'The AI travel creator marketplace · Hong Kong · Taipei · Tokyo'],

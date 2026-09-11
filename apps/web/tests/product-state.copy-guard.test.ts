@@ -32,5 +32,8 @@ describe('product-state claim copy', () => {
       })
 
     expect(violations, `Forbidden feature-state claims:\n${violations.join('\n')}`).toEqual([])
-  })
+    // Whole-tree scan: reads every .tsx under app/ and components/, so the 5s
+    // default is the wrong budget. It timed out in full runs while passing
+    // alone, which reads as flakiness rather than as a test that is simply slow.
+  }, 15_000)
 })
