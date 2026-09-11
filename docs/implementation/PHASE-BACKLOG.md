@@ -260,7 +260,40 @@ settlement. `/studio/earnings` can therefore show a batch "Paid" beside settleme
 All background work is unawaited in-process promises in a single Hono worker; a redeploy
 strands the row until a 15-minute sweeper marks it failed. Plan §8 (phase 3) depends on this.
 
-### B15. Source-scanning suites sit on the 5s timeout boundary — ✅ **FIXED** (it was three, not two)
+### B15. Whole-tree source scans flake in full runs — ⚠️ **PARTIALLY FIXED, root cause NOT addressed**
+
+**Corrected after measurement.** This was marked FIXED twice and was wrong both times.
+The final full run still failed **four** scans, including `r7-6-navigation-footer` at the
+raised **15000ms** budget:
+
+| Suite | Timed out at |
+|---|---|
+| `design.kinnso-token-coverage` | 5000ms |
+| `media.source-contract` | 5000ms |
+| `r7-6-navigation-footer` | **15000ms** |
+| `product-state.copy-guard` | (5000ms in the prior run) |
+
+**Root cause: this is not a budget problem.** Vitest runs 506 test files in parallel
+*processes*. Each whole-tree scanner independently walks and reads the same ~1200 files
+under `app/` and `components/`. A module-level cache cannot cross worker processes, so
+raising timeouts only moves the threshold — demonstrated: 15s was not enough either.
+
+**What was genuinely achieved:** `media.source-contract` no longer TypeScript-parses every
+file (5.06s → 2.98s in isolation), `r7-6` no longer concatenates ~1200 files into one
+string and now names the offending file, and the new token guard asserts it actually
+scanned something. All real improvements; none of them addresses the contention.
+
+**The correct fix:** consolidate the four whole-tree source-contract scans into a single
+test file so the tree is read **once**, in one worker, shared at module scope — or move
+them out of the parallel unit suite entirely into a single-pass lint script alongside
+`honesty:lint`. Four independent walks become one. This is a deliberate restructuring of
+existing tests' semantics and was **not** attempted rather than bolted on.
+
+Original description follows.
+
+---
+
+### B15 (original). Two source-scanning suites sit on the 5s timeout boundary
 
 `media.source-contract` TypeScript-parsed every `.ts`/`.tsx` under `app` and `components`
 (~1200 files) inside one `it()`. Only three constructs can violate the contract, so files
@@ -279,11 +312,6 @@ A later full run surfaced a third: `product-state.copy-guard`. Worth noting beca
 appeared immediately after a commit that added i18n keys, so it *looked* like a copy
 regression — the signature (`Test timed out in 5000ms`, not an assertion failure) is what
 distinguishes them.
-
-Measured: the three scanning suites together take ~11s of test time, so the 5s per-test
-default was the wrong budget for whole-tree work rather than the machine being slow. They
-now get an explicit 15s, and `r7-6` stopped concatenating ~1200 files into one string just
-to search it once.
 
 Original description follows.
 
