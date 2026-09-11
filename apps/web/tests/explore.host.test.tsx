@@ -45,6 +45,32 @@ describe('/[locale]/explore host', () => {
     expect(captured.props?.destinations).toEqual([])
   })
 
+  // Plan acceptance story #18: a failed live read stays an error with retry —
+  // never a demo fallback and never a false empty. /explore is statically
+  // regenerated every 300s across seven locales, so a swallowed failure would
+  // cache a cheerful "no guides yet" catalogue for five minutes per locale.
+  it('propagates a guides read failure instead of rendering an empty catalogue', async () => {
+    const failure = Object.assign(new Error('terminating connection'), { code: '57P01' })
+    mocks.guides.mockRejectedValueOnce(failure)
+
+    await expect(ExplorePage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toBe(failure)
+    expect(captured.props).toBeNull()
+  })
+
+  it('propagates a destinations read failure for the same reason', async () => {
+    const failure = Object.assign(new Error('connection failure'), { code: '08006' })
+    mocks.destinations.mockRejectedValueOnce(failure)
+
+    await expect(ExplorePage({ params: Promise.resolve({ locale: 'en' }) })).rejects.toBe(failure)
+    expect(captured.props).toBeNull()
+  })
+
+  it('renders a true empty catalogue as empty, distinctly from a failure', async () => {
+    mocks.guides.mockResolvedValueOnce([])
+    render(await ExplorePage({ params: Promise.resolve({ locale: 'en' }) }))
+    expect(captured.props?.guides).toEqual([])
+  })
+
   it('renders a labelled skeleton structure without visible copy', () => {
     const { container } = render(<ExploreLoading />)
     expect(container.querySelector('[data-explore-skeleton="true"]')).toBeTruthy()

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mutable mock state, read fresh on each query call.
-const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown }))
+const state = vi.hoisted(() => ({ list: [] as unknown[], single: null as unknown, error: null as unknown }))
 const limitSpy = vi.hoisted(() => vi.fn())
 const rpcSpy = vi.hoisted(() => vi.fn())
 
@@ -29,10 +29,10 @@ vi.mock('@/lib/supabase/public', () => ({
         maybeSingle: async () => ({ data: state.single }),
         limit: (n: number) => {
           limitSpy(n)
-          return Promise.resolve({ data: state.list })
+          return Promise.resolve({ data: state.list, error: state.error })
         },
-        then: (onF: (v: { data: unknown }) => unknown) =>
-          Promise.resolve({ data: state.list }).then(onF),
+        then: (onF: (v: { data: unknown; error: unknown }) => unknown) =>
+          Promise.resolve({ data: state.list, error: state.error }).then(onF),
       }
       return builder
     },
@@ -54,6 +54,7 @@ const row = {
 beforeEach(() => {
   state.list = []
   state.single = null
+  state.error = null
   limitSpy.mockClear()
   rpcSpy.mockClear()
 })
@@ -87,6 +88,24 @@ describe('getPublishedGuides', () => {
   it('returns an empty array when the DB has no published guides', async () => {
     state.list = []
     expect(await getPublishedGuides()).toEqual([])
+  })
+
+  it('surfaces a query failure instead of reporting an empty catalogue', async () => {
+    // "Unavailable" and "empty" are different facts. /explore is statically
+    // regenerated every 300s across seven locales, so swallowing this served a
+    // cheerful "no guides yet" page for five minutes per locale.
+    const failure = { code: '57P01', message: 'terminating connection' }
+    state.list = []
+    state.error = failure
+
+    await expect(getPublishedGuides()).rejects.toBe(failure)
+  })
+
+  it('surfaces a query failure even when a limit is applied', async () => {
+    const failure = { code: '08006', message: 'connection failure' }
+    state.error = failure
+
+    await expect(getPublishedGuides(6)).rejects.toBe(failure)
   })
 
   it('forwards a row limit when given', async () => {
