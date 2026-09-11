@@ -242,3 +242,24 @@ export async function waitForRoute(
   await page.getByRole(route.ready.role, { level: route.ready.level }).first().waitFor({ state: 'visible' })
   return response
 }
+
+/**
+ * Fonts loaded, in-viewport images decoded, two animation frames passed. Used before
+ * any layout assertion so a measurement is not taken mid-paint. Deliberately polls
+ * rather than sleeping: a fixed timeout is both slower and flakier, and the
+ * no-fixed-sleeps meta-test forbids one.
+ */
+export async function waitForVisualSettlement(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    await document.fonts.ready
+  })
+  await page.waitForFunction(() => Array.from(document.images)
+    .filter((image) => {
+      const bounds = image.getBoundingClientRect()
+      return bounds.bottom > 0 && bounds.right > 0 && bounds.top < window.innerHeight && bounds.left < window.innerWidth
+    })
+    .every((image) => image.complete))
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  }))
+}
