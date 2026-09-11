@@ -4125,6 +4125,32 @@ export type Database = {
         }
         Returns: string
       }
+      // --- Phase 2 slice 1 (trip write path), same graft as above ---
+      create_trip: {
+        Args: {
+          p_destination_id?: string
+          p_start_date?: string
+          p_timezone?: string
+          p_title: string
+        }
+        Returns: string
+      }
+      update_trip: {
+        Args: {
+          p_clear_start_date?: boolean
+          p_expected_revision: number
+          p_start_date?: string
+          p_status?: string
+          p_timezone?: string
+          p_title?: string
+          p_trip_id: string
+        }
+        Returns: number
+      }
+      delete_trip: {
+        Args: { p_expected_revision: number; p_trip_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

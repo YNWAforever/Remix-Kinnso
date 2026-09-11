@@ -99,8 +99,13 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
     // trips.owner_user_id is ON DELETE CASCADE to auth.users, so removing the
     // two accounts removes every row this suite created.
     if (!svc) return
-    if (userAId) await svc.auth.admin.deleteUser(userAId)
-    if (userBId) await svc.auth.admin.deleteUser(userBId)
+    // Asserted, not fire-and-forget: these deletions were failing silently
+    // (the append-only trigger blocked the authorship SET NULL) and the
+    // accumulating rows were the only visible symptom of a real defect.
+    for (const id of [userAId, userBId].filter(Boolean)) {
+      const { error } = await svc.auth.admin.deleteUser(id)
+      expect(error, `cleanup failed for ${id}: ${error?.message}`).toBeNull()
+    }
   }, hookTimeout)
 
   // ---- cross-account isolation --------------------------------------------
