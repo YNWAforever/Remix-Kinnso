@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -16,10 +17,7 @@ export default async function StudioEditGuidePage({
   const messages = await getDictionary(locale as Locale)
 
   const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect(`/${locale}/sign-in`)
+  await requireCreatorPage(supabase, locale as Locale, 'creator')
 
   // RLS scopes to owner; a non-owner / missing id yields null -> notFound.
   const { data: guide } = await supabase

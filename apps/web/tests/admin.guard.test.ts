@@ -119,6 +119,34 @@ describe('requireCreatorPage', () => {
     contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
     await expect(requireCreatorPage(sb(), 'ja', 'studio')).rejects.toThrow('NEXT_REDIRECT:/ja/studio')
   })
+
+  // The guide and session authoring pages send a not-yet-active creator to
+  // onboarding: every sign-up gets a blank `creators` row, so a 404 would
+  // strand someone mid-application behind a page they are entitled to reach.
+  it('redirects a non-creator to onboarding in creator mode', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'en', 'creator')).rejects.toThrow('NEXT_REDIRECT:/en/creator')
+  })
+
+  it('sends creator-pending to onboarding rather than a dead end in creator mode', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'creator-pending' }))
+    await expect(requireCreatorPage(sb(), 'en', 'creator')).rejects.toThrow('NEXT_REDIRECT:/en/creator')
+  })
+
+  it('still prefers sign-in over onboarding for an anonymous viewer', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: null, role: 'anon' }))
+    await expect(requireCreatorPage(sb(), 'en', 'creator')).rejects.toThrow('NEXT_REDIRECT:/en/sign-in')
+  })
+
+  it('localizes the onboarding redirect', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ role: 'traveler' }))
+    await expect(requireCreatorPage(sb(), 'zh-hk', 'creator')).rejects.toThrow('NEXT_REDIRECT:/zh-hk/creator')
+  })
+
+  it('lets an active creator through in creator mode', async () => {
+    contextMock.mockResolvedValueOnce(contextFor({ user: { id: 'creator-1' }, role: 'creator' }))
+    await expect(requireCreatorPage(sb(), 'en', 'creator')).resolves.toEqual({ user: { id: 'creator-1' } })
+  })
 })
 
 describe('requireOpsAction', () => {

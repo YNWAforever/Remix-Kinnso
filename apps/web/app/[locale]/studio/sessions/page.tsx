@@ -1,4 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { requireCreatorPage } from '@/lib/admin/guard'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
@@ -11,8 +12,7 @@ export default async function StudioSessionsPage({ params }: { params: Promise<{
   const messages = await getDictionary(locale as Locale)
 
   const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect(`/${locale}/sign-in`)
+  const { user } = await requireCreatorPage(supabase, locale as Locale, 'creator')
 
   const { data } = await supabase
     .from('community_sessions')

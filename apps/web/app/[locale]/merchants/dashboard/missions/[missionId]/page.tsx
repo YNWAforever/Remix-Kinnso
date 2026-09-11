@@ -1,9 +1,10 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { MissionDetailView, type MissionDetail } from '@/components/kinnso/pages/MissionDetailView'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { reviewParticipantAction, reviewSubmissionAction } from '@/lib/missions/actions'
-import { getMerchantProfile, listMerchantMissions } from '@/lib/missions/queries'
+import { listMerchantMissions } from '@/lib/missions/queries'
 import { getCreatorPublicNames, type CreatorPublicName } from '@/lib/creators/queries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
@@ -76,15 +77,9 @@ export default async function MerchantMissionDetailPage({ params }: { params: Pa
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
+  const { merchantId } = await requireMerchantPage(supabase, loc)
 
-  const { data: merchantProfile } = await getMerchantProfile(supabase, user.id)
-  if (!merchantProfile) notFound()
-
-  const { data } = await listMerchantMissions(supabase, merchantProfile.id)
+  const { data } = await listMerchantMissions(supabase, merchantId)
   const row = ((data ?? []) as unknown as MerchantMissionDetailData[]).find((mission) => mission.id === missionId)
   if (!row) notFound()
 
