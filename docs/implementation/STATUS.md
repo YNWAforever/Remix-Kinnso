@@ -179,6 +179,36 @@ stable anchor because `i18n.locale-parity.test.ts` compares key-path **arrays** 
 **Proof.** 58 tests across `OfferClaimCard`, the new `MerchantDashboardHomeView` suite
 (the view had none), locale parity, offers actions and the merchant post host.
 
+### Phase 1 — slice S5: honest save failures, and re-auth on an expired session
+
+`GuideSaveButton` / `ExperienceSaveButton` only mutated state when `result.ok`, so every
+failed save rendered **nothing at all** — the button appeared to stop responding. The
+action's message was untranslated English, so surfacing it as-is would have shown English
+to all 7 locales.
+
+**Why this needed more than an if-else.** The two failures call for opposite responses.
+A rejected write should leave the viewer in place with a retry. But `signedIn` is computed
+at **server render**, so a session that lapses before the click produces a failure that is
+really a sign-in — and plan §6.4 requires that case to *"clearly ask for
+re-authentication"*, not report a broken save.
+
+Telling them apart by matching the English message text would break the moment that copy
+is reworded, so `lib/saves/result.ts` adds `SaveOutcome` with an explicit
+`reason: 'auth' | 'failed'`. `errors` is carried through unchanged so the shape stays
+readable to existing `ActionFailure` consumers; `reason` is purely additive. Named
+`SaveOutcome`, not `SaveResult`, because four admin components already alias `SaveResult`
+locally to a plain `ActionResult<{id}>`.
+
+An expired session routes through `signInHref` / `currentReturnPath` — **the producer
+added in slice S1** — so the viewer re-authenticates and lands back on the guide or
+experience they were saving. Stories **#3**, **#20** and §6.4 meet here.
+
+**Proof.** 29 files / 236 tests. The eight updated assertions in the save-action suites
+are deliberate contract churn — they pinned the failure shape with `toEqual` and the shape
+is what this extends. The case most worth having: a failed save never flips the button to
+"Saved" and never calls `router.refresh()`, because only server evidence marks a save as
+saved.
+
 ---
 
 ## Not done / explicitly out of scope this session
@@ -198,19 +228,24 @@ stable anchor because `i18n.locale-parity.test.ts` compares key-path **arrays** 
 
 ## Next task (concrete)
 
-**Slice S5 — B4: stop swallowing save failures.** `GuideSaveButton` and
-`ExperienceSaveButton` only mutate state when `result.ok`, so a failed save renders
-nothing at all — the same class of defect S4 just fixed on the claim path, and it pairs
-directly with the S1 work already landed on those two components. The action's message is
-also untranslated English (`formError('Guide could not be saved')`), so surfacing it
-as-is would show English to every locale; budget the 7-locale key cost.
+**Slice S6 — B8: `.gitattributes` with `eol=lf`.** This is now the highest-leverage
+remaining item, because it is what makes the test suite reproducible on Windows at all:
+14 of the ~17 remaining failures are pure line-ending artifacts (`BASELINE-VERIFICATION.md`
+§3.1). It **must be its own PR** — it rewrites line endings repo-wide and would otherwise
+bury a feature diff — and it should be verified by re-running the `db.*` static-text
+suites before and after.
 
-After that, **B8** (`.gitattributes`, `eol=lf`) is the highest-leverage remaining item,
-because it is what makes the test suite reproducible on Windows at all — 14 of the
-remaining failures are line-ending artifacts. It **must be its own PR**: it rewrites line
-endings repo-wide and would otherwise bury a feature diff.
+Then **B9** (`--color-kinnso-line` is used in ~20 places but never defined, so those
+borders render as nothing under Tailwind v4) — small, visible, and self-contained.
 
 The highest-severity finding overall remains the **ops-member deletion bug**
-(`BASELINE-VERIFICATION.md` §3.3) — it needs a migration and a product decision about
-mission ownership, and is *not* a frontend concern. See `PHASE-BACKLOG.md` for the ranked
-remainder.
+(`BASELINE-VERIFICATION.md` §3.3) — a `DELETE` on `kinnso_ops_members` aborts with a check
+violation. It needs a migration and a product decision about mission ownership, and is
+*not* a frontend concern. See `PHASE-BACKLOG.md` for the ranked remainder.
+
+### Before extending the branch further
+
+Eleven commits are unpushed. The GitHub connector is not authenticated in this session, so
+opening a PR needs either explicit authorization to push or the owner doing it. Given that
+five slices now touch identity, discovery, role gates, the visit loop and saves, review
+before the branch grows further is the cheaper order.
