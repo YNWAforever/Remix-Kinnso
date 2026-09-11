@@ -206,6 +206,18 @@ settlement. `/studio/earnings` can therefore show a batch "Paid" beside settleme
 All background work is unawaited in-process promises in a single Hono worker; a redeploy
 strands the row until a 15-minute sweeper marks it failed. Plan §8 (phase 3) depends on this.
 
+### B15. Two source-scanning suites sit on the 5s timeout boundary — **UNBLOCKED**
+
+`tests/media.source-contract.test.ts` and `tests/r7-6-navigation-footer.test.ts`
+recursively walk the source tree. Run in isolation on an idle machine they take **5.06s of
+test time against a 5000ms per-test timeout**; in a full 502-file parallel run they time
+out. This is not the CRLF issue (B8) — the signature is `Test timed out in 5000ms`, not a
+`
+` assertion mismatch — and it will flake in CI under a noisy runner, not just
+locally. Either narrow the walk (skip `node_modules`/`.next` earlier, or cache the file
+list across the suite) or give these two tests an explicit longer timeout. Discovered by
+the post-S6 full run; evidence in `BASELINE-VERIFICATION.md` §3.1b.
+
 ### B14. Every new user-facing string is a 7-file edit — **UNBLOCKED, but plan for it**
 
 `tests/i18n.locale-parity.test.ts` enforces recursive dotted-key-path equality across all

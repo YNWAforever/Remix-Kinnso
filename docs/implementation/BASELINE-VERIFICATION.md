@@ -111,6 +111,28 @@ Proposed fix (separate slice, deliberately not bundled here): add a `.gitattribu
 pinning `*.sql`, `*.yml`, `*.ts`, `*.tsx` to `eol=lf`. That rewrites line endings
 repo-wide, so it must not ride along with a feature change.
 
+### 3.1b Post-S6 full-suite result, and a new finding
+
+Full suite after the line-ending fix: **497 files passed / 8 failed; 3149 tests passed,
+8 failed, 13 skipped (505 files).** Baseline was 17 failed. The CRLF class is gone.
+
+The 8 remaining split cleanly:
+
+| Count | Files | Cause |
+|---|---|---|
+| 6 | `creator-rls`, `g.slug.host`, `mission.rls`, `notifications.rls`, `offers-attribution.rls`, `queries.detail` | live-DB — §3.2, and §3.3 for `mission.rls` |
+| 2 | `media.source-contract`, `r7-6-navigation-footer` | **new finding, see below** |
+
+**New finding — two source-scanning suites sit on the 5s timeout boundary.** Both failed
+in the full run with `Test timed out in 5000ms`, *not* the `
+` assertion signature —
+so this is not a CRLF regression. They recursively walk the source tree
+(`sourceFiles(directory)` / `resolve(process.cwd())` + scan) and, re-run in isolation,
+pass in **5.06s of test time against a 5000ms per-test timeout**. They are therefore
+fragile on any loaded machine, not only this one, and will flake in CI under a noisy
+runner. Worth either narrowing the walk or raising the timeout for those two tests
+specifically. Tracked as **B15** in `PHASE-BACKLOG.md`.
+
 ### 3.2 Live-stack flakiness — 2 tests in this run (environment, **non-deterministic**)
 
 | File | Test | Signature |
