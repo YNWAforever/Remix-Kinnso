@@ -13,7 +13,7 @@ export function ExploreView({ locale, t, guides, destinations }: {
   destinations: Destination[]
 }) {
   return (
-    <main className="bg-kinnso-cream font-sans">
+    <div className="bg-kinnso-cream font-sans">
       <SectionShell>
         <Eyebrow>{t.pill}</Eyebrow>
         <h1 className="k2-display mt-4 max-w-3xl text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-6xl">
@@ -22,7 +22,7 @@ export function ExploreView({ locale, t, guides, destinations }: {
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-kinnso-ink/70">{t.subtitle}</p>
         <ExploreDiscovery locale={locale} t={t} guides={guides} destinations={destinations} />
       </SectionShell>
-    </main>
+    </div>
   )
 }
 

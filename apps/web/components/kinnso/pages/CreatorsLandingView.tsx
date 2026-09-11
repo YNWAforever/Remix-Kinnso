@@ -18,7 +18,7 @@ export function CreatorsLandingView({
 }) {
   const p = (path: string) => `/${locale}${path}`
   return (
-    <main className="bg-kinnso-cream font-sans">
+    <div className="bg-kinnso-cream font-sans">
       {/* Compact hero + apply CTA */}
       <SectionShell as="header" className="py-12 md:py-16">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -80,7 +80,7 @@ export function CreatorsLandingView({
           </Link>
         </div>
       </section>
-    </main>
+    </div>
   )
 }
 

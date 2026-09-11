@@ -21,7 +21,7 @@ export function ForMerchantsView({ locale, t, testimonials, bookingLive }: {
   ]
   const bullets = [t.why1, t.why2, bookingLive ? t.why3Live : t.why3Waitlist]
   return (
-    <main className="bg-kinnso-cream font-sans">
+    <div className="bg-kinnso-cream font-sans">
       <SectionShell as="header">
         <Eyebrow>{t.heroEyebrow}</Eyebrow>
         <h1 className="k2-display mt-4 max-w-3xl text-4xl font-semibold leading-[1.08] text-kinnso-ink md:text-6xl">{t.heroTitle}</h1>
@@ -84,7 +84,7 @@ export function ForMerchantsView({ locale, t, testimonials, bookingLive }: {
           <Link href={p('/merchants/post')} className="mt-8 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[3px] bg-kinnso-ink px-6 py-2.5 text-sm font-semibold tracking-wide text-white transition hover:bg-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{t.ctaButton}</Link>
         </div>
       </section>
-    </main>
+    </div>
   )
 }
 
