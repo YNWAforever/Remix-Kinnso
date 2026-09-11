@@ -173,12 +173,30 @@ assert LF, failing 14 tests across 11 files. Fix: pin `*.sql`, `*.yml`, `*.ts`, 
 `eol=lf`. **Must be its own PR** — it rewrites line endings repo-wide and would otherwise
 bury a feature diff. Evidence: `BASELINE-VERIFICATION.md` §3.1.
 
-### B9. `--color-kinnso-line` is undefined — **UNBLOCKED**
+### B9. `--color-kinnso-line` is undefined — ✅ **FIXED** (slice S7), and it was three tokens
+
+Fixed in `fix(web): three kinnso colour tokens were referenced but never defined`.
+The backlog entry understated it: **`kinnso-border` (11 uses) and `kinnso-bg-muted` (1)
+were also undefined**, not just `kinnso-line` (130). All 142 swept to the canonical
+`kinnso-edge` / `kinnso-cream2` rather than defining the phantoms, so the design system
+converges on the R1C contract instead of gaining aliases it does not recognise.
+
+`tests/design.kinnso-token-coverage.test.ts` now guards the class of bug: it compares
+what source *uses* against what `globals.css` *defines*. Verified non-tautological by
+injecting a phantom token and watching it fail. Original description follows.
+
+---
+
+### B9 (original). `--color-kinnso-line` is undefined
 
 `border-kinnso-line` is used in ~20 places; the token does not exist, so under Tailwind v4
 those borders render as nothing. Either define it or sweep the usages.
 
-### B10. 13 of 18 `components/ui` primitives are dead source — **UNBLOCKED**
+### B10. 13 of 18 `components/ui` primitives are dead source — **STILL OPEN**
+
+Untouched by slice S7, which swept `kinnso-*` tokens only. These primitives reference
+*shadcn* CSS variables (`--border`, `--input`, `--ring`…), a separate namespace the new
+coverage guard deliberately does not match. Same class of drift, different namespace.
 
 Unreferenced, and every CVA variant references shadcn CSS variables defined nowhere in the
 repo. Either wire them to real tokens or delete them; leaving them invites a future slice
