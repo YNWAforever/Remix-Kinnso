@@ -118,10 +118,33 @@ varies between runs.** This was established, not assumed:
 - Re-running those four **in isolation**: `4 passed (4)`, `44 tests passed`.
 
 They share one Postgres while 501 vitest files run in parallel, and they create and delete
-real `auth.users` rows. **Consequence for any future verification claim: a diff in the
-failing-file list across two full runs is not by itself evidence of a regression.** Confirm
-causality by (a) checking whether the suite imports the changed module at all, and
-(b) re-running the suite in isolation.
+real `auth.users` rows.
+
+**Root cause, measured — the host is saturated, not the code.** Late in the session a
+bare `select 1;` against the local database took **9.9 seconds**:
+
+```
+$ time docker exec supabase_db_kinnso-v3 psql -U postgres -d postgres -tAc "select 1;"
+1
+real    0m9.927s
+```
+
+**42 containers** were running, including *three* concurrent Supabase stacks — `kinnso-v3`
+(this worktree) plus `kinnso-r7-10-task5` and `kinnso-r7-10-task6` from sibling worktrees.
+Suites with 5s and 15s timeouts cannot pass reliably against a database that takes ten
+seconds to answer `select 1`, and no application change can affect that number.
+
+**Consequences for any verification claim made on this machine:**
+
+1. A diff in the failing-file list between two full runs is **not** evidence of a
+   regression. Establish causality by (a) checking whether the suite imports the changed
+   module at all, and (b) re-running it in isolation — and if the host is loaded, note
+   that (b) may fail for the same environmental reason.
+2. **Live-DB suite results are not measurable here while sibling stacks are running.**
+   Stop the other stacks (`supabase stop --project-id <id>`) before trusting a full-suite
+   number, or read CI, which gets a dedicated runner.
+3. Unit and component suites (no database) remain reliable and are what the slices in §4
+   are verified against.
 
 ### 3.3 A genuine pre-existing data-integrity bug — 1 test
 
@@ -182,6 +205,14 @@ ownership — it belongs with the missions domain, not a frontend slice. Recorde
 | `tests/kinnso.experience-card.test.tsx` (unchanged) | PASS |
 | `tests/auth.middleware.test.ts` (unchanged) | PASS |
 | `tests/auth.signin-redirect.test.tsx` (unchanged) | PASS |
+| `tests/auth.proxy-gate.test.ts` (**new**) | PASS (6 tests) |
+
+`proxy.ts` previously had **no test at all** — `auth.middleware.test.ts` covers
+`lib/supabase/middleware.ts`, not the proxy that consumes it. The new suite is genuine
+regression coverage, not a tautology: against the pre-change code the first case sees no
+`next` param at all, and the `%3Fnext` case specifically catches the trap of assigning a
+string containing `?` to `url.pathname`, which would escape the separator into the path
+and yield a 404 instead of a redirect.
 
 Focused run: **7 files, 70 tests, all passing.**
 `pnpm typecheck` **PASS** (8/8), `pnpm lint` **PASS** (0 errors), `pnpm honesty:lint` **PASS**.
@@ -208,7 +239,17 @@ Meanwhile `settlement-minting.rls.test.ts`, which failed in the baseline, **pass
 post-slice run — the failing set moves in both directions, which is the signature of the
 flakiness documented in §3.2, not of a code change.
 
-Every CRLF failure in §3.1 is unchanged in both runs.
+A third full run (after slice S2) reported `486 passed / 16 failed` files, again with a
+*different* live-DB set (`auth.creators-row`, `g.slug.host`, `queries.detail`, `rpc`).
+All four were cleared the same way: **zero** references to `getPublishedGuides`,
+`lib/auth/gate.ts`, `lib/auth/return-path.ts`, `@/proxy`, `GuideSaveButton` or
+`ExperienceSaveButton`, verified by grep. By that point the host measured 9.9s for
+`select 1` (§3.2), so isolation re-runs were no longer diagnostic either.
+
+**Honest summary of what the full-suite number proves on this machine: very little for the
+live-DB suites, and nothing that contradicts the focused results in §4.** Every CRLF
+failure in §3.1 is unchanged across all three runs, and the unit/component suites covering
+the changed code pass deterministically.
 
 ---
 
