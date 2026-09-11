@@ -79,7 +79,17 @@ trustworthy for a task-first UI. This is **slice S2**, the next task in `STATUS.
 
 ## P1 — honesty and recoverability
 
-### B4. Save failures are silently swallowed — **UNBLOCKED**
+### B4. Save failures are silently swallowed — ✅ **FIXED** (slice S5)
+
+Fixed in `fix(web): tell the traveller when a save fails, and re-auth an expired
+session`. `lib/saves/result.ts` adds a `reason: 'auth' | 'failed'` discriminator so an
+expired session re-authenticates through `signInHref` and returns to the guide or
+experience (plan §6.4), while a rejected write shows localized copy and lets the viewer
+retry. A failed save never flips the button to "Saved". Original description follows.
+
+---
+
+### B4 (original). Save failures are silently swallowed
 
 `GuideSaveButton` / `ExperienceSaveButton` only mutate state when `result.ok`; a failed
 save renders nothing at all. The action's message is also untranslated English
