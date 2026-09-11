@@ -255,10 +255,14 @@ cover its changes too.
 `docs/implementation/A11Y-SCREEN-READER-CHECKLIST.md`.
 
 **Modified:** `playwright.r7-10.config.ts` (imports `offSpecs` instead of declaring it),
-`r7-10-accessibility.ts` (new pure helpers + the `A11yException` ledger),
-`specs/r7-10-contract.spec.ts` (registration guard, ledger contents assertion),
-`specs/r7-10-accessibility-review.spec.ts` (unit tests for the new helpers, extended
-no-fixed-sleeps meta-test), `docs/implementation/STATUS.md` (records the partial closure).
+`r7-10-accessibility.ts` (new pure helpers, the `A11yException` ledger, and
+`waitForVisualSettlement` moved here so all three new specs can use it),
+`specs/r7-10-contract.spec.ts` (registration guard, ledger contents assertion, and the
+extended no-fixed-sleeps meta-test — structural assertions belong with the other contract
+checks, not with the helper unit tests),
+`specs/r7-10-accessibility.spec.ts` (imports `waitForVisualSettlement` instead of declaring
+it), `specs/r7-10-accessibility-review.spec.ts` (unit tests for the new pure helpers),
+`docs/implementation/STATUS.md` (records the partial closure).
 
 Plus whatever contained application fixes the new tests turn up (§5) — each independently
 revertible, and each called out separately in the PR rather than folded into the test commit.
