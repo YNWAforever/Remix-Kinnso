@@ -7,7 +7,7 @@
 
 | | |
 |---|---|
-| **Phase** | 0 complete (source portion) · 1 in progress · 2 slice 0 landed and tested |
+| **Phase** | 0 complete (source portion) · 1 in progress · 2 slices 0 and 1 landed and tested |
 | **Source revision** | `e086fbfc4e2bc4447dc9bbbe71af1290c866adaf` (== `origin/main`) |
 | **Working branch** | `claude/phase01-canonical-frontend` |
 | **Preserved branch** | `claude/kinnso-phased-implementation-42478b` @ `87f62693` (superseded; nothing unique) |
