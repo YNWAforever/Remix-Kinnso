@@ -76,9 +76,9 @@ const Footer = ({
         </div>
         {cols.map((column) => (
           <div key={column.title}>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso-amber">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso-amber">
               {column.title}
-            </h4>
+            </h2>
             <ul className="mt-4 space-y-2.5 text-sm">
               {column.links.map(([label, href]) => (
                 <li key={`${label}-${href}`}>
