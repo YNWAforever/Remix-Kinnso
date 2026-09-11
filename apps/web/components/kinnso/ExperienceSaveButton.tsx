@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Bookmark } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { saveExperienceAction, unsaveExperienceAction } from '@/lib/saves/experience-actions'
+import { currentReturnPath, signInHref } from '@/lib/auth/return-path'
 import type { Locale } from '@/lib/i18n/config'
 import type { Messages } from '@/lib/i18n/messages/en'
 
@@ -21,7 +22,9 @@ export function ExperienceSaveButton({ locale, experienceId, initialSaved, signe
 
   async function toggle() {
     if (!signedIn) {
-      router.push(`/${locale}/sign-in`)
+      // Carry this experience as the post-sign-in destination so the viewer
+      // lands back on the thing they wanted to save, not on a bare hub.
+      router.push(signInHref(locale, currentReturnPath()))
       return
     }
     setPending(true)
