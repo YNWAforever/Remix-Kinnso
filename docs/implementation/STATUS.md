@@ -81,6 +81,40 @@ across all 7 locales and that hostile inputs degrade. `tests/auth.gate.test.ts` 
 for query preservation and round-trip. `tests/kinnso.guide-save-button.test.tsx` extended.
 Focused run: **7 files, 70 tests, all pass.** `typecheck`/`lint`/`honesty:lint` **PASS**.
 
+### Phase 1 — slice S2: honest failure state for discovery
+
+Plan acceptance stories **#2** (absent destination → true empty, distinguish an API
+failure) and **#18** (an injected read failure stays an error with retry, never demo and
+never a false empty). Both are **Phase 1 exit-gate items**.
+
+**The defect.** `lib/guides/queries.ts:34` destructured only `data`, discarding the
+PostgREST error. `/explore` is statically regenerated every 300s across 7 locales, so one
+failed regeneration served a cheerful "no guides yet" catalogue for five minutes per
+locale — unlogged, unretryable, and indistinguishable from an empty database. The same
+`Promise.all` already awaited `getPublishedDestinations`, which *throws*: two opposite
+failure contracts on one route.
+
+**The change.**
+
+| File | Change |
+|---|---|
+| `lib/guides/queries.ts` | `getPublishedGuides` surfaces the query error |
+| `app/[locale]/page.tsx` | homepage opts into degrading via the repo's own `optionalQuery`, which **records** the failure |
+| `app/[locale]/explore/error.tsx` | **new** — the same one-line localized boundary already used by `g/[slug]` and `experiences/[slug]` |
+
+The homepage keeps the opposite contract deliberately: one band of ten degrading to hidden
+is reasonable where an empty catalogue *page* is not. The difference is now explicit and
+logged rather than invisible, matching the `.catch()` already on the articles band.
+
+Reusing `DetailRouteError` meant **no new i18n keys** — the localized `detailError` copy
+("We couldn't load this page" / "Try again") already exists in all 7 locales, and it
+supplies a real `reset()`. The locale-level fallback boundary's copy is hardcoded English,
+so this is also a small localization improvement.
+
+**Proof.** 58 tests across `guides.queries`, `explore.host`, `home.host`, `home.queries`.
+New cases assert `/explore` propagates **both** read failures, that a genuinely empty
+catalogue still renders as empty, and that the homepage still degrades *and logs*.
+
 ---
 
 ## Not done / explicitly out of scope this session

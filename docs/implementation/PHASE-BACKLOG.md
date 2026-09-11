@@ -23,7 +23,21 @@ Two distinct latent failures (ops-member delete; affiliate-program delete). Repr
 or relaxing the check, or soft-deleting ops members. Additive migration + RLS test.
 **Do not apply to production without authorization for that specific scope.**
 
-### B2. Silent false empty on the highest-traffic surface — **UNBLOCKED**
+### B2. Silent false empty on the highest-traffic surface — ✅ **FIXED** (slice S2)
+
+Fixed in `fix(web): stop /explore reporting a failed catalogue read as "no guides"`.
+`getPublishedGuides` now surfaces the error; the homepage opts into degrading through
+`optionalQuery` so the choice is explicit and logged; `/explore` gained the localized
+`DetailRouteError` boundary. See `STATUS.md`.
+
+**Residual, not fixed:** `getGuidesForSitemap` (`lib/guides/queries.ts:67`) still discards
+its error, so a failed read silently emits a sitemap with zero guides. Same class of bug,
+different blast radius (SEO rather than UI) — deliberately left out of that slice to keep
+it coherent. Original description follows.
+
+---
+
+### B2 (original). Silent false empty on the highest-traffic surface
 
 `lib/guides/queries.ts:26-36` destructures `const { data } = await query`, discarding the
 PostgREST error. `/explore` is statically generated with `revalidate = 300` across 7
