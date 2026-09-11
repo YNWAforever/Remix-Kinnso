@@ -51,8 +51,13 @@ test.describe('R7.10 keyboard traversal', () => {
       await waitForRoute(page, route)
       await waitForVisualSettlement(page)
 
+      // CSS applies a descendant combinator to only the FIRST clause of a selector list,
+      // so `main ${INTERACTIVE_SELECTOR}` left seven of its eight clauses matching the
+      // whole document — the header's locale <select> included. Scope each clause.
+      const mainScoped = INTERACTIVE_SELECTOR.split(', ').map((clause) => `main ${clause}`).join(', ')
+
       await page.evaluate((selector) => {
-        Array.from(document.querySelectorAll<HTMLElement>(`main ${selector}`))
+        Array.from(document.querySelectorAll<HTMLElement>(selector))
           .filter((element) => element.getClientRects().length > 0)
           // A roving-tabindex composite (the WAI-ARIA Tabs widget in HowItWorks.tsx)
           // keeps its inactive members out of Tab order with tabindex="-1" on purpose;
@@ -60,8 +65,21 @@ test.describe('R7.10 keyboard traversal', () => {
           // value, so this drops exactly those without touching the shared selector,
           // which the structure spec still needs to see them for name checking.
           .filter((element) => element.tabIndex >= 0)
+          // A native same-name radio group is ONE Tab stop: the checked member, or the
+          // first when none is checked. Unchecked members still report tabIndex 0, so
+          // excluding them here is the only way not to demand that the browser's own
+          // grouping semantics be wrong.
+          .filter((element, _index, all) => {
+            const input = element as HTMLInputElement
+            if (input.type !== 'radio' || !input.name) return true
+            const group = all.filter((candidate) => {
+              const other = candidate as HTMLInputElement
+              return other.type === 'radio' && other.name === input.name
+            })
+            return (group.find((candidate) => (candidate as HTMLInputElement).checked) ?? group[0]) === element
+          })
           .forEach((element, index) => element.setAttribute('data-r710-target', String(index)))
-      }, INTERACTIVE_SELECTOR)
+      }, mainScoped)
 
       const expected = await page.locator('[data-r710-target]').count()
       expect(expected, `${route.id} found no interactive elements in main`).toBeGreaterThan(0)
