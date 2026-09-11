@@ -260,7 +260,7 @@ settlement. `/studio/earnings` can therefore show a batch "Paid" beside settleme
 All background work is unawaited in-process promises in a single Hono worker; a redeploy
 strands the row until a 15-minute sweeper marks it failed. Plan §8 (phase 3) depends on this.
 
-### B15. Two source-scanning suites sit on the 5s timeout boundary — ✅ **FIXED**
+### B15. Source-scanning suites sit on the 5s timeout boundary — ✅ **FIXED** (it was three, not two)
 
 `media.source-contract` TypeScript-parsed every `.ts`/`.tsx` under `app` and `components`
 (~1200 files) inside one `it()`. Only three constructs can violate the contract, so files
@@ -274,6 +274,16 @@ cannot produce a violation, and any file mentioning `next/image` is parsed regar
 the local alias). Verified by injecting `<img alt="" />` into a real component and
 confirming the suite fails with the file and line — after a first attempt whose injection
 silently did not land, which is exactly the false pass this check exists to catch.
+
+A later full run surfaced a third: `product-state.copy-guard`. Worth noting because it
+appeared immediately after a commit that added i18n keys, so it *looked* like a copy
+regression — the signature (`Test timed out in 5000ms`, not an assertion failure) is what
+distinguishes them.
+
+Measured: the three scanning suites together take ~11s of test time, so the 5s per-test
+default was the wrong budget for whole-tree work rather than the machine being slow. They
+now get an explicit 15s, and `r7-6` stopped concatenating ~1200 files into one string just
+to search it once.
 
 Original description follows.
 
