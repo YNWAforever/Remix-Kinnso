@@ -41,8 +41,8 @@ describe('ExploreView', () => {
     expect(document.querySelector('.k2-card')).toBeTruthy()
   })
 
-  it('filters by canonical destination and replaces the current URL', () => {
-    const replaceSpy = vi.spyOn(window.history, 'replaceState')
+  it('filters by canonical destination and PUSHES the URL so Back undoes it', () => {
+    const pushSpy = vi.spyOn(window.history, 'pushState')
     render(<ExploreView
       locale="en"
       t={en.explore}
@@ -64,7 +64,7 @@ describe('ExploreView', () => {
     fireEvent.click(screen.getByRole('radio', { name: 'Tokyo' }))
     expect(screen.getByRole('heading', { level: 3, name: guides[0].title })).toBeVisible()
     expect(screen.queryByRole('heading', { level: 3, name: guides[1].title })).not.toBeInTheDocument()
-    expect(replaceSpy).toHaveBeenLastCalledWith(
+    expect(pushSpy).toHaveBeenLastCalledWith(
       window.history.state,
       '',
       '/en/explore?destination=tokyo',
@@ -144,5 +144,51 @@ describe('ExploreView', () => {
     fireEvent.click(screen.getByRole('button', { name: en.explore.resetFilters }))
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(guides.length)
     expect(window.location.search).toBe('')
+  })
+
+  // Discrete choices push so Back steps through them; typing replaces, because a
+  // history entry per keystroke would mean pressing Back a dozen times to leave
+  // a search typed once. Previously everything replaced, so Back skipped the
+  // whole filtering session in one jump.
+  it('replaces rather than pushes while the viewer is typing', async () => {
+    vi.useFakeTimers()
+    const pushSpy = vi.spyOn(window.history, 'pushState')
+    const replaceSpy = vi.spyOn(window.history, 'replaceState')
+    render(<ExploreView locale="en" t={en.explore} guides={guides} destinations={destinations} />)
+
+    fireEvent.change(screen.getByRole('searchbox', { name: en.explore.searchLabel }), {
+      target: { value: guides[0].creatorHandle },
+    })
+    await vi.advanceTimersByTimeAsync(250)
+
+    expect(window.location.search).toContain('q=')
+    expect(replaceSpy).toHaveBeenCalled()
+    expect(pushSpy).not.toHaveBeenCalled()
+  })
+
+  it('re-derives the grid on back/forward, not just the URL', async () => {
+    render(<ExploreView
+      locale="en"
+      t={en.explore}
+      guides={[
+        { ...guides[0], slug: 'tokyo', city: '東京' },
+        { ...guides[1], slug: 'seoul', city: 'Seoul' },
+      ]}
+      destinations={[
+        ...destinations,
+        { ...destinations[0], slug: 'seoul', name: 'Seoul', matchTerms: [], guideCount: 1 },
+      ]}
+    />)
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Tokyo' }))
+    expect(screen.queryByRole('heading', { level: 3, name: guides[1].title })).not.toBeInTheDocument()
+
+    // Simulate the browser going Back: the URL reverts and popstate fires.
+    window.history.replaceState({}, '', '/en/explore')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+
+    // Without the popstate listener the URL would say "unfiltered" while the grid
+    // still showed only Tokyo -- the two silently disagreeing.
+    expect(await screen.findByRole('heading', { level: 3, name: guides[1].title })).toBeVisible()
   })
 })
