@@ -48,6 +48,12 @@ const offer = {
   validTo: '2027-06-01T00:00:00.000Z',
 }
 
+const copy = {
+  claimButton: 'Claim this offer',
+  validThrough: 'Valid through',
+  claimFailed: 'That offer could not be claimed. It may have ended or reached its limit.',
+}
+
 describe('OfferClaimCard', () => {
   beforeEach(() => {
     cleanup()
@@ -64,7 +70,7 @@ describe('OfferClaimCard', () => {
     const onClaim = vi.fn(async () => ({ ok: true, claimId: 'claim-1' }))
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={onClaim}
       />,
@@ -78,7 +84,7 @@ describe('OfferClaimCard', () => {
   it('renders the offer title and merchant name', () => {
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId={null} source="profile"
         onClaim={vi.fn()}
       />,
@@ -91,7 +97,7 @@ describe('OfferClaimCard', () => {
     hasAnalyticsConsentMock.mockReturnValue(true)
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={vi.fn()}
       />,
@@ -105,7 +111,7 @@ describe('OfferClaimCard', () => {
     hasAnalyticsConsentMock.mockReturnValue(true)
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId={null} source="profile"
         onClaim={vi.fn()}
       />,
@@ -118,7 +124,7 @@ describe('OfferClaimCard', () => {
   it('does NOT fire offer_viewed on mount when consent has not been granted yet', () => {
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={vi.fn()}
       />,
@@ -129,7 +135,7 @@ describe('OfferClaimCard', () => {
   it('fires offer_viewed once consent is granted AFTER mount, instead of losing the event', () => {
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={vi.fn()}
       />,
@@ -149,7 +155,7 @@ describe('OfferClaimCard', () => {
   it('fires offer_viewed exactly once even if consent toggles or the component re-renders repeatedly', () => {
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={vi.fn()}
       />,
@@ -166,7 +172,7 @@ describe('OfferClaimCard', () => {
     const onClaim = vi.fn(async () => ({ ok: true, claimId: 'claim-1' }))
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={onClaim}
       />,
@@ -182,7 +188,7 @@ describe('OfferClaimCard', () => {
     const onClaim = vi.fn(async () => ({ ok: false, errors: { form: ['This offer could not be claimed'] } }))
     render(
       <OfferClaimCard
-        t={{ claimButton: 'Claim this offer', validThrough: 'Valid through' }}
+        t={copy}
         locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
         onClaim={onClaim}
       />,
@@ -191,5 +197,71 @@ describe('OfferClaimCard', () => {
     fireEvent.click(screen.getByText('Claim this offer'))
     await waitFor(() => expect(onClaim).toHaveBeenCalled())
     expect(trackTravellerEventMock).not.toHaveBeenCalledWith('offer_claimed', expect.anything())
+  })
+
+  it('states that a claim failed instead of silently doing nothing', async () => {
+    // Cap reached / already claimed / no longer live all used to render nothing:
+    // the button simply stopped responding, which reads as a broken page.
+    const onClaim = vi.fn(async () => ({ ok: false, errors: { form: ['Offer is no longer available'] } }))
+    render(
+      <OfferClaimCard
+        t={copy}
+        locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
+        onClaim={onClaim}
+      />,
+    )
+
+    fireEvent.click(screen.getByText('Claim this offer'))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent(copy.claimFailed)
+  })
+
+  it('does not leak the server reason for the failure', async () => {
+    // The specific reason would expose another visitor's claim state and the
+    // merchant's remaining capacity, so it stays server-side.
+    const onClaim = vi.fn(async () => ({ ok: false, errors: { form: ['total_cap_reached'] } }))
+    render(
+      <OfferClaimCard
+        t={copy}
+        locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
+        onClaim={onClaim}
+      />,
+    )
+
+    fireEvent.click(screen.getByText('Claim this offer'))
+
+    await screen.findByRole('alert')
+    expect(screen.queryByText(/total_cap_reached/)).toBeNull()
+  })
+
+  it('does not record an offer_claimed event for a failed claim', async () => {
+    setConsent(true)
+    trackTravellerEventMock.mockClear()
+    const onClaim = vi.fn(async () => ({ ok: false, errors: { form: ['nope'] } }))
+    render(
+      <OfferClaimCard
+        t={copy}
+        locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
+        onClaim={onClaim}
+      />,
+    )
+
+    fireEvent.click(screen.getByText('Claim this offer'))
+
+    await screen.findByRole('alert')
+    const claimed = trackTravellerEventMock.mock.calls.filter((c) => c[0] === 'offer_claimed')
+    expect(claimed).toHaveLength(0)
+  })
+
+  it('shows no alert before the viewer has tried to claim', () => {
+    render(
+      <OfferClaimCard
+        t={copy}
+        locale="en" offer={offer} creatorId="creator-1" guideId="guide-1" source="guide"
+        onClaim={vi.fn(async () => ({ ok: true, claimId: 'claim-1' }))}
+      />,
+    )
+    expect(screen.queryByRole('alert')).toBeNull()
   })
 })

@@ -139,6 +139,10 @@ export interface MerchantDashboardMessages {
   cardExperiencesBody: string
   cardBookingsTitle: string
   cardBookingsBody: string
+  cardOffersTitle: string
+  cardOffersBody: string
+  cardRedeemTitle: string
+  cardRedeemBody: string
   cardProfileTitle: string
   cardProfileBody: string
   cardBudgetTitle: string
@@ -1471,6 +1475,7 @@ export interface Messages {
     validThrough: string
     heading: string
     showAt: string
+    claimFailed: string
   }
   offerRedeem: {
     title: string
@@ -2647,6 +2652,10 @@ const messages: Messages = {
     cardExperiencesBody: 'List the tours and activities travellers will soon book.',
     cardBookingsTitle: 'Bookings',
     cardBookingsBody: 'Track who booked your experiences and mark completed stays.',
+    cardOffersTitle: 'Offers',
+    cardOffersBody: 'Create in-store offers travellers can claim from creator guides.',
+    cardRedeemTitle: 'Redeem a code',
+    cardRedeemBody: 'Scan or type a visitor code to confirm the visit in store.',
     cardProfileTitle: 'Public profile',
     cardProfileBody: 'Control how your business appears across KINNSO.',
     cardBudgetTitle: 'Budget',
@@ -3183,6 +3192,7 @@ const messages: Messages = {
     validThrough: 'Valid through',
     heading: 'Show this at the venue',
     showAt: 'Show this at',
+    claimFailed: 'That offer could not be claimed. It may have ended or reached its limit.',
   },
   offerRedeem: {
     title: 'Redeem',
