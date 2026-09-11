@@ -7,6 +7,9 @@ import { describe, expect, it } from 'vitest'
 const webRoot = fileURLToPath(new URL('..', import.meta.url))
 const sourceRoots = ['app', 'components'].map((directory) => join(webRoot, directory))
 
+/** Every construct findViolations can flag. Anything else cannot violate the contract. */
+const MEDIA_MARKERS = ['EntityMedia', 'next/image', '<img'] as const
+
 function sourceFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = join(directory, entry.name)
@@ -136,9 +139,18 @@ describe('media source contract', () => {
 
   it('keeps application media JSX within the contract', () => {
     const violations = sourceRoots.flatMap((directory) =>
-      sourceFiles(directory).flatMap((path) =>
-        findViolations(relative(webRoot, path), readFileSync(path, 'utf8')),
-      ),
+      sourceFiles(directory).flatMap((path) => {
+        const text = readFileSync(path, 'utf8')
+        // Only three constructs can violate this contract, and TypeScript-parsing
+        // ~1200 files to find them took the whole 5s budget -- the test passed
+        // alone and timed out in a full run, which reads as flakiness rather
+        // than as a slow test. The filter is deliberately conservative: a file
+        // mentioning none of these markers cannot produce a violation, and any
+        // file mentioning next/image is parsed regardless of the local alias
+        // the import is bound to.
+        if (!MEDIA_MARKERS.some((marker) => text.includes(marker))) return []
+        return findViolations(relative(webRoot, path), text)
+      }),
     )
 
     expect(violations).toEqual([])

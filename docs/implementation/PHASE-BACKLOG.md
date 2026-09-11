@@ -202,7 +202,26 @@ Unreferenced, and every CVA variant references shadcn CSS variables defined nowh
 repo. Either wire them to real tokens or delete them; leaving them invites a future slice
 to adopt a primitive that silently renders unstyled.
 
-### B11. hreflang over-advertises — **UNBLOCKED**
+### B11. hreflang over-advertises — ❌ **NOT A DEFECT** (withdrawn)
+
+Re-examined during Phase 1 and **withdrawn**. The finding assumed hreflang implies a
+translated body, so advertising 7 locales for a single-language guide looked like a lie.
+It is not: `/zh-hk/g/<slug>` is a real, reachable URL that renders that guide under
+Chinese chrome, so all seven alternates exist.
+
+The contrast with articles is deliberate, not an oversight. Articles carry per-locale
+**translation rows** (`article_translations`), so `buildArticleMetadata` narrows to
+`indexing.alternateLocales` — a missing translation genuinely means no alternate. Guides,
+creators, merchants, experiences and sessions have no translation table: one authored
+body, seven localized presentations. `hreflangFor` takes a `locales` parameter precisely
+so callers can narrow it when narrowing is correct.
+
+**Implementing the "fix" would have removed genuine alternates and hurt discovery.**
+Left unchanged.
+
+---
+
+### B11 (original, withdrawn). hreflang over-advertises
 
 All `build*Metadata` helpers pass the full 7-locale tuple, so a single-language guide
 advertises six translations that do not exist. Only articles compute this correctly.
@@ -224,7 +243,26 @@ settlement. `/studio/earnings` can therefore show a batch "Paid" beside settleme
 All background work is unawaited in-process promises in a single Hono worker; a redeploy
 strands the row until a 15-minute sweeper marks it failed. Plan §8 (phase 3) depends on this.
 
-### B15. Two source-scanning suites sit on the 5s timeout boundary — **UNBLOCKED**
+### B15. Two source-scanning suites sit on the 5s timeout boundary — ✅ **FIXED**
+
+`media.source-contract` TypeScript-parsed every `.ts`/`.tsx` under `app` and `components`
+(~1200 files) inside one `it()`. Only three constructs can violate the contract, so files
+are now pre-filtered on `EntityMedia` / `next/image` / `<img` before being parsed.
+
+**5.06s → 2.98s** for the two suites together — real headroom against the 5s timeout
+rather than passing by luck on an idle machine.
+
+The filter is conservative by construction (a file mentioning none of those markers
+cannot produce a violation, and any file mentioning `next/image` is parsed regardless of
+the local alias). Verified by injecting `<img alt="" />` into a real component and
+confirming the suite fails with the file and line — after a first attempt whose injection
+silently did not land, which is exactly the false pass this check exists to catch.
+
+Original description follows.
+
+---
+
+### B15 (original). Two source-scanning suites sit on the 5s timeout boundary
 
 `tests/media.source-contract.test.ts` and `tests/r7-6-navigation-footer.test.ts`
 recursively walk the source tree. Run in isolation on an idle machine they take **5.06s of
