@@ -209,6 +209,34 @@ is what this extends. The case most worth having: a failed save never flips the 
 "Saved" and never calls `router.refresh()`, because only server evidence marks a save as
 saved.
 
+### Phase 1 — slice S6: pin line endings (B8)
+
+Not a feature, but the thing that made every other verification claim harder than it
+needed to be: **the suite was silently not reproducible off Linux.** 14 tests across 11
+files failed on any Windows checkout because they `readFileSync` a tracked file and assert
+LF fragments, while the working tree was CRLF.
+
+The repository had **no `.gitattributes`**, so working-tree encoding was decided by
+whatever `core.autocrlf` a contributor happened to have. CI runs on Linux and never saw
+it — the worst shape for this kind of defect, because anyone hitting it would reasonably
+assume they had broken something.
+
+**The risk worth ruling out was whether this changed committed content. It did not:**
+
+- All 1566 index entries were already `i/lf` (`git ls-files --eol`).
+- `git add --renormalize .` staged zero blobs.
+- worktree↔index, index↔HEAD and worktree↔HEAD diffs are **all empty**.
+- The only staged file is `.gitattributes` itself.
+
+**Result: 97 tests across the 11 files now pass — 14 failures eliminated.**
+
+Two notes for anyone repeating it. `core.autocrlf=true` here comes from **system** config
+(the Git-for-Windows default), not user or repo config — which is exactly why a
+repository-level `.gitattributes` is the right fix rather than a machine-wide change. And
+converting an *existing* working tree in place leaves the index stat cache stale, so
+`git status` reports every file modified while `git diff` shows nothing; `git add .` clears
+it and stages nothing. A fresh clone never sees this.
+
 ---
 
 ## Not done / explicitly out of scope this session
@@ -228,24 +256,23 @@ saved.
 
 ## Next task (concrete)
 
-**Slice S6 — B8: `.gitattributes` with `eol=lf`.** This is now the highest-leverage
-remaining item, because it is what makes the test suite reproducible on Windows at all:
-14 of the ~17 remaining failures are pure line-ending artifacts (`BASELINE-VERIFICATION.md`
-§3.1). It **must be its own PR** — it rewrites line endings repo-wide and would otherwise
-bury a feature diff — and it should be verified by re-running the `db.*` static-text
-suites before and after.
-
-Then **B9** (`--color-kinnso-line` is used in ~20 places but never defined, so those
-borders render as nothing under Tailwind v4) — small, visible, and self-contained.
+**Slice S7 — B9: `--color-kinnso-line` is used but never defined.** `border-kinnso-line`
+appears in ~20 places; the token does not exist, so under Tailwind v4 those borders resolve
+to nothing and simply do not render. Small, visible, self-contained — either define the
+token or sweep the usages to an existing one. Worth pairing with **B10** (13 of 18
+`components/ui` primitives are unreferenced and their CVA variants reference shadcn CSS
+variables defined nowhere), since both are the same class of design-system drift.
 
 The highest-severity finding overall remains the **ops-member deletion bug**
 (`BASELINE-VERIFICATION.md` §3.3) — a `DELETE` on `kinnso_ops_members` aborts with a check
-violation. It needs a migration and a product decision about mission ownership, and is
-*not* a frontend concern. See `PHASE-BACKLOG.md` for the ranked remainder.
+violation because `ON DELETE SET NULL` contradicts `missions_check`. It needs a migration
+and a product decision about mission ownership, and is *not* a frontend concern.
+
+See `PHASE-BACKLOG.md` for the ranked remainder.
 
 ### Before extending the branch further
 
-Eleven commits are unpushed. The GitHub connector is not authenticated in this session, so
-opening a PR needs either explicit authorization to push or the owner doing it. Given that
-five slices now touch identity, discovery, role gates, the visit loop and saves, review
-before the branch grows further is the cheaper order.
+Thirteen commits are unpushed. The GitHub connector is not authenticated in this session,
+so opening a PR needs either explicit authorization to push or the owner doing it. Six
+slices now touch identity, discovery, role gates, the visit loop, saves and the build —
+review before the branch grows further is the cheaper order.
