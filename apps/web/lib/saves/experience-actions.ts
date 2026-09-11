@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { requireTravelerAction } from '@/lib/admin/guard'
-import { formError, type ActionResult } from '@/lib/admin/result'
+import { saveAuthFailure, saveFailed, type SaveOutcome } from '@/lib/saves/result'
 import type { Locale } from '@/lib/i18n/config'
 
 const tripsPath = (locale: Locale) => `/${locale}/trips`
@@ -12,10 +12,13 @@ const tripsPath = (locale: Locale) => `/${locale}/trips`
 export async function saveExperienceAction(
   locale: Locale,
   experienceId: string,
-): Promise<ActionResult<{ experienceId: string }>> {
+): Promise<SaveOutcome<{ experienceId: string }>> {
   const supabase = await createSupabaseServerClient()
   const gate = await requireTravelerAction(supabase)
-  if (!gate.ok) return gate
+  // Distinguished from a write failure: the viewer signed in, then the session
+  // lapsed before they clicked. They should be asked to re-authenticate and
+  // returned to this experience, not told the save broke.
+  if (!gate.ok) return saveAuthFailure(gate.errors)
 
   // ignoreDuplicates compiles to INSERT ... ON CONFLICT DO NOTHING, never
   // ON CONFLICT DO UPDATE -- so no UPDATE grant on experience_saves is needed,
@@ -28,7 +31,7 @@ export async function saveExperienceAction(
       { experience_id: experienceId, traveler_user_id: gate.user.id },
       { onConflict: 'experience_id,traveler_user_id', ignoreDuplicates: true },
     )
-  if (error) return formError('Experience could not be saved')
+  if (error) return saveFailed('Experience could not be saved')
 
   revalidatePath(tripsPath(locale))
   return { ok: true, experienceId }
@@ -38,17 +41,20 @@ export async function saveExperienceAction(
 export async function unsaveExperienceAction(
   locale: Locale,
   experienceId: string,
-): Promise<ActionResult<{ experienceId: string }>> {
+): Promise<SaveOutcome<{ experienceId: string }>> {
   const supabase = await createSupabaseServerClient()
   const gate = await requireTravelerAction(supabase)
-  if (!gate.ok) return gate
+  // Distinguished from a write failure: the viewer signed in, then the session
+  // lapsed before they clicked. They should be asked to re-authenticate and
+  // returned to this experience, not told the save broke.
+  if (!gate.ok) return saveAuthFailure(gate.errors)
 
   const { error } = await supabase
     .from('experience_saves')
     .delete()
     .eq('experience_id', experienceId)
     .eq('traveler_user_id', gate.user.id)
-  if (error) return formError('Experience could not be removed')
+  if (error) return saveFailed('Experience could not be removed')
 
   revalidatePath(tripsPath(locale))
   return { ok: true, experienceId }

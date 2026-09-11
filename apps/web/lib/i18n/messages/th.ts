@@ -1517,11 +1517,13 @@ const messages: Messages = {
     save: 'บันทึก',
     saved: 'บันทึกแล้ว',
     signInToSave: 'เข้าสู่ระบบเพื่อบันทึก',
+    saveFailed: 'บันทึกไม่สำเร็จ โปรดลองอีกครั้ง',
   },
   experienceSave: {
     save: 'บันทึก',
     saved: 'บันทึกแล้ว',
     signInToSave: 'เข้าสู่ระบบเพื่อบันทึก',
+    saveFailed: 'บันทึกไม่สำเร็จ โปรดลองอีกครั้ง',
   },
   reviews: {
     formHeading: 'เขียนรีวิว',

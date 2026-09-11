@@ -1375,11 +1375,13 @@ export interface Messages {
     save: string
     saved: string
     signInToSave: string
+    saveFailed: string
   }
   experienceSave: {
     save: string
     saved: string
     signInToSave: string
+    saveFailed: string
   }
   reviews: {
     formHeading: string
@@ -3043,11 +3045,13 @@ const messages: Messages = {
     save: 'Save',
     saved: 'Saved',
     signInToSave: 'Sign in to save',
+    saveFailed: 'That did not save. Please try again.',
   },
   experienceSave: {
     save: 'Save',
     saved: 'Saved',
     signInToSave: 'Sign in to save',
+    saveFailed: 'That did not save. Please try again.',
   },
   reviews: {
     formHeading: 'Leave a review',

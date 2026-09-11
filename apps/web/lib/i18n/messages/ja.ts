@@ -1517,11 +1517,13 @@ const messages: Messages = {
     save: '保存',
     saved: '保存済み',
     signInToSave: '保存するにはログイン',
+    saveFailed: '保存できませんでした。もう一度お試しください。',
   },
   experienceSave: {
     save: '保存',
     saved: '保存済み',
     signInToSave: '保存するにはログイン',
+    saveFailed: '保存できませんでした。もう一度お試しください。',
   },
   reviews: {
     formHeading: 'レビューを書く',

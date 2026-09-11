@@ -1517,11 +1517,13 @@ const messages: Messages = {
     save: '저장',
     saved: '저장됨',
     signInToSave: '저장하려면 로그인하세요',
+    saveFailed: '저장하지 못했습니다. 다시 시도해 주세요.',
   },
   experienceSave: {
     save: '저장',
     saved: '저장됨',
     signInToSave: '저장하려면 로그인하세요',
+    saveFailed: '저장하지 못했습니다. 다시 시도해 주세요.',
   },
   reviews: {
     formHeading: '리뷰 작성',

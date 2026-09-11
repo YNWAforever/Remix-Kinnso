@@ -1517,11 +1517,13 @@ const messages: Messages = {
     save: '儲存',
     saved: '已儲存',
     signInToSave: '登入以儲存',
+    saveFailed: '未能儲存，請再試一次。',
   },
   experienceSave: {
     save: '儲存',
     saved: '已儲存',
     signInToSave: '登入以儲存',
+    saveFailed: '未能儲存，請再試一次。',
   },
   reviews: {
     formHeading: '撰寫評價',
