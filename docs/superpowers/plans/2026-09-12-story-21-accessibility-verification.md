@@ -1073,6 +1073,14 @@ For each of the 9 routes in `apps/e2e/r7-10-routes.ts`:
 
 - [ ] **Step 2: Record the partial closure**
 
+> **CORRECTION, found during execution.** `docs/implementation/STATUS.md` does NOT exist on
+> `main` — the whole `docs/implementation/` tree belongs to branch
+> `claude/phase01-canonical-frontend` (PR #131), which is not an ancestor of this branch. The
+> plan referenced it because the author had it in context from that PR. Creating a competing
+> `STATUS.md` here would conflict with #131, so **skip this step**: the partial-closure record
+> goes in the pull request description instead, and the STATUS.md entry is added once #131
+> merges. The checklist file itself is unaffected and still lands in `docs/implementation/`.
+
 In `docs/implementation/STATUS.md`, replace the story 21 line (`4. **Story 21 - viewports, native 200% zoom, keyboard, screen reader.** NOT RUN.`) with:
 
 ```markdown

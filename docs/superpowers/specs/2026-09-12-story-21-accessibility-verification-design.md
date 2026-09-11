@@ -209,6 +209,11 @@ of an open-ended layout project.
 `docs/implementation/A11Y-SCREEN-READER-CHECKLIST.md`: per route, the exact steps to perform,
 what should be announced, and a results table to fill in.
 
+> **Correction, found during execution:** this spec also assumed `docs/implementation/STATUS.md`
+> exists on `main`. It does not — that tree belongs to PR #131 and is not an ancestor of this
+> branch. The partial-closure record therefore goes in the pull request description, and the
+> STATUS.md entry follows once #131 merges.
+
 **Story 21 will be closed partially, and STATUS.md will say so.** NVDA and VoiceOver cannot
 be driven from this environment, so the honest end state is:
 
