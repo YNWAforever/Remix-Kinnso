@@ -49,15 +49,15 @@ already depend on. In slice 0 every one is `NULL` and `origin` is always `'autho
 | **No FK from `trips` to `guides` anywhere** | "Saving is not cloning" becomes structural, not conventional. A trip cannot be a view over a guide. | grep of the migration |
 | **Credit is a snapshot, not a join** | `guides.creator_id` is `ON DELETE CASCADE`, so a departing creator takes their guides with them. A live FK would orphan or delete a traveller's stop. The snapshot is the plan's "non-sensitive provenance tombstone", and it is why traveller notes survive withdrawal. | schema inspection |
 | **`trip_stops_origin_credit_consistent` CHECK** | An authored stop cannot carry credit; an adopted stop must name its source. | **Tested:** inserting `origin='authored'` with a `source_guide_id` fails. |
-| **Credit columns and `origin` excluded from the UPDATE grant** | A traveller edits their own note, time and order; they cannot rewrite who a stop came from, nor promote an authored stop into a credited one. | column-level `grant update (...)` |
-| **`head_revision_no` excluded from the UPDATE grant** | A client cannot fake a revision and defeat optimistic concurrency. | column-level grant |
+| **Credit columns and `origin` excluded from the UPDATE grant** | A traveller edits their own note, time and order; they cannot rewrite who a stop came from, nor promote an authored stop into a credited one. | **Mutation-verified:** granting `update (origin, source_creator_name)` makes the test fail; revoking it makes it pass. |
+| **`head_revision_no` excluded from the UPDATE grant** | A client cannot fake a revision and defeat optimistic concurrency. | **Mutation-verified:** granting `update (head_revision_no)` makes the test fail. |
 | **Day offsets + `start_minute_of_day`, never stored dates** | Changing the destination timezone rewrites **zero** stop rows and preserves wall-clock intent. | **Tested:** `updated_at` identical before/after a zone change while `starts_at` moved. |
 | **`start_date` nullable, not a sentinel** | Undated trips are first-class; "Day 1" renders with `starts_at = NULL`. | **Tested.** |
 | **`dst_anomaly` in `trip_stops_resolved`** | A spring-forward 01:30 surfaces as an anomaly instead of being silently shifted an hour. | **Tested:** 01:30 Europe/London on 2030-03-31 → `dst_anomaly = true`. |
 | **Timezone validated by BEFORE trigger** | A `CHECK` cannot call `pg_timezone_names` (not IMMUTABLE). Fails at write time, not at read time when it would break a page. | **Tested:** `Mars/Olympus` → `invalid_time_zone`. |
 | **`trip_revisions` is metadata-only, append-only** | A jsonb content snapshot would duplicate live rows and become a second place where withdrawn creator text hides from redaction. | **Tested:** `UPDATE` → `trip_revisions_append_only`. |
-| **No anon grant *and* no anon policy on any `trip_*` table** | The privilege layer refuses before RLS is consulted. | migration |
-| **`trip_stops_resolved` uses `security_invoker`** | The view is filtered by the caller's own RLS, not the view owner's privileges. | migration |
+| **No anon grant *and* no anon policy on any `trip_*` table** | The privilege layer refuses before RLS is consulted. | **Tested:** all five relations answer anon with an *error*, not an empty set. |
+| **`trip_stops_resolved` uses `security_invoker`** | The view is filtered by the caller's own RLS, not the view owner's privileges. | **Tested:** traveller B reads nothing through the view. |
 
 ## 4. Known trade-off, discovered by testing
 
@@ -70,6 +70,32 @@ future upsert keyed on `(trip_id, day_offset)` or `(trip_day_id, position)` must
 written as an explicit `UPDATE … else INSERT`, or the constraint must be split into a
 deferrable one plus a non-deferrable partial index. Recorded here because it will otherwise be
 rediscovered as a confusing runtime error.
+
+## 4a. Verification, and a trap found inside it
+
+The invariants above are no longer asserted by hand-run SQL. They live in
+`apps/web/tests/trips.rls.test.ts`, which signs in **two real accounts** and reaches
+PostgREST directly — an application-layer guard proves nothing about what a determined
+caller can reach. It is gated on the same fail-closed local-live opt-in as the other RLS
+suites (15 skipped without it, 15 passed with it), so the secret-free CI gate is unaffected.
+
+**The trap, worth recording because it nearly shipped:** a defence-in-depth schema can make
+a test pass for the wrong reason. The first version of the "cannot promote an authored stop
+into a credited one" test updated `origin='adopted'` while leaving `source_guide_id` NULL.
+That payload violates `trip_stops_origin_credit_consistent`, so the **CHECK** refused the
+write and the **grant was never exercised**. Proof: granting
+`update (origin, source_creator_name)` to `authenticated` left the suite fully green.
+
+The fix is to attack with a payload the CHECK *accepts* — either a credit column the CHECK
+says nothing about (`source_creator_name` alone), or a fully self-consistent adopted payload
+— so only the column grant can refuse it. Both now fail the test when the grant is widened
+and pass when it is revoked.
+
+Generalisation for the remaining slices: **when two layers both refuse a write, a green test
+does not tell you which one is holding.** Any assertion whose value depends on a *specific*
+layer must be mutation-verified by removing that layer. Where both layers genuinely should
+hold (ownership reassignment is refused by the missing grant *and* by the RLS `with check`),
+the test asserts the property rather than claiming a mechanism.
 
 ## 5. Deferred — these need an owner decision, not an invented rule
 

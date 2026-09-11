@@ -7,7 +7,7 @@
 
 | | |
 |---|---|
-| **Phase** | 0 complete (source portion) · 1 in progress |
+| **Phase** | 0 complete (source portion) · 1 in progress · 2 slice 0 landed and tested |
 | **Source revision** | `e086fbfc4e2bc4447dc9bbbe71af1290c866adaf` (== `origin/main`) |
 | **Working branch** | `claude/phase01-canonical-frontend` |
 | **Preserved branch** | `claude/kinnso-phased-implementation-42478b` @ `87f62693` (superseded; nothing unique) |
@@ -311,14 +311,39 @@ any code is written.
 
 ---
 
+## Phase 2 — slice 0 (personal trips, authored-only)
+
+**Landed.** Migration `20260911090000_p2_0_personal_trips.sql` adds `places`, `trips`,
+`trip_days`, `trip_stops`, `trip_revisions`, the `trip_stops_resolved` view and
+`upsert_place()`. It touches **zero existing objects**, so rollback is a drop in reverse
+dependency order and no existing behaviour can regress. **Applied to the local ephemeral
+container only — no hosted environment.** Reasoning and deferred owner decisions:
+`ADRs/0001-phase-2-trips-and-versions.md`.
+
+**Exit-gate item met:** isolation is now demonstrated with *separate accounts and direct API
+attempts* — `apps/web/tests/trips.rls.test.ts`, 15 tests, two signed-in travellers going
+straight at PostgREST. Two grant assertions are **mutation-verified** (widening the column
+grant makes them fail). One of them originally passed for the wrong reason — the CHECK
+constraint refused the payload so the grant was never exercised; see ADR §4a, which
+generalises the trap for the remaining slices.
+
+**Not yet built:** journals, immutable public versions, the adoption RPC, and any trip UI.
+Adoption is deliberately data-only for now because every guide in the database is
+summary-only, so structured adoption has nothing to adopt (ADR §2).
+
+---
+
 ## Next task (concrete)
 
-**Slice S7 — B9: `--color-kinnso-line` is used but never defined.** `border-kinnso-line`
-appears in ~20 places; the token does not exist, so under Tailwind v4 those borders resolve
-to nothing and simply do not render. Small, visible, self-contained — either define the
-token or sweep the usages to an existing one. Worth pairing with **B10** (13 of 18
-`components/ui` primitives are unreferenced and their CVA variants reference shadcn CSS
-variables defined nowhere), since both are the same class of design-system drift.
+**Phase 2 slice 1 — the trip write path.** Slice 0 is schema and proof; nothing in the app
+can create a trip yet. The next reviewable vertical slice is the definer RPCs that mint
+revisions (`head_revision_no` is ungrantable precisely so they must exist), plus a minimal
+authenticated trip page. That is the smallest change that turns a proven schema into
+something a traveller can use.
+
+Before it, one blocking prerequisite: **`packages/db` types do not know the `trip_*`
+tables**, which is why the new suite uses untyped clients. Regeneration must use `--local`,
+not the `--linked` script — this session has no production access.
 
 The highest-severity finding overall remains the **ops-member deletion bug**
 (`BASELINE-VERIFICATION.md` §3.3) — a `DELETE` on `kinnso_ops_members` aborts with a check
@@ -329,7 +354,9 @@ See `PHASE-BACKLOG.md` for the ranked remainder.
 
 ### Before extending the branch further
 
-Thirteen commits are unpushed. The GitHub connector is not authenticated in this session,
-so opening a PR needs either explicit authorization to push or the owner doing it. Six
-slices now touch identity, discovery, role gates, the visit loop, saves and the build —
-review before the branch grows further is the cheaper order.
+**Thirty-two commits are unpushed.** The GitHub connector is not authenticated in this
+session, so opening a PR needs either explicit authorization to push or the owner doing it.
+The branch now spans identity, discovery, role gates, the visit loop, saves, the build and a
+new Phase 2 schema — review before it grows further is the cheaper order, and the Phase 2
+migration in particular should be reviewed before anyone considers applying it anywhere
+hosted.
