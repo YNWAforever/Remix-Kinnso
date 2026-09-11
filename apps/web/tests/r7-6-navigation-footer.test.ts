@@ -1,7 +1,4 @@
 // @vitest-environment node
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join, relative, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import en from '@/lib/i18n/messages/en'
 import ja from '@/lib/i18n/messages/ja'
@@ -11,67 +8,11 @@ import zhCn from '@/lib/i18n/messages/zh-cn'
 import zhHk from '@/lib/i18n/messages/zh-hk'
 import zhTw from '@/lib/i18n/messages/zh-tw'
 
-const EXCLUDED_SOURCE_DIRECTORIES = new Set([
-  '.next',
-  '.turbo',
-  '.vercel',
-  'build',
-  'coverage',
-  'dist',
-  'node_modules',
-  'playwright-report',
-  'test-results',
-])
-
-function sourceFiles(directory: string): string[] {
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(directory, entry.name)
-    if (entry.isDirectory()) {
-      return EXCLUDED_SOURCE_DIRECTORIES.has(entry.name) ? [] : sourceFiles(path)
-    }
-    return [path]
-  })
-}
+// The whole-tree source scan that used to live here (and the walker test that
+// guards it) moved to tests/source-contracts.test.ts, where one walk and one
+// read are shared by every scan. See that file for why.
 
 describe('R7.6 navigation and footer acceptance', () => {
-  it('walks the full web tree while excluding generated, dependency, and test-artifact directories', () => {
-    const root = mkdtempSync(join(tmpdir(), 'kinnso-r7-6-guard-'))
-    const excluded = ['.next', 'node_modules', 'coverage', 'playwright-report', 'test-results']
-    try {
-      mkdirSync(join(root, 'content'))
-      writeFileSync(join(root, 'content', 'copy.md'), 'marketplace copy')
-      excluded.forEach((directory) => {
-        mkdirSync(join(root, directory))
-        writeFileSync(join(root, directory, 'ignored.ts'), 'generated artifact')
-      })
-
-      const files = sourceFiles(root)
-        .map((file) => relative(root, file).replaceAll('\\', '/'))
-
-      expect(files).toContain('content/copy.md')
-      excluded.forEach((directory) => {
-        expect(files).not.toContain(`${directory}/ignored.ts`)
-      })
-    } finally {
-      rmSync(root, { recursive: true, force: true })
-    }
-  })
-
-  // Whole-tree scan: reads every source file, so the 5s default is the wrong
-  // budget and this timed out in full runs while passing alone -- flakiness in
-  // appearance, a too-slow test in fact. Searching file by file with an early
-  // exit also avoids concatenating ~1200 files into one string to search once,
-  // and names the offending file instead of just failing.
-  it('removes the pre-pivot English product line from app source', () => {
-    const forbidden = ['AI Travel', 'Content Studio'].join(' ')
-    const webRoot = resolve(process.cwd())
-    const offender = sourceFiles(webRoot).find((file) =>
-      readFileSync(file, 'utf8').includes(forbidden),
-    )
-
-    expect(offender, `pre-pivot product line still present in ${offender}`).toBeUndefined()
-  }, 15_000)
-
   it.each([
     ['en', en, 'For Creators', 'The AI travel creator marketplace · Hong Kong · Taipei · Tokyo'],
     ['zh-hk', zhHk, '創作者專區', 'AI 旅遊創作者市集 · 香港 · 台北 · 東京'],
