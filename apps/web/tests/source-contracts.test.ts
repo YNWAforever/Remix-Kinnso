@@ -357,6 +357,37 @@ function scan(files: readonly WebFile[], marker: string, pattern: RegExp) {
 const report = (missing: string[], where: Map<string, string>, prefix: string) =>
   missing.map((name) => `${prefix}${name} (e.g. ${where.get(name)})`)
 
+/**
+ * The mirror image of the missing-token bug above, and strictly worse to debug:
+ * a token defined TWICE. CSS applies the last definition, so the first silently
+ * loses — nothing errors, nothing is undefined, and every utility naming it just
+ * changes colour.
+ *
+ * This is not hypothetical. `--color-muted` was the brand's muted TEXT colour
+ * (#6D6257), and adding shadcn's `muted` — which means a muted BACKGROUND
+ * (#EFE3D2) — redefined it. Every `text-muted` became cream-on-cream and the
+ * article route produced 373 axe colour-contrast violations, caught only by the
+ * e2e accessibility job. `og.palette-parity.test.ts` kept passing throughout,
+ * because its `token()` helper reads the FIRST match while the browser applies
+ * the LAST — so the duplicate also quietly disarmed the test watching that token.
+ */
+describe('colour token uniqueness', () => {
+  it('never defines the same colour token twice', () => {
+    const counts = new Map<string, number>()
+    for (const [, name] of css.matchAll(/^\s*(--color-[A-Za-z0-9-]+)\s*:/gm)) {
+      counts.set(name, (counts.get(name) ?? 0) + 1)
+    }
+
+    expect(counts.size, 'scan matched nothing — regex or path is wrong').toBeGreaterThan(20)
+
+    const duplicated = [...counts.entries()]
+      .filter(([, count]) => count > 1)
+      .map(([name, count]) => `${name} defined ${count}x`)
+
+    expect(duplicated, 'a later definition silently overrides the earlier one').toEqual([])
+  })
+})
+
 describe('kinnso colour token coverage', () => {
   const defined = new Set(
     [...css.matchAll(/--color-kinnso-([A-Za-z0-9]+):/g)].map((m) => m[1]),

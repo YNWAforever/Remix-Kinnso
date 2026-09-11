@@ -27,7 +27,7 @@ export function ArticleToc({ items, label }: { items: Array<{ id: string; title:
       <ul className="space-y-1">
         {items.map((it) => (
           <li key={it.id}>
-            <a href={`#${it.id}`} className={active === it.id ? 'text-orange font-medium' : 'text-muted hover:text-kinnso-ink'}>
+            <a href={`#${it.id}`} className={active === it.id ? 'text-orange font-medium' : 'text-kinnso-muted hover:text-kinnso-ink'}>
               {it.title}
             </a>
           </li>

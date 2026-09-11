@@ -110,7 +110,7 @@ export function EnquiryDialog({ type, targetId, targetName, triggerLabel, t }: {
           </div>
         ) : (
           <form className="grid gap-4" noValidate onSubmit={handleSubmit}>
-            <div className="rounded-md bg-muted p-3 text-sm">
+            <div className="rounded-md bg-kinnso-cream2 p-3 text-sm">
               <p className="font-medium">{targetName}</p>
               <p className="text-muted-foreground">{purpose}</p>
             </div>

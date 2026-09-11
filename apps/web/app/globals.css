@@ -63,7 +63,14 @@
   --color-primary-foreground: #FFFFFF;
   --color-secondary: #EFE3D2;            /* kinnso-cream2 */
   --color-secondary-foreground: #211B16;
-  --color-muted: #EFE3D2;
+  /* NO `--color-muted` here, deliberately. `--color-muted` already existed above as
+     a TEXT colour (#6D6257, and lib/seo/og/card.tsx mirrors it), whereas shadcn's
+     `muted` means a BACKGROUND. Defining it twice did not merge the two meanings, it
+     silently replaced one: the later value won, every `text-muted` became
+     cream-on-cream, and the article route produced 373 axe colour-contrast
+     violations. One name cannot carry both meanings, so each now uses its own
+     canonical token -- muted text is `text-kinnso-muted`, a muted surface is
+     `bg-kinnso-cream2`. `source-contracts.test.ts` fails on any duplicated token. */
   --color-muted-foreground: #6D6257;     /* kinnso-muted */
   --color-accent: #EFE3D2;
   --color-accent-foreground: #211B16;
