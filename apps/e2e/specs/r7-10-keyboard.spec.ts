@@ -54,6 +54,12 @@ test.describe('R7.10 keyboard traversal', () => {
       await page.evaluate((selector) => {
         Array.from(document.querySelectorAll<HTMLElement>(`main ${selector}`))
           .filter((element) => element.getClientRects().length > 0)
+          // A roving-tabindex composite (the WAI-ARIA Tabs widget in HowItWorks.tsx)
+          // keeps its inactive members out of Tab order with tabindex="-1" on purpose;
+          // they are reached with Arrow keys. `element.tabIndex` reflects the effective
+          // value, so this drops exactly those without touching the shared selector,
+          // which the structure spec still needs to see them for name checking.
+          .filter((element) => element.tabIndex >= 0)
           .forEach((element, index) => element.setAttribute('data-r710-target', String(index)))
       }, INTERACTIVE_SELECTOR)
 
@@ -65,7 +71,14 @@ test.describe('R7.10 keyboard traversal', () => {
       const reached = new Set<string>()
       const focusFailures: string[] = []
 
+      // Enter `main` through the skip link rather than Tabbing in from the top. The
+      // shared header is ~13 stops wide, which would consume the traversal budget
+      // before the last elements of `main` were reached — the budget is meant to catch
+      // a focus trap, not to be spent on chrome this test is not about.
       await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+      await page.keyboard.press('Tab')
+      await page.keyboard.press('Enter')
+      await expect(page.locator('#main-content')).toBeFocused()
       for (let index = 0; index < maxTabs && reached.size < expected; index += 1) {
         await page.keyboard.press('Tab')
         const marker = await page.evaluate(() => document.activeElement?.getAttribute('data-r710-target') ?? null)
