@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@kinnso/db'
+import type { Database,Json } from '@kinnso/db'
 import { resolveR73LocalLiveConfig } from './helpers/r7-3-local-live-config'
 
 /**
@@ -55,6 +55,11 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
   let tripAId = ''
   let dayAId = ''
   let stopAId = ''
+  async function command(value:Json) {
+    const current=await travellerA.from('trips').select('head_revision_no').eq('id',tripAId).single()
+    const result=await travellerA.rpc('apply_trip_command',{p_trip_id:tripAId,p_expected_revision:current.data!.head_revision_no,p_request_id:randomUUID(),p_command:value})
+    expect(result.error).toBeNull()
+  }
 
   beforeAll(async () => {
     travellerA = await signedInClient(`p2-trip-a-${runId}@example.test`)
@@ -62,37 +67,13 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
     userAId = (await travellerA.auth.getUser()).data.user!.id
     userBId = (await travellerB.auth.getUser()).data.user!.id
 
-    const trip = await travellerA
-      .from('trips')
-      .insert({ owner_user_id: userAId, title: 'Kyoto in spring', timezone: 'Asia/Tokyo' })
-      .select('id')
-      .single()
+    const trip = await travellerA.rpc('create_trip',{p_title:'Kyoto in spring',p_timezone:'Asia/Tokyo'})
     expect(trip.error, `trip insert failed: ${trip.error?.message}`).toBeNull()
-    tripAId = trip.data!.id
+    tripAId = trip.data!
 
-    const day = await travellerA
-      .from('trip_days')
-      .insert({ trip_id: tripAId, day_offset: 0, title: 'Arrival' })
-      .select('id')
-      .single()
-    expect(day.error, `day insert failed: ${day.error?.message}`).toBeNull()
-    dayAId = day.data!.id
-
-    const stop = await travellerA
-      .from('trip_stops')
-      .insert({
-        trip_id: tripAId,
-        trip_day_id: dayAId,
-        position: 0,
-        title: 'Fushimi Inari at dawn',
-        traveller_note: 'PRIVATE-NOTE-A',
-        start_minute_of_day: 330,
-        duration_minutes: 120,
-      })
-      .select('id')
-      .single()
-    expect(stop.error, `stop insert failed: ${stop.error?.message}`).toBeNull()
-    stopAId = stop.data!.id
+    dayAId=randomUUID();stopAId=randomUUID()
+    await command({type:'addDay',id:dayAId,offset:0,title:'Arrival'})
+    await command({type:'addStop',id:stopAId,dayId:dayAId,position:0,input:{title:'Fushimi Inari at dawn',placeId:null,travellerNote:'PRIVATE-NOTE-A',startMinuteOfDay:330,durationMinutes:120}})
   }, hookTimeout)
 
   afterAll(async () => {
@@ -177,7 +158,7 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
     expect(error).not.toBeNull()
 
     const trip = await svc!.from('trips').select('head_revision_no').eq('id', tripAId).single()
-    expect(trip.data!.head_revision_no).toBe(0)
+    expect(trip.data!.head_revision_no).toBe(3)
   })
 
   // ---- saving is not cloning ----------------------------------------------
@@ -193,7 +174,7 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
       adopted_at: new Date().toISOString(),
     })
     expect(error).not.toBeNull()
-    expect(error!.message).toContain('trip_stops_origin_credit_consistent')
+    expect(error!.code).toBe('42501')
   })
 
   it('cannot promote an authored stop into a credited one', async () => {
@@ -240,11 +221,8 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
   })
 
   it('still lets a traveller edit their own note, time and order', async () => {
-    const { error } = await travellerA
-      .from('trip_stops')
-      .update({ traveller_note: 'my own words', start_minute_of_day: 600, position: 1 })
-      .eq('id', stopAId)
-    expect(error, `owner edit was refused: ${error?.message}`).toBeNull()
+    await command({type:'updateStop',id:stopAId,patch:{travellerNote:'my own words',startMinuteOfDay:600}})
+    await command({type:'moveStop',id:stopAId,dayId:dayAId,position:0})
 
     const stop = await svc!
       .from('trip_stops')
@@ -253,7 +231,7 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
       .single()
     expect(stop.data!.traveller_note).toBe('my own words')
     expect(stop.data!.start_minute_of_day).toBe(600)
-    expect(stop.data!.position).toBe(1)
+    expect(stop.data!.position).toBe(0)
   })
 
   // ---- dates, time zones, DST ---------------------------------------------
@@ -273,14 +251,10 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
   it('re-resolves stops on a time-zone change without rewriting a single stop row', async () => {
     const before = await svc!.from('trip_stops').select('updated_at').eq('id', stopAId).single()
 
-    const dated = await travellerA
-      .from('trips')
-      .update({ start_date: '2030-06-01', timezone: 'Europe/London' })
-      .eq('id', tripAId)
-    expect(dated.error, `dating the trip failed: ${dated.error?.message}`).toBeNull()
+    await command({type:'patchTrip',patch:{startDate:'2030-06-01',timezone:'Europe/London'}})
     const london = await travellerA.from('trip_stops_resolved').select('starts_at').eq('id', stopAId).single()
 
-    await travellerA.from('trips').update({ timezone: 'America/New_York' }).eq('id', tripAId)
+    await command({type:'patchTrip',patch:{timezone:'America/New_York'}})
     const newYork = await travellerA.from('trip_stops_resolved').select('starts_at').eq('id', stopAId).single()
 
     const after = await svc!.from('trip_stops').select('updated_at, start_minute_of_day').eq('id', stopAId).single()
@@ -297,35 +271,15 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
     // BST begins 01:00 on 2030-03-31 (the last Sunday of March), so 01:30 that
     // morning never happens. Surfacing it beats silently shifting the
     // traveller's stated intent by an hour.
-    const day2 = await travellerA
-      .from('trip_days')
-      .insert({ trip_id: tripAId, day_offset: 1 })
-      .select('id')
-      .single()
-    expect(day2.error, `day 2 insert failed: ${day2.error?.message}`).toBeNull()
-
-    const gapStop = await travellerA
-      .from('trip_stops')
-      .insert({
-        trip_id: tripAId,
-        trip_day_id: day2.data!.id,
-        position: 0,
-        title: 'Spring forward',
-        start_minute_of_day: 90,
-      })
-      .select('id')
-      .single()
-    expect(gapStop.error, `gap stop insert failed: ${gapStop.error?.message}`).toBeNull()
-
-    await travellerA
-      .from('trips')
-      .update({ start_date: '2030-03-30', timezone: 'Europe/London' })
-      .eq('id', tripAId)
+    const day2=randomUUID(),gapStop=randomUUID()
+    await command({type:'addDay',id:day2,offset:1,title:'Spring forward'})
+    await command({type:'addStop',id:gapStop,dayId:day2,position:0,input:{title:'Spring forward',placeId:null,travellerNote:'',startMinuteOfDay:90,durationMinutes:null}})
+    await command({type:'patchTrip',patch:{startDate:'2030-03-30',timezone:'Europe/London'}})
 
     const gap = await travellerA
       .from('trip_stops_resolved')
       .select('dst_anomaly')
-      .eq('id', gapStop.data!.id)
+      .eq('id', gapStop)
       .single()
     expect(gap.data!.dst_anomaly).toBe(true)
 
@@ -340,7 +294,8 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
   })
 
   it('rejects an invalid time zone at write time', async () => {
-    const { error } = await travellerA.from('trips').update({ timezone: 'Mars/Olympus' }).eq('id', tripAId)
+    const current=await travellerA.from('trips').select('head_revision_no').eq('id',tripAId).single()
+    const {error}=await travellerA.rpc('apply_trip_command',{p_trip_id:tripAId,p_expected_revision:current.data!.head_revision_no,p_request_id:randomUUID(),p_command:{type:'patchTrip',patch:{timezone:'Mars/Olympus'}}})
     expect(error).not.toBeNull()
     expect(error!.message).toContain('invalid_time_zone')
 
@@ -357,10 +312,8 @@ d('Phase 2 personal trips: isolation, grants and time invariants (live)', () => 
       .insert({ trip_id: tripAId, revision_no: 1, change_kind: 'create' })
     expect(forged.error).not.toBeNull()
 
-    const seeded = await svc!
-      .from('trip_revisions')
-      .insert({ trip_id: tripAId, revision_no: 1, change_kind: 'create' })
-    expect(seeded.error, `seeding a revision failed: ${seeded.error?.message}`).toBeNull()
+    const seeded=await travellerA.from('trip_revisions').select('id').eq('trip_id',tripAId)
+    expect(seeded.error).toBeNull();expect(seeded.data!.length).toBeGreaterThan(0)
 
     // Even the service role cannot rewrite history: the guard is a trigger, not
     // a policy, so it holds for every role.

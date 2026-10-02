@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
-import { createHmac, randomBytes } from 'node:crypto'
+import { createHmac, randomBytes, randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 
 const url = process.env.SUPABASE_URL
@@ -61,15 +61,15 @@ const svc = () => createClient(url!, svcKey!, { auth: { persistSession: false, a
 // themselves `on delete cascade` off auth.users. So a single `delete from auth.users` in
 // afterAll tears down the entire seed tree, notifications included, exactly like
 // creator-earnings.rls.test.ts's pattern (not payout-batches.rls.test.ts's no-cleanup one).
-const creatorA = '55555555-5555-4555-8555-555555555555'
-const creatorB = '66666666-6666-4666-8666-666666666666'
-const nonCreator = '77777777-7777-4777-8777-777777777777'
-const merchantUser = '88888888-8888-4888-8888-888888888888'
+const creatorA = randomUUID()
+const creatorB = randomUUID()
+const nonCreator = randomUUID()
+const merchantUser = randomUUID()
 // Distinct from merchantUser: merchant_profiles.user_id is unique, and the fault-injection
 // test below needs its own merchant_profiles row alongside the one beforeAll already created
 // for merchantUser -- reusing merchantUser here would violate that constraint on every run,
 // not just a re-run against leftover state.
-const faultMerchantUser = '99999999-9999-4999-8999-999999999999'
+const faultMerchantUser = randomUUID()
 
 d('r10.3 notifications: triggers, RLS isolation, mark-read, and the fault-injection guarantee', () => {
   let normalMissionId = ''

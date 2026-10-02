@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       affiliate_network_events: {
@@ -1072,6 +1097,150 @@ export type Database = {
           },
         ]
       }
+      creator_payout_batches: {
+        Row: {
+          amount: number
+          cancelled_at: string | null
+          created_at: string
+          created_by_ops_member_id: string
+          creator_id: string
+          currency: string
+          id: string
+          paid_at: string | null
+          status: string
+          target_at: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          cancelled_at?: string | null
+          created_at?: string
+          created_by_ops_member_id: string
+          creator_id: string
+          currency: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          target_at: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          cancelled_at?: string | null
+          created_at?: string
+          created_by_ops_member_id?: string
+          creator_id?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          target_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_payout_batches_created_by_ops_member_id_fkey"
+            columns: ["created_by_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_payout_batches_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_payout_decisions: {
+        Row: {
+          actor_ops_member_id: string
+          created_at: string
+          decision_kind: string
+          id: string
+          idempotency_key: string
+          payout_batch_id: string
+          reason: string
+          request_hash: string
+          supersedes_decision_id: string | null
+        }
+        Insert: {
+          actor_ops_member_id: string
+          created_at?: string
+          decision_kind: string
+          id?: string
+          idempotency_key: string
+          payout_batch_id: string
+          reason: string
+          request_hash: string
+          supersedes_decision_id?: string | null
+        }
+        Update: {
+          actor_ops_member_id?: string
+          created_at?: string
+          decision_kind?: string
+          id?: string
+          idempotency_key?: string
+          payout_batch_id?: string
+          reason?: string
+          request_hash?: string
+          supersedes_decision_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_payout_decisions_actor_ops_member_id_fkey"
+            columns: ["actor_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_payout_decisions_payout_batch_id_fkey"
+            columns: ["payout_batch_id"]
+            isOneToOne: false
+            referencedRelation: "creator_payout_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_payout_decisions_supersedes_decision_id_fkey"
+            columns: ["supersedes_decision_id"]
+            isOneToOne: false
+            referencedRelation: "creator_payout_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_payout_settings: {
+        Row: {
+          id: boolean
+          processing_window_days: number
+          updated_at: string
+          updated_by_ops_member_id: string | null
+        }
+        Insert: {
+          id?: boolean
+          processing_window_days?: number
+          updated_at?: string
+          updated_by_ops_member_id?: string | null
+        }
+        Update: {
+          id?: boolean
+          processing_window_days?: number
+          updated_at?: string
+          updated_by_ops_member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_payout_settings_updated_by_ops_member_id_fkey"
+            columns: ["updated_by_ops_member_id"]
+            isOneToOne: false
+            referencedRelation: "kinnso_ops_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_scan_jobs: {
         Row: {
           completed_at: string | null
@@ -1192,6 +1361,29 @@ export type Database = {
           verified?: boolean
         }
         Relationships: []
+      }
+      destination_aliases: {
+        Row: {
+          alias: string
+          destination_id: string
+        }
+        Insert: {
+          alias: string
+          destination_id: string
+        }
+        Update: {
+          alias?: string
+          destination_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destination_aliases_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       destinations: {
         Row: {
@@ -1512,6 +1704,38 @@ export type Database = {
           },
         ]
       }
+      guide_versions: {
+        Row: {
+          content: Json
+          guide_id: string
+          published_at: string
+          version: number
+          withdrawn_at: string | null
+        }
+        Insert: {
+          content: Json
+          guide_id: string
+          published_at?: string
+          version: number
+          withdrawn_at?: string | null
+        }
+        Update: {
+          content?: Json
+          guide_id?: string
+          published_at?: string
+          version?: number
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_versions_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guides: {
         Row: {
           city: string
@@ -1651,6 +1875,188 @@ export type Database = {
         }
         Relationships: []
       }
+      kinnso_place_aliases: {
+        Row: {
+          alias_id: string
+          canonical_id: string
+          created_at: string
+          reason: string
+          reviewed_by: string | null
+        }
+        Insert: {
+          alias_id: string
+          canonical_id: string
+          created_at?: string
+          reason: string
+          reviewed_by?: string | null
+        }
+        Update: {
+          alias_id?: string
+          canonical_id?: string
+          created_at?: string
+          reason?: string
+          reviewed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kinnso_place_aliases_alias_id_fkey"
+            columns: ["alias_id"]
+            isOneToOne: true
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kinnso_place_aliases_canonical_id_fkey"
+            columns: ["canonical_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kinnso_place_facts: {
+        Row: {
+          opening_hours: Json | null
+          place_id: string
+          published: boolean
+          source_url: string | null
+          timezone: string
+          verified_at: string | null
+        }
+        Insert: {
+          opening_hours?: Json | null
+          place_id: string
+          published?: boolean
+          source_url?: string | null
+          timezone: string
+          verified_at?: string | null
+        }
+        Update: {
+          opening_hours?: Json | null
+          place_id?: string
+          published?: boolean
+          source_url?: string | null
+          timezone?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kinnso_place_facts_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: true
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kinnso_place_reports: {
+        Row: {
+          created_at: string
+          id: string
+          owner_id: string
+          place_id: string
+          reason: string
+          review_reason: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id: string
+          place_id: string
+          reason: string
+          review_reason?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          place_id?: string
+          reason?: string
+          review_reason?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kinnso_place_reports_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kinnso_trip_media: {
+        Row: {
+          attached: boolean
+          byte_size: number | null
+          checksum: string | null
+          created_at: string
+          id: string
+          mime: string | null
+          object_path: string
+          owner_id: string
+          state: string
+          stop_id: string | null
+          trip_id: string
+        }
+        Insert: {
+          attached?: boolean
+          byte_size?: number | null
+          checksum?: string | null
+          created_at?: string
+          id?: string
+          mime?: string | null
+          object_path: string
+          owner_id: string
+          state?: string
+          stop_id?: string | null
+          trip_id: string
+        }
+        Update: {
+          attached?: boolean
+          byte_size?: number | null
+          checksum?: string | null
+          created_at?: string
+          id?: string
+          mime?: string | null
+          object_path?: string
+          owner_id?: string
+          state?: string
+          stop_id?: string | null
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kinnso_trip_media_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "trip_stops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kinnso_trip_media_stop_id_fkey"
+            columns: ["stop_id"]
+            isOneToOne: false
+            referencedRelation: "trip_stops_resolved"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kinnso_trip_media_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       merchant_applications: {
         Row: {
           company_name: string
@@ -1784,6 +2190,13 @@ export type Database = {
             referencedRelation: "merchant_profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "merchant_budgets_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: true
+            referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       merchant_offers: {
@@ -1853,6 +2266,13 @@ export type Database = {
             columns: ["merchant_profile_id"]
             isOneToOne: false
             referencedRelation: "merchant_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchant_offers_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -2124,26 +2544,35 @@ export type Database = {
       }
       mission_review_events: {
         Row: {
-          id: string
-          submission_id: string
-          actor_type: string
-          actor_id: string | null
           action: string
+          actor_id: string | null
+          actor_type: string
+          created_at: string
+          id: string
           reason_category: string | null
           reason_text: string | null
-          created_at: string
+          submission_id: string
         }
         Insert: {
-          id?: string
-          submission_id: string
-          actor_type: string
-          actor_id?: string | null
           action: string
+          actor_id?: string | null
+          actor_type: string
+          created_at?: string
+          id?: string
           reason_category?: string | null
           reason_text?: string | null
-          created_at?: string
+          submission_id: string
         }
-        Update: Partial<Database['public']['Tables']['mission_review_events']['Insert']>
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: string
+          created_at?: string
+          id?: string
+          reason_category?: string | null
+          reason_text?: string | null
+          submission_id?: string
+        }
         Relationships: [
           {
             foreignKeyName: "mission_review_events_submission_id_fkey"
@@ -2544,10 +2973,6 @@ export type Database = {
           },
         ]
       }
-      // Hand-maintained (not from `supabase gen types`) -- `pnpm --filter @kinnso/db gen`
-      // reads production via --linked and R10.3's notifications table only exists on this
-      // branch's unmerged migrations. Reconcile with a real `gen --local` run once R10.3 is
-      // testable against a full local stack.
       notifications: {
         Row: {
           created_at: string
@@ -2654,13 +3079,6 @@ export type Database = {
             referencedRelation: "merchant_offers"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "offer_claims_visitor_user_id_fkey"
-            columns: ["visitor_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       offer_redemptions: {
@@ -2703,17 +3121,17 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "offer_redemptions_merchant_profile_id_fkey"
+            columns: ["merchant_profile_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "offer_redemptions_offer_claim_id_fkey"
             columns: ["offer_claim_id"]
             isOneToOne: true
             referencedRelation: "offer_claims"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "offer_redemptions_redeemed_by_merchant_user_id_fkey"
-            columns: ["redeemed_by_merchant_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -2849,6 +3267,65 @@ export type Database = {
             columns: ["perk_id"]
             isOneToOne: false
             referencedRelation: "partner_perks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      places: {
+        Row: {
+          country_code: string | null
+          created_at: string
+          created_by_user_id: string | null
+          destination_id: string | null
+          formatted_address: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          provider: string
+          provider_place_id: string | null
+          status: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          destination_id?: string | null
+          formatted_address?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          provider?: string
+          provider_place_id?: string | null
+          status?: string
+          timezone: string
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          destination_id?: string | null
+          formatted_address?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          provider?: string
+          provider_place_id?: string | null
+          status?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "places_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
             referencedColumns: ["id"]
           },
         ]
@@ -3126,6 +3603,24 @@ export type Database = {
         }
         Relationships: []
       }
+      traveller_analytics_ip_rate_limits: {
+        Row: {
+          ip: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          ip: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          ip?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       traveller_analytics_rate_limits: {
         Row: {
           event_count: number
@@ -3144,70 +3639,175 @@ export type Database = {
         }
         Relationships: []
       }
-      // --- Phase 2 slice 0 (personal trips) -------------------------------
-      // Hand-grafted from `supabase gen types typescript --db-url <local>`.
-      // NOT from the package `gen` script: that reads production via --linked,
-      // which does not have these tables. A full regeneration was attempted and
-      // rejected -- the current CLI emits optional args (`p_x?: string`) where
-      // this file has nullable ones (`p_x: string | null`), which would force 28
-      // call sites across payouts/missions/offers to swap `null` for `undefined`.
-      // Those are not equivalent over PostgREST: an omitted arg takes the SQL
-      // DEFAULT, a null arg passes NULL. See docs/implementation/STATUS.md.
-      places: {
+      trip_days: {
         Row: {
-          country_code: string | null
           created_at: string
-          created_by_user_id: string | null
-          destination_id: string | null
-          formatted_address: string | null
+          day_offset: number
           id: string
-          lat: number | null
-          lng: number | null
-          name: string
-          provider: string
-          provider_place_id: string | null
-          status: string
-          timezone: string
+          title: string | null
+          trip_id: string
           updated_at: string
         }
         Insert: {
-          country_code?: string | null
           created_at?: string
-          created_by_user_id?: string | null
-          destination_id?: string | null
-          formatted_address?: string | null
+          day_offset: number
           id?: string
-          lat?: number | null
-          lng?: number | null
-          name: string
-          provider?: string
-          provider_place_id?: string | null
-          status?: string
-          timezone: string
+          title?: string | null
+          trip_id: string
           updated_at?: string
         }
         Update: {
-          country_code?: string | null
           created_at?: string
-          created_by_user_id?: string | null
-          destination_id?: string | null
-          formatted_address?: string | null
+          day_offset?: number
           id?: string
-          lat?: number | null
-          lng?: number | null
-          name?: string
-          provider?: string
-          provider_place_id?: string | null
-          status?: string
-          timezone?: string
+          title?: string | null
+          trip_id?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "places_destination_id_fkey"
-            columns: ["destination_id"]
+            foreignKeyName: "trip_days_trip_id_fkey"
+            columns: ["trip_id"]
             isOneToOne: false
-            referencedRelation: "destinations"
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_revisions: {
+        Row: {
+          author_user_id: string | null
+          change_kind: string
+          created_at: string
+          id: string
+          parent_revision_no: number | null
+          revision_no: number
+          summary: Json
+          trip_id: string
+        }
+        Insert: {
+          author_user_id?: string | null
+          change_kind: string
+          created_at?: string
+          id?: string
+          parent_revision_no?: number | null
+          revision_no: number
+          summary?: Json
+          trip_id: string
+        }
+        Update: {
+          author_user_id?: string | null
+          change_kind?: string
+          created_at?: string
+          id?: string
+          parent_revision_no?: number | null
+          revision_no?: number
+          summary?: Json
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_revisions_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_stops: {
+        Row: {
+          adopted_at: string | null
+          copied_note: string | null
+          copied_title: string | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          origin: string
+          place_id: string | null
+          position: number
+          source_creator_handle: string | null
+          source_creator_id: string | null
+          source_creator_name: string | null
+          source_guide_id: string | null
+          source_guide_slug: string | null
+          source_guide_version: number | null
+          source_withdrawn_at: string | null
+          start_minute_of_day: number | null
+          title: string
+          traveller_note: string | null
+          trip_day_id: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          adopted_at?: string | null
+          copied_note?: string | null
+          copied_title?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          origin?: string
+          place_id?: string | null
+          position: number
+          source_creator_handle?: string | null
+          source_creator_id?: string | null
+          source_creator_name?: string | null
+          source_guide_id?: string | null
+          source_guide_slug?: string | null
+          source_guide_version?: number | null
+          source_withdrawn_at?: string | null
+          start_minute_of_day?: number | null
+          title: string
+          traveller_note?: string | null
+          trip_day_id: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          adopted_at?: string | null
+          copied_note?: string | null
+          copied_title?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          origin?: string
+          place_id?: string | null
+          position?: number
+          source_creator_handle?: string | null
+          source_creator_id?: string | null
+          source_creator_name?: string | null
+          source_guide_id?: string | null
+          source_guide_slug?: string | null
+          source_guide_version?: number | null
+          source_withdrawn_at?: string | null
+          start_minute_of_day?: number | null
+          title?: string
+          traveller_note?: string | null
+          trip_day_id?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_stops_day_same_trip"
+            columns: ["trip_day_id", "trip_id"]
+            isOneToOne: false
+            referencedRelation: "trip_days"
+            referencedColumns: ["id", "trip_id"]
+          },
+          {
+            foreignKeyName: "trip_stops_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_stops_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -3255,176 +3855,6 @@ export type Database = {
             columns: ["destination_id"]
             isOneToOne: false
             referencedRelation: "destinations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      trip_days: {
-        Row: {
-          created_at: string
-          day_offset: number
-          id: string
-          title: string | null
-          trip_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          day_offset: number
-          id?: string
-          title?: string | null
-          trip_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          day_offset?: number
-          id?: string
-          title?: string | null
-          trip_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "trip_days_trip_id_fkey"
-            columns: ["trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      trip_stops: {
-        Row: {
-          adopted_at: string | null
-          copied_note: string | null
-          copied_title: string | null
-          created_at: string
-          duration_minutes: number | null
-          id: string
-          origin: string
-          place_id: string | null
-          position: number
-          source_creator_handle: string | null
-          source_creator_id: string | null
-          source_creator_name: string | null
-          source_guide_id: string | null
-          source_guide_slug: string | null
-          source_withdrawn_at: string | null
-          start_minute_of_day: number | null
-          title: string
-          traveller_note: string | null
-          trip_day_id: string
-          trip_id: string
-          updated_at: string
-        }
-        Insert: {
-          adopted_at?: string | null
-          copied_note?: string | null
-          copied_title?: string | null
-          created_at?: string
-          duration_minutes?: number | null
-          id?: string
-          origin?: string
-          place_id?: string | null
-          position: number
-          source_creator_handle?: string | null
-          source_creator_id?: string | null
-          source_creator_name?: string | null
-          source_guide_id?: string | null
-          source_guide_slug?: string | null
-          source_withdrawn_at?: string | null
-          start_minute_of_day?: number | null
-          title: string
-          traveller_note?: string | null
-          trip_day_id: string
-          trip_id: string
-          updated_at?: string
-        }
-        Update: {
-          adopted_at?: string | null
-          copied_note?: string | null
-          copied_title?: string | null
-          created_at?: string
-          duration_minutes?: number | null
-          id?: string
-          origin?: string
-          place_id?: string | null
-          position?: number
-          source_creator_handle?: string | null
-          source_creator_id?: string | null
-          source_creator_name?: string | null
-          source_guide_id?: string | null
-          source_guide_slug?: string | null
-          source_withdrawn_at?: string | null
-          start_minute_of_day?: number | null
-          title?: string
-          traveller_note?: string | null
-          trip_day_id?: string
-          trip_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "trip_stops_day_same_trip"
-            columns: ["trip_day_id", "trip_id"]
-            isOneToOne: false
-            referencedRelation: "trip_days"
-            referencedColumns: ["id", "trip_id"]
-          },
-          {
-            foreignKeyName: "trip_stops_place_id_fkey"
-            columns: ["place_id"]
-            isOneToOne: false
-            referencedRelation: "places"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trip_stops_trip_id_fkey"
-            columns: ["trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      trip_revisions: {
-        Row: {
-          author_user_id: string | null
-          change_kind: string
-          created_at: string
-          id: string
-          parent_revision_no: number | null
-          revision_no: number
-          summary: Json
-          trip_id: string
-        }
-        Insert: {
-          author_user_id?: string | null
-          change_kind: string
-          created_at?: string
-          id?: string
-          parent_revision_no?: number | null
-          revision_no: number
-          summary?: Json
-          trip_id: string
-        }
-        Update: {
-          author_user_id?: string | null
-          change_kind?: string
-          created_at?: string
-          id?: string
-          parent_revision_no?: number | null
-          revision_no?: number
-          summary?: Json
-          trip_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "trip_revisions_trip_id_fkey"
-            columns: ["trip_id"]
-            isOneToOne: false
-            referencedRelation: "trips"
             referencedColumns: ["id"]
           },
         ]
@@ -3562,7 +3992,11 @@ export type Database = {
         Returns: undefined
       }
       admin_cancel_payout: {
-        Args: { p_batch_id: string; p_idempotency_key: string; p_reason: string }
+        Args: {
+          p_batch_id: string
+          p_idempotency_key: string
+          p_reason: string
+        }
         Returns: Json
       }
       admin_create_payout_batch: {
@@ -3579,7 +4013,11 @@ export type Database = {
       admin_creator_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_creator_detail: { Args: { p_creator_id: string }; Returns: Json }
       admin_credit_merchant_budget: {
-        Args: { p_merchant_profile_id: string; p_amount: number; p_reason: string }
+        Args: {
+          p_amount: number
+          p_merchant_profile_id: string
+          p_reason: string
+        }
         Returns: undefined
       }
       admin_invite_ops_member: {
@@ -3598,11 +4036,11 @@ export type Database = {
       }
       admin_list_enquiries: {
         Args: {
-          p_cursor_created_at?: string
-          p_cursor_id?: string
+          p_cursor_created_at?: string | null
+          p_cursor_id?: string | null
           p_limit?: number
           p_status_group?: string
-          p_type?: string
+          p_type?: string | null
         }
         Returns: {
           created_at: string
@@ -3641,7 +4079,10 @@ export type Database = {
       }
       admin_list_ops_members: { Args: never; Returns: Json }
       admin_list_payout_batches: { Args: { p_status?: string | null }; Returns: Json }
-      admin_mark_payout_paid: { Args: { p_batch_id: string; p_reason: string }; Returns: undefined }
+      admin_mark_payout_paid: {
+        Args: { p_batch_id: string; p_reason: string }
+        Returns: undefined
+      }
       admin_merchant_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_merchant_detail: { Args: { p_merchant_id: string }; Returns: Json }
       admin_mission_analytics: { Args: { p_days?: number }; Returns: Json }
@@ -3671,10 +4112,10 @@ export type Database = {
       }
       admin_review_submission: {
         Args: {
-          p_submission_id: string
           p_action: string
-          p_reason_category: string | null
-          p_reason_text: string | null
+          p_reason_category?: string | null
+          p_reason_text?: string | null
+          p_submission_id: string
         }
         Returns: undefined
       }
@@ -3684,14 +4125,14 @@ export type Database = {
       }
       admin_search_creators: {
         Args: {
-          p_cursor_created_at?: string
-          p_cursor_id?: string
-          p_dna?: string
+          p_cursor_created_at?: string | null
+          p_cursor_id?: string | null
+          p_dna?: string | null
           p_limit?: number
-          p_search?: string
-          p_statuses?: string[]
-          p_tiers?: string[]
-          p_verified?: boolean
+          p_search?: string | null
+          p_statuses?: string[] | null
+          p_tiers?: string[] | null
+          p_verified?: boolean | null
         }
         Returns: {
           contribution_points: number
@@ -3707,12 +4148,12 @@ export type Database = {
       }
       admin_search_merchants: {
         Args: {
-          p_cursor_created_at?: string
-          p_cursor_id?: string
+          p_cursor_created_at?: string | null
+          p_cursor_id?: string | null
           p_limit?: number
-          p_search?: string
-          p_statuses?: string[]
-          p_tiers?: string[]
+          p_search?: string | null
+          p_statuses?: string[] | null
+          p_tiers?: string[] | null
         }
         Returns: {
           company_name: string
@@ -3725,17 +4166,21 @@ export type Database = {
       admin_set_booking_settlement_status: {
         Args: {
           p_allow_revert?: boolean
-          p_creator_commission_status?: string
+          p_creator_commission_status?: string | null
           p_id: string
-          p_kinnso_commission_status?: string
-          p_merchant_payout_status?: string
-          p_reason?: string
-          p_status?: string
+          p_kinnso_commission_status?: string | null
+          p_merchant_payout_status?: string | null
+          p_reason?: string | null
+          p_status?: string | null
         }
         Returns: undefined
       }
       admin_set_budget_enforcement: {
-        Args: { p_merchant_profile_id: string; p_enforced: boolean; p_reason: string }
+        Args: {
+          p_enforced: boolean
+          p_merchant_profile_id: string
+          p_reason: string
+        }
         Returns: undefined
       }
       admin_set_creator_listed: {
@@ -3751,7 +4196,7 @@ export type Database = {
         Returns: undefined
       }
       admin_set_enquiry_status: {
-        Args: { p_id: string; p_reason?: string; p_status: string }
+        Args: { p_id: string; p_reason?: string | null; p_status: string }
         Returns: undefined
       }
       admin_set_merchant_status: {
@@ -3776,18 +4221,22 @@ export type Database = {
       }
       admin_set_settlement_status: {
         Args: {
-          p_affiliate_commission_status?: string
+          p_affiliate_commission_status?: string | null
           p_allow_revert?: boolean
-          p_creator_payout_status?: string
+          p_creator_payout_status?: string | null
           p_id: string
-          p_kinnso_commission_status?: string
-          p_reason?: string
-          p_status?: string
+          p_kinnso_commission_status?: string | null
+          p_reason?: string | null
+          p_status?: string | null
         }
         Returns: undefined
       }
       admin_set_user_status: {
         Args: { p_id: string; p_kind: string; p_status: string }
+        Returns: undefined
+      }
+      admin_suspend_ops_member: {
+        Args: { p_member_id: string; p_reason: string }
         Returns: undefined
       }
       admin_traveller_analytics_report: {
@@ -3796,18 +4245,33 @@ export type Database = {
           attribution_window_days: number
           booking_state: string
           denominator: number
-          entity_type: string | null
+          entity_type: string
           locale: string
           metric_key: string
           numerator: number
-          rate: number | null
+          rate: number
           sample_count: number
           status: string
         }[]
       }
-      admin_suspend_ops_member: {
-        Args: { p_member_id: string; p_reason: string }
-        Returns: undefined
+      adopt_guide_to_trip: {
+        Args: {
+          p_expected_revision: number
+          p_guide_id: string
+          p_request_id: string
+          p_trip_id: string
+          p_version: number
+        }
+        Returns: Json
+      }
+      apply_trip_command: {
+        Args: {
+          p_command: Json
+          p_expected_revision: number
+          p_request_id: string
+          p_trip_id: string
+        }
+        Returns: Json
       }
       award_contribution_event: {
         Args: {
@@ -3845,11 +4309,11 @@ export type Database = {
       claim_offer: {
         Args: {
           p_creator_id: string
-          p_guide_id: string | null
+          p_guide_id?: string | null
           p_journey_id?: string | null
           p_locale?: string | null
           p_offer_id: string
-          p_source: string
+          p_source?: string
         }
         Returns: Json
       }
@@ -3879,10 +4343,48 @@ export type Database = {
           partner_url: string
         }[]
       }
+      create_trip: {
+        Args: {
+          p_destination_id?: string | null
+          p_start_date?: string | null
+          p_timezone?: string
+          p_title: string
+        }
+        Returns: string
+      }
+      create_trip_share: {
+        Args: {
+          p_expires_at: string
+          p_media_ids: string[]
+          p_stop_ids: string[]
+          p_trip_id: string
+        }
+        Returns: Json
+      }
+      create_trip_v2: {
+        Args: { p_payload: Json; p_request_id: string }
+        Returns: Json
+      }
       creator_earnings_summary: { Args: never; Returns: Json }
       creator_insights: { Args: never; Returns: Json }
       creator_payout_batches_mine: { Args: never; Returns: Json }
       creator_public_profile_json: { Args: { p_final: Json }; Returns: Json }
+      delete_trip: {
+        Args: { p_expected_revision: number; p_trip_id: string }
+        Returns: undefined
+      }
+      delete_trip_v2: {
+        Args: {
+          p_expected_revision: number
+          p_request_id: string
+          p_trip_id: string
+        }
+        Returns: Json
+      }
+      finalize_trip_upload: {
+        Args: { p_actor_id: string; p_checksum: string; p_media_id: string }
+        Returns: Json
+      }
       funded_merchant_profiles: { Args: never; Returns: string[] }
       get_attributed_guides_for_merchant: {
         Args: { p_limit?: number; p_merchant_id: string }
@@ -3912,8 +4414,17 @@ export type Database = {
       }
       get_my_offer_claim: {
         Args: { p_claim_id: string }
-        Returns: { offer_title: string; merchant_name: string }[]
+        Returns: {
+          merchant_name: string
+          offer_title: string
+        }[]
       }
+      get_shared_trip: { Args: { p_token: string }; Returns: Json }
+      get_shared_trip_media: {
+        Args: { p_media_id: string; p_token: string }
+        Returns: Json
+      }
+      get_trip_snapshot: { Args: { p_trip_id: string }; Returns: Json }
       get_you_may_like: {
         Args: { p_article_id: string; p_limit?: number; p_locale: string }
         Returns: {
@@ -3924,6 +4435,10 @@ export type Database = {
           url: string
         }[]
       }
+      import_local_trip: {
+        Args: { p_payload: Json; p_request_id: string; p_source_id: string }
+        Returns: Json
+      }
       increment_article_view: { Args: { p_url: string }; Returns: undefined }
       is_active_ops: { Args: never; Returns: boolean }
       is_active_ops_role: { Args: { p_min: string }; Returns: boolean }
@@ -3931,6 +4446,23 @@ export type Database = {
         Args: { p_email: string; p_feature: string; p_locale: string }
         Returns: boolean
       }
+      kinnso_actor: { Args: never; Returns: Json }
+      kinnso_bookmark: {
+        Args: {
+          p_desired_state: boolean
+          p_guide_id: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      kinnso_guide: { Args: { p_guide_id: string }; Returns: Json }
+      kinnso_guide_authoring: { Args: { p_guide_id: string }; Returns: Json }
+      kinnso_media_cleanup_ack: {
+        Args: { p_paths: string[] }
+        Returns: undefined
+      }
+      kinnso_media_cleanup_candidates: { Args: never; Returns: Json }
+      kinnso_trip_place_facts: { Args: { p_trip_id: string }; Returns: Json }
       list_active_perks: {
         Args: never
         Returns: {
@@ -3946,10 +4478,23 @@ export type Database = {
           title: string
         }[]
       }
+      list_kinnso_place_reports: {
+        Args: { p_after?: string | null; p_after_id?: string | null }
+        Returns: Json
+      }
       list_offers_for_creator: {
         Args: { p_creator_id: string }
-        Returns: { id: string; title: string; terms: string; discount_kind: string; discount_value: number; merchant_name: string; valid_to: string }[]
+        Returns: {
+          discount_kind: string
+          discount_value: number
+          id: string
+          merchant_name: string
+          terms: string
+          title: string
+          valid_to: string
+        }[]
       }
+      list_trip_shares: { Args: { p_trip_id: string }; Returns: Json }
       lowercase_text_array: { Args: { arr: string[] }; Returns: string[] }
       mark_booking_completed: {
         Args: { p_booking_id: string }
@@ -3961,8 +4506,16 @@ export type Database = {
         Returns: string
       }
       merchant_slugify: { Args: { p_text: string }; Returns: string }
+      merge_kinnso_place: {
+        Args: { p_alias_id: string; p_canonical_id: string; p_reason: string }
+        Returns: Json
+      }
       mission_review_event_append: {
-        Args: { p_submission_id: string; p_action: string; p_reason_text: string | null }
+        Args: {
+          p_action: string
+          p_reason_text?: string | null
+          p_submission_id: string
+        }
         Returns: undefined
       }
       notifications_mine: { Args: never; Returns: Json }
@@ -3973,11 +4526,11 @@ export type Database = {
           p_entity_id: string
           p_entity_type: string
           p_metadata?: Json
-          p_reason?: string
+          p_reason?: string | null
         }
         Returns: string
       }
-      purge_traveller_analytics_events: { Args: never; Returns: undefined }
+      payout_processing_window_days: { Args: never; Returns: number }
       platform_stats: {
         Args: never
         Returns: {
@@ -3988,9 +4541,28 @@ export type Database = {
           upcoming_sessions: number
         }[]
       }
+      prepare_trip_upload: {
+        Args: {
+          p_mime: string
+          p_request_id: string
+          p_size: number
+          p_trip_id: string
+        }
+        Returns: Json
+      }
+      publish_guide_version: {
+        Args: {
+          p_content: Json
+          p_expected_version: number
+          p_guide_id: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      purge_traveller_analytics_events: { Args: never; Returns: undefined }
       rate_agent_message: {
         Args: {
-          p_anon_session_id?: string
+          p_anon_session_id?: string | null
           p_message_id: string
           p_rating: string
         }
@@ -4001,7 +4573,7 @@ export type Database = {
         Returns: undefined
       }
       redeem_offer_claim: {
-        Args: { p_raw_token: string; p_amount_spent: number | null }
+        Args: { p_amount_spent?: number | null; p_raw_token: string }
         Returns: Json
       }
       redeem_perk: {
@@ -4011,6 +4583,15 @@ export type Database = {
           redemption_value: string
         }[]
       }
+      report_kinnso_place: {
+        Args: { p_place_id: string; p_reason: string }
+        Returns: Json
+      }
+      resolve_kinnso_destination: { Args: { p_query: string }; Returns: Json }
+      review_kinnso_place_report: {
+        Args: { p_reason: string; p_report_id: string; p_status: string }
+        Returns: Json
+      }
       revoke_contribution_event: {
         Args: {
           p_creator_id: string
@@ -4019,15 +4600,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      revoke_trip_share: { Args: { p_share_id: string }; Returns: Json }
       search_articles: {
         Args: {
-          p_category?: string
+          p_category?: string | null
           p_limit?: number
           p_locale: string
           p_offset?: number
-          p_q?: string
-          p_region?: string
-          p_tag?: string
+          p_q?: string | null
+          p_region?: string | null
+          p_tag?: string | null
         }
         Returns: {
           category: string
@@ -4043,10 +4625,10 @@ export type Database = {
       }
       search_experiences: {
         Args: {
-          p_city?: string
+          p_city?: string | null
           p_limit?: number
           p_offset?: number
-          p_q?: string
+          p_q?: string | null
         }
         Returns: {
           city: string
@@ -4063,10 +4645,10 @@ export type Database = {
       }
       search_guides: {
         Args: {
-          p_city?: string
+          p_city?: string | null
           p_limit?: number
           p_offset?: number
-          p_q?: string
+          p_q?: string | null
         }
         Returns: {
           city: string
@@ -4096,10 +4678,7 @@ export type Database = {
         Returns: string
       }
       submit_receipt: {
-        Args: {
-          p_mission_id: string
-          p_proof_urls: string[]
-        }
+        Args: { p_mission_id: string; p_proof_urls: string[] }
         Returns: Json
       }
       trip_stop_starts_at: {
@@ -4111,46 +4690,33 @@ export type Database = {
         }
         Returns: string
       }
-      upsert_place: {
-        Args: {
-          p_country_code?: string
-          p_destination_id?: string
-          p_formatted_address?: string
-          p_lat?: number
-          p_lng?: number
-          p_name: string
-          p_provider?: string
-          p_provider_place_id?: string
-          p_timezone: string
-        }
-        Returns: string
-      }
-      // --- Phase 2 slice 1 (trip write path), same graft as above ---
-      create_trip: {
-        Args: {
-          p_destination_id?: string
-          p_start_date?: string
-          p_timezone?: string
-          p_title: string
-        }
-        Returns: string
-      }
       update_trip: {
         Args: {
           p_clear_start_date?: boolean
           p_expected_revision: number
-          p_start_date?: string
-          p_status?: string
-          p_timezone?: string
-          p_title?: string
+          p_start_date?: string | null
+          p_status?: string | null
+          p_timezone?: string | null
+          p_title?: string | null
           p_trip_id: string
         }
         Returns: number
       }
-      delete_trip: {
-        Args: { p_expected_revision: number; p_trip_id: string }
-        Returns: undefined
+      upsert_place: {
+        Args: {
+          p_country_code?: string | null
+          p_destination_id?: string | null
+          p_formatted_address?: string | null
+          p_lat?: number | null
+          p_lng?: number | null
+          p_name: string
+          p_provider?: string
+          p_provider_place_id?: string | null
+          p_timezone: string
+        }
+        Returns: string
       }
+      withdraw_guide_versions: { Args: { p_guide_id: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
@@ -4279,6 +4845,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

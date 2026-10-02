@@ -4,6 +4,7 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { GuideForm } from '@/components/kinnso/GuideForm'
+import { StructuredGuideForm,type StructuredContent } from '@/components/kinnso/StructuredGuideForm'
 import { updateGuideAction } from '@/lib/guides/actions'
 import type { GuideInput } from '@/lib/guides/types'
 
@@ -41,5 +42,7 @@ export default async function StudioEditGuidePage({
     return result
   }
 
-  return <GuideForm t={messages.studioGuides} mode="edit" initial={initial} backHref={`/${locale}/studio/guides`} onSubmit={submitGuide} />
+  const version=await supabase.rpc('kinnso_guide_authoring',{p_guide_id:id})
+  const authoring=version.data as {version?:number;content?:StructuredContent|null}|null
+  return <><GuideForm t={messages.studioGuides} mode="edit" initial={initial} backHref={`/${locale}/studio/guides`} onSubmit={submitGuide} />{version.error?<p role="status">Structured versions are currently unavailable.</p>:<StructuredGuideForm id={id} locale={locale} initialVersion={authoring?.version??0} initialContent={authoring?.content??null}/>}</>
 }
