@@ -301,98 +301,11 @@ export interface A11yException {
   reviewWhen: string
 }
 
-// Every reason below is duplicated verbatim in r7-10-contract.spec.ts's
-// "a11y exception ledger has exactly the approved entries" test (a shared constant would
-// let a reason change silently pass that test). Keep both copies in sync.
-const NAVBAR_OVERFLOW_REASON = "Shared Navbar.tsx desktop chrome (baseAnchors nav + "
-  + "audienceAnchors/LocaleSwitcher/CTA, both gated xl:flex) renders starting exactly at "
-  + "the xl breakpoint (1280px). CSS pins min-width media queries to a nominal 16px root "
-  + "font-size, so the breakpoint does not move when text is zoomed, but the rem-sized "
-  + "gaps/padding/type inside the nav do scale -- at 200% zoom the row that barely fits "
-  + "at 1280px/100% needs roughly double its width (document scrollWidth grows to "
-  + "~2324-2479px against the 1280px viewport). Needs a redesign of how the desktop nav "
-  + "degrades under text zoom (an overflow/priority-nav pattern, container-query-driven "
-  + "breakpoints, or fewer top-row items), not a token or class change."
-
-export const A11Y_EXCEPTIONS: readonly A11yException[] = [
-  {
-    routeId: 'home',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'explore',
-    check: 'text-200',
-    reason: `${NAVBAR_OVERFLOW_REASON} Explore also has its own, separate issue: `
-      + "ExploreControls.tsx's lg:grid-cols-[14rem_minmax(0,1fr)] destination-filter "
-      + "sidebar column is sized in rem, so it grows from 224px to 448px at 200% zoom and "
-      + "steals space from the adjoining 3-column guide-card grid in "
-      + "ExploreDiscovery.tsx, shrinking each GuideCard's content column to ~78px -- too "
-      + "narrow for its eyebrow/title text even once wrapped. Needs a redesigned filter "
-      + "layout (a fixed-px sidebar width, fewer grid columns at high zoom, or a "
-      + "collapsible filter panel), not a contained CSS change.",
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'guide',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'experience',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'article',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'creator-landing',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'merchant-landing',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'creator-directory',
-    check: 'text-200',
-    reason: `${NAVBAR_OVERFLOW_REASON} creator-directory also has its own, separate `
-      + "issue: CreatorsLandingView.tsx's creator-bio preview "
-      + '(<p className="mt-3 line-clamp-2">{c.bio}</p>) is clamped to 2 lines; a short '
-      + "bio that fits on 1 line at 100% zoom needs 3 lines at 200% zoom and is newly "
-      + "truncated by the clamp for the first time. The full bio stays reachable via the "
-      + "profile link, so nothing is permanently lost, but it's a product/design call "
-      + "whether to raise the clamp or resize the card at high zoom rather than a "
-      + "code-only fix.",
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-  {
-    routeId: 'merchant-directory',
-    check: 'text-200',
-    reason: NAVBAR_OVERFLOW_REASON,
-    owner: 'Design',
-    reviewWhen: 'Before public launch',
-  },
-]
+// The nine historical text-200 exceptions were reproduced and fixed with
+// font-relative container layouts. Their RED/GREEN evidence is retained privately
+// in docs/implementation/batch1/TEXT200_ACCEPTANCE.json. New suppression requires
+// an explicit independent contract change and review.
+export const A11Y_EXCEPTIONS: readonly A11yException[] = []
 
 export function isExcepted(
   routeId: R710RouteId,

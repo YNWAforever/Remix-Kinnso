@@ -18,8 +18,8 @@ import type { Messages } from "@/lib/i18n/messages/en";
  * Merchant deep links (mission queue / creator search / insights) live on a slim
  * second row under the main row — nine top-row anchors overflow the container at
  * every width — and merchants skip the redundant "For Merchants" link. Desktop
- * chrome is gated at xl: (tablets get the hamburger) so the row never overflows
- * at 768–1100px.
+ * chrome uses a font-relative container query (tablets and enlarged text get the
+ * same hamburger) so the desktop row only appears when its text can fit.
  */
 export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: boolean; dashboardLabel: string; t: Messages["nav"] }> = ({ locale, role, sessionsLive, dashboardLabel, t }) => {
   const [open, setOpen] = useState(false);
@@ -71,7 +71,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
+    <header className="k2-navbar sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
       <Dialog open={open} onOpenChange={setOpen}>
       <div className="k2-container flex h-16 items-center justify-between gap-4">
         <Link href={p("")} aria-label="KINNSO" className="flex items-baseline gap-1.5">
@@ -79,7 +79,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-kinnso-orange" />
         </Link>
 
-        <nav className="hidden items-center gap-1 xl:flex">
+        <nav className="k2-navbar-desktop items-center gap-1">
           {baseAnchors.map((a) => {
             const href = p(a.to);
             return (
@@ -90,7 +90,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 xl:flex">
+        <div className="k2-navbar-desktop items-center gap-3">
           {audienceAnchors.map((anchor) => {
             const href = p(anchor.to);
             return (
@@ -118,7 +118,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
         <DialogTrigger asChild>
           <button
             type="button"
-            className="grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange xl:hidden"
+            className="k2-navbar-toggle grid h-10 w-10 place-items-center rounded-full text-kinnso-ink transition hover:bg-kinnso-cream2/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kinnso-orange"
             aria-label={t.menuToggle}
             aria-expanded={open}
             aria-controls={open ? "kinnso-mobile-menu" : undefined}
@@ -129,7 +129,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
       </div>
 
       {role === "merchant" && (
-        <nav aria-label={t.merchantMenuLabel} className="hidden border-t border-kinnso-edge xl:block">
+        <nav aria-label={t.merchantMenuLabel} className="k2-navbar-merchant border-t border-kinnso-edge">
           <div className="k2-container flex h-10 items-center gap-1">
             {merchantAnchors.map((a) => {
               const href = p(a.to);
@@ -146,7 +146,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
         <DialogContent
           id="kinnso-mobile-menu"
           aria-describedby={undefined}
-          className="top-16 bottom-0 left-0 right-0 max-h-[calc(100dvh-4rem)] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-none border-x-0 border-b-0 bg-kinnso-cream p-0 xl:hidden"
+          className="top-16 bottom-0 left-0 right-0 max-h-[calc(100dvh-4rem)] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto rounded-none border-x-0 border-b-0 bg-kinnso-cream p-0"
         >
           <DialogTitle className="sr-only">{t.menuToggle}</DialogTitle>
           <div className="k2-container flex flex-col gap-1 py-3">

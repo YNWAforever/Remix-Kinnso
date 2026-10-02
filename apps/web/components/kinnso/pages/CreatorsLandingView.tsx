@@ -34,9 +34,9 @@ export function CreatorsLandingView({
       </SectionShell>
 
       {/* Directory grid */}
-      <section className="k2-container py-12">
+      <section className="k2-creator-directory k2-container py-12">
         {creators.length > 0 ? (
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="k2-creator-grid grid gap-5">
             {creators.map((c) => (
               <li key={c.handle}>
                 <div className="k2-card flex h-full flex-col p-5">

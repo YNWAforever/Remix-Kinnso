@@ -201,6 +201,43 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* Unlike viewport media queries, em in a container query follows the container's
+   computed font size. Keep the usual desktop layout at 100%, and reuse the
+   existing accessible trays when text enlargement needs more space. */
+.k2-navbar { container: kinnso-navbar / inline-size; }
+.k2-navbar-desktop, .k2-navbar-merchant { display: none; }
+@container kinnso-navbar (min-width: 80em) {
+  .k2-navbar-desktop { display: flex; }
+  .k2-navbar-merchant { display: block; }
+  .k2-navbar-toggle { display: none; }
+}
+
+.k2-explore-controls { container: kinnso-explore / inline-size; }
+.k2-explore-sort, .k2-explore-sidebar { display: none; }
+@container kinnso-explore (min-width: 36em) {
+  .k2-explore-search { grid-template-columns: minmax(0, 1fr) auto; }
+}
+@container kinnso-explore (min-width: 60em) {
+  .k2-explore-with-sidebar { grid-template-columns: 14rem minmax(0, 1fr); }
+  .k2-explore-sort, .k2-explore-sidebar { display: block; }
+  .k2-explore-filter-trigger { display: none; }
+}
+.k2-explore-results { container: kinnso-explore-results / inline-size; }
+@container kinnso-explore-results (min-width: 32em) {
+  .k2-explore-guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container kinnso-explore-results (min-width: 44em) {
+  .k2-explore-guide-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.k2-creator-directory { container: kinnso-creators / inline-size; }
+@container kinnso-creators (min-width: 40em) {
+  .k2-creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container kinnso-creators (min-width: 64em) {
+  .k2-creator-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

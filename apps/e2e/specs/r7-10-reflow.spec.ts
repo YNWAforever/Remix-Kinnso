@@ -5,6 +5,7 @@ import {
   installLayoutShiftObserver,
   isExcepted,
   readCLS,
+  tabTo,
   waitForRoute,
   waitForVisualSettlement,
   type ElementBox,
@@ -23,21 +24,74 @@ import { R7_10_ROUTES, type R710Route } from '../r7-10-routes'
  */
 const WIDTHS = [380, 768, 1280, 1440] as const
 
-async function measureTextBoxes(page: Page): Promise<ElementBox[]> {
-  return page.evaluate(() => Array.from(
-    document.querySelectorAll<HTMLElement>('main :is(p, h1, h2, h3, h4, li, dd, dt, button, a)'),
-  )
-    .filter((element) => element.getClientRects().length > 0 && Boolean(element.textContent?.trim()))
-    .map((element) => {
+test('navigation stays available by keyboard when desktop text is doubled', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await waitForRoute(page, R7_10_ROUTES[0])
+  await waitForVisualSettlement(page)
+  const desktopExplore = page.getByRole('banner').getByRole('link', { name: 'Explore', exact: true })
+  await expect(desktopExplore).toBeVisible()
+  await page.addStyleTag({ content: 'html { font-size: 200% !important; }' })
+  const toggle = page.getByRole('banner').getByRole('button')
+  await expect(toggle).toBeVisible()
+  await expect(desktopExplore).toBeHidden()
+  await tabTo(page, toggle)
+  await page.keyboard.press('Enter')
+  const menu = page.getByRole('dialog')
+  await expect(menu).toBeVisible()
+  for (const path of ['/explore', '/destinations', '/articles', '/agent', '/creators', '/merchants', '/for-creators', '/for-merchants', '/sign-in', '/sign-up']) {
+    await expect(menu.locator(`a[href="/en${path}"]`)).toBeVisible()
+  }
+  await expect(menu.getByRole('combobox')).toBeVisible()
+  await assertNoHorizontalOverflow(page)
+  await page.keyboard.press('Escape')
+  await expect(menu).toBeHidden()
+  await expect(toggle).toBeFocused()
+  // Switching back restores the original desktop row, without a client-side zoom detector.
+  await page.addStyleTag({ content: 'html { font-size: 100% !important; }' })
+  await expect(desktopExplore).toBeVisible()
+  await expect(toggle).toBeHidden()
+})
+
+test('Explore filters stay usable when enlarged text collapses the sidebar', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await waitForRoute(page, R7_10_ROUTES[1])
+  await waitForVisualSettlement(page)
+  await expect(page.getByRole('button', { name: 'Filters', exact: true })).toBeHidden()
+  expect(await page.locator('.k2-explore-guide-grid').evaluate((element) =>
+    getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(3)
+  await page.addStyleTag({ content: 'html { font-size: 200% !important; }' })
+  const trigger = page.getByRole('button', { name: 'Filters', exact: true })
+  await expect(trigger).toBeVisible()
+  await trigger.click()
+  const sheet = page.getByRole('dialog')
+  await expect(sheet).toBeVisible()
+  await sheet.getByRole('radio', { name: 'Tokyo', exact: true }).check()
+  await expect(page).toHaveURL(/destination=tokyo/)
+  await sheet.getByRole('button', { name: /Show .* results/ }).click()
+  await expect(sheet).toBeHidden()
+  await expect(page.getByRole('button', { name: /Filters, 1 Active filters/ })).toBeFocused()
+  await assertNoHorizontalOverflow(page)
+})
+
+async function measureTextBoxes(page: Page): Promise<{ total: number; visible: Array<ElementBox & { index: number }> }> {
+  return page.evaluate(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>(
+      'main :is(p, h1, h2, h3, h4, li, dd, dt, button, a)',
+    ))
+    const visible = elements.flatMap((element, index) => {
+      if (!element.getClientRects().length || !element.textContent?.trim()) return []
       const first = String(element.className || '').split(/\s+/)[0]
-      return {
+      return [{
+        index,
         label: `${element.tagName.toLowerCase()}${first ? `.${first}` : ''}`,
         scrollWidth: element.scrollWidth,
         clientWidth: element.clientWidth,
         scrollHeight: element.scrollHeight,
         clientHeight: element.clientHeight,
-      }
-    }))
+      }]
+    })
+    return { total: elements.length, visible }
+  })
 }
 
 test.describe('R7.10 viewports and zoom', () => {
@@ -61,7 +115,6 @@ test.describe('R7.10 viewports and zoom', () => {
     }
 
     test(`${route.id}: text stays unclipped at 200% (WCAG 1.4.4)`, async ({ page }) => {
-      test.skip(isExcepted(route.id, 'text-200'), 'recorded in A11Y_EXCEPTIONS')
       await page.setViewportSize({ width: 1280, height: 900 })
       await waitForRoute(page, route)
       await waitForVisualSettlement(page)
@@ -77,17 +130,18 @@ test.describe('R7.10 viewports and zoom', () => {
       await waitForVisualSettlement(page)
       const after = await measureTextBoxes(page)
 
-      expect(before.length, `${route.id} measured no text — selector or route is wrong`).toBeGreaterThan(0)
-      // Compared index-by-index, so repeated labels (six `h2.k2-display`, say) cannot
-      // mask each other the way a label set would.
-      expect(after.length, `${route.id} element set changed under zoom; indexes cannot be compared`)
-        .toBe(before.length)
+      expect(before.visible.length, `${route.id} measured no text — selector or route is wrong`).toBeGreaterThan(0)
+      // Compare stable DOM indexes, including hidden nodes. Responsive trays can
+      // reveal a button under zoom; that newly visible text must also fit. Repeated
+      // labels cannot hide another element's clipping; DOM-size changes fail.
+      expect(after.total, `${route.id} DOM element set changed under zoom; indexes cannot be compared`)
+        .toBe(before.total)
+      const baseline = new Map(before.visible.map((box) => [box.index, box]))
 
       const clipped = (box: ElementBox) => clippedElements([box]).length > 0
-      const newlyClipped = after
-        .map((box, index) => ({ box, index }))
-        .filter(({ box, index }) => clipped(box) && !clipped(before[index]))
-        .map(({ box }) => box.label)
+      const newlyClipped = after.visible
+        .filter((box) => clipped(box) && (!baseline.has(box.index) || !clipped(baseline.get(box.index)!)))
+        .map((box) => box.label)
 
       expect(newlyClipped, `${route.id} clips text at 200% that was intact at 100%`).toEqual([])
       await assertNoHorizontalOverflow(page)

@@ -139,7 +139,7 @@ export function ExploreDiscovery({ locale, t, guides, destinations }: ExploreDis
         <h2 id="explore-grid-heading" className="sr-only">{t.gridHeading}</h2>
         {results.total ? (
           <>
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="k2-explore-guide-grid mt-5 grid gap-5">
               {results.visible.map((guide) => (
                 <GuideCard
                   key={guide.slug}
