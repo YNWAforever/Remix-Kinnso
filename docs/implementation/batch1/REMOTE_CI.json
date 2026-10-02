@@ -70,5 +70,8 @@
     "CI uses synthetic isolated local stack, not approved cloud staging",
     "Booking ON is test mode; no live payment acceptance",
     "Conditional cutover/parity jobs are skipped and not release acceptance"
-  ]
+  ],
+  "historicalOnly": true,
+  "supersededByPublicationEvidence": ".local-private/text200-publication-ci.json",
+  "currentExecutableSourceSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6"
 }

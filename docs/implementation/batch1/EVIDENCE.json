@@ -1,7 +1,7 @@
 {
-  "observedAt": "2026-10-02T18:33:03.235155+00:00",
+  "observedAt": "2026-10-02T19:56:40.503924+00:00",
   "frontendSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
-  "backendSourceSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+  "backendSourceSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
   "schemaHead": "20261002154501",
   "environment": "LOCAL_SYNTHETIC",
   "overall": "PARTIAL",
@@ -29,9 +29,9 @@
       "bytes": 604
     },
     "publicBrowser": {
-      "path": ".local-private/public-current-browser.log",
-      "sha256": "a690b4a82f53bc01d5d8b4c25d79509612402a0f504ea19fd9bd5294f9994242",
-      "bytes": 2812
+      "path": ".local-private/public-text200-pair-browser.log",
+      "sha256": "1b2972e27a879f53a570c7da4ca970d63e406f304b8f514bcd6304980b48aee5",
+      "bytes": 2761
     },
     "sourceBoundary": {
       "path": ".local-private/source-boundary-current.log",
@@ -59,9 +59,9 @@
       "bytes": 49
     },
     "privateRegression": {
-      "path": ".local-private/private-ci-fix-regression-serial.log",
-      "sha256": "ba4c99b476c55f74bce1b964d9ca79c7984c8450d01dd51d2996fc6ce094bf65",
-      "bytes": 174591
+      "path": ".local-private/a11y-full-regression.log",
+      "sha256": "07cb7ecf592d258b14e81d6ee07f5cb09358ea644faba512a9de137d16f4249a",
+      "bytes": 165387
     },
     "privateTypes": {
       "path": ".local-private/private-ci-fix-types.log",
@@ -79,9 +79,9 @@
       "bytes": 31
     },
     "privateBuild": {
-      "path": ".local-private/private-final-build.log",
-      "sha256": "b637c8846c10b0de9b9c25ee628be2721b1b55256548f0a31c74f4cb37a102ef",
-      "bytes": 7871
+      "path": ".local-private/a11y-text200-wide-build.log",
+      "sha256": "9dcf70b9bcd15c1b9fbab7238d20fcc6b3e4dd40f8bc9405379f1ab6deffb297",
+      "bytes": 7790
     },
     "nightlyFixture": {
       "path": ".local-private/nightly-final-fixture.log",
@@ -109,9 +109,9 @@
       "bytes": 264
     },
     "privateBrowserSubset": {
-      "path": ".local-private/private-final-browser-subset.log",
-      "sha256": "2bac25764023d129a841c8ee2af0ea8e42b953b443e44d94287b2768fd016475",
-      "bytes": 26441
+      "path": ".local-private/a11y-wide-complete-browser.log",
+      "sha256": "f7de3b03a27266d46e1ea6955c2ca7665f3a3fda8d82b2f78b7a1f83ca9ff023",
+      "bytes": 27236
     },
     "mediaCleanup": {
       "path": ".local-private/media-cleanup-final-after-browser.log",
@@ -162,6 +162,11 @@
       "path": ".local-private/public-comparison-browser-fixture-failure.log",
       "sha256": "a8a167a65412e7cbc6bea4dbdcd4e1265cd02f774653a2f7a011650ba0300ea8",
       "bytes": 5225
+    },
+    "privateTypesAndLint": {
+      "path": ".local-private/a11y-wide-quality.log",
+      "sha256": "0c6c39d6bdbcfca35905d993e3bf197204e80c25bbcecd960d2a106ea1e6c379",
+      "bytes": 9189
     }
   },
   "results": {
@@ -173,7 +178,9 @@
       "pass": 3692,
       "skip": 10,
       "tasks": 7,
-      "cached": 0
+      "cached": 0,
+      "sourceSha": "45423e2e8b86adaed7591e37147186ca37254fe4",
+      "scope": "Before final capped-navigation adjustment; final components, types, build and browser suites rerun. Complete final-head suite is recorded by publication CI."
     },
     "publicIntegration": {
       "pass": 4
@@ -200,90 +207,28 @@
     },
     "lint": {
       "errors": 0,
-      "warnings": 31
+      "warnings": 28
     },
     "publicBuild": "PASS",
     "privateBuild": "PASS",
     "archive": "PASS",
     "privateBrowserSubset": {
-      "pass": 154,
-      "skip": 9,
-      "reason": "Retained text-200 Design exceptions; not human screen-reader acceptance"
+      "pass": 168,
+      "skip": 0,
+      "reason": "Nine original text-200 defects fixed; menu at1280/2560, filters and read-only preview cases included. Modeled zoom is not human screen-reader acceptance"
+    },
+    "privateTypesAndLint": {
+      "result": "PASS",
+      "tasks": 9,
+      "cached": 6,
+      "errors": 0,
+      "warnings": 28
     }
   },
   "remoteCI": {
-    "observedAt": "2026-10-02T18:20:44.167483+00:00",
-    "head": "223372f923adec3e5b4c2b9ff829e7830768e98e",
-    "url": "https://github.com/YNWAforever/Remix-Kinnso/actions/runs/37039770188",
-    "conclusion": "SUCCESS",
-    "jobs": [
-      {
-        "name": "quality",
-        "result": "success"
-      },
-      {
-        "name": "Scan worker image",
-        "result": "success"
-      },
-      {
-        "name": "e2e",
-        "result": "success"
-      }
-    ],
-    "quality": {
-      "pass": 3701,
-      "skip": 1,
-      "tasks": 7,
-      "cached": 0,
-      "packages": [
-        {
-          "pass": 11,
-          "skip": 0
-        },
-        {
-          "pass": 40,
-          "skip": 0
-        },
-        {
-          "pass": 27,
-          "skip": 0
-        },
-        {
-          "pass": 91,
-          "skip": 1
-        },
-        {
-          "pass": 92,
-          "skip": 0
-        },
-        {
-          "pass": 187,
-          "skip": 0
-        },
-        {
-          "pass": 3253,
-          "skip": 0
-        }
-      ]
-    },
-    "browser": {
-      "bookingOff": {
-        "pass": 169,
-        "skip": 10
-      },
-      "profileEnquiry": {
-        "pass": 1
-      },
-      "bookingOnTestMode": {
-        "pass": 3,
-        "skip": 1
-      }
-    },
-    "limitations": [
-      "CI uses synthetic isolated local stack, not approved cloud staging",
-      "Booking ON is test mode; no live payment acceptance",
-      "Conditional cutover/parity jobs are skipped and not release acceptance"
-    ]
+    "result": "SEE_EXACT_FINAL_HEAD_PUBLICATION_SIDECAR",
+    "artifact": ".local-private/text200-publication-ci.json",
+    "previousSuccessfulHead": "f4399b43b26f30dbb289abc6244dbb78f484c1dd"
   },
   "archive": {
     "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
@@ -396,5 +341,140 @@
     "result": "PASS",
     "artifact": ".local-private/media-cleanup-current.log",
     "target": "verified synthetic local only"
-  }
+  },
+  "previousSourcePairResults": {
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "results": {
+      "publicUnit": {
+        "pass": 79,
+        "skip": 0
+      },
+      "privateRegression": {
+        "pass": 3692,
+        "skip": 10,
+        "tasks": 7,
+        "cached": 0,
+        "sourceSha": "45423e2e8b86adaed7591e37147186ca37254fe4",
+        "scope": "Before final capped-navigation adjustment; final components, types, build and browser suites rerun. Complete final-head suite is recorded by publication CI."
+      },
+      "publicIntegration": {
+        "pass": 4
+      },
+      "publicBrowser": {
+        "pass": 16
+      },
+      "nightlyFixture": {
+        "pass": 2
+      },
+      "nightlyLocalSmoke": {
+        "pass": 4
+      },
+      "sourceBoundary": {
+        "pass": 3,
+        "skip": 1,
+        "reason": "Windows symlink creation unavailable"
+      },
+      "privateTypes": {
+        "tasks": 8,
+        "result": "PASS",
+        "localLatestCached": 8,
+        "remoteCurrentCached": 0
+      },
+      "lint": {
+        "errors": 0,
+        "warnings": 28
+      },
+      "publicBuild": "PASS",
+      "privateBuild": "PASS",
+      "archive": "PASS",
+      "privateBrowserSubset": {
+        "pass": 168,
+        "skip": 0,
+        "reason": "Nine original text-200 defects fixed; menu at1280/2560, filters and read-only preview cases included. Modeled zoom is not human screen-reader acceptance"
+      },
+      "privateTypesAndLint": {
+        "result": "PASS",
+        "tasks": 9,
+        "cached": 6,
+        "errors": 0,
+        "warnings": 28
+      }
+    },
+    "remoteCI": {
+      "observedAt": "2026-10-02T18:20:44.167483+00:00",
+      "head": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+      "url": "https://github.com/YNWAforever/Remix-Kinnso/actions/runs/37039770188",
+      "conclusion": "SUCCESS",
+      "jobs": [
+        {
+          "name": "quality",
+          "result": "success"
+        },
+        {
+          "name": "Scan worker image",
+          "result": "success"
+        },
+        {
+          "name": "e2e",
+          "result": "success"
+        }
+      ],
+      "quality": {
+        "pass": 3701,
+        "skip": 1,
+        "tasks": 7,
+        "cached": 0,
+        "packages": [
+          {
+            "pass": 11,
+            "skip": 0
+          },
+          {
+            "pass": 40,
+            "skip": 0
+          },
+          {
+            "pass": 27,
+            "skip": 0
+          },
+          {
+            "pass": 91,
+            "skip": 1
+          },
+          {
+            "pass": 92,
+            "skip": 0
+          },
+          {
+            "pass": 187,
+            "skip": 0
+          },
+          {
+            "pass": 3253,
+            "skip": 0
+          }
+        ]
+      },
+      "browser": {
+        "bookingOff": {
+          "pass": 169,
+          "skip": 10
+        },
+        "profileEnquiry": {
+          "pass": 1
+        },
+        "bookingOnTestMode": {
+          "pass": 3,
+          "skip": 1
+        }
+      },
+      "limitations": [
+        "CI uses synthetic isolated local stack, not approved cloud staging",
+        "Booking ON is test mode; no live payment acceptance",
+        "Conditional cutover/parity jobs are skipped and not release acceptance"
+      ]
+    }
+  },
+  "text200Acceptance": "docs/implementation/batch1/TEXT200_ACCEPTANCE.json"
 }

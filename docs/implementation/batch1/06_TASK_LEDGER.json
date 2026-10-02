@@ -4,7 +4,7 @@
   "owner": "Codex GPT-6.1 Sol",
   "scope": "Execute batch 1 K00-K16 first; later K17-K25 scheduled",
   "completion_summary": {
-    "new_tasks_done": 9,
+    "new_tasks_done": 10,
     "tasks_total": 26,
     "batch_1": 17,
     "later_batches": 9,
@@ -16,6 +16,7 @@
     "batch_1_done": [
       "K00",
       "K01",
+      "K02",
       "K03",
       "K04",
       "K05",
@@ -25,7 +26,6 @@
       "K15"
     ],
     "batch_1_partial": [
-      "K02",
       "K06",
       "K07",
       "K08",
@@ -339,7 +339,7 @@
         "E06",
         "E09"
       ],
-      "implementation_status": "PARTIAL",
+      "implementation_status": "DONE",
       "files": [
         "私人 Remix：PR #131/#133/#132/#130 的實際 changed files",
         "重點 apps/web/lib/auth/return-path.ts、proxy.ts、lib/guides/queries.ts",
@@ -361,7 +361,7 @@
       "verification": "pnpm typecheck；pnpm honesty:lint；pnpm --filter web test -- tests/auth.return-path.test.ts tests/guides.queries.test.ts。K02只關閉source integration／非DB回歸；DB suites由依賴它的K06執行，因此不形成循環。未過K06/K16前，candidate不得標ready for production。",
       "external_dependencies": "無；按依賴次序執行",
       "owner": "Codex GPT-6.1 Sol",
-      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "verification_status": "PASS_SOURCE_INTEGRATION",
       "completion_evidence": [
         {
           "taskId": "K02",
@@ -432,11 +432,34 @@
           "limitations": [
             "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Read-only legacy browser154 PASS/9 existing text-200 exceptions; human screen reader NOT_RUN. Existing main merchant entry semantics preserved; stale test corrected, isolated fixture phases guarded."
           ]
+        },
+        {
+          "taskId": "K02",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Nine original text-200 failures, two control failures and a 2560px container-boundary failure reproduced; 12 targeted and 168 full related browser cases pass with zero skips; complete local regression3692 PASS/10 existing skips/0 cached at45423e2 before final capped-navigation adjustment, with final components/types/build/browser rerun. Complete exact-final-head regression is recorded by publication CI. Current connected public U01/U02 browser16 PASS. Migration files unchanged; previous U06 rehearsal is preserved, not relabeled as rerun.",
+          "result": "PASS_SOURCE_INTEGRATION",
+          "artifact": "docs/implementation/batch1/TEXT200_ACCEPTANCE.json",
+          "observedAt": "2026-10-02T19:56:40.503924+00:00",
+          "reviewer": "Codex executor; no additional whole-branch reviewer or approval claimed",
+          "skips": [
+            "10 existing private unit/integration suite skips; zero accessibility browser skips"
+          ],
+          "limitations": [
+            "Root font-size is modeled at 200%, not native browser chrome zoom",
+            "Human screen reader and physical iOS/Android remain NOT_RUN",
+            "Approved cloud staging and real source/cover rights remain BLOCKED",
+            "No production merge, migration, reset, DNS or payment"
+          ]
         }
       ],
-      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "readiness": "SOURCE_INTEGRATION_ONLY_NOT_PRODUCTION",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T18:33:03.235155+00:00"
+      "updated_at": "2026-10-02T19:56:40.503924+00:00",
+      "closure_ruling": "K02 closes source integration/non-DB regression. All four candidate histories and legacy capabilities are retained; the nine text-200 exceptions now pass mandatory RED/GREEN regressions. Human screen-reader acceptance remains explicitly NOT_RUN under K16, whose staging gate stays PARTIAL."
     },
     {
       "id": "K03",
@@ -2008,11 +2031,33 @@
           "limitations": [
             "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Public79 unit/4 integration/16 browser and 132-file extracted build PASS; private local3692 PASS/10 SKIP across7 uncached tasks; trusted remote quality3701 PASS/1 SKIP with browser jobs SUCCESS; read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN."
           ]
+        },
+        {
+          "taskId": "K16",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Nine original text-200 failures, two control failures and a 2560px container-boundary failure reproduced; 12 targeted and 168 full related browser cases pass with zero skips; complete local regression3692 PASS/10 existing skips/0 cached at45423e2 before final capped-navigation adjustment, with final components/types/build/browser rerun. Complete exact-final-head regression is recorded by publication CI. Current connected public U01/U02 browser16 PASS. Migration files unchanged; previous U06 rehearsal is preserved, not relabeled as rerun.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/TEXT200_ACCEPTANCE.json",
+          "observedAt": "2026-10-02T19:56:40.503924+00:00",
+          "reviewer": "Codex executor; no additional whole-branch reviewer or approval claimed",
+          "skips": [
+            "10 existing private unit/integration suite skips; zero accessibility browser skips"
+          ],
+          "limitations": [
+            "Root font-size is modeled at 200%, not native browser chrome zoom",
+            "Human screen reader and physical iOS/Android remain NOT_RUN",
+            "Approved cloud staging and real source/cover rights remain BLOCKED",
+            "No production merge, migration, reset, DNS or payment"
+          ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T18:33:03.235155+00:00"
+      "updated_at": "2026-10-02T19:56:40.503924+00:00"
     },
     {
       "id": "K17",
@@ -3384,9 +3429,9 @@
     "Never include credentials or private user content in evidence"
   ],
   "execution_current": {
-    "observedAt": "2026-10-02T18:33:03.235155+00:00",
+    "observedAt": "2026-10-02T19:56:40.503924+00:00",
     "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
-    "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "backendSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
     "schemaHead": "20261002154501",
     "historicalBaselinePreserved": true,
     "status": "PARTIAL",
@@ -3396,6 +3441,8 @@
       "Physical iOS Safari/Android and screen reader",
       "Cloud cleanup schedule and access-log token redaction",
       "Cloud rollback rehearsal; production NOT_RUN"
-    ]
+    ],
+    "text200Acceptance": "PASS_MODELED_BROWSER_NOT_HUMAN_SR",
+    "latestPublicationEvidence": ".local-private/text200-publication-ci.json"
   }
 }

@@ -15,7 +15,7 @@
   },
   "private": {
     "visibility": "private",
-    "head": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "head": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
     "branch": "feat/batch1-services",
     "remote": "https://github.com/YNWAforever/Remix-Kinnso.git",
     "lockfileSha256": "ec2edf79285ea14520cf1b9124c469af130c4043474cf96518827720a2c3f4cc",
@@ -48,6 +48,12 @@
     "Private #133/#132/#130 integrated on isolated #131 review branch only.",
     "Original private checkout and untracked user files retained untouched.",
     "Windows fileURL test failure corrected. Initial private suite had no env/test execution; full local suite subsequently armed.",
-    "Published/deployed heads remain UNKNOWN until release owner verifies external target."
-  ]
+    "Published/deployed heads remain UNKNOWN until release owner verifies external target.",
+    "Public PR2 changed from draft to ready before this continuation and is preserved. Private text200 defects were fixed; source/current-head CI correlation is in the publication sidecar. Human/staging gates remain PARTIAL."
+  ],
+  "priorPublishedSourceBaseline": {
+    "observedAt": "2026-10-02T18:28:21.170518+00:00",
+    "publicHead": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "privateHead": "223372f923adec3e5b4c2b9ff829e7830768e98e"
+  }
 }
