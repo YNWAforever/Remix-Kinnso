@@ -4462,6 +4462,7 @@ export type Database = {
         Returns: undefined
       }
       kinnso_media_cleanup_candidates: { Args: never; Returns: Json }
+      kinnso_session_valid: { Args: never; Returns: boolean }
       kinnso_trip_place_facts: { Args: { p_trip_id: string }; Returns: Json }
       list_active_perks: {
         Args: never
@@ -4572,6 +4573,7 @@ export type Database = {
         Args: { p_creator_id: string }
         Returns: undefined
       }
+      record_kinnso_return_visit: { Args: never; Returns: Json }
       redeem_offer_claim: {
         Args: { p_amount_spent?: number | null; p_raw_token: string }
         Returns: Json
