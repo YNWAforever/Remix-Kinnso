@@ -476,5 +476,15 @@
       ]
     }
   },
-  "text200Acceptance": "docs/implementation/batch1/TEXT200_ACCEPTANCE.json"
+  "text200Acceptance": "docs/implementation/batch1/TEXT200_ACCEPTANCE.json",
+  "externalPublicFoundationDelta": {
+    "observedAt": "2026-10-02T20:05:39.797532+00:00",
+    "event": "PUBLIC_PR1_EXTERNALLY_MERGED",
+    "mergedAt": "2026-10-02T19:12:54Z",
+    "publicMainSha": "2a22235d34984b8741ba2339cbc391a9dc1ddd8c",
+    "originalMainSha": "4507686c9fac761554fa66d9756a850172e1c9ce",
+    "foundationSha": "f181cff22d28a480120c2abaa2dde91c573582bf",
+    "evidence": "PR1 merge metadata and git diff foundation..origin/main is empty; foundation is already an ancestor of public review branch",
+    "disposition": "Preserve external merge; public implementation source remains a01f273; retarget PR2 review base to main; executor does not merge any formal main"
+  }
 }

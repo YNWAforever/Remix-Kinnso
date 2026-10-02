@@ -199,6 +199,20 @@
             "1 Windows source symlink skip"
           ],
           "limitations": []
+        },
+        {
+          "taskId": "K00",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
+          "environment": "read-only remote metadata and local Git comparison",
+          "command": "gh pr view1; git fetch main; git diff f181cff origin/main; git merge-base --is-ancestor",
+          "result": "PASS_DELTA_PRESERVED",
+          "artifact": "execution_current.externalPublicFoundationDelta",
+          "observedAt": "2026-10-02T20:05:39.797532+00:00",
+          "skips": [],
+          "limitations": [
+            "External public foundation merge only; no executor main merge or production operation"
+          ]
         }
       ],
       "readiness": "COMPLETE_LOCAL",
@@ -3443,6 +3457,16 @@
       "Cloud rollback rehearsal; production NOT_RUN"
     ],
     "text200Acceptance": "PASS_MODELED_BROWSER_NOT_HUMAN_SR",
-    "latestPublicationEvidence": ".local-private/text200-publication-ci.json"
+    "latestPublicationEvidence": ".local-private/text200-publication-ci.json",
+    "externalPublicFoundationDelta": {
+      "observedAt": "2026-10-02T20:05:39.797532+00:00",
+      "event": "PUBLIC_PR1_EXTERNALLY_MERGED",
+      "mergedAt": "2026-10-02T19:12:54Z",
+      "publicMainSha": "2a22235d34984b8741ba2339cbc391a9dc1ddd8c",
+      "originalMainSha": "4507686c9fac761554fa66d9756a850172e1c9ce",
+      "foundationSha": "f181cff22d28a480120c2abaa2dde91c573582bf",
+      "evidence": "PR1 merge metadata and git diff foundation..origin/main is empty; foundation is already an ancestor of public review branch",
+      "disposition": "Preserve external merge; public implementation source remains a01f273; retarget PR2 review base to main; executor does not merge any formal main"
+    }
   }
 }
