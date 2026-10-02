@@ -5,6 +5,9 @@
     "dev": { "cache": false, "persistent": true },
     "lint": {},
     "typecheck": {},
-    "test": {}
+    "test": {
+      "cache": false,
+      "env": ["CI", "KINNSO_TEST_TARGET", "KINNSO_TEST_PROJECT", "KINNSO_APPROVED_SUPABASE_ORIGIN", "SUPABASE_DB_CONTAINER"]
+    }
   }
 }

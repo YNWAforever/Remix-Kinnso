@@ -105,6 +105,9 @@ jobs:
           {
             echo "SUPABASE_DB_CONTAINER=${SUPABASE_DB_CONTAINER}"
             echo 'RUN_R7_3_LOCAL_LIVE_TESTS=1'
+            echo 'KINNSO_TEST_TARGET=local'
+            echo 'KINNSO_TEST_PROJECT=kinnso-v3'
+            echo 'KINNSO_APPROVED_SUPABASE_ORIGIN=http://127.0.0.1:54421'
           } >> apps/web/.env.test
 
       - name: Export local Supabase env for web build
