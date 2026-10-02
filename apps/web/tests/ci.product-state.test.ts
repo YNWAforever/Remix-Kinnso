@@ -196,6 +196,37 @@ describe('CI product-state startup contract', () => {
     expect(hasCiProductStateContract(workflow)).toBe(true)
   })
 
+  // The Booking ON step carries a condition, so "nothing here is skipped or softened"
+  // has to be enforced rather than promised in prose. hasCiProductStateContract reads
+  // only that step's env mapping and run line, so on its own it would accept
+  // `if: false` — or a `continue-on-error` one level up on the job, which neutralises
+  // the step just as completely — without complaint. Pin the exact predicate instead.
+  //
+  // The condition names the only runs GitHub structurally refuses repository secrets
+  // to via the actor. Widening it (to the pull request author, say) would silently stop
+  // checking runs that do have the secret: a maintainer's fixup push onto a
+  // dependabot/** branch runs as the maintainer and must still be covered.
+  it('skips Booking ON only on Dependabot-triggered runs', () => {
+    const jobs = uniqueSourceBlock(workflow, 'jobs:', 0)
+    const e2eJob = jobs && uniqueSourceBlock(jobs.source, 'e2e:', 2)
+    const onStep = e2eJob && uniqueSourceBlock(e2eJob.source, '- name: R7.10 accessibility - Booking ON', 6)
+
+    // Comments are stripped before matching: the step is documented at length, and the
+    // prose names the very keys asserted against here. Matching raw text would fail on
+    // its own explanation rather than on a real softening.
+    const keyLines = (block: SourceBlock | undefined): string[] =>
+      (block?.source.split('\n') ?? []).filter((line) => !line.trimStart().startsWith('#'))
+
+    expect(keyLines(onStep).filter((line) => line.startsWith('        if:')))
+      .toEqual(["        if: github.actor != 'dependabot[bot]'"])
+
+    // A softening on the job itself would neutralise the step just as completely and
+    // would not appear in the step block at all.
+    expect(keyLines(onStep).some((line) => line.includes('continue-on-error'))).toBe(false)
+    expect(keyLines(e2eJob).some((line) => line.includes('continue-on-error'))).toBe(false)
+    expect(keyLines(e2eJob).filter((line) => line.startsWith('    if:'))).toEqual([])
+  })
+
   it('rejects product-state strings moved outside the named Booking OFF step', () => {
     const mutated = replaceOnce(
       workflow,
@@ -235,6 +266,7 @@ describe('CI product-state startup contract', () => {
           R7_10_BOOKING_STATE: 'off'
         run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts`
     const on = `      - name: R7.10 accessibility - Booking ON
+        if: github.actor != 'dependabot[bot]'
         env:
           R7_10_BOOKING_STATE: 'on'
           STRIPE_SECRET_KEY: \${{ secrets.STRIPE_SECRET_KEY }}

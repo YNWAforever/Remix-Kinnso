@@ -254,11 +254,44 @@ jobs:
       # Deliberately last of the test steps: it is the only one that depends on a
       # repository secret, and its config refuses to load without STRIPE_SECRET_KEY.
       # Ahead of the others it would abort the job before they ran, hiding their
-      # result behind a configuration problem rather than a code one. It still fails
-      # the job — nothing here is skipped or softened. `hasCiProductStateContract`
-      # (apps/web/tests/ci.product-state.test.ts) still enforces that this runs after
-      # Booking OFF; it compares line positions, so intervening steps are allowed.
+      # result behind a configuration problem rather than a code one.
+      #
+      # The condition is not a softening of that rule, it is the one case the rule
+      # cannot describe: GitHub gives a Dependabot-triggered run no access to
+      # repository secrets at all (those runs see only the separate Dependabot secrets
+      # store), so this step could never pass there — and it never did, on every
+      # Dependabot pull request since the step landed, which is why #101-#105 were each
+      # merged with a red e2e. A failing check that can never be made green teaches
+      # reviewers to ignore the check.
+      #
+      # `github.actor`, NOT `github.event.pull_request.user.login`: the restriction is
+      # keyed to the run, not to who opened the pull request. A maintainer who pushes a
+      # fixup onto a dependabot/** branch triggers a run whose actor is the maintainer,
+      # which therefore DOES carry the secret and must still be checked; matching on the
+      # pull request author would skip it forever, because the author never changes.
+      # `github.actor` also stays 'dependabot[bot]' when a human re-runs a Dependabot
+      # run, which is equally correct: a re-run executes with the original actor's
+      # privileges and still has no secret.
+      #
+      # Everywhere else — push to main, workflow_dispatch, and every human pull request
+      # — the step stays unconditional, so a deleted, renamed or rotated-out secret
+      # still fails the job loudly with `STRIPE_SECRET_KEY is required for Booking ON`.
+      # On push and workflow_dispatch `github.actor` is a real login, never the bot, so
+      # the guard is a no-op there.
+      #
+      # Deliberately NOT covered: a pull request from a fork also receives no secrets
+      # and would still fail here. This repository is private and is not a fork, so that
+      # cannot arise today; if it ever does it fails loudly rather than skipping
+      # silently, which is the behaviour this file prefers.
+      #
+      # `hasCiProductStateContract` (apps/web/tests/ci.product-state.test.ts) still
+      # enforces that this runs after Booking OFF; it compares line positions, so
+      # intervening steps are allowed. That contract reads only this step's env mapping
+      # and run line, so on its own it would accept `if: false` just as happily. The
+      # exact condition below is therefore pinned by its own test, together with the
+      # absence of `continue-on-error` on both this step and the enclosing job.
       - name: R7.10 accessibility - Booking ON
+        if: github.actor != 'dependabot[bot]'
         env:
           R7_10_BOOKING_STATE: 'on'
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
