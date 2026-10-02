@@ -24,33 +24,35 @@ import { R7_10_ROUTES, type R710Route } from '../r7-10-routes'
  */
 const WIDTHS = [380, 768, 1280, 1440] as const
 
-test('navigation stays available by keyboard when desktop text is doubled', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 })
-  await waitForRoute(page, R7_10_ROUTES[0])
-  await waitForVisualSettlement(page)
-  const desktopExplore = page.getByRole('banner').getByRole('link', { name: 'Explore', exact: true })
-  await expect(desktopExplore).toBeVisible()
-  await page.addStyleTag({ content: 'html { font-size: 200% !important; }' })
-  const toggle = page.getByRole('banner').getByRole('button')
-  await expect(toggle).toBeVisible()
-  await expect(desktopExplore).toBeHidden()
-  await tabTo(page, toggle)
-  await page.keyboard.press('Enter')
-  const menu = page.getByRole('dialog')
-  await expect(menu).toBeVisible()
-  for (const path of ['/explore', '/destinations', '/articles', '/agent', '/creators', '/merchants', '/for-creators', '/for-merchants', '/sign-in', '/sign-up']) {
-    await expect(menu.locator(`a[href="/en${path}"]`)).toBeVisible()
-  }
-  await expect(menu.getByRole('combobox')).toBeVisible()
-  await assertNoHorizontalOverflow(page)
-  await page.keyboard.press('Escape')
-  await expect(menu).toBeHidden()
-  await expect(toggle).toBeFocused()
-  // Switching back restores the original desktop row, without a client-side zoom detector.
-  await page.addStyleTag({ content: 'html { font-size: 100% !important; }' })
-  await expect(desktopExplore).toBeVisible()
-  await expect(toggle).toBeHidden()
-})
+for (const width of [1280, 2560]) {
+  test(`navigation stays available by keyboard when desktop text is doubled at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await waitForRoute(page, R7_10_ROUTES[0])
+    await waitForVisualSettlement(page)
+    const desktopExplore = page.getByRole('banner').getByRole('link', { name: 'Explore', exact: true })
+    await expect(desktopExplore).toBeVisible()
+    await page.addStyleTag({ content: 'html { font-size: 200% !important; }' })
+    const toggle = page.getByRole('banner').getByRole('button')
+    await expect(toggle).toBeVisible()
+    await expect(desktopExplore).toBeHidden()
+    await tabTo(page, toggle)
+    await page.keyboard.press('Enter')
+    const menu = page.getByRole('dialog')
+    await expect(menu).toBeVisible()
+    for (const path of ['/explore', '/destinations', '/articles', '/agent', '/creators', '/merchants', '/for-creators', '/for-merchants', '/sign-in', '/sign-up']) {
+      await expect(menu.locator(`a[href="/en${path}"]`)).toBeVisible()
+    }
+    await expect(menu.getByRole('combobox')).toBeVisible()
+    await assertNoHorizontalOverflow(page)
+    await page.keyboard.press('Escape')
+    await expect(menu).toBeHidden()
+    await expect(toggle).toBeFocused()
+    // Switching back restores the original desktop row, without a client-side zoom detector.
+    await page.addStyleTag({ content: 'html { font-size: 100% !important; }' })
+    await expect(desktopExplore).toBeVisible()
+    await expect(toggle).toBeHidden()
+  })
+}
 
 test('Explore filters stay usable when enlarged text collapses the sidebar', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })

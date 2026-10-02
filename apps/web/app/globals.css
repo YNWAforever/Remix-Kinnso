@@ -204,12 +204,21 @@
 /* Unlike viewport media queries, em in a container query follows the container's
    computed font size. Keep the usual desktop layout at 100%, and reuse the
    existing accessible trays when text enlargement needs more space. */
-.k2-navbar { container: kinnso-navbar / inline-size; }
+.k2-navbar-layout {
+  container: kinnso-navbar / inline-size;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
 .k2-navbar-desktop, .k2-navbar-merchant { display: none; }
-@container kinnso-navbar (min-width: 80em) {
-  .k2-navbar-desktop { display: flex; }
-  .k2-navbar-merchant { display: block; }
-  .k2-navbar-toggle { display: none; }
+@media (min-width: 80rem) {
+  /* Both the viewport and the capped content column must have room. A wide
+     monitor cannot make the 1200px column fit twice-sized desktop navigation. */
+  @container kinnso-navbar (min-width: 75em) {
+    .k2-navbar-desktop { display: flex; }
+    .k2-navbar-merchant { display: block; }
+    .k2-navbar-toggle { display: none; }
+  }
 }
 
 .k2-explore-controls { container: kinnso-explore / inline-size; }

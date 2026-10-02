@@ -73,6 +73,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
   return (
     <header className="k2-navbar sticky top-0 z-40 border-b border-kinnso-edge bg-kinnso-cream/95 font-sans backdrop-blur">
       <Dialog open={open} onOpenChange={setOpen}>
+      <div className="k2-navbar-layout">
       <div className="k2-container flex h-16 items-center justify-between gap-4">
         <Link href={p("")} aria-label="KINNSO" className="flex items-baseline gap-1.5">
           <span className="k2-display text-2xl font-semibold tracking-tight text-kinnso-ink">KINNSO</span>
@@ -142,6 +143,7 @@ export const Navbar: React.FC<{ locale: Locale; role: ViewerRole; sessionsLive: 
           </div>
         </nav>
       )}
+      </div>
 
         <DialogContent
           id="kinnso-mobile-menu"
