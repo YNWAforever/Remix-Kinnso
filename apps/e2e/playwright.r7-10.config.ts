@@ -3,21 +3,7 @@ import { resolve } from 'node:path'
 import { defineConfig } from '@playwright/test'
 import baseConfig from './playwright.config'
 import { resolveR710LocalConfig } from './r7-10-local'
-
-const offSpecs = [
-  'creator-onboarding.spec.ts',
-  'e2e-target.spec.ts',
-  'funnel-smoke.spec.ts',
-  'honesty.spec.ts',
-  'notfound.spec.ts',
-  'r7-10-contract.spec.ts',
-  'r7-10-accessibility.spec.ts',
-  // Helper-level coverage for r7-10-accessibility.ts (axe formatting, the CLS
-  // session-window calculation, focus-indicator detection). It matched only the
-  // default config, which nothing runs any more, so it executed nowhere.
-  'r7-10-accessibility-review.spec.ts',
-  'r7-10-booking.spec.ts',
-] as const
+import { R7_10_OFF_SPECS } from './r7-10-specs'
 
 function localEnv() {
   const values: Record<string, string> = {}
@@ -51,7 +37,7 @@ Object.assign(process.env, {
 
 export default defineConfig({
   ...baseConfig,
-  testMatch: local.bookingState === 'on' ? 'r7-10-booking.spec.ts' : [...offSpecs],
+  testMatch: local.bookingState === 'on' ? 'r7-10-booking.spec.ts' : [...R7_10_OFF_SPECS],
   use: { ...baseConfig.use, baseURL: local.baseURL },
   webServer: {
     command: `pnpm --filter web exec next dev --hostname 127.0.0.1 --port ${port}`,

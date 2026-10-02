@@ -29,7 +29,7 @@ describe('saveExperienceAction', () => {
   it('requires sign-in', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: null } })
     const result = await saveExperienceAction('en', 'e1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Sign in is required'] } })
+    expect(result).toEqual({ ok: false, reason: 'auth', errors: { form: ['Sign in is required'] } })
   })
 
   it('upserts the save for a signed-in traveller and revalidates /trips', async () => {
@@ -47,7 +47,7 @@ describe('saveExperienceAction', () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     upsertMock.mockResolvedValueOnce({ error: { message: 'permission denied for table experience_saves' } })
     const result = await saveExperienceAction('en', 'e1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Experience could not be saved'] } })
+    expect(result).toEqual({ ok: false, reason: 'failed', errors: { form: ['Experience could not be saved'] } })
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 
@@ -72,7 +72,7 @@ describe('unsaveExperienceAction', () => {
   it('requires sign-in', async () => {
     getUserMock.mockResolvedValueOnce({ data: { user: null } })
     const result = await unsaveExperienceAction('en', 'e1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Sign in is required'] } })
+    expect(result).toEqual({ ok: false, reason: 'auth', errors: { form: ['Sign in is required'] } })
   })
 
   it('deletes the save for a signed-in traveller', async () => {
@@ -85,7 +85,7 @@ describe('unsaveExperienceAction', () => {
     getUserMock.mockResolvedValueOnce({ data: { user: { id: 'u1' } } })
     deleteEqMock.mockResolvedValueOnce({ error: { message: 'permission denied for table experience_saves' } })
     const result = await unsaveExperienceAction('en', 'e1')
-    expect(result).toEqual({ ok: false, errors: { form: ['Experience could not be removed'] } })
+    expect(result).toEqual({ ok: false, reason: 'failed', errors: { form: ['Experience could not be removed'] } })
     expect(revalidatePathMock).not.toHaveBeenCalled()
   })
 })

@@ -1,0 +1,77 @@
+{
+  "observedAt": "2026-10-02T18:20:44.167483+00:00",
+  "head": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+  "url": "https://github.com/YNWAforever/Remix-Kinnso/actions/runs/37039770188",
+  "conclusion": "SUCCESS",
+  "jobs": [
+    {
+      "name": "quality",
+      "result": "success"
+    },
+    {
+      "name": "Scan worker image",
+      "result": "success"
+    },
+    {
+      "name": "e2e",
+      "result": "success"
+    }
+  ],
+  "quality": {
+    "pass": 3701,
+    "skip": 1,
+    "tasks": 7,
+    "cached": 0,
+    "packages": [
+      {
+        "pass": 11,
+        "skip": 0
+      },
+      {
+        "pass": 40,
+        "skip": 0
+      },
+      {
+        "pass": 27,
+        "skip": 0
+      },
+      {
+        "pass": 91,
+        "skip": 1
+      },
+      {
+        "pass": 92,
+        "skip": 0
+      },
+      {
+        "pass": 187,
+        "skip": 0
+      },
+      {
+        "pass": 3253,
+        "skip": 0
+      }
+    ]
+  },
+  "browser": {
+    "bookingOff": {
+      "pass": 169,
+      "skip": 10
+    },
+    "profileEnquiry": {
+      "pass": 1
+    },
+    "bookingOnTestMode": {
+      "pass": 3,
+      "skip": 1
+    }
+  },
+  "limitations": [
+    "CI uses synthetic isolated local stack, not approved cloud staging",
+    "Booking ON is test mode; no live payment acceptance",
+    "Conditional cutover/parity jobs are skipped and not release acceptance"
+  ],
+  "historicalOnly": true,
+  "supersededByPublicationEvidence": ".local-private/text200-publication-ci.json",
+  "currentExecutableSourceSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6"
+}

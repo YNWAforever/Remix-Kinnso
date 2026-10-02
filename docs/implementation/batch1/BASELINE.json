@@ -1,0 +1,69 @@
+{
+  "observedAt": "2026-10-02T18:28:21.170518+00:00",
+  "status": "LOCAL_IMPLEMENTATION_REMOTE_GATES_PENDING",
+  "originalPublicHead": "f181cff22d28a480120c2abaa2dde91c573582bf",
+  "originalPrivateMain": "e086fbfc4e2bc4447dc9bbbe71af1290c866adaf",
+  "originalPrivateCandidate": "62d7860d7454aea99d891a832b867795197d4df9",
+  "public": {
+    "visibility": "public",
+    "head": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "branch": "feat/batch1-traveller",
+    "remote": "https://github.com/YNWAforever/KinnsoOS.git",
+    "lockfileSha256": "2d860a900cff0dfb4e1f8e23538bef53375e923df6ecd16f6c8fa3cf00cff06d",
+    "runtime": "Node 24.18.0 / npm 11.16.0 / Next 16.3.8",
+    "deploySha": "UNKNOWN"
+  },
+  "private": {
+    "visibility": "private",
+    "head": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
+    "branch": "feat/batch1-services",
+    "remote": "https://github.com/YNWAforever/Remix-Kinnso.git",
+    "lockfileSha256": "ec2edf79285ea14520cf1b9124c469af130c4043474cf96518827720a2c3f4cc",
+    "packageManager": "pnpm 11.6.0",
+    "deploySha": "UNKNOWN"
+  },
+  "localSchemaHead": "20261002154501",
+  "hostedSchemaHead": "UNKNOWN",
+  "inputPackHashes": {
+    "00_PRODUCT_SPEC.md": true,
+    "00_START_HERE.txt": true,
+    "01_COMPLETE_READING_VIEW.html": true,
+    "01_MASTER_PLAN.md": true,
+    "02_BATCH_1_TASKS.md": true,
+    "03_LATER_BATCHES.md": true,
+    "04_TRACEABILITY.md": true,
+    "05_UAT_CASES.md": true,
+    "06_TASK_LEDGER.json": true,
+    "07_DECISIONS_AND_BLOCKERS.md": true,
+    "08_EVIDENCE_MANIFEST.json": true,
+    "README.md": true,
+    "sources/GITHUB_SNAPSHOT.json": true,
+    "sources/KinnsoOS_Audit_2026-10-01.md": true,
+    "sources/KinnsoOS_Evidence_2026-10-01.zip": true,
+    "sources/KinnsoOS_Requirements_Gap_Review_2026-10-01_zhHK.md": true
+  },
+  "delta": [
+    "Candidate heads unchanged from supplied snapshot at initial live verification.",
+    "Workspace was initially empty. Public PR1 branch cloned instead of empty main.",
+    "Private #133/#132/#130 integrated on isolated #131 review branch only.",
+    "Original private checkout and untracked user files retained untouched.",
+    "Windows fileURL test failure corrected. Initial private suite had no env/test execution; full local suite subsequently armed.",
+    "Published/deployed heads remain UNKNOWN until release owner verifies external target.",
+    "Public PR2 changed from draft to ready before this continuation and is preserved. Private text200 defects were fixed; source/current-head CI correlation is in the publication sidecar. Human/staging gates remain PARTIAL."
+  ],
+  "priorPublishedSourceBaseline": {
+    "observedAt": "2026-10-02T18:28:21.170518+00:00",
+    "publicHead": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "privateHead": "223372f923adec3e5b4c2b9ff829e7830768e98e"
+  },
+  "externalPublicFoundationDelta": {
+    "observedAt": "2026-10-02T20:05:39.797532+00:00",
+    "event": "PUBLIC_PR1_EXTERNALLY_MERGED",
+    "mergedAt": "2026-10-02T19:12:54Z",
+    "publicMainSha": "2a22235d34984b8741ba2339cbc391a9dc1ddd8c",
+    "originalMainSha": "4507686c9fac761554fa66d9756a850172e1c9ce",
+    "foundationSha": "f181cff22d28a480120c2abaa2dde91c573582bf",
+    "evidence": "PR1 merge metadata and git diff foundation..origin/main is empty; foundation is already an ancestor of public review branch",
+    "disposition": "Preserve external merge; public implementation source remains a01f273; retarget PR2 review base to main; executor does not merge any formal main"
+  }
+}

@@ -28,10 +28,13 @@ export async function requireMerchantPage(
 /**
  * Page gate: redirect anon to sign-in, then deny non-creators. Returns the creator user.
  *
- * `denied` exists because the studio's eight role-checking pages historically split into
- * two behaviours and both are asserted by host tests: six `notFound()` (the default here),
- * while /studio/insights and /studio/tier `redirect()` to the hub. This helper preserves
- * each page's existing behaviour rather than silently unifying it.
+ * `denied` exists because the studio's role-checking pages historically split into
+ * several behaviours and they are asserted by host tests: most `notFound()` (the default
+ * here), /studio/insights and /studio/tier `redirect()` to the hub, and the guide and
+ * session authoring pages send a not-yet-active creator to onboarding at /creator --
+ * every sign-up gets a blank `creators` row, so a session alone is not a creator, and a
+ * 404 would strand someone who is mid-application. This helper preserves each page's
+ * existing behaviour rather than silently unifying it.
  *
  * `creators.id` IS `auth.uid()`, so the returned `user.id` is directly usable as a
  * creator id — the same rule requireCreatorAction documents.
@@ -39,12 +42,13 @@ export async function requireMerchantPage(
 export async function requireCreatorPage(
   supabase: Supabase,
   loc: Locale,
-  denied: 'not-found' | 'studio' = 'not-found',
+  denied: 'not-found' | 'studio' | 'creator' = 'not-found',
 ): Promise<{ user: { id: string } }> {
   const context = await getAuthorizationContext(supabase)
   if (!context.user) redirect(`/${loc}/sign-in`)
   if (context.role !== 'creator') {
     if (denied === 'studio') redirect(`/${loc}/studio`)
+    if (denied === 'creator') redirect(`/${loc}/creator`)
     notFound()
   }
   return { user: context.user }

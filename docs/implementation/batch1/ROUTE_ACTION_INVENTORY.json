@@ -1,0 +1,3510 @@
+{
+  "routes": [
+    {
+      "repository": "public",
+      "path": "app/[locale]/[[...route]]/page.tsx",
+      "route": "/[locale]/[[...route]]",
+      "actor": "public",
+      "decision": "LOCAL_ROUTE_REVIEW_REQUIRED",
+      "dataOwner": "capability-dependent; inspect connected/demo dispatch",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/[locale]/[[...route]]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "SSR dispatcher selects capability; private data uses session-aware BFF",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/[locale]/sign-in/page.tsx",
+      "route": "/[locale]/sign-in",
+      "actor": "traveller",
+      "decision": "LOCAL_ROUTE_REVIEW_REQUIRED",
+      "dataOwner": "capability-dependent; inspect connected/demo dispatch",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/[locale]/sign-in/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "SSR dispatcher selects capability; private data uses session-aware BFF",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/bookmarks/route.ts",
+      "route": "/api/bookmarks",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/bookmarks/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/catalog/route.ts",
+      "route": "/api/catalog",
+      "actor": "public",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/catalog/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/guides/[id]/route.ts",
+      "route": "/api/guides/[id]",
+      "actor": "public",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/guides/[id]/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/media/[id]/route.ts",
+      "route": "/api/media/[id]",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/media/[id]/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/media/finalize/route.ts",
+      "route": "/api/media/finalize",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/media/finalize/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/media/route.ts",
+      "route": "/api/media",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/media/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/return-visit/route.ts",
+      "route": "/api/return-visit",
+      "actor": "public",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/return-visit/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/session/route.ts",
+      "route": "/api/session",
+      "actor": "public",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/session/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/shared-media/[token]/[id]/route.ts",
+      "route": "/api/shared-media/[token]/[id]",
+      "actor": "public",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/shared-media/[token]/[id]/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/shares/[id]/route.ts",
+      "route": "/api/shares/[id]",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/shares/[id]/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/shares/route.ts",
+      "route": "/api/shares",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/shares/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/[id]/adopt/route.ts",
+      "route": "/api/trips/[id]/adopt",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/[id]/adopt/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/[id]/commands/route.ts",
+      "route": "/api/trips/[id]/commands",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/[id]/commands/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/[id]/facts/route.ts",
+      "route": "/api/trips/[id]/facts",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/[id]/facts/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/[id]/reports/route.ts",
+      "route": "/api/trips/[id]/reports",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/[id]/reports/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/[id]/route.ts",
+      "route": "/api/trips/[id]",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/[id]/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/import/route.ts",
+      "route": "/api/trips/import",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/import/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/api/trips/route.ts",
+      "route": "/api/trips",
+      "actor": "traveller",
+      "decision": "BFF_LOCAL_CONNECTED",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/api/trips/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Minimal BFF delegates fresh session/owner or published/token projection to private authority",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/auth/callback/route.ts",
+      "route": "/auth/callback",
+      "actor": "traveller",
+      "decision": "LOCAL_ROUTE_REVIEW_REQUIRED",
+      "dataOwner": "capability-dependent; inspect connected/demo dispatch",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/auth/callback/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "SSR dispatcher selects capability; private data uses session-aware BFF",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/page.tsx",
+      "route": "/.",
+      "actor": "public",
+      "decision": "LOCAL_ROUTE_REVIEW_REQUIRED",
+      "dataOwner": "capability-dependent; inspect connected/demo dispatch",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "SSR dispatcher selects capability; private data uses session-aware BFF",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "public",
+      "path": "app/share/[token]/page.tsx",
+      "route": "/share/[token]",
+      "actor": "public",
+      "decision": "LOCAL_ROUTE_REVIEW_REQUIRED",
+      "dataOwner": "capability-dependent; inspect connected/demo dispatch",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "KinnsoOS newly authored UI/BFF",
+      "permissionSource": "app/share/[token]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Read-only token projection, private no-store",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/about/page.tsx",
+      "route": "/[locale]/about",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/about/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/analytics/page.tsx",
+      "route": "/[locale]/admin/analytics",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/analytics/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/bookings/page.tsx",
+      "route": "/[locale]/admin/bookings",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/bookings/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/creators/[creatorId]/page.tsx",
+      "route": "/[locale]/admin/creators/[creatorId]",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/creators/[creatorId]/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/creators/directory/page.tsx",
+      "route": "/[locale]/admin/creators/directory",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/creators/directory/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/creators/page.tsx",
+      "route": "/[locale]/admin/creators",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/creators/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/creators/payouts/page.tsx",
+      "route": "/[locale]/admin/creators/payouts",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/creators/payouts/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/enquiries/page.tsx",
+      "route": "/[locale]/admin/enquiries",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/enquiries/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/merchants/[merchantId]/page.tsx",
+      "route": "/[locale]/admin/merchants/[merchantId]",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/merchants/[merchantId]/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/merchants/applications/page.tsx",
+      "route": "/[locale]/admin/merchants/applications",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/merchants/applications/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/merchants/directory/page.tsx",
+      "route": "/[locale]/admin/merchants/directory",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/merchants/directory/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/merchants/page.tsx",
+      "route": "/[locale]/admin/merchants",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/merchants/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/missions/[missionId]/page.tsx",
+      "route": "/[locale]/admin/missions/[missionId]",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/missions/[missionId]/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/missions/page.tsx",
+      "route": "/[locale]/admin/missions",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/missions/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/missions/review/page.tsx",
+      "route": "/[locale]/admin/missions/review",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/missions/review/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/page.tsx",
+      "route": "/[locale]/admin",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "route": "/[locale]/admin/perks",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/sessions/page.tsx",
+      "route": "/[locale]/admin/sessions",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/sessions/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/team/directory/page.tsx",
+      "route": "/[locale]/admin/team/directory",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/team/directory/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/team/page.tsx",
+      "route": "/[locale]/admin/team",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/team/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "route": "/[locale]/admin/testimonials",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/admin/users/page.tsx",
+      "route": "/[locale]/admin/users",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/users/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/agent/page.tsx",
+      "route": "/[locale]/agent",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/agent/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/articles/[category]/[url]/page.tsx",
+      "route": "/[locale]/articles/[category]/[url]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/articles/[category]/[url]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/articles/[category]/page.tsx",
+      "route": "/[locale]/articles/[category]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/articles/[category]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/articles/page.tsx",
+      "route": "/[locale]/articles",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/articles/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/auth/callback/route.ts",
+      "route": "/[locale]/auth/callback",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/auth/callback/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/auth/reset-password/page.tsx",
+      "route": "/[locale]/auth/reset-password",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/auth/reset-password/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/auth/sign-out/route.ts",
+      "route": "/[locale]/auth/sign-out",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/auth/sign-out/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/c/[handle]/page.tsx",
+      "route": "/[locale]/c/[handle]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/c/[handle]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/contact/page.tsx",
+      "route": "/[locale]/contact",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/contact/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/creator/page.tsx",
+      "route": "/[locale]/creator",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/creator/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/creators/apply/page.tsx",
+      "route": "/[locale]/creators/apply",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/creators/apply/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/creators/page.tsx",
+      "route": "/[locale]/creators",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/creators/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/destinations/[slug]/page.tsx",
+      "route": "/[locale]/destinations/[slug]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/destinations/[slug]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/destinations/page.tsx",
+      "route": "/[locale]/destinations",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/destinations/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/experiences/[slug]/booked/page.tsx",
+      "route": "/[locale]/experiences/[slug]/booked",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/experiences/[slug]/booked/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/experiences/[slug]/page.tsx",
+      "route": "/[locale]/experiences/[slug]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/experiences/[slug]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/explore/page.tsx",
+      "route": "/[locale]/explore",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/explore/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/feed/page.tsx",
+      "route": "/[locale]/feed",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/feed/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/for-creators/page.tsx",
+      "route": "/[locale]/for-creators",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/for-creators/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/for-merchants/page.tsx",
+      "route": "/[locale]/for-merchants",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/for-merchants/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/forgot-password/page.tsx",
+      "route": "/[locale]/forgot-password",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/forgot-password/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/g/[slug]/page.tsx",
+      "route": "/[locale]/g/[slug]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/g/[slug]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/legal/creator-terms/page.tsx",
+      "route": "/[locale]/legal/creator-terms",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/legal/creator-terms/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/m/[slug]/page.tsx",
+      "route": "/[locale]/m/[slug]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/m/[slug]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/apply/page.tsx",
+      "route": "/[locale]/merchants/apply",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/apply/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/creators/page.tsx",
+      "route": "/[locale]/merchants/creators",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/creators/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/bookings/page.tsx",
+      "route": "/[locale]/merchants/dashboard/bookings",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/bookings/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/budget/page.tsx",
+      "route": "/[locale]/merchants/dashboard/budget",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/budget/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "route": "/[locale]/merchants/dashboard/creators",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/experiences/[experienceId]/availability/page.tsx",
+      "route": "/[locale]/merchants/dashboard/experiences/[experienceId]/availability",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/experiences/[experienceId]/availability/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/experiences/[experienceId]/edit/page.tsx",
+      "route": "/[locale]/merchants/dashboard/experiences/[experienceId]/edit",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/experiences/[experienceId]/edit/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/experiences/new/page.tsx",
+      "route": "/[locale]/merchants/dashboard/experiences/new",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/experiences/new/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/experiences/page.tsx",
+      "route": "/[locale]/merchants/dashboard/experiences",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/experiences/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/insights/page.tsx",
+      "route": "/[locale]/merchants/dashboard/insights",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/insights/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/missions/[missionId]/page.tsx",
+      "route": "/[locale]/merchants/dashboard/missions/[missionId]",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/missions/[missionId]/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/missions/page.tsx",
+      "route": "/[locale]/merchants/dashboard/missions",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/missions/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/offers/page.tsx",
+      "route": "/[locale]/merchants/dashboard/offers",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/offers/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/page.tsx",
+      "route": "/[locale]/merchants/dashboard",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/post/page.tsx",
+      "route": "/[locale]/merchants/dashboard/post",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/post/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/profile/page.tsx",
+      "route": "/[locale]/merchants/dashboard/profile",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/profile/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/dashboard/redeem/page.tsx",
+      "route": "/[locale]/merchants/dashboard/redeem",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/redeem/page.tsx",
+      "observedGuardSymbols": [
+        "requireMerchantPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/insights/page.tsx",
+      "route": "/[locale]/merchants/insights",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/insights/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/missions/[missionId]/page.tsx",
+      "route": "/[locale]/merchants/missions/[missionId]",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/missions/[missionId]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/missions/page.tsx",
+      "route": "/[locale]/merchants/missions",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/missions/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/page.tsx",
+      "route": "/[locale]/merchants",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/merchants/post/page.tsx",
+      "route": "/[locale]/merchants/post",
+      "actor": "merchant",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/post/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/offers/[claimId]/page.tsx",
+      "route": "/[locale]/offers/[claimId]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/offers/[claimId]/page.tsx",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/ops/accept-invite/page.tsx",
+      "route": "/[locale]/ops/accept-invite",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/ops/accept-invite/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/ops/place-reports/page.tsx",
+      "route": "/[locale]/ops/place-reports",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/ops/place-reports/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/ops/settlements/page.tsx",
+      "route": "/[locale]/ops/settlements",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/ops/settlements/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/page.tsx",
+      "route": "/[locale]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/sessions/[slug]/page.tsx",
+      "route": "/[locale]/sessions/[slug]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/sessions/[slug]/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/sessions/page.tsx",
+      "route": "/[locale]/sessions",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/sessions/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/sign-in/page.tsx",
+      "route": "/[locale]/sign-in",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/sign-in/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/sign-up/page.tsx",
+      "route": "/[locale]/sign-up",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/sign-up/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/copilot/page.tsx",
+      "route": "/[locale]/studio/copilot",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/copilot/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/earnings/page.tsx",
+      "route": "/[locale]/studio/earnings",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/earnings/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/guides/[id]/edit/page.tsx",
+      "route": "/[locale]/studio/guides/[id]/edit",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/guides/[id]/edit/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/guides/new/page.tsx",
+      "route": "/[locale]/studio/guides/new",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/guides/new/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/guides/page.tsx",
+      "route": "/[locale]/studio/guides",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/guides/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/inbox/page.tsx",
+      "route": "/[locale]/studio/inbox",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/inbox/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/insights/page.tsx",
+      "route": "/[locale]/studio/insights",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/insights/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "route": "/[locale]/studio/missions/[id]",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/missions/page.tsx",
+      "route": "/[locale]/studio/missions",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/offers/page.tsx",
+      "route": "/[locale]/studio/offers",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/offers/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/page.tsx",
+      "route": "/[locale]/studio",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/perks/page.tsx",
+      "route": "/[locale]/studio/perks",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/perks/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/scan/page.tsx",
+      "route": "/[locale]/studio/scan",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/scan/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/sessions/[id]/edit/page.tsx",
+      "route": "/[locale]/studio/sessions/[id]/edit",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/sessions/[id]/edit/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/sessions/new/page.tsx",
+      "route": "/[locale]/studio/sessions/new",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/sessions/new/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/sessions/page.tsx",
+      "route": "/[locale]/studio/sessions",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/sessions/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/studio/tier/page.tsx",
+      "route": "/[locale]/studio/tier",
+      "actor": "creator",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/tier/page.tsx",
+      "observedGuardSymbols": [
+        "requireCreatorPage"
+      ],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/[locale]/trips/page.tsx",
+      "route": "/[locale]/trips",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/[locale]/trips/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/admin/analytics/route.ts",
+      "route": "/api/admin/analytics",
+      "actor": "ops",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/admin/analytics/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/agent/route.ts",
+      "route": "/api/agent",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/agent/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/analytics/route.ts",
+      "route": "/api/analytics",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/analytics/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/copilot/route.ts",
+      "route": "/api/copilot",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/copilot/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/cron/traveller-analytics-retention/route.ts",
+      "route": "/api/cron/traveller-analytics-retention",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/cron/traveller-analytics-retention/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/cron/travelpayouts-sync/route.ts",
+      "route": "/api/cron/travelpayouts-sync",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/cron/travelpayouts-sync/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/health/route.ts",
+      "route": "/api/health",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/health/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/kinnso/media/finalize/route.ts",
+      "route": "/api/kinnso/media/finalize",
+      "actor": "traveller",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/kinnso/media/finalize/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/kinnso/shared-media/[token]/[id]/route.ts",
+      "route": "/api/kinnso/shared-media/[token]/[id]",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/kinnso/shared-media/[token]/[id]/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/revalidate/route.ts",
+      "route": "/api/revalidate",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/revalidate/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/api/stripe/webhook/route.ts",
+      "route": "/api/stripe/webhook",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/api/stripe/webhook/route.ts",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    },
+    {
+      "repository": "private",
+      "path": "apps/web/app/page.tsx",
+      "route": "/.",
+      "actor": "public",
+      "decision": "RETAIN_PRIVATE",
+      "dataOwner": "private backend",
+      "verification": "NOT_RUN_PER_ROUTE; related suites recorded separately",
+      "owner": "Remix-Kinnso existing route/domain",
+      "permissionSource": "apps/web/app/page.tsx",
+      "observedGuardSymbols": [],
+      "permission": "Retain existing server/domain guards and database RLS; no client role grants",
+      "actorClassification": "Route prefix and static guard evidence; does not assert browser authorization for every route",
+      "notificationOwner": "Retained private notification domain",
+      "job": null
+    }
+  ],
+  "serverActions": [
+    {
+      "file": "apps/web/app/[locale]/admin/bookings/page.tsx",
+      "line": 30,
+      "action": "onMarkPaid",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/bookings/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/enquiries/page.tsx",
+      "line": 78,
+      "action": "onSetStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/enquiries/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/merchants/applications/page.tsx",
+      "line": 26,
+      "action": "onApprove",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/merchants/applications/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/merchants/applications/page.tsx",
+      "line": 30,
+      "action": "onReject",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/merchants/applications/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "line": 25,
+      "action": "onCreate",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "line": 29,
+      "action": "onUpdate",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "line": 33,
+      "action": "onToggle",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/perks/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "line": 30,
+      "action": "onCreate",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "line": 34,
+      "action": "onUpdate",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "line": 38,
+      "action": "onSetStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "line": 42,
+      "action": "onDelete",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/testimonials/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/admin/users/page.tsx",
+      "line": 24,
+      "action": "onSetStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/admin/users/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/bookings/page.tsx",
+      "line": 29,
+      "action": "completeBooking",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/bookings/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "line": 76,
+      "action": "onInvite",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "line": 81,
+      "action": "onSave",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "line": 86,
+      "action": "onUnsave",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "line": 91,
+      "action": "onNote",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/creators/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/missions/[missionId]/page.tsx",
+      "line": 86,
+      "action": "reviewParticipant",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/missions/[missionId]/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/missions/[missionId]/page.tsx",
+      "line": 91,
+      "action": "reviewSubmission",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/missions/[missionId]/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/merchants/dashboard/post/page.tsx",
+      "line": 27,
+      "action": "submitMission",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/merchants/dashboard/post/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/ops/place-reports/page.tsx",
+      "line": 16,
+      "action": "review",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/ops/place-reports/page.tsx",
+      "observedGuardSymbols": [
+        "requireOpsPage"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/guides/new/page.tsx",
+      "line": 26,
+      "action": "submitGuide",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/guides/new/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/guides/[id]/edit/page.tsx",
+      "line": 38,
+      "action": "submitGuide",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/guides/[id]/edit/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/missions/page.tsx",
+      "line": 160,
+      "action": "join",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/missions/page.tsx",
+      "line": 165,
+      "action": "accept",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "line": 39,
+      "action": "join",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "line": 44,
+      "action": "apply",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "line": 49,
+      "action": "submitMilestone",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "line": 61,
+      "action": "submitReceipt",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/missions/[id]/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/offers/page.tsx",
+      "line": 61,
+      "action": "join",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/offers/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/offers/page.tsx",
+      "line": 66,
+      "action": "createLink",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/offers/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/app/[locale]/studio/perks/page.tsx",
+      "line": 33,
+      "action": "onRedeem",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/app/[locale]/studio/perks/page.tsx",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/budget-actions.ts",
+      "line": 25,
+      "action": "creditMerchantBudget",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/budget-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/budget-actions.ts",
+      "line": 56,
+      "action": "setBudgetEnforcement",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/budget-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 31,
+      "action": "setCreatorStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 51,
+      "action": "reinstateCreator",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 70,
+      "action": "setCreatorVerified",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 89,
+      "action": "setCreatorListed",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 116,
+      "action": "addCreatorNote",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 135,
+      "action": "bulkSetCreatorStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/creators-actions.ts",
+      "line": 164,
+      "action": "setSettlementStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/creators-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/enquiries-actions.ts",
+      "line": 14,
+      "action": "setEnquiryStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/enquiries-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/merchant-applications-actions.ts",
+      "line": 23,
+      "action": "approveMerchantApplicationAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/merchant-applications-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/merchant-applications-actions.ts",
+      "line": 43,
+      "action": "rejectMerchantApplicationAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/merchant-applications-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/merchants-actions.ts",
+      "line": 26,
+      "action": "setMerchantStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/merchants-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/merchants-actions.ts",
+      "line": 45,
+      "action": "setMerchantTier",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/merchants-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/merchants-actions.ts",
+      "line": 64,
+      "action": "addMerchantNote",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/merchants-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/merchants-actions.ts",
+      "line": 82,
+      "action": "bulkSetMerchantStatus",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/merchants-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/mission-review-actions.ts",
+      "line": 40,
+      "action": "reviewSubmissionOpsAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/mission-review-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/mission-review-actions.ts",
+      "line": 75,
+      "action": "setMissionAutoApprovePolicyAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/mission-review-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/payout-batches-actions.ts",
+      "line": 38,
+      "action": "createPayoutBatch",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/payout-batches-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/payout-batches-actions.ts",
+      "line": 67,
+      "action": "markPayoutBatchPaid",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/payout-batches-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/payout-batches-actions.ts",
+      "line": 91,
+      "action": "cancelPayoutBatch",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/payout-batches-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/perks-actions.ts",
+      "line": 26,
+      "action": "createPerkAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/perks-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/perks-actions.ts",
+      "line": 53,
+      "action": "updatePerkAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/perks-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/perks-actions.ts",
+      "line": 80,
+      "action": "togglePerkActiveAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/perks-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/sessions-actions.ts",
+      "line": 25,
+      "action": "adminCreateSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/sessions-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/sessions-actions.ts",
+      "line": 58,
+      "action": "adminUpdateSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/sessions-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/sessions-actions.ts",
+      "line": 91,
+      "action": "adminSetSessionStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/sessions-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/sessions-actions.ts",
+      "line": 123,
+      "action": "adminDeleteSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/sessions-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/sessions-actions.ts",
+      "line": 141,
+      "action": "listSessionRsvpsForAdminAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/sessions-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/team-actions.ts",
+      "line": 36,
+      "action": "inviteMemberAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/team-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/team-actions.ts",
+      "line": 54,
+      "action": "revokeInviteAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/team-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/team-actions.ts",
+      "line": 70,
+      "action": "setMemberRoleAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/team-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/team-actions.ts",
+      "line": 89,
+      "action": "suspendMemberAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/team-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/team-actions.ts",
+      "line": 107,
+      "action": "reactivateMemberAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/team-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/testimonials-actions.ts",
+      "line": 34,
+      "action": "createTestimonialAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/testimonials-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/testimonials-actions.ts",
+      "line": 55,
+      "action": "updateTestimonialAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/testimonials-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/testimonials-actions.ts",
+      "line": 82,
+      "action": "setTestimonialStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/testimonials-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/testimonials-actions.ts",
+      "line": 108,
+      "action": "deleteTestimonialAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/testimonials-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/admin/users-actions.ts",
+      "line": 20,
+      "action": "setUserStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/admin/users-actions.ts",
+      "observedGuardSymbols": [
+        "requireOpsAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/agent/actions.ts",
+      "line": 7,
+      "action": "rateAgentMessageAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/agent/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/bookings/actions.ts",
+      "line": 36,
+      "action": "markBookingCompletedAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/bookings/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/bookings/actions.ts",
+      "line": 68,
+      "action": "adminCancelAndRefundBookingAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/bookings/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/bookings/actions.ts",
+      "line": 144,
+      "action": "adminSetBookingSettlementStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/bookings/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/enquiries/actions.ts",
+      "line": 12,
+      "action": "submitEnquiryAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/enquiries/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/experiences/actions.ts",
+      "line": 20,
+      "action": "createExperienceAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/experiences/actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/experiences/actions.ts",
+      "line": 59,
+      "action": "updateExperienceAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/experiences/actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/experiences/actions.ts",
+      "line": 109,
+      "action": "setExperienceStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/experiences/actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/experiences/availability-actions.ts",
+      "line": 19,
+      "action": "addAvailabilityDateAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/experiences/availability-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/experiences/availability-actions.ts",
+      "line": 55,
+      "action": "closeAvailabilityDateAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/experiences/availability-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/experiences/booking-actions.ts",
+      "line": 55,
+      "action": "createCheckoutSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/experiences/booking-actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/feature-interest/actions.ts",
+      "line": 24,
+      "action": "joinFeatureInterestAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/feature-interest/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/guides/actions.ts",
+      "line": 86,
+      "action": "createGuideAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/guides/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/guides/actions.ts",
+      "line": 125,
+      "action": "updateGuideAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/guides/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/guides/actions.ts",
+      "line": 170,
+      "action": "deleteGuideAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/guides/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/guides/versions.ts",
+      "line": 5,
+      "action": "publishStructuredGuide",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/guides/versions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/guides/versions.ts",
+      "line": 14,
+      "action": "withdrawStructuredGuide",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/guides/versions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/application-actions.ts",
+      "line": 21,
+      "action": "submitMerchantApplicationAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/application-actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/invite-actions.ts",
+      "line": 31,
+      "action": "inviteCreatorAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/invite-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/offers-actions.ts",
+      "line": 10,
+      "action": "createMerchantOfferAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/offers-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/offers-actions.ts",
+      "line": 52,
+      "action": "setMerchantOfferStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/offers-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/profile-actions.ts",
+      "line": 21,
+      "action": "updateMerchantProfileAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/profile-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/saved-actions.ts",
+      "line": 10,
+      "action": "saveCreatorAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/saved-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/saved-actions.ts",
+      "line": 32,
+      "action": "unsaveCreatorAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/saved-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/merchants/saved-actions.ts",
+      "line": 53,
+      "action": "setSavedNoteAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/merchants/saved-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 215,
+      "action": "createMissionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 287,
+      "action": "joinMissionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 338,
+      "action": "reviewParticipantAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 395,
+      "action": "reviewSubmissionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 502,
+      "action": "submitMilestoneAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 594,
+      "action": "submitReceiptAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/actions.ts",
+      "line": 621,
+      "action": "createPartnerLinkAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/missions/invite-actions.ts",
+      "line": 28,
+      "action": "acceptInviteAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/missions/invite-actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/notifications/actions.ts",
+      "line": 14,
+      "action": "markNotificationReadAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/notifications/actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/offers/actions.ts",
+      "line": 20,
+      "action": "claimOfferAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/offers/actions.ts",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/offers/redeem-actions.ts",
+      "line": 15,
+      "action": "redeemOfferClaimAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/offers/redeem-actions.ts",
+      "observedGuardSymbols": [
+        "requireMerchantAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/perks/actions.ts",
+      "line": 10,
+      "action": "redeemPerkAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/perks/actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/reviews/actions.ts",
+      "line": 27,
+      "action": "submitReviewAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/reviews/actions.ts",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/saves/experience-actions.ts",
+      "line": 12,
+      "action": "saveExperienceAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/saves/experience-actions.ts",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/saves/experience-actions.ts",
+      "line": 41,
+      "action": "unsaveExperienceAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/saves/experience-actions.ts",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/saves/guide-actions.ts",
+      "line": 12,
+      "action": "saveGuideAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/saves/guide-actions.ts",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/saves/guide-actions.ts",
+      "line": 41,
+      "action": "unsaveGuideAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/saves/guide-actions.ts",
+      "observedGuardSymbols": [
+        "requireTravelerAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/sessions/rsvp-actions.ts",
+      "line": 27,
+      "action": "rsvpToSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/sessions/rsvp-actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/sessions/studio-actions.ts",
+      "line": 33,
+      "action": "createSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/sessions/studio-actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/sessions/studio-actions.ts",
+      "line": 62,
+      "action": "updateSessionAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/sessions/studio-actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/sessions/studio-actions.ts",
+      "line": 95,
+      "action": "setSessionStatusAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/sessions/studio-actions.ts",
+      "observedGuardSymbols": [
+        "requireCreatorAction"
+      ],
+      "verification": "Static inventory; related regression suites recorded separately"
+    },
+    {
+      "file": "apps/web/lib/sessions/waitlist-actions.ts",
+      "line": 16,
+      "action": "joinSessionWaitlistAction",
+      "decision": "RETAIN_PRIVATE_SERVER_AUTHORITY",
+      "owner": "Remix-Kinnso server module/domain",
+      "permissionSource": "apps/web/lib/sessions/waitlist-actions.ts",
+      "observedGuardSymbols": [],
+      "verification": "Static inventory; related regression suites recorded separately"
+    }
+  ],
+  "workflows": [
+    ".github/workflows/ci.yml",
+    ".github/workflows/nightly-funnel.yml",
+    ".github/workflows/verify.yml"
+  ],
+  "method": "Complete route file inventory + TypeScript AST module/inline server actions; static owner/evidence mapping, not blanket per-route UAT"
+}

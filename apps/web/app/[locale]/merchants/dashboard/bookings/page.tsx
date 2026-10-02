@@ -1,6 +1,6 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
+import { requireMerchantPage } from '@/lib/admin/guard'
 import { MerchantBookingsView } from '@/components/kinnso/pages/MerchantBookingsView'
-import { getMerchantProfile } from '@/lib/missions/queries'
 import { listMerchantBookings } from '@/lib/bookings/queries'
 import { markBookingCompletedAction } from '@/lib/bookings/actions'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
@@ -20,15 +20,11 @@ export default async function MerchantBookingsPage({ params }: { params: Params 
   const messages = await getDictionary(loc)
 
   const supabase = await createSupabaseServerClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect(`/${loc}/sign-in`)
+  // The guard already derives merchant_profiles.id from the session, so the
+  // separate getMerchantProfile round trip this page used to make is redundant.
+  const { merchantId } = await requireMerchantPage(supabase, loc)
 
-  const { data: merchantProfile } = await getMerchantProfile(supabase, user.id)
-  if (!merchantProfile) notFound()
-
-  const bookings = await listMerchantBookings(supabase, merchantProfile.id)
+  const bookings = await listMerchantBookings(supabase, merchantId)
 
   async function completeBooking(bookingId: string) {
     'use server'

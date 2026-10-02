@@ -9,7 +9,7 @@ export function MissionsTab({ t, missions }: { t: T; missions: MerchantDetailMis
   return (
     <table className="w-full text-left text-sm">
       <thead className="text-kinnso-muted">
-        <tr className="border-b border-kinnso-line">
+        <tr className="border-b border-kinnso-edge">
           <th className="py-2 font-bold">{t.colMission}</th>
           <th className="py-2 font-bold">{t.colStatus}</th>
           <th className="py-2 font-bold">{t.colVisibility}</th>
@@ -20,7 +20,7 @@ export function MissionsTab({ t, missions }: { t: T; missions: MerchantDetailMis
       </thead>
       <tbody>
         {missions.map((m) => (
-          <tr key={m.id} className="border-b border-kinnso-line/60">
+          <tr key={m.id} className="border-b border-kinnso-edge/60">
             <td className="py-2 font-bold text-kinnso-ink">{m.title}</td>
             <td className="py-2 text-kinnso-muted">{m.status}</td>
             <td className="py-2 text-kinnso-muted">{m.visibility ?? '—'}</td>

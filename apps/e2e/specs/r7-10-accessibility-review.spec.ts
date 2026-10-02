@@ -1,10 +1,15 @@
 import { expect, test } from '@playwright/test'
 import {
+  A11Y_EXCEPTIONS,
   calculateCLS,
+  clippedElements,
+  firstHeadingOrderViolation,
   formatAxeViolations,
   hasMeaningfulFocusIndicator,
   installLayoutShiftObserver,
+  isExcepted,
   readCLS,
+  type ElementBox,
   type FocusStyleSnapshot,
 } from '../r7-10-accessibility'
 
@@ -74,4 +79,45 @@ test('focus indicator requires a focus-induced visible outline or ring', async (
   for (const { name, baseline, focused, expected } of cases) {
     expect(hasMeaningfulFocusIndicator(baseline, focused), name).toBe(expected)
   }
+})
+
+test('a11y exceptions match on both route and check, never one alone', () => {
+  const exceptions = [{
+    routeId: 'guide' as const,
+    check: 'reflow-320' as const,
+    reason: 'Itinerary table needs a real responsive rewrite',
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  }]
+
+  expect(isExcepted('guide', 'reflow-320', exceptions)).toBe(true)
+  expect(isExcepted('guide', 'text-200', exceptions)).toBe(false)
+  expect(isExcepted('home', 'reflow-320', exceptions)).toBe(false)
+  expect(isExcepted('home', 'text-200', exceptions)).toBe(false)
+})
+
+test('a11y ledger defaults to the real list when none is passed', () => {
+  expect(isExcepted('home', 'reflow-320')).toBe(A11Y_EXCEPTIONS.some(
+    (entry) => entry.routeId === 'home' && entry.check === 'reflow-320',
+  ))
+})
+
+test('heading order rejects a skipped level and accepts a legal descent', () => {
+  expect(firstHeadingOrderViolation([1, 2, 3, 2, 3])).toBeUndefined()
+  expect(firstHeadingOrderViolation([1, 2, 4])).toBe('h2 is followed by h4 at position 3; levels must not skip')
+  expect(firstHeadingOrderViolation([2, 3])).toBe('first heading is h2 at position 1; the page must start at h1')
+  // Descending by more than one is legal: a section ending returns to any shallower level.
+  expect(firstHeadingOrderViolation([1, 2, 3, 1])).toBeUndefined()
+  expect(firstHeadingOrderViolation([])).toBeUndefined()
+})
+
+test('clipping tolerates one sub-pixel rounding pixel but not real overflow', () => {
+  const boxes: ElementBox[] = [
+    { label: 'p.fits', scrollWidth: 300, clientWidth: 300, scrollHeight: 40, clientHeight: 40 },
+    { label: 'p.rounding', scrollWidth: 301, clientWidth: 300, scrollHeight: 40, clientHeight: 40 },
+    { label: 'p.cut-horizontally', scrollWidth: 420, clientWidth: 300, scrollHeight: 40, clientHeight: 40 },
+    { label: 'p.cut-vertically', scrollWidth: 300, clientWidth: 300, scrollHeight: 96, clientHeight: 40 },
+  ]
+
+  expect(clippedElements(boxes).map((box) => box.label)).toEqual(['p.cut-horizontally', 'p.cut-vertically'])
 })

@@ -1,0 +1,329 @@
+{
+  "observedAt": "2026-10-02T19:56:40.503924+00:00",
+  "frontendSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+  "backendSourceSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
+  "previousPublicationSha": "f4399b43b26f30dbb289abc6244dbb78f484c1dd",
+  "tasks": [
+    "K02",
+    "K16"
+  ],
+  "environment": "LOCAL_SYNTHETIC",
+  "schemaHead": "20261002154501",
+  "historicalExceptions": [
+    "home",
+    "explore",
+    "guide",
+    "experience",
+    "article",
+    "creator-landing",
+    "merchant-landing",
+    "creator-directory",
+    "merchant-directory"
+  ],
+  "closedBy": "Actual RED/GREEN browser regressions, never skips",
+  "scope": "Private legacy Navbar, Explore filters/cards and creator directory; public frontend source unchanged",
+  "implementation": "Font-relative named container queries retain the 100% desktop layout and reuse existing accessible navigation/filter trays; enlarged creator cards retain the original two-line preview without newly clipping the fixture bio.",
+  "testMeasurementRuling": "Stable indexes include hidden DOM nodes so newly visible tray controls are checked for clipping. DOM-size changes fail; explicit keyboard/filter cases prove the collapsed controls remain usable.",
+  "runnerSetupRuling": "The first public browser invocation used the public CLI from the private working directory; two installed Playwright versions failed during spec collection before test execution. This failed setup is retained, never counted as passing. The correct public-directory runner then executed all16 cases against the verified local pair.",
+  "results": {
+    "redOriginal": {
+      "fail": 9
+    },
+    "redControls": {
+      "fail": 2
+    },
+    "redWide": {
+      "fail": 1
+    },
+    "targetedGreen": {
+      "pass": 12
+    },
+    "browser": {
+      "pass": 168,
+      "skip": 0
+    },
+    "components": {
+      "pass": 37
+    },
+    "privateRegression": {
+      "pass": 3692,
+      "skip": 10,
+      "tasks": 7,
+      "cached": 0,
+      "sourceSha": "45423e2e8b86adaed7591e37147186ca37254fe4",
+      "scope": "Before final capped-navigation adjustment; final components, types, build and browser suites rerun. Complete final-head suite is recorded by publication CI."
+    },
+    "publicBrowser": {
+      "pass": 16
+    },
+    "build": "PASS",
+    "typesAndLint": {
+      "result": "PASS",
+      "tasks": 9,
+      "cached": 6,
+      "errors": 0,
+      "warnings": 28
+    }
+  },
+  "logs": {
+    "redNine": {
+      "path": ".local-private/a11y-text200-red.log",
+      "sha256": "e85e648cd127640d6df3211f41d881b91a9594491fda6b9f7514f63826b30251",
+      "bytes": 14939
+    },
+    "redControls": {
+      "path": ".local-private/a11y-text200-controls-red.log",
+      "sha256": "d781b2e3f9512c83afa71807d9f6a7ed73c959b0d006841c671d6e560aba5ef3",
+      "bytes": 3838
+    },
+    "redWide": {
+      "path": ".local-private/a11y-text200-wide-red.log",
+      "sha256": "091e8f4cf362b92a532db475b8a67df8b834f2544787c0e856c4f8ab8d20bfe1",
+      "bytes": 2055
+    },
+    "greenTwelve": {
+      "path": ".local-private/a11y-text200-wide-green.log",
+      "sha256": "427cd8f9c9f431b81fecce1b42ea30bc9c2de84d08baceb7149ff501361250d9",
+      "bytes": 2399
+    },
+    "browser": {
+      "path": ".local-private/a11y-wide-complete-browser.log",
+      "sha256": "f7de3b03a27266d46e1ea6955c2ca7665f3a3fda8d82b2f78b7a1f83ca9ff023",
+      "bytes": 27236
+    },
+    "components": {
+      "path": ".local-private/a11y-wide-components.log",
+      "sha256": "1a7a5d7616ea21a85239d2108b4e7517da5c6bbdd0be2e89bc662978fb4c2031",
+      "bytes": 474
+    },
+    "quality": {
+      "path": ".local-private/a11y-wide-quality.log",
+      "sha256": "0c6c39d6bdbcfca35905d993e3bf197204e80c25bbcecd960d2a106ea1e6c379",
+      "bytes": 9189
+    },
+    "build": {
+      "path": ".local-private/a11y-text200-wide-build.log",
+      "sha256": "9dcf70b9bcd15c1b9fbab7238d20fcc6b3e4dd40f8bc9405379f1ab6deffb297",
+      "bytes": 7790
+    },
+    "regression": {
+      "path": ".local-private/a11y-full-regression.log",
+      "sha256": "07cb7ecf592d258b14e81d6ee07f5cb09358ea644faba512a9de137d16f4249a",
+      "bytes": 165387
+    },
+    "publicBrowser": {
+      "path": ".local-private/public-text200-pair-browser.log",
+      "sha256": "1b2972e27a879f53a570c7da4ca970d63e406f304b8f514bcd6304980b48aee5",
+      "bytes": 2761
+    },
+    "publicRunnerSetupFailure": {
+      "path": ".local-private/public-text200-browser-cwd-failed.log",
+      "sha256": "8e09059f7134afede82cbbbe5a19a830e359efcb4b26b6eee3f3bd9b558fc4c8",
+      "bytes": 574096
+    }
+  },
+  "layout": {
+    "environment": "LOCAL_SYNTHETIC",
+    "nativeBrowserZoom": "NOT_RUN",
+    "rows": [
+      {
+        "path": "/en",
+        "percent": 100,
+        "metrics": {
+          "rootFontPixels": 16,
+          "viewportWidth": 1280,
+          "documentWidth": 1280,
+          "headerHeight": 65,
+          "desktopNavigation": true,
+          "menuToggle": false,
+          "exploreColumns": null,
+          "creatorColumns": null
+        },
+        "screenshot": "en-100.png"
+      },
+      {
+        "path": "/en",
+        "percent": 200,
+        "metrics": {
+          "rootFontPixels": 32,
+          "viewportWidth": 1280,
+          "documentWidth": 1280,
+          "headerHeight": 129,
+          "desktopNavigation": false,
+          "menuToggle": true,
+          "exploreColumns": null,
+          "creatorColumns": null
+        },
+        "screenshot": "en-200.png"
+      },
+      {
+        "path": "/en/explore",
+        "percent": 100,
+        "metrics": {
+          "rootFontPixels": 16,
+          "viewportWidth": 1280,
+          "documentWidth": 1280,
+          "headerHeight": 65,
+          "desktopNavigation": true,
+          "menuToggle": false,
+          "exploreColumns": 3,
+          "creatorColumns": null
+        },
+        "screenshot": "en-explore-100.png"
+      },
+      {
+        "path": "/en/explore",
+        "percent": 200,
+        "metrics": {
+          "rootFontPixels": 32,
+          "viewportWidth": 1280,
+          "documentWidth": 1280,
+          "headerHeight": 129,
+          "desktopNavigation": false,
+          "menuToggle": true,
+          "exploreColumns": 2,
+          "creatorColumns": null
+        },
+        "screenshot": "en-explore-200.png"
+      },
+      {
+        "path": "/en/creators",
+        "percent": 100,
+        "metrics": {
+          "rootFontPixels": 16,
+          "viewportWidth": 1280,
+          "documentWidth": 1280,
+          "headerHeight": 65,
+          "desktopNavigation": true,
+          "menuToggle": false,
+          "exploreColumns": null,
+          "creatorColumns": 3
+        },
+        "screenshot": "en-creators-100.png"
+      },
+      {
+        "path": "/en/creators",
+        "percent": 200,
+        "metrics": {
+          "rootFontPixels": 32,
+          "viewportWidth": 1280,
+          "documentWidth": 1280,
+          "headerHeight": 129,
+          "desktopNavigation": false,
+          "menuToggle": true,
+          "exploreColumns": null,
+          "creatorColumns": 1
+        },
+        "screenshot": "en-creators-200.png"
+      }
+    ]
+  },
+  "screenshots": [
+    {
+      "path": ".local-private/text200-layout/en-100.png",
+      "sha256": "3ac7c5a8b1c97024e2ef5ce70ae572d994caa4b196de6306f618fded8b6dcbf6"
+    },
+    {
+      "path": ".local-private/text200-layout/en-200.png",
+      "sha256": "1a6b691f7cddcc5812fad06de3b7e35a1570b2a128e45a4f1903830e6020d224"
+    },
+    {
+      "path": ".local-private/text200-layout/en-explore-100.png",
+      "sha256": "4f8de0589182c38bf98f4dfab2dc26b407fc7128be69261d0bb4cdb7f8f85c61"
+    },
+    {
+      "path": ".local-private/text200-layout/en-explore-200.png",
+      "sha256": "c18851c4268db8629d765334d08ec2af5dea0b02a00ecbb9d471d8257320d9a0"
+    },
+    {
+      "path": ".local-private/text200-layout/en-creators-100.png",
+      "sha256": "202dfadae866b9afd88352364e6f7bc4616b8853418e5e72f26b988ca7e310f5"
+    },
+    {
+      "path": ".local-private/text200-layout/en-creators-200.png",
+      "sha256": "588ddea6411a8003fdf825c6daf5319e5039576d8b37ccc285e857ae472cc4c7"
+    }
+  ],
+  "wideLayout": {
+    "red": {
+      "environment": "LOCAL_SYNTHETIC",
+      "nativeBrowserZoom": "NOT_RUN",
+      "rows": [
+        {
+          "path": "/en",
+          "percent": 100,
+          "metrics": {
+            "rootFontPixels": 16,
+            "viewportWidth": 2560,
+            "documentWidth": 2560,
+            "headerHeight": 65,
+            "desktopNavigation": true,
+            "menuToggle": false,
+            "exploreColumns": null,
+            "creatorColumns": null
+          },
+          "screenshot": "en-100.png"
+        },
+        {
+          "path": "/en",
+          "percent": 200,
+          "metrics": {
+            "rootFontPixels": 32,
+            "viewportWidth": 2560,
+            "documentWidth": 2964,
+            "headerHeight": 129,
+            "desktopNavigation": true,
+            "menuToggle": false,
+            "exploreColumns": null,
+            "creatorColumns": null
+          },
+          "screenshot": "en-200.png"
+        }
+      ]
+    },
+    "green": {
+      "environment": "LOCAL_SYNTHETIC",
+      "nativeBrowserZoom": "NOT_RUN",
+      "rows": [
+        {
+          "path": "/en",
+          "percent": 100,
+          "metrics": {
+            "rootFontPixels": 16,
+            "viewportWidth": 2560,
+            "documentWidth": 2560,
+            "headerHeight": 65,
+            "desktopNavigation": true,
+            "menuToggle": false,
+            "exploreColumns": null,
+            "creatorColumns": null
+          },
+          "screenshot": "en-100.png"
+        },
+        {
+          "path": "/en",
+          "percent": 200,
+          "metrics": {
+            "rootFontPixels": 32,
+            "viewportWidth": 2560,
+            "documentWidth": 2560,
+            "headerHeight": 129,
+            "desktopNavigation": false,
+            "menuToggle": true,
+            "exploreColumns": null,
+            "creatorColumns": null
+          },
+          "screenshot": "en-200.png"
+        }
+      ]
+    }
+  },
+  "reference": "https://www.w3.org/TR/css-contain-3/#size-container",
+  "limits": [
+    "Root font-size is modeled at 200%, not native browser chrome zoom",
+    "Human screen reader and physical iOS/Android remain NOT_RUN",
+    "Approved cloud staging and real source/cover rights remain BLOCKED",
+    "No production merge, migration, reset, DNS or payment"
+  ],
+  "currentPublicationCI": "Recorded for the exact final document head in .local-private/text200-publication-ci.json; older CI remains historical"
+}

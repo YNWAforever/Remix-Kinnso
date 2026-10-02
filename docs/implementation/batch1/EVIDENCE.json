@@ -1,0 +1,490 @@
+{
+  "observedAt": "2026-10-02T19:56:40.503924+00:00",
+  "frontendSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+  "backendSourceSha": "a4d9c0c67ad071ca1f2320c2ad7e51010a279de6",
+  "schemaHead": "20261002154501",
+  "environment": "LOCAL_SYNTHETIC",
+  "overall": "PARTIAL",
+  "cloudStaging": "BLOCKED",
+  "production": "NOT_RUN",
+  "logs": {
+    "publicUnit": {
+      "path": ".local-private/public-current-unit.log",
+      "sha256": "3bddf0128e0e53746fa6aad3d857b7e594cf8f100cbe4968b8716711d1528f2a",
+      "bytes": 6939
+    },
+    "publicBuild": {
+      "path": ".local-private/public-comparison-build.log",
+      "sha256": "f2371bdb088dc81cf87ed2fec564fee1799a55cea05079c24e4110bf0c3ae111",
+      "bytes": 1464
+    },
+    "publicTypes": {
+      "path": ".local-private/public-current-types.log",
+      "sha256": "252159596f2610e7ad7114529e0ca7c6581d2908b22c3fd4a85a5f7d2be933a6",
+      "bytes": 49
+    },
+    "publicIntegration": {
+      "path": ".local-private/public-current-integration.log",
+      "sha256": "d2a98709d8aba9adde66774603a1dc3509fa68095c84b64ab94d84ea5b67bda1",
+      "bytes": 604
+    },
+    "publicBrowser": {
+      "path": ".local-private/public-text200-pair-browser.log",
+      "sha256": "1b2972e27a879f53a570c7da4ca970d63e406f304b8f514bcd6304980b48aee5",
+      "bytes": 2761
+    },
+    "sourceBoundary": {
+      "path": ".local-private/source-boundary-current.log",
+      "sha256": "07479cc26c47f290cd0e64a7324c60b486e8c7dc89c338943a149bd1ac9d7bf4",
+      "bytes": 119
+    },
+    "archiveInstall": {
+      "path": ".local-private/archive-current-ci.log",
+      "sha256": "89d27796829f85b3bd6879cc71d90553cf8255aa4b04a3bd1044fc0406fd669d",
+      "bytes": 337
+    },
+    "archiveUnit": {
+      "path": ".local-private/archive-current-unit.log",
+      "sha256": "ddd1e7c42d443babacde235631ed59f35c91fcd69ae70a6e4c28b0ceadb67254",
+      "bytes": 6934
+    },
+    "archiveBuild": {
+      "path": ".local-private/archive-current-build.log",
+      "sha256": "445c0d2374d9bd01549fcb74dac94cc0e08702673531cf84b66dee77b5e9b4c4",
+      "bytes": 1437
+    },
+    "archiveTypes": {
+      "path": ".local-private/archive-current-types.log",
+      "sha256": "252159596f2610e7ad7114529e0ca7c6581d2908b22c3fd4a85a5f7d2be933a6",
+      "bytes": 49
+    },
+    "privateRegression": {
+      "path": ".local-private/a11y-full-regression.log",
+      "sha256": "07cb7ecf592d258b14e81d6ee07f5cb09358ea644faba512a9de137d16f4249a",
+      "bytes": 165387
+    },
+    "privateTypes": {
+      "path": ".local-private/private-ci-fix-types.log",
+      "sha256": "ed6e106d8cf4859b8a191f11cfd92720500f7ee74bddb9082427720af17f8f34",
+      "bytes": 1241
+    },
+    "privateLint": {
+      "path": ".local-private/private-ci-fix-lint.log",
+      "sha256": "6dd2c24e749741f03cf199bbc459812818c1875c96f3b759e6624648c19b23a2",
+      "bytes": 9027
+    },
+    "privateHonesty": {
+      "path": ".local-private/private-ci-fix-honesty.log",
+      "sha256": "d1aafe7b2128ca7e487019b47823c54d2ac26e958851b3dc6d7b38ffad7fa379",
+      "bytes": 31
+    },
+    "privateBuild": {
+      "path": ".local-private/a11y-text200-wide-build.log",
+      "sha256": "9dcf70b9bcd15c1b9fbab7238d20fcc6b3e4dd40f8bc9405379f1ab6deffb297",
+      "bytes": 7790
+    },
+    "nightlyFixture": {
+      "path": ".local-private/nightly-final-fixture.log",
+      "sha256": "9fc7ca2fc5891f8b99589045380b7f65829456bc38507dd5deedbb14bfbba2d3",
+      "bytes": 800
+    },
+    "localRehearsal": {
+      "path": ".local-private/rehearsal-final.log",
+      "sha256": "3e5f19148b22a237f1c1e80b6dcf7bba50d5be36c1679e5c7b01f3d6c47a5bd5",
+      "bytes": 2340
+    },
+    "reviewPrivate": {
+      "path": ".local-private/review-private-green-final.log",
+      "sha256": "017506413f68e5cd9e0e1dc709964e40a372808a38465f884212b3051f9fc48b",
+      "bytes": 269
+    },
+    "reviewBrowser": {
+      "path": ".local-private/review-public-green.log",
+      "sha256": "7ce16bbc1c8ee7f8f9ebc736cc0cbfa4c6ec62f8a0ee931c7d489fe10ca969ce",
+      "bytes": 781
+    },
+    "fixtures": {
+      "path": ".local-private/final-fixtures-green.log",
+      "sha256": "8d68c08f0f6981ef64581cb87e61583e92d66bca4aa95f603b96a112e693998d",
+      "bytes": 264
+    },
+    "privateBrowserSubset": {
+      "path": ".local-private/a11y-wide-complete-browser.log",
+      "sha256": "f7de3b03a27266d46e1ea6955c2ca7665f3a3fda8d82b2f78b7a1f83ca9ff023",
+      "bytes": 27236
+    },
+    "mediaCleanup": {
+      "path": ".local-private/media-cleanup-final-after-browser.log",
+      "sha256": "c86051714a93710dc56393eda431657f59f623125d33e534e292e34a0d167e45",
+      "bytes": 46
+    },
+    "localFlagRollback": {
+      "path": ".local-private/local-flag-rollback.log",
+      "sha256": "5a8f3f70ed370d12adb7399c98b5f158ba863de67f7f89fa452fb07b083c3952",
+      "bytes": 82
+    },
+    "nightlyLocalSmoke": {
+      "path": ".local-private/nightly-current-smoke.log",
+      "sha256": "c1491877817aeeb1ea2dd295a68f3d177609a2ec6d46da43dc8fafffcce7dfd8",
+      "bytes": 1133
+    },
+    "adoptionAccountRed": {
+      "path": ".local-private/public-comparison-account-red.log",
+      "sha256": "d8f13327cccc1363f0d154d8928370645d28e3032c02ab9531acc0fafda01c93",
+      "bytes": 5891
+    },
+    "adoptionAccountGreen": {
+      "path": ".local-private/public-comparison-account-green.log",
+      "sha256": "d509f593fca292a516d898d4410452fd949ec147dd7652a81265727f98103966",
+      "bytes": 827
+    },
+    "turboEnvRed": {
+      "path": ".local-private/turbo-env-red.log",
+      "sha256": "181fe45998fe6e15a682632988201cc8ecacff99228724bbce01862e6230248d",
+      "bytes": 77
+    },
+    "turboEnvGreen": {
+      "path": ".local-private/turbo-env-green.log",
+      "sha256": "62cadc9c5f90a25b5ed7387a87d2e348af95dcfa195f63c6bccf5163af4d7d95",
+      "bytes": 112
+    },
+    "mediaCleanupCurrent": {
+      "path": ".local-private/media-cleanup-current.log",
+      "sha256": "fed07a6acd88558b18433b50aefd6cbbfaa4535f8f31140511f8564c47ffb86c",
+      "bytes": 46
+    },
+    "localRollbackCurrent": {
+      "path": ".local-private/local-flag-rollback-current.log",
+      "sha256": "5a8f3f70ed370d12adb7399c98b5f158ba863de67f7f89fa452fb07b083c3952",
+      "bytes": 82
+    },
+    "browserFixtureFailure": {
+      "path": ".local-private/public-comparison-browser-fixture-failure.log",
+      "sha256": "a8a167a65412e7cbc6bea4dbdcd4e1265cd02f774653a2f7a011650ba0300ea8",
+      "bytes": 5225
+    },
+    "privateTypesAndLint": {
+      "path": ".local-private/a11y-wide-quality.log",
+      "sha256": "0c6c39d6bdbcfca35905d993e3bf197204e80c25bbcecd960d2a106ea1e6c379",
+      "bytes": 9189
+    }
+  },
+  "results": {
+    "publicUnit": {
+      "pass": 79,
+      "skip": 0
+    },
+    "privateRegression": {
+      "pass": 3692,
+      "skip": 10,
+      "tasks": 7,
+      "cached": 0,
+      "sourceSha": "45423e2e8b86adaed7591e37147186ca37254fe4",
+      "scope": "Before final capped-navigation adjustment; final components, types, build and browser suites rerun. Complete final-head suite is recorded by publication CI."
+    },
+    "publicIntegration": {
+      "pass": 4
+    },
+    "publicBrowser": {
+      "pass": 16
+    },
+    "nightlyFixture": {
+      "pass": 2
+    },
+    "nightlyLocalSmoke": {
+      "pass": 4
+    },
+    "sourceBoundary": {
+      "pass": 3,
+      "skip": 1,
+      "reason": "Windows symlink creation unavailable"
+    },
+    "privateTypes": {
+      "tasks": 8,
+      "result": "PASS",
+      "localLatestCached": 8,
+      "remoteCurrentCached": 0
+    },
+    "lint": {
+      "errors": 0,
+      "warnings": 28
+    },
+    "publicBuild": "PASS",
+    "privateBuild": "PASS",
+    "archive": "PASS",
+    "privateBrowserSubset": {
+      "pass": 168,
+      "skip": 0,
+      "reason": "Nine original text-200 defects fixed; menu at1280/2560, filters and read-only preview cases included. Modeled zoom is not human screen-reader acceptance"
+    },
+    "privateTypesAndLint": {
+      "result": "PASS",
+      "tasks": 9,
+      "cached": 6,
+      "errors": 0,
+      "warnings": 28
+    }
+  },
+  "remoteCI": {
+    "result": "SEE_EXACT_FINAL_HEAD_PUBLICATION_SIDECAR",
+    "artifact": ".local-private/text200-publication-ci.json",
+    "previousSuccessfulHead": "f4399b43b26f30dbb289abc6244dbb78f484c1dd"
+  },
+  "archive": {
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "files": 132,
+    "entries": 133,
+    "sourceMatchesCommittedBlobHashes": true,
+    "dirty": true,
+    "dirtyReason": "Untracked Next-generated local AGENTS.md and CLAUDE.md deliberately excluded",
+    "archiveSha256": "b644dae7a03bc2af8a9c2de70708381430cb14799a0954303a689d869c1f353c",
+    "target": "C:\\Users\\laich\\Documents\\KinnsoOS\\.local-private\\archive-final-a01f273ff53a"
+  },
+  "performance": {
+    "environment": "synthetic local preview",
+    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "measuredAt": "2026-10-02T18:20:23.086Z",
+    "conditions": "Desktop Chromium; unthrottled; three observations; not representative mobile or cloud p95",
+    "samples": [
+      {
+        "route": "/en",
+        "mode": "connected",
+        "actor": "anonymous",
+        "ttfbMs": 8.799999982118607,
+        "domContentLoadedMs": 28.69999998807907,
+        "loadMs": 158.5,
+        "lcpMs": 120,
+        "resources": 25
+      },
+      {
+        "route": "/en/explore",
+        "mode": "connected",
+        "actor": "anonymous",
+        "ttfbMs": 10.700000017881393,
+        "domContentLoadedMs": 47.30000001192093,
+        "loadMs": 48.10000002384186,
+        "lcpMs": 44,
+        "resources": 30
+      },
+      {
+        "route": "/zh-HK",
+        "mode": "connected",
+        "actor": "anonymous",
+        "ttfbMs": 8.400000005960464,
+        "domContentLoadedMs": 132.89999997615814,
+        "loadMs": 133.09999999403954,
+        "lcpMs": 148,
+        "resources": 25
+      }
+    ]
+  },
+  "review": {
+    "reviewer": "single fresh gpt-6-astra read-only whole-branch review",
+    "critical": 2,
+    "important": 7,
+    "minor": 0,
+    "findingsFixed": 9,
+    "ruling": "Fixes verified by executor RED/GREEN and fresh whole-suite results; no second reviewer verdict is claimed",
+    "privateFixSha": "184149d8c0f31fdf98de1cda7c6316f60d517ac8",
+    "publicFixSha": "d9a1a3b165e36d504aae48de371e6e647dd2d2fb"
+  },
+  "privateProductionBuild": {
+    "localVerifiedRuntimeSourceSha": "184149d8c0f31fdf98de1cda7c6316f60d517ac8",
+    "remoteVerifiedSourceSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "currentSourceSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "explanation": "Latest trusted CI executed uncached production build, types/lint and complete tests at this source SHA. Local running build has identical application runtime inputs; subsequent changes are tests, fixture helper, documentation and Turbo/CI environment forwarding."
+  },
+  "publicProductionBuild": {
+    "verifiedRuntimeSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "currentSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "buildWorktreeMatchesCommittedApplicationInputs": true,
+    "currentHeadExtractedSourceBuild": "PASS"
+  },
+  "localFlagRollback": {
+    "environment": "verified synthetic local only",
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "schemaHead": "20261002154501",
+    "disabledTripStatus": 503,
+    "disabledTripCode": "UNAVAILABLE",
+    "legacyStatus": 200,
+    "schemaUnchanged": true,
+    "migrationReversal": "NOT_RUN",
+    "cloudRollback": "NOT_RUN",
+    "result": "PASS",
+    "observedAt": "2026-10-02T18:24:14.250Z"
+  },
+  "unrunLocalProviderJourneys": [
+    "Booking ON (missing approved test-mode provider credentials)",
+    "Paid creator scan/onboarding",
+    "Cloud/staging cutover or backup restore",
+    "Physical phone and human screen reader"
+  ],
+  "originalSites": {
+    "observedAt": "2026-10-02T16:22:34.424141+00:00",
+    "requests": "read-only GET, no mutation",
+    "sites": [
+      {
+        "url": "https://remix-kinnso-web.vercel.app/en",
+        "status": 200,
+        "finalUrl": "https://remix-kinnso-web.vercel.app/en"
+      },
+      {
+        "url": "https://kinnso-journeys.laichiwillyjp.chatgpt.site/",
+        "status": 200,
+        "finalUrl": "https://kinnso-journeys.laichiwillyjp.chatgpt.site/zh-HK"
+      }
+    ]
+  },
+  "localMediaCleanup": {
+    "previousRemoved": 19,
+    "latestRemoved": 8,
+    "result": "PASS",
+    "artifact": ".local-private/media-cleanup-current.log",
+    "target": "verified synthetic local only"
+  },
+  "previousSourcePairResults": {
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "results": {
+      "publicUnit": {
+        "pass": 79,
+        "skip": 0
+      },
+      "privateRegression": {
+        "pass": 3692,
+        "skip": 10,
+        "tasks": 7,
+        "cached": 0,
+        "sourceSha": "45423e2e8b86adaed7591e37147186ca37254fe4",
+        "scope": "Before final capped-navigation adjustment; final components, types, build and browser suites rerun. Complete final-head suite is recorded by publication CI."
+      },
+      "publicIntegration": {
+        "pass": 4
+      },
+      "publicBrowser": {
+        "pass": 16
+      },
+      "nightlyFixture": {
+        "pass": 2
+      },
+      "nightlyLocalSmoke": {
+        "pass": 4
+      },
+      "sourceBoundary": {
+        "pass": 3,
+        "skip": 1,
+        "reason": "Windows symlink creation unavailable"
+      },
+      "privateTypes": {
+        "tasks": 8,
+        "result": "PASS",
+        "localLatestCached": 8,
+        "remoteCurrentCached": 0
+      },
+      "lint": {
+        "errors": 0,
+        "warnings": 28
+      },
+      "publicBuild": "PASS",
+      "privateBuild": "PASS",
+      "archive": "PASS",
+      "privateBrowserSubset": {
+        "pass": 168,
+        "skip": 0,
+        "reason": "Nine original text-200 defects fixed; menu at1280/2560, filters and read-only preview cases included. Modeled zoom is not human screen-reader acceptance"
+      },
+      "privateTypesAndLint": {
+        "result": "PASS",
+        "tasks": 9,
+        "cached": 6,
+        "errors": 0,
+        "warnings": 28
+      }
+    },
+    "remoteCI": {
+      "observedAt": "2026-10-02T18:20:44.167483+00:00",
+      "head": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+      "url": "https://github.com/YNWAforever/Remix-Kinnso/actions/runs/37039770188",
+      "conclusion": "SUCCESS",
+      "jobs": [
+        {
+          "name": "quality",
+          "result": "success"
+        },
+        {
+          "name": "Scan worker image",
+          "result": "success"
+        },
+        {
+          "name": "e2e",
+          "result": "success"
+        }
+      ],
+      "quality": {
+        "pass": 3701,
+        "skip": 1,
+        "tasks": 7,
+        "cached": 0,
+        "packages": [
+          {
+            "pass": 11,
+            "skip": 0
+          },
+          {
+            "pass": 40,
+            "skip": 0
+          },
+          {
+            "pass": 27,
+            "skip": 0
+          },
+          {
+            "pass": 91,
+            "skip": 1
+          },
+          {
+            "pass": 92,
+            "skip": 0
+          },
+          {
+            "pass": 187,
+            "skip": 0
+          },
+          {
+            "pass": 3253,
+            "skip": 0
+          }
+        ]
+      },
+      "browser": {
+        "bookingOff": {
+          "pass": 169,
+          "skip": 10
+        },
+        "profileEnquiry": {
+          "pass": 1
+        },
+        "bookingOnTestMode": {
+          "pass": 3,
+          "skip": 1
+        }
+      },
+      "limitations": [
+        "CI uses synthetic isolated local stack, not approved cloud staging",
+        "Booking ON is test mode; no live payment acceptance",
+        "Conditional cutover/parity jobs are skipped and not release acceptance"
+      ]
+    }
+  },
+  "text200Acceptance": "docs/implementation/batch1/TEXT200_ACCEPTANCE.json",
+  "externalPublicFoundationDelta": {
+    "observedAt": "2026-10-02T20:05:39.797532+00:00",
+    "event": "PUBLIC_PR1_EXTERNALLY_MERGED",
+    "mergedAt": "2026-10-02T19:12:54Z",
+    "publicMainSha": "2a22235d34984b8741ba2339cbc391a9dc1ddd8c",
+    "originalMainSha": "4507686c9fac761554fa66d9756a850172e1c9ce",
+    "foundationSha": "f181cff22d28a480120c2abaa2dde91c573582bf",
+    "evidence": "PR1 merge metadata and git diff foundation..origin/main is empty; foundation is already an ancestor of public review branch",
+    "disposition": "Preserve external merge; public implementation source remains a01f273; retarget PR2 review base to main; executor does not merge any formal main"
+  }
+}

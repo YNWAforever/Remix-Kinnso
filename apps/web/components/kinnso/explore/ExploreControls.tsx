@@ -92,8 +92,8 @@ export function ExploreControls(props: ExploreControlsProps) {
   )
 
   return (
-    <>
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+    <div className="k2-explore-controls">
+      <div className="k2-explore-search grid gap-3">
         <label className="grid gap-2 text-sm font-semibold text-kinnso-ink">
           {t.searchLabel}
           <input
@@ -108,17 +108,17 @@ export function ExploreControls(props: ExploreControlsProps) {
           type="button"
           ref={triggerRef}
           onClick={() => setOpen(true)}
-          className="k-btn-ghost self-end border border-kinnso-edge bg-white lg:hidden"
+          className="k2-explore-filter-trigger k-btn-ghost self-end border border-kinnso-edge bg-white"
           aria-label={activeCount ? `${t.filters}, ${activeCount} ${t.activeFilters}` : t.filters}
         >
           {t.filters}{activeCount ? ` (${activeCount})` : ''}
         </button>
-        <div className="hidden self-end lg:block">{sortSelect}</div>
+        <div className="k2-explore-sort self-end">{sortSelect}</div>
       </div>
 
-      <div className={`mt-6 grid gap-8 ${hasDestinations ? 'lg:grid-cols-[14rem_minmax(0,1fr)]' : ''}`}>
-        {hasDestinations ? <aside className="hidden lg:block">{destinationOptions('explore-destination-desktop')}</aside> : null}
-        <div>{children}</div>
+      <div className={`mt-6 grid gap-8 ${hasDestinations ? 'k2-explore-with-sidebar' : ''}`}>
+        {hasDestinations ? <aside className="k2-explore-sidebar">{destinationOptions('explore-destination-desktop')}</aside> : null}
+        <div className="k2-explore-results min-w-0">{children}</div>
       </div>
 
       <Sheet open={open} onOpenChange={handleOpenChange}>
@@ -144,6 +144,6 @@ export function ExploreControls(props: ExploreControlsProps) {
           </SheetFooter>
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   )
 }

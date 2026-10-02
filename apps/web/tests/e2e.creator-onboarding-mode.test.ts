@@ -27,6 +27,9 @@ describe('creator onboarding scan tolerance wiring', () => {
     const ci = readRepo('.github/workflows/ci.yml')
     const nightly = readRepo('.github/workflows/nightly-funnel.yml')
     const r710Config = readRepo('apps/e2e/playwright.r7-10.config.ts')
+    const r710Specs = readRepo('apps/e2e/r7-10-specs.ts')
+    expect(r710Config).toContain("import { R7_10_OFF_SPECS } from './r7-10-specs'")
+    expect(r710Config).toContain('[...R7_10_OFF_SPECS]')
 
     expect(verify).toMatch(
       /allow_external_scan_skip:\s*\r?\n\s+description: [^\r\n]+\r?\n\s+required: false\r?\n\s+type: boolean\r?\n\s+default: false/,
@@ -44,7 +47,7 @@ describe('creator onboarding scan tolerance wiring', () => {
       'honesty.spec.ts',
       'notfound.spec.ts',
     ]) {
-      expect(r710Config).toContain(`'${spec}'`)
+      expect(r710Specs).toContain(`'${spec}'`)
     }
     expect(ci).not.toContain(FLAG)
     expect(nightly).not.toContain(FLAG)

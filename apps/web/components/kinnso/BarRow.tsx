@@ -16,7 +16,7 @@ export function BarRow({ label, value, max }: BarRowProps) {
       <div
         role="img"
         aria-label={`${label}: ${value}`}
-        className="relative h-2 flex-1 overflow-hidden rounded bg-muted"
+        className="relative h-2 flex-1 overflow-hidden rounded bg-kinnso-cream2"
       >
         <div aria-hidden="true" className="h-full rounded bg-primary" style={{ width: `${pct}%` }} />
       </div>

@@ -242,3 +242,133 @@ export async function waitForRoute(
   await page.getByRole(route.ready.role, { level: route.ready.level }).first().waitFor({ state: 'visible' })
   return response
 }
+
+/**
+ * Fonts loaded, in-viewport images decoded, two animation frames passed. Used before
+ * any layout assertion so a measurement is not taken mid-paint. Deliberately polls
+ * rather than sleeping: a fixed timeout is both slower and flakier, and the
+ * no-fixed-sleeps meta-test forbids one.
+ */
+export async function waitForVisualSettlement(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    await document.fonts.ready
+  })
+  await page.waitForFunction(() => Array.from(document.images)
+    .filter((image) => {
+      const bounds = image.getBoundingClientRect()
+      return bounds.bottom > 0 && bounds.right > 0 && bounds.top < window.innerHeight && bounds.left < window.innerWidth
+    })
+    .every((image) => image.complete))
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  }))
+}
+
+/**
+ * Checks the story 21 suites assert. A closed union so a suppression cannot name a
+ * check that does not exist: a typo is a compile error rather than a silently inert
+ * entry that suppresses nothing while looking like it does.
+ */
+export type A11yCheck =
+  | 'viewport-overflow'
+  | 'viewport-cls'
+  | 'text-200'
+  | 'reflow-320'
+  | 'skip-link'
+  | 'keyboard-reachable'
+  | 'focus-visible'
+  | 'focus-trap'
+  | 'dialog-focus'
+  | 'landmarks'
+  | 'heading-order'
+  | 'accessible-name'
+  | 'html-lang'
+
+/**
+ * A known, accepted failure. Separate from AXE_EXCEPTIONS because that one is keyed by
+ * rule id and CSS target and filters individual violation nodes, while this suppresses
+ * a whole assertion for one route. Merging them would give one type where half the
+ * fields are meaningless in each case.
+ *
+ * r7-10-contract.spec.ts asserts this list's EXACT contents, so an entry cannot be
+ * added without showing up in a diff.
+ */
+export interface A11yException {
+  routeId: R710RouteId
+  check: A11yCheck
+  reason: string
+  owner: string
+  reviewWhen: string
+}
+
+// The nine historical text-200 exceptions were reproduced and fixed with
+// font-relative container layouts. Their RED/GREEN evidence is retained privately
+// in docs/implementation/batch1/TEXT200_ACCEPTANCE.json. New suppression requires
+// an explicit independent contract change and review.
+export const A11Y_EXCEPTIONS: readonly A11yException[] = []
+
+export function isExcepted(
+  routeId: R710RouteId,
+  check: A11yCheck,
+  exceptions: readonly A11yException[] = A11Y_EXCEPTIONS,
+): boolean {
+  return exceptions.some((entry) => entry.routeId === routeId && entry.check === check)
+}
+
+/**
+ * Returns a description of the first heading-order violation, or undefined if the
+ * sequence is legal. Skipping DOWN a level (h2 -> h4) hides structure from a screen
+ * reader; jumping back UP any distance (h3 -> h1) is a section ending and is fine.
+ */
+export function firstHeadingOrderViolation(levels: readonly number[]): string | undefined {
+  let previous = 0
+
+  for (const [index, level] of levels.entries()) {
+    if (previous === 0) {
+      if (level !== 1) return `first heading is h${level} at position ${index + 1}; the page must start at h1`
+    } else if (level > previous + 1) {
+      return `h${previous} is followed by h${level} at position ${index + 1}; levels must not skip`
+    }
+    previous = level
+  }
+
+  return undefined
+}
+
+export interface ElementBox {
+  label: string
+  scrollWidth: number
+  clientWidth: number
+  scrollHeight: number
+  clientHeight: number
+}
+
+/**
+ * Elements whose content is cut off by their own box. The 1px tolerance absorbs
+ * sub-pixel layout rounding, which otherwise flags every second text node at scaled
+ * font sizes and makes the check useless.
+ */
+export function clippedElements(boxes: readonly ElementBox[], tolerance = 1): ElementBox[] {
+  return boxes.filter((box) => (
+    box.scrollWidth > box.clientWidth + tolerance
+    || box.scrollHeight > box.clientHeight + tolerance
+  ))
+}
+
+/**
+ * Interactive elements a keyboard user must be able to reach. Excludes disabled and
+ * aria-hidden nodes; the specs additionally drop anything with a zero-area box, which
+ * cannot be expressed in a selector.
+ */
+export const INTERACTIVE_SELECTOR = [
+  'a[href]',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  '[tabindex]:not([tabindex="-1"])',
+  '[role="button"]',
+  '[role="link"]',
+]
+  .map((selector) => `${selector}:not([disabled]):not([aria-hidden="true"])`)
+  .join(', ')

@@ -36,7 +36,7 @@ export function MerchantBudgetPanel({
   }
 
   return (
-    <section className="mt-6 rounded-xl border border-kinnso-line p-4">
+    <section className="mt-6 rounded-xl border border-kinnso-edge p-4">
       <p className="mb-2 text-sm font-bold text-kinnso-ink">{t.budgetPanelTitle}</p>
       {budget ? (
         <p className="mb-3 text-sm text-kinnso-muted">
@@ -56,7 +56,7 @@ export function MerchantBudgetPanel({
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder={t.budgetCreditAmountPlaceholder}
-          className="rounded-md border border-kinnso-line p-2 text-sm"
+          className="rounded-md border border-kinnso-edge p-2 text-sm"
         />
         <label className="text-xs font-bold text-kinnso-ink" htmlFor="budget-credit-reason">{t.budgetReasonPlaceholder}</label>
         <textarea
@@ -65,7 +65,7 @@ export function MerchantBudgetPanel({
           onChange={(e) => setReason(e.target.value)}
           placeholder={t.budgetReasonPlaceholder}
           rows={2}
-          className="rounded-md border border-kinnso-line p-2 text-sm"
+          className="rounded-md border border-kinnso-edge p-2 text-sm"
         />
         <div className="flex gap-2">
           <button
@@ -80,7 +80,7 @@ export function MerchantBudgetPanel({
             type="button"
             disabled={isPending || !budget || !reason.trim()}
             onClick={() => run(() => enforce(locale, merchantId, !(budget?.enforced ?? false), reason))}
-            className="rounded-md border border-kinnso-line px-3 py-1 text-sm font-bold text-kinnso-ink disabled:opacity-50"
+            className="rounded-md border border-kinnso-edge px-3 py-1 text-sm font-bold text-kinnso-ink disabled:opacity-50"
           >
             {budget?.enforced ? t.budgetEnforceOff : t.budgetEnforceOn}
           </button>

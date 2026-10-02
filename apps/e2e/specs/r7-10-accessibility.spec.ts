@@ -11,25 +11,11 @@ import {
   tabTo,
   unapprovedViolations,
   waitForRoute,
+  waitForVisualSettlement,
   type FocusStyleSnapshot,
 } from '../r7-10-accessibility'
 import { AXE_EXCEPTIONS } from '../r7-10-accessibility'
 import { R7_10_ROUTES, type R710Route } from '../r7-10-routes'
-
-async function waitForVisualSettlement(page: Parameters<typeof installLayoutShiftObserver>[0]) {
-  await page.evaluate(async () => {
-    await document.fonts.ready
-  })
-  await page.waitForFunction(() => Array.from(document.images)
-    .filter((image) => {
-      const bounds = image.getBoundingClientRect()
-      return bounds.bottom > 0 && bounds.right > 0 && bounds.top < window.innerHeight && bounds.left < window.innerWidth
-    })
-    .every((image) => image.complete))
-  await page.evaluate(() => new Promise<void>((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-  }))
-}
 
 async function readFocusStyle(locator: Parameters<typeof tabTo>[1]): Promise<FocusStyleSnapshot> {
   return locator.evaluate((element) => {

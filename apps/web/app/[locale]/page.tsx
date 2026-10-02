@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { HomeView } from '@/components/kinnso/pages/HomeView'
 import { searchArticles } from '@/lib/articles/queries'
 import { getPublishedGuides } from '@/lib/guides/queries'
+import type { Guide } from '@/lib/guides/types'
+import { optionalQuery } from '@/lib/resilience/optional'
 import { getPlatformStats, getPublishedTestimonials, getHomeSessions } from '@/lib/home/queries'
 import { isLocale, type Locale, LOCALES } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -30,7 +32,10 @@ export default async function LocaleHome({ params }: { params: Promise<{ locale:
   const loc = locale as Locale
   const [messages, guides, stats, testimonials, articleResult, sessions, productState] = await Promise.all([
     getDictionary(loc),
-    getPublishedGuides(6),
+    // The guides band degrades to hidden rather than taking down the whole
+    // homepage, but the failure is recorded — unlike /explore, where the
+    // catalogue is the entire point of the page and must not be faked.
+    optionalQuery('home-guides', () => getPublishedGuides(6), [] as Guide[]),
     getPlatformStats(),
     getPublishedTestimonials(loc),
     // Articles highlight degrades to hidden rather than crashing the homepage

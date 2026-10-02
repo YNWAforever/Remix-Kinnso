@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 afterEach(cleanup)
 
-const { getMerchantProfileMock, listMerchantMissionsMock, notFoundMock } = vi.hoisted(() => ({
-  getMerchantProfileMock: vi.fn(async () => ({ data: { id: 'merchant-profile-1' } })),
+const { merchantPageGateMock, listMerchantMissionsMock, notFoundMock } = vi.hoisted(() => ({
+  merchantPageGateMock: vi.fn(async () => ({ user: { id: 'merchant-user-1' }, merchantId: 'merchant-profile-1' })),
   listMerchantMissionsMock: vi.fn(async () => ({
     data: [{
       id: 'mission-1',
@@ -35,16 +35,15 @@ vi.mock('next/navigation', () => ({
 }))
 
 vi.mock('@/lib/missions/queries', () => ({
-  getMerchantProfile: getMerchantProfileMock,
   listMerchantMissions: listMerchantMissionsMock,
 }))
 
+// The page now takes merchant identity from the central guard instead of a
+// separate getMerchantProfile round trip, so the guard is what is mocked here.
+vi.mock('@/lib/admin/guard', () => ({ requireMerchantPage: merchantPageGateMock }))
+
 vi.mock('@/lib/supabase/server', () => ({
-  createSupabaseServerClient: async () => ({
-    auth: {
-      getUser: async () => ({ data: { user: { id: 'merchant-user-1' } } }),
-    },
-  }),
+  createSupabaseServerClient: async () => ({}),
 }))
 
 vi.mock('@/lib/creators/queries', () => ({
@@ -68,5 +67,7 @@ describe('/[locale]/merchants/dashboard/missions/[missionId] host', () => {
     expect(screen.getByRole('heading', { level: 2, name: en.missions.submitMilestone })).toBeTruthy()
     expect(screen.getAllByRole('link', { name: 'Maya Wanders' })[0].getAttribute('href')).toBe('/en/c/maya')
     expect(screen.getByText('Verified signal')).toBeTruthy()
+    // Missions are listed by the server-derived merchant id, never a browser value.
+    expect(listMerchantMissionsMock).toHaveBeenCalledWith(expect.anything(), 'merchant-profile-1')
   })
 })

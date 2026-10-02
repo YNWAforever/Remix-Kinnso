@@ -1163,6 +1163,10 @@ const messages: Messages = {
     cardExperiencesBody: '上架旅客即將可以預訂的導覽與活動。',
     cardBookingsTitle: '訂單',
     cardBookingsBody: '查看誰預訂了你的體驗,並將完成的行程標記為已完成。',
+    cardOffersTitle: '優惠',
+    cardOffersBody: '建立店內優惠，旅客可從創作者指南領取。',
+    cardRedeemTitle: '核銷優惠碼',
+    cardRedeemBody: '掃描或輸入旅客的優惠碼，在店內確認到訪。',
     cardProfileTitle: '公開檔案',
     cardProfileBody: '掌控你的商家在 KINNSO 上的公開形象。',
     cardBudgetTitle: '預算',
@@ -1513,11 +1517,13 @@ const messages: Messages = {
     save: '儲存',
     saved: '已儲存',
     signInToSave: '登入以儲存',
+    saveFailed: '未能儲存，請再試一次。',
   },
   experienceSave: {
     save: '儲存',
     saved: '已儲存',
     signInToSave: '登入以儲存',
+    saveFailed: '未能儲存，請再試一次。',
   },
   reviews: {
     formHeading: '撰寫評價',
@@ -1660,6 +1666,7 @@ const messages: Messages = {
     validThrough: '有效期至',
     heading: '請於商家出示此頁面',
     showAt: '請於此商家出示',
+    claimFailed: '無法領取此優惠，可能已結束或已達上限。',
   },
   offerRedeem: {
     title: '兌換',

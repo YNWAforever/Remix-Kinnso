@@ -1,0 +1,38 @@
+{
+  "environment": "synthetic local preview",
+  "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+  "measuredAt": "2026-10-02T18:20:23.086Z",
+  "conditions": "Desktop Chromium; unthrottled; three observations; not representative mobile or cloud p95",
+  "samples": [
+    {
+      "route": "/en",
+      "mode": "connected",
+      "actor": "anonymous",
+      "ttfbMs": 8.799999982118607,
+      "domContentLoadedMs": 28.69999998807907,
+      "loadMs": 158.5,
+      "lcpMs": 120,
+      "resources": 25
+    },
+    {
+      "route": "/en/explore",
+      "mode": "connected",
+      "actor": "anonymous",
+      "ttfbMs": 10.700000017881393,
+      "domContentLoadedMs": 47.30000001192093,
+      "loadMs": 48.10000002384186,
+      "lcpMs": 44,
+      "resources": 30
+    },
+    {
+      "route": "/zh-HK",
+      "mode": "connected",
+      "actor": "anonymous",
+      "ttfbMs": 8.400000005960464,
+      "domContentLoadedMs": 132.89999997615814,
+      "loadMs": 133.09999999403954,
+      "lcpMs": 148,
+      "resources": 25
+    }
+  ]
+}

@@ -11,7 +11,7 @@ export function MerchantsDirectoryView({ locale, t, merchants }: {
 }) {
   const p = (path: string) => `/${locale}${path}`
   return (
-    <main className="bg-kinnso-cream font-sans">
+    <div className="bg-kinnso-cream font-sans">
       <SectionShell as="header">
         <Eyebrow>{t.heading}</Eyebrow>
         <h1 className="k2-display mt-4 text-3xl font-semibold text-kinnso-ink md:text-5xl">{t.heading}</h1>
@@ -40,7 +40,7 @@ export function MerchantsDirectoryView({ locale, t, merchants }: {
         <p className="text-kinnso-ink/70">{t.newHereNote}</p>
         <Link href={p('/for-merchants')} className="mt-4 inline-block font-semibold text-kinnso-orangeDark hover:underline">{t.newHereCta}</Link>
       </SectionShell>
-    </main>
+    </div>
   )
 }
 

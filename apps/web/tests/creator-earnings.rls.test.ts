@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 import { createClient } from '@supabase/supabase-js'
-import { createHmac } from 'node:crypto'
+import { createHmac, randomUUID } from 'node:crypto'
 import { spawn } from 'node:child_process'
 
 const url = process.env.SUPABASE_URL
@@ -49,10 +49,10 @@ function clientFor(userId: string) {
 
 const svc = () => createClient(url!, svcKey!, { auth: { persistSession: false, autoRefreshToken: false } })
 
-const creatorC = '11111111-1111-4111-8111-111111111111'
-const creatorD = '22222222-2222-4222-8222-222222222222'
-const traveller = '33333333-3333-4333-8333-333333333333'
-const merchantUser = '44444444-4444-4444-8444-444444444444'
+const creatorC = randomUUID()
+const creatorD = randomUUID()
+const traveller = randomUUID()
+const merchantUser = randomUUID()
 
 d('creator_earnings_summary', () => {
   let missionId = ''

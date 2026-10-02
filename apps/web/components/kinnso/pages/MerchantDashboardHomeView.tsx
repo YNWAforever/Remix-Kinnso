@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CalendarCheck, FileText, LineChart, MapPin, Store, Users, Briefcase, Wallet } from 'lucide-react'
+import { CalendarCheck, FileText, LineChart, MapPin, QrCode, Store, Tag, Users, Briefcase, Wallet } from 'lucide-react'
 import { EditorialCard } from '@/components/kinnso/editorial/EditorialCard'
 import { Eyebrow } from '@/components/kinnso/editorial/Eyebrow'
 import { SectionShell } from '@/components/kinnso/editorial/SectionShell'
@@ -15,6 +15,11 @@ export function MerchantDashboardHomeView({ locale, t }: { locale: Locale; t: Me
     { title: t.cardInsightsTitle, body: t.cardInsightsBody, href: p('/merchants/dashboard/insights'), icon: <LineChart aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardExperiencesTitle, body: t.cardExperiencesBody, href: p('/merchants/dashboard/experiences'), icon: <MapPin aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardBookingsTitle, body: t.cardBookingsBody, href: p('/merchants/dashboard/bookings'), icon: <CalendarCheck aria-hidden="true" className="h-5 w-5" /> },
+    // /offers and /redeem shipped with R12.0 but were linked from nowhere, so
+    // merchant staff could not reach the redemption scanner from the product at
+    // all -- the visit loop was only completable by typing the URL.
+    { title: t.cardOffersTitle, body: t.cardOffersBody, href: p('/merchants/dashboard/offers'), icon: <Tag aria-hidden="true" className="h-5 w-5" /> },
+    { title: t.cardRedeemTitle, body: t.cardRedeemBody, href: p('/merchants/dashboard/redeem'), icon: <QrCode aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardProfileTitle, body: t.cardProfileBody, href: p('/merchants/dashboard/profile'), icon: <Store aria-hidden="true" className="h-5 w-5" /> },
     { title: t.cardBudgetTitle, body: t.cardBudgetBody, href: p('/merchants/dashboard/budget'), icon: <Wallet aria-hidden="true" className="h-5 w-5" /> },
   ]

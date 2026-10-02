@@ -113,7 +113,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <select aria-label={t.dirStatus} defaultValue={params.get('status') ?? ''}
           onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('status', e.target.value); else sp.delete('status') })}
-          className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+          className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirStatus}: {t.dirAll}</option>
           <option value="active">{t.statusActive}</option>
           <option value="paused">{t.statusPaused}</option>
@@ -122,7 +122,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
         </select>
         <select aria-label={t.dirTier} defaultValue={params.get('tier') ?? ''}
           onChange={(e) => setQuery((sp) => { if (e.target.value) sp.set('tier', e.target.value); else sp.delete('tier') })}
-          className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+          className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
           <option value="">{t.dirTier}: {t.dirAll}</option>
           <option value="free">{t.tierFree}</option>
           <option value="growth">{t.tierGrowth}</option>
@@ -135,7 +135,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
           <select data-testid="bulk-action-select" value={bulkStatus}
             onChange={(e) => setBulkStatus(e.target.value as '' | MerchantStatus)}
             aria-label={t.bulkChooseAction}
-            className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+            className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
             <option value="">{t.bulkChooseAction}</option>
             <option value="active">{t.statusActive}</option>
             <option value="paused">{t.statusPaused}</option>
@@ -145,7 +145,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
           <input data-testid="bulk-reason" value={bulkReason} onChange={(e) => setBulkReason(e.target.value)}
             placeholder={t.reasonPlaceholder} className="k-input max-w-xs" aria-label={t.reasonPlaceholder} />
           <button onClick={applyBulk} disabled={busy || !bulkStatus || bulkReason.trim().length === 0}
-            className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
+            className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">
             {t.bulkApply}
           </button>
           {bulkError ? <p className="w-full text-sm text-red-600">{bulkError}</p> : null}
@@ -186,13 +186,13 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
                 </div>
 
                 {pending?.id === row.id && (
-                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-kinnso-line pt-3">
+                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-kinnso-edge pt-3">
                     {pending.kind === 'status' ? (
                       <>
                         {pending.status === 'archived' ? <p className="w-full text-sm text-red-600">{t.confirmArchive}</p> : null}
                         <select value={pending.status ?? ''}
                           onChange={(e) => setPending({ ...pending, status: e.target.value as MerchantStatus })}
-                          className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+                          className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
                           <option value="active">{t.statusActive}</option>
                           <option value="paused">{t.statusPaused}</option>
                           <option value="suspended">{t.statusSuspended}</option>
@@ -202,7 +202,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
                     ) : pending.kind === 'tier' ? (
                       <select value={pending.tier ?? ''}
                         onChange={(e) => setPending({ ...pending, tier: e.target.value as MerchantTier })}
-                        className="rounded-full border border-kinnso-line px-3 py-2 text-sm font-bold text-kinnso-ink">
+                        className="rounded-full border border-kinnso-edge px-3 py-2 text-sm font-bold text-kinnso-ink">
                         <option value="free">{t.tierFree}</option>
                         <option value="growth">{t.tierGrowth}</option>
                       </select>
@@ -212,7 +212,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
                       aria-label={isNote ? t.notePlaceholder : t.reasonPlaceholder}
                       className="k-input max-w-sm" />
                     <button onClick={applyPending} disabled={busy || !reasonValid}
-                      className="rounded-full border border-kinnso-line px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">{t.actApply}</button>
+                      className="rounded-full border border-kinnso-edge px-4 py-2 text-sm font-bold text-kinnso-ink disabled:opacity-50">{t.actApply}</button>
                     <button onClick={() => setPending(null)} disabled={busy}
                       className="rounded-full px-4 py-2 text-sm font-bold text-kinnso-muted">{t.actCancel}</button>
                   </div>
@@ -228,7 +228,7 @@ export function MerchantsDirectoryView({ t, locale, directory, onSetStatus, onSe
         <div className="mt-6 flex justify-center">
           <button
             onClick={() => setQuery((sp) => { sp.set('cursor_at', directory.nextCursor!.createdAt); sp.set('cursor_id', directory.nextCursor!.id) })}
-            className="rounded-full border border-kinnso-line px-5 py-2.5 text-sm font-bold text-kinnso-ink">{t.dirLoadMore}</button>
+            className="rounded-full border border-kinnso-edge px-5 py-2.5 text-sm font-bold text-kinnso-ink">{t.dirLoadMore}</button>
         </div>
       )}
     </main>

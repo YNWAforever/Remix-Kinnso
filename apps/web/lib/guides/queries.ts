@@ -23,6 +23,21 @@ export function mapRowToGuide(r: GuideRowLite): Guide {
   }
 }
 
+/**
+ * Published guides, newest first.
+ *
+ * Surfaces a query failure rather than swallowing it. This previously
+ * destructured only `data`, so a failed read was indistinguishable from an
+ * empty catalogue — and `/explore` is statically regenerated every 300s across
+ * seven locales, which meant a single failed regeneration served a cheerful
+ * "no guides yet" page for five minutes per locale, with nothing logged.
+ *
+ * "Unavailable" and "empty" are different facts and callers must be able to
+ * tell them apart. A caller that genuinely prefers degrading — a homepage band,
+ * say — opts in explicitly with `optionalQuery`, which records the failure
+ * instead of hiding it. This matches `getPublishedDestinations` and
+ * `getPublishedGuidesForCreator`, which already throw.
+ */
 export async function getPublishedGuides(limit?: number): Promise<Guide[]> {
   const supabase = createSupabasePublicClient()
   let query = supabase
@@ -31,7 +46,8 @@ export async function getPublishedGuides(limit?: number): Promise<Guide[]> {
     .eq('status', 'published')
     .order('published_at', { ascending: false })
   if (limit !== undefined) query = query.limit(limit)
-  const { data } = await query
+  const { data, error } = await query
+  if (error) throw error
   return (data ?? []).map(mapRowToGuide)
 }
 
@@ -62,14 +78,23 @@ function normalizeAttributedGuidesLimit(limit: number | undefined): number {
 }
 }
 
+/**
+ * Surfaces a query failure rather than emitting a sitemap with every guide
+ * missing. A sitemap that silently drops a whole content type is worse than one
+ * that fails: a failed generation makes a crawler retry and keep the last known
+ * good, whereas a successful-but-empty section actively tells it those URLs are
+ * gone. Every sibling here already throws -- merchants, experiences, sessions
+ * and destinations -- so this was the lone outlier.
+ */
 export async function getGuidesForSitemap(): Promise<{ slug: string; lastmod: string | null }[]> {
   const supabase = createSupabasePublicClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('guides')
     .select('slug, published_at')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .order('slug') // stable tie-break so sitemap sharding partitions a deterministic order
+  if (error) throw error
   return (data ?? []).map((r) => ({
     slug: r.slug as string,
     lastmod: (r.published_at as string | null) ?? null,

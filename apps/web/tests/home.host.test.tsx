@@ -12,9 +12,11 @@ beforeEach(() => {
   productStateMock.mockResolvedValue({ agentLive: true, bookingLive: false, sessionsLive: false })
   homeSessionsMock.mockResolvedValue([])
   testimonialsMock.mockResolvedValue([])
+  homeGuidesMock.mockResolvedValue([])
 })
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NEXT_NOT_FOUND') } }))
-vi.mock('@/lib/guides/queries', () => ({ getPublishedGuides: async () => [] }))
+const { homeGuidesMock } = vi.hoisted(() => ({ homeGuidesMock: vi.fn(async () => [] as unknown[]) }))
+vi.mock('@/lib/guides/queries', () => ({ getPublishedGuides: homeGuidesMock }))
 vi.mock('@/lib/articles/queries', () => ({ searchArticles: async () => ({ items: [], total: 0, page: 1, perPage: 3 }) }))
 vi.mock('@/lib/product-state', () => ({ getProductState: productStateMock }))
 vi.mock('@/lib/home/queries', async (importOriginal) => ({
@@ -36,6 +38,25 @@ describe('/[locale] home host', () => {
     expect(screen.getByText(en.home.featuredEmpty)).toBeTruthy()
     expect(screen.queryByText(en.home.sessionsHeading)).toBeNull()
   })
+  // The homepage deliberately keeps the opposite contract to /explore: one band
+  // of ten degrading to hidden is reasonable, and optionalQuery records it.
+  // /explore must not fake an empty catalogue -- see explore.host.test.tsx.
+  it('hides the guides band rather than crashing when the guides read fails', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    homeGuidesMock.mockRejectedValueOnce(
+      Object.assign(new Error('terminating connection'), { code: '57P01' }),
+    )
+
+    const ui = await LocaleHome({ params: Promise.resolve({ locale: 'en' }) })
+    render(ui)
+
+    expect(screen.getByRole('heading', { level: 1, name: en.home.heroTitle })).toBeTruthy()
+    expect(screen.getByText(en.home.featuredEmpty)).toBeTruthy()
+    // The failure is recorded, not silently swallowed.
+    expect(consoleError).toHaveBeenCalledWith('optional-module-failed', expect.objectContaining({ module: 'home-guides' }))
+    consoleError.mockRestore()
+  })
+
   it('passes the resolved product state and home sessions to the view', async () => {
     productStateMock.mockResolvedValue({ agentLive: true, bookingLive: true, sessionsLive: true })
     homeSessionsMock.mockResolvedValue([{ id: 's1', slug: 'replay', title: 'Replay session', hostHandle: 'sora', startsAt: '2026-01-01T00:00:00Z' }])

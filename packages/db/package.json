@@ -5,6 +5,6 @@
   "main": "types.ts",
   "types": "types.ts",
   "scripts": {
-    "gen": "supabase gen types typescript --linked > types.ts"
+    "gen": "node --env-file=../../apps/web/.env.test ../../scripts/gen-kinnso-local-types.mjs"
   }
 }

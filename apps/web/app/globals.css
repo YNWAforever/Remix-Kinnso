@@ -49,6 +49,41 @@
   --color-kinnso-blue: #2E6FB8;
   --color-kinnso-edge: #DED5C7;
 
+  /* shadcn primitive tokens, aliased onto the canonical kinnso palette.
+     components/ui/* is generated shadcn source and styles itself through these
+     names (bg-primary, border-input, ring-ring...). They were never defined, so
+     under Tailwind v4 those utilities produced no class at all and the FIVE
+     primitives actually in use rendered unstyled -- most visibly the enquiry
+     dialog, whose <Button> has no className override and therefore had no
+     background colour at all.
+     These are aliases, not a second palette: every value below is an existing
+     kinnso token, so the R1C contract (kinnso-* is the canonical colour system)
+     still holds and there is nothing new to keep in sync. */
+  --color-primary: #B94000;              /* kinnso-orange */
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #EFE3D2;            /* kinnso-cream2 */
+  --color-secondary-foreground: #211B16;
+  /* NO `--color-muted` here, deliberately. `--color-muted` already existed above as
+     a TEXT colour (#6D6257, and lib/seo/og/card.tsx mirrors it), whereas shadcn's
+     `muted` means a BACKGROUND. Defining it twice did not merge the two meanings, it
+     silently replaced one: the later value won, every `text-muted` became
+     cream-on-cream, and the article route produced 373 axe colour-contrast
+     violations. One name cannot carry both meanings, so each now uses its own
+     canonical token -- muted text is `text-kinnso-muted`, a muted surface is
+     `bg-kinnso-cream2`. `source-contracts.test.ts` fails on any duplicated token. */
+  --color-muted-foreground: #6D6257;     /* kinnso-muted */
+  --color-accent: #EFE3D2;
+  --color-accent-foreground: #211B16;
+  --color-destructive: #D24A3B;          /* kinnso-red */
+  --color-destructive-foreground: #FFFFFF;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #211B16;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #211B16;
+  --color-border: #DED5C7;               /* kinnso-edge */
+  --color-input: #DED5C7;
+  --color-ring: #B94000;
+
   /* keyframe registrations (Tailwind v4 reads --animate-* from @theme) */
   --animate-marquee: marquee 40s linear infinite;
   --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
@@ -147,7 +182,7 @@
   /* Editorial primitives (k2-*) — used by components/kinnso/editorial/*
      and the rebuilt chrome. Same utility-class-in-globals.css pattern as k-*. */
   .k2-container   { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
-  .k2-display     { font-family: var(--font-display); letter-spacing: -0.01em; }
+  .k2-display     { font-family: var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
   .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso-orangeDark; } /* 4.79:1 on white, 4.26:1 on cream (fails AA-normal by 0.24 — accepted brand deviation ②, see R1C plan D-R1C-2). Never swap to kinnso-orange (2.73:1). */
   .k2-card        { @apply overflow-hidden rounded-[4px] border border-kinnso-edge bg-white; }
   .k2-hairline    { @apply border-t border-kinnso-edge; }
@@ -165,6 +200,52 @@
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Unlike viewport media queries, em in a container query follows the container's
+   computed font size. Keep the usual desktop layout at 100%, and reuse the
+   existing accessible trays when text enlargement needs more space. */
+.k2-navbar-layout {
+  container: kinnso-navbar / inline-size;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+.k2-navbar-desktop, .k2-navbar-merchant { display: none; }
+@media (min-width: 80rem) {
+  /* Both the viewport and the capped content column must have room. A wide
+     monitor cannot make the 1200px column fit twice-sized desktop navigation. */
+  @container kinnso-navbar (min-width: 75em) {
+    .k2-navbar-desktop { display: flex; }
+    .k2-navbar-merchant { display: block; }
+    .k2-navbar-toggle { display: none; }
+  }
+}
+
+.k2-explore-controls { container: kinnso-explore / inline-size; }
+.k2-explore-sort, .k2-explore-sidebar { display: none; }
+@container kinnso-explore (min-width: 36em) {
+  .k2-explore-search { grid-template-columns: minmax(0, 1fr) auto; }
+}
+@container kinnso-explore (min-width: 60em) {
+  .k2-explore-with-sidebar { grid-template-columns: 14rem minmax(0, 1fr); }
+  .k2-explore-sort, .k2-explore-sidebar { display: block; }
+  .k2-explore-filter-trigger { display: none; }
+}
+.k2-explore-results { container: kinnso-explore-results / inline-size; }
+@container kinnso-explore-results (min-width: 32em) {
+  .k2-explore-guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container kinnso-explore-results (min-width: 44em) {
+  .k2-explore-guide-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.k2-creator-directory { container: kinnso-creators / inline-size; }
+@container kinnso-creators (min-width: 40em) {
+  .k2-creator-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container kinnso-creators (min-width: 64em) {
+  .k2-creator-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 
 body {
   background: var(--background);

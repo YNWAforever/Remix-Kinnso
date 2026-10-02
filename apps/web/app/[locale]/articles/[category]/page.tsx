@@ -64,7 +64,7 @@ export default async function CategoryPage(
       <p className="text-kinnso-muted mb-6">{total} {dict.listing.resultsCount}</p>
 
       {items.length === 0 ? (
-        <p className="text-muted">{dict.listing.noResults}</p>
+        <p className="text-kinnso-muted">{dict.listing.noResults}</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((r) => (

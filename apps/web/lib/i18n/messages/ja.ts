@@ -1163,6 +1163,10 @@ const messages: Messages = {
     cardExperiencesBody: '旅行者がまもなく予約できるツアーやアクティビティを掲載しましょう。',
     cardBookingsTitle: '予約',
     cardBookingsBody: '誰があなたの体験を予約したか確認し、完了した滞在を完了済みにできます。',
+    cardOffersTitle: '特典',
+    cardOffersBody: '店舗特典を作成し、クリエイターのガイドから旅行者が受け取れるようにします。',
+    cardRedeemTitle: 'コードを利用する',
+    cardRedeemBody: '旅行者のコードをスキャンまたは入力して、店舗での来店を確認します。',
     cardProfileTitle: '公開プロフィール',
     cardProfileBody: 'KINNSO 上でのお店の見え方を管理できます。',
     cardBudgetTitle: '予算',
@@ -1513,11 +1517,13 @@ const messages: Messages = {
     save: '保存',
     saved: '保存済み',
     signInToSave: '保存するにはログイン',
+    saveFailed: '保存できませんでした。もう一度お試しください。',
   },
   experienceSave: {
     save: '保存',
     saved: '保存済み',
     signInToSave: '保存するにはログイン',
+    saveFailed: '保存できませんでした。もう一度お試しください。',
   },
   reviews: {
     formHeading: 'レビューを書く',
@@ -1660,6 +1666,7 @@ const messages: Messages = {
     validThrough: '有効期限',
     heading: '店舗でこの画面を提示してください',
     showAt: '提示先',
+    claimFailed: 'この特典を受け取れませんでした。終了したか、上限に達した可能性があります。',
   },
   offerRedeem: {
     title: '利用受付',

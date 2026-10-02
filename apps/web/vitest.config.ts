@@ -16,6 +16,7 @@ export default defineConfig({
     },
   },
   test: {
+    maxWorkers: process.env.KINNSO_TEST_TARGET === 'local' ? 1 : undefined,
     environment: 'node',
     // Node 22+ ships an experimental native `globalThis.localStorage`, on by default in
     // this Node version, backed by nothing until `--localstorage-file=<path>` is set — it

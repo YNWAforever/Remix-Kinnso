@@ -112,12 +112,12 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
   if (faqLd) ld.push(faqLd)
 
   return (
-    <main className="k2-container py-8">
+    <div className="k2-container py-8">
       <JsonLd data={ld} />
       <ViewPing url={url} />
       <AnalyticsEntityView locale={loc} routeKey="article_detail" entityType="article" entityId={a.id} />
 
-      <nav className="text-sm text-muted mb-4" aria-label="breadcrumb">
+      <nav className="text-sm text-kinnso-muted mb-4" aria-label="breadcrumb">
         <Link href={`/${loc}`}>{dict.breadcrumb.home}</Link> ·{' '}
         <Link href={`/${loc}/articles`}>{dict.breadcrumb.articles}</Link> ·{' '}
         <Link href={`/${loc}/articles/${category}`}>{dict.categories[category as 'destinations' | 'dining' | 'shopping']}</Link>
@@ -132,7 +132,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
             {dict.article.fallbackNotice}
           </p>
         )}
-        {a.author && <p className="text-muted mt-2">{dict.article.by} {a.author.name}</p>}
+        {a.author && <p className="text-kinnso-muted mt-2">{dict.article.by} {a.author.name}</p>}
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_260px]">
@@ -149,7 +149,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
                 {a.faqs.map((f, i) => (
                   <div key={`${f.question}-${i}`} className="rounded-card border border-kinnso-cream2 p-4">
                     <dt className="font-semibold">{f.question}</dt>
-                    <dd className="text-muted mt-1">{f.answer}</dd>
+                    <dd className="text-kinnso-muted mt-1">{f.answer}</dd>
                   </div>
                 ))}
               </dl>
@@ -179,6 +179,6 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
           </div>
         </section>
       )}
-    </main>
+    </div>
   )
 }

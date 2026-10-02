@@ -68,14 +68,14 @@ describe('FeatureInterestForm', () => {
     fireEvent.submit(screen.getByRole('form'))
     expect(joinFeatureInterestActionMock).toHaveBeenCalledTimes(1)
     resolveAction({ ok: true })
-    expect(await screen.findByRole('status')).toHaveTextContent(t.success)
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(t.success))
   })
 
   it('announces success through a status region', async () => {
     renderForm()
     submit()
 
-    expect(await screen.findByRole('status')).toHaveTextContent(t.success)
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(t.success))
     expect(joinFeatureInterestActionMock).toHaveBeenCalledWith({
       feature: 'agent',
       email: 'traveller@example.com',
@@ -89,7 +89,7 @@ describe('FeatureInterestForm', () => {
     renderForm()
     submit('invalid')
 
-    expect(await screen.findByRole('status')).toHaveTextContent(t.invalidEmail)
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(t.invalidEmail))
   })
 
   it('shows localized retry feedback and clears a stale message on resubmit', async () => {
@@ -98,7 +98,7 @@ describe('FeatureInterestForm', () => {
       .mockResolvedValueOnce({ ok: true })
     renderForm()
     submit()
-    expect(await screen.findByRole('status')).toHaveTextContent(t.retry)
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(t.retry))
 
     await waitFor(() => expect(screen.getByRole('button', { name: t.submitAgent })).not.toBeDisabled())
     submit()
