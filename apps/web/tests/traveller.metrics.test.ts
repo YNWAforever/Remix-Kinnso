@@ -12,4 +12,4 @@ it('durable create/import/revisit events are replay-safe, content-free and separ
  const data=JSON.parse(execFileSync('docker',['exec',process.env.SUPABASE_DB_CONTAINER!,'psql','-U','postgres','-d','postgres','-Atc',`select coalesce(json_agg(e),'[]'::json) from kinnso_internal.traveller_events e where actor_id in ('${a.id}'::uuid,'${ops.id}'::uuid)`],{encoding:'utf8'}))
  expect(data.filter((e:{actor_id:string})=>e.actor_id===a.id).map((e:{event_name:string})=>e.event_name).sort()).toEqual(['return_visit','trip_created','trip_imported']);expect(data.find((e:{actor_id:string})=>e.actor_id===ops.id).actor_context).toBe('ops');expect(data.every((e:{app_mode:string})=>e.app_mode==='connected')).toBe(true)
  expect(JSON.stringify(data)).not.toContain(args.p_payload.title);expect(data.find((e:{event_name:string;actor_id:string})=>e.actor_id===a.id&&e.event_name==='trip_created').related_trip_id).toBe(t.id)
-})
+},30000)

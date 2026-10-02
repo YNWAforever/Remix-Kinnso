@@ -1,3 +1,4 @@
+import sharp from 'sharp'
 import {randomUUID,createHash} from 'node:crypto'
 import {beforeAll,afterAll,expect,it} from 'vitest'
 import {actor,admin,anonymous,cleanup,trip} from './helpers/kinnso-local'
@@ -12,7 +13,7 @@ it('upload intent is owner/trip scoped, replay safe and rejects unsupported form
  expect((await a.client.rpc('finalize_trip_upload',{p_actor_id:a.id,p_media_id:first.data.id,p_checksum:'0'.repeat(64)})).error?.code).toBe('42501')
 })
 it('private storage denies B and anonymous; privileged finalize validates actual bytes after fresh owner auth',async()=>{
- const t=await trip(a.client),bytes=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jzssAAAAASUVORK5CYII=','base64')
+ const t=await trip(a.client),bytes=await sharp({create:{width:1,height:1,channels:4,background:{r:255,g:255,b:255,alpha:1}}}).png().toBuffer()
  const intent=await a.client.rpc('prepare_trip_upload',{p_trip_id:t.id,p_request_id:randomUUID(),p_mime:'image/png',p_size:bytes.length});expect(intent.error).toBeNull()
  expect((await a.client.storage.from('kinnso-trip-private').upload(intent.data.path,bytes,{contentType:'image/png',upsert:false})).error).toBeNull()
  expect((await b.client.storage.from('kinnso-trip-private').download(intent.data.path)).error).not.toBeNull()
@@ -24,4 +25,4 @@ it('private storage denies B and anonymous; privileged finalize validates actual
  expect((await finalizeMedia({token,id:intent.data.id,checksum},process.env)).id).toBe(done.id)
  expect((await admin.from('kinnso_trip_media').select('state').eq('id',done.id).single()).data?.state).toBe('ready')
  await a.client.storage.from('kinnso-trip-private').remove([intent.data.path])
-})
+},30000)

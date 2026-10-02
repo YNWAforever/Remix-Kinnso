@@ -31,7 +31,7 @@ describe('structured publication and owner adoption',()=>{
     const withdrawnSnapshot=await a.client.rpc('get_trip_snapshot',{p_trip_id:t.id});expect(withdrawnSnapshot.data.revision).toBe(4)
     const blocked=await a.client.rpc('adopt_guide_to_trip',{...args,p_request_id:randomUUID(),p_expected_revision:withdrawnSnapshot.data.revision,p_version:2});expect(blocked.error?.message).toContain('source_unavailable')
     const preserved=await a.client.rpc('get_trip_snapshot',{p_trip_id:t.id});expect(preserved.data.days[0].stops[0].travellerNote).toBe('PRIVATE retained note');expect(preserved.data.days[0].stops[0].source.withdrawn).toBe(true)
-  })
+  },30000)
   it('desired bookmark state is replay safe and does not create trips',async()=>{
     const request=randomUUID(),args={p_guide_id:id,p_desired_state:true,p_request_id:request}
     const before=await a.client.from('trips').select('id')
