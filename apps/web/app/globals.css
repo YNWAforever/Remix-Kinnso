@@ -182,7 +182,7 @@
   /* Editorial primitives (k2-*) — used by components/kinnso/editorial/*
      and the rebuilt chrome. Same utility-class-in-globals.css pattern as k-*. */
   .k2-container   { @apply mx-auto w-full max-w-[1200px] px-5 sm:px-8; }
-  .k2-display     { font-family: var(--font-display); letter-spacing: -0.01em; }
+  .k2-display     { font-family: var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
   .k2-eyebrow     { @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-kinnso-orangeDark; } /* 4.79:1 on white, 4.26:1 on cream (fails AA-normal by 0.24 — accepted brand deviation ②, see R1C plan D-R1C-2). Never swap to kinnso-orange (2.73:1). */
   .k2-card        { @apply overflow-hidden rounded-[4px] border border-kinnso-edge bg-white; }
   .k2-hairline    { @apply border-t border-kinnso-edge; }

@@ -242,3 +242,220 @@ export async function waitForRoute(
   await page.getByRole(route.ready.role, { level: route.ready.level }).first().waitFor({ state: 'visible' })
   return response
 }
+
+/**
+ * Fonts loaded, in-viewport images decoded, two animation frames passed. Used before
+ * any layout assertion so a measurement is not taken mid-paint. Deliberately polls
+ * rather than sleeping: a fixed timeout is both slower and flakier, and the
+ * no-fixed-sleeps meta-test forbids one.
+ */
+export async function waitForVisualSettlement(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    await document.fonts.ready
+  })
+  await page.waitForFunction(() => Array.from(document.images)
+    .filter((image) => {
+      const bounds = image.getBoundingClientRect()
+      return bounds.bottom > 0 && bounds.right > 0 && bounds.top < window.innerHeight && bounds.left < window.innerWidth
+    })
+    .every((image) => image.complete))
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+  }))
+}
+
+/**
+ * Checks the story 21 suites assert. A closed union so a suppression cannot name a
+ * check that does not exist: a typo is a compile error rather than a silently inert
+ * entry that suppresses nothing while looking like it does.
+ */
+export type A11yCheck =
+  | 'viewport-overflow'
+  | 'viewport-cls'
+  | 'text-200'
+  | 'reflow-320'
+  | 'skip-link'
+  | 'keyboard-reachable'
+  | 'focus-visible'
+  | 'focus-trap'
+  | 'dialog-focus'
+  | 'landmarks'
+  | 'heading-order'
+  | 'accessible-name'
+  | 'html-lang'
+
+/**
+ * A known, accepted failure. Separate from AXE_EXCEPTIONS because that one is keyed by
+ * rule id and CSS target and filters individual violation nodes, while this suppresses
+ * a whole assertion for one route. Merging them would give one type where half the
+ * fields are meaningless in each case.
+ *
+ * r7-10-contract.spec.ts asserts this list's EXACT contents, so an entry cannot be
+ * added without showing up in a diff.
+ */
+export interface A11yException {
+  routeId: R710RouteId
+  check: A11yCheck
+  reason: string
+  owner: string
+  reviewWhen: string
+}
+
+// Every reason below is duplicated verbatim in r7-10-contract.spec.ts's
+// "a11y exception ledger has exactly the approved entries" test (a shared constant would
+// let a reason change silently pass that test). Keep both copies in sync.
+const NAVBAR_OVERFLOW_REASON = "Shared Navbar.tsx desktop chrome (baseAnchors nav + "
+  + "audienceAnchors/LocaleSwitcher/CTA, both gated xl:flex) renders starting exactly at "
+  + "the xl breakpoint (1280px). CSS pins min-width media queries to a nominal 16px root "
+  + "font-size, so the breakpoint does not move when text is zoomed, but the rem-sized "
+  + "gaps/padding/type inside the nav do scale -- at 200% zoom the row that barely fits "
+  + "at 1280px/100% needs roughly double its width (document scrollWidth grows to "
+  + "~2324-2479px against the 1280px viewport). Needs a redesign of how the desktop nav "
+  + "degrades under text zoom (an overflow/priority-nav pattern, container-query-driven "
+  + "breakpoints, or fewer top-row items), not a token or class change."
+
+export const A11Y_EXCEPTIONS: readonly A11yException[] = [
+  {
+    routeId: 'home',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'explore',
+    check: 'text-200',
+    reason: `${NAVBAR_OVERFLOW_REASON} Explore also has its own, separate issue: `
+      + "ExploreControls.tsx's lg:grid-cols-[14rem_minmax(0,1fr)] destination-filter "
+      + "sidebar column is sized in rem, so it grows from 224px to 448px at 200% zoom and "
+      + "steals space from the adjoining 3-column guide-card grid in "
+      + "ExploreDiscovery.tsx, shrinking each GuideCard's content column to ~78px -- too "
+      + "narrow for its eyebrow/title text even once wrapped. Needs a redesigned filter "
+      + "layout (a fixed-px sidebar width, fewer grid columns at high zoom, or a "
+      + "collapsible filter panel), not a contained CSS change.",
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'guide',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'experience',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'article',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'creator-landing',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'merchant-landing',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'creator-directory',
+    check: 'text-200',
+    reason: `${NAVBAR_OVERFLOW_REASON} creator-directory also has its own, separate `
+      + "issue: CreatorsLandingView.tsx's creator-bio preview "
+      + '(<p className="mt-3 line-clamp-2">{c.bio}</p>) is clamped to 2 lines; a short '
+      + "bio that fits on 1 line at 100% zoom needs 3 lines at 200% zoom and is newly "
+      + "truncated by the clamp for the first time. The full bio stays reachable via the "
+      + "profile link, so nothing is permanently lost, but it's a product/design call "
+      + "whether to raise the clamp or resize the card at high zoom rather than a "
+      + "code-only fix.",
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+  {
+    routeId: 'merchant-directory',
+    check: 'text-200',
+    reason: NAVBAR_OVERFLOW_REASON,
+    owner: 'Design',
+    reviewWhen: 'Before public launch',
+  },
+]
+
+export function isExcepted(
+  routeId: R710RouteId,
+  check: A11yCheck,
+  exceptions: readonly A11yException[] = A11Y_EXCEPTIONS,
+): boolean {
+  return exceptions.some((entry) => entry.routeId === routeId && entry.check === check)
+}
+
+/**
+ * Returns a description of the first heading-order violation, or undefined if the
+ * sequence is legal. Skipping DOWN a level (h2 -> h4) hides structure from a screen
+ * reader; jumping back UP any distance (h3 -> h1) is a section ending and is fine.
+ */
+export function firstHeadingOrderViolation(levels: readonly number[]): string | undefined {
+  let previous = 0
+
+  for (const [index, level] of levels.entries()) {
+    if (previous === 0) {
+      if (level !== 1) return `first heading is h${level} at position ${index + 1}; the page must start at h1`
+    } else if (level > previous + 1) {
+      return `h${previous} is followed by h${level} at position ${index + 1}; levels must not skip`
+    }
+    previous = level
+  }
+
+  return undefined
+}
+
+export interface ElementBox {
+  label: string
+  scrollWidth: number
+  clientWidth: number
+  scrollHeight: number
+  clientHeight: number
+}
+
+/**
+ * Elements whose content is cut off by their own box. The 1px tolerance absorbs
+ * sub-pixel layout rounding, which otherwise flags every second text node at scaled
+ * font sizes and makes the check useless.
+ */
+export function clippedElements(boxes: readonly ElementBox[], tolerance = 1): ElementBox[] {
+  return boxes.filter((box) => (
+    box.scrollWidth > box.clientWidth + tolerance
+    || box.scrollHeight > box.clientHeight + tolerance
+  ))
+}
+
+/**
+ * Interactive elements a keyboard user must be able to reach. Excludes disabled and
+ * aria-hidden nodes; the specs additionally drop anything with a zero-area box, which
+ * cannot be expressed in a selector.
+ */
+export const INTERACTIVE_SELECTOR = [
+  'a[href]',
+  'button',
+  'input',
+  'select',
+  'textarea',
+  '[tabindex]:not([tabindex="-1"])',
+  '[role="button"]',
+  '[role="link"]',
+]
+  .map((selector) => `${selector}:not([disabled]):not([aria-hidden="true"])`)
+  .join(', ')

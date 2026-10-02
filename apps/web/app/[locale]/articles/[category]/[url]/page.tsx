@@ -112,7 +112,7 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
   if (faqLd) ld.push(faqLd)
 
   return (
-    <main className="k2-container py-8">
+    <div className="k2-container py-8">
       <JsonLd data={ld} />
       <ViewPing url={url} />
       <AnalyticsEntityView locale={loc} routeKey="article_detail" entityType="article" entityId={a.id} />
@@ -179,6 +179,6 @@ export default async function ArticleDetailPage({ params }: { params: Params }) 
           </div>
         </section>
       )}
-    </main>
+    </div>
   )
 }
