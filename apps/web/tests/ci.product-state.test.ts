@@ -218,7 +218,7 @@ describe('CI product-state startup contract', () => {
       (block?.source.split('\n') ?? []).filter((line) => !line.trimStart().startsWith('#'))
 
     expect(keyLines(onStep).filter((line) => line.startsWith('        if:')))
-      .toEqual(["        if: github.actor != 'dependabot[bot]'"])
+      .toEqual(["        if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)"])
 
     // A softening on the job itself would neutralise the step just as completely and
     // would not appear in the step block at all.
@@ -266,7 +266,7 @@ describe('CI product-state startup contract', () => {
           R7_10_BOOKING_STATE: 'off'
         run: pnpm --filter @kinnso/e2e e2e --config playwright.r7-10.config.ts`
     const on = `      - name: R7.10 accessibility - Booking ON
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         env:
           R7_10_BOOKING_STATE: 'on'
           STRIPE_SECRET_KEY: \${{ secrets.STRIPE_SECRET_KEY }}

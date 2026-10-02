@@ -20,12 +20,16 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.event_name }}-${{ github.event.pull_request.head.ref || github.ref_name }}
-  cancel-in-progress: true
+  group: ${{ github.event_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   quality:
     runs-on: ubuntu-latest
+    env:
+      KINNSO_TEST_TARGET: local
+      KINNSO_TEST_PROJECT: kinnso-v3
+      KINNSO_APPROVED_SUPABASE_ORIGIN: http://127.0.0.1:54421
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -291,7 +295,7 @@ jobs:
       # exact condition below is therefore pinned by its own test, together with the
       # absence of `continue-on-error` on both this step and the enclosing job.
       - name: R7.10 accessibility - Booking ON
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         env:
           R7_10_BOOKING_STATE: 'on'
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}

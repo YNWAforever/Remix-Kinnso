@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { findAttributedExperience } from '../funnel-guide'
 
 const bookingLive = process.env.BOOKING_LIVE === 'true'
 
@@ -17,20 +18,7 @@ test('home to a published guide to its linked experience', async ({ page }) => {
   )
   expect(guideLinks.length, 'home should expose at least one featured guide').toBeGreaterThan(0)
 
-  let experienceHref: string | null = null
-  for (const guideHref of guideLinks) {
-    const guideResponse = await page.goto(guideHref)
-    expect(guideResponse?.status(), `${guideHref} should return HTTP 200`).toBe(200)
-    await expect(page.locator('h1')).toBeVisible()
-    await expect(page.locator('a[href^="/en/c/"]').first()).toBeVisible()
-    experienceHref = await page
-      .locator('a[href^="/en/experiences/"][href*="src=guide"]')
-      .first()
-      .getAttribute('href')
-    if (experienceHref) break
-  }
-
-  expect(experienceHref, 'a featured guide should link to a nearby experience attributed to the guide').toBeTruthy()
+  const experienceHref = await findAttributedExperience(page, guideLinks)
   const experienceResponse = await page.goto(experienceHref as string)
   expect(experienceResponse?.status(), `${experienceHref} should return HTTP 200`).toBe(200)
   await expect(page.locator('h1')).toBeVisible()

@@ -14,6 +14,7 @@ export const R7_10_OFF_SPECS = [
   'creator-onboarding.spec.ts',
   'e2e-target.spec.ts',
   'funnel-smoke.spec.ts',
+  'funnel-fixture.spec.ts',
   'honesty.spec.ts',
   'notfound.spec.ts',
   'r7-10-contract.spec.ts',
