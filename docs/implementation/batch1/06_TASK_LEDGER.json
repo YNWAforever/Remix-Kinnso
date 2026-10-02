@@ -4,7 +4,7 @@
   "owner": "Codex GPT-6.1 Sol",
   "scope": "Execute batch 1 K00-K16 first; later K17-K25 scheduled",
   "completion_summary": {
-    "new_tasks_done": 8,
+    "new_tasks_done": 9,
     "tasks_total": 26,
     "batch_1": 17,
     "later_batches": 9,
@@ -18,6 +18,7 @@
       "K01",
       "K03",
       "K04",
+      "K05",
       "K09",
       "K11",
       "K12",
@@ -25,7 +26,6 @@
     ],
     "batch_1_partial": [
       "K02",
-      "K05",
       "K06",
       "K07",
       "K08",
@@ -178,12 +178,32 @@
             "10 existing private suite skips",
             "1 Windows source symlink skip"
           ],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K00",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Actual source/PR/lock/runtime, latest unchanged remote heads and 16 original pack hashes reconciled. Exhaustive130 route files/118 AST server actions/3 workflows mapped to retained or new authoritative owner/module and permission-source evidence; actor hints are labelled static. Individual route UAT is not claimed by the inventory.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K01",
@@ -275,12 +295,29 @@
           "observedAt": "2026-10-02T17:01:19.221210+00:00",
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K01",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Public new DTO/BFF; private business/migrations; shared verified local identity, separately authenticated hostnames; unavailable modes and booking/payment disabled.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K02",
@@ -375,13 +412,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
+            "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Read-only legacy browser154 PASS/9 existing text-200 exceptions; human screen reader NOT_RUN. Existing main merchant entry semantics preserved; stale test corrected, isolated fixture phases guarded.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K02",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Read-only legacy browser154 PASS/9 existing text-200 exceptions; human screen reader NOT_RUN. Existing main merchant entry semantics preserved; stale test corrected, isolated fixture phases guarded.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
             "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Read-only legacy browser154 PASS/9 existing text-200 exceptions; human screen reader NOT_RUN. Existing main merchant entry semantics preserved; stale test corrected, isolated fixture phases guarded."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K03",
@@ -473,12 +528,32 @@
             "10 existing private suite skips",
             "1 Windows source symlink skip"
           ],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K03",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "132-file explicit source allowlist, boundary checks 3 PASS/1 Windows symlink SKIP, canonical committed blob match, extracted npm ci/test/build/typecheck PASS. Local guidance and all private content excluded.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K04",
@@ -557,12 +632,29 @@
           "observedAt": "2026-10-02T17:01:19.221210+00:00",
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K04",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "SSR no-JS en/zh-HK, unknown locale404, 320/375/768/1280, 200% text and keyboard/focus local browser checks; connected/demo separation and noindex/private no-store; legacy handoff regression retained.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K05",
@@ -578,7 +670,7 @@
         "A16",
         "G17"
       ],
-      "implementation_status": "PARTIAL",
+      "implementation_status": "DONE",
       "files": [
         "修改 Remix/apps/e2e/specs/funnel-smoke.spec.ts、.github/workflows/nightly-funnel.yml",
         "檢查 #132 的 .github/workflows/ci.yml 與 apps/web/tests/ci.product-state.test.ts",
@@ -599,7 +691,7 @@
       "verification": "pnpm --filter @kinnso/e2e exec playwright test funnel-smoke funnel-fixture --workers=1；pnpm --filter web test -- tests/ci.product-state.test.ts；驗 GitHub 最新 head 的 job 結果，無 skipped gate 冒充成功。",
       "external_dependencies": "無；按依賴次序執行",
       "owner": "Codex GPT-6.1 Sol",
-      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "verification_status": "PASS",
       "completion_evidence": [
         {
           "taskId": "K05",
@@ -633,13 +725,29 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
-            "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Local fixture2 PASS; current remote CI recorded separately, trusted provider jobs unavailable locally."
+            "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Local fixture2 PASS; current remote CI recorded separately, trusted provider jobs unavailable locally.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
           ]
+        },
+        {
+          "taskId": "K05",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Current private head local funnel-smoke/fixture4 PASS; latest trusted CI quality/scan image/e2e SUCCESS, quality3701 PASS/1 SKIP, Booking OFF169 PASS/10 SKIP and Booking ON test mode3 PASS/1 SKIP. Conditional cutover jobs explicitly SKIPPED; not staging/cutover acceptance.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
         }
       ],
-      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K06",
@@ -716,13 +824,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
+            "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K06",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
             "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K07",
@@ -831,13 +957,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
+            "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K07",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
             "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K08",
@@ -914,13 +1058,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
+            "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K08",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
             "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K09",
@@ -1011,12 +1173,29 @@
           "observedAt": "2026-10-02T17:01:19.221210+00:00",
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K09",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Atomic aggregate commands/revisions, day/stop/note/media/source boundaries, request digests/replay/tombstones and direct grant restrictions; concurrency, captured revoked JWT legacy/v2 writes and cross-owner API regressions PASS.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K10",
@@ -1107,13 +1286,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
-            "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Browser retry after committed response loss yields one version. Human-author rights and real staging content missing."
+            "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Browser retry after committed response loss yields one version. Human-author rights and real staging content missing.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K10",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Explicit pre-write comparison states appended copy/versions/days/stops/private notes; conflict requires fresh review, unknown response retries same ID exactly once. Human-author rights and real staging content missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Explicit pre-write comparison states appended copy/versions/days/stops/private notes; conflict requires fresh review, unknown response retries same ID exactly once. Human-author rights and real staging content missing."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K11",
@@ -1208,12 +1405,29 @@
           "observedAt": "2026-10-02T17:01:19.221210+00:00",
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K11",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Connected Journeys auth/catalog/bookmark/home/trip editor use persisted local services; reload/second context/owner denial, title/date/timezone/day/stop/reorder/delete, explicit conflicts and honest save states verified.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K12",
@@ -1302,12 +1516,29 @@
           "observedAt": "2026-10-02T17:01:19.221210+00:00",
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K12",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Guest/demo identity preview, explicit account import, bounded untrusted payloads, stable replay and original data retained; source credit not trusted; pending unknown legacy photo metadata remains partial.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K13",
@@ -1402,13 +1633,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
+            "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K13",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
             "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K14",
@@ -1498,13 +1747,31 @@
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
           "limitations": [
+            "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K14",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
             "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K15",
@@ -1590,12 +1857,29 @@
           "observedAt": "2026-10-02T17:01:19.221210+00:00",
           "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
           "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K15",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Deterministic hours/overlap/unknown travel/cross-day/DST/undated reminders, no invented travel precision; flat canonical aliases preserve old refs; private owner reports and audited ops review; reasoned overrides tested.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
           "limitations": []
         }
       ],
       "readiness": "COMPLETE_LOCAL",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K16",
@@ -1701,13 +1985,34 @@
             "1 Windows source symlink skip"
           ],
           "limitations": [
-            "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Uncached complete quality suite, read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN."
+            "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Uncached complete quality suite, read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K16",
+          "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+          "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Public79 unit/4 integration/16 browser and 132-file extracted build PASS; private local3692 PASS/10 SKIP across7 uncached tasks; trusted remote quality3701 PASS/1 SKIP with browser jobs SUCCESS; read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T18:33:03.235155+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": [
+            "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Public79 unit/4 integration/16 browser and 132-file extracted build PASS; private local3692 PASS/10 SKIP across7 uncached tasks; trusted remote quality3701 PASS/1 SKIP with browser jobs SUCCESS; read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN."
           ]
         }
       ],
       "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
       "gate": "BATCH_1",
-      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+      "updated_at": "2026-10-02T18:33:03.235155+00:00"
     },
     {
       "id": "K17",
@@ -3079,9 +3384,9 @@
     "Never include credentials or private user content in evidence"
   ],
   "execution_current": {
-    "observedAt": "2026-10-02T17:01:19.221210+00:00",
-    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
-    "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+    "observedAt": "2026-10-02T18:33:03.235155+00:00",
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "backendSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
     "schemaHead": "20261002154501",
     "historicalBaselinePreserved": true,
     "status": "PARTIAL",

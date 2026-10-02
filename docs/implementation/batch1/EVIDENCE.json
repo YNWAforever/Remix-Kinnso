@@ -1,7 +1,7 @@
 {
-  "observedAt": "2026-10-02T17:01:19.221210+00:00",
-  "frontendSourceSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
-  "backendSourceSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+  "observedAt": "2026-10-02T18:33:03.235155+00:00",
+  "frontendSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+  "backendSourceSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
   "schemaHead": "20261002154501",
   "environment": "LOCAL_SYNTHETIC",
   "overall": "PARTIAL",
@@ -9,72 +9,72 @@
   "production": "NOT_RUN",
   "logs": {
     "publicUnit": {
-      "path": ".local-private/public-committed-unit.log",
-      "sha256": "2b9f2a8366804679a1ee7983e107ad368c2df08bb7cfd1b2a3023ee2b90dfe5f",
-      "bytes": 6651
+      "path": ".local-private/public-current-unit.log",
+      "sha256": "3bddf0128e0e53746fa6aad3d857b7e594cf8f100cbe4968b8716711d1528f2a",
+      "bytes": 6939
     },
     "publicBuild": {
-      "path": ".local-private/public-committed-build.log",
-      "sha256": "8906ed4e372fb7813ed9574874a539b9d197fb4d27c79767beb11f21147c446e",
-      "bytes": 1463
+      "path": ".local-private/public-comparison-build.log",
+      "sha256": "f2371bdb088dc81cf87ed2fec564fee1799a55cea05079c24e4110bf0c3ae111",
+      "bytes": 1464
     },
     "publicTypes": {
-      "path": ".local-private/public-committed-typecheck.log",
+      "path": ".local-private/public-current-types.log",
       "sha256": "252159596f2610e7ad7114529e0ca7c6581d2908b22c3fd4a85a5f7d2be933a6",
       "bytes": 49
     },
     "publicIntegration": {
-      "path": ".local-private/public-final-integration.log",
-      "sha256": "a4d62eef543b88837a9766a8e3399898393b85b6de0096dfb340d88eafc62de6",
-      "bytes": 606
+      "path": ".local-private/public-current-integration.log",
+      "sha256": "d2a98709d8aba9adde66774603a1dc3509fa68095c84b64ab94d84ea5b67bda1",
+      "bytes": 604
     },
     "publicBrowser": {
-      "path": ".local-private/public-final-browser.log",
-      "sha256": "fed4cd55f4ce38230b07225d440942af861db4b30cf390366f8453eb4a3d8ccc",
-      "bytes": 2464
+      "path": ".local-private/public-current-browser.log",
+      "sha256": "a690b4a82f53bc01d5d8b4c25d79509612402a0f504ea19fd9bd5294f9994242",
+      "bytes": 2812
     },
     "sourceBoundary": {
-      "path": ".local-private/source-boundary-final.log",
-      "sha256": "01b6af3ef7c79acede6650e7a3f00def8935ac0796dd4c31eac493491fcd4f8b",
+      "path": ".local-private/source-boundary-current.log",
+      "sha256": "07479cc26c47f290cd0e64a7324c60b486e8c7dc89c338943a149bd1ac9d7bf4",
       "bytes": 119
     },
     "archiveInstall": {
-      "path": ".local-private/archive-final-ci.log",
-      "sha256": "2005ebdb93405b683190ee44d2d143b4ea3a7766ed9289ef65124c19a20491d8",
-      "bytes": 458
+      "path": ".local-private/archive-current-ci.log",
+      "sha256": "89d27796829f85b3bd6879cc71d90553cf8255aa4b04a3bd1044fc0406fd669d",
+      "bytes": 337
     },
     "archiveUnit": {
-      "path": ".local-private/archive-final-unit.log",
-      "sha256": "456f0d1e69d6302c40bbef30a46a8294ce9c85e50359061573e83d85471e4971",
-      "bytes": 6648
+      "path": ".local-private/archive-current-unit.log",
+      "sha256": "ddd1e7c42d443babacde235631ed59f35c91fcd69ae70a6e4c28b0ceadb67254",
+      "bytes": 6934
     },
     "archiveBuild": {
-      "path": ".local-private/archive-final-build.log",
-      "sha256": "a0802873a94d7dc1667ff82a91f4505ba19b863fbde39079f673c584eba09a26",
-      "bytes": 1436
+      "path": ".local-private/archive-current-build.log",
+      "sha256": "445c0d2374d9bd01549fcb74dac94cc0e08702673531cf84b66dee77b5e9b4c4",
+      "bytes": 1437
     },
     "archiveTypes": {
-      "path": ".local-private/archive-final-typecheck.log",
+      "path": ".local-private/archive-current-types.log",
       "sha256": "252159596f2610e7ad7114529e0ca7c6581d2908b22c3fd4a85a5f7d2be933a6",
       "bytes": 49
     },
     "privateRegression": {
-      "path": ".local-private/private-final-regression-green.log",
-      "sha256": "0359666c5739adc920e9482e061aa09e562a544f94ea8458846f310c82bde1b2",
-      "bytes": 190173
+      "path": ".local-private/private-ci-fix-regression-serial.log",
+      "sha256": "ba4c99b476c55f74bce1b964d9ca79c7984c8450d01dd51d2996fc6ce094bf65",
+      "bytes": 174591
     },
     "privateTypes": {
-      "path": ".local-private/private-final-typecheck.log",
-      "sha256": "0620e82aad41d10299b84eb6a2e61d4f19fe853105de7e51eeff065c736e51ab",
+      "path": ".local-private/private-ci-fix-types.log",
+      "sha256": "ed6e106d8cf4859b8a191f11cfd92720500f7ee74bddb9082427720af17f8f34",
       "bytes": 1241
     },
     "privateLint": {
-      "path": ".local-private/private-final-lint.log",
-      "sha256": "b7f1fd8d9efebc3047b5e1b26c0ac8ca43c9792a97033f98abe0b80418912e50",
+      "path": ".local-private/private-ci-fix-lint.log",
+      "sha256": "6dd2c24e749741f03cf199bbc459812818c1875c96f3b759e6624648c19b23a2",
       "bytes": 9027
     },
     "privateHonesty": {
-      "path": ".local-private/private-final-honesty.log",
+      "path": ".local-private/private-ci-fix-honesty.log",
       "sha256": "d1aafe7b2128ca7e487019b47823c54d2ac26e958851b3dc6d7b38ffad7fa379",
       "bytes": 31
     },
@@ -122,26 +122,70 @@
       "path": ".local-private/local-flag-rollback.log",
       "sha256": "5a8f3f70ed370d12adb7399c98b5f158ba863de67f7f89fa452fb07b083c3952",
       "bytes": 82
+    },
+    "nightlyLocalSmoke": {
+      "path": ".local-private/nightly-current-smoke.log",
+      "sha256": "c1491877817aeeb1ea2dd295a68f3d177609a2ec6d46da43dc8fafffcce7dfd8",
+      "bytes": 1133
+    },
+    "adoptionAccountRed": {
+      "path": ".local-private/public-comparison-account-red.log",
+      "sha256": "d8f13327cccc1363f0d154d8928370645d28e3032c02ab9531acc0fafda01c93",
+      "bytes": 5891
+    },
+    "adoptionAccountGreen": {
+      "path": ".local-private/public-comparison-account-green.log",
+      "sha256": "d509f593fca292a516d898d4410452fd949ec147dd7652a81265727f98103966",
+      "bytes": 827
+    },
+    "turboEnvRed": {
+      "path": ".local-private/turbo-env-red.log",
+      "sha256": "181fe45998fe6e15a682632988201cc8ecacff99228724bbce01862e6230248d",
+      "bytes": 77
+    },
+    "turboEnvGreen": {
+      "path": ".local-private/turbo-env-green.log",
+      "sha256": "62cadc9c5f90a25b5ed7387a87d2e348af95dcfa195f63c6bccf5163af4d7d95",
+      "bytes": 112
+    },
+    "mediaCleanupCurrent": {
+      "path": ".local-private/media-cleanup-current.log",
+      "sha256": "fed07a6acd88558b18433b50aefd6cbbfaa4535f8f31140511f8564c47ffb86c",
+      "bytes": 46
+    },
+    "localRollbackCurrent": {
+      "path": ".local-private/local-flag-rollback-current.log",
+      "sha256": "5a8f3f70ed370d12adb7399c98b5f158ba863de67f7f89fa452fb07b083c3952",
+      "bytes": 82
+    },
+    "browserFixtureFailure": {
+      "path": ".local-private/public-comparison-browser-fixture-failure.log",
+      "sha256": "a8a167a65412e7cbc6bea4dbdcd4e1265cd02f774653a2f7a011650ba0300ea8",
+      "bytes": 5225
     }
   },
   "results": {
     "publicUnit": {
-      "pass": 76,
+      "pass": 79,
       "skip": 0
     },
     "privateRegression": {
       "pass": 3692,
       "skip": 10,
-      "tasks": 7
+      "tasks": 7,
+      "cached": 0
     },
     "publicIntegration": {
       "pass": 4
     },
     "publicBrowser": {
-      "pass": 14
+      "pass": 16
     },
     "nightlyFixture": {
       "pass": 2
+    },
+    "nightlyLocalSmoke": {
+      "pass": 4
     },
     "sourceBoundary": {
       "pass": 3,
@@ -150,7 +194,9 @@
     },
     "privateTypes": {
       "tasks": 8,
-      "result": "PASS"
+      "result": "PASS",
+      "localLatestCached": 8,
+      "remoteCurrentCached": 0
     },
     "lint": {
       "errors": 0,
@@ -165,50 +211,124 @@
       "reason": "Retained text-200 Design exceptions; not human screen-reader acceptance"
     }
   },
+  "remoteCI": {
+    "observedAt": "2026-10-02T18:20:44.167483+00:00",
+    "head": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "url": "https://github.com/YNWAforever/Remix-Kinnso/actions/runs/37039770188",
+    "conclusion": "SUCCESS",
+    "jobs": [
+      {
+        "name": "quality",
+        "result": "success"
+      },
+      {
+        "name": "Scan worker image",
+        "result": "success"
+      },
+      {
+        "name": "e2e",
+        "result": "success"
+      }
+    ],
+    "quality": {
+      "pass": 3701,
+      "skip": 1,
+      "tasks": 7,
+      "cached": 0,
+      "packages": [
+        {
+          "pass": 11,
+          "skip": 0
+        },
+        {
+          "pass": 40,
+          "skip": 0
+        },
+        {
+          "pass": 27,
+          "skip": 0
+        },
+        {
+          "pass": 91,
+          "skip": 1
+        },
+        {
+          "pass": 92,
+          "skip": 0
+        },
+        {
+          "pass": 187,
+          "skip": 0
+        },
+        {
+          "pass": 3253,
+          "skip": 0
+        }
+      ]
+    },
+    "browser": {
+      "bookingOff": {
+        "pass": 169,
+        "skip": 10
+      },
+      "profileEnquiry": {
+        "pass": 1
+      },
+      "bookingOnTestMode": {
+        "pass": 3,
+        "skip": 1
+      }
+    },
+    "limitations": [
+      "CI uses synthetic isolated local stack, not approved cloud staging",
+      "Booking ON is test mode; no live payment acceptance",
+      "Conditional cutover/parity jobs are skipped and not release acceptance"
+    ]
+  },
   "archive": {
-    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
-    "files": 130,
-    "entries": 131,
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "files": 132,
+    "entries": 133,
     "sourceMatchesCommittedBlobHashes": true,
     "dirty": true,
     "dirtyReason": "Untracked Next-generated local AGENTS.md and CLAUDE.md deliberately excluded",
-    "archiveSha256": "db1368673792036368043bb8537d40b661806a1cfcb311d6fc22fc20a4a07a0a",
-    "target": "C:\\Users\\laich\\Documents\\KinnsoOS\\.local-private\\archive-final-ecc62d773837"
+    "archiveSha256": "b644dae7a03bc2af8a9c2de70708381430cb14799a0954303a689d869c1f353c",
+    "target": "C:\\Users\\laich\\Documents\\KinnsoOS\\.local-private\\archive-final-a01f273ff53a"
   },
   "performance": {
     "environment": "synthetic local preview",
     "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
-    "measuredAt": "2026-10-02T16:55:45.534Z",
+    "measuredAt": "2026-10-02T18:20:23.086Z",
     "conditions": "Desktop Chromium; unthrottled; three observations; not representative mobile or cloud p95",
     "samples": [
       {
         "route": "/en",
         "mode": "connected",
         "actor": "anonymous",
-        "ttfbMs": 15.200000017881393,
-        "domContentLoadedMs": 32.5,
-        "loadMs": 195.39999997615814,
-        "lcpMs": 148,
+        "ttfbMs": 8.799999982118607,
+        "domContentLoadedMs": 28.69999998807907,
+        "loadMs": 158.5,
+        "lcpMs": 120,
         "resources": 25
       },
       {
         "route": "/en/explore",
         "mode": "connected",
         "actor": "anonymous",
-        "ttfbMs": 13.199999988079071,
-        "domContentLoadedMs": 47.5,
-        "loadMs": 47.70000001788139,
-        "lcpMs": 40,
+        "ttfbMs": 10.700000017881393,
+        "domContentLoadedMs": 47.30000001192093,
+        "loadMs": 48.10000002384186,
+        "lcpMs": 44,
         "resources": 30
       },
       {
         "route": "/zh-HK",
         "mode": "connected",
         "actor": "anonymous",
-        "ttfbMs": 5.700000017881393,
-        "domContentLoadedMs": 117.80000001192093,
-        "loadMs": 118,
-        "lcpMs": 132,
+        "ttfbMs": 8.400000005960464,
+        "domContentLoadedMs": 132.89999997615814,
+        "loadMs": 133.09999999403954,
+        "lcpMs": 148,
         "resources": 25
       }
     ]
@@ -224,20 +344,20 @@
     "publicFixSha": "d9a1a3b165e36d504aae48de371e6e647dd2d2fb"
   },
   "privateProductionBuild": {
-    "verifiedRuntimeSourceSha": "184149d8c0f31fdf98de1cda7c6316f60d517ac8",
-    "laterChangesOnlyTestsAndGuardedFixtureRunner": true,
-    "currentSourceSha": "b5f577533c07be354091e88861a7138639b0c7b5",
-    "explanation": "Only five test files and the guarded local fixture runner changed afterwards; current types/lint and uncached complete tests were rerun. Application runtime build inputs are unchanged."
+    "localVerifiedRuntimeSourceSha": "184149d8c0f31fdf98de1cda7c6316f60d517ac8",
+    "remoteVerifiedSourceSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "currentSourceSha": "223372f923adec3e5b4c2b9ff829e7830768e98e",
+    "explanation": "Latest trusted CI executed uncached production build, types/lint and complete tests at this source SHA. Local running build has identical application runtime inputs; subsequent changes are tests, fixture helper, documentation and Turbo/CI environment forwarding."
   },
   "publicProductionBuild": {
-    "verifiedRuntimeSourceSha": "792a5464f25ae9ac646a673fe2f508ac6ade85ef",
-    "currentSourceSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
-    "laterChangeOnlyBrowserAssertion": true,
+    "verifiedRuntimeSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "currentSourceSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
+    "buildWorktreeMatchesCommittedApplicationInputs": true,
     "currentHeadExtractedSourceBuild": "PASS"
   },
   "localFlagRollback": {
     "environment": "verified synthetic local only",
-    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "frontendSha": "a01f273ff53a870d58cd28319a9646fac0c9eeca",
     "schemaHead": "20261002154501",
     "disabledTripStatus": 503,
     "disabledTripCode": "UNAVAILABLE",
@@ -246,7 +366,7 @@
     "migrationReversal": "NOT_RUN",
     "cloudRollback": "NOT_RUN",
     "result": "PASS",
-    "observedAt": "2026-10-02T16:58:32.159Z"
+    "observedAt": "2026-10-02T18:24:14.250Z"
   },
   "unrunLocalProviderJourneys": [
     "Booking ON (missing approved test-mode provider credentials)",
@@ -271,10 +391,10 @@
     ]
   },
   "localMediaCleanup": {
-    "previousRemoved": 15,
-    "latestRemoved": 4,
+    "previousRemoved": 19,
+    "latestRemoved": 8,
     "result": "PASS",
-    "artifact": ".local-private/media-cleanup-final-after-browser.log",
+    "artifact": ".local-private/media-cleanup-current.log",
     "target": "verified synthetic local only"
   }
 }
