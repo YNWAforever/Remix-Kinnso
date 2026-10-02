@@ -1,0 +1,280 @@
+{
+  "observedAt": "2026-10-02T17:01:19.221210+00:00",
+  "frontendSourceSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+  "backendSourceSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+  "schemaHead": "20261002154501",
+  "environment": "LOCAL_SYNTHETIC",
+  "overall": "PARTIAL",
+  "cloudStaging": "BLOCKED",
+  "production": "NOT_RUN",
+  "logs": {
+    "publicUnit": {
+      "path": ".local-private/public-committed-unit.log",
+      "sha256": "2b9f2a8366804679a1ee7983e107ad368c2df08bb7cfd1b2a3023ee2b90dfe5f",
+      "bytes": 6651
+    },
+    "publicBuild": {
+      "path": ".local-private/public-committed-build.log",
+      "sha256": "8906ed4e372fb7813ed9574874a539b9d197fb4d27c79767beb11f21147c446e",
+      "bytes": 1463
+    },
+    "publicTypes": {
+      "path": ".local-private/public-committed-typecheck.log",
+      "sha256": "252159596f2610e7ad7114529e0ca7c6581d2908b22c3fd4a85a5f7d2be933a6",
+      "bytes": 49
+    },
+    "publicIntegration": {
+      "path": ".local-private/public-final-integration.log",
+      "sha256": "a4d62eef543b88837a9766a8e3399898393b85b6de0096dfb340d88eafc62de6",
+      "bytes": 606
+    },
+    "publicBrowser": {
+      "path": ".local-private/public-final-browser.log",
+      "sha256": "fed4cd55f4ce38230b07225d440942af861db4b30cf390366f8453eb4a3d8ccc",
+      "bytes": 2464
+    },
+    "sourceBoundary": {
+      "path": ".local-private/source-boundary-final.log",
+      "sha256": "01b6af3ef7c79acede6650e7a3f00def8935ac0796dd4c31eac493491fcd4f8b",
+      "bytes": 119
+    },
+    "archiveInstall": {
+      "path": ".local-private/archive-final-ci.log",
+      "sha256": "2005ebdb93405b683190ee44d2d143b4ea3a7766ed9289ef65124c19a20491d8",
+      "bytes": 458
+    },
+    "archiveUnit": {
+      "path": ".local-private/archive-final-unit.log",
+      "sha256": "456f0d1e69d6302c40bbef30a46a8294ce9c85e50359061573e83d85471e4971",
+      "bytes": 6648
+    },
+    "archiveBuild": {
+      "path": ".local-private/archive-final-build.log",
+      "sha256": "a0802873a94d7dc1667ff82a91f4505ba19b863fbde39079f673c584eba09a26",
+      "bytes": 1436
+    },
+    "archiveTypes": {
+      "path": ".local-private/archive-final-typecheck.log",
+      "sha256": "252159596f2610e7ad7114529e0ca7c6581d2908b22c3fd4a85a5f7d2be933a6",
+      "bytes": 49
+    },
+    "privateRegression": {
+      "path": ".local-private/private-final-regression-green.log",
+      "sha256": "0359666c5739adc920e9482e061aa09e562a544f94ea8458846f310c82bde1b2",
+      "bytes": 190173
+    },
+    "privateTypes": {
+      "path": ".local-private/private-final-typecheck.log",
+      "sha256": "0620e82aad41d10299b84eb6a2e61d4f19fe853105de7e51eeff065c736e51ab",
+      "bytes": 1241
+    },
+    "privateLint": {
+      "path": ".local-private/private-final-lint.log",
+      "sha256": "b7f1fd8d9efebc3047b5e1b26c0ac8ca43c9792a97033f98abe0b80418912e50",
+      "bytes": 9027
+    },
+    "privateHonesty": {
+      "path": ".local-private/private-final-honesty.log",
+      "sha256": "d1aafe7b2128ca7e487019b47823c54d2ac26e958851b3dc6d7b38ffad7fa379",
+      "bytes": 31
+    },
+    "privateBuild": {
+      "path": ".local-private/private-final-build.log",
+      "sha256": "b637c8846c10b0de9b9c25ee628be2721b1b55256548f0a31c74f4cb37a102ef",
+      "bytes": 7871
+    },
+    "nightlyFixture": {
+      "path": ".local-private/nightly-final-fixture.log",
+      "sha256": "9fc7ca2fc5891f8b99589045380b7f65829456bc38507dd5deedbb14bfbba2d3",
+      "bytes": 800
+    },
+    "localRehearsal": {
+      "path": ".local-private/rehearsal-final.log",
+      "sha256": "3e5f19148b22a237f1c1e80b6dcf7bba50d5be36c1679e5c7b01f3d6c47a5bd5",
+      "bytes": 2340
+    },
+    "reviewPrivate": {
+      "path": ".local-private/review-private-green-final.log",
+      "sha256": "017506413f68e5cd9e0e1dc709964e40a372808a38465f884212b3051f9fc48b",
+      "bytes": 269
+    },
+    "reviewBrowser": {
+      "path": ".local-private/review-public-green.log",
+      "sha256": "7ce16bbc1c8ee7f8f9ebc736cc0cbfa4c6ec62f8a0ee931c7d489fe10ca969ce",
+      "bytes": 781
+    },
+    "fixtures": {
+      "path": ".local-private/final-fixtures-green.log",
+      "sha256": "8d68c08f0f6981ef64581cb87e61583e92d66bca4aa95f603b96a112e693998d",
+      "bytes": 264
+    },
+    "privateBrowserSubset": {
+      "path": ".local-private/private-final-browser-subset.log",
+      "sha256": "2bac25764023d129a841c8ee2af0ea8e42b953b443e44d94287b2768fd016475",
+      "bytes": 26441
+    },
+    "mediaCleanup": {
+      "path": ".local-private/media-cleanup-final-after-browser.log",
+      "sha256": "c86051714a93710dc56393eda431657f59f623125d33e534e292e34a0d167e45",
+      "bytes": 46
+    },
+    "localFlagRollback": {
+      "path": ".local-private/local-flag-rollback.log",
+      "sha256": "5a8f3f70ed370d12adb7399c98b5f158ba863de67f7f89fa452fb07b083c3952",
+      "bytes": 82
+    }
+  },
+  "results": {
+    "publicUnit": {
+      "pass": 76,
+      "skip": 0
+    },
+    "privateRegression": {
+      "pass": 3692,
+      "skip": 10,
+      "tasks": 7
+    },
+    "publicIntegration": {
+      "pass": 4
+    },
+    "publicBrowser": {
+      "pass": 14
+    },
+    "nightlyFixture": {
+      "pass": 2
+    },
+    "sourceBoundary": {
+      "pass": 3,
+      "skip": 1,
+      "reason": "Windows symlink creation unavailable"
+    },
+    "privateTypes": {
+      "tasks": 8,
+      "result": "PASS"
+    },
+    "lint": {
+      "errors": 0,
+      "warnings": 31
+    },
+    "publicBuild": "PASS",
+    "privateBuild": "PASS",
+    "archive": "PASS",
+    "privateBrowserSubset": {
+      "pass": 154,
+      "skip": 9,
+      "reason": "Retained text-200 Design exceptions; not human screen-reader acceptance"
+    }
+  },
+  "archive": {
+    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "files": 130,
+    "entries": 131,
+    "sourceMatchesCommittedBlobHashes": true,
+    "dirty": true,
+    "dirtyReason": "Untracked Next-generated local AGENTS.md and CLAUDE.md deliberately excluded",
+    "archiveSha256": "db1368673792036368043bb8537d40b661806a1cfcb311d6fc22fc20a4a07a0a",
+    "target": "C:\\Users\\laich\\Documents\\KinnsoOS\\.local-private\\archive-final-ecc62d773837"
+  },
+  "performance": {
+    "environment": "synthetic local preview",
+    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "measuredAt": "2026-10-02T16:55:45.534Z",
+    "conditions": "Desktop Chromium; unthrottled; three observations; not representative mobile or cloud p95",
+    "samples": [
+      {
+        "route": "/en",
+        "mode": "connected",
+        "actor": "anonymous",
+        "ttfbMs": 15.200000017881393,
+        "domContentLoadedMs": 32.5,
+        "loadMs": 195.39999997615814,
+        "lcpMs": 148,
+        "resources": 25
+      },
+      {
+        "route": "/en/explore",
+        "mode": "connected",
+        "actor": "anonymous",
+        "ttfbMs": 13.199999988079071,
+        "domContentLoadedMs": 47.5,
+        "loadMs": 47.70000001788139,
+        "lcpMs": 40,
+        "resources": 30
+      },
+      {
+        "route": "/zh-HK",
+        "mode": "connected",
+        "actor": "anonymous",
+        "ttfbMs": 5.700000017881393,
+        "domContentLoadedMs": 117.80000001192093,
+        "loadMs": 118,
+        "lcpMs": 132,
+        "resources": 25
+      }
+    ]
+  },
+  "review": {
+    "reviewer": "single fresh gpt-6-astra read-only whole-branch review",
+    "critical": 2,
+    "important": 7,
+    "minor": 0,
+    "findingsFixed": 9,
+    "ruling": "Fixes verified by executor RED/GREEN and fresh whole-suite results; no second reviewer verdict is claimed",
+    "privateFixSha": "184149d8c0f31fdf98de1cda7c6316f60d517ac8",
+    "publicFixSha": "d9a1a3b165e36d504aae48de371e6e647dd2d2fb"
+  },
+  "privateProductionBuild": {
+    "verifiedRuntimeSourceSha": "184149d8c0f31fdf98de1cda7c6316f60d517ac8",
+    "laterChangesOnlyTestsAndGuardedFixtureRunner": true,
+    "currentSourceSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+    "explanation": "Only five test files and the guarded local fixture runner changed afterwards; current types/lint and uncached complete tests were rerun. Application runtime build inputs are unchanged."
+  },
+  "publicProductionBuild": {
+    "verifiedRuntimeSourceSha": "792a5464f25ae9ac646a673fe2f508ac6ade85ef",
+    "currentSourceSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "laterChangeOnlyBrowserAssertion": true,
+    "currentHeadExtractedSourceBuild": "PASS"
+  },
+  "localFlagRollback": {
+    "environment": "verified synthetic local only",
+    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "schemaHead": "20261002154501",
+    "disabledTripStatus": 503,
+    "disabledTripCode": "UNAVAILABLE",
+    "legacyStatus": 200,
+    "schemaUnchanged": true,
+    "migrationReversal": "NOT_RUN",
+    "cloudRollback": "NOT_RUN",
+    "result": "PASS",
+    "observedAt": "2026-10-02T16:58:32.159Z"
+  },
+  "unrunLocalProviderJourneys": [
+    "Booking ON (missing approved test-mode provider credentials)",
+    "Paid creator scan/onboarding",
+    "Cloud/staging cutover or backup restore",
+    "Physical phone and human screen reader"
+  ],
+  "originalSites": {
+    "observedAt": "2026-10-02T16:22:34.424141+00:00",
+    "requests": "read-only GET, no mutation",
+    "sites": [
+      {
+        "url": "https://remix-kinnso-web.vercel.app/en",
+        "status": 200,
+        "finalUrl": "https://remix-kinnso-web.vercel.app/en"
+      },
+      {
+        "url": "https://kinnso-journeys.laichiwillyjp.chatgpt.site/",
+        "status": 200,
+        "finalUrl": "https://kinnso-journeys.laichiwillyjp.chatgpt.site/zh-HK"
+      }
+    ]
+  },
+  "localMediaCleanup": {
+    "previousRemoved": 15,
+    "latestRemoved": 4,
+    "result": "PASS",
+    "artifact": ".local-private/media-cleanup-final-after-browser.log",
+    "target": "verified synthetic local only"
+  }
+}

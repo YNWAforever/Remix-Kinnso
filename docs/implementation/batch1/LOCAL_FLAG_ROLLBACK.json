@@ -1,0 +1,13 @@
+{
+  "environment": "verified synthetic local only",
+  "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+  "schemaHead": "20261002154501",
+  "disabledTripStatus": 503,
+  "disabledTripCode": "UNAVAILABLE",
+  "legacyStatus": 200,
+  "schemaUnchanged": true,
+  "migrationReversal": "NOT_RUN",
+  "cloudRollback": "NOT_RUN",
+  "result": "PASS",
+  "observedAt": "2026-10-02T16:58:32.159Z"
+}

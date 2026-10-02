@@ -1,0 +1,3096 @@
+{
+  "schema_version": 1,
+  "plan_date": "2026-10-01",
+  "owner": "Codex GPT-6.1 Sol",
+  "scope": "Execute batch 1 K00-K16 first; later K17-K25 scheduled",
+  "completion_summary": {
+    "new_tasks_done": 8,
+    "tasks_total": 26,
+    "batch_1": 17,
+    "later_batches": 9,
+    "audit_findings": 20,
+    "supplementary_requirements": 18,
+    "user_stories": 6,
+    "additional_evidence": 9,
+    "batch_1_status": "PARTIAL",
+    "batch_1_done": [
+      "K00",
+      "K01",
+      "K03",
+      "K04",
+      "K09",
+      "K11",
+      "K12",
+      "K15"
+    ],
+    "batch_1_partial": [
+      "K02",
+      "K05",
+      "K06",
+      "K07",
+      "K08",
+      "K10",
+      "K13",
+      "K14",
+      "K16"
+    ],
+    "batch_1_blocked_tasks": [],
+    "later_batches_status": "NOT_STARTED"
+  },
+  "baseline": {
+    "observed_at": "2026-10-01",
+    "method": "GitHub connector read-only metadata, PRs, commits and workflow runs; original audit reports",
+    "new_repository": {
+      "url": "https://github.com/YNWAforever/KinnsoOS",
+      "visibility": "public",
+      "default_branch": "main",
+      "main_sha": "4507686c9fac761554fa66d9756a850172e1c9ce",
+      "working_branch": "feat/journeys-integration-foundation",
+      "working_sha": "f181cff22d28a480120c2abaa2dde91c573582bf",
+      "pr": 1,
+      "state": "OPEN_DRAFT_UNMERGED",
+      "ci_run_ids": [
+        36833935737,
+        36833934872
+      ],
+      "ci_conclusion": "success"
+    },
+    "old_repository": {
+      "url": "https://github.com/YNWAforever/Remix-Kinnso",
+      "visibility": "private",
+      "main_sha": "e086fbfc4e2bc4447dc9bbbe71af1290c866adaf",
+      "open_prs": [
+        {
+          "number": 131,
+          "sha": "62d7860d7454aea99d891a832b867795197d4df9"
+        },
+        {
+          "number": 133,
+          "sha": "a56e22420d52347c74dfbfd6e3b584d3deb8a7b0"
+        },
+        {
+          "number": 132,
+          "sha": "8bceb6615866e07fa0282dbf963e5082df7ab12b"
+        },
+        {
+          "number": 130,
+          "sha": "3142eb295b3d98a24aa736409db82b89b36bdc02"
+        }
+      ]
+    },
+    "deployed_frontend_sha": "UNKNOWN",
+    "hosted_schema_head": "UNKNOWN",
+    "this_turn_execution": "PLAN_ONLY_NO_REPO_MUTATIONS",
+    "limits": [
+      "No new app browser UAT",
+      "No live Supabase configuration",
+      "Old full test suite not executed by this audit",
+      "Old PR author test counts are author reports"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "K00",
+      "title": "版本、功能和證據基線",
+      "batch": 1,
+      "step": 1,
+      "depends_on": [],
+      "requirements": [
+        "A01",
+        "G01",
+        "G02",
+        "E01"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "新建（私人計劃工作區）docs/implementation/BASELINE.json",
+        "新建 docs/implementation/ROUTE_ACTION_MATRIX.md",
+        "讀 KinnsoOS/README.md、package.json、docs/IMPLEMENTATION_PLAN.md",
+        "讀 Remix-Kinnso/AGENTS.md（若存在）、package.json、各 PR diff"
+      ],
+      "interfaces": "產出 Baseline{repository,visibility,defaultBranch,baseSha,headSha,lockfileHash,framework,packageManager,deploySha|null,schemaVersion|null}；RouteAction{actor,route,action,keepOrMigrateOrDefer,dataSource,permission,job,notification,verification}。",
+      "acceptance": [
+        "兩個 repo、PR heads、鎖檔、runtime 都有實際值；未知部署 SHA/DB ledger 必須是 UNKNOWN",
+        "每個既有 route/action 都有去留及 owner，沒有將 demo 或 handoff 列為 LIVE",
+        "舊來源報告 SHA 與重新讀到的版本差異有 delta 清單"
+      ],
+      "implementation": [
+        "讀本包全部來源與 repo 規則；先 git status、remote -v、rev-parse HEAD，再 fetch 並列 diff；保留使用者改動",
+        "在隔離分支／worktree 重跑適用基線，區分原有失敗與新失敗",
+        "從 app routes、action exports、job/workflow、頁面連結建立完整清單；逐頁對應實際行為",
+        "記錄四個角色主線及本期／後期邊界，提交 baseline 與 inventory 到私人工作區"
+      ],
+      "verification": "新 repo：npm ci；npm test；npm run build；npm run typecheck。舊 repo：pnpm install --frozen-lockfile；pnpm typecheck；pnpm honesty:lint；pnpm test。依現場 AGENTS.md/lockfile 調整並記錄；DB-gated tests 不得將 skipped 算 pass。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K00",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Public baseline passed after Windows runner fix; private typecheck/honesty passed, complete tests blocked by missing .env.test",
+          "result": "BLOCKED",
+          "artifact": ".local-private/private-baseline-test.log",
+          "observedAt": "2026-10-02T19:43:59.420044+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K00",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Actual source/PR/lock/runtime, latest unchanged remote heads and 16 original pack hashes reconciled. Exhaustive130 route files/118 AST server actions/3 workflows mapped to retained or new authoritative owner/module and permission-source evidence; actor hints are labelled static. Individual route UAT is not claimed by the inventory.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K00",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Actual source/PR/lock/runtime, latest unchanged remote heads and 16 original pack hashes reconciled. Exhaustive130 route files/118 AST server actions/3 workflows mapped to retained or new authoritative owner/module and permission-source evidence; actor hints are labelled static. Individual route UAT is not claimed by the inventory.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K01",
+      "title": "落實雙 repo 架構、契約及功能狀態",
+      "batch": 1,
+      "step": 1,
+      "depends_on": [
+        "K00"
+      ],
+      "requirements": [
+        "A02",
+        "A03",
+        "A04",
+        "G01",
+        "G02",
+        "G03",
+        "G12",
+        "G17",
+        "E01"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "新建（私人）docs/implementation/ADR-001-integration-boundary.md",
+        "新建 KinnsoOS/lib/contracts/capabilities.ts",
+        "新建 KinnsoOS/lib/contracts/trips.ts",
+        "新建 KinnsoOS/tests/capabilities.test.mjs"
+      ],
+      "interfaces": "CapabilityMode=\"demo\"|\"connected\"|\"unavailable\"；ApiResult<T>={ok:true,data:T}|{ok:false,code:\"AUTH_REQUIRED\"|\"FORBIDDEN\"|\"NOT_FOUND\"|\"CONFLICT\"|\"INVALID\"|\"UNAVAILABLE\",retryable:boolean,requestId:string}。TripSnapshot、TripCommand 與 GuideSnapshot 見 00_PRODUCT_SPEC.md。",
+      "acceptance": [
+        "無設定時讀寫顯示 unavailable，不能以 sample success 冒充",
+        "新舊使用同一批准 backend 的 identity；public repo 沒有私人實作／完整 DB type dump",
+        "每個能力有 data owner、session、可見性、交易規則 owner；booking/payment 未就緒即關閉 CTA"
+      ],
+      "implementation": [
+        "按預設 D01–D08 寫 ADR：公開新前端、私人後端 migrations、同一身份／資料來源、跨來源 cookie 不自動共用",
+        "只在 public repo 新寫 DTO/client adapter；不把舊 Server Actions 當 REST 呼叫",
+        "用 allowlist 驗證外部 origin；將 mode 與 data source 分開；錯誤不含 DB/credential detail",
+        "補 capability unit tests，再提交契約；若使用者要求改 repo 可見性，只暫停該動作，不暫停其他工作"
+      ],
+      "verification": "npm test（新增 capability tests）；檢查 public diff 與 source manifest 不含私人檔案。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K01",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "New DTO and capability guard tests 2/2 PASS; identity configuration not yet deployed",
+          "result": "PASS",
+          "artifact": "",
+          "observedAt": "2026-10-02T19:43:59.947236+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K01",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Public new DTO/BFF; private business/migrations; shared verified local identity, separately authenticated hostnames; unavailable modes and booking/payment disabled.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K01",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Public new DTO/BFF; private business/migrations; shared verified local identity, separately authenticated hostnames; unavailable modes and booking/payment disabled.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K02",
+      "title": "整合舊 PR 候選及保留既有能力",
+      "batch": 1,
+      "step": 2,
+      "depends_on": [
+        "K00",
+        "K01"
+      ],
+      "requirements": [
+        "A01",
+        "A07",
+        "A13",
+        "A16",
+        "G02",
+        "G04",
+        "E05",
+        "E06",
+        "E09"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "私人 Remix：PR #131/#133/#132/#130 的實際 changed files",
+        "重點 apps/web/lib/auth/return-path.ts、proxy.ts、lib/guides/queries.ts",
+        "重點 apps/web/tests/trips.rls.test.ts、trips.write-path.test.ts",
+        "重點 supabase/migrations/20260911090000_p2_0_personal_trips.sql、20260911120000_p2_1_trip_write_path.sql"
+      ],
+      "interfaces": "產出私人 integration candidate SHA、各 PR disposition、完整 regression 結果；沿用 create_trip(text,text,date,uuid)、update_trip(uuid,integer,text,text,date,boolean,text)、delete_trip(uuid,integer)，不把它們當完整 editor API。",
+      "acceptance": [
+        "登入回跳、儲存意圖、錯誤狀態與角色 gate 回歸通過",
+        "#133 的九項例外及 screen-reader 未驗證仍明示，不能靠 skip 關閉",
+        "#131 trips direct day/stop grants 和 revision 限制記入 K09 前置條件"
+      ],
+      "implementation": [
+        "逐一讀 diff 與最近 review，依 #131→#133 檢查衝突；在本機私人 candidate 整合，保留原 PR 歷史",
+        "評估 #132 CI guard 後再評估 #130 action bump；不要重跑舊 merge ref 當成新證據",
+        "保留 creator onboarding resume、in-app inbox、existing keyset/bulk/payout audit；不以新 UI 取代底層狀態機",
+        "原有 fail/flaky 用最小重現分辨，不能刪 test／擴大 skip；提交可 review 候選 PR，不自動合併正式 main"
+      ],
+      "verification": "pnpm typecheck；pnpm honesty:lint；pnpm --filter web test -- tests/auth.return-path.test.ts tests/guides.queries.test.ts。K02只關閉source integration／非DB回歸；DB suites由依賴它的K06執行，因此不形成循環。未過K06/K16前，candidate不得標ready for production。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K02",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Candidate PR histories integrated without conflicts; post-integration regression pending",
+          "result": "NOT_RUN",
+          "artifact": "",
+          "observedAt": "2026-10-02T19:44:00.235624+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K02",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Nine historical #133 accessibility exceptions and screen reader NOT_RUN retained.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Nine historical #133 accessibility exceptions and screen reader NOT_RUN retained.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K02",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Read-only legacy browser154 PASS/9 existing text-200 exceptions; human screen reader NOT_RUN. Existing main merchant entry semantics preserved; stale test corrected, isolated fixture phases guarded.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "All four candidate histories retained on private review branch; auth/intent/role/onboarding/notifications/keyset/payout regressions passed. Read-only legacy browser154 PASS/9 existing text-200 exceptions; human screen reader NOT_RUN. Existing main merchant entry semantics preserved; stale test corrected, isolated fixture phases guarded."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K03",
+      "title": "收窄 source ZIP 與保留授權來源",
+      "batch": 1,
+      "step": 2,
+      "depends_on": [
+        "K00"
+      ],
+      "requirements": [
+        "A02",
+        "G17",
+        "E04"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "修改 KinnsoOS/scripts/package-source.py",
+        "新建 scripts/source-manifest.json",
+        "新建 tests/source_package_test.py",
+        "修改 docs/ADVENTURELOG-REUSE-MANIFEST.md、.github/workflows/verify.yml"
+      ],
+      "interfaces": "package-source.py 只納入經 review 的顯式 manifest；manifest 含 source revision/build metadata、必要 source/lockfile/assets/license。",
+      "acceptance": [
+        "放入 private-note.txt、dump.sql、credential.json、.env.local、symlink 外部檔作測試，ZIP 全部不能收錄",
+        "source archive 可解壓後 npm ci/build，沒有遺漏新增必要模組",
+        "LICENSE、照片 provenance、AdventureLog attribution 和對應版本存在；source ZIP 不遞迴包自身"
+      ],
+      "implementation": [
+        "先以臨時目錄測 manifest 拒絕未列檔案及 path traversal/symlink",
+        "改打包器使用顯式 file list、路徑範圍校驗；不單靠副檔名或 .env 排除",
+        "CI 驗 ZIP manifest 和重建；把新檔加入 manifest 作為 PR checklist",
+        "提交獨立修正，不將本計劃或私人 audit 加進公開 source 包"
+      ],
+      "verification": "python3 -m unittest discover -s tests -p 'source_package_test.py'；npm run source:pack；在臨時解壓目錄執行 npm ci、npm run build；檢查 ZIP 檔案集合完全相等。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K03",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Explicit archive boundary RED-GREEN; extracted ZIP npm ci/build PASS; Windows symlink case SKIPPED",
+          "result": "PASS",
+          "artifact": ".local-private/archive-build.log",
+          "observedAt": "2026-10-02T19:43:59.656260+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K03",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "130-file explicit source allowlist, boundary checks 3 PASS/1 Windows symlink SKIP, canonical committed blob match, extracted npm ci/test/build/typecheck PASS. Local guidance and all private content excluded.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K03",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "130-file explicit source allowlist, boundary checks 3 PASS/1 Windows symlink SKIP, canonical committed blob match, extracted npm ci/test/build/typecheck PASS. Local guidance and all private content excluded.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K04",
+      "title": "SSR 語言、導航與 demo/live 分界",
+      "batch": 1,
+      "step": 2,
+      "depends_on": [
+        "K00",
+        "K01"
+      ],
+      "requirements": [
+        "A03",
+        "A04",
+        "A05",
+        "A12",
+        "A16",
+        "A19",
+        "A20",
+        "G02",
+        "G15",
+        "E02",
+        "E03"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "修改 KinnsoOS/app/layout.tsx、app/[locale]/[[...route]]/page.tsx、app/travel/Workbench.tsx",
+        "新建 app/[locale]/layout.tsx、app/[locale]/not-found.tsx",
+        "修改 app/travel/routes.ts、lib/canonical.ts",
+        "新建 tests/e2e/shell.spec.ts、lib/seo/policy.ts"
+      ],
+      "interfaces": "pageMetadata(locale,route,mode,deployment): Metadata；route capability 由 K01 提供。Locale root layout server-render html lang；搬移 root layout 結構時保持 root redirect/404 可 build。",
+      "acceptance": [
+        "無 JS 首個 /en HTML 的 html lang=en；/zh-HK 對應繁中；未知locale回404",
+        "320/375/768/1280、200%文字、鍵盤及焦點可用，主導覽無溢出",
+        "demo 商業數字不出現在 connected 頁；stage noindex；private routes永遠不可索引",
+        "旧站 zh-hk handoff regression 保留"
+      ],
+      "implementation": [
+        "建立最小 browser harness，版本鎖定，不複製整套舊 e2e infra",
+        "以 locale root layout 或官方支持的等效 server 結構修 html 語言，移除前端才修正的依賴",
+        "保留米白／深綠／橙色和 Journeys 主要版面；拆出 shell/mode 組件而不重寫整個 model",
+        "做角色導航、小屏 drawer 和原任務返回；沒有真服務的 CTA 顯示真實狀態"
+      ],
+      "verification": "npm test；npm run build；npm run typecheck；npm run test:e2e -- tests/e2e/shell.spec.ts（本任務建立 script/harness）；保存同 viewport 截圖和 AX/console 結果。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K04",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "SSR no-JS en/zh-HK, unknown locale404, 320/375/768/1280, 200% text and keyboard/focus local browser checks; connected/demo separation and noindex/private no-store; legacy handoff regression retained.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K04",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "SSR no-JS en/zh-HK, unknown locale404, 320/375/768/1280, 200% text and keyboard/focus local browser checks; connected/demo separation and noindex/private no-store; legacy handoff regression retained.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K05",
+      "title": "修復 nightly 與 CI 證據完整性",
+      "batch": 1,
+      "step": 2,
+      "depends_on": [
+        "K02"
+      ],
+      "requirements": [
+        "A01",
+        "A15",
+        "A16",
+        "G17"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "修改 Remix/apps/e2e/specs/funnel-smoke.spec.ts、.github/workflows/nightly-funnel.yml",
+        "檢查 #132 的 .github/workflows/ci.yml 與 apps/web/tests/ci.product-state.test.ts",
+        "新建 apps/e2e/specs/funnel-fixture.spec.ts"
+      ],
+      "interfaces": "產出 deterministic guide→attributed experience fixture contract、獨立 sitemap job、CI coverage matrix（trusted/untrusted、booking on/off）。",
+      "acceptance": [
+        "第一篇無 experience 時繼續檢查候選；完全沒有 link 時有明確內容錯誤，不等120秒",
+        "funnel fail 仍執行 sitemap crawl，各自報結果",
+        "外部／Dependabot PR 不取得 secrets；trusted 必要檢查不能永久跳過或被 concurrency 取消掩蓋"
+      ],
+      "implementation": [
+        "用兩篇攻略測第一篇無連結、第二篇有連結；另外測全部無連結",
+        "有限時等頁面就緒，再以可選 locator 檢查內容；保留真正缺失的失敗訊號",
+        "拆獨立 crawl job；pin 可執行測試清單，配置改動要驗證真的執行",
+        "處理 #132 actor 規則及 main run cancellation；#130 如需要重建新 base，只準備更新PR，不代發訊息給bot"
+      ],
+      "verification": "pnpm --filter @kinnso/e2e exec playwright test funnel-smoke funnel-fixture --workers=1；pnpm --filter web test -- tests/ci.product-state.test.ts；驗 GitHub 最新 head 的 job 結果，無 skipped gate 冒充成功。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K05",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Local fixture2 PASS; current remote CI recorded separately, trusted provider jobs unavailable locally.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Local fixture2 PASS; current remote CI recorded separately, trusted provider jobs unavailable locally.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K05",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Local fixture2 PASS; current remote CI recorded separately, trusted provider jobs unavailable locally.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Nightly skips summary-only candidate and explicit CONTENT_MISSING; independent sitemap job; event-specific PR/SHA concurrency and trusted-secret gating. Local fixture2 PASS; current remote CI recorded separately, trusted provider jobs unavailable locally."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K06",
+      "title": "隔離 staging、schema 與權限基線",
+      "batch": 1,
+      "step": 2,
+      "depends_on": [
+        "K01",
+        "K02"
+      ],
+      "requirements": [
+        "A01",
+        "A03",
+        "G03",
+        "G17",
+        "E09"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "私人 Remix/supabase/config.toml、supabase/migrations/（只新增，不改已套用歷史）",
+        "修改 packages/db/package.json；新增 local type-generation script",
+        "新建 scripts/verify-kinnso-target.ts、docs/implementation/ENVIRONMENT_MANIFEST.md",
+        "新建 apps/web/tests/trips.integration-baseline.test.ts",
+        "新 KinnsoOS/tests/integration/*.test.mjs、scripts/verify-test-target.mjs、package.json（integration runner）"
+      ],
+      "interfaces": "EnvironmentManifest{environment,projectRef,authIssuer,dbVersion,migrationHead,apiOrigin,storageBuckets,deploySha}；assertNonProductionTarget(manifest) 在任何 reset/test write 前執行。",
+      "acceptance": [
+        "新舊測試 app 指向同一 staging identity；與 production ref 不同，未辨識目標即 fail closed",
+        "clean reset和從main升級至candidate皆通過；新grant/RLS/view/RPC權限以anon、A、B直接API驗證",
+        "types由已驗證local/schema產生；禁止誤用現有 gen --linked 對未知target",
+        "記錄DB版本、extensions及當前Supabase changelog適用性，不能推定必須升級"
+      ],
+      "implementation": [
+        "先盤點已有local/staging資源；有local stack可先用，沒有cloud配置不阻止local開發",
+        "讀 CLI --help 與官方docs；私有隔離stack套用main再#131，核對migration ledger",
+        "更改gen腳本為顯式local或核對target參數；檢查權限、view security_invoker、function auth與execute grants",
+        "測刪trip/account、sourceFK、兩帳戶隔離及舊表regression；列明backup/restore演練方法",
+        "建立新站test:integration script及目標guard，缺test env即非零退出；禁止把DB測試預設skip。每個新feature再加入自身contract case。"
+      ],
+      "verification": "先 supabase --version、supabase db --help、supabase gen types --help；只在確認local target後使用該版支援的 reset/typegen 指令。pnpm --filter web test -- tests/trips.rls.test.ts tests/trips.write-path.test.ts tests/trips.integration-baseline.test.ts；live suites 未 arm 記 BLOCKED。",
+      "external_dependencies": "Cloud staging 的批准 project/config 尚未提供；local可先完成。任何遠端migration前必須核對目標及既有授權。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K06",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K06",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Verified isolated local main-to-candidate upgrade and clean rebuild PASS at schema20261002154501; fresh-session direct RLS/grants and private generated types PASS. Cloud staging target/callback/access missing."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K07",
+      "title": "真正登入、同一帳戶與安全返回",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K04",
+        "K06"
+      ],
+      "requirements": [
+        "A03",
+        "A13",
+        "G03",
+        "G04",
+        "G05"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "新建 KinnsoOS/lib/supabase/server.ts、client.ts、proxy.ts；新建 root proxy.ts",
+        "新建 lib/auth/actor.ts、return-path.ts、app/[locale]/sign-in/page.tsx、app/auth/callback/route.ts",
+        "新建 tests/e2e/auth-continuation.spec.ts",
+        "參考但不複製私人 Remix/lib/auth/authorization-context.ts 與 #131 return-path 行為"
+      ],
+      "interfaces": "requireActor():Promise<Actor>；Actor{id,roles:string[],merchantMemberships:string[]} 只由已驗證session+server角色資料得到；safeReturnPath(value,locale):string。",
+      "acceptance": [
+        "同一staging帳戶可登入兩站但各自持cookie；URL/log無token/password",
+        "登入取消不丟draft，成功回原攻略或待執行動作；意圖只執行一次",
+        "過期session刷新、登出、角色移除及陌生帳戶無資料泄漏；user_metadata/demo role不能授權",
+        "私人頁/API response不共用public cache"
+      ],
+      "implementation": [
+        "依已核對官方SSR方法新寫client與proxy；從鎖檔選相容Supabase版本並pin",
+        "保留既有登入方式，新增站內登入頁；next只接受本origin允許path，拒絕protocol-relative與外站",
+        "roles由backend資料查詢，保留server/action及DB兩層guard；same-origin寫入校驗origin/CSRF",
+        "測A/B兩session、cookies刷新/登出和深連結，提交 auth PR"
+      ],
+      "verification": "npm test；npm run test:e2e -- tests/e2e/auth-continuation.spec.ts；抓首個SSR和API結果，不只檢查client畫面。",
+      "external_dependencies": "需staging旅人A/B測試帳戶；可在批准localstack生成測試身份。真實密碼只經安全登入，不放計劃、chat或repo。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K07",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Local auth action and server actor are implemented; browser continuation currently under runtime diagnosis, cloud dual-origin login not run.",
+          "result": "BLOCKED",
+          "artifact": ".local-private/trip-runtime-debug.log",
+          "observedAt": "2026-10-02T20:52:09.735288+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K07",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Real new-site sign-in and safe continuation passed in Chromium with separate cookie contexts; old-site/staging provider checks remain pending.",
+          "result": "PASS",
+          "artifact": ".local-private/trip-label-regression.log",
+          "observedAt": "2026-10-02T21:22:46.844223+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K07",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K07",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Independent two-host real local identity login, safe return/bookmark intent, fresh session and revoked JWT/cross-tab logout/account change isolation verified. Cloud staging account/config and callback UAT pending."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K08",
+      "title": "正式攻略、目的地別名與錯誤分頁",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K06"
+      ],
+      "requirements": [
+        "A06",
+        "A07",
+        "A08",
+        "A18",
+        "A20",
+        "G07",
+        "G09",
+        "G15",
+        "E08"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "修改 KinnsoOS/lib/catalog.ts、app/api/catalog/route.ts、app/integration/CatalogPanel.tsx",
+        "新建 lib/catalog/destinations.ts、tests/catalog-destinations.test.mjs",
+        "私人 Remix/lib/guides/queries.ts、lib/destinations/queries.ts；新建目的地aliases migration"
+      ],
+      "interfaces": "resolveDestination(q:string):Promise<{id:string,displayName:string}|null>；CatalogPage{items,nextCursor|null,mode}；GuideSummary{kind:\"summary\",...} 與 GuideSnapshot{kind:\"itinerary\",...} 不可混用。",
+      "acceptance": [
+        "京都/Kyoto及香港/Hong Kong解析相同destination ID；一般q仍可搜內容",
+        "空資料、503/401/timeout、未配置分開；錯誤不能快取為空集合",
+        "穩定排序分頁無重覆漏列；超過12筆有next；現有100頁上限若保留須有明確範圍說明",
+        "未批准cover顯示有名稱fallback；私人草稿不被anon讀到"
+      ],
+      "implementation": [
+        "保留existing adapter tests並新增aliases與真实PostgREST contract test",
+        "統一destination ID/alias，舊city字串用mapping兼容；按實際schema建索引與查詢plan",
+        "更新Exploration真實資料模式，published-only公共DTO，安全link/cover規則",
+        "大資料fixture驗排序；按測量決定cache，先不快取private/error"
+      ],
+      "verification": "npm test；node --experimental-strip-types --test tests/integration/catalog.test.mjs（K06建立runner）；EXPLAIN查詢；用staging發布及未發布攻略直打API驗證。",
+      "external_dependencies": "真正內容驗收需一份經owner核實可公開的攻略；local合成fixture可測流程，但不能算LIVE內容。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K08",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K08",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Connected published catalog, stable bounded keyset pagination, destination aliases, honest failures and named cover fallbacks tested. Content is synthetic; real author/content/cover rights not provided."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K09",
+      "title": "行程整體的原子寫入與版本衝突",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K06"
+      ],
+      "requirements": [
+        "A03",
+        "A17",
+        "G03",
+        "G05",
+        "G06",
+        "G08",
+        "E09"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "私人 Remix：新建 apps/web/lib/trips/contracts.ts；新 migration 由 supabase migration new kinnso_trip_commands 產生",
+        "新建 apps/web/tests/trips.commands.test.ts、trips.concurrent-write.test.ts",
+        "新 KinnsoOS/lib/contracts/trips.ts（只DTO）"
+      ],
+      "interfaces": "新RPC apply_trip_command(p_trip_id uuid,p_expected_revision integer,p_request_id uuid,p_command jsonb) returns jsonb；command union見Spec，owner永遠從auth.uid；既有create/update/delete RPC保持相容或以versioned bridge封裝，列出所有caller。；新增相容的create_trip_v2(p_request_id uuid,p_payload jsonb)與delete_trip_v2(p_trip_id uuid,p_expected_revision integer,p_request_id uuid) returns jsonb，將create/delete的去重與授權納入同一規則；旧RPC caller仍要逐個核對。",
+      "acceptance": [
+        "同revision兩次並行不同寫入只有一次成功，其餘CONFLICT；新snapshot可重讀",
+        "同requestId+same payload重試同結果，不加第二revision；不同payload同key拒絕",
+        "所有day/stop寫入與重排都在同transaction驗owner+revision；直接API不能绕過新規則",
+        "既有credit fields不能由client改；cross-trip day/stop引用拒絕；刪除與account cleanup regression通過",
+        "建立／刪除trip在commit後丟response，再試仍只有一次有效操作；刪除後用owner-scoped tombstone/ledger辨認合法重播，不洩漏他人已刪資料。"
+      ],
+      "implementation": [
+        "先建立DB concurrency/idempotency/ownership失敗測試",
+        "鎖trip row→verify actor→檢查request ledger/payload digest→verify revision→apply typed command→append metadata revision→commit；重播仍先驗authority",
+        "採本計劃預設：每次有效editor寫入遞增aggregate revision，歷史僅metadata log；不做歷史restore UI。新增migration收窄p2表直接寫grant，只有列出的RPC能寫",
+        "保留舊RPC名稱/已知caller相容並測；禁止為解permission error改用任意service_role"
+      ],
+      "verification": "pnpm --filter web test -- tests/trips.commands.test.ts tests/trips.concurrent-write.test.ts tests/trips.rls.test.ts tests/trips.write-path.test.ts；必須兩真實local/staging帳戶直打API，不只mock。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K09",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "39/39 live local trip compatibility, owner isolation, aggregate command and guide adoption assertions passed; current cloud migration not run.",
+          "result": "PASS",
+          "artifact": ".local-private/trip-compatibility.log",
+          "observedAt": "2026-10-02T20:52:05.806936+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K09",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Atomic aggregate commands/revisions, day/stop/note/media/source boundaries, request digests/replay/tombstones and direct grant restrictions; concurrency, captured revoked JWT legacy/v2 writes and cross-owner API regressions PASS.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K09",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Atomic aggregate commands/revisions, day/stop/note/media/source boundaries, request digests/replay/tombstones and direct grant restrictions; concurrency, captured revoked JWT legacy/v2 writes and cross-owner API regressions PASS.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K10",
+      "title": "真實結構化攻略、版本與套用來源",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K08",
+        "K09"
+      ],
+      "requirements": [
+        "A06",
+        "G06",
+        "G09",
+        "G10",
+        "E09"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "私人 Remix：新 guide_versions migration、apps/web/lib/guides/versions.ts、tests/guides.adoption.test.ts",
+        "擴展既有 GuideForm/guide action 實際路徑（K00 inventory定位）作最小站點作者入口",
+        "新 KinnsoOS/lib/guides/repository.ts、tests/guide-contract.test.mjs"
+      ],
+      "interfaces": "GuideSnapshot{id,version,title,destinationId,publishedAt,creator:{id,name,handle},days:PublicDay[],kind:\"itinerary\"}；adopt_guide_to_trip(p_guide_id uuid,p_version integer,p_trip_id uuid,p_expected_revision integer,p_request_id uuid) returns jsonb。",
+      "acceptance": [
+        "summary guide保持閱讀/收藏，沒有造出的days或「套用完整行程」",
+        "由獲授權作者輸入並發布一份真實structured guide，旅人可套用server snapshot",
+        "v2不自動覆蓋旅人已改內容；採納更新有diff/明確操作；withdraw阻止新套用",
+        "来源撤回/刪creator不刪旅人筆記，保留允許的來源標識；raw client credit不可寫"
+      ],
+      "implementation": [
+        "讀existing guides schema及撤回規則，新增版本表而不把原摘要改成虛構站點",
+        "補最小creator authoring/publish入口供首條真實攻略；完整onboarding/editor在K17",
+        "採用server擷取已發布版本、來源快照與原子RPC；client不可提供可信來源正文",
+        "發布／撤回與A/B旅人測試；真內容不足時保持feature unavailable，不能用sample當正式庫"
+      ],
+      "verification": "pnpm --filter web test -- tests/guides.adoption.test.ts；npm test；node --experimental-strip-types --test tests/integration/guide-contract.test.mjs；保存published guide→trip的去識別staging證據。",
+      "external_dependencies": "真實內容/公開權利由Willy或指定內容owner核實；不阻止用明示synthetic的staging fixture完成技術驗證。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K10",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "3/3 structured publication, A/B adoption, withdrawal and bookmark scenarios passed on synthetic isolated local data; real content rights and staging gate remain blocked.",
+          "result": "PASS",
+          "artifact": ".local-private/guides-final-local.log",
+          "observedAt": "2026-10-02T20:52:07.419017+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K10",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Browser retry after committed response loss yields one version. Human-author rights and real staging content missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Browser retry after committed response loss yields one version. Human-author rights and real staging content missing.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K10",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Browser retry after committed response loss yields one version. Human-author rights and real staging content missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Minimum private Studio structured publishing with transport recovery/stable request ID; immutable v1/v2, adoption/withdraw/fresh creator, source instructions and private notes preserved. Browser retry after committed response loss yields one version. Human-author rights and real staging content missing."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K11",
+      "title": "將 Journeys 旅人介面接上真實讀寫",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K07",
+        "K09",
+        "K10"
+      ],
+      "requirements": [
+        "A03",
+        "A06",
+        "A17",
+        "A19",
+        "G01",
+        "G03",
+        "G06"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "新建 KinnsoOS/lib/trips/repository.ts、app/api/trips/route.ts、app/api/trips/[id]/route.ts、app/api/trips/[id]/commands/route.ts",
+        "修改 app/travel/Workbench.tsx、editing.tsx、explore.tsx、ui.tsx",
+        "新建 app/travel/TripWorkspace.tsx、tests/e2e/trip-editor.spec.ts",
+        "新 lib/bookmarks/repository.ts、app/api/bookmarks/route.ts、tests/integration/bookmarks.test.mjs"
+      ],
+      "interfaces": "TripRepository.list(cursor?),get(id),create(input,requestId),apply(id,expectedRevision,requestId,command),adopt(guideId,version,id,expectedRevision,requestId) -> ApiResult；前端只用界面，不直接改demo Store當正式save。；BookmarkRepository.list/toggle(guideId,desiredState,requestId) 沿用既有guide saves唯一鍵，bookmark與trip clone分開。；remove(id,expectedRevision,requestId)呼叫delete_trip_v2，create呼叫create_trip_v2。",
+      "acceptance": [
+        "connected home/explore/guide/trips與editor讀同一backend；重整與第二context一致",
+        "非本人id一致404、不洩漏；401保留未送出內容但不冒充save",
+        "save state editing/saving/saved/offline/conflict/error有清晰文本和重試；server acknowledge前不能saved",
+        "刪除/重排/日期/時區變更均有真實持久結果",
+        "匿名收藏→登入→回原攻略完成一次；再次點收藏可取消，刷新及另一context一致；收藏不偷偷建立行程。"
+      ],
+      "implementation": [
+        "將讀寫抽到repository adapter，保留demo adapter供明示demo route；同route不能因後端壞掉自動回sample",
+        "新route handlers只接受allowlistedDTO、驗session/origin、回typederrors及private no-store",
+        "接UI command/revision；衝突保留draft并展示server版／重新套用選擇，不靜默last-write-wins",
+        "測mobile back/refresh/loginreturn及新context，保留Journeys視覺",
+        "接既有guide save/unsave持久化、empty/error/retry與intent去重；保留experience saves舊入口直至另有遷移，不偷偷丟棄。"
+      ],
+      "verification": "npm test；node --experimental-strip-types --test tests/integration/trips.test.mjs；npm run test:e2e -- tests/e2e/trip-editor.spec.ts；npm run build；npm run typecheck。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K11",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "True trip create/day/stop/private note persisted through reload and second context; cross-origin POST 403 and private no-store verified. Bookmark/adoption/import UI acceptance pending.",
+          "result": "PASS",
+          "artifact": ".local-private/trip-label-regression.log",
+          "observedAt": "2026-10-02T21:22:47.026072+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K11",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Connected Journeys auth/catalog/bookmark/home/trip editor use persisted local services; reload/second context/owner denial, title/date/timezone/day/stop/reorder/delete, explicit conflicts and honest save states verified.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K11",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Connected Journeys auth/catalog/bookmark/home/trip editor use persisted local services; reload/second context/owner denial, title/date/timezone/day/stop/reorder/delete, explicit conflicts and honest save states verified.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K12",
+      "title": "本機資料匯入與重試去重",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K11"
+      ],
+      "requirements": [
+        "A03",
+        "A17",
+        "G05",
+        "G06",
+        "G08"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "新建 KinnsoOS/lib/trips/import.ts、app/travel/ImportPreview.tsx、tests/e2e/local-import.spec.ts",
+        "私人 Remix：新增 import ledger migration、apps/web/tests/trips.import.test.ts",
+        "讀 app/travel/model.ts 的 account export／validation"
+      ],
+      "interfaces": "previewLocalImport(payload:unknown):ImportPreview；import_local_trip(p_request_id uuid,p_source_id text,p_payload jsonb) -> TripSnapshot；每位owner/sourceId/versionHash為去重依據，photo用pending media manifest。",
+      "acceptance": [
+        "preview明示將匯入哪位本機demo identity的哪些私人行程，登入後owner由server決定",
+        "雙擊、timeout after commit、重登再試只一份；不同內容同key拒絕",
+        "不匯入商業收益、payout、ops cache、其他本機persona內容；自稱source/role不被信任",
+        "匯入失敗保留原資料；metadata成功但photo未完成必須顯示部分完成",
+        "匯入視為不可信輸入：限制大小、深度、格式及數量；source attribution只由server核實版本重建，demo credit不能冒充正式creator授權。"
+      ],
+      "implementation": [
+        "設計選取/preview與帳戶確認，將local資料視為不可信input",
+        "server validate schema/size、去重ledger、transaction寫入；canonical來源必須再次server驗證，未知來源標為未驗證",
+        "K13前media只列待處理，不刪原local photos；完整驗收等K13",
+        "以斷線前／後commit及非法payload測試，提交import流程"
+      ],
+      "verification": "pnpm --filter web test -- tests/trips.import.test.ts；npm run test:e2e -- tests/e2e/local-import.spec.ts；核對資料列與ledger數量。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K12",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "2/2 real local import assertions and owner-scoped preview unit pass; media completion and browser import remain pending.",
+          "result": "PASS",
+          "artifact": ".local-private/import-replay-fixed.log",
+          "observedAt": "2026-10-02T21:09:53.243566+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K12",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Guest/demo identity preview, explicit account import, bounded untrusted payloads, stable replay and original data retained; source credit not trusted; pending unknown legacy photo metadata remains partial.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K12",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Guest/demo identity preview, explicit account import, bounded untrusted payloads, stable replay and original data retained; source credit not trusted; pending unknown legacy photo metadata remains partial.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K13",
+      "title": "私人記錄、媒體及有限離線能力",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K11",
+        "K12"
+      ],
+      "requirements": [
+        "A17",
+        "A18",
+        "G05",
+        "G06",
+        "G08",
+        "G10",
+        "G17"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "新建 KinnsoOS/lib/media/uploads.ts、lib/trips/local-drafts.ts、app/travel/RecordCapture.tsx、lib/trips/export.ts",
+        "修改 app/travel/editing.tsx、TripMap.tsx",
+        "私人 Remix：media metadata/storage policies migration；tests/media.access.test.ts",
+        "新建 tests/e2e/record-recovery.spec.ts"
+      ],
+      "interfaces": "prepareUpload(tripId,fileMeta)->UploadIntent；finalizeUpload(intentId,checksum)->MediaRef；MediaRef{id,ownerId,visibility:\"private\",state}; saveLocalDraft(ownerId,tripId,baseRevision,command)、exportPrivateTrip(id)；設定 max10MiB JPEG/PNG/WebP，HEIC須先轉換或明確拒絕並保留原檔。",
+      "acceptance": [
+        "上載中斷重試不重覆附件；MIME/內容不符、超限、惡意SVG拒絕",
+        "A不能讀B物件；私人圖不混publicCDN；公開前移除不必要EXIF定位",
+        "離線可讀已下載核心行程/地址/文字，編輯顯示local draft未同步，重連以revision檢查",
+        "登出清除此app的owner cache；不刪未確認匯出的原demo資料；source archive無上載資料",
+        "刪私人行程後原share及media授權失效；登出或換帳戶不能讀上一帳戶cache；帳戶刪除沿用既有受控入口並核對cascade與法定保留例外。"
+      ],
+      "implementation": [
+        "分離object storage與DBmetadata；上載授權限制owner/trip/path/size，finalize後才顯示完成",
+        "以預覽、壓縮/支援格式說明處理手機相片；錯誤不吞掉用戶原檔",
+        "先做下載檔與per-owner local draft/retry；不承諾離線map tiles或聲音",
+        "新增清理孤兒上載的安全job及ledger，演練quota不足與旅途中reload"
+      ],
+      "verification": "pnpm --filter web test -- tests/media.access.test.ts；npm run test:e2e -- tests/e2e/record-recovery.spec.ts；iOS Safari真機/可用雲真機另外記錄，不以desktop WebKit冒充。",
+      "external_dependencies": "需staging私人bucket；無真機可先自動測試，真機檢查維持BLOCKED而非PASS。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K13",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Private storage A/B/anonymous, replay and full-byte decoder verification passed; offline UI recovery and actual phone checks remain pending.",
+          "result": "PASS",
+          "artifact": ".local-private/sharing-media-regression.log",
+          "observedAt": "2026-10-02T21:34:03.748811+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K13",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K13",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Private normalized photo PUT/checksum/decode/ack/attachment and revoked owner isolation verified. IndexedDB core text/download JSON and one unresolved edit per trip, reconnect revision checks; logout purge across tabs. Maps/photos/full offline reload unavailable. Physical phones and cloud cleanup scheduler missing."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K14",
+      "title": "可撤銷的唯讀行程分享",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K11",
+        "K13"
+      ],
+      "requirements": [
+        "G06",
+        "G08",
+        "G15",
+        "G17"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "新建 KinnsoOS/app/share/[token]/page.tsx、lib/trips/sharing.ts、app/travel/SharePreview.tsx",
+        "私人 Remix：share_tokens與公開投影RPC migration、tests/trips.sharing.test.ts",
+        "新建 tests/e2e/share-revoke.spec.ts"
+      ],
+      "interfaces": "createShare(tripId,selection,expiresAt)->{url,id}；revokeShare(id)；getSharedTrip(token)->PublicTripProjection（不得回TripSnapshot全量）。預設private；新link預設7日到期可縮短；一期view-only。；selection只含允許的stop/media IDs，公開文字由server從owner snapshot生成，不信任client傳入完整投影。",
+      "acceptance": [
+        "分享前預覽沒有私人note、收據、owner email或未選擇相片",
+        "只存token hash；不記raw token到analytics/log；share頁 noindex、no-store",
+        "撤銷/到期後新request不可讀，媒體也驗有效share；已下載副本無法收回的限制有清楚說明",
+        "copy link失敗有fallback；B view-only不可以寫入"
+      ],
+      "implementation": [
+        "先測刻意加入private fields的serialization case，再做projection allowlist",
+        "token由server產生足夠entropy、限頻與expiry，owner-only管理",
+        "public image delivery按分享授權，不能漏出永久private object URL",
+        "測匿名、朋友、撤銷、過期、unknown token；不做協作編輯"
+      ],
+      "verification": "pnpm --filter web test -- tests/trips.sharing.test.ts；npm run test:e2e -- tests/e2e/share-revoke.spec.ts。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K14",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Owner-selected projection excludes private fields; unknown/expired/revoked/deleted shares fail closed on local DB. Browser/media revocation subset pending.",
+          "result": "PASS",
+          "artifact": ".local-private/sharing-media-regression.log",
+          "observedAt": "2026-10-02T21:34:03.932704+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K14",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K14",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "Explicit selected read-only projection, private note omission, token hashes only, owner list/revoke after reload, expiry/deletion/media denial verified locally. Cloud access-log token redaction remains required before enablement."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K15",
+      "title": "行程可行性及內容品質提醒",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K08",
+        "K11"
+      ],
+      "requirements": [
+        "G07",
+        "G09"
+      ],
+      "implementation_status": "DONE",
+      "files": [
+        "新建 KinnsoOS/lib/trips/feasibility.ts、app/travel/TripWarnings.tsx、tests/feasibility.test.mjs",
+        "私人 Remix：place freshness/report queue 模組，沿用existing places/destinations",
+        "新建 lib/places/contracts.ts"
+      ],
+      "interfaces": "assessItinerary(snapshot,placeFacts):Warning[]；PlaceFact{placeId,timezone,openingHours|null,verifiedAt|null,sourceUrl|null}；Warning{code,dayId,stopId,severity,messageKey}。",
+      "acceptance": [
+        "10點開門而9點到訪會提示；未知hours顯示未核實而非開放",
+        "overlap、移動時間未知、跨日、DST gap/fold及無日期各有固定結果",
+        "來源資料不夠時不虛构精準交通時間；標示估算/來源時間",
+        "同地點alias合併不刪舊引用；內容回報有owner和處理狀態"
+      ],
+      "implementation": [
+        "先用固定fact fixtures測時間計算，保留使用者wall-clock意圖",
+        "新增非阻斷warning與manualoverride理由；無精準資料時允許規劃但提示未核實",
+        "建立內容過期／結業回報到營運queue的最小入口",
+        "測旅行者能理解并修正，不把warn當hard block造成無法save"
+      ],
+      "verification": "npm test（feasibility cases）；npm run test:e2e -- tests/e2e/trip-editor.spec.ts；用Asia/Tokyo、Asia/Hong_Kong、DST有轉換地區及undated四組fixture驗收。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "PASS",
+      "completion_evidence": [
+        {
+          "taskId": "K15",
+          "frontendSha": "88809d47164ae300c288a96c0ab8b304ea5237c1",
+          "backendSha": "736676127fa4e28594eb59288944b68ea28a6577",
+          "schemaHead": null,
+          "environment": "local",
+          "command": "Opening hours, unknown facts, overlap/cross-day and DST gap/fold fixed fixtures pass; curated live facts and report processing still pending.",
+          "result": "PASS",
+          "artifact": "tests/feasibility.test.mjs",
+          "observedAt": "2026-10-02T21:34:04.268967+08:00",
+          "reviewer": "Codex",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ],
+          "sourceState": "WORKTREE_BASE_HEAD_PRECOMMIT"
+        },
+        {
+          "taskId": "K15",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Deterministic hours/overlap/unknown travel/cross-day/DST/undated reminders, no invented travel precision; flat canonical aliases preserve old refs; private owner reports and audited ops review; reasoned overrides tested.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": [
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K15",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Deterministic hours/overlap/unknown travel/cross-day/DST/undated reminders, no invented travel precision; flat canonical aliases preserve old refs; private owner reports and audited ops review; reasoned overrides tested.",
+          "result": "PASS",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [],
+          "limitations": []
+        }
+      ],
+      "readiness": "COMPLETE_LOCAL",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K16",
+      "title": "第一批整體驗收與可試用 staging",
+      "batch": 1,
+      "step": 3,
+      "depends_on": [
+        "K03",
+        "K04",
+        "K05",
+        "K07",
+        "K08",
+        "K09",
+        "K10",
+        "K11",
+        "K12",
+        "K13",
+        "K14",
+        "K15"
+      ],
+      "requirements": [
+        "A01",
+        "A03",
+        "A05",
+        "A06",
+        "A13",
+        "A16",
+        "A17",
+        "A19",
+        "G01",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09",
+        "G17",
+        "G18",
+        "U01",
+        "U02",
+        "U06"
+      ],
+      "implementation_status": "PARTIAL",
+      "files": [
+        "新建 KinnsoOS/tests/e2e/u01-traveller.spec.ts、u02-travel-share.spec.ts、privacy-cross-account.spec.ts",
+        "新建 docs/implementation/BATCH_1_ACCEPTANCE.md（私人證據版本）",
+        "修改 .github/workflows/verify.yml；對應更新 task ledger"
+      ],
+      "interfaces": "Evidence{taskId,headSha,environment,command,result,artifact,observedAt,reviewer}；產出B1 release candidate，僅staging/beta，不自動正式上線。",
+      "acceptance": [
+        "U01與U02完整PASS，包括兩帳戶、第二browser context、真persisted資料和source權限",
+        "U06的staging重建/回退子集PASS，production切換仍NOT_RUN",
+        "320/375/768/1280、鍵盤、200%文字、核心screen-reader及實際手機記錄齊；BLOCKED不當完成",
+        "新repo全tests/typecheck/build +舊相关及整合全套，privatecache/isolation和DBdirect tests全通過",
+        "保留實測perf原始資料，event trip_created/trip_imported/return_visit區分demo/admin"
+      ],
+      "implementation": [
+        "對照05_UAT_CASES逐項執行，測試fixture明示synthetic，至少再做一份核實真內容試用",
+        "fresh current-head full regression；讀所有skip ledger，修被本次影響的問題",
+        "同region手機情境3次cold/warm測LCP/CLS/TBT及實際interaction trace；記baseline不虛構INP",
+        "由使用者/指定reviewer走一次核心flow；更新coverage ledger，提交按功能分拆的review PR及具體preview"
+      ],
+      "verification": "新 npm test、npm run build、npm run typecheck、npm run test:integration、npm run test:e2e；舊 pnpm typecheck、pnpm honesty:lint、pnpm test；CI must match final heads。",
+      "external_dependencies": "staging URL、角色測試帳戶及可用browser為端到端證據依賴；缺任一只阻擋對應gate，不停止已可驗證工作。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "LOCAL_PASS_GATE_BLOCKED",
+      "completion_evidence": [
+        {
+          "taskId": "K16",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b91ce783aae6facb2479135a86db37cb2fca1cd7",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild PASS. Complete suites and measured local perf/event separation recorded. Cloud staging/rollback drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; production NOT_RUN.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T16:37:39.451972+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": [
+            "Local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild PASS. Complete suites and measured local perf/event separation recorded. Cloud staging/rollback drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; production NOT_RUN.",
+            "These historical SHAs identify the worktree base, not the subsequently committed implementation."
+          ]
+        },
+        {
+          "taskId": "K16",
+          "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+          "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+          "schemaHead": "20261002154501",
+          "environment": "local synthetic",
+          "sourceState": "COMMITTED_SOURCE_PAIR",
+          "command": "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Uncached complete quality suite, read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN.",
+          "result": "LOCAL_PASS_GATE_BLOCKED",
+          "artifact": "docs/implementation/batch1/EVIDENCE.json",
+          "observedAt": "2026-10-02T17:01:19.221210+00:00",
+          "reviewer": "Codex executor; fresh external review recorded in REVIEW.md",
+          "skips": [
+            "10 existing private suite skips",
+            "1 Windows source symlink skip"
+          ],
+          "limitations": [
+            "Current-source-pair local U01/U02 persisted synthetic-source flows PASS; U06 main upgrade/clean rebuild and local flag rollback PASS. Uncached complete quality suite, read-only legacy subset154 PASS/9 exceptions and measured local perf/events recorded. Cloud staging/rollback/backup drill, real source rights, physical iOS/Android and screen reader remain BLOCKED/NOT_RUN; provider-dependent paid journeys NOT_RUN locally; production NOT_RUN."
+          ]
+        }
+      ],
+      "readiness": "EXTERNAL_OR_REVIEW_GATE_PENDING",
+      "gate": "BATCH_1",
+      "updated_at": "2026-10-02T17:01:19.221210+00:00"
+    },
+    {
+      "id": "K17",
+      "title": "創作者內容供應與完整 onboarding",
+      "batch": 2,
+      "step": 4,
+      "depends_on": [
+        "K16"
+      ],
+      "requirements": [
+        "A06",
+        "G04",
+        "G06",
+        "G10",
+        "G13",
+        "U03",
+        "E06",
+        "G09"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人 Remix：既有 lib/onboarding/resumeRoute.ts、lib/onboarding/progress.ts、components/onboarding/*",
+        "擴展lib/guides/versions.ts（K10）",
+        "新 KinnsoOS/app/creator/CreatorWorkspace.tsx、lib/creators/repository.ts",
+        "新建 tests/e2e/u03-creator.spec.ts"
+      ],
+      "interfaces": "CreatorProgress{step:\"wait\"|\"handles\"|\"progress\"|\"review\"|\"retry\"|\"done\",jobId?,retryable}；publishGuide(draftId,expectedRevision,requestId)->GuideSnapshot；每個write經新站session＋私人backendcontract。",
+      "acceptance": [
+        "scan queued/fetching/analyzing/ready/failed中斷後正確續做",
+        "scan失敗可人工輸入及本人確認，不自動發布AI資料",
+        "草稿/autosave/preview/版本/撤回與旅人clone關係正確",
+        "不是只handoff：creator新站能完成核心authoring，商業功能未接可保留明確入口"
+      ],
+      "implementation": [
+        "沿用現有job state及role流程，以版本化API/RPC暴露最小DTO；無既有API才新寫private endpoint",
+        "接新版task-first shell、品質檢查和publish preview",
+        "加入修改要求及inbox deep link contract供K20",
+        "完成U03並更新route inventory與狀態"
+      ],
+      "verification": "舊 pnpm --filter web test（onboarding/guide現有suite＋新contracts）；新 npm run test:e2e -- tests/e2e/u03-creator.spec.ts。 K17關閉U03的onboarding/authoring子集；通知deep-link端到端由K20關閉，不因等待K20阻擋K17的已定義子集。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_2",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K18",
+      "title": "商戶組織、活動及核銷工作區",
+      "batch": 2,
+      "step": 4,
+      "depends_on": [
+        "K16"
+      ],
+      "requirements": [
+        "G04",
+        "G11",
+        "G12",
+        "U04"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人 Remix：既有lib/admin/merchant-applications-queries.ts、lib/admin/merchants-actions.ts、lib/missions/queries.ts；按K00定位offers/redeem actions",
+        "新建組織membership最小migration（僅existing schema不足時）",
+        "新 KinnsoOS/lib/merchants/repository.ts、app/merchant/MerchantWorkspace.tsx",
+        "新 tests/e2e/u04-merchant.spec.ts"
+      ],
+      "interfaces": "MerchantMembership{merchantId,branchIds,role:\"owner\"|\"marketing\"|\"clerk\"|\"finance\"}；role mapping先對照現有角色，不改舊enum硬塞；redeemOffer(code,branchId,requestId)->RedemptionResult。",
+      "acceptance": [
+        "owner/marketing/clerk/finance分權且離職撤權即拒絕敏感操作",
+        "錯分店/過期/paused/new claim不可核銷；重放/併發只一次有效結果",
+        "商戶建立brief、review申請、查看verified outcome可在新站完成",
+        "無live funding/payment不可顯示已入帳或可用預算假數字"
+      ],
+      "implementation": [
+        "讀現有申請/任務/offer狀態機，建立contract映射而非重寫狀態",
+        "補分店範圍；核銷及權限必須server+DB驗證",
+        "新shell聚焦今日待辦、活動進度和核實結果",
+        "測到領取/核銷與營運handoff；錢相關正式驗收由K21關閉"
+      ],
+      "verification": "舊mission/offer/redemption direct API suites＋新 npm run test:e2e -- tests/e2e/u04-merchant.spec.ts；退職權限實測。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_2",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K19",
+      "title": "營運佇列、分頁、金融彙總與批次",
+      "batch": 2,
+      "step": 4,
+      "depends_on": [
+        "K02",
+        "K06",
+        "K07"
+      ],
+      "requirements": [
+        "A08",
+        "A09",
+        "A10",
+        "A11",
+        "A12",
+        "G11",
+        "G14",
+        "U05",
+        "G09"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "修改私人 Remix/apps/web/lib/admin/mission-review-queries.ts、creators-queries.ts、lib/missions/queries.ts",
+        "修改 components/kinnso/admin/AdminDashboardView.tsx、AdminShell.tsx；保留既有keyset/bulk",
+        "新建私有RPC與tests/admin.queues-scale.test.ts、admin.bulk-partial.test.ts",
+        "新 KinnsoOS/lib/ops/repository.ts、app/ops/OpsWorkspace.tsx"
+      ],
+      "interfaces": "getReviewQueue({status,missionId,cursor,limit:50})->CursorPage；getSettlementSummary(filters)->CurrencyTotals；runBulk({selectionSnapshot,action,reason,requestId})->{succeeded,failed,jobId}。",
+      "acceptance": [
+        "detail只查所屬mission；超過實際APIrowcap的fixture總額仍正確",
+        "aggregate由server計，按currency分組，count/total不依当前page",
+        "選本頁/所有篩選結果有明確scope；preview後資料改動能察覺，權限每項再驗",
+        "100項中3項失败只重試3項；已有成功不重覆，原因與audit完整",
+        "手機drawer與待辦老化/owner/action可用",
+        "K15的結業／內容過期回報可指派、修訂、關閉及通知回報者；新修訂不覆蓋旅人私人筆記。"
+      ],
+      "implementation": [
+        "先為現有無界查詢寫大資料及SQL-filter測試",
+        "將filter/order/cursor推入DB，增加必要索引；finance aggregate獨立接口",
+        "批次沿用既有最大100/action規則，超額用明確分批job；immutable selection snapshot＋per-item result",
+        "新ops shell接真queue；給營運做U05，不只展示總數"
+      ],
+      "verification": "pnpm --filter web test -- tests/admin.queues-scale.test.ts tests/admin.bulk-partial.test.ts；EXPLAIN/rowcap fixtures；新 npm run test:e2e -- tests/e2e/u05-ops.spec.ts（本任務建立）。 K19關閉U05的queue/scale/bulk子集；通知及完整對帳分別由K20/K21關閉。若提前處理A10，只交私人query修正，完整新ops UI仍依賴K07。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_2",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K20",
+      "title": "站內通知、外送通知與客服待辦",
+      "batch": 2,
+      "step": 4,
+      "depends_on": [
+        "K17",
+        "K18",
+        "K19"
+      ],
+      "requirements": [
+        "A14",
+        "G13",
+        "G14",
+        "E05"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人 Remix/lib/notifications/queries.ts、actions.ts與既有notification triggers",
+        "新建 lib/notifications/delivery.ts、support/cases.ts及必要outbox migration",
+        "新 KinnsoOS/app/workspace/Inbox.tsx、lib/notifications/repository.ts",
+        "新 tests/notifications.delivery.test.ts"
+      ],
+      "interfaces": "NotificationEvent{eventId,type,recipientId,entityRef,localeKey,payload}；Delivery{channel,state,attempts,nextAttemptAt}；in-app既有RPC保留；support case有owner/status/linkedEntity。",
+      "acceptance": [
+        "站內read/unread與entity deep link存在；不把它說成email已送",
+        "outbox寫入/delivery失敗不回滾核心商業transaction；有dead-letter及受控重試",
+        "event/channel去重；偏好/取消訂閱生效；payload無私人收據或token",
+        "申請補件/審核結果/結算狀態有對應收件人與客服入口"
+      ],
+      "implementation": [
+        "先列event×recipient×channel×preference表並與現有7trigger核對",
+        "保留in-app能力；只有有provider及核准模板的channel才啟用",
+        "加retry/dead-letter/指派，重試不得重做付款或核銷",
+        "通知文案與AI能力表共用真實delivery狀態"
+      ],
+      "verification": "pnpm --filter web test -- tests/notifications.delivery.test.ts；provider sandbox及in-app UAT；沒有provider時外送維持BLOCKED，不影響in-app驗收。",
+      "external_dependencies": "外送provider／寄件身分和模板未提供；不用真實用戶作測試收件人。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_2",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K21",
+      "title": "歸因、收據、结算與爭議對帳",
+      "batch": 2,
+      "step": 4,
+      "depends_on": [
+        "K18",
+        "K19"
+      ],
+      "requirements": [
+        "A10",
+        "G11",
+        "G12",
+        "G17",
+        "U04",
+        "U05"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人 Remix既有mission settlements、creator payout batch、booking/refund、attribution/receipt模組（K00定位）",
+        "新建 docs/implementation/MONEY_STATE_MATRIX.md、tests/commerce.reconciliation.test.ts",
+        "新 KinnsoOS/app/merchant/OutcomeDetails.tsx、app/ops/Reconciliation.tsx"
+      ],
+      "interfaces": "MoneyState 與既有enum逐一映射；amount用現有currency規則的最小貨幣單位；adjustment reference原交易，provider event ID唯一；結果區分claimed/redeemed/validated/eligible/settled/paid。",
+      "acceptance": [
+        "重覆provider webhook、相同收據、核銷並發不多付",
+        "退款/撤銷保留原付款歷史和調整關係；unknown payment不盲目retry",
+        "不同currency不混加；payout金額與serveraggregate及provider test mode對齊",
+        "receipt進行中/拒絕/申訴與權限完整；人工override需reason+audit"
+      ],
+      "implementation": [
+        "先盤點R12.1/R12.2/R13.0實際contract及active flags，別靠commit名猜完成",
+        "用test mode跑建立→核验→eligibility→settlement→payout→refund，核對雙方帳",
+        "補去重、併發、dispute queue及例外status；不重寫已成熟payout機制",
+        "正式費率、資金責任與付款放行由指定商業owner填入可review決策；缺失不開live payment"
+      ],
+      "verification": "pnpm --filter web test -- tests/commerce.reconciliation.test.ts＋既有payout/receipt/attribution suites；provider test-mode evidence；真實資金操作不包含在本計劃初始執行。",
+      "external_dependencies": "正式費率、退款/爭議規則和live payment授權尚未確定；工程與test-mode可先完成。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_2",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K22",
+      "title": "有來源、可預覽的 AI 任務",
+      "batch": 2,
+      "step": 4,
+      "depends_on": [
+        "K11",
+        "K17",
+        "K20"
+      ],
+      "requirements": [
+        "A14",
+        "G07",
+        "G10",
+        "G16"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人 Remix/apps/web/lib/agent/tools.ts、policy.ts、config.ts、app/api/agent/route.ts",
+        "新建 lib/agent/result-contract.ts、tests/agent.evaluation.test.ts",
+        "新 KinnsoOS/app/agent/AgentWorkspace.tsx、lib/agent/repository.ts"
+      ],
+      "interfaces": "AgentResult{answer,sources:[{url,title,verifiedAt|null}],proposedActions:[{type,payload,requiresConfirmation:true}],capabilityMode}；server tool允許名單；UI sanitize/render來源及Markdown。",
+      "acceptance": [
+        "來源是可點canonical URL，不是slug；無資料/過期/衝突可明確說不知道",
+        "AI不能自稱已save/book/pay/notify，除非對應工具確實成功",
+        "私有trip作上下文只在當前owner範圍；內容prompt injection不能改tool權限",
+        "行程改動有diff和明確套用；timeout/rate limit/budget耗盡可退回普通編輯",
+        "四種任務各有入口與能力說明：來源問答、行程建議、creator素材整理、merchant brief建議；未開放角色的工具不可由prompt啟用。"
+      ],
+      "implementation": [
+        "建立20個固定evaluation案例：有根據4、無資料3、過期3、矛盾3、惡意內容/越權4、timeout/重試3；四種任務皆有案例。",
+        "沿用現有rate/toolcall限制並核對，新增actor配額/成本記錄；無預算設定則付費AI關閉",
+        "structuredresult驅動可點來源與proposal UI；採用修改經K09而非AI直寫DB",
+        "評估critical safety/claim斷言必須全pass，內容品質另外report不冒充確定性"
+      ],
+      "verification": "pnpm --filter web test -- tests/agent.evaluation.test.ts；provider sandbox小量實測（設定預算後），完整20例存model/prompt/version/成本，無user private payload。",
+      "external_dependencies": "無；按依賴次序執行",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_2",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K23",
+      "title": "舊網址、SEO/GEO與分享預覽遷移",
+      "batch": 3,
+      "step": 5,
+      "depends_on": [
+        "K16",
+        "K17",
+        "K18"
+      ],
+      "requirements": [
+        "A04",
+        "A18",
+        "A20",
+        "G02",
+        "G09",
+        "G15",
+        "E02",
+        "E03",
+        "E07"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人：從 Remix/app/sitemap.ts、lib/seo/metadata和routes取得公開URL清單",
+        "新 KinnsoOS/app/robots.ts、app/sitemap.ts、lib/seo/policy.ts、lib/seo/redirects.ts、app/opengraph-image.tsx",
+        "新 tests/e2e/seo-migration.spec.ts、scripts/check-url-parity.ts"
+      ],
+      "interfaces": "UrlMapping{oldUrl,newUrl,disposition:\"redirect\"|\"retain\"|\"gone\",reason}；metadata與hreflang只指向實際存在內容語言；非公開route不進sitemap。",
+      "acceptance": [
+        "每個舊published URL有明確對應、無loop/chain；legacy仍服務時不假稱已切換",
+        "公開guide/creator/article正確canonical/title/OG；私有trip/share/login/ops不索引",
+        "staging維持noindex；production只在K25放行後啟用公開內容",
+        "WhatsApp/link preview和無JS render用真實頁面驗，不只單測metadata函式"
+      ],
+      "implementation": [
+        "先生成URL parity inventory及實際response基線",
+        "按相同content ID建redirect，未遷移內容retain舊canonical並標示handoff",
+        "SSR內容、多語metadata、照片尺寸與作者/更新日期；structured data只描述真實內容",
+        "crawl和preview驗證；正式domain未確定前使用staging測mapping，不開SEOlaunch"
+      ],
+      "verification": "npm run test:e2e -- tests/e2e/seo-migration.spec.ts；npm run check:url-parity（本任務建立）；sitemap crawl每URL記status/canonical/robots。",
+      "external_dependencies": "正式domain及切換日期尚未指定；不改DNS/原站redirect直到具體發布方案獲授權。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_3",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K24",
+      "title": "增長、成本和服務監察",
+      "batch": 3,
+      "step": 5,
+      "depends_on": [
+        "K16",
+        "K19",
+        "K22"
+      ],
+      "requirements": [
+        "A08",
+        "A09",
+        "A10",
+        "A15",
+        "A17",
+        "G13",
+        "G17",
+        "G18"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "新 KinnsoOS/lib/telemetry/events.ts、performance.ts；私人backend聚合/費用adapters",
+        "新 docs/implementation/METRICS_AND_ALERTS.md",
+        "新 tests/telemetry.privacy.test.mjs、tests/cost-limits.test.mjs"
+      ],
+      "interfaces": "Event{name,anonymousSessionId?,actorPseudonym?,mode,consent,requestId}；name allowlist guide_viewed/bookmark_saved/trip_created/trip_imported/return_visit/record_saved/guide_published/verified_outcome；Budget{service,period,limit,spent,stopBehavior}。",
+      "acceptance": [
+        "demo/admin/synthetic不混入業務漏斗；analytics consent拒絕時不發未允許追蹤",
+        "事件不含私人note、原始收據、share token、email/password",
+        "AI/maps/storage/jobs成本能按成功流程量測；超budget不產生假成功",
+        "告警有owner/runbook；last successful scheduled run可看，缺資料與零值分開"
+      ],
+      "implementation": [
+        "K16基礎事件延伸到完整funnel，沿用舊analytics consent要求",
+        "收集server request/query latency與client field metrics；樣本不足顯示不足",
+        "設定每service預算、停止/降級行為及告警，缺budget不啟用新付費能力",
+        "以故障注入測一次告警與處理，保留去識別證據"
+      ],
+      "verification": "npm test；以test events驗funnel排除規則、同意與PII遮罩；staging成本限額測試，不製造正式流量。",
+      "external_dependencies": "成本limit數值由Willy/指定owner決定；沒有數值的付費服務維持disabled，其他工程繼續。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_3",
+      "updated_at": "2026-10-01"
+    },
+    {
+      "id": "K25",
+      "title": "備份還原、分批發布與回退",
+      "batch": 3,
+      "step": 5,
+      "depends_on": [
+        "K17",
+        "K18",
+        "K19",
+        "K20",
+        "K21",
+        "K22",
+        "K23",
+        "K24"
+      ],
+      "requirements": [
+        "A01",
+        "A02",
+        "A03",
+        "A15",
+        "A16",
+        "G02",
+        "G03",
+        "G15",
+        "G17",
+        "U01",
+        "U02",
+        "U03",
+        "U04",
+        "U05",
+        "U06"
+      ],
+      "implementation_status": "NOT_STARTED",
+      "files": [
+        "私人 docs/implementation/RELEASE_RUNBOOK.md、RESTORE_DRILL.md、RELEASE_MANIFEST.json",
+        "新舊repo CI/deploy設定只按核實provider調整",
+        "更新00_PRODUCT_SPEC的capability矩陣及06_TASK_LEDGER.json"
+      ],
+      "interfaces": "ReleaseManifest{frontendSha,backendSha,schemaHead,flags,sourceArchiveHash,testRuns,knownLimitations,rollbackTarget}；production readiness不等同stagingPASS。",
+      "acceptance": [
+        "U01–U06全流程有當前SHA證據；所有critical權限/資金/來源邊界問題已解",
+        "backup可還原到隔離target並驗row/media/identity；migration失敗及app回退經演練",
+        "敏感資料不靠noindex保護；publicsource ZIP與release一致",
+        "launch後synthetic和error/funnel告警可用；field p75樣本不足不能稱CWV已通過"
+      ],
+      "implementation": [
+        "先提出可review發布清單：domain、目標、schema delta、影響帳戶、flags、回退；需要授權的最後操作才詢問",
+        "先traveller/creator受控beta，再已通過驗收的merchant/ops能力；未就緒commerce繼續舊系統明確入口",
+        "逐步enable，問題時按feature flag/read-only/app rollback處理；避免對已有新資料直接drop migration",
+        "記錄實際發布結果、post-release checks及尚未關閉事項，交維護手冊與owner"
+      ],
+      "verification": "執行05_UAT_CASES U06；fresh full CI；staging restore drill；production發布後只做核准的非破壞synthetic；未授權發布時交可review PR/runbook，不宣稱已上線。",
+      "external_dependencies": "production目標、正式切換／migration授權及真實商業規則必須具體確定。",
+      "owner": "Codex GPT-6.1 Sol",
+      "verification_status": "NOT_RUN_FOR_THIS_TASK",
+      "completion_evidence": [],
+      "readiness": "WAITING_DEPENDENCIES",
+      "gate": "BATCH_3",
+      "updated_at": "2026-10-01"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "A01",
+      "priority": "P0",
+      "title": "分支、部署與資料庫狀態未對齊；容易把未合併的個人行程当成不存在，或當成已上線",
+      "source_acceptance": "建立 release manifest：commit、schema version、flags、tests；先整合候選分支至 staging",
+      "tasks": [
+        "K00",
+        "K02",
+        "K05",
+        "K06",
+        "K16",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A02",
+      "priority": "P0",
+      "title": "新 repo 公開、舊 repo 私人；直接搬 private backend 會改變披露範圍",
+      "source_acceptance": "選擇保持後端私人並經 API 整合，或先確定 repo 可見性／程式發布範圍；本次沒有公開私人後台實作",
+      "tasks": [
+        "K01",
+        "K03",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A03",
+      "priority": "P0",
+      "title": "demo 行程與商業狀態不能成為正式資料來源",
+      "source_acceptance": "將 demo/live mode 分開；真實寫入必须由 session、RLS、transaction 驗證，斷線顯示明確狀態",
+      "tasks": [
+        "K01",
+        "K04",
+        "K06",
+        "K07",
+        "K09",
+        "K11",
+        "K12",
+        "K16",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A04",
+      "priority": "P1",
+      "title": "首頁「Book the trip…／Book in one place」與 booking 尚未開放的訊息混合",
+      "source_acceptance": "核心 CTA 改為探索／收藏／規劃；僅於 booking flag + 可售庫存成立時顯示預訂",
+      "tasks": [
+        "K01",
+        "K04",
+        "K23"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A05",
+      "priority": "P1",
+      "title": "主導覽將旅人、內容、AI、creators/merchants 與 acquisition links 同級排列，主要任務不突出",
+      "source_acceptance": "首層保留 Explore／Trips／Record；角色工作區另設切換；320px、200% 文字放大與鍵盤驗收",
+      "tasks": [
+        "K04",
+        "K16"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A06",
+      "priority": "P1",
+      "title": "舊攻略缺少可套用的結構化天數／站點；兩邊資料模型不相容",
+      "source_acceptance": "summary-only 攻略保留為閱讀型；先建 rich guide/version/adoption contract，不能用 AI 猜造來源站點",
+      "tasks": [
+        "K08",
+        "K10",
+        "K11",
+        "K16",
+        "K17"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A07",
+      "priority": "P1",
+      "title": "main 的探索查詢忽略 error，服務故障可顯示「沒有攻略」",
+      "source_acceptance": "接續 #131，保留 retry、搜尋條件與可觀察錯誤；新 adapter 已區分 ready/empty/error/unconfigured",
+      "tasks": [
+        "K02",
+        "K08"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "PARTIAL_UNMERGED",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A08",
+      "priority": "P1",
+      "title": "Explore 讀取未設硬上限，再於 client 篩選，資料增加時 payload/記憶體與 row-cap 風險上升",
+      "source_acceptance": "server filter/pagination、穩定排序、lookahead；新 adapter 每頁12+1，最大100頁，後續大目錄改 keyset",
+      "tasks": [
+        "K08",
+        "K19",
+        "K24"
+      ],
+      "batches": [
+        1,
+        2,
+        3
+      ],
+      "status": "PARTIAL_UNMERGED",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A09",
+      "priority": "P1",
+      "title": "審核 queue 全量讀取；mission detail 亦先載入整個 queue 再篩選",
+      "source_acceptance": "將 mission/status/cursor 帶入 SQL；detail 只取自身紀錄。用多於服務 row limit 的 fixture 驗收",
+      "tasks": [
+        "K19",
+        "K24"
+      ],
+      "batches": [
+        2,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A10",
+      "priority": "P0 before scale",
+      "title": "結算 queue 全量讀取後 client 彙總，超過 API 上限時可能缺列／總額不完整",
+      "source_acceptance": "總額用 server aggregate + currency/status filter；列表 keyset；不要從當頁 rows 計財務總額。本次未見真實金額錯誤",
+      "tasks": [
+        "K19",
+        "K21",
+        "K24"
+      ],
+      "batches": [
+        2,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A11",
+      "priority": "P1",
+      "title": "Admin 首頁以六個總數為主，缺乏待辦老化、逾期、指派與下一步",
+      "source_acceptance": "首屏設待審閱、付款例外、逾期核驗，附數量/最舊日期/負責人/動作；保留總覽作次要資訊",
+      "tasks": [
+        "K19"
+      ],
+      "batches": [
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A12",
+      "priority": "P1",
+      "title": "Admin 12個導覽項目在小屏使用橫向 flex，未見 wrap/overflow 控制，存在手機溢出風險",
+      "source_acceptance": "以角色側欄+手機 drawer；本項為源碼風險，待登入後實際量測",
+      "tasks": [
+        "K04",
+        "K19"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A13",
+      "priority": "P1",
+      "title": "登入後回到原任務及 save intent 的問題已在 #131 修正，但尚未合併",
+      "source_acceptance": "保留安全 next allowlist；匿名 save→signin→返回原攻略且明確完成/待重試，不可静默丟失",
+      "tasks": [
+        "K02",
+        "K07",
+        "K16"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "PARTIAL_UNMERGED",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A14",
+      "priority": "P1",
+      "title": "Agent 回覆來源只有 `kyoto-temples-weekend` 純文字 slug；未完成完整兩日結構，並聲稱收藏會收到開放預訂通知",
+      "source_acceptance": "回傳可點 canonical URL；render Markdown；對通知／付款採能力白名單。通知聲稱是否有服務支持仍待證實",
+      "tasks": [
+        "K20",
+        "K22"
+      ],
+      "batches": [
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A15",
+      "priority": "P1",
+      "title": "最新夜間測試等待 guide→experience link 超時，後續 sitemap crawl 被跳過；監察覆蓋中斷",
+      "source_acceptance": "修 test 使用可選 link 探測/有限等待，找到有 attributed experience 的 deterministic fixture；獨立 sitemap job。另核對內容關聯是否缺失，不要只延長 timeout",
+      "tasks": [
+        "K05",
+        "K24",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A16",
+      "priority": "P1",
+      "title": "#133 的無障礙工作有實際價值但仍未完成，不能寫「全面通過」",
+      "source_acceptance": "合併前解決例外或確定整改期限；人工 NVDA/VoiceOver 驗證；新 repo 也需獨立測試",
+      "tasks": [
+        "K02",
+        "K04",
+        "K05",
+        "K16",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "PARTIAL_UNMERGED",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A17",
+      "priority": "P1",
+      "title": "Journeys 將資料及照片 data URL 寫入本機 storage，容量、同步及多裝置連續性受限",
+      "source_acceptance": "先穩定 local export/recovery，再接 object storage + metadata + optimistic concurrency；photo 不放入整份同步 JSON",
+      "tasks": [
+        "K09",
+        "K11",
+        "K12",
+        "K13",
+        "K16",
+        "K24"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A18",
+      "priority": "P2",
+      "title": "舊站 Explore 可見卡片使用漸層 fallback，與照片導向旅遊決策不匹配",
+      "source_acceptance": "補內容 cover 品質與比例；空圖仍保留標題、目的地、作者及 accessible name",
+      "tasks": [
+        "K08",
+        "K13",
+        "K23"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A19",
+      "priority": "P2",
+      "title": "Journeys UI/model 混合多個領域，原始檔案有大量壓縮式長行；維護与首屏負擔較高",
+      "source_acceptance": "格式化、按領域拆分、延遲載入非旅人 workspace；本次先 lazy chunks，CSS/fixtures 仍待進一步整理",
+      "tasks": [
+        "K04",
+        "K11",
+        "K16"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "PARTIAL_UNMERGED",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "A20",
+      "priority": "P1",
+      "title": "Locale URL 不一致：Journeys `zh-HK`，舊站只接受 `zh-hk`",
+      "source_acceptance": "新 repo 已集中轉換且有 regression test；避免自行拼接 locale",
+      "tasks": [
+        "K04",
+        "K08",
+        "K23"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "PARTIAL_UNMERGED",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G01",
+      "priority": "開發前",
+      "title": "首期核心價值與商業次序",
+      "source_acceptance": "新旅人不用教學，可從攻略完成一份可再次打開的私人行程；另行決定是否把商戶活動收入列為首期核心",
+      "tasks": [
+        "K00",
+        "K01",
+        "K11",
+        "K16"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G02",
+      "priority": "開發前",
+      "title": "舊功能去留與完成定義",
+      "source_acceptance": "每個被保留的按鈕有真實結果與權限；handoff、demo 和 unavailable 明確標示",
+      "tasks": [
+        "K00",
+        "K01",
+        "K02",
+        "K04",
+        "K23",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G03",
+      "priority": "開發前",
+      "title": "新舊系統關係與資料歸屬",
+      "source_acceptance": "同一用戶不因換站產生兩個帳戶；商戶和創作者 ID 可追溯；migration mapping 可核對",
+      "tasks": [
+        "K01",
+        "K06",
+        "K07",
+        "K09",
+        "K11",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G04",
+      "priority": "首期",
+      "title": "匿名用戶、身份升級與多角色 onboarding",
+      "source_acceptance": "手機收藏→登入→回原頁；social scan 中斷後續做；商戶職員離職後失去該店操作權",
+      "tasks": [
+        "K02",
+        "K07",
+        "K16",
+        "K17",
+        "K18"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G05",
+      "priority": "首期",
+      "title": "本機 demo 資料的正式匯入",
+      "source_acceptance": "連按兩次匯入不產生兩份行程；網路中斷後不出現「已儲存」假成功",
+      "tasks": [
+        "K07",
+        "K09",
+        "K12",
+        "K13",
+        "K16"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G06",
+      "priority": "首期",
+      "title": "行程內容所有權與分享",
+      "source_acceptance": "A 分享给 B，B 不會看到私人備忘或收據；creator 下架來源不會刪掉旅人自己寫的筆記",
+      "tasks": [
+        "K09",
+        "K10",
+        "K11",
+        "K12",
+        "K13",
+        "K14",
+        "K16",
+        "K17"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G07",
+      "priority": "首期",
+      "title": "真正可出行的行程",
+      "source_acceptance": "上午10點的店不可排到9點；未知營業時間明示未核實；跨日／時區顯示一致",
+      "tasks": [
+        "K08",
+        "K15",
+        "K16",
+        "K22"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G08",
+      "priority": "首期",
+      "title": "手機旅行中的使用",
+      "source_acceptance": "旅途中斷網仍可讀已下載行程；修改顯示待同步；不宣稱有未建好的離線地圖",
+      "tasks": [
+        "K09",
+        "K12",
+        "K13",
+        "K14",
+        "K16"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G09",
+      "priority": "首期",
+      "title": "地點與內容品質",
+      "source_acceptance": "「京都」與「Kyoto」指向同目的地；過期推薦可回報、指派、修訂而不清空原稿",
+      "tasks": [
+        "K08",
+        "K10",
+        "K15",
+        "K16",
+        "K17",
+        "K19",
+        "K23"
+      ],
+      "batches": [
+        1,
+        2,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G10",
+      "priority": "首期",
+      "title": "創作者由素材到發布",
+      "source_acceptance": "沒有商戶任務的 creator 也能產出首篇攻略；公開預覽不帶私人筆記；掃描失敗可人工輸入",
+      "tasks": [
+        "K10",
+        "K13",
+        "K17",
+        "K22"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G11",
+      "priority": "商業上線前",
+      "title": "商戶組織、分店和職員",
+      "source_acceptance": "店員只核銷所屬店優惠，看不到全公司 payout；下架優惠不影響歷史核對",
+      "tasks": [
+        "K18",
+        "K19",
+        "K21"
+      ],
+      "batches": [
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G12",
+      "priority": "商業上線前",
+      "title": "收入定義、對帳及爭議",
+      "source_acceptance": "同一 QR／收據重播不重覆計獎；通知失敗不阻斷交易；退款保留原紀錄及調整紀錄",
+      "tasks": [
+        "K01",
+        "K18",
+        "K21"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G13",
+      "priority": "首期",
+      "title": "通知、提醒和客服",
+      "source_acceptance": "Creator 被要求補件後能回到該 submission；商戶未處理申請有待辦；沒有實際 delivery 不顯示「已通知」",
+      "tasks": [
+        "K17",
+        "K20",
+        "K24"
+      ],
+      "batches": [
+        2,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G14",
+      "priority": "首期",
+      "title": "營運每日工作與批次處理",
+      "source_acceptance": "100項中3項失敗只重試3項；任務分配明確；批次結果可追溯，不依靠工程師手改資料",
+      "tasks": [
+        "K19",
+        "K20"
+      ],
+      "batches": [
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G15",
+      "priority": "公開前",
+      "title": "SEO、GEO、分享與語言",
+      "source_acceptance": "舊 creator/guide link 可到對應新內容；WhatsApp 分享正確封面；英文首個 HTML 也是英文語言標記",
+      "tasks": [
+        "K04",
+        "K08",
+        "K14",
+        "K23",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G16",
+      "priority": "首期",
+      "title": "AI 的任務和驗收",
+      "source_acceptance": "對相同資料集測有根據、無資料、過期、矛盾、惡意內容、timeout；不得憑空確定可預訂／已付款／已通知",
+      "tasks": [
+        "K22"
+      ],
+      "batches": [
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G17",
+      "priority": "公開前",
+      "title": "發布、還原與檔案邊界",
+      "source_acceptance": "從乾淨環境可重建；新 migration 失敗有回退途徑；source ZIP 不含私人工作檔；公開圖片URL不泄露私人收據",
+      "tasks": [
+        "K01",
+        "K03",
+        "K05",
+        "K06",
+        "K13",
+        "K14",
+        "K16",
+        "K21",
+        "K24",
+        "K25"
+      ],
+      "batches": [
+        1,
+        2,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "G18",
+      "priority": "首期",
+      "title": "增長、留存與成本",
+      "source_acceptance": "能分清「看攻略」「真正建立行程」「旅行後回來」，排除 demo/admin 活動；不用 pageviews 當全部成功",
+      "tasks": [
+        "K16",
+        "K24"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E01",
+      "priority": "",
+      "title": "KinnsoOS PR #1 的 `/workspace`、`/admin` 是原站入口；`/library` 尚待 backend config；個人行程為本機 demo",
+      "source_acceptance": "首期成果是 foundation，不是完整功能搬遷。下期要清楚指定哪些流程須在新站完成",
+      "tasks": [
+        "K00",
+        "K01"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E02",
+      "priority": "",
+      "title": "新 `app/layout.tsx:12` 及 locale page metadata 全站 noindex/nofollow",
+      "source_acceptance": "Preview 階段合理；正式發布要按 public/private route 設索引策略，不可全站直接切 index",
+      "tasks": [
+        "K04",
+        "K23"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E03",
+      "priority": "",
+      "title": "新 `app/layout.tsx:16` 固定 `lang=\"zh-HK\"`；Workbench 掛載後才設當前 locale",
+      "source_acceptance": "英文初始 HTML 語言不正確。應在 server render 設 locale，並測無 JS／screen reader／metadata",
+      "tasks": [
+        "K04",
+        "K23"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E04",
+      "priority": "",
+      "title": "新 `scripts/package-source.py:7–12` 遍歷工作目錄，採排除清單打包",
+      "source_acceptance": "日後放入非公開附件或其他命名 secrets 可能被誤收。本次未發現資料洩漏；改用 reviewed manifest／tracked allowlist，核對 ZIP 內容和版本",
+      "tasks": [
+        "K03"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E05",
+      "priority": "",
+      "title": "舊 `lib/notifications/queries.ts` 已有本人 notifications／unread count RPC；設計文件範圍為 creator in-app inbox",
+      "source_acceptance": "不應重新宣稱「尚無通知」。但 in-app inbox 不代表 email/push、商戶訊息或 traveller booking alert 已完成",
+      "tasks": [
+        "K02",
+        "K20"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E06",
+      "priority": "",
+      "title": "舊 `lib/onboarding/resumeRoute.ts` 已有 wait/handles/progress/review/retry/done，配合 social scan job 狀態",
+      "source_acceptance": "遷移要保留中斷續做、失敗重試和人工覆核，不只重畫註冊表格",
+      "tasks": [
+        "K02",
+        "K17"
+      ],
+      "batches": [
+        1,
+        2
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E07",
+      "priority": "",
+      "title": "舊 `app/sitemap.ts` 包含文章、攻略、創作者、商戶、體驗、sessions、destinations 及分片",
+      "source_acceptance": "新站只有行程介面不足以等同完整替換；需要 SEO/URL/內容遷移清單",
+      "tasks": [
+        "K23"
+      ],
+      "batches": [
+        3
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E08",
+      "priority": "",
+      "title": "新 catalog 是文字 ilike 搜尋與 city 精確匹配；沒有目的地別名或跨語言搜尋映射",
+      "source_acceptance": "不保證「京都／Kyoto」、「香港／Hong Kong」得到相同結果；應定義 destination ID 與 aliases",
+      "tasks": [
+        "K08"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "E09",
+      "priority": "",
+      "title": "舊 #131 trip RPC 有 revision；day/stop 直接更新不自動產生 trip revision",
+      "source_acceptance": "必須決定行程歷史是「trip 基本資料變更紀錄」還是「每次站點／筆記變更可還原」，不可用同一說法混淆",
+      "tasks": [
+        "K02",
+        "K06",
+        "K09",
+        "K10"
+      ],
+      "batches": [
+        1
+      ],
+      "status": "OPEN",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "U01",
+      "priority": "END_TO_END",
+      "title": "第一次來的旅人",
+      "source_acceptance": "詳見05_UAT_CASES.md及原始補充需求",
+      "tasks": [
+        "K16",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "NOT_VERIFIED_END_TO_END",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "U02",
+      "priority": "END_TO_END",
+      "title": "旅途中與分享",
+      "source_acceptance": "詳見05_UAT_CASES.md及原始補充需求",
+      "tasks": [
+        "K16",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "NOT_VERIFIED_END_TO_END",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "U03",
+      "priority": "END_TO_END",
+      "title": "新創作者產出第一篇攻略",
+      "source_acceptance": "詳見05_UAT_CASES.md及原始補充需求",
+      "tasks": [
+        "K17",
+        "K25"
+      ],
+      "batches": [
+        2,
+        3
+      ],
+      "status": "NOT_VERIFIED_END_TO_END",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "U04",
+      "priority": "END_TO_END",
+      "title": "商戶的第一個可核實成果",
+      "source_acceptance": "詳見05_UAT_CASES.md及原始補充需求",
+      "tasks": [
+        "K18",
+        "K21",
+        "K25"
+      ],
+      "batches": [
+        2,
+        3
+      ],
+      "status": "NOT_VERIFIED_END_TO_END",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "U05",
+      "priority": "END_TO_END",
+      "title": "營運一日工作與失敗處理",
+      "source_acceptance": "詳見05_UAT_CASES.md及原始補充需求",
+      "tasks": [
+        "K19",
+        "K21",
+        "K25"
+      ],
+      "batches": [
+        2,
+        3
+      ],
+      "status": "NOT_VERIFIED_END_TO_END",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    },
+    {
+      "id": "U06",
+      "priority": "END_TO_END",
+      "title": "發布切換",
+      "source_acceptance": "詳見05_UAT_CASES.md及原始補充需求",
+      "tasks": [
+        "K16",
+        "K25"
+      ],
+      "batches": [
+        1,
+        3
+      ],
+      "status": "NOT_VERIFIED_END_TO_END",
+      "closure_rule": "所有對應task acceptance有目前SHA證據；若只完成一批，只更新partial，不能關閉整項。"
+    }
+  ],
+  "evidence_template": {
+    "taskId": null,
+    "frontendSha": null,
+    "backendSha": null,
+    "schemaHead": null,
+    "environment": null,
+    "command": null,
+    "result": "NOT_RUN",
+    "artifact": null,
+    "observedAt": null,
+    "reviewer": null,
+    "skips": [],
+    "limitations": []
+  },
+  "update_rules": [
+    "Never count a mock/demo/handoff as a completed live workflow",
+    "DONE requires all task acceptance evidence on current heads",
+    "Keep merge/deployment status separate",
+    "A blocked gate does not prevent independent ready tasks",
+    "Never include credentials or private user content in evidence"
+  ],
+  "execution_current": {
+    "observedAt": "2026-10-02T17:01:19.221210+00:00",
+    "frontendSha": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "backendSha": "b5f577533c07be354091e88861a7138639b0c7b5",
+    "schemaHead": "20261002154501",
+    "historicalBaselinePreserved": true,
+    "status": "PARTIAL",
+    "unresolved": [
+      "Approved cloud staging project/ref/deployment access and callbacks",
+      "Verified real creator/content/cover rights",
+      "Physical iOS Safari/Android and screen reader",
+      "Cloud cleanup schedule and access-log token redaction",
+      "Cloud rollback rehearsal; production NOT_RUN"
+    ]
+  }
+}

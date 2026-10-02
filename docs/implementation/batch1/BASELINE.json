@@ -1,0 +1,53 @@
+{
+  "observedAt": "2026-10-02T17:01:13.780931+00:00",
+  "status": "LOCAL_IMPLEMENTATION_REMOTE_GATES_PENDING",
+  "originalPublicHead": "f181cff22d28a480120c2abaa2dde91c573582bf",
+  "originalPrivateMain": "e086fbfc4e2bc4447dc9bbbe71af1290c866adaf",
+  "originalPrivateCandidate": "62d7860d7454aea99d891a832b867795197d4df9",
+  "public": {
+    "visibility": "public",
+    "head": "ecc62d773837a4881cdcfbbcf2a8285bf0efea9f",
+    "branch": "feat/batch1-traveller",
+    "remote": "https://github.com/YNWAforever/KinnsoOS.git",
+    "lockfileSha256": "2d860a900cff0dfb4e1f8e23538bef53375e923df6ecd16f6c8fa3cf00cff06d",
+    "runtime": "Node 24.18.0 / npm 11.16.0 / Next 16.3.8",
+    "deploySha": "UNKNOWN"
+  },
+  "private": {
+    "visibility": "private",
+    "head": "b5f577533c07be354091e88861a7138639b0c7b5",
+    "branch": "feat/batch1-services",
+    "remote": "https://github.com/YNWAforever/Remix-Kinnso.git",
+    "lockfileSha256": "ec2edf79285ea14520cf1b9124c469af130c4043474cf96518827720a2c3f4cc",
+    "packageManager": "pnpm 11.6.0",
+    "deploySha": "UNKNOWN"
+  },
+  "localSchemaHead": "20261002154501",
+  "hostedSchemaHead": "UNKNOWN",
+  "inputPackHashes": {
+    "00_PRODUCT_SPEC.md": true,
+    "00_START_HERE.txt": true,
+    "01_COMPLETE_READING_VIEW.html": true,
+    "01_MASTER_PLAN.md": true,
+    "02_BATCH_1_TASKS.md": true,
+    "03_LATER_BATCHES.md": true,
+    "04_TRACEABILITY.md": true,
+    "05_UAT_CASES.md": true,
+    "06_TASK_LEDGER.json": true,
+    "07_DECISIONS_AND_BLOCKERS.md": true,
+    "08_EVIDENCE_MANIFEST.json": true,
+    "README.md": true,
+    "sources/GITHUB_SNAPSHOT.json": true,
+    "sources/KinnsoOS_Audit_2026-10-01.md": true,
+    "sources/KinnsoOS_Evidence_2026-10-01.zip": true,
+    "sources/KinnsoOS_Requirements_Gap_Review_2026-10-01_zhHK.md": true
+  },
+  "delta": [
+    "Candidate heads unchanged from supplied snapshot at initial live verification.",
+    "Workspace was initially empty. Public PR1 branch cloned instead of empty main.",
+    "Private #133/#132/#130 integrated on isolated #131 review branch only.",
+    "Original private checkout and untracked user files retained untouched.",
+    "Windows fileURL test failure corrected. Initial private suite had no env/test execution; full local suite subsequently armed.",
+    "Published/deployed heads remain UNKNOWN until release owner verifies external target."
+  ]
+}
